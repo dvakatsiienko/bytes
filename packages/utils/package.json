@@ -1,0 +1,9 @@
+{
+    "name": "utils",
+    "version": "0.0.1",
+    "main": "./calc.ts",
+    "types": "./calc.ts",
+    "exports": {
+        ".": "./calc.ts"
+    }
+}

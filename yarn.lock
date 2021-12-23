@@ -20211,6 +20211,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"utils@workspace:packages/utils":
+  version: 0.0.0-use.local
+  resolution: "utils@workspace:packages/utils"
+  languageName: unknown
+  linkType: soft
+
 "uuid@npm:8.3.2, uuid@npm:^8.0.0":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
