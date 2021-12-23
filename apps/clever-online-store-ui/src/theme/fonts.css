@@ -1,0 +1,84 @@
+/* roboto-100 - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 100;
+    src: local(''), url('/fonts/roboto/roboto-100.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-100italic - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 100;
+    src: local(''), url('/fonts/roboto/roboto-100i.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-300 - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 300;
+    src: local(''), url('/fonts/roboto/roboto-300.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-300italic - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 300;
+    src: local(''), url('/fonts/roboto/roboto-300i.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-italic - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 400;
+    src: local(''), url('/fonts/roboto/roboto-400.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-regular - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: local(''), url('/fonts/roboto/roboto-400.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-500 - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    src: local(''), url('/fonts/roboto/roboto-500.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-500italic - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 500;
+    src: local(''), url('/fonts/roboto/roboto-500i.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-700 - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    src: local(''), url('/fonts/roboto/roboto-700.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-700italic - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 700;
+    src: local(''), url('/fonts/roboto/roboto-700i.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-900 - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 900;
+    src: local(''), url('/fonts/roboto/roboto-900.woff2') format('woff2'); /* Super Modern Browsers */
+}
+/* roboto-900italic - latin_cyrillic */
+@font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 900;
+    src: local(''), url('/fonts/roboto/roboto-900i.woff2') format('woff2'); /* Super Modern Browsers */
+}

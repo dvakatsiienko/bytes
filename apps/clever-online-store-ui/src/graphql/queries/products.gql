@@ -1,0 +1,105 @@
+# Query
+query allProducts($first: Int, $skip: Int = 0) {
+    allProducts(first: $first, skip: $skip, sortBy: id_DESC) {
+        ...product
+    }
+}
+
+query productsCount {
+    _allProductsMeta {
+        count
+    }
+}
+
+query product($id: ID!) {
+    product: Product(where: { id: $id }) {
+        ...product
+    }
+}
+
+query searchProducts($searchTerm: String!) {
+    searchTerms: allProducts(
+        where: {
+            OR: [
+                { name_contains_i: $searchTerm }
+                { description_contains_i: $searchTerm }
+            ]
+        }
+    ) {
+        id
+        name
+        photo {
+            image {
+                publicUrlTransformed
+            }
+        }
+    }
+}
+
+# Mutation
+mutation createProduct(
+    $name: String!
+    $description: String!
+    $price: Int!
+    $image: Upload
+) {
+    createProduct(
+        data: {
+            name: $name
+            description: $description
+            price: $price
+            status: "AVAILABLE"
+            photo: { create: { image: $image, altText: $name } }
+        }
+    ) {
+        ...product
+    }
+}
+
+mutation updateProduct(
+    $id: ID!
+    $name: String!
+    $description: String!
+    $price: Int!
+) {
+    updateProduct(
+        id: $id
+        data: { name: $name, description: $description, price: $price }
+    ) {
+        ...product
+    }
+}
+
+mutation deleteProduct($id: ID!) {
+    deleteProduct(id: $id) {
+        ...product
+    }
+}
+
+mutation addToCart($productId: ID!) {
+    addToCart(productId: $productId) {
+        id
+    }
+}
+
+mutation removeFromCart($productId: ID!) {
+    deleteCartItem(id: $productId) {
+        id
+    }
+}
+
+# Fragment
+fragment product on Product {
+    id
+    name
+    price
+    description
+    status
+    photo {
+        id
+        altText
+        image {
+            publicUrlTransformed
+        }
+    }
+}

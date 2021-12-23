@@ -1,11 +1,13 @@
 {
-  "name": "tsconfig",
-  "version": "0.0.0",
-  "private": true,
-  "main": "index.js",
-  "files": [
-    "base.json",
-    "nextjs.json",
-    "react-library.json"
-  ]
+    "name": "tsconfig",
+    "version": "0.0.3",
+    "repository": "git@github.com:dvakatsiienko/tsconfig-dva.git",
+    "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
+    "license": "MIT",
+    "main": "tsconfig.json",
+    "keywords": [
+        "typescript",
+        "tsconfig",
+        "dvakatsiienko"
+    ]
 }

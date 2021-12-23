@@ -1,0 +1,11 @@
+@import 'sanitize.css';
+@import './palette.css';
+@import './typography/index.css';
+
+:root {
+    background-color: var(--color-3);
+}
+
+body {
+    padding: 8px;
+}
