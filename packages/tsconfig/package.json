@@ -5,6 +5,9 @@
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "license": "MIT",
     "main": "tsconfig.json",
+    "exports": {
+        ".": "./tsconfig.json"
+    },
     "keywords": [
         "typescript",
         "tsconfig",
