@@ -1,0 +1,50 @@
+{
+    "name": "clever-online-store-api",
+    "version": "0.0.4",
+    "private": true,
+    "scripts": {
+        "start": "keystone-next",
+        "build": "keystone-next build",
+        "serve": "keystone-next start",
+        "seed-data": "keystone-next --seed-data",
+        "check-all": "run-p check:*",
+        "check:ts": "tsc --project ./tsconfig.json",
+        "prettify": "prettier-eslint --write \"$PWD/src/**/*.{ts,tsx}\"",
+        "check:eslint": "eslint --max-warnings 10 ./src",
+        "prepare": "husky install",
+        "release": "release-it --ci"
+    },
+    "dependencies": {
+        "@keystone-next/admin-ui": "12.0.1",
+        "@keystone-next/auth": "19.0.0",
+        "@keystone-next/cloudinary": "3.0.5",
+        "@keystone-next/fields": "5.4.0",
+        "@keystone-next/keystone": "14.0.1",
+        "@keystone-next/types": "15.0.1",
+        "@keystonejs/server-side-graphql-client": "2.1.0",
+        "dotenv": "10.0.0",
+        "next": "10.1.2",
+        "nodemailer": "6.7.2",
+        "react": "17.0.2",
+        "react-dom": "17.0.2",
+        "stripe": "8.195.0"
+    },
+    "devDependencies": {
+        "@babel/preset-env": "7.16.5",
+        "@babel/preset-react": "7.16.5",
+        "@babel/preset-typescript": "7.16.5",
+        "@types/nodemailer": "6.4.4",
+        "@typescript-eslint/eslint-plugin": "5.8.0",
+        "@typescript-eslint/parser": "5.8.0",
+        "auto-changelog": "2.3.0",
+        "eslint": "8.5.0",
+        "eslint-config-dva": "0.0.16",
+        "husky": "7.0.4",
+        "npm-run-all": "4.1.5",
+        "prettier": "2.5.1",
+        "prettier-eslint-cli": "5.0.1",
+        "release-it": "14.11.8",
+        "tsconfig-dva": "0.0.3",
+        "typescript": "4.5.4"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "projects": {
+        "app": {
+            "schemaPath": "http://localhost:4000/graphql",
+            "includes": [
+                "**/**/*.graphql"
+            ]
+        }
+    }
+}

@@ -6,18 +6,22 @@
         "apps/*",
         "packages/*"
     ],
+    "packageManager": "yarn@3.1.1",
     "scripts": {
         "build": "turbo run build",
         "dev": "turbo run dev --parallel",
+        "start:hackernews": "turbo run start --scope=\"@hackernews/*\"",
         "lint": "turbo run lint",
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "devDependencies": {
+        "eslint": "8.5.0",
         "prettier": "2.5.1",
-        "turbo": "latest"
+        "turbo": "1.0.22"
     },
     "turbo": {
         "baseBranch": "origin/main",
+        "npmClient": "yarn",
         "pipeline": {
             "build": {
                 "dependsOn": [
@@ -32,6 +36,9 @@
                 "outputs": []
             },
             "dev": {
+                "cache": false
+            },
+            "start": {
                 "cache": false
             }
         }

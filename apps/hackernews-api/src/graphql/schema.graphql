@@ -1,0 +1,73 @@
+scalar Date
+
+type Query {
+    feed(filter: String, skip: Int, take: Int, orderBy: OrderByInput): Feed!
+    post(id: ID!): Post!
+    users: [User!]!
+    user(id: ID!): User!
+    authenticate(token: String!): User
+}
+
+type Mutation {
+    signup(email: String!, password: String!, name: String!): AuthPayload
+    login(email: String!, password: String!): AuthPayload
+
+    updateUser(id: ID!, name: String, email: String, bio: String): User!
+
+    createPost(url: String!, description: String!): Post!
+    updatePost(id: ID!, url: String!, description: String!): Post!
+    deletePost(id: ID!): Boolean!
+
+    vote(postId: ID!): Vote!
+    unVote(postId: ID!): Vote!
+}
+
+type Subscription {
+    postCreated: Post!
+    postVoted: Vote!
+}
+
+type AuthPayload {
+    token: String
+    user: User!
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    bio: String
+    posts: [Post!]!
+    votes: [Vote!]!
+}
+
+type Feed {
+    posts: [Post!]!
+    count: Int!
+}
+
+type Post {
+    id: ID!
+    description: String!
+    url: String!
+    postedBy: User!
+    votes: [Vote!]!
+    createdAt: Date!
+    isVotedByMe: Boolean!
+}
+
+input OrderByInput {
+    createdAt: ORDER_BY_ENUM
+    voteCount: ORDER_BY_ENUM
+}
+
+type Vote {
+    id: ID!
+    post: Post!
+    user: User!
+}
+
+enum ORDER_BY_ENUM {
+    asc
+    desc
+}

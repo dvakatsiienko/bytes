@@ -1,0 +1,35 @@
+schema: ${NEXT_PUBLIC_DEV_GQL_URL}
+documents: 'src/graphql/**/*.gql'
+
+config:
+    enumsAsConst: true
+
+generates:
+    src/graphql/operation-types.tsx:
+        config:
+            exportFragmentSpreadSubTypes: true
+            documentMode: graphQLTag
+        plugins:
+            - typescript
+            - typescript-operations
+            - typescript-react-apollo
+            - typescript-apollo-client-helpers
+hooks:
+    afterAllFileWrite:
+        - prettier-eslint --write
+
+# ? 06.10.2021 - was't updated to work properly.
+# ? possibly deprecate in favor of React Server Components.
+# src/graphql/ssr-types.tsx:
+#     config:
+#         documentMode: external
+#         importDocumentNodeExternallyFrom: ./operation-types
+#         reactApolloVersion: 3
+#         withHooks: true
+#         withHOC: false
+#         apolloClientInstanceImport: ../lib
+#     preset: import-types
+#     presetConfig:
+#         typesPath: ./operation-types
+#     plugins:
+#         - graphql-codegen-apollo-next-ssr
