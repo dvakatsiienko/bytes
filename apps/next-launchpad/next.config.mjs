@@ -2,7 +2,7 @@
 import createWithBundleAnalyzer from '@next/bundle-analyzer';
 
 const withBundleAnalyzer = createWithBundleAnalyzer({
-    enabled: process.env.ANALYZE === 'true',
+    enabled:      process.env.ANALYZE === 'true',
     defaultSizes: 'gzip',
 });
 
@@ -11,7 +11,7 @@ const withBundleAnalyzer = createWithBundleAnalyzer({
  */
 const nextConfig = {
     images: {
-        domains: ['images.unsplash.com'],
+        domains: [ 'images.unsplash.com' ],
     },
 };
 

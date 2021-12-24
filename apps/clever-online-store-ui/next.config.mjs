@@ -1,6 +1,3 @@
-/**
- * @type {import('next').NextConfig}
- */
 /* Core */
 import analyze from '@next/bundle-analyzer';
 
@@ -9,10 +6,11 @@ const withBundleAnalyzer = analyze({
     defaultSizes: 'gzip',
 });
 
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
-    images: {
-        domains: [ 'res.cloudinary.com' ],
-    },
+    images: { domains: [ 'res.cloudinary.com' ] },
     redirects() {
         return [
             {

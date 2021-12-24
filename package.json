@@ -12,6 +12,7 @@
         "dev": "turbo run dev --parallel",
         "start:hackernews": "turbo run start --scope='@hackernews/*'",
         "start:launchpad": "turbo run start --scope=next-launchpad",
+        "start:basic": "turbo run start --scope='@basic/*'",
         "lint": "turbo run lint",
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },

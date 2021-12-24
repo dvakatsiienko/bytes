@@ -1,27 +1,27 @@
 /* Core */
 import createWithTm from 'next-transpile-modules';
 
-const withTm = createWithTm(['utils']);
+const withTm = createWithTm([ 'utils' ]);
 
 /**
  * @type {import('next').NextConfig}
  */
-const config = withTm({
+const config = {
     reactStrictMode: true,
     async redirects() {
         return [
             {
-                source: '/user',
+                source:      '/user',
                 destination: '/new/1',
-                permanent: true,
+                permanent:   true,
             },
             {
-                source: '/new',
+                source:      '/new',
                 destination: '/new/1',
-                permanent: true,
+                permanent:   true,
             },
         ];
     },
-});
+};
 
-export default config;
+export default withTm(config);

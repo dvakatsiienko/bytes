@@ -1565,6 +1565,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@basic/docs@workspace:apps/basic-docs":
+  version: 0.0.0-use.local
+  resolution: "@basic/docs@workspace:apps/basic-docs"
+  dependencies:
+    "@types/react": 17.0.38
+    eslint: 8.5.0
+    next: 12.0.7
+    next-transpile-modules: 9.0.0
+    react: 17.0.2
+    react-dom: 17.0.2
+    tsconfig-core: "*"
+    typescript: 4.5.4
+  languageName: unknown
+  linkType: soft
+
+"@basic/web@workspace:apps/basic-web":
+  version: 0.0.0-use.local
+  resolution: "@basic/web@workspace:apps/basic-web"
+  dependencies:
+    "@types/react": 17.0.38
+    eslint: 8.5.0
+    next: 12.0.7
+    next-transpile-modules: 9.0.0
+    react: 17.0.2
+    react-dom: 17.0.2
+    tsconfig-core: "*"
+    typescript: 4.5.4
+  languageName: unknown
+  linkType: soft
+
 "@cspotcode/source-map-consumer@npm:0.8.0":
   version: 0.8.0
   resolution: "@cspotcode/source-map-consumer@npm:0.8.0"
@@ -2445,7 +2475,6 @@ __metadata:
     sanitize.css: 13.0.0
     sass: 1.45.1
     styled-components: 5.3.3
-    tsconfig: 0.0.3
     typescript: 4.5.4
     waait: 1.0.5
     yup: 0.32.11
@@ -7664,15 +7693,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"config@npm:*":
-  version: 3.3.6
-  resolution: "config@npm:3.3.6"
-  dependencies:
-    json5: ^2.1.1
-  checksum: 53684cae0d1c9fa2fe6db41fa85201aa5ab92dcbe7596d63381e7e48f0cb3dea45bee812dc18ee91a3daf887ec0f3c57bf4acc555629ba7608d5a3b932e61c8e
-  languageName: node
-  linkType: hard
-
 "configstore@npm:^5.0.1":
   version: 5.0.1
   resolution: "configstore@npm:5.0.1"
@@ -8572,22 +8592,6 @@ __metadata:
   checksum: d7381bca22ed11933a1ccf376db7a94bee2c57aa61e490f680124fa2d1cd27e94eba641d9f45be57caab4f9a6579de0983466f620a2cd6230d7ec93312105ae7
   languageName: node
   linkType: hard
-
-"docs@workspace:apps/docs":
-  version: 0.0.0-use.local
-  resolution: "docs@workspace:apps/docs"
-  dependencies:
-    "@types/react": 17.0.38
-    config: "*"
-    eslint: 8.5.0
-    next: 12.0.7
-    next-transpile-modules: 9.0.0
-    react: 17.0.2
-    react-dom: 17.0.2
-    typescript: 4.5.4
-    ui: "*"
-  languageName: unknown
-  linkType: soft
 
 "doctrine@npm:^2.1.0":
   version: 2.1.0
@@ -10471,16 +10475,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob-expand@npm:0.0.2":
-  version: 0.0.2
-  resolution: "glob-expand@npm:0.0.2"
-  dependencies:
-    glob: ~3.1.21
-    lodash: 1.2.x
-  checksum: 89998cc6391e510ed083badc6d7d11628603e7e0d8c227522053841a29262624a6808fa878b31e17820aeb7bd04b1df08626c33cf723d1a3dab51d48d5363709
-  languageName: node
-  linkType: hard
-
 "glob-parent@npm:^5.1.2, glob-parent@npm:~5.1.0, glob-parent@npm:~5.1.2":
   version: 5.1.2
   resolution: "glob-parent@npm:5.1.2"
@@ -10517,17 +10511,6 @@ __metadata:
     once: ^1.3.0
     path-is-absolute: ^1.0.0
   checksum: 78a8ea942331f08ed2e055cb5b9e40fe6f46f579d7fd3d694f3412fe5db23223d29b7fee1575440202e9a7ff9a72ab106a39fee39934c7bedafe5e5f8ae20134
-  languageName: node
-  linkType: hard
-
-"glob@npm:~3.1.21":
-  version: 3.1.21
-  resolution: "glob@npm:3.1.21"
-  dependencies:
-    graceful-fs: ~1.2.0
-    inherits: 1
-    minimatch: ~0.2.11
-  checksum: b7ae26c6b05cb87d77529849dba309481fbea69ed7fe15407bc436a2aff8eb833e779018cabb722a300094e59a7c1010ddecd472f90b950b6dd56502ccef017b
   languageName: node
   linkType: hard
 
@@ -10688,13 +10671,6 @@ __metadata:
   version: 4.2.8
   resolution: "graceful-fs@npm:4.2.8"
   checksum: 5d224c8969ad0581d551dfabdb06882706b31af2561bd5e2034b4097e67cc27d05232849b8643866585fd0a41c7af152950f8776f4dd5579e9853733f31461c6
-  languageName: node
-  linkType: hard
-
-"graceful-fs@npm:~1.2.0":
-  version: 1.2.3
-  resolution: "graceful-fs@npm:1.2.3"
-  checksum: e40637fe703134214b9eb0c77d6eed336842d47259cb9c6b3fe8e9f864363d8cc7a062309899be4a0ba12e75d1a264adad3c43376c42d251a8dc0c4442ec8232
   languageName: node
   linkType: hard
 
@@ -11437,13 +11413,6 @@ __metadata:
     once: ^1.3.0
     wrappy: 1
   checksum: f4f76aa072ce19fae87ce1ef7d221e709afb59d445e05d47fba710e85470923a75de35bfae47da6de1b18afc3ce83d70facf44cfb0aff89f0a3f45c0a0244dfd
-  languageName: node
-  linkType: hard
-
-"inherits@npm:1":
-  version: 1.0.2
-  resolution: "inherits@npm:1.0.2"
-  checksum: e2f5c1d2868f3bc49a6875478dfaad7c09c7c70d00368cfe0eca834d13589f2704b5aa8964caf1c6d26828022a0d21d2b8397d75a435fe952c1af949496bc00a
   languageName: node
   linkType: hard
 
@@ -12260,7 +12229,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^3.13.0, js-yaml@npm:^3.13.1, js-yaml@npm:^3.2.3":
+"js-yaml@npm:^3.13.0, js-yaml@npm:^3.13.1":
   version: 3.14.1
   resolution: "js-yaml@npm:3.14.1"
   dependencies:
@@ -12380,7 +12349,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json5@npm:^2.1.1, json5@npm:^2.1.2":
+"json5@npm:^2.1.2":
   version: 2.2.0
   resolution: "json5@npm:2.2.0"
   dependencies:
@@ -12965,13 +12934,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:1.2.x":
-  version: 1.2.1
-  resolution: "lodash@npm:1.2.1"
-  checksum: 442425461b3e3160b503c2a427a9974c7d259a607607aac569613a4b5c9d961c35873571d22a346711a87a7560c52e3752f924f71beffd07a4cc0ddda5076ef2
-  languageName: node
-  linkType: hard
-
 "lodash@npm:4.17.21, lodash@npm:^4.17.11, lodash@npm:^4.17.12, lodash@npm:^4.17.13, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:~4.17.0":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
@@ -13092,13 +13054,6 @@ __metadata:
   version: 2.0.0
   resolution: "lowercase-keys@npm:2.0.0"
   checksum: 24d7ebd56ccdf15ff529ca9e08863f3c54b0b9d1edb97a3ae1af34940ae666c01a1e6d200707bce730a8ef76cb57cc10e65f245ecaaf7e6bc8639f2fb460ac23
-  languageName: node
-  linkType: hard
-
-"lru-cache@npm:2":
-  version: 2.7.3
-  resolution: "lru-cache@npm:2.7.3"
-  checksum: f3bff3990f2936826da865d1b56f591185df9163e9ebc5e1234a9c5fd4574f8bbb67373fe6f8b914a2a88a3988591fc6b80b5e77705d5ca6ce2c9ef2ea08b572
   languageName: node
   linkType: hard
 
@@ -13537,16 +13492,6 @@ __metadata:
   dependencies:
     brace-expansion: ^1.1.7
   checksum: 66ac295f8a7b59788000ea3749938b0970344c841750abd96694f80269b926ebcafad3deeb3f1da2522978b119e6ae3a5869b63b13a7859a456b3408bd18a078
-  languageName: node
-  linkType: hard
-
-"minimatch@npm:~0.2.11":
-  version: 0.2.14
-  resolution: "minimatch@npm:0.2.14"
-  dependencies:
-    lru-cache: 2
-    sigmund: ~1.0.0
-  checksum: c2c5209302f9621aedd6c685477a8e1e4fc1a6caa8b42da8dcd8b44060941dcbcc3b4664d727a50f45028b91e6ac22987ee14ffc8a68d56a7ef4ee84ff582fde
   languageName: node
   linkType: hard
 
@@ -17763,13 +17708,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sigmund@npm:~1.0.0":
-  version: 1.0.1
-  resolution: "sigmund@npm:1.0.1"
-  checksum: 793f81f8083ad75ff3903ffd93cf35be8d797e872822cf880aea27ce6db522b508d93ea52ae292bccf357ce34dd5c7faa544cc51c2216e70bbf5fcf09b62707c
-  languageName: node
-  linkType: hard
-
 "signal-exit@npm:^3.0.0, signal-exit@npm:^3.0.2, signal-exit@npm:^3.0.3":
   version: 3.0.6
   resolution: "signal-exit@npm:3.0.6"
@@ -19373,7 +19311,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsconfig-core@workspace:packages/tsconfig-core":
+"tsconfig-core@*, tsconfig-core@workspace:packages/tsconfig-core":
   version: 0.0.0-use.local
   resolution: "tsconfig-core@workspace:packages/tsconfig-core"
   languageName: unknown
@@ -19391,7 +19329,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsconfig@npm:*, tsconfig@npm:^7.0.0":
+"tsconfig@npm:^7.0.0":
   version: 7.0.0
   resolution: "tsconfig@npm:7.0.0"
   dependencies:
@@ -19400,16 +19338,6 @@ __metadata:
     strip-bom: ^3.0.0
     strip-json-comments: ^2.0.0
   checksum: 8bce05e93c673defd56d93d83d4055e49651d3947c076339c4bc15d47b7eb5029bed194087e568764213a2e4bf45c477ba9f4da16adfd92cd901af7c09e4517e
-  languageName: node
-  linkType: hard
-
-"tsconfig@npm:0.0.3":
-  version: 0.0.3
-  resolution: "tsconfig@npm:0.0.3"
-  dependencies:
-    glob-expand: 0.0.2
-    js-yaml: ^3.2.3
-  checksum: 435e4e77e30f7a31f1b97191a7c258a5c48e620cbf118808eddb44e8776e0148f74eea0ae48b75a18cf360f5865efae1836de462c84a2d729ed7cbd76f2d07cf
   languageName: node
   linkType: hard
 
@@ -19763,13 +19691,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ui@*, ui@workspace:packages/ui":
+"ui@workspace:packages/ui":
   version: 0.0.0-use.local
   resolution: "ui@workspace:packages/ui"
   dependencies:
     "@types/react": 17.0.38
     "@types/react-dom": 17.0.11
-    tsconfig: "*"
     typescript: 4.5.4
   languageName: unknown
   linkType: soft
@@ -20372,22 +20299,6 @@ __metadata:
   checksum: 94c21d3aba1c26e5942bb210ffd60c6990cbc750d34bdf548ed93ed845f0a6eac89cdae1dd0195afaba15fbcf4aaca9e397ee40fa4d1f2c191d04d43717bd065
   languageName: node
   linkType: hard
-
-"web@workspace:apps/web":
-  version: 0.0.0-use.local
-  resolution: "web@workspace:apps/web"
-  dependencies:
-    "@types/react": 17.0.38
-    config: "*"
-    eslint: 8.5.0
-    next: 12.0.7
-    next-transpile-modules: 9.0.0
-    react: 17.0.2
-    react-dom: 17.0.2
-    typescript: 4.5.4
-    ui: "*"
-  languageName: unknown
-  linkType: soft
 
 "webidl-conversions@npm:^3.0.0":
   version: 3.0.1
