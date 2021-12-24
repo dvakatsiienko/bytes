@@ -1,3 +1,3 @@
 module.exports = {
-    extends: 'dva',
+    extends: 'eslint-config-core',
 };

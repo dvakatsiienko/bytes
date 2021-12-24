@@ -2,52 +2,45 @@
 import NextLink from 'next/link';
 
 /* Components */
-import {
-    H1, Ul, Li, Link
-} from '@/components/styled';
+import { H1, Ul, Li, Link } from '@/components/styled';
 
-export const Nav: React.FC<NavProps> = props => {
+export const Nav: React.FC<NavProps> = (props) => {
     return (
         <>
             <nav>
                 <Ul>
                     <Li>
-                        <NextLink href = '/'>
+                        <NextLink href='/'>
                             <Link>Home</Link>
                         </NextLink>
                     </Li>
                     <Li>
-                        <NextLink href = '/charts'>
-                            <Link>Charts</Link>
-                        </NextLink>
-                    </Li>
-                    <Li>
-                        <NextLink href = '/redux'>
+                        <NextLink href='/redux'>
                             <Link>Redux SSG</Link>
                         </NextLink>
                     </Li>
                     <Li>
-                        <NextLink href = '/apollo-ssr'>
+                        <NextLink href='/apollo-ssr'>
                             <Link>Apollo SSR</Link>
                         </NextLink>
                     </Li>
                     <Li>
-                        <NextLink href = '/apollo-ssg'>
+                        <NextLink href='/apollo-ssg'>
                             <Link>Apollo SSG</Link>
                         </NextLink>
                     </Li>
                     <Li>
-                        <NextLink href = '/apollo-redux'>
+                        <NextLink href='/apollo-redux'>
                             <Link>Apollo Redux SSG</Link>
                         </NextLink>
                     </Li>
                     <Li>
-                        <NextLink href = '/apollo-redux-ssr'>
+                        <NextLink href='/apollo-redux-ssr'>
                             <Link>Apollo Redux SSR</Link>
                         </NextLink>
                     </Li>
                     <Li>
-                        <NextLink href = '/images'>
+                        <NextLink href='/images'>
                             <Link>Images</Link>
                         </NextLink>
                     </Li>
