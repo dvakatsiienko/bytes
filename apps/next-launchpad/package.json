@@ -54,7 +54,6 @@
         "babel-plugin-transform-define": "2.0.1",
         "dotenv": "10.0.0",
         "eslint": "8.5.0",
-        "eslint-config-dva": "0.0.16",
         "husky": "7.0.4",
         "npm-run-all": "4.1.5",
         "postcss-preset-env": "7.1.0",

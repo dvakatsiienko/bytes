@@ -1,3 +1,1 @@
-module.exports = {
-    extends: 'eslint-config',
-};
+module.exports = { extends: 'core' };

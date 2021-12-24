@@ -38,7 +38,6 @@
     "@graphql-codegen/typescript": "2.4.1",
     "@types/faker": "5.5.9",
     "eslint": "8.5.0",
-    "eslint-config-dva": "0.0.16",
     "ts-node": "10.4.0",
     "typescript": "4.5.4"
   }
