@@ -2422,7 +2422,7 @@ __metadata:
     "@types/nprogress": 0.2.0
     "@types/react": 17.0.38
     "@types/react-dom": 17.0.11
-    "@types/styled-components": 5.1.18
+    "@types/styled-components": 5.1.19
     apollo-link-logger: 2.0.0
     auto-changelog: 2.3.0
     babel-plugin-styled-components: 2.0.2
@@ -2442,7 +2442,7 @@ __metadata:
     prettier-eslint-cli: 5.0.1
     react: 17.0.2
     react-dom: 17.0.2
-    react-hook-form: 7.22.4
+    react-hook-form: 7.22.5
     release-it: 14.11.8
     sanitize.css: 13.0.0
     sass: 1.45.1
@@ -4723,7 +4723,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-redux@npm:7.1.20, @types/react-redux@npm:^7.1.20":
+"@types/react-redux@npm:7.1.21":
+  version: 7.1.21
+  resolution: "@types/react-redux@npm:7.1.21"
+  dependencies:
+    "@types/hoist-non-react-statics": ^3.3.0
+    "@types/react": "*"
+    hoist-non-react-statics: ^3.3.0
+    redux: ^4.0.0
+  checksum: 5104e818ef718d2ed454a66da0fd5a61350aa67b948d117f1d93a6135d9808f9f90a60ffcc97a4b008059048cc154a6fc2c24cc57db4e76b6e89e207edb48023
+  languageName: node
+  linkType: hard
+
+"@types/react-redux@npm:^7.1.20":
   version: 7.1.20
   resolution: "@types/react-redux@npm:7.1.20"
   dependencies:
@@ -4832,14 +4844,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/styled-components@npm:5.1.18":
-  version: 5.1.18
-  resolution: "@types/styled-components@npm:5.1.18"
+"@types/styled-components@npm:5.1.19":
+  version: 5.1.19
+  resolution: "@types/styled-components@npm:5.1.19"
   dependencies:
     "@types/hoist-non-react-statics": "*"
     "@types/react": "*"
     csstype: ^3.0.2
-  checksum: f4d99353e53781283549f5988fda3b3d4cf8fc1bca6624a215883851148db0d5c65c0d0b04ff0a9de43cbce54219a46fe5272278391051e7a4164b4b5e5bd125
+  checksum: ccd2baa6c980ad176650889f2fb286edbb57f5e2b74a01d80d349f751fa7fbdb4f21ed34a893a4c417cc5731c5f0174dba5d180c3a11954996d29c2818ecab13
   languageName: node
   linkType: hard
 
@@ -7281,7 +7293,7 @@ __metadata:
     "@types/lodash.debounce": 4.0.6
     "@types/nprogress": 0.2.0
     "@types/react": 17.0.38
-    "@types/styled-components": 5.1.18
+    "@types/styled-components": 5.1.19
     "@typescript-eslint/eslint-plugin": 5.8.0
     "@typescript-eslint/parser": 5.8.0
     apollo-upload-client: 16.0.0
@@ -7305,7 +7317,7 @@ __metadata:
     prettier-eslint-cli: 5.0.1
     react: 17.0.2
     react-dom: 17.0.2
-    react-hook-form: 7.22.4
+    react-hook-form: 7.22.5
     release-it: 14.11.8
     styled-components: 5.3.3
     stylelint: 14.2.0
@@ -13923,9 +13935,9 @@ __metadata:
     "@types/node": 17.0.4
     "@types/nprogress": 0.2.0
     "@types/react": 17.0.38
-    "@types/react-redux": 7.1.20
+    "@types/react-redux": 7.1.21
     "@types/redux-logger": 3.0.9
-    "@types/styled-components": 5.1.18
+    "@types/styled-components": 5.1.19
     apollo-link-logger: 2.0.0
     auto-changelog: 2.3.0
     babel-plugin-styled-components: 2.0.2
@@ -16604,12 +16616,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.22.4":
-  version: 7.22.4
-  resolution: "react-hook-form@npm:7.22.4"
+"react-hook-form@npm:7.22.5":
+  version: 7.22.5
+  resolution: "react-hook-form@npm:7.22.5"
   peerDependencies:
     react: ^16.8.0 || ^17
-  checksum: 9d30bdfa9df56b26c96d572cf95b3d18516f625e06187c8c4bf9481e79325ae0282cf1a97cf686d6971b07e09ab04692985007051b15d334c86146222d7ebabf
+  checksum: 73c76e132f96f01cf9bd447817dda393c57e04ab65005946cefd96436f5b49bc5fa2b3e24d2d1fa737c7334f971e28aef4f617cf25dbf89d0d019d0cb0b0e41f
   languageName: node
   linkType: hard
 
@@ -19511,106 +19523,106 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-darwin-64@npm:1.0.22"
+"turbo-darwin-64@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-darwin-64@npm:1.0.23"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-darwin-arm64@npm:1.0.22"
+"turbo-darwin-arm64@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-darwin-arm64@npm:1.0.23"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-freebsd-64@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-freebsd-64@npm:1.0.22"
+"turbo-freebsd-64@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-freebsd-64@npm:1.0.23"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-freebsd-arm64@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-freebsd-arm64@npm:1.0.22"
+"turbo-freebsd-arm64@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-freebsd-arm64@npm:1.0.23"
   conditions: os=freebsd & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-32@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-linux-32@npm:1.0.22"
+"turbo-linux-32@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-linux-32@npm:1.0.23"
   conditions: os=linux & cpu=ia32
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-linux-64@npm:1.0.22"
+"turbo-linux-64@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-linux-64@npm:1.0.23"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-linux-arm64@npm:1.0.22"
+"turbo-linux-arm64@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-linux-arm64@npm:1.0.23"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-linux-arm@npm:1.0.22"
+"turbo-linux-arm@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-linux-arm@npm:1.0.23"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"turbo-linux-mips64le@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-linux-mips64le@npm:1.0.22"
+"turbo-linux-mips64le@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-linux-mips64le@npm:1.0.23"
   conditions: os=linux & cpu=mips64el
   languageName: node
   linkType: hard
 
-"turbo-linux-ppc64le@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-linux-ppc64le@npm:1.0.22"
+"turbo-linux-ppc64le@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-linux-ppc64le@npm:1.0.23"
   conditions: os=linux & cpu=ppc64
   languageName: node
   linkType: hard
 
-"turbo-windows-32@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-windows-32@npm:1.0.22"
+"turbo-windows-32@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-windows-32@npm:1.0.23"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo-windows-64@npm:1.0.22"
+"turbo-windows-64@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo-windows-64@npm:1.0.23"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo@npm:1.0.22":
-  version: 1.0.22
-  resolution: "turbo@npm:1.0.22"
+"turbo@npm:1.0.23":
+  version: 1.0.23
+  resolution: "turbo@npm:1.0.23"
   dependencies:
-    turbo-darwin-64: 1.0.22
-    turbo-darwin-arm64: 1.0.22
-    turbo-freebsd-64: 1.0.22
-    turbo-freebsd-arm64: 1.0.22
-    turbo-linux-32: 1.0.22
-    turbo-linux-64: 1.0.22
-    turbo-linux-arm: 1.0.22
-    turbo-linux-arm64: 1.0.22
-    turbo-linux-mips64le: 1.0.22
-    turbo-linux-ppc64le: 1.0.22
-    turbo-windows-32: 1.0.22
-    turbo-windows-64: 1.0.22
+    turbo-darwin-64: 1.0.23
+    turbo-darwin-arm64: 1.0.23
+    turbo-freebsd-64: 1.0.23
+    turbo-freebsd-arm64: 1.0.23
+    turbo-linux-32: 1.0.23
+    turbo-linux-64: 1.0.23
+    turbo-linux-arm: 1.0.23
+    turbo-linux-arm64: 1.0.23
+    turbo-linux-mips64le: 1.0.23
+    turbo-linux-ppc64le: 1.0.23
+    turbo-windows-32: 1.0.23
+    turbo-windows-64: 1.0.23
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -19638,7 +19650,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: f2a590bb8cea944f75b12d0eb861e0e9b275998dcd08aa7e169ba858dcf05016de0b438c26b7165f06faea7ddefd69d9e1b2e6b02fb84e6efb7f16c47a02197c
+  checksum: b19054a406108212b50db9d439100358f5b05e7fe333bb41196435d49e3f7d15034e9cbcb5b8eb1fc7ed0c7fe6591a3bd225bacdd4f60d689d06ba2896cfda22
   languageName: node
   linkType: hard
 
@@ -19648,7 +19660,7 @@ __metadata:
   dependencies:
     eslint: 8.5.0
     prettier: 2.5.1
-    turbo: 1.0.22
+    turbo: 1.0.23
   languageName: unknown
   linkType: soft
 
