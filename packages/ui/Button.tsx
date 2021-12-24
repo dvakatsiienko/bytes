@@ -1,3 +1,3 @@
-export const Button = () => {
-  return <button>Boop</button>;
+export const Button: React.FC = () => {
+    return <button>Click 🤌🏼</button>;
 };
