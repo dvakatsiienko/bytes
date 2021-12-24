@@ -1,4 +1,4 @@
-# eslint-config-dva
+# eslint-config-core
 
 [![npm version](https://badge.fury.io/js/eslint-config-dva.svg)](https://badge.fury.io/js/eslint-config-dva)
 
