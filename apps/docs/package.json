@@ -19,7 +19,6 @@
         "config": "*",
         "eslint": "8.5.0",
         "next-transpile-modules": "9.0.0",
-        "tsconfig-test": "*",
         "typescript": "4.5.4"
     }
 }

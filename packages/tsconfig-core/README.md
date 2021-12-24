@@ -1,4 +1,4 @@
-# tsconfig-dva
+# tsconfig-core
 
 [![npm version](https://badge.fury.io/js/tsconfig-dva.svg)](https://badge.fury.io/js/tsconfig-dva)
 
@@ -34,8 +34,8 @@ import { Link } from '@/components/Link';
 export const Navigation = () => {
     return (
         <nav>
-            <Link to="/home">Home</Link>
-            <Link to="/profile">Profile</Link>
+            <Link to='/home'>Home</Link>
+            <Link to='/profile'>Profile</Link>
         </nav>
     );
 };

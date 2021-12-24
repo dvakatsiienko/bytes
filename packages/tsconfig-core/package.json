@@ -1,5 +1,5 @@
 {
-    "name": "tsconfig",
+    "name": "tsconfig-core",
     "version": "0.0.3",
     "repository": "git@github.com:dvakatsiienko/tsconfig-dva.git",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",

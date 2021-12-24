@@ -1,5 +1,5 @@
 {
-  "extends": "tsconfig-dva",
+  "extends": "tsconfig-core/tsconfig.json",
   /* File inclusion */
   "exclude": [
     "node_modules"
