@@ -3,12 +3,12 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     lastUpdate: 0,
-    light:      false,
-    count:      0,
+    light: false,
+    count: 0,
 };
 
 export const timerSlice = createSlice({
-    name:     'TIMER',
+    name: 'TIMER',
     initialState,
     reducers: {
         tick(state, action: TickAction) {

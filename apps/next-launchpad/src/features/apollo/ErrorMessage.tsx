@@ -1,7 +1,7 @@
 /* Core */
 import styled from 'styled-components';
 
-export const ErrorMessage: React.FC<ErrorMessageProps> = props => {
+export const ErrorMessage: React.FC<ErrorMessageProps> = (props) => {
     return <Container>{props.message}</Container>;
 };
 

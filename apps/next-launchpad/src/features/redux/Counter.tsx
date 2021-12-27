@@ -5,12 +5,12 @@ import styled from 'styled-components';
 import { H6, Button } from '@/components/styled';
 
 /* Instruments */
-import { timerSlice }               from '@/lib/redux/slices';
+import { timerSlice } from '@/lib/redux/slices';
 import { useSelector, useDispatch } from '@/lib/redux';
 
 export const Counter = () => {
     const dispatch = useDispatch();
-    const { count } = useSelector(state => state.timer);
+    const { count } = useSelector((state) => state.timer);
 
     const increment = () => dispatch(timerSlice.actions.increment());
     const decrement = () => dispatch(timerSlice.actions.decrement());

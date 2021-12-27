@@ -1,10 +1,10 @@
 /* Core */
 import { NextPage } from 'next';
-import Image        from 'next/image';
+import Image from 'next/image';
 
 /* Components */
 import { Layout, Nav } from '@/components';
-import { P, Link }     from '@/components/styled';
+import { P, Link } from '@/components/styled';
 
 const ImagesPage: NextPage = () => {
     return (
@@ -16,8 +16,7 @@ const ImagesPage: NextPage = () => {
                 <Link
                     href = 'https://nextjs.org/docs/api-reference/next/image'
                     rel = 'noopener noreferrer'
-                    target = '_blank'
-                >
+                    target = '_blank'>
                     next/image
                 </Link>{' '}
                 component.

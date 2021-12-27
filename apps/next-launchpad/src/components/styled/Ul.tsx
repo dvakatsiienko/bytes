@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 export const Ul = styled.ul<UlProps>`
     display: flex;
-    flex-direction: ${props => props[ '$flex-direction' ]};
+    flex-direction: ${(props) => props[ '$flex-direction' ]};
     padding: 0;
     margin-top: 24px;
     margin-bottom: 24px;

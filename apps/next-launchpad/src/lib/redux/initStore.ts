@@ -7,7 +7,7 @@ import { createStore } from './createStore';
  */
 export let store = null; // eslint-disable-line
 
-export const initStore = preloadedState => {
+export const initStore = (preloadedState) => {
     let _store = store ?? createStore(preloadedState);
 
     /**

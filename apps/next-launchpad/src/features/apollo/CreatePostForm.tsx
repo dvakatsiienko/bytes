@@ -1,6 +1,6 @@
 /* Core */
 import { gql as tag } from '@apollo/client';
-import styled         from 'styled-components';
+import styled from 'styled-components';
 
 /* Components */
 import { H6, Button } from '@/components/styled';
@@ -11,7 +11,7 @@ import * as gql from '@/graphql';
 export const CreatePostForm: React.FC = () => {
     const [ createPost, { loading }] = gql.useCreatePostMutation();
 
-    const submitForm = event => {
+    const submitForm = (event) => {
         event.preventDefault();
 
         const form = event.target;

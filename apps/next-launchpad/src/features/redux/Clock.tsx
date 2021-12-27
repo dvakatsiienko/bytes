@@ -1,15 +1,12 @@
 /* Core */
 import { shallowEqual } from 'react-redux';
-import styled           from 'styled-components';
+import styled from 'styled-components';
 
 /* Instruments */
 import { useSelector } from '@/lib/redux';
 
 export const Clock = () => {
-    const { lastUpdate, light } = useSelector(
-        state => state.timer,
-        shallowEqual,
-    );
+    const { lastUpdate, light } = useSelector((state) => state.timer, shallowEqual);
 
     return <Container $light = { !!light }>{formatTime(lastUpdate)}</Container>;
 };
@@ -24,7 +21,7 @@ const Container = styled.div<ContainerProps>`
     margin-top: 15px;
     font: 50px menlo, monaco, monospace;
     color: #82fa58;
-    background-color: ${props => (props.$light ? '#999' : '#000')};
+    background-color: ${(props) => (props.$light ? '#999' : '#000')};
 `;
 
 /* Helpers */

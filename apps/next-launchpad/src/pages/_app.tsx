@@ -17,15 +17,15 @@ const App: React.FC<AppProps> = (props) => {
     const apolloClient = useApollo(props.pageProps.initialApolloState);
 
     return (
-        <ApolloProvider client={apolloClient}>
-            <ReduxProvider store={store}>
-                <StyledComponentsProvider theme={{}}>
+        <ApolloProvider client = { apolloClient }>
+            <ReduxProvider store = { store }>
+                <StyledComponentsProvider theme = {{}}>
                     <Head>
-                        <link href='/favicon.ico' rel='icon' />
+                        <link href = '/favicon.ico' rel = 'icon' />
                         <title>Next Experimental</title>
-                        <link href='/nprogress.css' rel='stylesheet' type='text/css' />
+                        <link href = '/nprogress.css' rel = 'stylesheet' type = 'text/css' />
                     </Head>
-                    <props.Component {...props.pageProps} />
+                    <props.Component { ...props.pageProps } />
                 </StyledComponentsProvider>
             </ReduxProvider>
         </ApolloProvider>

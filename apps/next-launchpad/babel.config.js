@@ -2,7 +2,7 @@
 
 const { envConfig } = require('./env-config.js');
 
-module.exports = api => {
+module.exports = (api) => {
     const env = api.env();
 
     api.cache.using(() => env === 'development');

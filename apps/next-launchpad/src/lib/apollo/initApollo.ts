@@ -1,5 +1,5 @@
 /* Core */
-import merge       from 'deepmerge';
+import merge from 'deepmerge';
 import { isEqual } from 'lodash';
 
 /* Instruments */
@@ -29,7 +29,7 @@ export const initApollo = (initialState = null) => {
              */
             arrayMerge: (destinationArray, sourceArray) => [
                 ...sourceArray,
-                ...destinationArray.filter(d => sourceArray.every(s => !isEqual(d, s))),
+                ...destinationArray.filter((d) => sourceArray.every((s) => !isEqual(d, s))),
             ],
         });
 

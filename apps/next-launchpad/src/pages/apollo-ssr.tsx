@@ -2,13 +2,13 @@
 import { NextPage, GetServerSideProps } from 'next';
 
 /* Components */
-import { Layout, Nav }              from '@/components';
-import { P, Link }                  from '@/components/styled';
+import { Layout, Nav } from '@/components';
+import { P, Link } from '@/components/styled';
 import { PostList, CreatePostForm } from '@/features/apollo';
 
 /* Instruments */
-import * as gql              from '@/graphql';
-import { initApollo }        from '@/lib/apollo';
+import * as gql from '@/graphql';
+import { initApollo } from '@/lib/apollo';
 import { allPostsQueryVars } from '@/features/apollo/helpers';
 
 const ApolloSSRPage: NextPage = () => {
@@ -17,15 +17,13 @@ const ApolloSSRPage: NextPage = () => {
             <Nav title = 'Apollo SSR' />
 
             <P>
-                This example shows how to fetch all initial apollo queries on
-                the server. If you <Link href = '/'>reload</Link> this page you
-                won&apos;t see a loader since Apollo fetched all needed data on
-                the server. This prevents{' '}
+                This example shows how to fetch all initial apollo queries on the server. If you{' '}
+                <Link href = '/'>reload</Link> this page you won&apos;t see a loader since Apollo
+                fetched all needed data on the server. This prevents{' '}
                 <Link
                     href = 'https://nextjs.org/blog/next-9#automatic-static-optimization'
                     rel = 'noopener noreferrer'
-                    target = '_blank'
-                >
+                    target = '_blank'>
                     automatic static optimization
                 </Link>{' '}
                 in favour of full Server-Side-Rendering.
