@@ -8,7 +8,7 @@ import { Post } from './Post';
 /* Instruments */
 import * as gql from '@/graphql';
 
-export const PostList: React.FC<PostListProps> = props => {
+export const PostList: React.FC<PostListProps> = (props) => {
     const { pagination } = props;
 
     const isXs = useMediaQuery('xs');
@@ -27,7 +27,7 @@ export const PostList: React.FC<PostListProps> = props => {
         <S.Container>
             <S.List>{postListJSX}</S.List>
 
-            {pagination && !isNaN(pagination.totalPages) && (
+            {pagination && !Number.isNaN(pagination.totalPages) && (
                 <S.Footer $isDisabled = { pagination.isFetchingMore }>
                     <Pagination
                         count = { pagination.totalPages }
@@ -56,8 +56,7 @@ const S = {
         gap: var(--post-list-gap);
 
         max-height: calc(
-            100vh - 41px - (var(--layout-v-offset) * 2) -
-                (var(--container-v-padding) * 2) - 24px -
+            100vh - 41px - (var(--layout-v-offset) * 2) - (var(--container-v-padding) * 2) - 24px -
                 var(--post-list-footer-height) - (var(--container-gap) * 2)
         );
         overflow-y: scroll;
@@ -85,14 +84,13 @@ const S = {
             & li {
                 margin-bottom: 0;
 
-                ${p => p.$isDisabled && 'cursor: not-allowed;'}
+                ${(p) => p.$isDisabled && 'cursor: not-allowed;'}
 
                 & button {
-                    ${p => p.$isDisabled && 'color: grey; pointer-events: none;'}
+                    ${(p) => p.$isDisabled && 'color: grey; pointer-events: none;'}
 
                     &.active {
-                        ${p => p.$isDisabled
-                            && 'color: white; background-color: grey;'}
+                        ${(p) => p.$isDisabled && 'color: white; background-color: grey;'}
                     }
                 }
             }

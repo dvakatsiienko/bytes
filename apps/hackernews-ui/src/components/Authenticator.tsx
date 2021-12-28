@@ -6,7 +6,7 @@ import * as gql from '@/graphql';
 import { vars } from '@/lib/apollo';
 import { getJwtToken } from '@/utils';
 
-export const Authenticator: React.FC = props => {
+export const Authenticator: React.FC = (props) => {
     const [ isInitialized, setIsInitialized ] = useState(false);
     const [ authenticate ] = gql.useAuthenticateLazyQuery({
         onCompleted(res) {

@@ -6,18 +6,17 @@ import styled from 'styled-components';
 /* Components */
 import { Nav } from '@/components';
 
-export const Layout: React.FC = props => {
+export const Layout: React.FC = (props) => {
     return (
         <S.Container>
             <Image.Browser
                 invert
-                // @ts-ignore
-                title = { (
+                // @ts-ignore: TODO later
+                title = {
                     <Link href = '/new/1'>
                         <S.A>λ Hackernews</S.A>
                     </Link>
-                ) }
-            >
+                }>
                 <S.Content>
                     <Nav />
                     {props.children}

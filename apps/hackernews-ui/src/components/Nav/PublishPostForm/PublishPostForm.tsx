@@ -10,7 +10,7 @@ import * as gql from '@/graphql';
 import { useToasts } from '@/hooks';
 import { resolver, FormShape } from './resolver';
 
-export const PublishPostForm: React.FC<PublishPostFormProps> = props => {
+export const PublishPostForm: React.FC<PublishPostFormProps> = (props) => {
     const createToast = useToasts();
 
     const form = useForm<FormShape>({
@@ -18,9 +18,7 @@ export const PublishPostForm: React.FC<PublishPostFormProps> = props => {
         mode:          'all',
         defaultValues: {
             url:         __DEV__ ? 'https://www.prisma.io' : '',
-            description: __DEV__
-                ? 'Check out Prisma — the next-gen type-safe ORM'
-                : '',
+            description: __DEV__ ? 'Check out Prisma — the next-gen type-safe ORM' : '',
         },
     });
 
@@ -34,8 +32,7 @@ export const PublishPostForm: React.FC<PublishPostFormProps> = props => {
             let fieldName = null;
 
             error.message.toLowerCase().includes('url') && (fieldName = 'url');
-            error.message.toLowerCase().includes('description')
-                && (fieldName = 'description');
+            error.message.toLowerCase().includes('description') && (fieldName = 'description');
 
             if (fieldName) {
                 form.setError(fieldName, { message: error.message });

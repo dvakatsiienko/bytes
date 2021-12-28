@@ -9,7 +9,7 @@ import { UserProfile } from '@/components';
 import * as gql from '@/graphql';
 import { getJwtToken } from '@/utils';
 
-const ProfilePage: ProfilePageProps = props => {
+const ProfilePage: ProfilePageProps = (props) => {
     const authQuery = gql.useAuthenticateQuery({
         variables: { token: getJwtToken() },
     });
@@ -19,7 +19,7 @@ const ProfilePage: ProfilePageProps = props => {
     return <UserProfile isEditable user = { user } />;
 };
 
-export const getServerSideProps: GetServerSideProps = async ctx => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const userQuery = await gql.getServerPageUser(
         { variables: { id: 'f2a1dc1e-b093-4075-9f74-7da6bcf1f3ec' } },
         ctx,

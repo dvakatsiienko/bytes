@@ -55,10 +55,7 @@ export const Nav: React.FC = () => {
                 </NextLink>
 
                 <NextLink href = { book.search }>
-                    <S.BreadcrumbsItem
-                        nextLink
-                        $active = { get$Active(book.search) }
-                    >
+                    <S.BreadcrumbsItem nextLink $active = { get$Active(book.search) }>
                         search
                     </S.BreadcrumbsItem>
                 </NextLink>
@@ -67,10 +64,7 @@ export const Nav: React.FC = () => {
             <GUI.Breadcrumbs>
                 {isAuthenticated && (
                     <NextLink href = { book.profile }>
-                        <S.BreadcrumbsItem
-                            nextLink
-                            $active = { get$Active(book.profile) }
-                        >
+                        <S.BreadcrumbsItem nextLink $active = { get$Active(book.profile) }>
                             profile
                         </S.BreadcrumbsItem>
                     </NextLink>
@@ -84,21 +78,14 @@ export const Nav: React.FC = () => {
                     </NextLink>
                 ) : (
                     <NextLink href = { book.login }>
-                        <S.BreadcrumbsItem
-                            nextLink
-                            $active = { get$Active(book.login) }
-                        >
+                        <S.BreadcrumbsItem nextLink $active = { get$Active(book.login) }>
                             login
                         </S.BreadcrumbsItem>
                     </NextLink>
                 )}
             </GUI.Breadcrumbs>
 
-            <GUI.Drawer
-                placement = 'bottom'
-                visible = { drawerState === 'open' }
-                onClose = { closeDrawer }
-            >
+            <GUI.Drawer placement = 'bottom' visible = { drawerState === 'open' } onClose = { closeDrawer }>
                 <PublishPostForm closeDrawer = { closeDrawer } />
             </GUI.Drawer>
 
@@ -109,8 +96,7 @@ export const Nav: React.FC = () => {
                     scale = { 2 / 3 }
                     title = 'Publish a post...'
                     type = 'secondary'
-                    onClick = { () => setDrawerState('open') }
-                >
+                    onClick = { () => setDrawerState('open') }>
                     Publish a post
                 </S.PublishPostButton>
             )}
@@ -138,7 +124,7 @@ const S = {
         }
     `,
     BreadcrumbsItem: styled(GUI.Breadcrumbs.Item)<TBreadcrumbsItemProps>`
-        ${props => props.$active && `color: ${palette.link} !important;`}
+        ${(props) => props.$active && `color: ${palette.link} !important;`}
     `,
     PublishPostButton: styled(GUI.Button)<GUI.ButtonProps>`
         &&& {

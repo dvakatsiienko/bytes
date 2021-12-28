@@ -9,7 +9,7 @@ import { UserProfile } from '@/components';
 import * as gql from '@/graphql';
 import { getStaticAC } from '@/lib/apollo';
 
-const UserByIdPage: UserByIdPageProps = props => {
+const UserByIdPage: UserByIdPageProps = (props) => {
     const router = useRouter();
     const userId = router.query.userId as string;
 
@@ -20,12 +20,13 @@ const UserByIdPage: UserByIdPageProps = props => {
     return <UserProfile user = { user } />;
 };
 
-export const getStaticProps: GetStaticProps<unknown, { userId: string }> = async ctx => {
+export const getStaticProps: GetStaticProps<unknown, { userId: string }> = async (ctx) => {
     const ac = getStaticAC();
 
-    const userQuery = await ac.query<gql.UserQuery, gql.UserQueryVariables>(
-        { variables: { id: ctx.params.userId }, query: gql.UserDocument },
-    );
+    const userQuery = await ac.query<gql.UserQuery, gql.UserQueryVariables>({
+        variables: { id: ctx.params.userId },
+        query:     gql.UserDocument,
+    });
 
     return { props: userQuery.data, revalidate: 5 };
 };
@@ -37,7 +38,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
         query: gql.UsersDocument,
     });
 
-    const paths = usersQuery.data.users.map(user => ({
+    const paths = usersQuery.data.users.map((user) => ({
         params: { userId: user.id },
     }));
 

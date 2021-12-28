@@ -10,13 +10,13 @@ import { Fieldset, Input } from '../Form';
 import * as gql from '@/graphql';
 import { resolver, FormShape } from './resolver';
 
-export const SearchPostForm: React.FC<SearchPostForm> = props => {
+export const SearchPostForm: React.FC<SearchPostForm> = (props) => {
     const form = useForm<FormShape>({
         resolver,
         defaultValues: { filter: '' },
     });
 
-    const search = form.handleSubmit(async values => {
+    const search = form.handleSubmit(async (values) => {
         const [ , feedQuery ] = props.feedLazyQuery;
 
         props.setIsRefetching(true);
@@ -36,11 +36,7 @@ export const SearchPostForm: React.FC<SearchPostForm> = props => {
                     register = { form.register('filter') }
                 />
                 &nbsp;
-                <Button
-                    disabled = { props.isDisabled }
-                    htmlType = 'submit'
-                    type = 'secondary'
-                >
+                <Button disabled = { props.isDisabled } htmlType = 'submit' type = 'secondary'>
                     GO
                 </Button>
             </Fieldset>

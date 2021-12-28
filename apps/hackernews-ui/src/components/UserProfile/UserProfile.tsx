@@ -7,14 +7,11 @@ import { UpdateUserForm } from './UpdateUserForm';
 /* Instruments */
 import * as gql from '@/graphql';
 
-export const UserProfile: React.FC<UserProfileProps> = props => {
+export const UserProfile: React.FC<UserProfileProps> = (props) => {
     return (
         <GUI.Card>
             <GUI.Tabs initialValue = '1'>
-                <GUI.Tabs.Item
-                    label = { props.isEditable ? 'My Info' : 'User' }
-                    value = '1'
-                >
+                <GUI.Tabs.Item label = { props.isEditable ? 'My Info' : 'User' } value = '1'>
                     {props.isEditable && <h2>Welcome {props.user?.name}</h2>}
                     {!props.isEditable && (
                         <p>
