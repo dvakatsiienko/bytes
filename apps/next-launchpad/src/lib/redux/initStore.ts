@@ -8,14 +8,14 @@ import { createStore } from './createStore';
 export let store = null; // eslint-disable-line
 
 export const initStore = (preloadedState) => {
-    let _store = store ?? createStore(preloadedState);
+    let nextStore = store ?? createStore(preloadedState);
 
     /**
      * After navigating to a page with an initial Redux state, merge that state
      * with the current state in the store, and create a new store.
      */
     if (preloadedState && store) {
-        _store = createStore({
+        nextStore = createStore({
             ...store.getState(),
             ...preloadedState,
         });
@@ -29,16 +29,14 @@ export const initStore = (preloadedState) => {
     /**
      * For SSG and SSR always create a new store.
      */
-    if (typeof window === 'undefined') {
-        return _store;
-    }
+    if (typeof window === 'undefined') return nextStore;
 
     /**
      * Create the store once in the client.
      */
     if (!store) {
-        store = _store;
+        store = nextStore;
     }
 
-    return _store;
+    return nextStore;
 };

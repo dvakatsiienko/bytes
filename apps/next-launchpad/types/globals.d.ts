@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { envConfig } = require('../env-config.js');
+import { envConfig } from '../env-config.js';
 
 declare const { __ENV__ }: { __ENV__: string } = envConfig;
 declare const { __DEV__ }: { __DEV__: boolean } = envConfig;

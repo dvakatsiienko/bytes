@@ -2,14 +2,14 @@
 import { NextPage } from 'next';
 
 /* Components */
-import { Layout, Nav }              from '@/components';
+import { Layout, Nav } from '@/components';
 import { PostList, CreatePostForm } from '@/features/apollo';
-import { Clock, Counter }           from '@/features/redux';
+import { Clock, Counter } from '@/features/redux';
 
 /* Instruments */
 import { useInterval } from '@/hooks';
 import { useDispatch } from '@/lib/redux';
-import { timerSlice }  from '@/lib/redux/slices';
+import { timerSlice } from '@/lib/redux/slices';
 
 const ApolloReduxPage: NextPage = () => {
     const dispatch = useDispatch();
