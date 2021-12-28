@@ -1,8 +1,8 @@
 /* Core  */
-import { useRouter }   from 'next/router';
-import { useForm }     from 'react-hook-form';
+import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup';
-import * as yup        from 'yup';
+import * as yup from 'yup';
 
 /* Components */
 import { Form, Input } from '@/components/form-elements';
@@ -38,18 +38,8 @@ export const CreateProductForm: React.FC = () => {
         <>
             <h1>Place new product</h1>
 
-            <Form
-                isLoading = { isLoading }
-                networkError = { error }
-                title = { null }
-                onSubmit = { createProduct }
-            >
-                <Input
-                    name = 'image'
-                    register = { form.register }
-                    text = 'Image'
-                    type = 'file'
-                />
+            <Form isLoading = { isLoading } networkError = { error } title = { null } onSubmit = { createProduct }>
+                <Input name = 'image' register = { form.register } text = 'Image' type = 'file' />
                 <Input
                     error = { form.formState.errors.name }
                     name = 'name'
@@ -83,13 +73,9 @@ export const CreateProductForm: React.FC = () => {
 
 /* Helpers */
 const schema: yup.SchemaOf<FormShape> = yup.object().shape({
-    image: yup.mixed(),
-    name:  yup.string().required('is required'),
-    price: yup
-        .number()
-        .nullable(true)
-        .positive('must be positive')
-        .required('is required'),
+    image:       yup.mixed(),
+    name:        yup.string().required('is required'),
+    price:       yup.number().nullable(true).positive('must be positive').required('is required'),
     description: yup.string().required('is required'),
 });
 const resolver = yupResolver(schema);
