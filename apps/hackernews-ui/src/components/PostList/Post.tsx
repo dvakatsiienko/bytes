@@ -8,7 +8,7 @@ import * as gql from '@/graphql';
 import { vars } from '@/lib/apollo';
 import { timeDifferenceForDate } from '@/utils';
 
-export const Post: React.FC<PostProps> = props => {
+export const Post: React.FC<PostProps> = (props) => {
     const isAuthenticated = vars.useIsAuthenticated();
     const [ voteMutation ] = gql.useVoteMutation({
         variables: { postId: props.post.id },
@@ -21,12 +21,7 @@ export const Post: React.FC<PostProps> = props => {
         <S.Container>
             <S.Header>
                 <S.OrderNumber>{props.orderNumber}.</S.OrderNumber>
-                <GUI.Link
-                    color
-                    href = { props.post.url }
-                    rel = 'noreferrer noopener'
-                    target = '_blank'
-                >
+                <GUI.Link color href = { props.post.url } rel = 'noreferrer noopener' target = '_blank'>
                     {props.post.description}
                 </GUI.Link>
             </S.Header>
@@ -35,10 +30,9 @@ export const Post: React.FC<PostProps> = props => {
                 {isAuthenticated && (
                     <S.Upvote
                         $isVotedByMe = { props.post.isVotedByMe }
-                        onClick = { () => (props.post.isVotedByMe
-                            ? unvoteMutation()
-                            : voteMutation()) }
-                    >
+                        // eslint-disable-next-line max-len
+                        onClick = { () => (props.post.isVotedByMe ? unvoteMutation() : voteMutation())
+                        }>
                         ▲
                     </S.Upvote>
                 )}
@@ -94,7 +88,7 @@ const S = {
         margin-right: 5px;
         cursor: pointer;
         user-select: none;
-        color: ${props => (props.$isVotedByMe ? palette.accents_7 : palette.accents_3)};
+        color: ${(props) => (props.$isVotedByMe ? palette.accents_7 : palette.accents_3)};
 
         &:hover {
             color: ${palette.accents_7};

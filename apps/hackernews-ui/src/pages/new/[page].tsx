@@ -15,11 +15,7 @@ const NewPostsPaginatedPage: NextPage = () => {
     const [ isFetchingMore, setIsFetchingMore ] = useState(false);
 
     const router = useRouter();
-    const {
-        page,
-        variables: feedVariables,
-        POSTS_PER_PAGE,
-    } = useFeedVariables();
+    const { page, variables: feedVariables, POSTS_PER_PAGE } = useFeedVariables();
 
     const feedQuery = gql.useFeedQuery({
         variables:                   feedVariables,
@@ -37,9 +33,7 @@ const NewPostsPaginatedPage: NextPage = () => {
 
                 const newPost = subscriptionData.data.postCreated;
 
-                const isExists = prev.feed.posts.find(
-                    post => post.id === newPost.id,
-                );
+                const isExists = prev.feed.posts.find((post) => post.id === newPost.id);
 
                 if (isExists) return prev;
 
@@ -71,7 +65,7 @@ const NewPostsPaginatedPage: NextPage = () => {
     };
 
     const feed = feedQuery.data?.feed;
-    const totalPages = Math.ceil(feed?.count / POSTS_PER_PAGE);
+    const totalPages = Math.ceil(feed.count / POSTS_PER_PAGE);
 
     return (
         <PostList

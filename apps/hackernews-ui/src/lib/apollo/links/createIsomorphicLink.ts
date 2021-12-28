@@ -19,13 +19,13 @@ export const createIsomorphicLink = () => {
     }
 
     const link = split(
-        operation => {
+        (operation) => {
             const mainDefinition = getMainDefinition(operation.query);
 
             return (
                 process.browser
-                    && mainDefinition.kind === 'OperationDefinition'
-                    && mainDefinition.operation === 'subscription'
+                && mainDefinition.kind === 'OperationDefinition'
+                && mainDefinition.operation === 'subscription'
             );
         },
         from([ ...baseLinks, wsLink ]),

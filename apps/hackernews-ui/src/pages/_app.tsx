@@ -5,9 +5,7 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { AppProps } from 'next/app';
 import { GeistProvider, CssBaseline } from '@geist-ui/react';
-import styled, {
-    ThemeProvider as StyledComponentsProvider
-} from 'styled-components';
+import { ThemeProvider as StyledComponentsProvider } from 'styled-components';
 
 /* Components */
 import { Authenticator, Layout } from '@/components';
@@ -16,7 +14,7 @@ import { Authenticator, Layout } from '@/components';
 import '@/theme/index.scss';
 import { useApollo } from '@/lib/apollo';
 
-const App: React.FC<AppProps> = props => {
+const App: React.FC<AppProps> = (props) => {
     const apolloClient = useApollo(props.pageProps.initialApolloState);
 
     return (
@@ -27,11 +25,7 @@ const App: React.FC<AppProps> = props => {
                         <Head>
                             <link href = '/favicon.ico' rel = 'icon' />
                             <title>Hackernews</title>
-                            <link
-                                href = '/nprogress.css'
-                                rel = 'stylesheet'
-                                type = 'text/css'
-                            />
+                            <link href = '/nprogress.css' rel = 'stylesheet' type = 'text/css' />
                         </Head>
                         <CssBaseline />
 

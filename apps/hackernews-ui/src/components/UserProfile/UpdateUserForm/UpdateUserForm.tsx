@@ -10,7 +10,7 @@ import * as gql from '@/graphql';
 import { useToasts } from '@/hooks';
 import { resolver, FormShape } from './resolver';
 
-export const UpdateUserForm: React.FC<UpdateUserFormProps> = props => {
+export const UpdateUserForm: React.FC<UpdateUserFormProps> = (props) => {
     const createToast = useToasts();
 
     const form = useForm<FormShape>({
@@ -34,10 +34,8 @@ export const UpdateUserForm: React.FC<UpdateUserFormProps> = props => {
         onError(error) {
             let fieldName = null;
 
-            error.message.toLowerCase().includes('name')
-                    && (fieldName = 'name');
-            error.message.toLowerCase().includes('email')
-                    && (fieldName = 'email');
+            error.message.toLowerCase().includes('name') && (fieldName = 'name');
+            error.message.toLowerCase().includes('email') && (fieldName = 'email');
 
             form.setError(fieldName, { message: error.message });
 
@@ -83,8 +81,7 @@ export const UpdateUserForm: React.FC<UpdateUserFormProps> = props => {
                     disabled = { isFetching }
                     htmlType = 'submit'
                     loading = { isFetching }
-                    type = 'secondary'
-                >
+                    type = 'secondary'>
                     Update
                 </GUI.Button>
             </Fieldset>

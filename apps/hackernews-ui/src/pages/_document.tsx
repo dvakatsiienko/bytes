@@ -11,7 +11,7 @@ export default class extends Document {
         try {
             ctx.renderPage = () => {
                 return originalRenderPage({
-                    enhanceApp: App => props => {
+                    enhanceApp: (App) => (props) => {
                         const styledSheetResult = styledComponentsStylesheet.collectStyles(
                             <App { ...props } />,
                         );

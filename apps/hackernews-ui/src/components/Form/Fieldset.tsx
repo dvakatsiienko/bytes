@@ -1,7 +1,7 @@
 /* Core */
 import styled from 'styled-components';
 
-export const Fieldset: React.FC<FieldsetProps> = props => {
+export const Fieldset: React.FC<FieldsetProps> = (props) => {
     return <StyledFieldset { ...props }>{props.children}</StyledFieldset>;
 };
 

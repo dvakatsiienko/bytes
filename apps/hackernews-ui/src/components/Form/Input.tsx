@@ -1,20 +1,11 @@
 /* Core */
-import type {
-    UseFormRegisterReturn,
-    FormState,
-    FieldValues
-} from 'react-hook-form';
+import type { UseFormRegisterReturn, FormState, FieldValues } from 'react-hook-form';
 import { Input as GeistInput, Dot } from '@geist-ui/react';
-import type {
-    InputProps as GeistInputProps,
-    InputPasswordProps
-} from '@geist-ui/react';
+import type { InputProps as GeistInputProps, InputPasswordProps } from '@geist-ui/react';
 import styled, { css } from 'styled-components';
 
-export const Input: React.FC<InputProps> = props => {
+export const Input: React.FC<InputProps> = (props) => {
     const isInvalid = props.formState.errors[ props.register.name ]?.message;
-
-    props.formState.isSubmitting;
 
     let dotType = 'default';
     isInvalid && (dotType = 'error');
@@ -24,33 +15,31 @@ export const Input: React.FC<InputProps> = props => {
         <S.PInput
             autoFocus = { props.autoFocus }
             htmlType = { props.type }
-            // @ts-ignore
+                // @ts-ignore: TODO later
             label = { <Dot type = { dotType } /> }
             placeholder = { props.placeholder }
             type = { isInvalid ? 'error' : 'default' }
             width = '100%'
             { ...props.register }
-        />
-    ) : (
-        <S.Input
-            autoFocus = { props.autoFocus }
-            htmlType = { props.type }
-            // @ts-ignore
-            label = { <Dot type = { dotType } /> }
-            placeholder = { props.placeholder }
-            type = { isInvalid ? 'error' : 'default' }
-            width = '100%'
-            { ...props.register }
-        />
-    );
+            />
+        ) : (
+            <S.Input
+                autoFocus = { props.autoFocus }
+                htmlType = { props.type }
+                // @ts-ignore: TODO later
+                label = { <Dot type = { dotType } /> }
+                placeholder = { props.placeholder }
+                type = { isInvalid ? 'error' : 'default' }
+                width = '100%'
+                { ...props.register }
+            />
+        );
 
     return (
         <S.Container>
             {InputComponent}
             <S.ErrorMessage>
-                {props.formState.errors[ props.register.name ]?.message ?? (
-                    <>&nbsp;</>
-                )}
+                {props.formState.errors[ props.register.name ]?.message ?? <>&nbsp;</>}
             </S.ErrorMessage>
         </S.Container>
     );

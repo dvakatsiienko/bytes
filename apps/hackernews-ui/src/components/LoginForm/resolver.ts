@@ -10,10 +10,10 @@ export const createResolver = (isLogin: boolean) => {
         .object({
             name:
                 !isLogin && yup.string().min(4, 'Minimum ${min} characters.').required('Required'),
-            email: yup.string().email('Should be a valid email.').required('Required.'),
-            password: yup.string().min(4, 'Minimum ${min} characters.').required('Required.'),
+            email:           yup.string().email('Should be a valid email.').required('Required.'),
+            password:        yup.string().min(4, 'Minimum ${min} characters.').required('Required.'),
             confirmPassword:
-                !isLogin && yup.string().oneOf([yup.ref('password')], 'Passwords must match'),
+                !isLogin && yup.string().oneOf([ yup.ref('password') ], 'Passwords must match'),
         })
         .required();
 

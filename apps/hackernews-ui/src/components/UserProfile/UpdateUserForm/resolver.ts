@@ -7,9 +7,9 @@ import * as gql from '@/graphql';
 
 const schema: yup.SchemaOf<FormShape> = yup
     .object({
-        name: yup.string().min(4, 'Minimum ${min} characters.').required('Required'),
+        name:  yup.string().min(4, 'Minimum ${min} characters.').required('Required'),
         email: yup.string().email('Should be a valid email.').required('Required.'),
-        bio: yup.string().max(100, 'Bio max length is ${max} characters.'),
+        bio:   yup.string().max(100, 'Bio max length is ${max} characters.'),
     })
     .required();
 

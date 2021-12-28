@@ -19,23 +19,23 @@ import { createResolver, FormShape } from './resolver';
 export const LoginForm: React.FC = () => {
     const router = useRouter();
     const isAuthenticated = vars.useIsAuthenticated();
-    const [isLogin, setIsLogin] = useState(true);
-    const [isFetching, setIsFetching] = useState(false);
+    const [ isLogin, setIsLogin ] = useState(true);
+    const [ isFetching, setIsFetching ] = useState(false);
 
     const createToast = useToasts();
 
     const form = useForm<FormShape>({
-        resolver: createResolver(isLogin),
-        mode: 'all',
+        resolver:      createResolver(isLogin),
+        mode:          'all',
         defaultValues: {
-            name: __DEV__ ? 'Jack' : '',
-            email: __DEV__ ? 'test@email.io' : '',
-            password: __DEV__ ? '12345' : '',
+            name:            __DEV__ ? 'Jack' : '',
+            email:           __DEV__ ? 'test@email.io' : '',
+            password:        __DEV__ ? '12345' : '',
             confirmPassword: __DEV__ ? '12345' : '',
         },
     });
 
-    const saveToken = async (data: gql.AuthPayloadFragment) => {
+    const saveToken = (data: gql.AuthPayloadFragment) => {
         const { token } = data;
 
         saveJwtToken(token);
@@ -43,7 +43,7 @@ export const LoginForm: React.FC = () => {
         vars.isAuthenticated(true);
     };
 
-    const [loginMutation] = gql.useLoginMutation({
+    const [ loginMutation ] = gql.useLoginMutation({
         variables: form.getValues(),
         onCompleted(data) {
             saveToken(data.login);
@@ -55,7 +55,7 @@ export const LoginForm: React.FC = () => {
             createToast({ type: 'error', text: error.message, delay: 10000 });
         },
     });
-    const [signupMutation] = gql.useSignupMutation({
+    const [ signupMutation ] = gql.useSignupMutation({
         variables: form.getValues(),
         onCompleted(data) {
             saveToken(data.signup);
@@ -63,7 +63,7 @@ export const LoginForm: React.FC = () => {
         onError(error) {
             let fieldName = null;
 
-            const fields: Array<keyof FormShape> = ['name', 'email', 'password'];
+            const fields: Array<keyof FormShape> = [ 'name', 'email', 'password' ];
 
             fields.forEach((field) => {
                 error.message.toLowerCase().includes(field) && (fieldName = field);
@@ -103,53 +103,53 @@ export const LoginForm: React.FC = () => {
     }
 
     return (
-        <form onSubmit={form.handleSubmit(submit)}>
+        <form onSubmit = { form.handleSubmit(submit) }>
             <GUI.Spacer />
             <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
-            <GUI.Spacer h={2} />
+            <GUI.Spacer h = { 2 } />
 
-            <Fieldset css='max-width: 300px;' disabled={isFetching}>
+            <Fieldset css = 'max-width: 300px;' disabled = { isFetching }>
                 {!isLogin && (
                     <Input
                         autoFocus
-                        formState={form.formState}
-                        placeholder='Your name'
-                        register={form.register('name')}
+                        formState = { form.formState }
+                        placeholder = 'Your name'
+                        register = { form.register('name') }
                     />
                 )}
 
                 <Input
                     autoFocus
-                    formState={form.formState}
-                    placeholder='Your email address'
-                    register={form.register('email')}
+                    formState = { form.formState }
+                    placeholder = 'Your email address'
+                    register = { form.register('email') }
                 />
                 <Input
-                    formState={form.formState}
-                    placeholder='Choose a safe password'
-                    register={form.register('password')}
-                    type='password'
+                    formState = { form.formState }
+                    placeholder = 'Choose a safe password'
+                    register = { form.register('password') }
+                    type = 'password'
                 />
                 {!isLogin && (
                     <Input
-                        formState={form.formState}
-                        placeholder='Confirm password'
-                        register={form.register('confirmPassword')}
-                        type='password'
+                        formState = { form.formState }
+                        placeholder = 'Confirm password'
+                        register = { form.register('confirmPassword') }
+                        type = 'password'
                     />
                 )}
 
                 <Styled.Controls>
-                    <GUI.Button auto disabled={isFetching} htmlType='submit' loading={isFetching}>
+                    <GUI.Button auto disabled = { isFetching } htmlType = 'submit' loading = { isFetching }>
                         {isLogin ? 'login' : 'create account'}
                     </GUI.Button>
 
                     <GUI.Button
                         auto
                         ghost
-                        disabled={isFetching}
-                        type='secondary'
-                        onClick={() => setIsLogin(!isLogin)}>
+                        disabled = { isFetching }
+                        type = 'secondary'
+                        onClick = { () => setIsLogin(!isLogin) }>
                         {isLogin ? 'create account' : 'back to login'}
                     </GUI.Button>
                 </Styled.Controls>

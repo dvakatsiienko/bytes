@@ -56,7 +56,7 @@ module.exports = {
         'no-param-reassign':      [ 2, { props: false }], // * to allow redux toolkit slices mutate the state param
         'no-restricted-syntax':   complex.noRestrictedSyntax, // *
         'no-undefined':           2,
-        // 'no-underscore-dangle':   0, // TODO disable rule in case of a trouble
+        'no-underscore-dangle':   0, // TODO disable rule in case of a trouble
         'no-unused-expressions':  complex.noUnusedExpressions, // *
         'no-void':                0,
         'prefer-destructuring':   0,

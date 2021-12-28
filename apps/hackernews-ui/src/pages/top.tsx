@@ -8,7 +8,7 @@ import { PostList } from '@/components';
 import * as gql from '@/graphql';
 import { getStaticAC } from '@/lib/apollo';
 
-const TopPostsPage: TopPostsPageProps = props => {
+const TopPostsPage: TopPostsPageProps = (props) => {
     // const feedQuery = gql.useFeedQuery({
     //     variables:   { take: 25, orderBy },
     //     fetchPolicy: 'cache-and-network',
