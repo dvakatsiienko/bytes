@@ -1,10 +1,6 @@
 /* Core */
 import { GetServerSidePropsContext, GetStaticPropsContext } from 'next';
-import {
-    ApolloClient,
-    InMemoryCache,
-    NormalizedCacheObject
-} from '@apollo/client';
+import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 
 /* Instruments */
 import { createIsomorphicLink } from './links';
@@ -36,10 +32,7 @@ export const getApolloClient = (
 
     return client;
 };
-export const getStaticAC = (
-    ctx?: GetStaticPropsContext,
-    initialState?: NormalizedCacheObject,
-) => {
+export const getStaticAC = (_?: GetStaticPropsContext, initialState?: NormalizedCacheObject) => {
     const client = createAC(initialState);
 
     return client;
