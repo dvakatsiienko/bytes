@@ -39,15 +39,17 @@ module.exports = {
         ...complex.disabledEslintImportRuleKeyList, // ? find out better way to disable eslint-plugin-import
 
         // ? ESLint: possible problems
+        'no-duplicate-imports':            [ 2, { includeExports: true }],
         'no-template-curly-in-string':     0,
         'no-unused-private-class-members': 2,
-        'no-use-before-define':            [ 2, 'nofunc' ], // *
+        'no-use-before-define':            0,
 
         // ? ESLint: suggestions
         'arrow-body-style':       0,
         'class-methods-use-this': 0,
         'consistent-return':      0,
         'func-style':             [ 2, 'declaration', { allowArrowFunctions: true }], // *
+        'init-declarations':      [ 2, 'always' ],
         'no-console':             [ 1, { allow: [ 'warn', 'error' ] }], // *
         'no-delete-var':          0,
         'no-negated-condition':   2,

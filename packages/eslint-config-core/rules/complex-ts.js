@@ -1,3 +1,6 @@
+/* Core */
+const style = require('eslint-config-airbnb-base/rules/style');
+
 exports.banTsComment = [
     2,
     {
@@ -7,3 +10,7 @@ exports.banTsComment = [
         'ts-check':        'allow-with-description',
     },
 ];
+
+const [ , commaDangleRuleOpts ] = style.rules[ 'comma-dangle' ];
+
+exports.commaDangleRuleOpts = commaDangleRuleOpts;
