@@ -2,12 +2,16 @@
     "name": "turborepo",
     "version": "0.0.0",
     "private": true,
-    "workspaces": [ "apps/*", "packages/*" ],
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
     "packageManager": "yarn@3.1.1",
     "scripts": {
         "build": "turbo run build",
         "dev": "turbo run dev --parallel",
         "start:hackernews": "turbo run start --scope='@hackernews/*'",
+        "start:hackernews-api": "turbo run start --scope=@hackernews/api",
         "build:hackernews-ui": "turbo run build --scope='@hackernews/ui'",
         "start:launchpad": "turbo run start --scope=next-launchpad",
         "start:basic": "turbo run start --scope='@basic/*'",

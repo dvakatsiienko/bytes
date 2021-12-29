@@ -66,6 +66,7 @@ const NewPostsPaginatedPage: NextPage = () => {
 
     const feed = feedQuery.data?.feed;
     const totalPages = Math.ceil(feed?.count ?? POSTS_PER_PAGE / POSTS_PER_PAGE);
+    const postList = feed?.posts ?? [];
 
     return (
         <PostList
@@ -76,7 +77,7 @@ const NewPostsPaginatedPage: NextPage = () => {
                 setPage,
                 skip: feedVariables.skip,
             }}
-            postList = { feed?.posts ?? [] }
+            postList = { postList }
         />
     );
 };
