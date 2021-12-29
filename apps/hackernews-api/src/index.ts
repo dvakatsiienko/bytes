@@ -9,9 +9,7 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import chalk from 'chalk';
 
 /* Instruments */
-import {
-    createApolloCtx, createWsCtx, wsLogging, getUrlParts
-} from './utils';
+import { createApolloCtx, createWsCtx, wsLogging, getUrlParts } from './utils';
 import { schema } from './graphql/schema';
 
 dotenv.config({ path: join(__dirname, '../.env.development.local') });

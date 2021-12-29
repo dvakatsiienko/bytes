@@ -1,8 +1,6 @@
-# Dima Vakatsiienko's turborepo
+# Turborepo
 
-This is an official turborepo.
-
-## What's inside?
+### What's inside?
 
 This turborepo uses [NPM](https://www.npmjs.com/) as a package manager. It includes the following packages/apps:
 
