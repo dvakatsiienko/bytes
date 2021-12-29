@@ -15,6 +15,8 @@ module.exports = {
                 // ? React: hooks
                 'react-hooks/rules-of-hooks': 2,
 
+                // TODO next eslint
+
                 // ? React: core
                 'react/destructuring-assignment':      0,
                 'react/function-component-definition': [
