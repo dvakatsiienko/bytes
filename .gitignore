@@ -8,12 +8,6 @@ node_modules
 # testing
 coverage
 
-# Output
-.next/
-out/
-build
-dist
-
 # misc
 .DS_Store
 *.pem
@@ -31,7 +25,11 @@ yarn-error.log*
 .env.production.local
 
 # turbo
-.turbo
+**/.turbo/**
+**/build/**
+**/dist/**
+**/.next/**
+**/out/**
 
 # yarn specifics
 .pnp.*
