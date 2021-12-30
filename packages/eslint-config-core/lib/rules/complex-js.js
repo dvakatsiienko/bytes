@@ -18,6 +18,8 @@ exports.noRestrictedSyntax = [
     },
 ];
 
+exports.noUnderscoreDangle = [ 2, { allow: [ '__typename', '__REDUX_DEVTOOLS_EXTENSION_COMPOSE__' ] }];
+
 exports.noUnusedExpressions = [
     // ? airbnb-config-base override — allow all to loose the rule strictness
     2,
