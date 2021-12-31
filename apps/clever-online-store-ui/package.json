@@ -39,7 +39,7 @@
         "zx": "4.2.0"
     },
     "devDependencies": {
-        "@babel/preset-env": "7.16.5",
+        "@babel/preset-env": "7.16.7",
         "@graphql-codegen/cli": "2.3.1",
         "@graphql-codegen/import-types-preset": "2.1.9",
         "@graphql-codegen/typescript": "2.4.2",
