@@ -36,8 +36,6 @@ module.exports = {
     // ? - same as above with * comment — overrides the extended from config or plugin
     // ? - the rest of rules are not extended but new
     rules: {
-        ...complex.disabledEslintImportRuleKeyList, // ? find out better way to disable eslint-plugin-import
-
         // ? ESLint: possible problems
         'no-duplicate-imports':            [ 2, { includeExports: true }],
         'no-template-curly-in-string':     0,
