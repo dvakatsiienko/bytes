@@ -11,7 +11,7 @@
     "release": "release-it --ci"
   },
   "dependencies": {
-    "@apollo/client": "3.5.6",
+    "@apollo/client": "3.5.7",
     "@geist-ui/react": "2.2.0",
     "@geist-ui/react-icons": "1.0.1",
     "@hookform/resolvers": "2.8.5",
@@ -21,13 +21,13 @@
     "graphql-ws": "5.5.5",
     "isomorphic-ws": "4.0.1",
     "lodash": "4.17.21",
-    "next": "12.0.7",
+    "next": "12.0.8",
     "nprogress": "0.2.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-hook-form": "7.22.5",
+    "react-hook-form": "7.23.0",
     "sanitize.css": "13.0.0",
-    "sass": "1.45.2",
+    "sass": "1.47.0",
     "styled-components": "5.3.3",
     "waait": "1.0.5",
     "yup": "0.32.11"
@@ -44,7 +44,7 @@
     "@types/nprogress": "0.2.0",
     "@types/react": "17.0.38",
     "@types/react-dom": "17.0.11",
-    "@types/styled-components": "5.1.19",
+    "@types/styled-components": "5.1.20",
     "apollo-link-logger": "2.0.0",
     "auto-changelog": "2.3.0",
     "babel-plugin-styled-components": "2.0.2",
@@ -53,7 +53,7 @@
     "graphql-codegen-apollo-next-ssr": "1.7.1",
     "prettier-eslint": "13.0.0",
     "prettier-eslint-cli": "5.0.1",
-    "release-it": "14.11.8",
+    "release-it": "14.12.1",
     "typescript": "4.5.4"
   }
 }
