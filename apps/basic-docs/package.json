@@ -18,6 +18,6 @@
         "eslint": "8.24.0",
         "next-transpile-modules": "9.0.0",
         "tsconfig-core": "*",
-        "typescript": "4.5.4"
+        "typescript": "4.8.4"
     }
 }
