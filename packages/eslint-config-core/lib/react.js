@@ -3,7 +3,7 @@
 const complex = require('./rules/complex-react');
 
 /**
- * @type {import('eslint').Linter.Config<import('eslint').Linter.RulesRecord)>}
+ * @type {import('eslint').Linter.Config}
  */
 module.exports = {
     overrides: [
