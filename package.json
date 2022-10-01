@@ -1,54 +1,54 @@
 {
-    "name": "turborepo",
-    "version": "0.0.0",
-    "private": true,
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ],
-    "packageManager": "yarn@3.1.1",
-    "scripts": {
-        "build": "turbo run build",
-        "dev": "turbo run dev --parallel",
-        "start:hackernews": "turbo run start --scope='@hackernews/*'",
-        "start:hackernews-api": "turbo run start --scope=@hackernews/api",
-        "build:hackernews-ui": "turbo run build --scope='@hackernews/ui'",
-        "start:launchpad": "turbo run start --scope=next-launchpad",
-        "start:basic": "turbo run start --scope='@basic/*'",
-        "lint": "turbo run lint",
-        "format": "prettier --write \"**/*.{ts,tsx,md}\""
-    },
-    "devDependencies": {
-        "eslint": "8.6.0",
-        "prettier": "2.5.1",
-        "turbo": "1.0.26"
-    },
-    "turbo": {
-        "baseBranch": "origin/main",
-        "npmClient": "yarn",
-        "pipeline": {
-            "build": {
-                "dependsOn": [
-                    "^build"
-                ],
-                "outputs": [
-                    "dist/**",
-                    ".next/**"
-                ]
-            },
-            "lint": {
-                "outputs": []
-            },
-            "dev": {
-                "cache": false
-            },
-            "start": {
-                "cache": false
-            }
-        }
-    },
-    "engines": {
-        "npm": ">=8.0.0",
-        "node": ">=16.11.0"
+  "name": "turborepo",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "yarn@3.2.3",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "start:hackernews": "turbo run start --scope='@hackernews/*'",
+    "start:hackernews-api": "turbo run start --scope=@hackernews/api",
+    "build:hackernews-ui": "turbo run build --scope='@hackernews/ui'",
+    "start:launchpad": "turbo run start --scope=next-launchpad",
+    "start:basic": "turbo run start --scope='@basic/*'",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "eslint": "8.24.0",
+    "prettier": "2.7.1",
+    "turbo": "1.0.26"
+  },
+  "turbo": {
+    "baseBranch": "origin/main",
+    "npmClient": "yarn",
+    "pipeline": {
+      "build": {
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": [
+          "dist/**",
+          ".next/**"
+        ]
+      },
+      "lint": {
+        "outputs": []
+      },
+      "dev": {
+        "cache": false
+      },
+      "start": {
+        "cache": false
+      }
     }
+  },
+  "engines": {
+    "npm": ">=8.0.0",
+    "node": ">=16.11.0"
+  }
 }
