@@ -2,8 +2,14 @@
 
 # dependencies
 node_modules
+build
+dist
+out
 .pnp
 .pnp.js
+.next
+.turbo
+.vercel
 
 # testing
 coverage
@@ -24,13 +30,6 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# turbo
-**/.turbo/**
-**/build/**
-**/dist/**
-**/.next/**
-**/out/**
-
 # yarn specifics
 .pnp.*
 .yarn/*
@@ -39,3 +38,5 @@ yarn-error.log*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+pscale.txt

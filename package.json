@@ -2,11 +2,6 @@
   "name": "turborepo",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "yarn@3.2.3",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
@@ -23,7 +18,7 @@
     "turbo": "^1.9.3"
   },
   "engines": {
-    "npm": ">=8.0.0",
-    "node": ">=16.11.0"
+    "pnpm": ">=8.0.0",
+    "node": ">=18.12.0"
   }
 }
