@@ -13,7 +13,6 @@
         "check:eslint": "eslint --max-warnings 10 ./src",
         "check:stylelint": "stylelint ./src",
         "prettify": "prettier-eslint --write \"$PWD/src/**/*.{ts,tsx}\"",
-        "prepare": "husky install",
         "release": "release-it --ci"
     },
     "dependencies": {
@@ -61,7 +60,6 @@
         "dotenv": "16.0.3",
         "eslint": "8.24.0",
         "graphql-codegen-apollo-next-ssr": "1.7.1",
-        "husky": "7.0.4",
         "npm-run-all": "4.1.5",
         "prettier": "2.7.1",
         "prettier-eslint-cli": "7.1.0",
