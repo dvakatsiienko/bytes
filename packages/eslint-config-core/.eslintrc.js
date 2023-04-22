@@ -1,3 +1,4 @@
 module.exports = {
-    extends: './index.js',
+  root:    true,
+  extends: "./index.js",
 };

@@ -1,14 +1,10 @@
-/* Core */
-import createWithTm from 'next-transpile-modules';
-
-const withTm = createWithTm([ 'utils' ]);
-
 /**
  * @type {import('next').NextConfig}
  */
-const config = {
-    reactStrictMode: true,
-    async redirects() {
+const nextConfig = {
+    reactStrictMode:   true,
+    transpilePackages: [ 'utils' ],
+    redirects() {
         return [
             {
                 source:      '/user',
@@ -24,4 +20,4 @@ const config = {
     },
 };
 
-export default withTm(config);
+export default nextConfig;

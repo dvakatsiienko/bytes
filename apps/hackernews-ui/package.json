@@ -2,7 +2,6 @@
   "name": "@hackernews/ui",
   "version": "0.9.1",
   "private": true,
-  "license": "MIT",
   "scripts": {
     "start": "next",
     "build": "next build",
@@ -21,7 +20,7 @@
     "graphql-ws": "5.5.5",
     "isomorphic-ws": "4.0.1",
     "lodash": "4.17.21",
-    "next": "12.0.8",
+    "next": "13.3.0",
     "nprogress": "0.2.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -49,11 +48,13 @@
     "auto-changelog": "2.3.0",
     "babel-plugin-styled-components": "2.0.2",
     "babel-plugin-transform-define": "2.0.1",
-    "eslint": "8.24.0",
-    "graphql-codegen-apollo-next-ssr": "1.7.1",
+    "eslint": "8.39.0",
     "prettier-eslint": "15.0.1",
+    "eslint-config-core": "workspace:*",
+    "graphql-codegen-apollo-next-ssr": "1.7.1",
     "prettier-eslint-cli": "7.1.0",
     "release-it": "14.12.1",
+    "tsconfig-core": "workspace:*",
     "typescript": "4.8.4"
   }
 }

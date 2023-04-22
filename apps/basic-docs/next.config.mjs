@@ -1,11 +1,9 @@
-/* Core */
-import createWithTm from 'next-transpile-modules';
-
-const withTm = createWithTm([ 'ui', 'utils' ]);
-
 /**
  * @type {import('next').NextConfig}
  */
-const nextConfig = { reactStrictMode: true };
+const nextConfig = {
+    reactStrictMode:   true,
+    transpilePackages: [ 'ui', 'utils' ],
+};
 
-export default withTm({ nextConfig });
+export default nextConfig;

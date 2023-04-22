@@ -1,20 +1,12 @@
 {
     "extends": "tsconfig-core/tsconfig.json",
     /* File inclusion */
-    "exclude": [
-        "node_modules"
-    ],
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx"
-    ],
+    "exclude": ["node_modules"],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@/*": [
-                "src/*"
-            ]
+            "@/*": ["src/*"]
         },
         "incremental": true
     }

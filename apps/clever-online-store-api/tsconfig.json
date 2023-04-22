@@ -1,19 +1,13 @@
 {
-    "extends": "tsconfig-core/tsconfig.json",
-    /* File inclusion */
-    "exclude": [
-        "node_modules"
-    ],
-    "include": [
-        "**/*.ts"
-    ],
-    "compilerOptions": {
-        /* Module resolution */
-        "baseUrl": ".",
-        "paths": {
-            "@/*": [
-                "src/*"
-            ]
-        }
+  "extends": "tsconfig-core/tsconfig.json",
+  /* File inclusion */
+  "exclude": ["node_modules"],
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    /* Module resolution */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
     }
+  }
 }
