@@ -1,1 +1,4 @@
-module.exports = { extends: 'core' };
+module.exports = {
+    root:    true,
+    extends: 'core',
+};
