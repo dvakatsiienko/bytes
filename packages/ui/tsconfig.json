@@ -1,5 +1,5 @@
 {
-  "extends": "tsconfig-core/tsconfig.json",
-  "include": ["."],
-  "exclude": ["dist", "build", "node_modules"]
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "include": ["."],
+    "exclude": ["dist", "build", "node_modules"]
 }

@@ -5,7 +5,11 @@ import { sum } from 'utils';
 const Docs = () => {
     return (
         <div>
-            <h1>Docs {sum(1, 2)}</h1>
+            <h1>
+                Docs
+                <br />
+                {sum(1, 2)}
+            </h1>
             <Button />
         </div>
     );
