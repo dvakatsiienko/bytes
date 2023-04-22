@@ -33,7 +33,6 @@
         "prisma": "3.8.0",
         "ts-node": "10.9.1",
         "ts-node-dev": "2.0.0",
-        "tsconfig-core": "workspace:*",
         "typescript": "4.8.4",
         "ws": "8.4.0",
         "yup": "0.32.11"
