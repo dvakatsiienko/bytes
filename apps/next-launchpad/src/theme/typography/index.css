@@ -1,9 +1,0 @@
-@import './fonts/index.css';
-
-:root {
-    font-size: 10px;
-}
-
-body {
-    font-family: roboto, system-ui, sans-serif;
-}
