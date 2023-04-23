@@ -3,10 +3,12 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start:simple": "turbo run start --filter='@simple/*'",
-        "start:space-explorer": "turbo run start --filter='@space-explorer/*'",
-        "build": "turbo run build",
-        "lint": "turbo run lint",
+        "start:simple": "turbo start --filter='@simple/*'",
+        "start:space-explorer": "turbo start --filter='@space-explorer/*'",
+        "build": "turbo build",
+        "starbuild:simple": "turbo build --filter='@simple/*'",
+        "build:space-explorer:ui": "turbo build --filter='@space-explorer/ui'",
+        "lint": "turbo lint",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
     },
     "devDependencies": {
