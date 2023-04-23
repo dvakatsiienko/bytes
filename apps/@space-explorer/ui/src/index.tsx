@@ -22,16 +22,3 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <GlobalStyle />
     </StrictMode>,
 );
-
-// render(
-//     <>
-//         <Router>
-//             <ApolloProvider client = { client }>
-//                 <Pages />
-//             </ApolloProvider>
-//         </Router>
-
-//         <GlobalStyle />
-//     </>,
-//     document.getElementById('root'),
-// );

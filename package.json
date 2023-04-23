@@ -4,6 +4,7 @@
     "private": true,
     "scripts": {
         "start:simple": "turbo run start --filter='@simple/*'",
+        "start:space-explorer": "turbo run start --filter='@space-explorer/*'",
         "build": "turbo run build",
         "lint": "turbo run lint",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
