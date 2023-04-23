@@ -26,7 +26,7 @@ importers:
         specifier: 1.9.3
         version: 1.9.3
 
-  apps/basic-docs:
+  apps/@simple/docs:
     dependencies:
       '@opentelemetry/api':
         specifier: 1.4.1
@@ -54,10 +54,10 @@ importers:
         version: 18.2.0(react@18.2.0)
       ui:
         specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../../../packages/ui
       utils:
         specifier: workspace:*
-        version: link:../../packages/utils
+        version: link:../../../packages/utils
     devDependencies:
       '@types/react':
         specifier: 18.0.38
@@ -70,12 +70,12 @@ importers:
         version: 2.8.8
       tsconfig-core:
         specifier: workspace:*
-        version: link:../../packages/tsconfig-core
+        version: link:../../../packages/tsconfig-core
       typescript:
         specifier: 5.0.4
         version: 5.0.4
 
-  apps/basic-web:
+  apps/@simple/web:
     dependencies:
       '@opentelemetry/api':
         specifier: 1.4.1
@@ -103,11 +103,14 @@ importers:
         version: 18.2.0(react@18.2.0)
       ui:
         specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../../../packages/ui
       utils:
         specifier: workspace:*
-        version: link:../../packages/utils
+        version: link:../../../packages/utils
     devDependencies:
+      '@types/node':
+        specifier: 18.16.0
+        version: 18.16.0
       '@types/react':
         specifier: 18.0.38
         version: 18.0.38
@@ -119,7 +122,7 @@ importers:
         version: 2.8.8
       tsconfig-core:
         specifier: workspace:*
-        version: link:../../packages/tsconfig-core
+        version: link:../../../packages/tsconfig-core
       typescript:
         specifier: 5.0.4
         version: 5.0.4
@@ -751,6 +754,10 @@ packages:
   /@types/minimist@1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
     dev: false
+
+  /@types/node@18.16.0:
+    resolution: {integrity: sha512-BsAaKhB+7X+H4GnSjGhJG9Qi8Tw+inU9nJDwmD5CgOmBLEI6ArdhikpLX7DjbjDRDTbqZzU2LSQNZg8WGPiSZQ==}
+    dev: true
 
   /@types/normalize-package-data@2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -1950,6 +1957,7 @@ packages:
   /eslint@8.39.0:
     resolution: {integrity: sha512-mwiok6cy7KTW7rBpo05k6+p4YVZByLNjAZ/ACB9DRCu4YDRwjXI01tWHp6KAUWelsBetTxKK/2sHB0vdS8Z2Og==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    hasBin: true
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.39.0)
       '@eslint-community/regexpp': 4.5.0
@@ -2836,6 +2844,7 @@ packages:
   /nanoid@3.3.6:
     resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
     dev: false
 
   /natural-compare@1.4.0:
@@ -3203,6 +3212,7 @@ packages:
   /prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /prop-types@15.8.1:
@@ -3333,7 +3343,7 @@ packages:
     resolution: {integrity: sha512-+dtWQ7l2lqQDxheaG3jjyN1QI37gEwvzACSgjYi4/C2y+ZTUMeRW8BIOm+9NBKvwaMBUSZfPXVOt1skB0vBkRw==}
     engines: {node: '>=8.6.0'}
     dependencies:
-      debug: 4.3.3
+      debug: 4.3.4
       module-details-from-path: 1.0.3
       resolve: 1.22.2
     transitivePeerDependencies:
