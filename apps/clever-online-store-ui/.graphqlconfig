@@ -1,8 +1,0 @@
-{
-    "projects": {
-        "app": {
-            "schemaPath": "http://localhost:3000/api/graphql",
-            "includes": [ "**/**/*.gql" ],
-        }
-    }
-}

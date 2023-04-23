@@ -23,7 +23,7 @@
     "devDependencies": {
         "@types/react": "18.0.38",
         "eslint": "8.39.0",
-        "prettier": "2.8.7",
+        "prettier": "2.8.8",
         "tsconfig-core": "workspace:*",
         "typescript": "5.0.4"
     }
