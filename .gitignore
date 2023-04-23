@@ -8,6 +8,7 @@ out
 .pnp
 .pnp.js
 .next
+.vite
 .turbo
 .vercel
 
