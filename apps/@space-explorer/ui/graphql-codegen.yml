@@ -1,0 +1,15 @@
+schema:
+    - ${VITE_GQL_URL}
+    - src/graphql/schema/client-schema.graphql
+documents: 'src/graphql/**/*.graphql'
+
+config:
+    dedupeOperationSuffix: true
+
+generates:
+    src/graphql/index.tsx:
+        plugins:
+            - typescript
+            - typescript-operations
+            - typescript-react-apollo
+            - typescript-apollo-client-helpers

@@ -1,0 +1,14 @@
+# Mutation
+mutation BookTrips($launchIds: [ID!]!) {
+    bookTrips(launchIds: $launchIds) {
+        id
+        createdAt
+        launch {
+            ...LaunchFragment
+        }
+    }
+}
+
+mutation cancelTrip($tripId: ID!) {
+    cancelTrip(tripId: $tripId)
+}

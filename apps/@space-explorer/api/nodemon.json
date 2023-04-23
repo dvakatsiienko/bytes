@@ -1,0 +1,12 @@
+{
+  "restartable": "rs",
+  "ext": "ts js json",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "ignore": [".git", "node_modules/**/node_modules"],
+  "execMap": {
+    "ts": "node -r @swc-node/register"
+  },
+  "watch": ["src", "nodemon.json", "package.json"]
+}
