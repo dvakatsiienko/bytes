@@ -6,7 +6,7 @@ const Web = () => {
     return (
         <div>
             <h1>
-                Web
+                Web...
                 <br />
                 {sum(1, 2)}
             </h1>
