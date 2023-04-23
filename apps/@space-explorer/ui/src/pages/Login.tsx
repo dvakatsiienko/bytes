@@ -27,7 +27,7 @@ export const Login = () => {
     });
 
     if (loading) return <Loading />;
-    if (error) return <p>An error occurred</p>;
+    if (error) return <p>An error occurred.</p>;
 
     return <LoginForm loginMutation = { loginMutation } />;
 };
