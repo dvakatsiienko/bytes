@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start:basic": "turbo run start --filter='@basic/*'",
+        "start:simple": "turbo run start --filter='@simple/*'",
         "build": "turbo run build",
         "lint": "turbo run lint",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
