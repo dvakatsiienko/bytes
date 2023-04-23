@@ -1,3 +1,5 @@
 packages:
-  - "apps/**"
-  - "packages/**"
+  - "apps/@simple/*"
+  - "apps/@space-exporer/*"
+  - "apps/hackernews"
+  - "packages/*"
