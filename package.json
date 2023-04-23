@@ -3,21 +3,16 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "build": "turbo run build",
-        "dev": "turbo run dev --parallel",
-        "start:hackernews": "turbo run start --filter='@hackernews/*'",
-        "start:hackernews-api": "turbo run start --filter=@hackernews/api",
-        "build:hackernews-ui": "turbo run build --filter='@hackernews/ui'",
         "start:basic": "turbo run start --filter='@basic/*'",
+        "build": "turbo run build",
         "lint": "turbo run lint",
-        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-        "packages:reinstall": "rimraf **/**/node_modules && pnpm install --fix-lockfile"
+        "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
     },
     "devDependencies": {
         "eslint": "8.39.0",
         "eslint-config-core": "workspace:*",
         "eslint-config-dva": "0.0.16",
-        "prettier": "2.8.7",
+        "prettier": "2.8.8",
         "rimraf": "5.0.0",
         "tsconfig-core": "workspace:*",
         "turbo": "1.9.3"
