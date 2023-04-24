@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "start:simple": "turbo start --filter='@simple/*'",
-        "start:space-explorer": "turbo start --filter='@space-explorer/*'",
+        "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
         "build": "turbo build",
         "starbuild:simple": "turbo build --filter='@simple/*'",
         "build:@space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
