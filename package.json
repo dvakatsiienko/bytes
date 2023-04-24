@@ -7,7 +7,7 @@
         "start:space-explorer": "turbo start --filter='@space-explorer/*'",
         "build": "turbo build",
         "starbuild:simple": "turbo build --filter='@simple/*'",
-        "build:space-explorer:ui": "turbo build --filter='@space-explorer/ui'",
+        "build:@space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
         "lint": "turbo lint",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
     },
