@@ -16,7 +16,7 @@ import spaceJpg from './img/space.jpg';
 export const LoginForm: React.FC<LoginFormProps> = (props) => {
     const form = useForm({
         resolver,
-        defaultValues: { email: '' },
+        defaultValues: { email: process.env.NODE_ENV === 'development' ? 'test@email.io' : '' },
         mode:          'all',
     });
 

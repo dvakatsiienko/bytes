@@ -1,25 +1,16 @@
 /* Core */
-import { DataSource, DataSourceConfig } from 'apollo-datasource';
-import { PrismaClient } from '@prisma/client';
+import { RESTDataSource } from '@apollo/datasource-rest';
 
 /* Instruments */
-import { ApolloCtx } from '@/types';
+import { prismaClient } from '@/utils'
 
-const client = new PrismaClient();
+export class UserAPI extends RESTDataSource {
+    userEmail: string | null;
 
-export class UserAPI extends DataSource<ApolloCtx> {
-    context: ApolloCtx = { userEmail: null };
+    constructor(userEmail: string | null) {
+        super();
 
-    /**
-     * This is a function that gets called by ApolloServer when being setup.
-     * This function gets called with the datasource config including things
-     * like caches and context. We'll assign this.context to the request context
-     * here, so we can know about the user making requests.
-     */
-    async initialize(config: DataSourceConfig<ApolloCtx>) {
-        this.context = config.context;
-
-        await client.$connect();
+        this.userEmail = userEmail;
     }
 
     async findOrCreate(email?: string | null) {
@@ -27,13 +18,13 @@ export class UserAPI extends DataSource<ApolloCtx> {
             throw new Error('Email is null!');
         }
 
-        let user = await client.user.findUnique({
+        let user = await prismaClient.user.findUnique({
             where:   { email },
             include: { trips: true },
         });
 
         if (user === null) {
-            user = await client.user.create({
+            user = await prismaClient.user.create({
                 data: {
                     email,
                     trips: { create: [] },
@@ -58,13 +49,13 @@ export class UserAPI extends DataSource<ApolloCtx> {
     async bookTrip(launchId: string) {
         const email = this.validateAuth();
 
-        const user = await client.user.findUnique({ where: { email } });
+        const user = await prismaClient.user.findUnique({ where: { email } });
 
         if (user === null) {
             throw new Error('User not found.');
         }
 
-        const trip = await client.trip.create({
+        const trip = await prismaClient.trip.create({
             data: { launchId, userId: user.id },
         });
 
@@ -74,13 +65,13 @@ export class UserAPI extends DataSource<ApolloCtx> {
     async cancelTrip(id: string) {
         this.validateAuth();
 
-        await client.trip.delete({ where: { id } });
+        await prismaClient.trip.delete({ where: { id } });
     }
 
     async getTrips() {
         const email = this.validateAuth();
 
-        const user = await client.user.findUnique({
+        const user = await prismaClient.user.findUnique({
             where:   { email },
             include: { trips: true },
         });
@@ -97,7 +88,7 @@ export class UserAPI extends DataSource<ApolloCtx> {
     async isBookedOnLaunch(launchId: string) {
         const email = this.validateAuth();
 
-        const user = await client.user.findUnique({
+        const user = await prismaClient.user.findUnique({
             where:   { email },
             include: { trips: true },
         });
@@ -106,7 +97,7 @@ export class UserAPI extends DataSource<ApolloCtx> {
             throw new Error('User not found.');
         }
 
-        const userTrips = await client.trip.findMany({
+        const userTrips = await prismaClient.trip.findMany({
             where: { userId: user.id, launchId },
         });
 
@@ -114,10 +105,18 @@ export class UserAPI extends DataSource<ApolloCtx> {
     }
 
     validateAuth() {
-        if (!this.context.userEmail) {
+        if (!this.userEmail) {
             throw new Error('Not authenticated.');
         }
 
-        return this.context.userEmail;
+        return this.userEmail;
+    }
+
+    login(email: string) {
+        this.userEmail = email;
+    }
+
+    logout() {
+        this.userEmail = null;
     }
 }

@@ -1,13 +1,20 @@
 /* Instruments */
-import { injectLaunchesIntoTrips } from '../utils';
-import type * as gql from '../graphql';
-import type { Resolver } from '../types';
+import { injectLaunchesIntoTrips } from '@/utils';
+import type * as gql from '@/graphql';
+import type { Resolver } from '@/types';
 
 export const Mutation: MutationResolvers = {
     login: async (_, args, { dataSources }) => {
         const userProfile = await dataSources.userAPI.findOrCreate(args.email);
 
+        dataSources.userAPI.login(userProfile?.email ?? null);
+
         return userProfile;
+    },
+    logout:  (_, __, { dataSources }) => {
+        dataSources.userAPI.logout();
+
+        return true;
     },
     bookTrips: async (_, args, { dataSources }) => {
         const { launchIds } = args;
@@ -31,6 +38,7 @@ export const Mutation: MutationResolvers = {
 /* Types */
 interface MutationResolvers {
     login: Resolver<gql.MutationLoginArgs>;
+    logout: Resolver;
     bookTrips: Resolver<gql.MutationBookTripsArgs>;
     cancelTrip: Resolver<gql.MutationCancelTripArgs>;
 }
