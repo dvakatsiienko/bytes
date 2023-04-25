@@ -1,7 +1,7 @@
 /* Instruments */
+import { injectLaunchesIntoTrips } from '../utils';
 import type * as gql from '../graphql';
 import type { Resolver } from '../types';
-import { injectLaunchesIntoTrips } from '../utils';
 
 export const Mutation: MutationResolvers = {
     login: async (_, args, { dataSources }) => {
@@ -13,9 +13,7 @@ export const Mutation: MutationResolvers = {
         const { launchIds } = args;
 
         const bookedTrips = await dataSources.userAPI.bookTrips(launchIds);
-        const launches = await dataSources.spaceXAPI.getLaunchesByIds(
-            launchIds,
-        );
+        const launches = await dataSources.spaceXAPI.getLaunchesByIds(launchIds);
 
         const finalTrips = injectLaunchesIntoTrips(bookedTrips, launches);
 

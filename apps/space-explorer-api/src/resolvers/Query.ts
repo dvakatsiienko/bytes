@@ -1,7 +1,7 @@
 /* Instruments */
+import { paginate } from '../utils';
 import type * as gql from '../graphql';
 import type { Resolver } from '../types';
-import { paginate } from '../utils';
 
 export const Query: QueryResolvers = {
     launches: async (_, args, { dataSources }) => {
@@ -17,8 +17,7 @@ export const Query: QueryResolvers = {
             list,
             cursor:  list.length ? list[ list.length - 1 ].flightNumber : null,
             hasMore: list.length
-                ? list[ list.length - 1 ].flightNumber
-                  !== launches[ launches.length - 1 ].flightNumber
+                ? list[ list.length - 1 ].flightNumber !== launches[ launches.length - 1 ].flightNumber
                 : false,
         };
     },

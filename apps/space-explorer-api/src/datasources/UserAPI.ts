@@ -3,7 +3,7 @@ import { DataSource, DataSourceConfig } from 'apollo-datasource';
 import { PrismaClient } from '@prisma/client';
 
 /* Instruments */
-import { ApolloCtx } from '../types';
+import { ApolloCtx } from '@/types';
 
 const client = new PrismaClient();
 
