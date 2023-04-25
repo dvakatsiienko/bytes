@@ -1,4 +1,5 @@
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -37,7 +38,7 @@ export type Mission = {
 
 
 export type MissionMissionPatchArgs = {
-  size?: Maybe<PatchSize>;
+  size?: InputMaybe<PatchSize>;
 };
 
 export type Mutation = {
@@ -45,6 +46,7 @@ export type Mutation = {
   bookTrips: Array<Trip>;
   cancelTrip: Scalars['Boolean'];
   login: UserProfile;
+  logout: Scalars['Boolean'];
 };
 
 
@@ -59,7 +61,7 @@ export type MutationCancelTripArgs = {
 
 
 export type MutationLoginArgs = {
-  email?: Maybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']>;
 };
 
 export enum PatchSize {
@@ -81,8 +83,8 @@ export type QueryLaunchArgs = {
 
 
 export type QueryLaunchesArgs = {
-  after?: Maybe<Scalars['Int']>;
-  pageSize?: Maybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['Int']>;
+  pageSize?: InputMaybe<Scalars['Int']>;
 };
 
 export type Rocket = {

@@ -7,16 +7,15 @@
     "scripts": {
         "start": "nodemon ./src/index.ts",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate",
+        "prestart": "pnpm codegen:graphql"
     },
     "dependencies": {
+        "@apollo/datasource-rest": "5.1.0",
         "@apollo/server": "4.7.0",
         "@graphql-tools/graphql-file-loader": "7.5.17",
         "@graphql-tools/load": "7.8.14",
         "@prisma/client": "4.13.0",
-        "apollo-datasource": "3.3.2",
-        "apollo-datasource-rest": "3.7.0",
-        "apollo-server": "3.12.0",
         "chalk": "5.2.0",
         "dotenv": "16.0.3",
         "graphql": "16.6.0",

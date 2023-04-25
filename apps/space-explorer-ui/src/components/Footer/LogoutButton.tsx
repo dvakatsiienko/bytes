@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { LogoutSvg } from './SVG';
 
 /* Instruments */
+import * as gql from '@/graphql';
 import { isLoggedInVar } from '@/lib/apollo';
 import { menuItemClassName } from '../MenuItem';
 
@@ -14,9 +15,13 @@ export const LogoutButton: React.FC = () => {
     const client = useApolloClient();
     const navigate = useNavigate();
 
+    const [ logoutMutation ] = gql.useLogoutMutation();
+
     const logout = () => {
         client.cache.evict({ fieldName: 'userProfile' });
         client.cache.gc();
+
+        logoutMutation();
 
         localStorage.removeItem('token');
         localStorage.removeItem('userId');

@@ -1,6 +1,6 @@
 /* Instruments */
 import { injectLaunchesIntoTrips } from '@/utils';
-import type { Resolver } from '../types';
+import type { Resolver } from '@/types';
 
 export const UserProfile: UserProfileResolvers = {
     trips: async (_, __, { dataSources }) => {

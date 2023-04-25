@@ -29,3 +29,7 @@ mutation Login($email: String!) {
         token
     }
 }
+
+mutation Logout {
+    logout
+}
