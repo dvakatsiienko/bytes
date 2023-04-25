@@ -6,10 +6,11 @@
 
         "moduleResolution": "Node",
         "target": "ESNext",
+        "module": "ESNext",
         "sourceMap": true,
         "outDir": "dist",
         "strict": true,
-        "lib": ["ESNext", "dom"],
+        "lib": ["ESNext"],
         "esModuleInterop": true,
         "jsx": "preserve"
     }

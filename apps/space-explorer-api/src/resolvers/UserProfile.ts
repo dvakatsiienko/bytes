@@ -1,5 +1,5 @@
 /* Instruments */
-import { injectLaunchesIntoTrips } from '../utils';
+import { injectLaunchesIntoTrips } from '@/utils';
 import type { Resolver } from '../types';
 
 export const UserProfile: UserProfileResolvers = {
@@ -7,9 +7,7 @@ export const UserProfile: UserProfileResolvers = {
         const userTrips = await dataSources.userAPI.getTrips();
 
         const launchIds = userTrips.map(trip => trip.launchId);
-        const launches = await dataSources.spaceXAPI.getLaunchesByIds(
-            launchIds,
-        );
+        const launches = await dataSources.spaceXAPI.getLaunchesByIds(launchIds);
 
         const finalTrips = injectLaunchesIntoTrips(userTrips, launches);
 

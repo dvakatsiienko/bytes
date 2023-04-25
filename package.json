@@ -5,6 +5,8 @@
     "scripts": {
         "start:simple": "turbo start --filter='@simple/*'",
         "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
+        "start:@space-explorer/ui": "turbo start --filter='@space-explorer/ui'",
+        "start:@space-explorer/api": "turbo start --filter='@space-explorer/api'",
         "build": "turbo build",
         "starbuild:simple": "turbo build --filter='@simple/*'",
         "build:@space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
