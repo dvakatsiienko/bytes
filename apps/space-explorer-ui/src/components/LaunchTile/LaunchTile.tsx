@@ -1,5 +1,5 @@
 /* Core */
-import { useReactiveVar, Reference } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
