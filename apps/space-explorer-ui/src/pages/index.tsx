@@ -12,10 +12,11 @@ import { Cart } from './Cart';
 import { Profile } from './Profile';
 
 /* Components */
-import { Footer, PageContainer } from '@/components';
+import { Layout } from '@/components';
 
 /* Instruments */
 import * as gql from '@/graphql';
+import { clearLocalStorageAuthItems } from '@/utils';
 
 export const Pages: React.FC = () => {
     const { data } = gql.useIsUserLoggedInQuery();
@@ -27,13 +28,14 @@ export const Pages: React.FC = () => {
             navigate(data?.isLoggedIn ? '/launches' : '/login', {
                 replace: true,
             });
+            if (!data?.isLoggedIn) clearLocalStorageAuthItems();
         }
     }, []);
 
     return (
         <>
             <Routes>
-                <Route element = { <PageContainer /> } path = '/'>
+                <Route element = { <Layout /> } path = '/'>
                     <Route element = { <Launches /> } path = 'launches' />
                     <Route element = { <Launch /> } path = 'launches/:launchId' />
                     <Route element = { <Cart /> } path = 'cart' />
@@ -47,8 +49,6 @@ export const Pages: React.FC = () => {
 
                 <Route element = { <Login /> } path = 'login' />
             </Routes>
-
-            {data?.isLoggedIn && <Footer />}
         </>
     );
 };
