@@ -7,9 +7,18 @@ import { LogoutButton } from './LogoutButton';
 import { HomeSvg, CartSvg, ProfileSvg } from './SVG';
 
 /* Instruments */
+import * as gql from '@/graphql';
 import { COLORS, SPACING } from '@/styles';
 
 export const Footer = () => {
+    const cartItemsQuery = gql.useGetCartItemsQuery();
+    const userProfileQuery = gql.useUserProfileQuery({
+        // fetchPolicy: 'cache-and-network',
+    });
+
+    const cartItemsCount = cartItemsQuery.data?.cartItems.length;
+    const userTripsCount = userProfileQuery.data?.userProfile.trips.length;
+
     return (
         <Container>
             <InnerContainer>
@@ -20,11 +29,13 @@ export const Footer = () => {
 
                 <MenuItem to = '/cart'>
                     <CartSvg />
+                    {!!cartItemsCount && <span className = 'count'>{cartItemsCount}</span>}
                     Cart
                 </MenuItem>
 
                 <MenuItem to = '/profile'>
                     <ProfileSvg />
+                    {!!userTripsCount && <span className = 'count'>{userTripsCount}</span>}
                     Profile
                 </MenuItem>
 
@@ -36,12 +47,13 @@ export const Footer = () => {
 
 /* Styles */
 const Container = styled('footer')({
-    flexShrink:      0,
-    marginTop:       'auto',
-    backgroundColor: 'white',
-    color:           COLORS.textSecondary,
     position:        'sticky',
     bottom:          0,
+    flexShrink:      0,
+    marginTop:       'auto',
+    height:          130,
+    backgroundColor: 'white',
+    color:           COLORS.textSecondary,
 });
 
 const InnerContainer = styled('div')({

@@ -23,22 +23,8 @@ export const LaunchTile: React.FC<LaunchTileProps> = (props) => {
     const isInCart = id ? cartItems.includes(id) : false;
 
     const [ cancelTripMutation, cancelTripMeta ] = gql.useCancelTripMutation({
-        variables: { tripId: props.trip?.id ?? '' },
-        update(cache) {
-            cache.modify({
-                id: cache.identify({
-                    __typename: 'UserProfile',
-                    id:         localStorage.getItem('userId'),
-                }),
-                fields: {
-                    trips(existingTrips: Reference[], { readField }) {
-                        return existingTrips.filter(
-                            (tripRef) => readField('id', tripRef) !== props.trip?.id,
-                        );
-                    },
-                },
-            });
-        },
+        variables:      { tripId: props.trip?.id ?? '' },
+        refetchQueries: [ gql.LaunchesDocument, gql.UserProfileDocument ],
     });
 
     const submit = (event: React.SyntheticEvent) => {
@@ -101,6 +87,7 @@ const StyledLink = styled(Link)<StyledLinkProps>`
     justify-content: space-between;
     height: ${(props) => (props.$isDetailed ? 365 : 193)}px;
     margin-top: ${padding}px;
+    margin-bottom: ${padding}px;
     padding: ${SPACING * 4}px ${SPACING * 5}px ${SPACING * 2}px;
     text-decoration: none;
     border-radius: 7px;

@@ -2,10 +2,16 @@
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
+/* Components */
+import { Footer } from '@/components';
+
 /* Instruments */
+import * as gql from '@/graphql';
 import { SPACING, COLORS } from '@/styles';
 
-export const PageContainer: React.FC = () => {
+export const Layout: React.FC = () => {
+    const { data } = gql.useIsUserLoggedInQuery();
+
     return (
         <>
             <Bar />
@@ -13,6 +19,8 @@ export const PageContainer: React.FC = () => {
             <Container>
                 <Outlet />
             </Container>
+
+            {data?.isLoggedIn && <Footer />}
         </>
     );
 };

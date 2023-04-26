@@ -25,6 +25,8 @@ export const Header: React.FC<HeaderProps> = (props) => {
 
 /* Styles */
 const Container = styled('div')({
+    // position:     'sticky',
+    // top:          0,
     display:      'flex',
     alignItems:   'center',
     marginBottom: SPACING * 4.5,

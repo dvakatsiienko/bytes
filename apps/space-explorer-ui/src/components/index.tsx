@@ -1,6 +1,6 @@
 export * from './SVG';
 
-export { PageContainer } from './PageContainer';
+export { Layout } from './Layout';
 export { Header } from './Header';
 export { Footer } from './Footer';
 export { Loading } from './Loading';
