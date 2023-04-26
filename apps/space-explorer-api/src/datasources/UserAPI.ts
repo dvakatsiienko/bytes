@@ -2,7 +2,7 @@
 import { RESTDataSource } from '@apollo/datasource-rest';
 
 /* Instruments */
-import { prismaClient } from '@/utils'
+import { prismaClient } from '@/lib'
 
 export class UserAPI extends RESTDataSource {
     userEmail: string | null;

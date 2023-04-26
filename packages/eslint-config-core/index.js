@@ -4,7 +4,8 @@
 module.exports = {
     extends: [ './lib/javascript', './lib/typescript', './lib/react' ],
     rules:   {
-        indent: [ 1, 4 ],
-        quotes: [ 'error', 'single' ],
+        indent:           [ 1, 4 ],
+        quotes:           [ 2, 'single' ],
+        [ 'no-console' ]: 0,
     },
 };
