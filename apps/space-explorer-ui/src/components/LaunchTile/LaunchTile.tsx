@@ -24,7 +24,7 @@ export const LaunchTile: React.FC<LaunchTileProps> = (props) => {
 
     const [ cancelTripMutation, cancelTripMeta ] = gql.useCancelTripMutation({
         variables:      { tripId: props.trip?.id ?? '' },
-        refetchQueries: [ gql.UserProfileDocument, gql.LaunchesDocument ],
+        refetchQueries: 'all',
     });
 
     const submit = (event: React.SyntheticEvent) => {
