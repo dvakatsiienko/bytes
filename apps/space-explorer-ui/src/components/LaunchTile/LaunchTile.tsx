@@ -22,13 +22,9 @@ export const LaunchTile: React.FC<LaunchTileProps> = (props) => {
     const cartItems = useReactiveVar(cartItemsVar);
     const isInCart = id ? cartItems.includes(id) : false;
 
-    const refetchQueries = 'all';
-
-    console.log('🚀 ~ refetchQueries:', refetchQueries);
-
     const [ cancelTripMutation, cancelTripMeta ] = gql.useCancelTripMutation({
-        variables: { tripId: props.trip?.id ?? '' },
-        refetchQueries,
+        variables:      { tripId: props.trip?.id ?? '' },
+        refetchQueries: [ 'UserProfile', 'Launches' ],
     });
 
     const submit = (event: React.SyntheticEvent) => {
