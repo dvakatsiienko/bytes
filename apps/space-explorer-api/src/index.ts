@@ -11,9 +11,10 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 
 /* Instruments */
+import { prismaClient } from '@/lib';
+import { getDirname } from '@/utils';
 import { resolvers } from './resolvers';
 import { SpaceXAPI, UserAPI } from './datasources';
-import { getDirname } from '@/utils';
 
 dotenv.config({ path: '.env.development.local' });
 
@@ -21,18 +22,27 @@ const typeDefs = loadSchemaSync(join(getDirname(import.meta.url), './graphql/sch
     loaders: [ new GraphQLFileLoader() ],
 }) as unknown as DocumentNode;
 
-const apolloServer = new ApolloServer({ resolvers, typeDefs, });
+const apolloServer = new ApolloServer({ resolvers, typeDefs });
 
 const { url } = await startStandaloneServer(apolloServer, {
-    context: async expressCtx => {
+    context: async (expressCtx) => {
         const { req } = expressCtx;
 
         const auth = req.headers?.authorization ?? '';
 
         const decodedUserEmail = Buffer.from(auth, 'base64').toString('ascii');
-        const userEmail = z.string().email().safeParse(decodedUserEmail).success
+        let userEmail = z.string().email().safeParse(decodedUserEmail).success
             ? decodedUserEmail
             : null;
+
+        let isUserExists = false;
+
+        if (userEmail) {
+            const user = await prismaClient.user.findUnique({ where: { email: userEmail } });
+            isUserExists = !!user;
+        }
+
+        if (!isUserExists) userEmail = null;
 
         return {
             userEmail,
