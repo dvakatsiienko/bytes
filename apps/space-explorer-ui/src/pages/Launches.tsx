@@ -10,7 +10,7 @@ import {
 import * as gql from '@/graphql';
 
 export const Launches: React.FC = () => {
-    const { data, loading, fetchMore } = gql.useLaunchesQuery();
+    const { data, loading, fetchMore } = gql.useLaunchesQuery({ fetchPolicy: 'cache-and-network' });
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
 
     const launchesListJSX = data?.launches.list.map((launch) => {
