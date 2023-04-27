@@ -3,15 +3,16 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start:hackernews": "turbo start --filter='hackernews'",
+        "start:hackernews": "turbo start --filter=hackernews",
         "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
         "start:@space-explorer/ui": "turbo start --filter='@space-explorer/ui'",
         "start:@space-explorer/api": "turbo start --filter='@space-explorer/api' --color",
         "start:@simple": "turbo start --filter='@simple/*'",
         "build": "turbo build",
-        "build:hackernews": "turbo build --filter='hackernews'",
+        "build:hackernews": "turbo build --filter=hackernews",
         "build:@space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
         "build:simple": "turbo build --filter='@simple/*'",
+        "vercel:build:hackernews": "pnpm prisma generate && pnpm build:hackernews",
         "lint": "turbo lint",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
     },
