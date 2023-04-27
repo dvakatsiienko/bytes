@@ -12,7 +12,6 @@
         "build:hackernews": "turbo build --filter=hackernews",
         "build:@space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
         "build:simple": "turbo build --filter='@simple/*'",
-        "vercel:build:hackernews": "pnpm prisma generate && pnpm build:hackernews",
         "lint": "turbo lint",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
     },
