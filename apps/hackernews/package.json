@@ -23,7 +23,7 @@
         "prisma:migrate:reset": "npx prisma db push --force-reset",
         "prisma:db:seed": "prisma db seed",
         "prisma:studio": "yarn dotenv -e .env.local --- yarn prisma studio",
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate --schema=./prisma/schema.prisma"
     },
     "prisma": {
         "seed": "node -r @swc-node/register prisma/seed"
@@ -81,7 +81,6 @@
         "prettier-eslint-cli": "7.1.0",
         "redux-logger": "3.0.6",
         "rimraf": "5.0.0",
-        "turbo": "1.9.3",
         "typescript": "5.0.4"
     }
 }
