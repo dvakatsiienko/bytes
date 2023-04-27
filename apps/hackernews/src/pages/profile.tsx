@@ -18,7 +18,7 @@ const ProfilePage: NextPage = () => {
 
     return (
         <section>
-            <h1>Profile</h1>
+            <h1>Profile...</h1>
 
             <h6>Hello, {session.data?.user.name}</h6>
             <h6>Bio: {session.data?.user.bio}</h6>
