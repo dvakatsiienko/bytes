@@ -180,9 +180,6 @@ importers:
       rimraf:
         specifier: 5.0.0
         version: 5.0.0
-      turbo:
-        specifier: 1.9.3
-        version: 1.9.3
       typescript:
         specifier: 5.0.4
         version: 5.0.4
