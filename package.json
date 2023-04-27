@@ -3,13 +3,15 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start:simple": "turbo start --filter='@simple/*'",
+        "start:hackernews": "turbo start --filter='hackernews'",
         "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
         "start:@space-explorer/ui": "turbo start --filter='@space-explorer/ui'",
         "start:@space-explorer/api": "turbo start --filter='@space-explorer/api' --color",
+        "start:@simple": "turbo start --filter='@simple/*'",
         "build": "turbo build",
-        "starbuild:simple": "turbo build --filter='@simple/*'",
+        "build:hackernews": "turbo build --filter='hackernews'",
         "build:@space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
+        "build:simple": "turbo build --filter='@simple/*'",
         "lint": "turbo lint",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
     },
