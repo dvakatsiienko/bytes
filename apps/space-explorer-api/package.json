@@ -7,7 +7,7 @@
     "scripts": {
         "start": "nodemon ./src/index.ts",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate --schema=./prisma/schema.prisma"
     },
     "dependencies": {
         "@apollo/datasource-rest": "5.1.0",
