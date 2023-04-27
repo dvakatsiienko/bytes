@@ -1,7 +1,7 @@
 /* Core */
 import { useRouter } from 'next/router';
 import { Tooltip, theme } from '@nextui-org/react';
-import { styled } from 'styled-components';
+import styled from 'styled-components';
 import { type StyledIconProps } from '@styled-icons/styled-icon';
 import { Aperture as ApertureIcon } from '@styled-icons/feather/Aperture';
 import { useSession } from 'next-auth/react';

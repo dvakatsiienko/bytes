@@ -1,7 +1,7 @@
 /* Core */
-import { styled } from 'styled-components';
-import { Triangle } from '@styled-icons/ionicons-sharp/Triangle';
 import { Card, Text, Tooltip, theme, useTheme } from '@nextui-org/react';
+import { Triangle } from '@styled-icons/ionicons-sharp/Triangle';
+import styled from 'styled-components';
 
 /* Components */
 import { Nav } from '@/elements';
