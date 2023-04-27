@@ -22,8 +22,7 @@
         "seed": "dotenv -e .env.local run-s prisma:migrate:reset prisma:db:seed",
         "prisma:migrate:reset": "npx prisma db push --force-reset",
         "prisma:db:seed": "prisma db seed",
-        "prisma:studio": "yarn dotenv -e .env.local --- yarn prisma studio",
-        "postinstall": "prisma generate --schema=./prisma/schema.prisma"
+        "prisma:studio": "yarn dotenv -e .env.local --- yarn prisma studio"
     },
     "prisma": {
         "seed": "node -r @swc-node/register prisma/seed"
