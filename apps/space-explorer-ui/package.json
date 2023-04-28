@@ -13,7 +13,7 @@
         "build:clean": "rimraf dist"
     },
     "dependencies": {
-        "@apollo/client": "3.7.12",
+        "@apollo/client": "3.7.13",
         "@hookform/resolvers": "3.1.0",
         "@types/styled-components": "5.1.26",
         "apollo-link-logger": "2.0.1",
@@ -24,7 +24,7 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-hook-form": "7.43.9",
-        "react-router-dom": "6.10.0",
+        "react-router-dom": "6.11.0",
         "styled-components": "5.3.10",
         "zod": "3.21.4"
     },
@@ -35,7 +35,7 @@
         "@graphql-codegen/typescript-operations": "3.0.4",
         "@graphql-codegen/typescript-react-apollo": "3.3.7",
         "@types/debug": "4.1.7",
-        "@types/node": "18.16.1",
+        "@types/node": "18.16.2",
         "@types/react": "18.2.0",
         "@types/react-dom": "18.2.1",
         "@vitejs/plugin-react-swc": "3.3.0",
