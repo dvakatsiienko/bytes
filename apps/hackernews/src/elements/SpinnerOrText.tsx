@@ -1,13 +1,12 @@
 /* Core */
 import { Loading } from '@nextui-org/react';
 
-export const SpinnerOrText = ({
-    isLogin = false,
-    loginText = '',
-    ...props
-}: SpinnerOrTextProps) => {
+export const SpinnerOrText = (props: SpinnerOrTextProps) => {
+    props.isLogin ||= false;
+    props.loginText ||= '';
+
     if (props.isFetching) return <Loading color = 'currentColor' size = 'sm' type = 'spinner' />;
-    if (isLogin) return <>{loginText}</>;
+    if (props.isLogin) return props.loginText;
 
     return <>{props.text}</>;
 };
