@@ -1,3 +1,3 @@
 # Turborepo
 
-Monorepositry is wired with [Turborepo](https://turbo.build/).
+🏎️ Monorepositry is wired with [Turborepo](https://turbo.build/).
