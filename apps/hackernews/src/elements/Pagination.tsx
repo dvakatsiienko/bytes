@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router';
 import {
     Pagination as NextUiPagination,
-    PaginationProps as NextPaginationProps
+    PaginationProps as NextPaginationProps,
 } from '@nextui-org/react';
 
 export const Pagination = () => {

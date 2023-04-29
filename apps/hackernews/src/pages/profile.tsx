@@ -20,9 +20,18 @@ const ProfilePage: NextPage = () => {
         <section>
             <h1>Profile...</h1>
 
-            <h6>Hello, {session.data?.user.name}</h6>
-            <h6>Bio: {session.data?.user.bio}</h6>
-            <h6>Location: {session.data?.user.location}</h6>
+            <h6>
+                Hello,
+                {session.data?.user.name}
+            </h6>
+            <h6>
+                Bio:
+                {session.data?.user.bio}
+            </h6>
+            <h6>
+                Location:
+                {session.data?.user.location}
+            </h6>
 
             <br />
             <br />

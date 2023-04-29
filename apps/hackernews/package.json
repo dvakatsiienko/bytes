@@ -76,7 +76,6 @@
         "@types/redux-logger": "3.0.9",
         "@types/styled-components": "5.1.26",
         "dotenv-cli": "7.2.1",
-        "eslint": "8.39.0",
         "npm-run-all": "4.1.5",
         "prettier": "2.8.8",
         "prettier-eslint-cli": "7.1.0",
