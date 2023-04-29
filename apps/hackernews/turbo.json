@@ -1,0 +1,14 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "extends": ["//"],
+    "pipeline": {
+        "build": {
+            "dependsOn": ["prisma:generate"]
+        },
+        "prisma:generate": {
+            "cache": true,
+            "inputs": ["prisma/schema.prisma"],
+            "env": ["DATABASE_URL"]
+        }
+    }
+}
