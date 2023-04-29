@@ -1,6 +1,5 @@
 /* eslint-env: Node */
-
-const complex = require('./rules/complex-js');
+const complex = require('../rules/complex-js');
 
 /**
  * @type {import('eslint').Linter.Config<import('eslint').Linter.RulesRecord)>}
@@ -11,13 +10,13 @@ module.exports = {
     parserOptions: {
         requireConfigFile: false,
         sourceType:        'module',
-        ecmaFeatures:      { ecmaVersion: 'latest' },
+        ecmaFeatures:      { ecmaVersion: 'latest', impliedStrict: true },
 
         // TODO support monorepo shape
         // babelOptions: { rootMode: 'upward' },
     },
     env: {
-        es2021:                true,
+        es2022:                true,
         node:                  true,
         browser:               true,
         'shared-node-browser': true,
@@ -28,7 +27,7 @@ module.exports = {
         __PROD__: 'readonly',
         __TEST__: 'readonly',
     },
-    extends: [ 'eslint:recommended', './rules/eslint-config-airbnb-base' ],
+    extends: [ 'eslint:recommended', '../rules/eslint-config-airbnb-without-import' ],
 
     // ? any rule value set to:
     // ? - 0 — disables the rule extended from config or plugin
