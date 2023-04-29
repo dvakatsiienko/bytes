@@ -6,6 +6,7 @@ const complex = require('../rules/complex-js');
  */
 module.exports = {
     root:          true,
+    extends:       [ 'eslint:recommended', '../rules/eslint-config-airbnb-without-import' ],
     parser:        '@babel/eslint-parser',
     parserOptions: {
         requireConfigFile: false,
@@ -27,7 +28,6 @@ module.exports = {
         __PROD__: 'readonly',
         __TEST__: 'readonly',
     },
-    extends: [ 'eslint:recommended', '../rules/eslint-config-airbnb-without-import' ],
 
     // ? any rule value set to:
     // ? - 0 — disables the rule extended from config or plugin
