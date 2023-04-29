@@ -6,7 +6,7 @@ const complex = require('../rules/complex-js');
  */
 module.exports = {
     root:          true,
-    extends:       [ 'eslint:recommended', '../rules/eslint-config-airbnb-without-import' ],
+    extends:       [ 'eslint:recommended', './eslint-config-airbnb-without-import' ],
     parser:        '@babel/eslint-parser',
     parserOptions: {
         requireConfigFile: false,
