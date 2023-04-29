@@ -15,7 +15,7 @@ const server = z.object({
         // Since NextAuth.js automatically uses the VERCEL_URL if present.
         (str) => process.env.VERCEL_URL ?? str,
         // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-        process.env.VERCEL ? z.string().min(1) : z.string().url(),
+        process.env.VERCEL ? z.string().min(1) : z.string().url()
     ),
 
     GITHUB_CLIENT_ID:     z.string().min(1),
@@ -66,7 +66,7 @@ function createProtectedEnv() {
 
     const protectedEnv = new Proxy(parsed.data, {
         get(target, prop) {
-            if (typeof prop !== 'string') return undefined;
+            if (typeof prop !== 'string') return void 0;
 
             // Throw a descriptive error if a server-side env var is accessed on the client
             // Otherwise it would just be returning `undefined` and be annoying to debug
@@ -74,7 +74,7 @@ function createProtectedEnv() {
                 throw new Error(
                     process.env.NODE_ENV === 'production'
                         ? '❌ Attempted to access a server-side environment variable on the client'
-                        : `❌ Attempted to access a server-side environment variable '${prop}' on the client`,
+                        : `❌ Attempted to access a server-side environment variable '${prop}' on the client`
                 );
             }
             return target[ /** @type {keyof typeof target} */ (prop) ];

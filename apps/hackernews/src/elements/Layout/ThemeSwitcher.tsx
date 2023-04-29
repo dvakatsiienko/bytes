@@ -11,8 +11,8 @@ export const ThemeSwitcher = () => {
 
     return (
         <Switch
-            shadow
             bordered
+            shadow
             checked = { isDark }
             color = 'warning'
             css = {{ marginBottom: 5 }}

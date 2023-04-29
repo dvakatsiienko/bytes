@@ -22,11 +22,13 @@ export const createNextAuthOptions = <T>(
     const query = baseQuery ?? (req.query as NextApiRequest['query']);
 
     const nextAuthQuery = query.nextauth;
-    const isCredentialsPostQuery = nextAuthQuery?.includes('callback')
-        && nextAuthQuery.includes('credentials')
-        && req.method === 'POST';
+    const isCredentialsPostQuery =
+        nextAuthQuery?.includes('callback') &&
+        nextAuthQuery.includes('credentials') &&
+        req.method === 'POST';
 
-    const getCookies = () => new Cookies(req, res, { secure: process.env.NODE_ENV === 'production' });
+    const getCookies = () =>
+        new Cookies(req, res, { secure: process.env.NODE_ENV === 'production' });
 
     const nextAuthOptions: NextAuthOptions = {
         debug:   true,
@@ -122,11 +124,11 @@ export const createNextAuthOptions = <T>(
                 },
 
                 // credentials
-                async authorize(credentials, req) {
+                async authorize(credentials) {
                     // TODO improve
                     // console.log('AUTHORIZE', credentials?.email, credentials?.password);
 
-                    const user = await prisma.user.findUnique({ where: { email: credentials?.email } });
+                    const user = await prisma.user.findUnique({where: { email: credentials?.email }});
 
                     // if (!authResponse.ok) {
                     //     return null;
@@ -178,9 +180,10 @@ export const withAuth = async (ctx: GetServerSidePropsContext) => {
 };
 
 /* Config */
-const NEXT_AUTH_SESSION_TOKEN_COOKIE_NAME = process.env.NODE_ENV === 'production'
-    ? '__Secure-next-auth.session-token'
-    : 'next-auth.session-token';
+const NEXT_AUTH_SESSION_TOKEN_COOKIE_NAME =
+    process.env.NODE_ENV === 'production'
+        ? '__Secure-next-auth.session-token'
+        : 'next-auth.session-token';
 const SESSION_AGE = 360 * 24 * 60 * 60; // 360 days
 
 /* Types */

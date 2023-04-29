@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import {
     useSelector as useReduxSelector,
     useDispatch as useReduxDispatch,
-    type TypedUseSelectorHook
+    type TypedUseSelectorHook,
 } from 'react-redux';
 
 /* Instruments */
