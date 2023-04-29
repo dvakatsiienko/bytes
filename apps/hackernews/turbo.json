@@ -8,10 +8,7 @@
         "prisma:generate": {
             "cache": true,
             "env": ["DATABASE_URL"],
-            "inputs": ["prisma/schema.prisma"],
-            "outputs": [
-                "./../../node_modules/.pnpm/@prisma+client@4.13.0_prisma@4.13.0/node_modules/@prisma/client"
-            ]
+            "inputs": ["prisma/schema.prisma"]
         }
     }
 }
