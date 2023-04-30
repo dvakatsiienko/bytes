@@ -441,6 +441,10 @@ importers:
       typescript:
         specifier: 5.0.4
         version: 5.0.4
+    devDependencies:
+      eslint-plugin-smells:
+        specifier: 1.0.1
+        version: 1.0.1
 
   packages/tsconfig-core: {}
 
@@ -6349,6 +6353,10 @@ packages:
       semver: 6.3.0
       string.prototype.matchall: 4.0.8
     dev: false
+
+  /eslint-plugin-smells@1.0.1:
+    resolution: {integrity: sha512-vIy2QY30ws/cNNuCMDpR4Sxnt6Y3oYACOemrl5pFR+/vgHwH/r8Mt4Cc3HrPE+FIk3w5uroYMUuD1NDSnIFvng==}
+    dev: true
 
   /eslint-scope@5.1.1:
     resolution: {integrity: sha512-2NxwbF/hZ0KpepYN0cNbo+FN6XoK7GaHlQhgx/hIZl6Va0bF45RQOOwhLIy8lQDbuCiadSLCBnH2CFYquit5bw==}
