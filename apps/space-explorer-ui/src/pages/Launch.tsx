@@ -14,7 +14,7 @@ export const Launch: React.FC = () => {
     });
 
     if (loading) return <Loading />;
-    if (error) return <p>ERROR: {error.message}</p>;
+    if (error) return <p>ERROR:{error.message}</p>;
     if (!data) return <p>Not found</p>;
 
     return (

@@ -62,6 +62,9 @@ module.exports = {
                 'react/jsx-sort-props':                    complex.jsxSortProps,
                 'react/jsx-space-before-closing':          2,
                 'react/jsx-wrap-multilines':               2,
+
+                // TODO process
+                'react/jsx-one-expression-per-line': 0, // ? off because it is't flexible enough to prettify good looking code
             },
         },
     ],

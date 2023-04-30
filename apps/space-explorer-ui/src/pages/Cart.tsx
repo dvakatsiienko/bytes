@@ -2,9 +2,7 @@
 import styled from 'styled-components';
 
 /* Components */
-import {
-    Header, Loading, CartItem, Button
-} from '@/components';
+import { Header, Loading, CartItem, Button } from '@/components';
 
 /* Instruments */
 import * as gql from '@/graphql';
@@ -23,7 +21,12 @@ export const Cart: React.FC = () => {
         return <Loading />;
     }
     if (cartItemsQuery.error) {
-        return <p>Error: {cartItemsQuery.error.message}</p>;
+        return (
+            <p>
+                Error:
+                {cartItemsQuery.error.message}
+            </p>
+        );
     }
 
     const { cartItems } = cartItemsQuery.data;

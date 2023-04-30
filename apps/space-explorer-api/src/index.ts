@@ -18,7 +18,9 @@ import { SpaceXAPI, UserAPI } from './datasources';
 
 dotenv.config({ path: '.env.development.local' });
 
-const typeDefs = loadSchemaSync(join(getDirname(import.meta.url), './graphql/schema.graphql'), {loaders: [ new GraphQLFileLoader() ]}) as unknown as DocumentNode;
+const typeDefs = loadSchemaSync(join(getDirname(import.meta.url), './graphql/schema.graphql'), {
+    loaders: [ new GraphQLFileLoader() ],
+}) as unknown as DocumentNode;
 
 const apolloServer = new ApolloServer({ resolvers, typeDefs });
 

@@ -1,8 +1,6 @@
 /* Core */
 import { useEffect } from 'react';
-import {
-    Routes, Route, Navigate, useNavigate, useLocation
-} from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 /* Pages */
 import { Login } from './Login';
@@ -33,22 +31,20 @@ export const Pages: React.FC = () => {
     }, []);
 
     return (
-        <>
-            <Routes>
-                <Route element = { <Layout /> } path = '/'>
-                    <Route element = { <Launches /> } path = 'launches' />
-                    <Route element = { <Launch /> } path = 'launches/:launchId' />
-                    <Route element = { <Cart /> } path = 'cart' />
-                    <Route element = { <Profile /> } path = 'profile' />
+        <Routes>
+            <Route element = { <Layout /> } path = '/'>
+                <Route element = { <Launches /> } path = 'launches' />
+                <Route element = { <Launch /> } path = 'launches/:launchId' />
+                <Route element = { <Cart /> } path = 'cart' />
+                <Route element = { <Profile /> } path = 'profile' />
 
-                    <Route
-                        element = { <Navigate to = { data?.isLoggedIn ? '/launches' : '/login' } /> }
-                        path = '*'
-                    />
-                </Route>
+                <Route
+                    element = { <Navigate to = { data?.isLoggedIn ? '/launches' : '/login' } /> }
+                    path = '*'
+                />
+            </Route>
 
-                <Route element = { <Login /> } path = 'login' />
-            </Routes>
-        </>
+            <Route element = { <Login /> } path = 'login' />
+        </Routes>
     );
 };
