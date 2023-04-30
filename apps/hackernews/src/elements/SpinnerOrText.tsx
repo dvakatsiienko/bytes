@@ -6,9 +6,9 @@ export const SpinnerOrText = (props: SpinnerOrTextProps) => {
     props.loginText ||= '';
 
     if (props.isFetching) return <Loading color = 'currentColor' size = 'sm' type = 'spinner' />;
-    if (props.isLogin) return props.loginText;
+    if (props.isLogin) return <>{props.loginText}</>;
 
-    return props.text;
+    return <>{props.text}</>;
 };
 
 /* Types */

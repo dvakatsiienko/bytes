@@ -13,6 +13,13 @@ module.exports = {
             files:   [ '*.ts', '*.tsx' ],
             extends: [ 'plugin:@typescript-eslint/recommended' ],
             rules:   {
+                // TODO
+                // '@typescript-eslint/no-empty-interface': 0,
+                // '@typescript-eslint/comma-dangle':       [ 1, 'always-multiline' ],
+                // '@typescript-eslint/no-shadow':          0,
+                // TODO configure this rule to allow missed parameters ... or? not.
+                // '@typescript-eslint/no-unused-vars':     0,
+
                 // ? Rules
                 '@typescript-eslint/explicit-module-boundary-types': 0,
                 '@typescript-eslint/ban-ts-comment':                 complex.banTsComment,
@@ -26,8 +33,8 @@ module.exports = {
                 'brace-style':                    0,
                 '@typescript-eslint/brace-style': 2,
 
-                'comma-dangle':                    0,
-                '@typescript-eslint/comma-dangle': [ 2, complex.commaDangleRuleOpts ],
+                'comma-dangle': 0,
+                // '@typescript-eslint/comma-dangle': [ 2, complex.commaDangleRuleOpts ],
 
                 'comma-spacing':                    0,
                 '@typescript-eslint/comma-spacing': 2,

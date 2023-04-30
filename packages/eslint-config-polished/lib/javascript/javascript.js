@@ -60,8 +60,7 @@ module.exports = {
         'require-atomic-updates':          2,
 
         // ? ESLint: suggestions
-        camelcase:                        1,
-        curly:                            [ 1, 'multi', 'consistent' ],
+        camelcase:                        [ 1, { allow: [ '^unstable_', 'grant_type', 'access_token', 'refresh_token' ] }],
         'default-case':                   2,
         'default-case-last':              1,
         'default-param-last':             1,
@@ -161,5 +160,24 @@ module.exports = {
         'lines-between-class-members': [ 2, 'always', { exceptAfterSingleLine: true }], // *
         'max-len':                     complex.maxLen,
         'object-curly-newline':        0,
+
+        // TODO configure this rule so prettier formats loo long lines. Exclude comments from linting.
+        // 'max-len':              [ 1, 100 ],
+        // 'arrow-parens':         [ 1, 'always' ],
+        // 'key-spacing':          [ 1, { beforeColon: false, afterColon: true, align: 'value' }],
+        // 'object-curly-newline': [
+        //     1,
+        //     {
+        //         ObjectExpression:  { multiline: true },
+        //         ObjectPattern:     { multiline: true },
+        //         ImportDeclaration: { multiline: true },
+        //         ExportDeclaration: { multiline: true },
+        //     },
+        // ],
+
+        // TODO eslint-plugin-import
+        'import/no-cycle': 0,
+
+        // TODO eslint-plugin-prettier
     },
 };

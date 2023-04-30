@@ -26,8 +26,8 @@ export const LoginForm: React.FC = () => {
             name:            __DEV__ ? 'Jack' : '',
             email:           __DEV__ ? 'admin@email.io' : '',
             password:        __DEV__ ? '12345' : '',
-            confirmPassword: __DEV__ ? '12345' : '',
-        },
+            confirmPassword: __DEV__ ? '12345' : ''
+        }
     });
 
     const login = async () => {
@@ -36,7 +36,7 @@ export const LoginForm: React.FC = () => {
         const result = await signIn('credentials', {
             redirect: false,
             email:    form.getValues().email,
-            password: form.getValues().password,
+            password: form.getValues().password
         });
 
         if (result?.ok) router.push('/');

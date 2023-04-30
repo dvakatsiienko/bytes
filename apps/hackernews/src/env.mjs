@@ -45,7 +45,7 @@ const processEnv = {
 
 const merged = server.merge(client);
 
-const isProtectingEnv = !!process.env.SKIP_ENV_VALIDATION === false;
+const isProtectingEnv = Boolean(process.env.SKIP_ENV_VALIDATION) === false;
 
 const env = isProtectingEnv ? createProtectedEnv() : /** @type {MergedOutput} */ (process.env);
 
