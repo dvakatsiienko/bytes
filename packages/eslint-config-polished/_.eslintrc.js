@@ -1,7 +1,7 @@
 /** @type {import('eslint').ESLint.ConfigData} */
 module.exports = {
-    root:    true,
-    extends: 'core',
+    // root:    true,
+    // extends: 'core',
     globals: { $: true },
     rules:   {
         // TODO: move to package config

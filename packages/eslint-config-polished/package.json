@@ -1,9 +1,8 @@
 {
-    "name": "eslint-config-core",
+    "name": "eslint-config-polished",
     "version": "0.0.16",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "license": "MIT",
-    "main": "index.js",
     "keywords": [
         "eslint",
         "eslintconfig"
@@ -22,5 +21,11 @@
         "eslint-plugin-react": "7.31.8",
         "eslint-plugin-react-hooks": "4.6.0",
         "typescript": "5.0.4"
+    },
+    "main": "index.js",
+    "exports": {
+        "./javascript": "./javascript.js",
+        "./typescript": "./typescript.js",
+        "./react": "./react.js"
     }
 }
