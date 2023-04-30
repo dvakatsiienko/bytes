@@ -19,10 +19,6 @@ module.exports = {
             extends: 'polished/javascript',
         },
         {
-            files:   [ './packages/utils/**/.ts' ],
-            extends: 'polished/typescript',
-        },
-        {
             files:   [ './packages/ui/**/*{.ts,.tsx}' ],
             extends: 'polished/react',
         },
