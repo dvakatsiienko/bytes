@@ -5,11 +5,14 @@
 ### Contents
 
 ###### Applications
-- 🖥️ Hackernews
-- 🛰️ Space Explorer
+
+-   🖥️ Hackernews
+-   🛰️ Space Explorer
 
 ###### Libraries
-- 💅🏼 ESLint config
+
+-   💅🏼 eslint-config-polished
 
 ###### Utilities
-- ...
+
+-   ...
