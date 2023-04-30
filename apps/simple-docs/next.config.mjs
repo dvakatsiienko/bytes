@@ -3,7 +3,7 @@
  */
 const nextConfig = {
     reactStrictMode:   true,
-        transpilePackages: [ 'ui', 'utils' ],
+    transpilePackages: [ 'ui', 'utils' ],
 };
 
 export default nextConfig;

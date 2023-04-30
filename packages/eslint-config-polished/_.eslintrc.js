@@ -18,7 +18,6 @@ module.exports = {
         'react/require-default-props':                     0, // defaultProps got deprecated, review this rule
         'react/jsx-sort-props':                            1,
         'react/jsx-no-useless-fragment':                   1,
-        'react/jsx-one-expression-per-line':               0, // ? off because it is't flexible enough to prettify good looking code
         'jsx-a11y/no-noninteractive-element-interactions': 0,
 
         'import/no-cycle': 0,
