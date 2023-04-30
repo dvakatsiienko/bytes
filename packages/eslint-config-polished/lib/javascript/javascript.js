@@ -146,6 +146,7 @@ module.exports = {
                 block: { markers: [ '!' ], exceptions: [ '-', '+', '*' ], balanced: true },
             },
         ],
+        strict:               [ 2, 'never' ], // ? "use strcit" is automatically added by bundlers
         'symbol-description': 1,
         yoda:                 1,
 
