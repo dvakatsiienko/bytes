@@ -1,4 +1,8 @@
 /* eslint-env: Node */
+/* Core */
+const { resolve } = require('path');
+
+/* Instruments */
 const complex = require('../rules/complex-js');
 
 /**
@@ -9,9 +13,11 @@ module.exports = {
     extends:       [ 'eslint:recommended', './eslint-config-airbnb-without-import' ],
     parser:        '@babel/eslint-parser',
     parserOptions: {
-        requireConfigFile: false,
-        sourceType:        'module',
-        ecmaFeatures:      { ecmaVersion: 'latest', impliedStrict: true },
+        sourceType:   'module',
+        ecmaFeatures: { ecmaVersion: 'latest', impliedStrict: true },
+        babelOptions: {
+            configFile: resolve(__dirname, 'babel.config.js'),
+        },
 
         // TODO support monorepo shape
         // babelOptions: { rootMode: 'upward' },
