@@ -16,7 +16,7 @@ export const Nav = () => {
     const router = useRouter();
     const { data: session } = useSession();
 
-    const isLoggedIn = !!session && !router.pathname.includes('/login');
+    const isLoggedIn = Boolean(session) && !router.pathname.includes('/login');
 
     return (
         <Container>

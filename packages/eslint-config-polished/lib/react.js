@@ -14,13 +14,19 @@ module.exports = {
             plugins:       [ 'react', 'react-hooks' ],
             extends:       [ 'plugin:react/recommended', 'plugin:react/jsx-runtime' ],
             rules:         {
+                // TODO connect next eslint
+                // TODO: move to package config
+                // ! The react/jsx-space-before-closing rule is deprecated. Please use the react/jsx-tag-spacing rule with the "beforeSelfClosing" option instead.
+                // 'react/require-default-props':                     0, // defaultProps got deprecated, review this rule
+                // 'react/jsx-sort-props':                            1,
+                // 'react/jsx-no-useless-fragment':                   1,
+                // 'jsx-a11y/no-noninteractive-element-interactions': 0,
+
                 // ? React: hooks
                 'react-hooks/rules-of-hooks': 2,
 
-                // TODO connect next eslint
-
                 // ? React: core
-                'react/button-has-type':               2,
+                'react/button-has-type':               0, // TODO: review
                 'react/function-component-definition': complex.functionComponentDefinition,
                 'react/no-adjacent-inline-elements':   2,
                 'react/no-array-index-key':            2,
@@ -54,7 +60,7 @@ module.exports = {
                 'react/jsx-max-props-per-line':            [ 2, { when: 'multiline', maximum: 1 }],
                 'react/jsx-no-constructed-context-values': 2,
                 'react/jsx-no-script-url':                 [ 2, [{ name: 'Link', props: [ 'to' ] }]],
-                'react/jsx-no-useless-fragment':           2,
+                'react/jsx-no-useless-fragment':           2, // TODO REVIEW. Currntly @types/react is working wrong disallowing singular strings to be returned from a component. https://github.com/microsoft/TypeScript/issues/21699
                 'react/jsx-one-expression-per-line':       [ 2, { allow: 'single-child' }],
                 'react/jsx-pascal-case':                   2,
                 'react/jsx-props-no-multi-spaces':         2,
@@ -64,7 +70,7 @@ module.exports = {
                 'react/jsx-wrap-multilines':               2,
 
                 // TODO process
-                'react/jsx-one-expression-per-line': 0, // ? off because it is't flexible enough to prettify good looking code
+                // 'react/jsx-one-expression-per-line': 0, // ? off because it is't flexible enough to prettify good looking code
             },
         },
     ],
