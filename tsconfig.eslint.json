@@ -5,9 +5,13 @@
     },
     "include": [
         // Include all TypeScript files.
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.mtsx"
+        "*.ts",
+        "*.tsx",
+        "*.mts",
+        "*.mtsx"
+        // "**/*.ts",
+        // "**/*.tsx",
+        // "**/*.mts",
+        // "**/*.mtsx"
     ]
 }

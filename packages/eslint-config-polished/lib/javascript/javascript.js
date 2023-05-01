@@ -239,6 +239,19 @@ module.exports = {
 
         // TODO eslint-plugin-import
         'import/no-cycle': 0,
+        // ? https://v6--typescript-eslint.netlify.app/linting/troubleshooting/performance-troubleshooting#eslint-plugin-import
+        // We recommend you do not use the following rules, as TypeScript provides the same checks as part of standard type checking:
+
+        // import/named
+        // import/namespace
+        // import/default
+        // import/no-named-as-default-member
+        // The following rules do not have equivalent checks in TypeScript, so we recommend that you only run them at CI/push time, to lessen the local performance burden.
+
+        // import/no-named-as-default
+        // import/no-cycle
+        // import/no-unused-modules
+        // import/no-deprecated
 
         // TODO eslint-plugin-prettier
     },

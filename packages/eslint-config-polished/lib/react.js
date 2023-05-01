@@ -9,8 +9,8 @@ module.exports = {
     overrides: [
         {
             files:         [ '*.tsx', '*.jsx' ],
-            settings:      { react: { version: 'detect' } },
-            parserOptions: { ecmaFeatures: { jsx: true } },
+            settings:      { react: { version: 'detect' }},
+            parserOptions: { ecmaFeatures: { jsx: true }},
             plugins:       [ 'react', 'react-hooks' ],
             extends:       [ 'plugin:react/recommended', 'plugin:react/jsx-runtime' ],
             rules:         {
@@ -52,14 +52,14 @@ module.exports = {
                 'react/jsx-curly-newline':                 2,
                 'react/jsx-curly-spacing':                 complex.jsxCurlySpacing,
                 'react/jsx-equals-spacing':                [ 2, 'always' ],
-                'react/jsx-filename-extension':            [ 2, { extensions: [ '.tsx', '.jsx' ] }],
+                'react/jsx-filename-extension':            [ 2, { extensions: [ '.tsx', '.jsx' ]}],
                 'react/jsx-first-prop-new-line':           2,
                 'react/jsx-fragments':                     2,
                 'react/jsx-indent':                        complex.jsxIdent,
                 'react/jsx-indent-props':                  [ 2, 4 ],
                 'react/jsx-max-props-per-line':            [ 2, { when: 'multiline', maximum: 1 }],
                 'react/jsx-no-constructed-context-values': 2,
-                'react/jsx-no-script-url':                 [ 2, [{ name: 'Link', props: [ 'to' ] }]],
+                'react/jsx-no-script-url':                 [ 2, [{ name: 'Link', props: [ 'to' ]}]],
                 'react/jsx-no-useless-fragment':           2, // TODO REVIEW. Currntly @types/react is working wrong disallowing singular strings to be returned from a component. https://github.com/microsoft/TypeScript/issues/21699
                 'react/jsx-one-expression-per-line':       [ 2, { allow: 'single-child' }],
                 'react/jsx-pascal-case':                   2,
