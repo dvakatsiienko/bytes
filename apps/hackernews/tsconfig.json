@@ -16,7 +16,7 @@
             "@/*": ["src/*"]
         },
         "target": "ESNext",
-        "lib": ["dom", "dom.iterable", "ESNext"],
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "allowJs": true,
         "skipLibCheck": true,
         "esModuleInterop": true,

@@ -31,11 +31,13 @@ module.exports = {
         __TEST__: 'readonly',
     },
 
-    // ? any rule value set to:
-    // ? - 0 — disables the rule extended from config or plugin
-    // ? - 1, 2 or with options — enables the rule
-    // ? - same as above with «!» comment — overrides the extended from config or plugin
-    // ? - the rest of rules are not extended but new
+    /**
+     * ? any rule value set to:
+     * ? - 0 — disables the rule extended from config or plugin
+     * ? - 1, 2 or with options — enables the rule
+     * ? - same as above with «!» comment — overrides the extended from config or plugin
+     * ? - the rest of rules are not extended but new
+     */
     rules: {
         // ? eslint-plugin-smells
         'smells/no-switch': 2,
@@ -214,7 +216,6 @@ module.exports = {
             { blankLine: 'always', prev: '*', next: 'export' },
             { blankLine: 'always', prev: '*', next: 'class' },
             { blankLine: 'always', prev: '*', next: 'return' },
-            { blankLine: 'always', prev: '*', next: 'if' },
             { blankLine: 'always', prev: '*', next: 'for' },
             { blankLine: 'always', prev: '*', next: 'do' },
             { blankLine: 'always', prev: '*', next: 'while' },
