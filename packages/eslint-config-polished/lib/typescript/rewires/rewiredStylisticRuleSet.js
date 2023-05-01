@@ -2,8 +2,8 @@
 const stylisticRuleSet = require('@typescript-eslint/eslint-plugin').configs.stylistic;
 
 /* Instruments */
-const { rewireRuleSeverityFromStringToNumber } = require('./rewireRuleSeverityFromStringToNumber');
+const { rewireRuleSet } = require('./rewireRuleSet');
 
-const rewiredStylisticRuleSet = rewireRuleSeverityFromStringToNumber(stylisticRuleSet);
+const rewiredStylisticRuleSet = rewireRuleSet(stylisticRuleSet);
 
 module.exports = rewiredStylisticRuleSet;

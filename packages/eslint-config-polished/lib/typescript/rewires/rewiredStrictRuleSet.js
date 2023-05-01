@@ -2,8 +2,8 @@
 const strictRuleSet = require('@typescript-eslint/eslint-plugin').configs.strict;
 
 /* Instruments */
-const { rewireRuleSeverityFromStringToNumber } = require('./rewireRuleSeverityFromStringToNumber');
+const { rewireRuleSet } = require('./rewireRuleSet');
 
-const rewiredStrictRuleSet = rewireRuleSeverityFromStringToNumber(strictRuleSet);
+const rewiredStrictRuleSet = rewireRuleSet(strictRuleSet);
 
 module.exports = rewiredStrictRuleSet;
