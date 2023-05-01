@@ -1,5 +1,5 @@
 /* eslint-env: Node */
-
+/* Instruments */
 const complex = require('./rules/complex-ts');
 
 /**
@@ -8,10 +8,10 @@ const complex = require('./rules/complex-ts');
 module.exports = {
     overrides: [
         {
-            parser:  '@typescript-eslint/parser',
-            plugins: [ '@typescript-eslint' ],
-            files:   [ '*.ts', '*.tsx' ],
+            files:   [ '*.ts', '*.tsx', '*.mts', '*.mtsx' ],
             extends: [ 'plugin:@typescript-eslint/recommended' ],
+            plugins: [ '@typescript-eslint' ],
+            parser:  '@typescript-eslint/parser',
             rules:   {
                 // TODO
                 // '@typescript-eslint/no-empty-interface': 0,
