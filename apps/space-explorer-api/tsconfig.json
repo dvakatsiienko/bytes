@@ -12,6 +12,7 @@
         "strict": true,
         "lib": ["ESNext"],
         "esModuleInterop": true,
-        "jsx": "preserve"
+        "jsx": "preserve",
+        "noEmit": true
     }
 }

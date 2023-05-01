@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        // Ensure no one accidentally builds the "lint" project.
+        "noEmit": true
+    },
+    "include": [
+        // Include all TypeScript files.
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.mts",
+        "**/*.mtsx"
+    ]
+}
