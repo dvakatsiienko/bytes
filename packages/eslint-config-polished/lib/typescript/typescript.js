@@ -1,7 +1,7 @@
 /* eslint-env: Node */
 
 /* Instruments */
-const complex = require('./rules/complex-ts');
+const complexTs = require('../rules/complex-ts');
 
 /**
  * @type {import('eslint').Linter.Config}
@@ -27,8 +27,8 @@ module.exports = {
                 'plugin:@typescript-eslint/eslint-recommended',
 
                 // ? Rewired «strict» and «stylistic» rule sets.
-                './rewiredStrictRuleSet',
-                './rewiredStylisticRuleSet',
+                './rewires/rewiredStrictRuleSet',
+                './rewires/rewiredStylisticRuleSet',
             ],
             plugins: [ '@typescript-eslint' ],
 
@@ -48,16 +48,35 @@ module.exports = {
                 indent:     0,
 
                 // ? TpyeScript Rules
-                '@typescript-eslint/ban-ts-comment': [
-                    // ! reduce severity, rewire options
+                '@typescript-eslint/ban-ts-comment':                complexTs.banTsComment, // ! reduce severity, rewire options
+                '@typescript-eslint/consistent-type-definitions':   0, // ! turning off to allow both «type» and «interface»
+                '@typescript-eslint/explicit-member-accessibility': 1,
+                '@typescript-eslint/member-delimiter-style':        [
                     1,
                     {
-                        'ts-expect-error': 'allow-with-description',
-                        'ts-ignore':       'allow-with-description',
-                        'ts-nocheck':      true,
-                        'ts-check':        true,
+                        multiline:          { delimiter: 'comma', requireLast: true },
+                        singleline:         { delimiter: 'comma', requireLast: false },
+                        multilineDetection: 'brackets',
                     },
                 ],
+                '@typescript-eslint/member-ordering':               complexTs.memberOrdering,
+                '@typescript-eslint/no-duplicate-enum-values':      2, // ! Incresing severity because it was decreased by rewiring
+                '@typescript-eslint/no-empty-interface':            [ 1, { allowSingleExtends: true }], // ! Because in default config «allowSingleExtends» is false, and in that case empty interface that extends is replaced by prettier to «type = Extension».
+                '@typescript-eslint/no-explicit-any':               [ 1, { fixToUnknown: true }], // ! Because in default config «fixToUnknown» is false, and uknown is better than any
+                '@typescript-eslint/no-import-type-side-effects':   1, // ? To enfore «import type» qualifier
+                '@typescript-eslint/no-misused-new':                2, // ! Incresing severity because «cosntructor» is better than «new»
+                '@typescript-eslint/no-namespace':                  2, // ! Incresing severity because «namespace» is deprecated
+                '@typescript-eslint/no-non-null-assertion':         2, // ! Incresing severity because non-null asertion («!») is not recommended (better use «.?» and «??»)
+                '@typescript-eslint/no-require-imports':            2, // ? To disallow «require» calls
+                '@typescript-eslint/no-this-alias':                 2, // ! Increasing severity because assiging «this» to a local identifier is an outdated practice
+                '@typescript-eslint/no-unsafe-declaration-merging': 2, // ! Incresing severity because declaration merging is dangerous
+                '@typescript-eslint/no-useless-empty-export':       1, // ? To disallow useless empty exports
+                '@typescript-eslint/no-var-requires':               2, // ! Incresing severity because «require» is outdated
+                '@typescript-eslint/parameter-properties':          2, // ? To disallow TypeScript's shortstand « constructor(private name: string) »
+                '@typescript-eslint/prefer-as-const':               2, // ! increasing severity because «as const» assertion is better than «as 'CONST_ID'»
+                '@typescript-eslint/prefer-enum-initializers':      2, // ? To enforce enum initializers
+                '@typescript-eslint/prefer-namespace-keyword':      2, // ! Increasing severity because «module» is even more deprecated than «namespace»
+                '@typescript-eslint/type-annotation-spacing':       [ 1, { before: false, after: true }], // ? To enforce good looking type annotation statements
 
                 // TODO process old config
                 // '@typescript-eslint/no-empty-interface': 0,
