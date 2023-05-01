@@ -2,11 +2,9 @@
  * @type {import('eslint').Linter.Config}
  */
 module.exports = {
-    root:          true,
-    extends:       'polished/typescript',
-    // TODO test commenting out «project» to see how «project: true» from «polished/typescript» works
-    parserOptions: { project: [ './apps/*/tsconfig.json', './packages/*/tsconfig.json' ]},
-    overrides:     [
+    root:      true,
+    extends:   'polished/typescript',
+    overrides: [
         // ? apps
         {
             files: [
