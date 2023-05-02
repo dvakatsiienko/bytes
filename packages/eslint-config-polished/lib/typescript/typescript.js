@@ -1,7 +1,8 @@
 /* eslint-env: Node */
 
 /* Instruments */
-const complexTs = require('../rules/complex-ts');
+const complexTsRules = require('./complex-ts-rules');
+const { getJsRule } = require('./getJsRule');
 
 /**
  * @type {import('eslint').Linter.Config}
@@ -19,14 +20,19 @@ module.exports = {
             },
 
             extends: [
-                /**
-                 * ? Extended by default in plugin:@typescript-eslint/{strict,stylistic}.
-                 * ? Adeed manually because «strict» and «stylistic» rule sets was rewired by reducing rule severity from «error» to 1 (warning).
-                 */
-                'plugin:@typescript-eslint/base',
-                'plugin:@typescript-eslint/eslint-recommended',
+                'plugin:@typescript-eslint/base', // ? Base config do not contain any rules: no need to rewire.
 
-                // ? Rewired «strict» and «stylistic» rule sets.
+                /**
+                 * ? Recommended config ix extended by default in plugin:@typescript-eslint/{strict,stylistic}.
+                 * ? «strict» and «stylistic» rule sets was rewired by reducing rule severity from «error» to 1 (warning).
+                 * ? During rewiring «extends» field is dropped.
+                 * ? Thus adding rewired version of «recommended» manually. (recommended is rewired also!)
+                 */
+                './rewires/rewiredRecommendedRuleSet',
+
+                /**
+                 * ? Rewired «strict» and «stylistic» rule sets.
+                 */
                 './rewires/rewiredStrictRuleSet',
                 './rewires/rewiredStylisticRuleSet',
             ],
@@ -40,26 +46,12 @@ module.exports = {
              * ? - the rest of rules are not extended but new
              */
             rules: {
-                'no-undef': 0, // ? ts(2304), extended from eslint-recommended → all shareable configs
-                /**
-                 * ? Recommended to disable this to save on performance. https://v6--typescript-eslint.netlify.app/linting/troubleshooting/performance-troubleshooting#the-indent--typescript-eslintindent-rules
-                 * ? Not included in shareable config.
-                 */
-                indent:     0,
-
-                // ? TpyeScript Rules
-                '@typescript-eslint/ban-ts-comment':                complexTs.banTsComment, // ! reduce severity, rewire options
+                // ? TypeScript Rules
+                '@typescript-eslint/ban-ts-comment':                complexTsRules.banTsComment, // ! reduce severity, rewire options
                 '@typescript-eslint/consistent-type-definitions':   0, // ! turning off to allow both «type» and «interface»
                 '@typescript-eslint/explicit-member-accessibility': 1,
-                '@typescript-eslint/member-delimiter-style':        [
-                    1,
-                    {
-                        multiline:          { delimiter: 'comma', requireLast: true },
-                        singleline:         { delimiter: 'comma', requireLast: false },
-                        multilineDetection: 'brackets',
-                    },
-                ],
-                '@typescript-eslint/member-ordering':               complexTs.memberOrdering,
+                '@typescript-eslint/member-ordering':               complexTsRules.memberOrdering,
+                '@typescript-eslint/method-signature-style':        1,
                 '@typescript-eslint/no-duplicate-enum-values':      2, // ! Incresing severity because it was decreased by rewiring
                 '@typescript-eslint/no-empty-interface':            [ 1, { allowSingleExtends: true }], // ! Because in default config «allowSingleExtends» is false, and in that case empty interface that extends is replaced by prettier to «type = Extension».
                 '@typescript-eslint/no-explicit-any':               [ 1, { fixToUnknown: true }], // ! Because in default config «fixToUnknown» is false, and uknown is better than any
@@ -76,63 +68,76 @@ module.exports = {
                 '@typescript-eslint/prefer-as-const':               2, // ! increasing severity because «as const» assertion is better than «as 'CONST_ID'»
                 '@typescript-eslint/prefer-enum-initializers':      2, // ? To enforce enum initializers
                 '@typescript-eslint/prefer-namespace-keyword':      2, // ! Increasing severity because «module» is even more deprecated than «namespace»
-                '@typescript-eslint/type-annotation-spacing':       [ 1, { before: false, after: true }], // ? To enforce good looking type annotation statements
 
-                // TODO process old config
-                // '@typescript-eslint/no-empty-interface': 0,
-                // '@typescript-eslint/comma-dangle':       [ 1, 'always-multiline' ],
-                // '@typescript-eslint/no-shadow':          0,
-                // TODO configure this rule to allow missed parameters ... or? not.
-                // '@typescript-eslint/no-unused-vars':     0,
-                // ? Rules
-                // '@typescript-eslint/explicit-module-boundary-types': 0,
-                // '@typescript-eslint/ban-ts-comment':                 complex.banTsComment,
-                // '@typescript-eslint/consistent-type-assertions':     [ 2, { assertionStyle: 'as' }],
-                // '@typescript-eslint/member-delimiter-style':         2,
-                // '@typescript-eslint/method-signature-style':         2,
-                // '@typescript-eslint/no-require-imports':             2,
-                // '@typescript-eslint/prefer-optional-chain':          2,
                 // ? Extension Rules
-                // 'brace-style':                    0,
-                // '@typescript-eslint/brace-style': 2,
-                // 'comma-dangle': 0,
-                // '@typescript-eslint/comma-dangle': [ 2, complex.commaDangleRuleOpts ],
-                // 'comma-spacing':                    0,
-                // '@typescript-eslint/comma-spacing': 2,
-                // 'default-param-last':                    0,
-                // '@typescript-eslint/default-param-last': 2,
-                // 'init-declarations':                    0,
-                // '@typescript-eslint/init-declarations': [ 2, 'always' ],
-                // 'no-dupe-class-members':                    0,
-                // '@typescript-eslint/no-dupe-class-members': 2,
-                // 'no-duplicate-imports':                    0,
-                // '@typescript-eslint/no-duplicate-imports': [ 2, { includeExports: true }],
-                // 'no-shadow':                    0,
-                // '@typescript-eslint/no-shadow': 2,
-                // quotes:                      0,
-                // '@typescript-eslint/quotes': [ 2, 'single' ],
+                'default-param-last':                        1,
+                '@typescript-eslint/default-param-last':     getJsRule('default-param-last'),
+                'init-declarations':                         0,
+                '@typescript-eslint/init-declarations':      getJsRule('init-declarations'),
+                'no-multi-spaces':                           0, // ? Disabled because it conflicts with «@typescript-eslint/key-spacing» and there is no corresponding override rule in «@typescript-eslint/key-spacing»
+                '@typescript-eslint/no-array-constructor':   0, // ! Turn off because I don't use this rule in JavaScript rule set
+                'no-dupe-class-members':                     0,
+                '@typescript-eslint/no-dupe-class-members':  2, // ! Increase severity because duplicating class member is dangerous. Not declared literally in JS config (extended from eslint-recommended), thus not using getJsRule.
+                'no-extra-semi':                             0,
+                '@typescript-eslint/no-extra-semi':          1, // ? Not declared literally in JS config (extended from eslint-recommended), thus not using getJsRule.
+                'no-invalid-this':                           0,
+                '@typescript-eslint/no-invalid-this':        getJsRule('no-invalid-this'),
+                'no-loop-func':                              0,
+                '@typescript-eslint/no-loop-func':           getJsRule('no-loop-func'),
+                'no-loss-of-precision':                      0,
+                '@typescript-eslint/no-loss-of-precision':   2, // ! Increase severity because loosing precision is dangerous. Not declared literally in JS config (extended from eslint-recommended), thus not using getJsRule
+                'no-redeclare':                              0,
+                '@typescript-eslint/no-redeclare':           2, // ? Not declared literally in JS config (extended from eslint-recommended), thus not using getJsRule.
+                'no-unused-expressions':                     0,
+                '@typescript-eslint/no-unused-expressions':  getJsRule('no-unused-expressions'),
+                'no-unused-vars':                            0,
+                '@typescript-eslint/no-unused-vars':         getJsRule('no-unused-vars'),
+                'no-useless-constructor':                    0,
+                '@typescript-eslint/no-useless-constructor': getJsRule('no-useless-constructor'),
 
-                // TODO process typescript-eslint's configs/eslint-recommended
-                // 'constructor-super': 'off', // ts(2335) & ts(2377)
-                // 'getter-return': 'off', // ts(2378)
-                // 'no-const-assign': 'off', // ts(2588)
-                // 'no-dupe-args': 'off', // ts(2300)
-                // 'no-dupe-class-members': 'off', // ts(2393) & ts(2300)
-                // 'no-dupe-keys': 'off', // ts(1117)
-                // 'no-func-assign': 'off', // ts(2539)
-                // 'no-import-assign': 'off', // ts(2539) & ts(2540)
-                // 'no-new-symbol': 'off', // ts(7009)
-                // 'no-obj-calls': 'off', // ts(2349)
-                // 'no-redeclare': 'off', // ts(2451)
-                // 'no-setter-return': 'off', // ts(2408)
-                // 'no-this-before-super': 'off', // ts(2376)
-                // 'no-undef': 'off', // ts(2304)
-                // 'no-unreachable': 'off', // ts(7027)
-                // 'no-unsafe-negation': 'off', // ts(2365) & ts(2360) & ts(2358)
-                // 'no-var': 'error', // ts transpiles let/const to var, so no need for vars any more
-                // 'prefer-const': 'error', // ts provides better types with const
-                // 'prefer-rest-params': 'error', // ts provides better types with rest args over arguments
-                // 'prefer-spread': 'error', // ts transpiles spread to apply, so no need for manual apply
+                // ? Formatting Rules (Probably delegate them to Prettier)
+                'block-spacing':                                  0,
+                '@typescript-eslint/block-spacing':               getJsRule('block-spacing'),
+                'brace-style':                                    0,
+                '@typescript-eslint/brace-style':                 getJsRule('brace-style'),
+                'comma-dangle':                                   0,
+                '@typescript-eslint/comma-dangle':                getJsRule('comma-dangle'),
+                'comma-spacing':                                  0,
+                '@typescript-eslint/comma-spacing':               getJsRule('comma-spacing'),
+                'func-call-spacing':                              0,
+                '@typescript-eslint/func-call-spacing':           getJsRule('func-call-spacing'),
+                /**
+                 * ? Recommended to disable this to save on performance. https://v6--typescript-eslint.netlify.app/linting/troubleshooting/performance-troubleshooting#the-indent--typescript-eslintindent-rules
+                 * ? Not included in shareable config.
+                 * * probably turn off for performance savings TL;DR: https://tinyurl.com/2p8evbcm
+                 */
+                indent:                                           0,
+                '@typescript-eslint/indent':                      getJsRule('indent'),
+                'key-spacing':                                    0,
+                '@typescript-eslint/key-spacing':                 getJsRule('key-spacing'),
+                'keyword-spacing':                                1,
+                '@typescript-eslint/keyword-spacing':             getJsRule('keyword-spacing'),
+                'lines-between-class-members':                    0,
+                '@typescript-eslint/lines-between-class-members': JSON.parse(JSON.stringify(getJsRule('lines-between-class-members'))), // ? Deep-cloned via JSON.stringify/parse becase «@typescript-eslint»'s equivalent of the rule adds additional rule option «exceptAfterOverload» which is being injected into the object, and gets passed back to ESLint's javascript config, thus breaking it. Because it is a single object, and it is working with reference.
+                '@typescript-eslint/member-delimiter-style':      complexTsRules.memberDelimiterStyle, // ? Does not have ESLint equivalent
+                'no-extra-parens':                                0,
+                '@typescript-eslint/no-extra-parens':             getJsRule('no-extra-parens'),
+                'object-curly-spacing':                           0,
+                '@typescript-eslint/object-curly-spacing':        getJsRule('object-curly-spacing'),
+                'padding-line-between-statements':                0,
+                '@typescript-eslint/padding-line-between-statements':
+                    complexTsRules.paddingLineBetweenStatements,
+                quotes:                                           0,
+                '@typescript-eslint/quotes':                      getJsRule('quotes'),
+                semi:                                             0,
+                '@typescript-eslint/semi':                        getJsRule('semi'),
+                'space-before-blocks':                            0,
+                '@typescript-eslint/space-before-blocks':         getJsRule('space-before-blocks'),
+                'space-before-function-paren':                    0,
+                '@typescript-eslint/space-before-function-paren': getJsRule('space-before-function-paren'),
+                'space-infix-ops':                                0,
+                '@typescript-eslint/space-infix-ops':             getJsRule('space-infix-ops'),
+                '@typescript-eslint/type-annotation-spacing':     [ 1, { before: false, after: true }], // ? To enforce good looking type annotation statements
             },
         },
     ],

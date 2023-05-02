@@ -1,3 +1,6 @@
+/* Instruments */
+const { getJsRule } = require('./getJsRule');
+
 exports.banTsComment = [
     // ! reduce severity, rewire options
     1,
@@ -150,5 +153,24 @@ exports.memberOrdering = [
 
             'method',
         ],
+    },
+];
+
+exports.memberDelimiterStyle = [
+    1,
+    {
+        multiline:          { delimiter: 'comma', requireLast: true },
+        singleline:         { delimiter: 'comma', requireLast: false },
+        multilineDetection: 'brackets',
+    },
+];
+
+exports.paddingLineBetweenStatements = [
+    // ? Deep-cloned via JSON.stringify/parse becase «@typescript-eslint»'s equivalent of the rule adds additional rule options: «interface» and «type» which is being injected into the object, and gets passed back to ESLint's javascript config, thus breaking it. Because it is a single object, and it is working with reference.
+    ...JSON.parse(JSON.stringify(getJsRule('padding-line-between-statements'))),
+    {
+        blankLine: 'always',
+        prev:      '*',
+        next:      [ 'interface' ],
     },
 ];
