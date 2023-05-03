@@ -4,6 +4,7 @@
     "exclude": ["dist", "build", "node_modules"],
     "compilerOptions": {
         "jsx": "react-jsx",
-        "noEmit": true
+        "noEmit": true,
+        "lib": ["DOM", "DOM.ITERABLE", "ESNEXT"]
     }
 }

@@ -1,12 +1,11 @@
-exports.functionComponentDefinition = [
-    2,
-    {
-        namedComponents:   [ 'arrow-function', 'function-declaration' ],
-        unnamedComponents: 'arrow-function',
-    },
+exports.fnComponentDefinition = [
+    1,
+    { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
 ];
 
-exports.jsxCurlySpacing = [ 2, { when: 'always', spacing: { objectLiterals: 'never' } }];
+exports.jsxCurlySpacing = [ 1, { when: 'always', spacing: { objectLiterals: 'never' }}];
+
+exports.jsxHandlernames = [ 1, { checkLocalVariables: true, checkInlineFunction: true }];
 
 exports.jsxIdent = [ 1, 4, { checkAttributes: true, indentLogicalExpressions: true }];
 
