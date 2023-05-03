@@ -8,7 +8,7 @@ const complex = require('./rules/complex-react');
 module.exports = {
     overrides: [
         {
-            files:         [ '*.tsx', '*.jsx' ],
+            files:         [ '*.tsx', '*.jsx', '*.js' ],
             settings:      { react: { version: 'detect' }},
             parserOptions: { ecmaFeatures: { jsx: true }},
             plugins:       [ 'react', 'react-hooks' ],
@@ -23,7 +23,8 @@ module.exports = {
                 // 'jsx-a11y/no-noninteractive-element-interactions': 0,
 
                 // ? React: hooks
-                'react-hooks/rules-of-hooks': 2,
+                'react-hooks/rules-of-hooks':  2,
+                'react-hooks/exhaustive-deps': 0,
 
                 // ? React: core
                 'react/button-has-type':               0, // TODO: review
