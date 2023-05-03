@@ -10,9 +10,8 @@ const comlexJsRules = require('./complex-js-rules');
  * @type {import('eslint').Linter.Config<import('eslint').Linter.RulesRecord)>}
  */
 module.exports = {
-    extends:       'eslint:recommended',
-    plugins:       [ 'smells' ],
-    parser:        '@babel/eslint-parser',
+    parser: '@babel/eslint-parser',
+
     parserOptions: {
         sourceType:   'module',
         ecmaFeatures: { ecmaVersion: 'latest', impliedStrict: true },
@@ -21,6 +20,10 @@ module.exports = {
         // TODO support monorepo shape
         // babelOptions: { rootMode: 'upward' },
     },
+
+    extends: 'eslint:recommended',
+    plugins: [ 'smells' ],
+
     env: {
         es2022:                true,
         node:                  true,
@@ -42,6 +45,8 @@ module.exports = {
      * ? - the rest of rules are not extended but new
      */
     rules: {
+        // TODO connect next eslint
+
         // ? eslint-plugin-smells
         'smells/no-switch': 2,
 
@@ -60,7 +65,7 @@ module.exports = {
         'no-unreachable':                  1, // ! Decreasing severity, because unreachable code is not so dangerous
         'no-unreachable-loop':             1,
         'no-unused-private-class-members': 1,
-        'no-unused-vars':                  1, // ! Decreasing severity, because unused vars are not so dangerous
+        'no-unused-vars':                  1, // ! Decreasing severity, because unused vars are not so dangerous.
         'require-atomic-updates':          2,
 
         // ? ESLint: suggestions
