@@ -25,8 +25,7 @@ const App: AppType<{ session: Session | null }> = (props) => {
             <NextThemesProvider
                 attribute = 'class'
                 defaultTheme = 'system'
-                value = {{ light: lightTheme.className, dark: darkTheme.className }}
-            >
+                value = {{ light: lightTheme.className, dark: darkTheme.className }}>
                 <reactQuery.QueryClientProvider client = { reactQueryClient }>
                     <NextUIProvider>
                         <StyledComponentsProvider theme = {{}}>

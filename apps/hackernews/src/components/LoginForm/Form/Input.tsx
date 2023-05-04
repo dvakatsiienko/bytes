@@ -8,8 +8,8 @@ import styled, { css } from 'styled-components';
 export const Input: React.FC<InputProps> = ({ type = 'text', autoFocus = false, ...props }) => {
     const isInvalid = Boolean(props.formState.errors[ props.register.name ]?.message);
 
-    const errorMessage
-    = (props.formState.errors[ props.register.name ]?.message as unknown as string) ?? '';
+    const errorMessage =
+    (props.formState.errors[ props.register.name ]?.message as unknown as string) ?? '';
 
     const BaseInput = type === 'password' ? NextUiInput.Password : NextUiInput;
 

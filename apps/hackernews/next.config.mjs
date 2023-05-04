@@ -27,7 +27,7 @@ const nextConfig = {
 
         return config;
     },
-    redirects() {
+    redirects () {
         return [
             {
                 source:      '/user',

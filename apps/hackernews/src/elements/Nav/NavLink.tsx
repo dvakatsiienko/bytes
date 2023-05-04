@@ -9,8 +9,7 @@ export const NavLink = (props: NavLinkProps) => {
             <NexTUiLink
                 underline
                 className = { cx({ active: props.active }) }
-                color = { props.active ? 'primary' : 'text' }
-            >
+                color = { props.active ? 'primary' : 'text' }>
                 {props.content}
             </NexTUiLink>
         </NextLink>
@@ -19,7 +18,7 @@ export const NavLink = (props: NavLinkProps) => {
 
 /* Types */
 interface NavLinkProps {
-    href: string;
-    content: string;
-    active: boolean;
+    href:    string,
+    content: string,
+    active:  boolean,
 }

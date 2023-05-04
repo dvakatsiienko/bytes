@@ -15,7 +15,7 @@ const server = z.object({
         // Since NextAuth.js automatically uses the VERCEL_URL if present.
         (str) => process.env.VERCEL_URL ?? str,
         // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-        process.env.VERCEL ? z.string().min(1) : z.string().url()
+        process.env.VERCEL ? z.string().min(1) : z.string().url(),
     ),
 
     GITHUB_CLIENT_ID:     z.string().min(1),
@@ -26,9 +26,7 @@ const server = z.object({
  * Specify your client-side environment variables schema here. This way you can ensure the app isn't
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
-const client = z.object({
-    // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
-});
+const client = z.object({}); // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
 
 /**
  * @type {Record<keyof z.infer<typeof server> | keyof z.infer<typeof client>, string | undefined>}
@@ -47,17 +45,17 @@ const merged = server.merge(client);
 
 const isProtectingEnv = Boolean(process.env.SKIP_ENV_VALIDATION) === false;
 
-const env = isProtectingEnv ? createProtectedEnv() : /** @type {MergedOutput} */ (process.env);
+const env = isProtectingEnv ? createProtectedEnv() : /** @type {MergedOutput} */ process.env;
 
 /* Helpers */
-function createProtectedEnv() {
+function createProtectedEnv () {
     const isServer = typeof window === 'undefined';
 
-    const parsed = /** @type {MergedSafeParseReturn} */ (
+    const parsed =
+        /** @type {MergedSafeParseReturn} */
         isServer
             ? merged.safeParse(processEnv) // on server we can validate all env vars
-            : client.safeParse(processEnv) // on client we can only validate the ones that are exposed
-    );
+            : client.safeParse(processEnv); // on client we can only validate the ones that are exposed
 
     if (parsed.success === false) {
         console.error('❌ Invalid environment variables:', parsed.error.flatten().fieldErrors);
@@ -65,19 +63,18 @@ function createProtectedEnv() {
     }
 
     const protectedEnv = new Proxy(parsed.data, {
-        get(target, prop) {
+        get (target, prop) {
             if (typeof prop !== 'string') return void 0;
 
             // Throw a descriptive error if a server-side env var is accessed on the client
             // Otherwise it would just be returning `undefined` and be annoying to debug
             if (!isServer && !prop.startsWith('NEXT_PUBLIC_')) {
-                throw new Error(
-                    process.env.NODE_ENV === 'production'
-                        ? '❌ Attempted to access a server-side environment variable on the client'
-                        : `❌ Attempted to access a server-side environment variable '${prop}' on the client`
-                );
+                throw new Error(process.env.NODE_ENV === 'production'
+                    ? '❌ Attempted to access a server-side environment variable on the client'
+                    : `❌ Attempted to access a server-side environment variable '${ prop }' on the client`);
             }
-            return target[ /** @type {keyof typeof target} */ (prop) ];
+
+            return target[ /** @type {keyof typeof target} */ prop ];
         },
     });
 

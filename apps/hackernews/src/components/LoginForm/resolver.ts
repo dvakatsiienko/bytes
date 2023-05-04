@@ -15,16 +15,14 @@ export const createResolver = (isLogin: boolean) => {
     }
 
     if (!isLogin) {
-        return zodResolver(
-            baseSchema.superRefine(({ confirmPassword, password }, ctx) => {
-                if (confirmPassword !== password) {
-                    ctx.addIssue({
-                        code:    'custom',
-                        message: 'The passwords did not match',
-                    });
-                }
-            }),
-        );
+        return zodResolver(baseSchema.superRefine(({ confirmPassword, password }, ctx) => {
+            if (confirmPassword !== password) {
+                ctx.addIssue({
+                    code:    'custom',
+                    message: 'The passwords did not match',
+                });
+            }
+        }));
     }
 };
 

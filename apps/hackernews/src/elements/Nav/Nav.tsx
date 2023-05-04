@@ -24,8 +24,7 @@ export const Nav = () => {
                 color = 'invert'
                 content = { `
                 App version: ${ packageJson.version }
-            ` }
-            >
+            ` }>
                 <Aperture $isLoggedIn = { isLoggedIn } width = { 24 } onPointerUp = { () => router.push('/') } />
             </Tooltip>
             <span>/</span>
@@ -42,11 +41,13 @@ export const Nav = () => {
         && <NavLink active = { router.pathname.includes('login') } content = 'login' href = '/login' />}
 
             {isLoggedIn
-                ?         <>
-                    <NavLink active = { router.pathname.includes('profile') } content = 'profile' href = '/profile' />
-                    <span>/</span>
-                    <LogoutButton />
-                </>
+                ? (
+                    <>
+                        <NavLink active = { router.pathname.includes('profile') } content = 'profile' href = '/profile' />
+                        <span>/</span>
+                        <LogoutButton />
+                    </>
+                )
                 : null}
         </Container>
     );
@@ -73,6 +74,7 @@ const Container = styled.nav`
 
 const Aperture = styled(ApertureIcon)<StyledIconProps & { $isLoggedIn: boolean }>`
   cursor: pointer;
+  // TODO: fix eslint conflict
   color: ${ (p) => (p.$isLoggedIn ? theme.colors.green600.value : theme.colors.red600.value)};
 
   &:hover {

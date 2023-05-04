@@ -13,8 +13,8 @@ export const SpinnerOrText = (props: SpinnerOrTextProps) => {
 
 /* Types */
 interface SpinnerOrTextProps {
-    isFetching: boolean;
-    isLogin?: boolean;
-    loginText?: string;
-    text: string;
+    isFetching: boolean,
+    isLogin?:   boolean,
+    loginText?: string,
+    text:       string,
 }
