@@ -3,9 +3,9 @@ exports.fnComponentDefinition = [
     { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
 ];
 
-exports.jsxCurlySpacing = [ 1, { when: 'always', spacing: { objectLiterals: 'never' }}];
+exports.jsxClosingBracketLocation = [ 1, { selfClosing: 'line-aligned', nonEmpty: 'after-props' }];
 
-exports.jsxHandlernames = [ 1, { checkLocalVariables: true, checkInlineFunction: false }];
+exports.jsxCurlySpacing = [ 1, { when: 'always', spacing: { objectLiterals: 'never' }}];
 
 exports.jsxIdent = [ 1, 4, { checkAttributes: true, indentLogicalExpressions: true }];
 
@@ -20,7 +20,7 @@ exports.jsxSortProps = [
     },
 ];
 
-exports.tagSpacing = [
+exports.jsxTagSpacing = [
     1,
     {
         closingSlash:      'never',
@@ -30,7 +30,7 @@ exports.tagSpacing = [
     },
 ];
 
-exports.wrapMultilines = [
+exports.jsxWrapMultilines = [
     1,
     {
         declaration: 'parens-new-line',

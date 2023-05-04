@@ -182,7 +182,7 @@ module.exports = {
         'multiline-ternary':                [ 1, 'always-multiline' ],
         'new-parens':                       [ 1, 'always' ],
         'no-extra-parens':                  [ 1, 'all', { ignoreJSX: 'multi-line' }],
-        'no-multi-spaces':                  [ 1, { exceptions: { Property: true }}],
+        'no-multi-spaces':                  [ 1, { ignoreEOLComments: true, exceptions: { Property: true }}],
         'no-multiple-empty-lines':          [ 1, { max: 1 }],
         'no-tabs':                          1,
         'no-trailing-spaces':               1,
