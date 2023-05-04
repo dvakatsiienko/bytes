@@ -257,8 +257,8 @@ importers:
   apps/space-explorer-api:
     dependencies:
       '@apollo/datasource-rest':
-        specifier: 5.1.1
-        version: 5.1.1(graphql@16.6.0)
+        specifier: 6.0.0
+        version: 6.0.0(graphql@16.6.0)
       '@apollo/server':
         specifier: 4.7.1
         version: 4.7.1(graphql@16.6.0)
@@ -529,16 +529,16 @@ packages:
       zen-observable-ts: 1.2.5
     dev: false
 
-  /@apollo/datasource-rest@5.1.1(graphql@16.6.0):
-    resolution: {integrity: sha512-NJ+d6zV+QhHS6+YE8YDv8cny8qyUlysJo7K0awnqR7wM1CuLNPD01aQ7JM+PoywQJXk0VYsgO+McS2CG9RbNCQ==}
-    engines: {node: '>=14.0'}
+  /@apollo/datasource-rest@6.0.0(graphql@16.6.0):
+    resolution: {integrity: sha512-M5lv0YcDuJTDF5ErgdCUyHDjEmHRIUoh4Y+6U9SnbfSChA6c+SMlLj+9xhyFjr3H0uJdG/QrRw4UIYNnqiuA+w==}
+    engines: {node: '>=16.14'}
     peerDependencies:
       graphql: ^16.5.0
     dependencies:
-      '@apollo/utils.fetcher': 2.0.1
-      '@apollo/utils.keyvaluecache': 2.1.1
-      '@apollo/utils.logger': 2.0.1
-      '@apollo/utils.withrequired': 2.0.1
+      '@apollo/utils.fetcher': 3.0.0
+      '@apollo/utils.keyvaluecache': 3.0.0
+      '@apollo/utils.logger': 3.0.0
+      '@apollo/utils.withrequired': 3.0.0
       '@types/http-cache-semantics': 4.0.1
       graphql: 16.6.0
       http-cache-semantics: 4.1.1
@@ -645,6 +645,11 @@ packages:
     engines: {node: '>=14'}
     dev: false
 
+  /@apollo/utils.fetcher@3.0.0:
+    resolution: {integrity: sha512-WL4pabs5TwWyl2ho0DMk5uRtsD4ORsP/7po83y03CrkCCBAB+E4cs6OteLPaQtizYGiBfMpANxWi11Cy3pwsUA==}
+    engines: {node: '>=16'}
+    dev: false
+
   /@apollo/utils.isnodelike@2.0.1:
     resolution: {integrity: sha512-w41XyepR+jBEuVpoRM715N2ZD0xMD413UiJx8w5xnAZD2ZkSJnMJBoIzauK83kJpSgNuR6ywbV29jG9NmxjK0Q==}
     engines: {node: '>=14'}
@@ -658,9 +663,22 @@ packages:
       lru-cache: 7.18.3
     dev: false
 
+  /@apollo/utils.keyvaluecache@3.0.0:
+    resolution: {integrity: sha512-tgMpuYU3KvYevCNG+hTemSuSQtZaaWcHGnF/h2ERcw8bodFmbwVsG/jHlhdT0ChlRXgBIqMUFXbQtF6epy+AKA==}
+    engines: {node: '>=16.14'}
+    dependencies:
+      '@apollo/utils.logger': 3.0.0
+      lru-cache: 9.1.1
+    dev: false
+
   /@apollo/utils.logger@2.0.1:
     resolution: {integrity: sha512-YuplwLHaHf1oviidB7MxnCXAdHp3IqYV8n0momZ3JfLniae92eYqMIx+j5qJFX6WKJPs6q7bczmV4lXIsTu5Pg==}
     engines: {node: '>=14'}
+    dev: false
+
+  /@apollo/utils.logger@3.0.0:
+    resolution: {integrity: sha512-M8V8JOTH0F2qEi+ktPfw4RL7MvUycDfKp7aEap2eWXfL5SqWHN6jTLbj5f5fj1cceHpyaUSOZlvlaaryaxZAmg==}
+    engines: {node: '>=16'}
     dev: false
 
   /@apollo/utils.printwithreducedwhitespace@2.0.1(graphql@16.6.0):
@@ -720,6 +738,11 @@ packages:
     engines: {node: '>=14'}
     dev: false
 
+  /@apollo/utils.withrequired@3.0.0:
+    resolution: {integrity: sha512-aaxeavfJ+RHboh7c2ofO5HHtQobGX4AgUujXP4CXpREHp9fQ9jPi6K9T1jrAKe7HIipoP0OJ1gd6JamSkFIpvA==}
+    engines: {node: '>=16'}
+    dev: false
+
   /@ardatan/relay-compiler@12.0.0(graphql@16.6.0):
     resolution: {integrity: sha512-9anThAaj1dQr6IGmzBMcfzOQKTa5artjuPmw8NYK/fiGEMjADbSguBY2FMDykt+QhilR3wc9VA/3yVju7JHg7Q==}
     hasBin: true
@@ -730,7 +753,7 @@ packages:
       '@babel/generator': 7.21.4
       '@babel/parser': 7.21.4
       '@babel/runtime': 7.21.0
-      '@babel/traverse': 7.21.4(supports-color@5.5.0)
+      '@babel/traverse': 7.21.4
       '@babel/types': 7.21.5
       babel-preset-fbjs: 3.4.0(@babel/core@7.21.8)
       chalk: 4.1.2
@@ -783,7 +806,7 @@ packages:
       '@babel/traverse': 7.21.5
       '@babel/types': 7.21.5
       convert-source-map: 1.9.0
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.0
@@ -1971,6 +1994,24 @@ packages:
       '@babel/parser': 7.21.4
       '@babel/types': 7.21.4
 
+  /@babel/traverse@7.21.4:
+    resolution: {integrity: sha512-eyKrRHKdyZxqDm+fV1iqL9UAHMoIg0nDaGqfIOd8rKH17m5snv7Gn4qgjBoFfLz9APvjFU/ICT00NVCv1Epp8Q==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      '@babel/code-frame': 7.21.4
+      '@babel/generator': 7.21.4
+      '@babel/helper-environment-visitor': 7.18.9
+      '@babel/helper-function-name': 7.21.0
+      '@babel/helper-hoist-variables': 7.18.6
+      '@babel/helper-split-export-declaration': 7.18.6
+      '@babel/parser': 7.21.4
+      '@babel/types': 7.21.4
+      debug: 4.3.4
+      globals: 11.12.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /@babel/traverse@7.21.4(supports-color@5.5.0):
     resolution: {integrity: sha512-eyKrRHKdyZxqDm+fV1iqL9UAHMoIg0nDaGqfIOd8rKH17m5snv7Gn4qgjBoFfLz9APvjFU/ICT00NVCv1Epp8Q==}
     engines: {node: '>=6.9.0'}
@@ -1987,6 +2028,7 @@ packages:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /@babel/traverse@7.21.5:
     resolution: {integrity: sha512-AhQoI3YjWi6u/y/ntv7k48mcrCXmus0t79J9qPNlk/lAsFlCiJ047RmbfMOawySTHtywXhbXgpx/8nXMYd+oFw==}
@@ -2000,7 +2042,7 @@ packages:
       '@babel/helper-split-export-declaration': 7.18.6
       '@babel/parser': 7.21.5
       '@babel/types': 7.21.5
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -2694,7 +2736,7 @@ packages:
     dependencies:
       '@babel/parser': 7.21.4
       '@babel/plugin-syntax-import-assertions': 7.20.0(@babel/core@7.21.8)
-      '@babel/traverse': 7.21.4(supports-color@5.5.0)
+      '@babel/traverse': 7.21.4
       '@babel/types': 7.21.5
       '@graphql-tools/utils': 9.2.1(graphql@16.6.0)
       graphql: 16.6.0
@@ -2766,7 +2808,7 @@ packages:
       '@types/json-stable-stringify': 1.0.34
       '@whatwg-node/fetch': 0.8.8
       chalk: 4.1.2
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
       dotenv: 16.0.3
       graphql: 16.6.0
       graphql-request: 6.0.0(graphql@16.6.0)
@@ -4053,7 +4095,7 @@ packages:
       '@swc-node/sourcemap-support': 0.3.0
       '@swc/core': 1.3.56
       colorette: 2.0.20
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
       pirates: 4.0.5
       tslib: 2.5.0
       typescript: 5.0.4
@@ -4820,7 +4862,7 @@ packages:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
 
@@ -5747,6 +5789,17 @@ packages:
     dependencies:
       ms: 2.1.3
       supports-color: 5.5.0
+
+  /debug@4.3.4:
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.2
 
   /debug@4.3.4(supports-color@5.5.0):
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -6863,7 +6916,7 @@ packages:
     dependencies:
       '@tootallnate/once': 2.0.0
       agent-base: 6.0.2
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6873,7 +6926,7 @@ packages:
     engines: {node: '>= 6'}
     dependencies:
       agent-base: 6.0.2
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
 
@@ -7473,6 +7526,11 @@ packages:
     resolution: {integrity: sha512-qFXQEwchrZcMVen2uIDceR8Tii6kCJak5rzDStfEM0qA3YLMswaxIEZO0DhIbJ3aqaJiDjt+3crlplOb0tDtKQ==}
     engines: {node: 14 || >=16.14}
     dev: true
+
+  /lru-cache@9.1.1:
+    resolution: {integrity: sha512-65/Jky17UwSb0BuB9V+MyDpsOtXKmYwzhyl+cOa9XUiI4uV2Ouy/2voFP3+al0BjZbJgMBD8FojMpAf+Z+qn4A==}
+    engines: {node: 14 || >=16.14}
+    dev: false
 
   /make-dir@3.1.0:
     resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}
