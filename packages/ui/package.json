@@ -2,7 +2,7 @@
     "name": "ui",
     "version": "0.0.0",
     "scripts": {
-        "lint": "eslint .",
+        "lint": "TIMING=1 eslint .",
         "typecheck": "tsc"
     },
     "dependencies": {

@@ -8,7 +8,7 @@
         "eslintconfig"
     ],
     "scripts": {
-        "lint": "eslint ."
+        "lint": "TIMING=1 eslint ."
     },
     "dependencies": {
         "@babel/core": "7.21.8",

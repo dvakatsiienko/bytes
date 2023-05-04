@@ -6,7 +6,7 @@
         "start": "next dev --port=3001",
         "build": "next build",
         "serve": "next start",
-        "lint": "TIMING=1 eslint . --ext .ts,.tsx,.js,.mjs,.cjs"
+        "lint": "TIMING=1 eslint ."
     },
     "dependencies": {
         "next": "13.4.0",
