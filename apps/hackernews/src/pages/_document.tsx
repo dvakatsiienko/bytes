@@ -7,7 +7,7 @@ import { CssBaseline as NextUiCssBaseline } from '@nextui-org/react';
 import { nextFont } from '@/theme';
 
 export default class extends Document {
-    static async getInitialProps(ctx: DocumentContext) {
+    public static async getInitialProps (ctx: DocumentContext) {
         const scserverStylesheet = new SCServerStyleSheet();
         const originalRenderPage = ctx.renderPage;
 
@@ -15,9 +15,7 @@ export default class extends Document {
             ctx.renderPage = () => {
                 return originalRenderPage({
                     enhanceApp: (App) => (props) => {
-                        const scServerStleSheetResult = scserverStylesheet.collectStyles(
-                            <App { ...props } />,
-                        );
+                        const scServerStleSheetResult = scserverStylesheet.collectStyles(<App { ...props } />);
 
                         return scServerStleSheetResult;
                     },
@@ -28,20 +26,20 @@ export default class extends Document {
 
             return {
                 ...initialProps,
-                styles: (
-                    <>
-                        {initialProps.styles}
-                        {scserverStylesheet.getStyleElement()}
-                        {Children.toArray([ initialProps.styles ])}
-                    </>
-                ),
+                styles:
+    <>
+        {initialProps.styles}
+        {scserverStylesheet.getStyleElement()}
+        {Children.toArray([ initialProps.styles ])}
+    </>,
+
             };
         } finally {
             scserverStylesheet.seal();
         }
     }
 
-    render() {
+    public render () {
         return (
             <Html className = { nextFont.robotoFlexVRFont.className } lang = 'en'>
                 <Head>{NextUiCssBaseline.flush()}</Head>

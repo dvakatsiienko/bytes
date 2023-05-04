@@ -1,5 +1,5 @@
 /* Core */
-import { type NextPage, type GetServerSideProps } from 'next';
+import type { NextPage, GetServerSideProps } from 'next';
 
 /* Components */
 import { LoginForm } from '@/components';
@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         };
     }
 
-    return { props: {} };
+    return { props: {}};
 };
 
 export default LoginPage;

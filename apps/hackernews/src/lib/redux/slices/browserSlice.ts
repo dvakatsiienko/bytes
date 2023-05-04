@@ -22,6 +22,6 @@ export const browserSlice = createSlice({
 
 /* Types */
 interface BrowserSliceState {
-    isClosed: boolean;
-    isMinimized: boolean;
+    isClosed:    boolean,
+    isMinimized: boolean,
 }

@@ -25,11 +25,12 @@ export const counterSlice = createSlice({
 
 /* Types */
 interface ConterSliceState {
-    count: number;
+    count: number,
 }
+
 interface ChangeByAction {
     payload: {
-        value: number;
-        type: 'increment' | 'decrement';
-    };
+        value: number,
+        type:  'decrement' | 'increment',
+    },
 }

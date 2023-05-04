@@ -8,11 +8,11 @@
 /* Core */
 import { createTRPCNext } from '@trpc/next';
 import { httpBatchLink, loggerLink } from '@trpc/client';
-import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
 import superjson from 'superjson';
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 
 /* Instruments */
-import { type AppRouter } from '@/server/trpc';
+import type { AppRouter } from '@/server/trpc';
 
 const getBaseUrl = () => {
     if (typeof window !== 'undefined') return ''; // browser should use relative url
@@ -23,7 +23,7 @@ const getBaseUrl = () => {
 
 /** A set of type-safe react-query hooks for your tRPC API. */
 export const trpc = createTRPCNext<AppRouter>({
-    config() {
+    config () {
         return {
             /**
              * Transformer used for data de-serialization from the server.
@@ -42,7 +42,7 @@ export const trpc = createTRPCNext<AppRouter>({
                     enabled: (opts) => process.env.NODE_ENV === 'development'
                         || (opts.direction === 'down' && opts.result instanceof Error),
                 }),
-                httpBatchLink({ url: `${getBaseUrl()}/api/trpc` }),
+                httpBatchLink({ url: `${ getBaseUrl() }/api/trpc` }),
             ],
         };
     },

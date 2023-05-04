@@ -2,9 +2,9 @@
 import { useRouter } from 'next/router';
 import { Tooltip, theme } from '@nextui-org/react';
 import styled from 'styled-components';
-import { type StyledIconProps } from '@styled-icons/styled-icon';
 import { Aperture as ApertureIcon } from '@styled-icons/feather/Aperture';
 import { useSession } from 'next-auth/react';
+import type { StyledIconProps } from '@styled-icons/styled-icon';
 
 /* Components */
 import { NavLink } from './NavLink';
@@ -23,14 +23,10 @@ export const Nav = () => {
             <Tooltip
                 color = 'invert'
                 content = { `
-                App version: ${packageJson.version}
+                App version: ${ packageJson.version }
             ` }
             >
-                <Aperture
-                    $isLoggedIn = { isLoggedIn }
-                    width = { 24 }
-                    onPointerUp = { () => router.push('/') }
-                />
+                <Aperture $isLoggedIn = { isLoggedIn } width = { 24 } onPointerUp = { () => router.push('/') } />
             </Tooltip>
             <span>/</span>
             <NavLink active = { router.pathname === '/' } content = 'home' href = '/' />
@@ -39,56 +35,47 @@ export const Nav = () => {
             <span>/</span>
             <NavLink active = { router.pathname.includes('top') } content = 'top' href = '/top' />
             <span>/</span>
-            <NavLink
-                active = { router.pathname.includes('search') }
-                content = 'search'
-                href = '/search/1'
-            />
+            <NavLink active = { router.pathname.includes('search') } content = 'search' href = '/search/1' />
             <span>/</span>
 
-            {!isLoggedIn && (
-                <NavLink active = { router.pathname.includes('login') } content = 'login' href = '/login' />
-            )}
+            {!isLoggedIn
+        && <NavLink active = { router.pathname.includes('login') } content = 'login' href = '/login' />}
 
-            {isLoggedIn && (
-                <>
-                    <NavLink
-                        active = { router.pathname.includes('profile') }
-                        content = 'profile'
-                        href = '/profile'
-                    />
+            {isLoggedIn
+                ?         <>
+                    <NavLink active = { router.pathname.includes('profile') } content = 'profile' href = '/profile' />
                     <span>/</span>
                     <LogoutButton />
                 </>
-            )}
+                : null}
         </Container>
     );
 };
 
 /* Styles */
 const Container = styled.nav`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  height: 32px;
+  padding: 0 var(--content-h-padding);
+  user-select: none;
+
+  & span {
     display: flex;
-    flex-direction: row;
-    gap: 8px;
-    height: 32px;
-    padding: 0 var(--content-h-padding);
-    user-select: none;
+    align-items: center;
+  }
 
-    & span {
-        display: flex;
-        align-items: center;
-    }
-
-    & .active {
-        text-decoration: underline;
-    }
+  & .active {
+    text-decoration: underline;
+  }
 `;
 
 const Aperture = styled(ApertureIcon)<StyledIconProps & { $isLoggedIn: boolean }>`
-    cursor: pointer;
-    color: ${(p) => (p.$isLoggedIn ? theme.colors.green600.value : theme.colors.red600.value)};
+  cursor: pointer;
+  color: ${ (p) => (p.$isLoggedIn ? theme.colors.green600.value : theme.colors.red600.value)};
 
-    &:hover {
-        color: ${theme.colors.link.value};
-    }
+  &:hover {
+    color: ${ theme.colors.link.value };
+  }
 `;

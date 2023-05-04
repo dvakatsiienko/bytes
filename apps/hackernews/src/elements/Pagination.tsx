@@ -8,9 +8,9 @@ import {
 export const Pagination = () => {
     const router = useRouter();
 
-    const changePage: NextPaginationProps['onChange'] = (nextPage) => {
+    const handleChangePage: NextPaginationProps['onChange'] = (nextPage) => {
         const pathSegment = router.pathname.split('/')[ 1 ];
-        router.push(`/${pathSegment}/${nextPage}`);
+        router.push(`/${ pathSegment }/${ nextPage }`);
     };
 
     if (!router.query.page) return null;
@@ -23,7 +23,7 @@ export const Pagination = () => {
             initialPage = { Number(router.query.page) }
             size = 'sm'
             total = { 20 }
-            onChange = { changePage }
+            onChange = { handleChangePage }
         />
     );
 };

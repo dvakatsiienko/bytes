@@ -14,8 +14,8 @@
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
-import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
-import { type Session } from 'next-auth';
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import type { Session } from 'next-auth';
 import { getApiHandlerSession } from '@/server/auth';
 import { prisma } from '@/server/prisma';
 
@@ -31,7 +31,7 @@ import superjson from 'superjson';
 import { ZodError } from 'zod';
 
 type CreateContextOptions = {
-    session: Session | null;
+    session: Session | null,
 };
 
 /**
@@ -67,7 +67,7 @@ export const createTRPCContext = async (options: CreateNextContextOptions) => {
 
 const trpcContext = initTRPC.context<typeof createTRPCContext>().create({
     transformer: superjson,
-    errorFormatter({ shape, error }) {
+    errorFormatter ({ shape, error }) {
         return {
             ...shape,
             data: {
@@ -106,6 +106,7 @@ const enforceUserIsAuthed = trpcContext.middleware(({ ctx, next }) => {
     if (!ctx.session || !ctx.session.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED' });
     }
+
     return next({
         ctx: {
             // infers the `session` as non-nullable

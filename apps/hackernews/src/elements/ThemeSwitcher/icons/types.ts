@@ -1,4 +1,7 @@
+/* Core */
+import type { SVGProps } from 'react';
+
 /* Types */
-export interface SvgIconProps extends React.SVGProps<SVGSVGElement> {
-    filled: boolean;
+export interface SvgIconProps extends SVGProps<SVGSVGElement> {
+    filled: boolean,
 }

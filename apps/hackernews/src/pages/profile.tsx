@@ -1,5 +1,5 @@
 /* Core */
-import { type NextPage, type GetServerSideProps } from 'next';
+import type { NextPage, GetServerSideProps } from 'next';
 import { useSession } from 'next-auth/react';
 
 /* Instruments */
@@ -20,18 +20,9 @@ const ProfilePage: NextPage = () => {
         <section>
             <h1>Profile...</h1>
 
-            <h6>
-                Hello,
-                {session.data?.user.name}
-            </h6>
-            <h6>
-                Bio:
-                {session.data?.user.bio}
-            </h6>
-            <h6>
-                Location:
-                {session.data?.user.location}
-            </h6>
+            <h6>Hello, {session.data?.user.name}</h6>
+            <h6>Bio: {session.data?.user.bio}</h6>
+            <h6>Location: {session.data?.user.location}</h6>
 
             <br />
             <br />
@@ -72,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         };
     }
 
-    return { props: { session } };
+    return { props: { session }};
 };
 
 export default ProfilePage;

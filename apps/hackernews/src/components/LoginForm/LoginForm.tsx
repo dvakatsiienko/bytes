@@ -26,8 +26,8 @@ export const LoginForm: React.FC = () => {
             name:            __DEV__ ? 'Jack' : '',
             email:           __DEV__ ? 'admin@email.io' : '',
             password:        __DEV__ ? '12345' : '',
-            confirmPassword: __DEV__ ? '12345' : ''
-        }
+            confirmPassword: __DEV__ ? '12345' : '',
+        },
     });
 
     const login = async () => {
@@ -36,14 +36,14 @@ export const LoginForm: React.FC = () => {
         const result = await signIn('credentials', {
             redirect: false,
             email:    form.getValues().email,
-            password: form.getValues().password
+            password: form.getValues().password,
         });
 
         if (result?.ok) router.push('/');
     };
 
     const signup = async () => {
-        // TODO signup
+    // TODO signup
         console.log('signup');
     };
 
@@ -67,14 +67,13 @@ export const LoginForm: React.FC = () => {
             </Text>
 
             <Fieldset disabled = { isFetching }>
-                {!isLogin && (
-                    <Input
-                        formState = { form.formState }
-                        labelLeft = 'Name'
-                        placeholder = 'Your name'
-                        register = { form.register('name') }
-                    />
-                )}
+                {!isLogin
+          && <Input
+              formState = { form.formState }
+              labelLeft = 'Name'
+              placeholder = 'Your name'
+              register = { form.register('name') }
+          />}
 
                 <Input
                     formState = { form.formState }
@@ -90,15 +89,14 @@ export const LoginForm: React.FC = () => {
                     type = 'password'
                 />
 
-                {!isLogin && (
-                    <Input
-                        formState = { form.formState }
-                        labelLeft = 'Confirm password'
-                        placeholder = 'Confirm password'
-                        register = { form.register('confirmPassword') }
-                        type = 'password'
-                    />
-                )}
+                {!isLogin
+          && <Input
+              formState = { form.formState }
+              labelLeft = 'Confirm password'
+              placeholder = 'Confirm password'
+              register = { form.register('confirmPassword') }
+              type = 'password'
+          />}
 
                 <Controls>
                     <section className = 'credentials'>
@@ -138,8 +136,8 @@ export const LoginForm: React.FC = () => {
                         </Button>
                     </section>
 
-                    {isLogin && (
-                        <section className = 'github-provider'>
+                    {isLogin
+                        ? <section className = 'github-provider'>
                             <Text
                                 css = {{ textGradient: '45deg, $blue600 -20%, $pink600 50%' }}
                                 size = { 60 }
@@ -160,8 +158,8 @@ export const LoginForm: React.FC = () => {
                             >
                                 <SpinnerOrText isFetching = { isFetching } text = 'Signin with Github' />
                             </Button>
-                        </section>
-                    )}
+                          </section>
+                        : null}
                 </Controls>
             </Fieldset>
         </form>
@@ -170,27 +168,27 @@ export const LoginForm: React.FC = () => {
 
 /* Styles */
 const Controls = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 400px;
+
+  & .credentials {
+    display: flex;
+    gap: 5px;
+  }
+
+  & .github-provider {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    max-width: 400px;
 
-    & .credentials {
-        display: flex;
-        gap: 5px;
+    & p {
+      text-align: center;
     }
 
-    & .github-provider {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-
-        & p {
-            text-align: center;
-        }
-
-        & button {
-            width: 100%;
-        }
+    & button {
+      width: 100%;
     }
+  }
 `;

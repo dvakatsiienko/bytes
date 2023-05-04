@@ -10,7 +10,7 @@ const Web = () => {
                 <br />
                 {sum(1, 2)}
             </h1>
-            <Button />
+            <Button isChecked text = 'hello' />
         </div>
     );
 };

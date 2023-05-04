@@ -45,7 +45,7 @@ const nextConfig = {
 
 /* Helpers */
 const message1 = '🚀 Starting Next.js.';
-const message2 = `🌍 Environment: ${process.env.NODE_ENV}.`;
+const message2 = `🌍 Environment: ${ process.env.NODE_ENV }.`;
 let message3 = null;
 
 try {
@@ -54,26 +54,26 @@ try {
     if (ipconfig.stdout) {
         const machineIpAddress = ipconfig.stdout.replace('\n', '');
 
-        message3 = `📡 Access aplication from the network: http://${machineIpAddress}:3000`;
+        message3 = `📡 Access aplication from the network: http://${ machineIpAddress }:3000`;
     }
 } catch (error) {
-    message3 = `❌ Error determining machine ip address ${error}`;
+    message3 = `❌ Error determining machine ip address ${ error }`;
 }
 
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
  * This is especially useful for Docker builds.
  */
-!process.env.SKIP_ENV_VALIDATION && (await import('./src/env.mjs'));
+!process.env.SKIP_ENV_VALIDATION && await import('./src/env.mjs');
 
-console.log(`
-    ${message1}
-    ${message2}
-    ${message3}
+console.info(`
+    ${ message1 }
+    ${ message2 }
+    ${ message3 }
 `);
 
 process.on('uncaughtException', (err) => {
-    console.log('ERR', err);
+    console.info('ERR', err);
 });
 
 export default nextConfig;

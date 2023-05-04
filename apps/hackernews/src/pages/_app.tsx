@@ -1,15 +1,14 @@
 /* Core */
 import Head from 'next/head';
-import { type AppType } from 'next/app';
-
 import * as reactQuery from '@tanstack/react-query';
 import { ThemeProvider as StyledComponentsProvider } from 'styled-components';
 import { Provider as ReduxProvider } from 'react-redux';
 import { NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { Analytics } from '@vercel/analytics/react';
+import type { AppType } from 'next/app';
+import type { Session } from 'next-auth';
 
 /* Components */
 import { Layout } from '@/elements';

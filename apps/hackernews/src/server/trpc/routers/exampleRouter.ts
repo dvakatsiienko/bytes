@@ -6,7 +6,7 @@ import { createTRPCRouter, publicProcedure, protectedProcedure } from '@/server/
 
 export const exampleRouter = createTRPCRouter({
     hello: publicProcedure.input(z.object({ text: z.string() })).query((options) => {
-        return { greeting: `Hello ${options.input.text}` };
+        return { greeting: `Hello ${ options.input.text }` };
     }),
 
     getAll: publicProcedure.query((options) => {
