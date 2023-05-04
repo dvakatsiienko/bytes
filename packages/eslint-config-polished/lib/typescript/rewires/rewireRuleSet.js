@@ -5,7 +5,7 @@
  * ?    - since new object with rules is created, those relative pointers are no longer valid.
  * ?    - thus, deleting them and pointing to them directly in main «typescript» config.
  */
-function rewireRuleSet(ruleSet) {
+function rewireRuleSet (ruleSet) {
     const nextRuleSet = { ...ruleSet };
     delete nextRuleSet.extends;
 
