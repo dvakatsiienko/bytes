@@ -137,19 +137,8 @@ module.exports = {
                 '@typescript-eslint/space-before-function-paren': getJsRule('space-before-function-paren'),
                 'space-infix-ops':                                0,
                 '@typescript-eslint/space-infix-ops':             getJsRule('space-infix-ops'),
-                '@typescript-eslint/type-annotation-spacing':     [
-                    1,
-                    {
-                        before:    false,
-                        after:     true,
-                        overrides: {
-                            arrow: {
-                                before: true,
-                                after:  true,
-                            },
-                        },
-                    },
-                ], // ? To enforce good looking type annotation statements
+                // ? To enforce good looking type annotation statements
+                '@typescript-eslint/type-annotation-spacing':     complexTsRules.typeAnnotationSpacing,
             },
         },
     ],

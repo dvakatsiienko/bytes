@@ -174,3 +174,17 @@ exports.paddingLineBetweenStatements = [
         next:      [ 'interface' ],
     },
 ];
+
+exports.typeAnnotationSpacing = [
+    1,
+    {
+        before:    false,
+        after:     true,
+        overrides: {
+            arrow: {
+                before: true,
+                after:  true,
+            },
+        },
+    },
+];
