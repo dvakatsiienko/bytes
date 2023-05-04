@@ -20,6 +20,6 @@
         "@types/react": "18.2.5",
         "prettier": "2.8.8",
         "tsconfig-core": "workspace:*",
-        "typescript": "5.1.0-beta"
+        "typescript": "5.0.4"
     }
 }
