@@ -12,7 +12,7 @@
     "devDependencies": {
         "@types/react": "18.2.5",
         "@types/react-dom": "18.2.3",
-        "typescript": "5.1.0-beta"
+        "typescript": "5.0.4"
     },
     "types": "./index.tsx",
     "main": "./index.tsx",
