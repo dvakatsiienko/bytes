@@ -39,10 +39,10 @@
         "@styled-icons/ionicons-sharp": "10.46.0",
         "@tanstack/react-query": "4.29.5",
         "@tanstack/react-query-devtools": "4.29.6",
-        "@trpc/client": "10.23.1",
-        "@trpc/next": "10.23.1",
-        "@trpc/react-query": "10.23.1",
-        "@trpc/server": "10.23.1",
+        "@trpc/client": "10.25.0",
+        "@trpc/next": "10.25.0",
+        "@trpc/react-query": "10.25.0",
+        "@trpc/server": "10.25.0",
         "@vercel/analytics": "1.0.1",
         "autoprefixer": "10.4.14",
         "bcrypt": "5.1.0",
@@ -71,8 +71,8 @@
         "@types/bcrypt": "5.0.0",
         "@types/cookies": "0.7.7",
         "@types/node": "18.16.3",
-        "@types/react": "18.2.0",
-        "@types/react-dom": "18.2.1",
+        "@types/react": "18.2.5",
+        "@types/react-dom": "18.2.3",
         "@types/redux-logger": "3.0.9",
         "@types/styled-components": "5.1.26",
         "dotenv-cli": "7.2.1",
@@ -81,6 +81,6 @@
         "prettier-eslint-cli": "7.1.0",
         "redux-logger": "3.0.6",
         "rimraf": "5.0.0",
-        "typescript": "5.0.4"
+        "typescript": "5.1.0-beta"
     }
 }

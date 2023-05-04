@@ -6,5 +6,6 @@
         "titleBar.inactiveForeground": "#000",
         "titleBar.inactiveBackground": "#ffe100",
         "titleBar.border": "#000"
-    }
+    },
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
