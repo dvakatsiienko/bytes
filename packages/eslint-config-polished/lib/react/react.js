@@ -26,9 +26,6 @@ module.exports = {
                 // 'react/jsx-no-useless-fragment':                   1,
                 // 'jsx-a11y/no-noninteractive-element-interactions': 0,
 
-                // ! The react/jsx-sort-default-props rule is deprecated. It has been renamed to `react/sort-default-props`.
-                // ! The react/jsx-space-before-closing rule is deprecated. Please use the react/jsx-tag-spacing rule with the "beforeSelfClosing" option instead.
-
                 // ? React: hooks
                 'react-hooks/rules-of-hooks':  2,
                 'react-hooks/exhaustive-deps': 0,
@@ -62,32 +59,31 @@ module.exports = {
                 'react/jsx-no-target-blank':               2,
                 'react/jsx-no-undef':                      2,
                 'react/jsx-no-useless-fragment':           [ 1, { allowExpressions: true }], // TODO REVIEW. allowExressions is a workaroud, because currntly @types/react is working wrong disallowing singular strings to be returned from a component. https://github.com/microsoft/TypeScript/issues/21699
-                // 'react/jsx-one-expression-per-line':       [ 2, { allow: 'single-child' }],
-                // 'react/jsx-one-expression-per-line': 0, // ? off because it is't flexible enough to prettify good looking code
-
-                // ---
-                'react/no-adjacent-inline-elements':   2,
-                'react/no-array-index-key':            2,
-                'react/no-invalid-html-attribute':     2,
-                'react/no-multi-comp':                 2,
-                'react/no-namespace':                  2,
-                'react/no-this-in-sfc':                2,
-                'react/no-unstable-nested-components': 2,
-                'react/prefer-es6-class':              [ 2, 'never' ],
-                'react/prefer-stateless-function':     2,
-                'react/prop-types':                    0,
-                'react/require-render-return':         0,
-                'react/self-closing-comp':             [ 2, { component: true, html: true }],
-                'react/style-prop-object':             2,
-                'react/void-dom-elements-no-children': 2,
-
-                // ? React: JSX
-                'react/jsx-pascal-case':           2,
-                'react/jsx-props-no-multi-spaces': 2,
-                'react/jsx-sort-default-props':    2,
-                'react/jsx-sort-props':            complexReactRules.jsxSortProps,
-                'react/jsx-space-before-closing':  2,
-                'react/jsx-wrap-multilines':       2,
+                'react/jsx-pascal-case':                   2,
+                'react/jsx-props-no-multi-spaces':         1,
+                'react/jsx-sort-props':                    complexReactRules.jsxSortProps,
+                'react/jsx-tag-spacing':                   complexReactRules.tagSpacing,
+                'react/jsx-uses-vars':                     1,
+                'react/jsx-wrap-multilines':               complexReactRules.wrapMultilines,
+                'react/no-array-index-key':                2,
+                'react/no-children-prop':                  2,
+                'react/no-danger':                         2,
+                'react/no-danger-with-children':           2,
+                'react/no-deprecated':                     2,
+                'react/no-invalid-html-attribute':         2,
+                'react/no-namespace':                      2,
+                'react/no-render-return-value':            2,
+                'react/no-string-refs':                    2,
+                'react/no-this-in-sfc':                    2,
+                'react/no-unknown-property':               [ 2, { ignore: [ 'css' ]}],
+                'react/no-unstable-nested-components':     2,
+                'react/prefer-es6-class':                  [ 2, 'never' ],
+                'react/prefer-stateless-function':         2,
+                'react/require-render-return':             2,
+                'react/self-closing-comp':                 1,
+                'react/sort-default-props':                1,
+                'react/style-prop-object':                 2,
+                'react/void-dom-elements-no-children':     2,
             },
         },
     ],
