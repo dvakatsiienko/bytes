@@ -20,12 +20,6 @@ module.exports = {
             globals: { React: true },
 
             rules: {
-                // TODO: move to package config
-                // 'react/require-default-props':                     0, // defaultProps got deprecated, review this rule
-                // 'react/jsx-sort-props':                            1,
-                // 'react/jsx-no-useless-fragment':                   1,
-                // 'jsx-a11y/no-noninteractive-element-interactions': 0,
-
                 // ? React: hooks
                 'react-hooks/rules-of-hooks':  2,
                 'react-hooks/exhaustive-deps': 0,
