@@ -67,13 +67,14 @@ export const LoginForm: React.FC = () => {
             </Text>
 
             <Fieldset disabled = { isFetching }>
-                {!isLogin
-          && <Input
-              formState = { form.formState }
-              labelLeft = 'Name'
-              placeholder = 'Your name'
-              register = { form.register('name') }
-          />}
+                {!isLogin && (
+                    <Input
+                        formState = { form.formState }
+                        labelLeft = 'Name'
+                        placeholder = 'Your name'
+                        register = { form.register('name') }
+                    />
+                )}
 
                 <Input
                     formState = { form.formState }
@@ -89,14 +90,15 @@ export const LoginForm: React.FC = () => {
                     type = 'password'
                 />
 
-                {!isLogin
-          && <Input
-              formState = { form.formState }
-              labelLeft = 'Confirm password'
-              placeholder = 'Confirm password'
-              register = { form.register('confirmPassword') }
-              type = 'password'
-          />}
+                {!isLogin && (
+                    <Input
+                        formState = { form.formState }
+                        labelLeft = 'Confirm password'
+                        placeholder = 'Confirm password'
+                        register = { form.register('confirmPassword') }
+                        type = 'password'
+                    />
+                )}
 
                 <Controls>
                     <section className = 'credentials'>
@@ -107,8 +109,7 @@ export const LoginForm: React.FC = () => {
                             // light
                             disabled = { isFetching }
                             size = 'sm'
-                            type = 'submit'
-                        >
+                            type = 'submit'>
                             <SpinnerOrText
                                 isFetching = { isFetching }
                                 isLogin = { isLogin }
@@ -125,8 +126,7 @@ export const LoginForm: React.FC = () => {
                             color = 'secondary'
                             disabled = { isFetching }
                             size = 'sm'
-                            onPointerUp = { () => setIsLogin(!isLogin) }
-                        >
+                            onPointerUp = { () => setIsLogin(!isLogin) }>
                             <SpinnerOrText
                                 isFetching = { isFetching }
                                 isLogin = { isLogin }
@@ -137,28 +137,28 @@ export const LoginForm: React.FC = () => {
                     </section>
 
                     {isLogin
-                        ? <section className = 'github-provider'>
-                            <Text
-                                css = {{ textGradient: '45deg, $blue600 -20%, $pink600 50%' }}
-                                size = { 60 }
-                                weight = 'bold'
-                            >
-                                OR
-                            </Text>
+                        ? (
+                            <section className = 'github-provider'>
+                                <Text
+                                    css = {{ textGradient: '45deg, $blue600 -20%, $pink600 50%' }}
+                                    size = { 60 }
+                                    weight = 'bold'>
+                                    OR
+                                </Text>
 
-                            <Button
-                                bordered
-                                ghost
-                                shadow
-                                color = 'gradient'
-                                disabled = { isFetching }
-                                size = 'sm'
-                                type = 'button'
-                                onPointerDown = { () => signInWithGithub() }
-                            >
-                                <SpinnerOrText isFetching = { isFetching } text = 'Signin with Github' />
-                            </Button>
-                          </section>
+                                <Button
+                                    bordered
+                                    ghost
+                                    shadow
+                                    color = 'gradient'
+                                    disabled = { isFetching }
+                                    size = 'sm'
+                                    type = 'button'
+                                    onPointerDown = { () => signInWithGithub() }>
+                                    <SpinnerOrText isFetching = { isFetching } text = 'Signin with Github' />
+                                </Button>
+                            </section>
+                        )
                         : null}
                 </Controls>
             </Fieldset>
@@ -167,6 +167,7 @@ export const LoginForm: React.FC = () => {
 };
 
 /* Styles */
+// TODO: fix styled components indentation
 const Controls = styled.section`
   display: flex;
   flex-direction: column;

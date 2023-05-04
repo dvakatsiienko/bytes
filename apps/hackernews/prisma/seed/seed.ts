@@ -5,13 +5,13 @@
 import { prisma } from './client';
 import { createUsers } from './createUsers';
 
-async function main() {
-    console.log('🌠 Seeding started.');
+async function main () {
+    console.info('🌠 Seeding started.');
     await createUsers();
 
-    await prisma.example.createMany({ data: [{}, {}] });
+    await prisma.example.createMany({ data: [{}, {}]});
 
-    console.log('✅ DB seeded.');
+    console.info('✅ DB seeded.');
 }
 
 main()
@@ -21,5 +21,5 @@ main()
     })
     .finally(async () => {
         await prisma.$disconnect();
-        console.log('🏁 Prisma disconnected.');
+        console.info('🏁 Prisma disconnected.');
     });
