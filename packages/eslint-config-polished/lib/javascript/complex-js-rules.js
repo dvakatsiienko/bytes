@@ -36,6 +36,6 @@ exports.paddingLineBetweenStatements = [
     {
         blankLine: 'always',
         prev:      '*',
-        next:      [ 'export', 'class', 'return', 'for', 'do', 'while', 'switch', 'default' ],
+        next:      [ 'class', 'return', 'for', 'do', 'while', 'switch', 'default' ],
     },
 ];

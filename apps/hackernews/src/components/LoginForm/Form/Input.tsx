@@ -8,8 +8,8 @@ import styled, { css } from 'styled-components';
 export const Input: React.FC<InputProps> = ({ type = 'text', autoFocus = false, ...props }) => {
     const isInvalid = Boolean(props.formState.errors[ props.register.name ]?.message);
 
-    const errorMessage =
-        (props.formState.errors[ props.register.name ]?.message as unknown as string) ?? '';
+    const errorMessage
+    = (props.formState.errors[ props.register.name ]?.message as unknown as string) ?? '';
 
     const BaseInput = type === 'password' ? NextUiInput.Password : NextUiInput;
 
@@ -42,49 +42,49 @@ export const Input: React.FC<InputProps> = ({ type = 'text', autoFocus = false, 
 
 /* Styles */
 const style = css`
-    &:not(:last-child) {
-        margin-bottom: 3px;
-    }
+  &:not(:last-child) {
+    margin-bottom: 3px;
+  }
 
-    & input {
-        &:disabled {
-            cursor: not-allowed;
-            color: grey;
-        }
+  & input {
+    &:disabled {
+      cursor: not-allowed;
+      color: grey;
     }
+  }
 `;
 
 const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
 
-    &:not(:last-child) {
-        margin-bottom: 7px;
-    }
+  &:not(:last-child) {
+    margin-bottom: 7px;
+  }
 `;
 
 const ErrorMessage = styled.span<{ children: React.ReactNode }>`
-    display: inline-block;
-    color: red;
-    font-weight: 500;
-    font-size: 14px;
-    margin-top: 5px;
+  display: inline-block;
+  color: red;
+  font-weight: 500;
+  font-size: 14px;
+  margin-top: 5px;
 
-    & span {
-        text-transform: initial !important;
-    }
+  & span {
+    text-transform: initial !important;
+  }
 `;
 
 /* Types */
 interface InputProps {
-    register: UseFormRegisterReturn;
-    formState: FormState<FieldValues>;
-    type?: React.HTMLInputTypeAttribute;
-    placeholder?: string;
-    autoFocus?: boolean;
-    label?: string;
-    labelPlaceholder?: string;
-    labelLeft?: string;
-    labelRight?: string;
+    register:          UseFormRegisterReturn,
+    formState:         FormState<FieldValues>,
+    type?:             React.HTMLInputTypeAttribute,
+    placeholder?:      string,
+    autoFocus?:        boolean,
+    label?:            string,
+    labelPlaceholder?: string,
+    labelLeft?:        string,
+    labelRight?:       string,
 }

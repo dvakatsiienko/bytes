@@ -18,5 +18,7 @@ const darkBase: Theme = {
     theme,
 };
 
-export const lightTheme = createTheme(lightBase);
-export const darkTheme = createTheme(darkBase);
+const lightTheme = createTheme(lightBase);
+const darkTheme = createTheme(darkBase);
+
+export { lightTheme, darkTheme };

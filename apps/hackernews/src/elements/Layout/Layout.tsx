@@ -16,7 +16,7 @@ export const Layout = (props: { children: React.ReactElement[] }) => {
     const dispatch = useDispatch();
     const browser = useSelector((state) => state.browser);
 
-    const closBrowser = () => {
+    const handleCloseBrowser = () => {
         window.confirm('Are you sure?') && dispatch(browserSlice.actions.close());
     };
 
@@ -26,7 +26,7 @@ export const Layout = (props: { children: React.ReactElement[] }) => {
             <Header $isDark = { isDark }>
                 <Controls>
                     <Tooltip color = 'invert' content = 'Close'>
-                        <div className = 'dot close' onPointerUp = { closBrowser } />
+                        <div className = 'dot close' onPointerUp = { handleCloseBrowser } />
                     </Tooltip>
 
                     <Tooltip color = 'invert' content = 'Minimize'>

@@ -1,5 +1,5 @@
 /* Core */
-import { type NextPage, type GetServerSideProps } from 'next';
+import type { NextPage, GetServerSideProps } from 'next';
 
 /* Instruments */
 import { trpc } from '@/api';

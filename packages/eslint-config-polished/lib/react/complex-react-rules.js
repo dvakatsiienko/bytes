@@ -5,7 +5,7 @@ exports.fnComponentDefinition = [
 
 exports.jsxCurlySpacing = [ 1, { when: 'always', spacing: { objectLiterals: 'never' }}];
 
-exports.jsxHandlernames = [ 1, { checkLocalVariables: true, checkInlineFunction: true }];
+exports.jsxHandlernames = [ 1, { checkLocalVariables: true, checkInlineFunction: false }];
 
 exports.jsxIdent = [ 1, 4, { checkAttributes: true, indentLogicalExpressions: true }];
 

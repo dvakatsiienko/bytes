@@ -1,5 +1,5 @@
 /* Core */
-import { type DefaultSession, type DefaultUser } from 'next-auth';
+import type { DefaultSession, DefaultUser } from 'next-auth';
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -9,16 +9,16 @@ import { type DefaultSession, type DefaultUser } from 'next-auth';
  */
 declare module 'next-auth' {
     interface Session extends DefaultSession {
-        sessionToken: string;
-        user: {
-            id: string;
-            bio: string | null;
-            location: string | null;
-        } & DefaultSession['user'];
+        sessionToken: string,
+        user: DefaultSession['user'] & {
+            id:       string,
+            bio:      string | null,
+            location: string | null,
+        },
     }
 
     interface User extends DefaultUser {
-        bio: string | null;
-        location: string | null;
+        bio:      string | null,
+        location: string | null,
     }
 }

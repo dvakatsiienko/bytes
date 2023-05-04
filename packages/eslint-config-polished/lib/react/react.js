@@ -59,6 +59,11 @@ module.exports = {
                 'react/jsx-no-duplicate-props':            2,
                 'react/jsx-no-leaked-render':              2,
                 'react/jsx-no-script-url':                 2,
+                'react/jsx-no-target-blank':               2,
+                'react/jsx-no-undef':                      2,
+                'react/jsx-no-useless-fragment':           [ 1, { allowExpressions: true }], // TODO REVIEW. allowExressions is a workaroud, because currntly @types/react is working wrong disallowing singular strings to be returned from a component. https://github.com/microsoft/TypeScript/issues/21699
+                // 'react/jsx-one-expression-per-line':       [ 2, { allow: 'single-child' }],
+                // 'react/jsx-one-expression-per-line': 0, // ? off because it is't flexible enough to prettify good looking code
 
                 // ---
                 'react/no-adjacent-inline-elements':   2,
@@ -77,17 +82,12 @@ module.exports = {
                 'react/void-dom-elements-no-children': 2,
 
                 // ? React: JSX
-                'react/jsx-no-useless-fragment':     2, // TODO REVIEW. Currntly @types/react is working wrong disallowing singular strings to be returned from a component. https://github.com/microsoft/TypeScript/issues/21699
-                'react/jsx-one-expression-per-line': [ 2, { allow: 'single-child' }],
-                'react/jsx-pascal-case':             2,
-                'react/jsx-props-no-multi-spaces':   2,
-                'react/jsx-sort-default-props':      2,
-                'react/jsx-sort-props':              complexReactRules.jsxSortProps,
-                'react/jsx-space-before-closing':    2,
-                'react/jsx-wrap-multilines':         2,
-
-                // TODO process
-                // 'react/jsx-one-expression-per-line': 0, // ? off because it is't flexible enough to prettify good looking code
+                'react/jsx-pascal-case':           2,
+                'react/jsx-props-no-multi-spaces': 2,
+                'react/jsx-sort-default-props':    2,
+                'react/jsx-sort-props':            complexReactRules.jsxSortProps,
+                'react/jsx-space-before-closing':  2,
+                'react/jsx-wrap-multilines':       2,
             },
         },
     ],
