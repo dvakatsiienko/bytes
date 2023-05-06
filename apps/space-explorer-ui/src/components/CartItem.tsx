@@ -4,10 +4,8 @@ import { LaunchTile } from './LaunchTile';
 /* Instruments */
 import * as gql from '@/graphql';
 
-export const CartItem: React.FC<CartItemProps> = (props) => {
-    const launchQuery = gql.useLaunchQuery({
-        variables: { id: props.launchId },
-    });
+export const CartItem = (props: CartItemProps) => {
+    const launchQuery = gql.useLaunchQuery({ variables: { id: props.launchId }});
     const { data, loading } = launchQuery;
 
     if (loading) return <h4>Loading...</h4>;
@@ -18,5 +16,5 @@ export const CartItem: React.FC<CartItemProps> = (props) => {
 
 /* Types */
 interface CartItemProps {
-    launchId: string;
+    launchId: string,
 }

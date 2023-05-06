@@ -2,14 +2,12 @@
 import { useState } from 'react';
 
 /* Components */
-import {
-    Header, LaunchTile, Loading, Button
-} from '@/components';
+import { Header, LaunchTile, Loading, Button } from '@/components';
 
 /* Instruments */
 import * as gql from '@/graphql';
 
-export const Launches: React.FC = () => {
+export const Launches = () => {
     const { data, loading, fetchMore } = gql.useLaunchesQuery({ fetchPolicy: 'cache-and-network' });
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
 
@@ -20,7 +18,7 @@ export const Launches: React.FC = () => {
     const fetchMoreLaunches = async () => {
         setIsLoadingMore(true);
 
-        await fetchMore({ variables: { after: data?.launches.cursor } });
+        await fetchMore({ variables: { after: data?.launches.cursor }});
 
         setIsLoadingMore(false);
     };
@@ -29,16 +27,14 @@ export const Launches: React.FC = () => {
         <>
             <Header title = 'Space Explorer' />
 
-            {loading && !data && <Loading />}
+            {loading && !data ? <Loading /> : null}
 
             {launchesListJSX}
 
-            {data?.launches.hasMore
-                && (isLoadingMore ? (
-                    <Loading />
-                ) : (
-                    <Button onClick = { fetchMoreLaunches }>Load More</Button>
-                ))}
+            {data?.launches.hasMore && isLoadingMore ? <Loading /> : null}
+            {data?.launches.hasMore && !isLoadingMore
+                ?         <Button onClick = { fetchMoreLaunches }>Load More</Button>
+                : null}
         </>
     );
 };

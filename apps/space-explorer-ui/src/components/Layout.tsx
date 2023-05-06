@@ -9,7 +9,7 @@ import { Footer } from '@/components';
 import * as gql from '@/graphql';
 import { SPACING, COLORS } from '@/styles';
 
-export const Layout: React.FC = () => {
+export const Layout = () => {
     const { data } = gql.useIsUserLoggedInQuery();
 
     return (
@@ -20,7 +20,7 @@ export const Layout: React.FC = () => {
                 <Outlet />
             </Container>
 
-            {data?.isLoggedIn && <Footer />}
+            {data?.isLoggedIn ? <Footer /> : null}
         </>
     );
 };

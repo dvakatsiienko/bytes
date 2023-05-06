@@ -8,11 +8,11 @@ import { Header, Loading, CartItem, Button } from '@/components';
 import * as gql from '@/graphql';
 import { cartItemsVar } from '@/lib/apollo';
 
-export const Cart: React.FC = () => {
+export const Cart = () => {
     const cartItemsQuery = gql.useGetCartItemsQuery();
 
     const [ bookTripsMutation, bookTripsMeta ] = gql.useBookTripsMutation({
-        variables:      { launchIds: cartItemsQuery.data?.cartItems ?? [] },
+        variables:      { launchIds: cartItemsQuery.data?.cartItems ?? []},
         onCompleted:    () => cartItemsVar([]),
         refetchQueries: [ gql.UserProfileDocument ],
     });
@@ -41,9 +41,9 @@ export const Cart: React.FC = () => {
         <>
             <Header title = 'My Cart' />
 
-            {message && <h4>{message}</h4>}
+            {message ? <h4>{message}</h4> : null}
 
-            {!!cartItems.length && (
+            {Boolean(cartItems.length) && (
                 <BookAllButtonContainer>
                     <Button onClick = { () => bookTripsMutation() }>Book All</Button>
                 </BookAllButtonContainer>
@@ -56,13 +56,13 @@ export const Cart: React.FC = () => {
 
 /* Styles */
 const BookAllButtonContainer = styled.div`
-    /* background-color: red; */
-    position: sticky;
-    top: 10px;
-    z-index: 1000;
-    overflow: hidden;
+  /* background-color: red; */
+  position: sticky;
+  top: 10px;
+  z-index: 1000;
+  overflow: hidden;
 
-    button {
-        /* margin-bottom: 32px; */
-    }
+  button {
+    /* margin-bottom: 32px; */
+  }
 `;

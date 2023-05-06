@@ -12,7 +12,7 @@ import { isLoggedInVar } from '@/lib/apollo';
 import { clearLocalStorageAuthItems } from '@/utils';
 import { menuItemClassName } from '../MenuItem';
 
-export const LogoutButton: React.FC = () => {
+export const LogoutButton = () => {
     const client = useApolloClient();
     const navigate = useNavigate();
 
