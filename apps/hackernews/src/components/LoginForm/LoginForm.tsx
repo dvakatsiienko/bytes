@@ -14,7 +14,7 @@ import { Fieldset, Input } from './Form';
 /* Instruments */
 import { createResolver, FormShape } from './resolver';
 
-export const LoginForm: React.FC = () => {
+export const LoginForm = () => {
     const router = useRouter();
     const [ isLogin, setIsLogin ] = useState(true);
     const [ isFetching, setIsFetching ] = useState(false);
