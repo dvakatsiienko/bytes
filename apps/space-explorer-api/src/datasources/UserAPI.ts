@@ -2,18 +2,18 @@
 import { RESTDataSource } from '@apollo/datasource-rest';
 
 /* Instruments */
-import { prismaClient } from '@/lib'
+import { prismaClient } from '@/lib';
 
 export class UserAPI extends RESTDataSource {
     userEmail: string | null;
 
-    constructor(userEmail: string | null) {
+    constructor (userEmail: string | null) {
         super();
 
         this.userEmail = userEmail;
     }
 
-    async findOrCreate(email?: string | null) {
+    async findOrCreate (email?: string | null) {
         if (!email) {
             throw new Error('Email is null!');
         }
@@ -27,7 +27,7 @@ export class UserAPI extends RESTDataSource {
             user = await prismaClient.user.create({
                 data: {
                     email,
-                    trips: { create: [] },
+                    trips: { create: []},
                 },
                 include: { trips: true },
             });
@@ -38,37 +38,35 @@ export class UserAPI extends RESTDataSource {
         return user;
     }
 
-    async bookTrips(launchIds: string[]) {
+    async bookTrips (launchIds: string[]) {
         this.validateAuth();
 
-        const results = await Promise.all(launchIds.map(launchId => this.bookTrip(launchId)));
+        const results = await Promise.all(launchIds.map((launchId) => this.bookTrip(launchId)));
 
         return results;
     }
 
-    async bookTrip(launchId: string) {
+    async bookTrip (launchId: string) {
         const email = this.validateAuth();
 
-        const user = await prismaClient.user.findUnique({ where: { email } });
+        const user = await prismaClient.user.findUnique({ where: { email }});
 
         if (user === null) {
             throw new Error('User not found.');
         }
 
-        const trip = await prismaClient.trip.create({
-            data: { launchId, userId: user.id },
-        });
+        const trip = await prismaClient.trip.create({ data: { launchId, userId: user.id }});
 
         return trip;
     }
 
-    async cancelTrip(id: string) {
+    async cancelTrip (id: string) {
         this.validateAuth();
 
-        await prismaClient.trip.delete({ where: { id } });
+        await prismaClient.trip.delete({ where: { id }});
     }
 
-    async getTrips() {
+    async getTrips () {
         const email = this.validateAuth();
 
         const user = await prismaClient.user.findUnique({
@@ -85,7 +83,7 @@ export class UserAPI extends RESTDataSource {
         return trips;
     }
 
-    async isBookedOnLaunch(launchId: string) {
+    async isBookedOnLaunch (launchId: string) {
         const email = this.validateAuth();
 
         const user = await prismaClient.user.findUnique({
@@ -97,14 +95,12 @@ export class UserAPI extends RESTDataSource {
             throw new Error('User not found.');
         }
 
-        const userTrips = await prismaClient.trip.findMany({
-            where: { userId: user.id, launchId },
-        });
+        const userTrips = await prismaClient.trip.findMany({ where: { userId: user.id, launchId }});
 
         return userTrips && userTrips.length > 0;
     }
 
-    validateAuth() {
+    validateAuth () {
         if (!this.userEmail) {
             throw new Error('Not authenticated.');
         }
@@ -112,11 +108,11 @@ export class UserAPI extends RESTDataSource {
         return this.userEmail;
     }
 
-    login(email: string) {
+    login (email: string) {
         this.userEmail = email;
     }
 
-    logout() {
+    logout () {
         this.userEmail = null;
     }
 }

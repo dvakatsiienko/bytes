@@ -33,7 +33,7 @@ export const Query: QueryResolvers = {
 
 /* Types */
 interface QueryResolvers {
-    launches: Resolver<gql.QueryLaunchesArgs>;
-    launch: Resolver<gql.QueryLaunchArgs>;
-    userProfile: Resolver;
+    launches:    Resolver<gql.QueryLaunchesArgs>,
+    launch:      Resolver<gql.QueryLaunchArgs>,
+    userProfile: Resolver,
 }

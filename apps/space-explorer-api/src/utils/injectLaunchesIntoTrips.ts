@@ -1,12 +1,12 @@
 /* Core */
-import { type Trip } from '@prisma/client';
+import type { Trip } from '@prisma/client';
 
 /* Instruments */
-import { type LaunchModel } from '../datasources';
+import type { LaunchModel } from '../datasources';
 
 export const injectLaunchesIntoTrips = (trips: Trip[], launches: LaunchModel[]) => {
-    const finalTrips = trips.map(trip => {
-        const launch = launches.find(_launch => _launch.id === trip.launchId);
+    const finalTrips = trips.map((trip) => {
+        const launch = launches.find((_launch) => _launch.id === trip.launchId);
 
         if (!launch) {
             throw new Error('Launch for a trip not found.');

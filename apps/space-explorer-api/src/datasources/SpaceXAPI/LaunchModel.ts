@@ -9,29 +9,25 @@ export class LaunchModel implements TLaunchModel {
     site: string;
 
     mission: {
-        name: string;
-        missionPatchSmall: string;
-        missionPatchLarge: string;
+        name:              string,
+        missionPatchSmall: string,
+        missionPatchLarge: string,
     };
 
     rocket: {
-        id: string;
-        name: string;
-        type: string;
+        id:   string,
+        name: string,
+        type: string,
     };
 
-    constructor(launch: Launch, rockets: Rocket[], launchpads: Launchpad[]) {
+    constructor (launch: Launch, rockets: Rocket[], launchpads: Launchpad[]) {
         this.id = launch.id;
         this.flightNumber = launch.flight_number;
 
-        const launchpad = launchpads.find(
-            _launchpad => _launchpad.id === launch.launchpad,
-        );
+        const launchpad = launchpads.find((_launchpad) => _launchpad.id === launch.launchpad);
 
         if (!launchpad) {
-            throw new Error(
-                `Launchpad for a ${launch.name} launch was not found!`,
-            );
+            throw new Error(`Launchpad for a ${ launch.name } launch was not found!`);
         }
 
         this.site = launchpad.name;
@@ -41,10 +37,10 @@ export class LaunchModel implements TLaunchModel {
             missionPatchLarge: launch.links.patch.large,
         };
 
-        const rocket = rockets.find(_rocket => _rocket.id === launch.rocket);
+        const rocket = rockets.find((_rocket) => _rocket.id === launch.rocket);
 
         if (!rocket) {
-            throw new Error(`Rocket for ${launch.name} launch was not found!`);
+            throw new Error(`Rocket for ${ launch.name } launch was not found!`);
         }
 
         this.rocket = {
@@ -57,22 +53,22 @@ export class LaunchModel implements TLaunchModel {
 
 /* Types */
 export interface TLaunchModel {
-    id: string;
-    flightNumber: number;
-    site: string;
+    id:           string,
+    flightNumber: number,
+    site:         string,
 
-    mission: TMission;
-    rocket: TRocket;
+    mission: TMission,
+    rocket:  TRocket,
 }
 
 export interface TMission {
-    name: string;
-    missionPatchSmall: string;
-    missionPatchLarge: string;
+    name:              string,
+    missionPatchSmall: string,
+    missionPatchLarge: string,
 }
 
 export interface TRocket {
-    id: string;
-    name: string;
-    type: string;
+    id:   string,
+    name: string,
+    type: string,
 }
