@@ -1,7 +1,9 @@
 export const Button = (props: ButtonProps) => {
+    props.text ||= 'Click';
+    props.type ||= 'button';
+
     return <button type = { props.type }>{props.text}</button>;
 };
-Button.defaultProps = { text: 'Click', type: 'button' };
 
 /* Types */
 interface ButtonProps {
