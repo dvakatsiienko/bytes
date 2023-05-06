@@ -42,8 +42,8 @@ export const GlobalStyle = createGlobalStyle`
         margin: 0;
         padding: 0;
         font-family: Source Sans Pro, system-ui, sans-serif;
-        background-color: ${COLORS.background};
-        color: ${COLORS.text};
+        background-color: ${ COLORS.background };
+        color: ${ COLORS.text };
     }
 
     h1, h2, h3, h4, h5, h6 {

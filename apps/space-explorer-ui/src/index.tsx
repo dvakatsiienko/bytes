@@ -11,14 +11,13 @@ import { Pages } from './pages';
 import { client } from './lib/apollo';
 import { GlobalStyle } from './styles';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <StrictMode>
-        <Router>
-            <ApolloProvider client = { client }>
-                <Pages />
-            </ApolloProvider>
-        </Router>
+// TODO fix eslint conflict
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<StrictMode>
+    <Router>
+        <ApolloProvider client = { client }>
+            <Pages />
+        </ApolloProvider>
+    </Router>
 
-        <GlobalStyle />
-    </StrictMode>,
-);
+    <GlobalStyle />
+</StrictMode>);

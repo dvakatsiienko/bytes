@@ -60,7 +60,7 @@ export const LaunchTile = (props: LaunchTileProps) => {
                     ? (
                         <h5>
                             Booked at: {new Date(props.trip.createdAt).toLocaleDateString()}
-            &nbsp;
+                        &nbsp;
                             {new Date(props.trip.createdAt).toLocaleTimeString()}
                         </h5>
                     )
@@ -85,23 +85,23 @@ interface StyledLinkProps {
     $bgImage:     string,
 }
 const StyledLink = styled(Link)<StyledLinkProps>`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: ${ (props) => (props.$isDetailed ? 365 : 193)}px;
-  margin-top: ${ padding }px;
-  margin-bottom: ${ padding }px;
-  padding: ${ SPACING * 4 }px ${ SPACING * 5 }px ${ SPACING * 2 }px;
-  text-decoration: none;
-  border-radius: 7px;
-  color: white;
-  background-image: ${ (props) => props.$bgImage };
-  background-size: cover;
-  background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: ${ (props) => (props.$isDetailed ? 365 : 193)}px;
+    margin-top: ${ padding }px;
+    margin-bottom: ${ padding }px;
+    padding: ${ SPACING * 4 }px ${ SPACING * 5 }px ${ SPACING * 2 }px;
+    text-decoration: none;
+    border-radius: 7px;
+    color: white;
+    background-image: ${ (props) => props.$bgImage };
+    background-size: cover;
+    background-position: center;
 
-  &:not(:last-child) {
-    margin-bottom: ${ padding * 2 }px;
-  }
+    &:not(:last-child) {
+        margin-bottom: ${ padding * 2 }px;
+    }
 `;
 
 /* Helpers */
