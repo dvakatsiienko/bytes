@@ -6,6 +6,8 @@
     "main": "src/index.ts",
     "scripts": {
         "start": "nodemon ./src/index.ts",
+        "lint": "TIMING=1 eslint .",
+        "typecheck": "tsc --noEmit",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
         "prisma:generate": "prisma generate"
     },
