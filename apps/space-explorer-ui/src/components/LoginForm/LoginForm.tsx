@@ -13,7 +13,7 @@ import { COLORS, SPACING } from '@/styles';
 import { resolver } from './resolver';
 import spaceJpg from './img/space.jpg';
 
-export const LoginForm: React.FC<LoginFormProps> = (props) => {
+export const LoginForm = (props: LoginFormProps) => {
     const form = useForm({
         resolver,
         defaultValues: { email: process.env.NODE_ENV === 'development' ? 'test@email.io' : '' },
@@ -21,7 +21,7 @@ export const LoginForm: React.FC<LoginFormProps> = (props) => {
     });
 
     const onSubmit = form.handleSubmit((values) => {
-        props.loginMutation({ variables: { email: values.email } });
+        props.loginMutation({ variables: { email: values.email }});
     });
 
     return (
@@ -51,7 +51,7 @@ const Container = styled('div')({
     paddingBottom:      SPACING * 6,
     color:              'white',
     backgroundColor:    COLORS.primary,
-    backgroundImage:    `url(${spaceJpg})`,
+    backgroundImage:    `url(${ spaceJpg })`,
     backgroundSize:     'cover',
     backgroundPosition: 'center',
 });
@@ -84,9 +84,7 @@ const StyledCurve = styled(CurveSvg)(size('100%'), {
     left:     0,
 });
 
-const Heading = styled('h1')({
-    margin: `${SPACING * 3}px 0 ${SPACING * 6}px`,
-});
+const Heading = styled('h1')({ margin: `${ SPACING * 3 }px 0 ${ SPACING * 6 }px` });
 
 const StyledRocket = styled(RocketSvg)({ width: 250 }, svgClassName);
 
@@ -102,24 +100,22 @@ const StyledForm = styled('form')({
 
 const StyledInput = styled('input')({
     width:        '100%',
-    padding:      `${SPACING * 1.25}px ${SPACING * 2.5}px`,
+    padding:      `${ SPACING * 1.25 }px ${ SPACING * 2.5 }px`,
     marginBottom: SPACING,
-    border:       `1px solid ${COLORS.grey}`,
+    border:       `1px solid ${ COLORS.grey }`,
     fontSize:     16,
     outline:      'none',
-    ':focus':     {
-        borderColor: COLORS.primary,
-    },
+    ':focus':     { borderColor: COLORS.primary },
 });
 
 const ErrorMessage = styled.span`
-    display: inline-block;
-    font-weight: 600;
-    color: red;
-    margin-bottom: ${SPACING * 2}px;
+  display: inline-block;
+  font-weight: 600;
+  color: red;
+  margin-bottom: ${ SPACING * 2 }px;
 `;
 
 /* Types */
 interface LoginFormProps {
-    loginMutation: gql.LoginMutationFn;
+    loginMutation: gql.LoginMutationFn,
 }

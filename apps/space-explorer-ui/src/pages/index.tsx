@@ -16,16 +16,14 @@ import { Layout } from '@/components';
 import * as gql from '@/graphql';
 import { clearLocalStorageAuthItems } from '@/utils';
 
-export const Pages: React.FC = () => {
+export const Pages = () => {
     const { data } = gql.useIsUserLoggedInQuery();
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
         if (location.pathname === '/') {
-            navigate(data?.isLoggedIn ? '/launches' : '/login', {
-                replace: true,
-            });
+            navigate(data?.isLoggedIn ? '/launches' : '/login', { replace: true });
             if (!data?.isLoggedIn) clearLocalStorageAuthItems();
         }
     }, []);
@@ -38,10 +36,7 @@ export const Pages: React.FC = () => {
                 <Route element = { <Cart /> } path = 'cart' />
                 <Route element = { <Profile /> } path = 'profile' />
 
-                <Route
-                    element = { <Navigate to = { data?.isLoggedIn ? '/launches' : '/login' } /> }
-                    path = '*'
-                />
+                <Route element = { <Navigate to = { data?.isLoggedIn ? '/launches' : '/login' } /> } path = '*' />
             </Route>
 
             <Route element = { <Login /> } path = 'login' />
