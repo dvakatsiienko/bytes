@@ -14,7 +14,6 @@ module.exports = {
 
             parser:        '@typescript-eslint/parser',
             parserOptions: {
-                // ?
                 ecmaVersion: 'latest',
                 lib:         [ 'DOM', 'DOM.Iterable', 'ESNext' ],
             },
