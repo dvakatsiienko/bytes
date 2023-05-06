@@ -177,7 +177,7 @@ module.exports = {
         'keyword-spacing':                  1,
         'linebreak-style':                  1,
         'lines-between-class-members':      [ 1, 'always', { exceptAfterSingleLine: true }],
-        'max-len':                          comlexJsRules.maxLen,
+        // 'max-len':                          comlexJsRules.maxLen, // ? Disabled because of other formatting rules in combination with prettier-eslint haver higher formatting precendence which leads to this rule being omitted. Probably enable in future.
         'max-statements-per-line':          [ 1, { max: 1 }],
         'multiline-ternary':                [ 1, 'always-multiline' ],
         'new-parens':                       [ 1, 'always' ],
