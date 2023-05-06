@@ -3,5 +3,8 @@
  */
 module.exports = {
     root:    true,
-    extends: 'polished/typescript',
+    extends: [ 'polished/typescript' ],
+    //    "plugin:prettier/recommended"
+    //   plugins: ["prettier"],
+    //   rules: { "prettier/prettier": "error" },
 };
