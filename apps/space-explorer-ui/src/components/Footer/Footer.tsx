@@ -29,13 +29,13 @@ export const Footer = () => {
 
                 <MenuItem to = '/cart'>
                     <CartSvg />
-                    {!!cartItemsCount && <span className = 'count'>{cartItemsCount}</span>}
+                    {Boolean(cartItemsCount) && <span className = 'count'>{cartItemsCount}</span>}
                     Cart
                 </MenuItem>
 
                 <MenuItem to = '/profile'>
                     <ProfileSvg />
-                    {!!userTripsCount && <span className = 'count'>{userTripsCount}</span>}
+                    {Boolean(userTripsCount) && <span className = 'count'>{userTripsCount}</span>}
                     Profile
                 </MenuItem>
 

@@ -11,7 +11,7 @@ import { isLoggedInVar } from '@/lib/apollo';
 export const Login = () => {
     const navigate = useNavigate();
     const [ loginMutation, { loading, error }] = gql.useLoginMutation({
-        onCompleted(response) {
+        onCompleted (response) {
             const { login } = response;
 
             if (login) {

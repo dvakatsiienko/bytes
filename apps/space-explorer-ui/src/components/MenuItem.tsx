@@ -20,8 +20,8 @@ export const menuItemClassName = css`
     & svg {
         display: block;
         width: 60px;
-        margin: 0 auto ${SPACING}px;
-        fill: ${COLORS.secondary};
+        margin: 0 auto ${ SPACING }px;
+        fill: ${ COLORS.secondary };
     }
 
     & .count {
@@ -32,14 +32,12 @@ export const menuItemClassName = css`
         width: 25px;
         height: 25px;
         border-radius: 50%;
-        background-color: ${COLORS.accent};
+        background-color: ${ COLORS.accent };
         color: white;
     }
 `;
 
 export const MenuItem = styled(Link)(
-    {
-        textDecoration: 'none',
-    },
+    { textDecoration: 'none' },
     menuItemClassName,
 );
