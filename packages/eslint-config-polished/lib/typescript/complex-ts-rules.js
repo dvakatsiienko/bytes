@@ -12,6 +12,24 @@ exports.banTsComment = [
     },
 ];
 
+exports.banTsTypes = [
+    2,
+    {
+        types: {
+            'React.FC': 'React.FC type is deprecated, provide a type for props directly instead.',
+            FC:         'React.FC type is deprecated, provide a type for props directly instead.',
+            'React.FunctionComponent':
+                'React.FunctionComponent type is deprecated, provide a type for props directly instead.',
+            'React.VFC':                   'React.VFC type is deprecated, use React.FC instead.',
+            VFC:                           'React.VFC type is deprecated, use React.FC instead.',
+            'React.VoidFunctionComponent': 'React.VFC type is deprecated, use React.FC instead.',
+
+            '{}': false,
+        },
+        extendDefaults: true,
+    },
+];
+
 exports.memberOrdering = [
     1,
     {
