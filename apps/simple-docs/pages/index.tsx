@@ -2,17 +2,17 @@
 import { Button } from 'ui';
 import { sum } from 'utils';
 
-const Docs = () => {
+const DocsPage = () => {
     return (
-        <div>
+        <section>
             <h1>
                 Docs
                 <br />
                 {sum(1, 2)}
             </h1>
             <Button />
-        </div>
+        </section>
     );
 };
 
-export default Docs;
+export default DocsPage;

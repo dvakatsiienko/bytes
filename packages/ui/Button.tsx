@@ -1,13 +1,11 @@
 export const Button = (props: ButtonProps) => {
-    props.text ||= 'Click';
-    props.type ||= 'button';
+    const { type = 'button', text = 'Click' } = props;
 
-    return <button type = { props.type }>{props.text}</button>;
+    return <button type = { type }>{text}</button>;
 };
 
 /* Types */
 interface ButtonProps {
-    text:      string,
-    type?:     React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
-    isChecked: boolean,
+    text?: string,
+    type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
 }
