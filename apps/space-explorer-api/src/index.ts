@@ -18,9 +18,8 @@ import { SpaceXAPI, UserAPI } from './datasources';
 
 dotenv.config({ path: '.env.development.local' });
 
-const typeDefs = loadSchemaSync(join(getDirname(import.meta.url), './graphql/schema.graphql'), {
-    loaders: [ new GraphQLFileLoader() ],
-}) as unknown as DocumentNode;
+// TODO resolve ESLint conflict that leads to too long lines
+const typeDefs = loadSchemaSync(join(getDirname(import.meta.url), './graphql/schema.graphql'), { loaders: [ new GraphQLFileLoader() ]}) as unknown as DocumentNode;
 
 const apolloServer = new ApolloServer({ resolvers, typeDefs });
 
@@ -38,8 +37,8 @@ const { url } = await startStandaloneServer(apolloServer, {
         let isUserExists = false;
 
         if (userEmail) {
-            const user = await prismaClient.user.findUnique({ where: { email: userEmail } });
-            isUserExists = !!user;
+            const user = await prismaClient.user.findUnique({ where: { email: userEmail }});
+            isUserExists = Boolean(user);
         }
 
         if (!isUserExists) userEmail = null;
@@ -55,4 +54,4 @@ const { url } = await startStandaloneServer(apolloServer, {
     listen: { port: Number(process.env.PORT) ?? 4000 },
 });
 
-console.log(chalk.cyanBright(`🚀 Server ready at ${chalk.blueBright(url)}`));
+console.log(chalk.cyanBright(`🚀 Server ready at ${ chalk.blueBright(url) }`));

@@ -11,7 +11,7 @@ export const paginate = ({
 
     if (!cursor) return results.slice(0, pageSize);
 
-    const cursorIndex = results.findIndex(item => {
+    const cursorIndex = results.findIndex((item) => {
         const itemCursor = item.flightNumber ? item.flightNumber : getCursor();
 
         return itemCursor ? cursor === itemCursor : false;
@@ -24,13 +24,14 @@ export const paginate = ({
 
         return results.slice(cursorIndex + 1, Math.min(results.length, cursorIndex + 1 + pageSize));
     }
+
     return results.slice(0, pageSize);
 };
 
 /* Types */
 interface Options {
-    after: number;
-    pageSize: number;
-    results: LaunchModel[];
-    getCursor?: () => null;
+    after:      number,
+    pageSize:   number,
+    results:    LaunchModel[],
+    getCursor?: () => null,
 }
