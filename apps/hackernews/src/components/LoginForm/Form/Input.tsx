@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 // import { Input as GeistInput, Dot } from '@geist-ui/core';
 // import type { InputProps as GeistInputProps, InputPasswordProps, DotProps } from '@geist-ui/core';
 
-export const Input: React.FC<InputProps> = ({ type = 'text', autoFocus = false, ...props }) => {
+export const Input = ({ type = 'text', autoFocus = false, ...props }: InputProps) => {
     const isInvalid = Boolean(props.formState.errors[ props.register.name ]?.message);
 
     const errorMessage =
