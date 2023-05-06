@@ -1,4 +1,4 @@
-export const Button: React.FC<ButtonProps> = (props) => {
+export const Button = (props: ButtonProps) => {
     return <button type = { props.type }>{props.text}</button>;
 };
 Button.defaultProps = { text: 'Click', type: 'button' };
