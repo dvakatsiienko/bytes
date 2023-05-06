@@ -48,6 +48,7 @@ module.exports = {
             rules: {
                 // ? TypeScript Rules
                 '@typescript-eslint/ban-ts-comment':                complexTsRules.banTsComment, // ! reduce severity, rewire options
+                '@typescript-eslint/ban-types':                     complexTsRules.banTsTypes,
                 '@typescript-eslint/consistent-type-definitions':   0, // ! turning off to allow both «type» and «interface»
                 '@typescript-eslint/explicit-member-accessibility': 1,
                 '@typescript-eslint/member-ordering':               complexTsRules.memberOrdering,
