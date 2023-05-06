@@ -2,17 +2,17 @@
 import { Button } from 'ui';
 import { sum } from 'utils';
 
-const Web = () => {
+const WebPage = () => {
     return (
-        <div>
+        <section>
             <h1>
-                Web...
+                Web
                 <br />
                 {sum(1, 2)}
             </h1>
-            <Button isChecked text = 'hello' />
-        </div>
+            <Button text = 'Click me...' />
+        </section>
     );
 };
 
-export default Web;
+export default WebPage;
