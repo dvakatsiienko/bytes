@@ -1,4 +1,4 @@
-1. move .eslintignore to root
-2. move typescript to root
-3. write test for eslint-config
-4. format with prettier-eslint https://github.com/prettier/prettier-eslint
+-   move .eslintignore to root
+-   move typescript to root
+-   write test for eslint-config
+-   format with prettier-eslint https://github.com/prettier/prettier-eslint
