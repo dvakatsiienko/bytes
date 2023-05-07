@@ -1,18 +1,4 @@
 /**
  * @type {import('prettier').Config}
  */
-module.exports = {
-    printWidth:      100,
-    tabWidth:        4,
-    useTabs:         false,
-    semi:            true,
-    singleQuote:     true,
-    quoteProps:      'as-needed',
-    jsxSingleQuote:  true,
-    trailingComma:   'all',
-    bracketSpacing:  true,
-    bracketSameLine: true,
-    arrowParens:     'always',
-    proseWrap:       'always',
-    endOfLine:       'lf',
-};
+module.exports = { ...require('prettier-config-polished') };
