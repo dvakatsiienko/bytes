@@ -120,8 +120,8 @@ module.exports = {
                 'lines-between-class-members':                    0,
                 '@typescript-eslint/lines-between-class-members': JSON.parse(JSON.stringify(getJsRule('lines-between-class-members'))), // ? Deep-cloned via JSON.stringify/parse becase «@typescript-eslint»'s equivalent of the rule adds additional rule option «exceptAfterOverload» which is being injected into the object, and gets passed back to ESLint's javascript config, thus breaking it. Because it is a single object, and it is working with reference.
                 '@typescript-eslint/member-delimiter-style':      complexTsRules.memberDelimiterStyle, // ? Does not have ESLint equivalent
-                'no-extra-parens':                                0,
-                '@typescript-eslint/no-extra-parens':             getJsRule('no-extra-parens'),
+                // 'no-extra-parens':                                0, // ? Disabled this rule, because of conflict with prettier-eslint
+                // '@typescript-eslint/no-extra-parens':             getJsRule('no-extra-parens'), // ? Disabled this rule, because of conflict with prettier-eslint
                 'object-curly-spacing':                           0,
                 '@typescript-eslint/object-curly-spacing':        getJsRule('object-curly-spacing'),
                 'padding-line-between-statements':                0,

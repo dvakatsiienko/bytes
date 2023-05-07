@@ -40,7 +40,7 @@ module.exports = {
                 'react/jsx-filename-extension':            [ 2, { extensions: [ '.tsx', '.js' ]}],
                 'react/jsx-first-prop-new-line':           1,
                 'react/jsx-fragments':                     1,
-                'react/jsx-indent':                        complexReactRules.jsxIdent,
+                // 'react/jsx-indent':                        complexReactRules.jsxIdent, // ? Disabled this rule, because of conflict with prettier-eslint
                 'react/jsx-indent-props':                  [ 1, 4 ],
                 'react/jsx-key':                           [ 2, { checkFragmentShorthand: true }],
                 'react/jsx-max-props-per-line':            [ 1, { when: 'multiline', maximum: 1 }],
@@ -51,7 +51,7 @@ module.exports = {
                 'react/jsx-no-script-url':                 2,
                 'react/jsx-no-target-blank':               2,
                 'react/jsx-no-undef':                      2,
-                'react/jsx-no-useless-fragment':           [ 1, { allowExpressions: true }], // TODO REVIEW. allowExressions is a workaroud, because currntly @types/react is working wrong disallowing singular strings to be returned from a component. https://github.com/microsoft/TypeScript/issues/21699
+                'react/jsx-no-useless-fragment':           [ 1, { allowExpressions: true }], // ? 08.05.2023 allowExressions is a workaroud, because currntly @types/react is working wrong disallowing singular strings to be returned from a component. https://github.com/microsoft/TypeScript/issues/21699
                 'react/jsx-pascal-case':                   2,
                 'react/jsx-props-no-multi-spaces':         1,
                 'react/jsx-sort-props':                    complexReactRules.jsxSortProps,
