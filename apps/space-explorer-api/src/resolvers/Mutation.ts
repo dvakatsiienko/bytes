@@ -11,7 +11,7 @@ export const Mutation: MutationResolvers = {
 
         return userProfile;
     },
-    logout:  (_, __, { dataSources }) => {
+    logout: (_, __, { dataSources }) => {
         dataSources.userAPI.logout();
 
         return true;
@@ -37,8 +37,8 @@ export const Mutation: MutationResolvers = {
 
 /* Types */
 interface MutationResolvers {
-    login: Resolver<gql.MutationLoginArgs>;
-    logout: Resolver;
-    bookTrips: Resolver<gql.MutationBookTripsArgs>;
-    cancelTrip: Resolver<gql.MutationCancelTripArgs>;
+    login:      Resolver<gql.MutationLoginArgs>,
+    logout:     Resolver,
+    bookTrips:  Resolver<gql.MutationBookTripsArgs>,
+    cancelTrip: Resolver<gql.MutationCancelTripArgs>,
 }

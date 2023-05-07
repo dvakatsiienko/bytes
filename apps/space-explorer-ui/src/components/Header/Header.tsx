@@ -36,7 +36,7 @@ const Image = styled.img<{ $round: boolean }>`
     width: 135px;
     height: 135px;
     margin-right: ${ SPACING * 2.5 }px;
-    border-radius: ${ (props) => (props.$round ? '50%' : '0%')};
+    border-radius: ${ (props) => (props.$round ? '50%' : '0%') };
 `;
 
 const Subheading = styled('h5')({
