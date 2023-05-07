@@ -13,6 +13,7 @@
         "build:@space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
         "build:simple": "turbo build --filter='@simple/*'",
         "lint": "turbo lint",
+        "lint:eslint": "TIMING=1 eslint .",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
     },
     "devDependencies": {
