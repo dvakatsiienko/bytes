@@ -31,6 +31,8 @@ exports.maxLen = [
     },
 ];
 
+exports.objectCurlySpacing = [ 1, 'always', { objectsInObjects: false, arraysInObjects: false }];
+
 exports.paddingLineBetweenStatements = [
     1,
     {
