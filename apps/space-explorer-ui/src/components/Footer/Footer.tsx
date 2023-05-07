@@ -12,9 +12,7 @@ import { COLORS, SPACING } from '@/styles';
 
 export const Footer = () => {
     const cartItemsQuery = gql.useGetCartItemsQuery();
-    const userProfileQuery = gql.useUserProfileQuery({
-        // fetchPolicy: 'cache-and-network',
-    });
+    const userProfileQuery = gql.useUserProfileQuery();
 
     const cartItemsCount = cartItemsQuery.data?.cartItems.length;
     const userTripsCount = userProfileQuery.data?.userProfile.trips.length;

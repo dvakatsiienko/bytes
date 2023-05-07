@@ -20,6 +20,6 @@ export const Loading = styled(LogoSvg)(size(64), {
     fill:    COLORS.grey,
     path:    {
         transformOrigin: 'center',
-        animation:       `${spin} 1s linear infinite`,
+        animation:       `${ spin } 1s linear infinite`,
     },
 });

@@ -16,8 +16,8 @@ import { createResolver, FormShape } from './resolver';
 
 export const LoginForm = () => {
     const router = useRouter();
-    const [isLogin, setIsLogin] = useState(true);
-    const [isFetching, setIsFetching] = useState(false);
+    const [ isLogin, setIsLogin ] = useState(true);
+    const [ isFetching, setIsFetching ] = useState(false);
 
     const form = useForm<FormShape>({
         resolver:      createResolver(isLogin),

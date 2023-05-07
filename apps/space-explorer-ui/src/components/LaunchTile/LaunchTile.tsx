@@ -41,7 +41,7 @@ export const LaunchTile = (props: LaunchTileProps) => {
         }
     };
 
-    const isDisabled = cancelTripMeta.loading || !props.trip && isBooked;
+    const isDisabled = cancelTripMeta.loading || (!props.trip && isBooked);
 
     return (
         <StyledLink
@@ -56,15 +56,13 @@ export const LaunchTile = (props: LaunchTileProps) => {
 
                 {props.isDetailed ? <h5>Launch site: {site}</h5> : null}
 
-                {props.trip
-                    ? (
-                        <h5>
-                            Booked at: {new Date(props.trip.createdAt).toLocaleDateString()}
+                {props.trip ? (
+                    <h5>
+                        Booked at: {new Date(props.trip.createdAt).toLocaleDateString()}
                         &nbsp;
-                            {new Date(props.trip.createdAt).toLocaleTimeString()}
-                        </h5>
-                    )
-                    : null}
+                        {new Date(props.trip.createdAt).toLocaleTimeString()}
+                    </h5>
+                ) : null}
             </div>
 
             <Button $mini disabled = { isDisabled } onClick = { submit }>
@@ -88,7 +86,7 @@ const StyledLink = styled(Link)<StyledLinkProps>`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: ${ (props) => (props.$isDetailed ? 365 : 193)}px;
+    height: ${ (props) => (props.$isDetailed ? 365 : 193) }px;
     margin-top: ${ padding }px;
     margin-bottom: ${ padding }px;
     padding: ${ SPACING * 4 }px ${ SPACING * 5 }px ${ SPACING * 2 }px;

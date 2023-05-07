@@ -17,5 +17,5 @@ export const UserProfile: UserProfileResolvers = {
 
 /* Types */
 interface UserProfileResolvers {
-    trips: Resolver;
+    trips: Resolver,
 }
