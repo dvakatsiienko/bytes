@@ -160,12 +160,8 @@ module.exports = {
 
                 // ? ESLint: layout and formatting
                 // * Formatting-related rules should be delegated to Prettier probably
-                'array-bracket-newline': [ 2, 'consistent' ],
-                'array-bracket-spacing': [
-                    2,
-                    'always',
-                    { objectsInArrays: false, arraysInArrays: false },
-                ],
+                'array-bracket-newline':            [ 2, 'consistent' ],
+                'array-bracket-spacing':            comlexJsRules.arrayBracketSpacing,
                 'array-element-newline':            [ 2, 'consistent' ],
                 'arrow-parens':                     1,
                 'arrow-spacing':                    1,

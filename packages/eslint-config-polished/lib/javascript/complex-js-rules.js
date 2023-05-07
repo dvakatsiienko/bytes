@@ -19,6 +19,8 @@ exports.spacedComment = [
     },
 ];
 
+exports.arrayBracketSpacing = [ 1, 'always', { objectsInArrays: false, arraysInArrays: false }];
+
 exports.maxLen = [
     1,
     {
