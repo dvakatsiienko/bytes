@@ -1,3 +1,7 @@
-src/graphql
+graphql
 dist
 .next
+
+!.*.js
+!.*.mjs
+!.*.cjs
