@@ -178,7 +178,7 @@ module.exports = {
                 'function-paren-newline':           [ 1, 'multiline' ],
                 'generator-star-spacing':           [ 1, { before: false, after: true }],
                 'implicit-arrow-linebreak':         [ 1, 'beside' ],
-                indent:                             [ 1, 4 ],
+                // indent:                             [ 1, 4, { ignoreComments: false }], // ? Disabled this rule, because of conflict with prettier-eslint
                 'jsx-quotes':                       [ 1, 'prefer-single' ],
                 'key-spacing':                      [ 1, { align: 'value' }],
                 'keyword-spacing':                  1,

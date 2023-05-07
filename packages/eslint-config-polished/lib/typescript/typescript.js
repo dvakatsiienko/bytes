@@ -111,8 +111,8 @@ module.exports = {
                  * ? Not included in shareable config.
                  * * probably turn off for performance savings TL;DR: https://tinyurl.com/2p8evbcm
                  */
-                indent:                                           0,
-                '@typescript-eslint/indent':                      getJsRule('indent'),
+                // indent:                                           0, // ? Disabled this rule, because of conflict with prettier-eslint
+                // '@typescript-eslint/indent':                      getJsRule('indent'), // ? Disabled this rule, because of conflict with prettier-eslint
                 'key-spacing':                                    0,
                 '@typescript-eslint/key-spacing':                 getJsRule('key-spacing'),
                 'keyword-spacing':                                1,
