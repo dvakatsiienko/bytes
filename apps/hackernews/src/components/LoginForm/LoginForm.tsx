@@ -16,8 +16,8 @@ import { createResolver, FormShape } from './resolver';
 
 export const LoginForm = () => {
     const router = useRouter();
-    const [ isLogin, setIsLogin ] = useState(true);
-    const [ isFetching, setIsFetching ] = useState(false);
+    const [isLogin, setIsLogin] = useState(true);
+    const [isFetching, setIsFetching] = useState(false);
 
     const form = useForm<FormShape>({
         resolver:      createResolver(isLogin),
@@ -43,7 +43,6 @@ export const LoginForm = () => {
     };
 
     const signup = async () => {
-    // TODO signup
         console.log('signup');
     };
 
@@ -136,30 +135,28 @@ export const LoginForm = () => {
                         </Button>
                     </section>
 
-                    {isLogin
-                        ? (
-                            <section className = 'github-provider'>
-                                <Text
-                                    css = {{ textGradient: '45deg, $blue600 -20%, $pink600 50%' }}
-                                    size = { 60 }
-                                    weight = 'bold'>
-                                    OR
-                                </Text>
+                    {isLogin ? (
+                        <section className = 'github-provider'>
+                            <Text
+                                css = {{ textGradient: '45deg, $blue600 -20%, $pink600 50%' }}
+                                size = { 60 }
+                                weight = 'bold'>
+                                OR
+                            </Text>
 
-                                <Button
-                                    bordered
-                                    ghost
-                                    shadow
-                                    color = 'gradient'
-                                    disabled = { isFetching }
-                                    size = 'sm'
-                                    type = 'button'
-                                    onPointerDown = { () => signInWithGithub() }>
-                                    <SpinnerOrText isFetching = { isFetching } text = 'Signin with Github' />
-                                </Button>
-                            </section>
-                        )
-                        : null}
+                            <Button
+                                bordered
+                                ghost
+                                shadow
+                                color = 'gradient'
+                                disabled = { isFetching }
+                                size = 'sm'
+                                type = 'button'
+                                onPointerDown = { () => signInWithGithub() }>
+                                <SpinnerOrText isFetching = { isFetching } text = 'Signin with Github' />
+                            </Button>
+                        </section>
+                    ) : null}
                 </Controls>
             </Fieldset>
         </form>
@@ -167,29 +164,28 @@ export const LoginForm = () => {
 };
 
 /* Styles */
-// TODO: fix styled components indentation
 const Controls = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  max-width: 400px;
-
-  & .credentials {
-    display: flex;
-    gap: 5px;
-  }
-
-  & .github-provider {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    max-width: 400px;
 
-    & p {
-      text-align: center;
+    & .credentials {
+        display: flex;
+        gap: 5px;
     }
 
-    & button {
-      width: 100%;
+    & .github-provider {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        & p {
+            text-align: center;
+        }
+
+        & button {
+            width: 100%;
+        }
     }
-  }
 `;
