@@ -5,10 +5,9 @@ import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { z } from 'zod';
 import dotenv from 'dotenv';
 import chalk from 'chalk';
-import type { DocumentNode } from 'graphql';
-
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
+import type { DocumentNode } from 'graphql';
 
 /* Instruments */
 import { prismaClient } from '@/lib';
@@ -18,7 +17,6 @@ import { SpaceXAPI, UserAPI } from './datasources';
 
 dotenv.config({ path: '.env.development.local' });
 
-// TODO resolve ESLint conflict that leads to too long lines
 const typeDefs = loadSchemaSync(join(getDirname(import.meta.url), './graphql/schema.graphql'), { loaders: [ new GraphQLFileLoader() ]}) as unknown as DocumentNode;
 
 const apolloServer = new ApolloServer({ resolvers, typeDefs });
@@ -51,7 +49,7 @@ const { url } = await startStandaloneServer(apolloServer, {
             },
         };
     },
-    listen: { port: Number(process.env.PORT) ?? 4000 },
+    listen: { port: Number(process.env.PORT ?? 4000) },
 });
 
-console.log(chalk.cyanBright(`🚀 Server ready at ${ chalk.blueBright(url) }`));
+console.info(chalk.cyanBright(`🚀 Server ready at ${ chalk.blueBright(url) }`));
