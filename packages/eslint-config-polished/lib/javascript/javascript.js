@@ -12,7 +12,17 @@ const comlexJsRules = require('./complex-js-rules');
 module.exports = {
     overrides: [
         {
-            files: [ '*.js', '*.mjs', '*.cjs' ],
+            files: [
+                '*.js',
+                '*.mjs',
+                '*.cjs',
+                '*.ts',
+                '*.tsx',
+                '*.mts',
+                '*.cts',
+                '*.mtsx',
+                '*.ctsx',
+            ],
 
             parser: '@babel/eslint-parser',
 
@@ -186,9 +196,9 @@ module.exports = {
                 'lines-between-class-members':      [ 1, 'always', { exceptAfterSingleLine: true }],
                 // 'max-len':                          comlexJsRules.maxLen, // ? Disabled because of other formatting rules in combination with prettier-eslint haver higher formatting precendence which leads to this rule being omitted. Probably enable in future.
                 'max-statements-per-line':          [ 1, { max: 1 }],
-                'multiline-ternary':                [ 1, 'always-multiline' ],
+                // 'multiline-ternary':                [ 1, 'always' ],
                 'new-parens':                       [ 1, 'always' ],
-                'no-extra-parens':                  [ 1, 'all', { ignoreJSX: 'multi-line' }],
+                // 'no-extra-parens':                  [ 1, 'all', { ignoreJSX: 'multi-line' }], // ? Disabled because of conflict with prettier-eslint
                 'no-multi-spaces':                  [ 1, { ignoreEOLComments: true, exceptions: { Property: true }}],
                 'no-multiple-empty-lines':          [ 1, { max: 1 }],
                 'no-tabs':                          1,
@@ -197,7 +207,7 @@ module.exports = {
                 'nonblock-statement-body-position': 1,
                 'object-curly-newline':             [ 1, { multiline: true }],
                 'object-curly-spacing':             comlexJsRules.objectCurlySpacing,
-                'operator-linebreak':               [ 1, 'before', { overrides: { '=': 'after' }}],
+                // 'operator-linebreak':               [ 1, 'before', { overrides: { '=': 'after' }}], // ? Disabled because of conflict with prettier-eslint
                 'padding-line-between-statements':  comlexJsRules.paddingLineBetweenStatements,
                 quotes:                             [ 1, 'single' ],
                 'rest-spread-spacing':              1,
@@ -214,24 +224,6 @@ module.exports = {
                 'template-tag-spacing':             1,
                 'wrap-iife':                        [ 1, 'inside' ],
                 'yield-star-spacing':               [ 1, 'after' ],
-
-                // TODO eslint-plugin-import
-                'import/no-cycle': 0,
-                // ? https://v6--typescript-eslint.netlify.app/linting/troubleshooting/performance-troubleshooting#eslint-plugin-import
-                // We recommend you do not use the following rules, as TypeScript provides the same checks as part of standard type checking:
-
-                // import/named
-                // import/namespace
-                // import/default
-                // import/no-named-as-default-member
-                // The following rules do not have equivalent checks in TypeScript, so we recommend that you only run them at CI/push time, to lessen the local performance burden.
-
-                // import/no-named-as-default
-                // import/no-cycle
-                // import/no-unused-modules
-                // import/no-deprecated
-
-                // TODO eslint-plugin-prettier
             },
         },
     ],
