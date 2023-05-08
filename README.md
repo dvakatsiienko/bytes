@@ -11,7 +11,10 @@
 
 ###### Libraries
 
--   💅🏼 eslint-config-polished
+-   💅🏼
+    [eslint-config-polished](https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished)
+-   💄
+    [prettier-config-polished](https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished)
 
 ###### Utilities
 

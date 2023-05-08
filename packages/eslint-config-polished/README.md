@@ -26,7 +26,7 @@ This config avoids some **ESLint**'s and **@typescript-eslint**'s formatting rul
 config is deisgned to use **Prettier** for formatting.
 
 You can find the acoomapnying **Prettier** shareable config here:
-[prettier-config-polished](https://www.npmjs.com/package/prettier-config-polished).
+[prettier-config-polished](https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished).
 
 Add full-functioning config via **yarn** or package manager of your preference:
 
