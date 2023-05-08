@@ -55,7 +55,7 @@ module.exports = { ...require('prettier-config-polished') };
 If you are not using **Prettier** (which you should), you can still use this config, just omit
 everything related to **Prettier** in the **Install** and **configuration** steps.
 
-### 🔬 Details
+## 🔬 Details
 
 For **JavaScript** support, config relies on
 [@babel/eslint-parser](https://github.com/babel/babel/tree/main/eslint/babel-eslint-parser). It is
