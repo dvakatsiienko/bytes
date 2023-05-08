@@ -1,4 +1,3 @@
--   move typescript to root
 -   write test for eslint-config
 -   publish eslint
 -   publish prettier
