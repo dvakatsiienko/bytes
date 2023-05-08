@@ -3,7 +3,7 @@
     "extends": ["//"],
     "pipeline": {
         "build": {
-            "dependsOn": ["prisma:generate", "lint", "typecheck"]
+            "dependsOn": ["prisma:generate", "lint"]
         },
         "prisma:generate": {
             "cache": true,
