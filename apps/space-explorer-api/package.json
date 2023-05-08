@@ -4,6 +4,7 @@
     "private": true,
     "type": "module",
     "main": "src/index.ts",
+    "packageManager": "pnpm@8.4.0",
     "scripts": {
         "start": "nodemon ./src/index.ts",
         "lint": "TIMING=1 eslint .",
