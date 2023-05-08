@@ -2,25 +2,7 @@
 import { Launch, Rocket, Launchpad } from './types';
 
 export class LaunchModel implements TLaunchModel {
-    id: string;
-
-    flightNumber: number;
-
-    site: string;
-
-    mission: {
-        name:              string,
-        missionPatchSmall: string,
-        missionPatchLarge: string,
-    };
-
-    rocket: {
-        id:   string,
-        name: string,
-        type: string,
-    };
-
-    constructor (launch: Launch, rockets: Rocket[], launchpads: Launchpad[]) {
+    public constructor (launch: Launch, rockets: Rocket[], launchpads: Launchpad[]) {
         this.id = launch.id;
         this.flightNumber = launch.flight_number;
 
@@ -49,6 +31,20 @@ export class LaunchModel implements TLaunchModel {
             type: rocket.type,
         };
     }
+
+    public id:           string;
+    public flightNumber: number;
+    public site:         string;
+    public rocket: {
+        id:   string,
+        name: string,
+        type: string,
+    };
+    public mission: {
+        name:              string,
+        missionPatchSmall: string,
+        missionPatchLarge: string,
+    };
 }
 
 /* Types */
