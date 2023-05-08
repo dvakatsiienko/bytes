@@ -45,7 +45,7 @@ module.exports = {
 };
 ```
 
-⚙️ Configure ESLint's **.prettierrc.js**:
+⚙️ Configure Prettier's **.prettierrc.js**:
 
 ```js
 /** @type {import("prettier").Config} */
@@ -57,8 +57,9 @@ everything related to **Prettier** in the **Install** and **configuration** step
 
 ### 🔬 Details
 
-For **JavaScript** support, config relies on [@babel/parser](https://babeljs.io/docs/babel-parser).
-It is installed automatically with this config.
+For **JavaScript** support, config relies on
+[@babel/eslint-parser](https://github.com/babel/babel/tree/main/eslint/babel-eslint-parser). It is
+installed automatically with this config.
 
 For **TypeScript** support, config relies on
 [@typescript-eslint/parser](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser).
