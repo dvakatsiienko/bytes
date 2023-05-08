@@ -1,7 +1,7 @@
--   move .eslintignore to root
 -   move typescript to root
 -   write test for eslint-config
 -   publish eslint
 -   publish prettier
 -   format with prettier-eslint https://github.com/prettier/prettier-eslint
+-   do typechecking with swc
 -   setup releasing
