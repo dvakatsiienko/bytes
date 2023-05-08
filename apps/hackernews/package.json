@@ -23,7 +23,8 @@
         "prisma:generate": "prisma generate",
         "prisma:migrate:reset": "prisma db push --force-reset",
         "prisma:db:seed": "prisma db seed",
-        "prisma:studio": "dotenv -e .env.local -- prisma studio"
+        "prisma:studio": "dotenv -e .env.local -- prisma studio",
+        "postinstall": "pnpm prisma:generate"
     },
     "prisma": {
         "seed": "node -r @swc-node/register prisma/seed"

@@ -9,18 +9,19 @@
         "lint": "TIMING=1 eslint .",
         "typecheck": "tsc",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
-        "prisma:generate": "prisma generate"
+        "prisma:generate": "prisma generate",
+        "postinstall": "pnpm prisma:generate"
     },
     "dependencies": {
         "@apollo/datasource-rest": "6.0.0",
         "@apollo/server": "4.7.1",
         "@graphql-tools/graphql-file-loader": "7.5.17",
         "@graphql-tools/load": "7.8.14",
-        "@prisma/client": "4.13.0",
+        "@prisma/client": "4.12.0",
         "chalk": "5.2.0",
         "dotenv": "16.0.3",
         "graphql": "16.6.0",
-        "prisma": "4.13.0",
+        "prisma": "4.12.0",
         "zod": "3.21.4"
     },
     "devDependencies": {
