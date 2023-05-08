@@ -34,15 +34,15 @@ exports.memberOrdering = [
     1,
     {
         default: [
+            // ? Signatures
+            'signature',
+            'call-signature',
+
             // ? Constructors
             'public-constructor',
             'protected-constructor',
             'private-constructor',
             'constructor',
-
-            // ? Signatures
-            'signature',
-            'call-signature',
 
             // ? Fields
             'public-static-field',

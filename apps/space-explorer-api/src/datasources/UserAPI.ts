@@ -5,15 +5,15 @@ import { RESTDataSource } from '@apollo/datasource-rest';
 import { prismaClient } from '@/lib';
 
 export class UserAPI extends RESTDataSource {
-    userEmail: string | null;
-
-    constructor (userEmail: string | null) {
+    public constructor (userEmail: string | null) {
         super();
 
         this.userEmail = userEmail;
     }
 
-    async findOrCreate (email?: string | null) {
+    private userEmail: string | null;
+
+    public async findOrCreate (email?: string | null) {
         if (!email) {
             throw new Error('Email is null!');
         }
@@ -38,7 +38,7 @@ export class UserAPI extends RESTDataSource {
         return user;
     }
 
-    async bookTrips (launchIds: string[]) {
+    public async bookTrips (launchIds: string[]) {
         this.validateAuth();
 
         const results = await Promise.all(launchIds.map((launchId) => this.bookTrip(launchId)));
@@ -46,7 +46,7 @@ export class UserAPI extends RESTDataSource {
         return results;
     }
 
-    async bookTrip (launchId: string) {
+    public async bookTrip (launchId: string) {
         const email = this.validateAuth();
 
         const user = await prismaClient.user.findUnique({ where: { email }});
@@ -60,13 +60,13 @@ export class UserAPI extends RESTDataSource {
         return trip;
     }
 
-    async cancelTrip (id: string) {
+    public async cancelTrip (id: string) {
         this.validateAuth();
 
         await prismaClient.trip.delete({ where: { id }});
     }
 
-    async getTrips () {
+    public async getTrips () {
         const email = this.validateAuth();
 
         const user = await prismaClient.user.findUnique({
@@ -83,7 +83,7 @@ export class UserAPI extends RESTDataSource {
         return trips;
     }
 
-    async isBookedOnLaunch (launchId: string) {
+    public async isBookedOnLaunch (launchId: string) {
         const email = this.validateAuth();
 
         const user = await prismaClient.user.findUnique({
@@ -100,7 +100,7 @@ export class UserAPI extends RESTDataSource {
         return userTrips && userTrips.length > 0;
     }
 
-    validateAuth () {
+    public validateAuth () {
         if (!this.userEmail) {
             throw new Error('Not authenticated.');
         }
@@ -108,11 +108,11 @@ export class UserAPI extends RESTDataSource {
         return this.userEmail;
     }
 
-    login (email: string) {
+    public login (email: string) {
         this.userEmail = email;
     }
 
-    logout () {
+    public logout () {
         this.userEmail = null;
     }
 }

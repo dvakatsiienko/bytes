@@ -96,16 +96,16 @@ module.exports = {
                 '@typescript-eslint/no-useless-constructor': getJsRule('no-useless-constructor'),
 
                 // ? Formatting Rules (Probably delegate them to Prettier)
-                'block-spacing':                                  0,
-                '@typescript-eslint/block-spacing':               getJsRule('block-spacing'),
-                'brace-style':                                    0,
-                '@typescript-eslint/brace-style':                 getJsRule('brace-style'),
-                'comma-dangle':                                   0,
-                '@typescript-eslint/comma-dangle':                getJsRule('comma-dangle'),
-                'comma-spacing':                                  0,
-                '@typescript-eslint/comma-spacing':               getJsRule('comma-spacing'),
-                'func-call-spacing':                              0,
-                '@typescript-eslint/func-call-spacing':           getJsRule('func-call-spacing'),
+                'block-spacing':                             0,
+                '@typescript-eslint/block-spacing':          getJsRule('block-spacing'),
+                'brace-style':                               0,
+                '@typescript-eslint/brace-style':            getJsRule('brace-style'),
+                'comma-dangle':                              0,
+                '@typescript-eslint/comma-dangle':           getJsRule('comma-dangle'),
+                'comma-spacing':                             0,
+                '@typescript-eslint/comma-spacing':          getJsRule('comma-spacing'),
+                'func-call-spacing':                         0,
+                '@typescript-eslint/func-call-spacing':      getJsRule('func-call-spacing'),
                 /**
                  * ? Recommended to disable this to save on performance. https://v6--typescript-eslint.netlify.app/linting/troubleshooting/performance-troubleshooting#the-indent--typescript-eslintindent-rules
                  * ? Not included in shareable config.
@@ -113,18 +113,16 @@ module.exports = {
                  */
                 // indent:                                           0, // ? Disabled this rule, because of conflict with prettier-eslint
                 // '@typescript-eslint/indent':                      getJsRule('indent'), // ? Disabled this rule, because of conflict with prettier-eslint
-                'key-spacing':                                    0,
-                '@typescript-eslint/key-spacing':                 getJsRule('key-spacing'),
-                'keyword-spacing':                                1,
-                '@typescript-eslint/keyword-spacing':             getJsRule('keyword-spacing'),
-                'lines-between-class-members':                    0,
-                '@typescript-eslint/lines-between-class-members': JSON.parse(JSON.stringify(getJsRule('lines-between-class-members'))), // ? Deep-cloned via JSON.stringify/parse becase «@typescript-eslint»'s equivalent of the rule adds additional rule option «exceptAfterOverload» which is being injected into the object, and gets passed back to ESLint's javascript config, thus breaking it. Because it is a single object, and it is working with reference.
-                '@typescript-eslint/member-delimiter-style':      complexTsRules.memberDelimiterStyle, // ? Does not have ESLint equivalent
+                'key-spacing':                               0,
+                '@typescript-eslint/key-spacing':            getJsRule('key-spacing'),
+                'keyword-spacing':                           1,
+                '@typescript-eslint/keyword-spacing':        getJsRule('keyword-spacing'),
+                '@typescript-eslint/member-delimiter-style': complexTsRules.memberDelimiterStyle, // ? Does not have ESLint equivalent
                 // 'no-extra-parens':                                0, // ? Disabled this rule, because of conflict with prettier-eslint
                 // '@typescript-eslint/no-extra-parens':             getJsRule('no-extra-parens'), // ? Disabled this rule, because of conflict with prettier-eslint
-                'object-curly-spacing':                           0,
-                '@typescript-eslint/object-curly-spacing':        getJsRule('object-curly-spacing'),
-                'padding-line-between-statements':                0,
+                'object-curly-spacing':                      0,
+                '@typescript-eslint/object-curly-spacing':   getJsRule('object-curly-spacing'),
+                'padding-line-between-statements':           0,
                 '@typescript-eslint/padding-line-between-statements':
                     complexTsRules.paddingLineBetweenStatements,
                 quotes:                                           0,
