@@ -1,7 +1,0 @@
-graphql
-dist
-.next
-
-!.*.js
-!.*.mjs
-!.*.cjs
