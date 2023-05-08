@@ -5,7 +5,7 @@
     "exclude": ["node_modules"],
     "compilerOptions": {
         "incremental": true,
-        "lib": ["dom", "dom.iterable", "esnext"],
+        "lib": ["DOM", "DOM.ITERABLE", "ESNext"],
         "allowJs": true,
         "skipLibCheck": true,
         "strict": false,
