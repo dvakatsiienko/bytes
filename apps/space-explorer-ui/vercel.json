@@ -1,6 +1,6 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
     "buildCommand": "turbo build --filter='@space-explorer/ui' --color",
-    "installCommand": "pnpm install'",
+    "installCommand": "pnpm install",
     "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
