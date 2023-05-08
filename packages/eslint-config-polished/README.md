@@ -14,7 +14,7 @@ The config includes support for the following file extensions:
 
 The ESLint's
 [overrides](https://eslint.org/docs/latest/use/configure/configuration-files#how-do-overrides-work)
-pattern to achieve that.
+pattern is used to achieve that.
 
 **Consequently**, all you need to do to get linting support for **everything** mentioned above is to
 simply extend **polished/typescript**.
@@ -22,8 +22,9 @@ simply extend **polished/typescript**.
 ## 🏎️ Install
 
 This config avoids some **ESLint**'s and **@typescript-eslint**'s formatting rules.
-[Read more](https://typescript-eslint.io/linting/troubleshooting/formatting/). Because of this, the
-config is deisgned to use **Prettier** for formatting.
+[Read more](https://typescript-eslint.io/linting/troubleshooting/formatting/).
+
+Because of this, the config is deisgned to use **Prettier** for formatting.
 
 You can find the acoomapnying **Prettier** shareable config here:
 [prettier-config-polished](https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished).
