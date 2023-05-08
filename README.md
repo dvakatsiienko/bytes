@@ -10,7 +10,7 @@
 -   🛰️
     [Space Explorer (UI)](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-ui)
 -   🚀
-    [Space Explorer (API)](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-API)
+    [Space Explorer (API)](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
 
 ###### Libraries
 
