@@ -6,8 +6,11 @@
 
 ###### Applications
 
--   🖥️ Hackernews
--   🛰️ Space Explorer
+-   🖥️ [Hackernews](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews)
+-   🛰️
+    [Space Explorer (UI)](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-ui)
+-   🚀
+    [Space Explorer (API)](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-API)
 
 ###### Libraries
 
