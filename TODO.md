@@ -3,3 +3,4 @@
 -   format with prettier-eslint https://github.com/prettier/prettier-eslint
 -   do typechecking with swc
 -   setup releasing
+-   remove auto-rename-tag VSCode extension once typescript 5.1 is released as RC
