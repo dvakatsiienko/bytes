@@ -10,6 +10,14 @@ const comlexJsRules = require('./complex-js-rules');
  * @type {import('eslint').Linter.Config<import('eslint').Linter.RulesRecord)>}
  */
 module.exports = {
+    ignorePatterns: [
+        'node_modules', // →↓
+        '.next', // →→→→→→→→↓
+        'dist', // →→→→→→→→→→ ignore specificed folders
+        'build', // →→→→→→→→↑
+        'graphql', // →→→→→→↑
+        '!.*.*', // ? allow dotfiles to be linted
+    ],
     overrides: [
         {
             files: [
