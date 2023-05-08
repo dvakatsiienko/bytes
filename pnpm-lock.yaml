@@ -26,8 +26,8 @@ importers:
         specifier: 1.9.3
         version: 1.9.3
       typescript:
-        specifier: 5.0.4
-        version: 5.0.4
+        specifier: 5.1.0-beta
+        version: 5.1.0-beta
 
   apps/hackernews:
     dependencies:
@@ -185,9 +185,6 @@ importers:
       rimraf:
         specifier: 5.0.0
         version: 5.0.0
-      typescript:
-        specifier: 5.0.4
-        version: 5.0.4
 
   apps/simple-docs:
     dependencies:
@@ -219,9 +216,6 @@ importers:
       tsconfig-core:
         specifier: workspace:*
         version: link:../../packages/tsconfig-core
-      typescript:
-        specifier: 5.0.4
-        version: 5.0.4
 
   apps/simple-web:
     dependencies:
@@ -253,9 +247,6 @@ importers:
       tsconfig-core:
         specifier: workspace:*
         version: link:../../packages/tsconfig-core
-      typescript:
-        specifier: 5.0.4
-        version: 5.0.4
 
   apps/space-explorer-api:
     dependencies:
@@ -311,9 +302,6 @@ importers:
       prettier:
         specifier: 2.8.8
         version: 2.8.8
-      typescript:
-        specifier: 5.0.4
-        version: 5.0.4
 
   apps/space-explorer-ui:
     dependencies:
@@ -405,9 +393,6 @@ importers:
       rimraf:
         specifier: 5.0.0
         version: 5.0.0
-      typescript:
-        specifier: 5.0.4
-        version: 5.0.4
       vite:
         specifier: 4.3.5
         version: 4.3.5(@types/node@20.1.0)
@@ -416,7 +401,7 @@ importers:
         version: 0.0.7(vite@4.3.5)
       vite-tsconfig-paths:
         specifier: 4.2.0
-        version: 4.2.0(typescript@5.0.4)(vite@4.3.5)
+        version: 4.2.0(typescript@5.1.0-beta)(vite@4.3.5)
 
   packages/eslint-config-polished:
     dependencies:
@@ -450,19 +435,12 @@ importers:
       eslint-plugin-smells:
         specifier: 1.0.1
         version: 1.0.1
-      typescript:
-        specifier: 5.0.4
-        version: 5.0.4
 
   packages/prettier-config-polished: {}
 
   packages/tsconfig-core: {}
 
   packages/ui:
-    dependencies:
-      '@types/prop-types':
-        specifier: 15.7.5
-        version: 15.7.5
     devDependencies:
       '@types/react':
         specifier: 18.2.6
@@ -470,9 +448,6 @@ importers:
       '@types/react-dom':
         specifier: 18.2.4
         version: 18.2.4
-      typescript:
-        specifier: 5.0.4
-        version: 5.0.4
 
   packages/utils: {}
 
@@ -9538,7 +9513,7 @@ packages:
     resolution: {integrity: sha512-PGcnJoTBnVGy6yYNFxWVNkdcAuAMstvutN9MgDJIV6L0oG8fB+ZNNy1T+wJzah8RPGor1mZuPQkVfXNDpy9eHA==}
     dev: true
 
-  /tsconfck@2.1.1(typescript@5.0.4):
+  /tsconfck@2.1.1(typescript@5.1.0-beta):
     resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
     engines: {node: ^14.13.1 || ^16 || >=18}
     hasBin: true
@@ -9548,7 +9523,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      typescript: 5.0.4
+      typescript: 5.1.0-beta
     dev: true
 
   /tsconfig-paths@3.14.2:
@@ -9693,6 +9668,12 @@ packages:
     engines: {node: '>=12.20'}
     hasBin: true
 
+  /typescript@5.1.0-beta:
+    resolution: {integrity: sha512-NT+wDYZu95yUj1K9fbHz6v2gl3m56MNZs6tbKdMJq7pN0l+oQn0g6Z0IV3fHcEQDA9LxZgs3BrWMdMsvJZixdg==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: true
+
   /ua-parser-js@0.7.35:
     resolution: {integrity: sha512-veRf7dawaj9xaWEu9HoTVn5Pggtc/qj+kqTOFvNiN1l0YdxwC1kvel57UCjThjGa3BHBihE8/UJAHI+uQHmd/g==}
     dev: true
@@ -9833,7 +9814,7 @@ packages:
       vite: 4.3.5(@types/node@20.1.0)
     dev: true
 
-  /vite-tsconfig-paths@4.2.0(typescript@5.0.4)(vite@4.3.5):
+  /vite-tsconfig-paths@4.2.0(typescript@5.1.0-beta)(vite@4.3.5):
     resolution: {integrity: sha512-jGpus0eUy5qbbMVGiTxCL1iB9ZGN6Bd37VGLJU39kTDD6ZfULTTb1bcc5IeTWqWJKiWV5YihCaibeASPiGi8kw==}
     peerDependencies:
       vite: '*'
@@ -9843,7 +9824,7 @@ packages:
     dependencies:
       debug: 4.3.4(supports-color@5.5.0)
       globrex: 0.1.2
-      tsconfck: 2.1.1(typescript@5.0.4)
+      tsconfck: 2.1.1(typescript@5.1.0-beta)
       vite: 4.3.5(@types/node@20.1.0)
     transitivePeerDependencies:
       - supports-color

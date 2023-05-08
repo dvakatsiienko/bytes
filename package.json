@@ -24,7 +24,7 @@
         "rimraf": "5.0.0",
         "tsconfig-core": "workspace:*",
         "turbo": "1.9.3",
-        "typescript": "5.0.4"
+        "typescript": "5.1.0-beta"
     },
     "engines": {
         "pnpm": ">=8.0.0",

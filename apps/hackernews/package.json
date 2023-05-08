@@ -10,7 +10,7 @@
         "build:clean": "rimraf .next",
         "serve": "next start",
         "lint": "TIMING=1 eslint .",
-        "typecheck": "tsc --noEmit",
+        "typecheck": "tsc",
         "validate": "run-p lint typecheck",
         "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\"",
         "release:patch": "release-it --ci",
@@ -81,7 +81,6 @@
         "prettier": "2.8.8",
         "prettier-eslint-cli": "7.1.0",
         "redux-logger": "3.0.6",
-        "rimraf": "5.0.0",
-        "typescript": "5.0.4"
+        "rimraf": "5.0.0"
     }
 }

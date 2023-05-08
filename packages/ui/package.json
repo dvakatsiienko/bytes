@@ -5,13 +5,9 @@
         "lint": "TIMING=1 eslint .",
         "typecheck": "tsc"
     },
-    "dependencies": {
-        "@types/prop-types": "15.7.5"
-    },
     "devDependencies": {
         "@types/react": "18.2.6",
-        "@types/react-dom": "18.2.4",
-        "typescript": "5.0.4"
+        "@types/react-dom": "18.2.4"
     },
     "types": "./index.tsx",
     "main": "./index.tsx",
