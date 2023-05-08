@@ -10,7 +10,7 @@
         "typecheck": "tsc",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
         "prisma:generate": "prisma generate",
-        "postinstall": "pnpm prisma:generate"
+        "postinstall": "prisma generate"
     },
     "dependencies": {
         "@apollo/datasource-rest": "6.0.0",
