@@ -2,16 +2,15 @@
     "name": "prettier-config-polished",
     "version": "0.0.1",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-    "license": "MIT",
-    "keywords": [
-        "prettier",
-        "prettierconfig"
-    ],
     "scripts": {
         "lint": "TIMING=1 eslint ."
     },
     "main": "./index.js",
     "exports": {
         ".": "./index.js"
-    }
+    },
+    "keywords": [
+        "prettier",
+        "prettierconfig"
+    ]
 }

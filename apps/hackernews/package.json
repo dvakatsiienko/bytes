@@ -1,8 +1,6 @@
 {
     "name": "hackernews",
     "version": "0.10.7",
-    "private": true,
-    "license": "MIT",
     "scripts": {
         "start": "next",
         "restart": "run-s build:clean start",

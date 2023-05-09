@@ -1,9 +1,7 @@
 {
     "name": "tsconfig-core",
-    "version": "0.0.3",
-    "repository": "git@github.com:dvakatsiienko/tsconfig-dva.git",
+    "version": "0.0.1",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-    "license": "MIT",
     "main": "nextjs.json",
     "exports": {
         ".": "./nextjs.json"

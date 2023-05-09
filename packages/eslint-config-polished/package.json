@@ -2,11 +2,6 @@
     "name": "eslint-config-polished",
     "version": "0.0.1",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-    "license": "MIT",
-    "keywords": [
-        "eslint",
-        "eslintconfig"
-    ],
     "scripts": {
         "lint": "TIMING=1 eslint ."
     },
@@ -26,5 +21,10 @@
     "exports": {
         "./javascript": "./javascript.js",
         "./typescript": "./typescript.js"
-    }
+    },
+    "repository": "https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished",
+    "keywords": [
+        "eslint",
+        "eslintconfig"
+    ]
 }
