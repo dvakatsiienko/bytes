@@ -9,6 +9,7 @@
     "exports": {
         ".": "./index.js"
     },
+    "repository": "https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished",
     "keywords": [
         "prettier",
         "prettierconfig"
