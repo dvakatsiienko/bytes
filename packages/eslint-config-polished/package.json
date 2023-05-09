@@ -1,6 +1,6 @@
 {
     "name": "eslint-config-polished",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "scripts": {
         "lint": "TIMING=1 eslint ."
@@ -24,11 +24,15 @@
     },
     "repository": {
         "type": "git",
-        "directory": "packages/eslint-config-polished",
-        "url": "https://github.com/dvakatsiienko/turborepo.git"
+        "url": "https://github.com/dvakatsiienko/turborepo.git",
+        "directory": "packages/eslint-config-polished"
     },
+    "homepage": "https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished#readme",
     "keywords": [
         "eslint",
         "eslintconfig"
-    ]
+    ],
+    "bugs": {
+        "url": "https://github.com/dvakatsiienko/turborepo/issues"
+    }
 }
