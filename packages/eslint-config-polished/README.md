@@ -1,4 +1,4 @@
-# eslint-config-polished
+# 💅🏼 eslint-config-polished
 
 [![npm version](https://badge.fury.io/js/eslint-config-polished.svg)](https://badge.fury.io/js/eslint-config-polished)
 
@@ -68,3 +68,13 @@ It is installed automatically with this config.
 For **React** support, config relies on
 [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react). It is installed
 automatically with this config.
+
+## ✨ Advanced usage
+
+For **VSCode** users I highly recommend [prettier-eslint](https://marketplace.visualstudio.com/items?itemName=rvest.vs-code-prettier-eslint) extension. I will catch up your **ESLint** configuration, so you will be able to execut in-editor formating that use **ESLint**'s rule set as schema.
+
+In a result, almost all **ESLint** issues are autmatically resolved with formatting step.
+
+This extension works with any valid **ESLint** configuration, including this one.
+
+> 💡 If you want to format your code with CLI command, take a look at [prettier-eslint](https://github.com/prettier/prettier-eslint). It works great too.
