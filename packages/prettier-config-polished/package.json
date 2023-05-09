@@ -1,6 +1,6 @@
 {
     "name": "prettier-config-polished",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "scripts": {
         "lint": "TIMING=1 eslint ."
@@ -9,7 +9,11 @@
     "exports": {
         ".": "./index.js"
     },
-    "repository": "https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished",
+    "repository": {
+        "type": "git",
+        "directory": "packages/prettier-config-polished",
+        "url": "https://github.com/dvakatsiienko/turborepo.git"
+    },
     "keywords": [
         "prettier",
         "prettierconfig"
