@@ -1,6 +1,6 @@
 {
     "name": "eslint-config-polished",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "scripts": {
         "lint": "TIMING=1 eslint ."
