@@ -30,7 +30,6 @@ module.exports = {
                 'react/hook-use-state':                    1,
                 'react/iframe-missing-sandbox':            2,
                 'react/jsx-boolean-value':                 1,
-                'react/jsx-child-element-spacing':         1,
                 'react/jsx-closing-bracket-location':      complexReactRules.jsxClosingBracketLocation,
                 'react/jsx-closing-tag-location':          1,
                 'react/jsx-curly-brace-presence':          [ 1, 'never' ],
