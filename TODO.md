@@ -1,5 +1,3 @@
--   publish eslint
--   publish prettier
 -   format with prettier-eslint https://github.com/prettier/prettier-eslint
 -   do typechecking with swc
 -   setup releasing
