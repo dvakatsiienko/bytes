@@ -107,7 +107,6 @@ module.exports = {
                 'guard-for-in':                   2,
                 'init-declarations':              [ 2, 'always' ],
                 'logical-assignment-operators':   [ 1, 'always', { enforceForIfStatements: true }],
-                'new-cap':                        2,
                 'no-bitwise':                     2,
                 'no-caller':                      2,
                 'no-confusing-arrow':             1,
