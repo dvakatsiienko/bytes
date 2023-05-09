@@ -17,7 +17,7 @@
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force",
         "publish:eslint-config": "pnpm -F='eslint-config-polished' publish",
         "publish:prettier-config": "pnpm -F='prettier-config-polished' publish",
-        "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"publish:eslint-config\" \"publish:prettier-config\""
+        "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
         "eslint": "8.40.0",
