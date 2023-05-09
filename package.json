@@ -14,7 +14,10 @@
         "lint": "turbo lint",
         "lint:eslint": "TIMING=1 eslint .",
         "typecheck": "turbo typecheck",
-        "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force"
+        "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force",
+        "publish:eslint-config": "pnpm -F='eslint-config-polished' publish",
+        "publish:prettier-config": "pnpm -F='prettier-config-polished' publish",
+        "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"publish:eslint-config\" \"publish:prettier-config\""
     },
     "devDependencies": {
         "eslint": "8.40.0",
@@ -24,7 +27,8 @@
         "rimraf": "5.0.0",
         "tsconfig-core": "workspace:*",
         "turbo": "1.9.3",
-        "typescript": "5.0.4"
+        "typescript": "5.0.4",
+        "concurrently": "8.0.1"
     },
     "engines": {
         "pnpm": ">=8.0.0",
