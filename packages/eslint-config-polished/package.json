@@ -23,7 +23,6 @@
         "./typescript": "./typescript.js"
     },
     "repository": "https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished",
-    "homepage": "",
     "keywords": [
         "eslint",
         "eslintconfig"
