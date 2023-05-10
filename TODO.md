@@ -1,3 +1,4 @@
+-   try downgrade ts-eslint to resolve Vercel issue
 -   format with prettier-eslint https://github.com/prettier/prettier-eslint
 -   configure cli
 -   do typechecking with swc
