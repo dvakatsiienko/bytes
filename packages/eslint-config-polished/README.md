@@ -1,6 +1,4 @@
-# 💅🏼 eslint-config-polished
-
-[![npm version](https://badge.fury.io/js/eslint-config-polished.svg)](https://badge.fury.io/js/eslint-config-polished)
+# 💅🏼 eslint-config-polished · [![npm version](https://badge.fury.io/js/eslint-config-polished.svg)](https://badge.fury.io/js/eslint-config-polished)
 
 ## 🔎 Overview
 
