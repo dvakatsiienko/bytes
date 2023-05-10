@@ -1,6 +1,4 @@
-# 💄 prettier-config-polished
-
-[![npm version](https://badge.fury.io/js/prettier-config-polished.svg)](https://badge.fury.io/js/prettier-config-polished)
+# 💄 prettier-config-polished · [![npm version](https://badge.fury.io/js/prettier-config-polished.svg)](https://badge.fury.io/js/prettier-config-polished)
 
 ## 🔎 Overview
 
