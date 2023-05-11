@@ -2,35 +2,29 @@
 
 🏎️ The monorepositry is wired up with [Turborepo](https://turbo.build/).
 
-### Contents
-
-#### Applications
+### Applications
 
 ###### 🖥️ Hackernews
 
-[Website](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews) |
+[Website](https://hackernews-modern.vercel.app/) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews)
 
+###### 🛰️ Space Explorer UI
 
--   🛰️
-    [Space Explorer (UI)](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-ui)
--   🚀
-    [Space Explorer (API)](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
+[Website](https://space-explorer-ui.vercel.app/launches) |
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-ui)
 
-###### Libraries
+###### 📡 Space Explorer API
+
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
+
+### 🧰 Libraries
 
 -   💅🏼
     [eslint-config-polished](https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished)
 -   💄
     [prettier-config-polished](https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished)
 
-###### Utilities
+### 💡 Utilities
 
 -   ...
-
-# H1
-## H2
-### H3
-#### H4
-##### H5
-###### H6
