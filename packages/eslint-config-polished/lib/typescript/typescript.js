@@ -33,7 +33,7 @@ module.exports = {
                  * ? Rewired «strict» and «stylistic» rule sets.
                  */
                 './rewires/rewiredStrictRuleSet',
-                // './rewires/rewiredStylisticRuleSet',
+                // './rewires/rewiredStylisticRuleSet', // ? Enable this when @typescript-eslint v6 is released.
             ],
             plugins: [ '@typescript-eslint' ],
 

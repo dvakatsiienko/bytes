@@ -21,6 +21,13 @@ exports.rewireRuleSet = (ruleSet) => {
     return nextRuleSet;
 };
 
+/**
+ * ? Rule set that requires type-checking of @typescript-eslint.
+ *
+ * ? The feature is overenginnered, so it's better to disable it.
+ * ? In v6 there will be separate rule that includes all rules that requires type-checking.
+ * ? When v6 is released, this may be removed by using that dedicated rule set.
+ */
 const typeRequiredRules = [
     '@typescript-eslint/no-base-to-string',
     '@typescript-eslint/no-meaningless-void-operator',
