@@ -5,4 +5,5 @@
 -   Fix badges in eslint and prettier configs
 -   Fix README preview of ESLint and Prettier configs in npm
 -   setup releasing
+-   Review ESLint recommended rule structure — probably drop it in favor of full manual config
 -   remove auto-rename-tag VSCode extension once typescript 5.1 is released as RC
