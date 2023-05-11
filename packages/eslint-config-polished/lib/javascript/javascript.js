@@ -133,7 +133,7 @@ module.exports = {
                 'no-mixed-operators':             1,
                 'no-multi-assign':                2,
                 'no-multi-str':                   1,
-                'no-negated-condition':           1,
+                'no-negated-condition':           0, // ? Disabled bacause sometimes negated condition may be useful
                 'no-nested-ternary':              2,
                 'no-new':                         1,
                 'no-new-func':                    1,
