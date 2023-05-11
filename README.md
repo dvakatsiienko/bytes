@@ -2,16 +2,16 @@
 
 🏎️ The monorepositry is wired up with [Turborepo](https://turbo.build/).
 
-### Applications
+### 🛸 Applications
 
 ###### 🖥️ Hackernews
 
-[Website](https://hackernews-modern.vercel.app/) |
+[Website](https://hackernews-modern.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews)
 
 ###### 🛰️ Space Explorer UI
 
-[Website](https://space-explorer-ui.vercel.app/launches) |
+[Website](https://space-explorer-ui.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-ui)
 
 ###### 📡 Space Explorer API
