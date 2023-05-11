@@ -2,5 +2,7 @@
 -   format with prettier-eslint https://github.com/prettier/prettier-eslint
 -   do typechecking with swc
 -   configure cli
+-   Fix badges in eslint and prettier configs
+-   Fix README preview of ESLint and Prettier configs in npm
 -   setup releasing
 -   remove auto-rename-tag VSCode extension once typescript 5.1 is released as RC
