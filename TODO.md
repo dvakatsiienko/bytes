@@ -1,2 +1,4 @@
 -   configure cli https://starship.rs/
+-   lift up @types/\* pacakges
+-   lift up react* pacakges
 -   remove auto-rename-tag VSCode extension once typescript 5.1 is released as RC
