@@ -1,6 +1,5 @@
--   format with prettier-eslint https://github.com/prettier/prettier-eslint
 -   do typechecking with swc
--   configure cli
+-   configure cli https://starship.rs/
 -   Fix badges in eslint and prettier configs
 -   Fix README preview of ESLint and Prettier configs in npm
 -   setup releasing
