@@ -5,3 +5,4 @@
 -   setup releasing
 -   Review ESLint recommended rule structure — probably drop it in favor of full manual config
 -   remove auto-rename-tag VSCode extension once typescript 5.1 is released as RC
+- test
