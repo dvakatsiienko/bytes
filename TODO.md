@@ -1,3 +1,2 @@
--   configure cli https://starship.rs/
 -   sync .dotfiles
 -   remove auto-rename-tag VSCode extension once typescript 5.1 is released as RC
