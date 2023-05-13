@@ -1,6 +1,7 @@
 {
     "name": "turborepo",
     "version": "0.0.0",
+    "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "scripts": {
         "start:hackernews": "turbo start --filter=hackernews",
         "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
