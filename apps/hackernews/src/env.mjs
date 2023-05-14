@@ -1,6 +1,8 @@
 /* Core */
 import { z } from 'zod';
 
+// TODO: move to https://create.t3.gg/en/usage/env-variables
+
 /**
  * Specify your server-side environment variables schema here.
  * This way you can ensure the app isn't built with invalid env vars.
