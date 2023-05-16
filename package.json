@@ -29,7 +29,7 @@
         "prettier-config-polished": "workspace:*",
         "rimraf": "5.0.0",
         "tsconfig-core": "workspace:*",
-        "turbo": "1.9.4",
+        "turbo": "1.9.6",
         "typescript": "5.0.4"
     },
     "engines": {
