@@ -26,13 +26,13 @@ export default class extends Document {
 
             return {
                 ...initialProps,
-                styles:
-    <>
-        {initialProps.styles}
-        {scserverStylesheet.getStyleElement()}
-        {Children.toArray([ initialProps.styles ])}
-    </>,
-
+                styles: (
+                    <>
+                        {initialProps.styles}
+                        {scserverStylesheet.getStyleElement()}
+                        {Children.toArray([ initialProps.styles ])}
+                    </>
+                ),
             };
         } finally {
             scserverStylesheet.seal();
