@@ -2,17 +2,15 @@
 import { Button } from 'ui';
 import { sum } from 'utils';
 
-const DocsPage = () => {
+export default () => {
     return (
         <section>
             <h1>
-                Docs
+                Web
                 <br />
                 {sum(1, 2)}
             </h1>
-            <Button />
+            <Button text = 'Click me...' />
         </section>
     );
 };
-
-export default DocsPage;
