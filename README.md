@@ -4,6 +4,11 @@
 
 ### 🛸 Applications
 
+###### 🧑🏼‍✈️ My CV
+
+[Website](https://ripeluokte.vercel.app) |
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile)
+
 ###### 🖥️ Hackernews
 
 [Website](https://hackernews-modern.vercel.app) |

@@ -1,11 +1,14 @@
 .profile {
     display: flex;
     flex-direction: column;
+    gap: 24px;
 
     & section {
         & :global(.key) {
             display: inline-block;
-            width: 120px;
+            width: 150px;
+            text-transform: uppercase;
+            color: grey;
         }
 
         & :global(.value) {
