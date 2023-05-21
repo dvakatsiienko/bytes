@@ -1,0 +1,15 @@
+.profile {
+    display: flex;
+    flex-direction: column;
+
+    & section {
+        & :global(.key) {
+            display: inline-block;
+            width: 120px;
+        }
+
+        & :global(.value) {
+            width: 100%;
+        }
+    }
+}
