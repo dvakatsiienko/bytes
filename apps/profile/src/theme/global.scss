@@ -4,4 +4,14 @@
         min-height: 100vh;
         font-family: system-ui, sans-serif;
     }
+
+    background-color: var(--color-2);
+
+    --color-1: #030304;
+    --color-2: #eeeefd;
+}
+
+[data-theme='dark'] {
+    --color-1: #eeeefd;
+    --color-2: #030304;
 }
