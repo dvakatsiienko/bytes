@@ -1,3 +1,26 @@
 {
-    "name": "profile"
+    "name": "profile",
+    "version": "0.0.1",
+    "scripts": {
+        "start": "next",
+        "restart": "run-s build:clean start",
+        "build": "next build",
+        "build:clean": "rimraf .next",
+        "serve": "next start",
+        "lint": "TIMING=1 eslint .",
+        "typecheck": "tsc",
+        "validate": "run-p lint typecheck"
+    },
+    "dependencies": {
+        "next": "13.4.3",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "reset-css": "5.0.1"
+    },
+    "devDependencies": {
+        "@types/react": "18.2.6",
+        "@types/react-dom": "18.2.4",
+        "prettier": "2.8.8",
+        "typescript": "5.0.4"
+    }
 }
