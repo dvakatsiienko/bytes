@@ -1,3 +1,9 @@
+/* Core */
+import Image from 'next/image';
+
+/* Components */
+import { ExternalLink } from '@/app/elements';
+
 /* Instruments */
 import styles from './index-page.module.scss';
 
@@ -24,31 +30,24 @@ export default () => {
                 <div>
                     <span className = 'key'>links</span>
                     <span className = 'value'>
-                        <a
-                            href = 'https://telegra.ph/SeniorLead-Frontend-Developer-10-02'
-                            rel = 'noreferrer noopener'
-                            target = '_blank'>
+                        <ExternalLink href = 'https://telegra.ph/SeniorLead-Frontend-Developer-10-02'>
                             Cover Letter
-                        </a>
-                        <a
-                            href = 'https://github.com/dvakatsiienko'
-                            rel = 'noreferrer noopener'
-                            target = '_blank'>
-                            Github
-                        </a>
-                        <a
-                            href = 'https://www.linkedin.com/in/dima-vakatsiienko-a20271100/'
-                            rel = 'noreferrer noopener'
-                            target = '_blank'>
+                        </ExternalLink>
+                        <ExternalLink href = 'https://github.com/dvakatsiienko'>Github</ExternalLink>
+                        <ExternalLink href = 'https://www.linkedin.com/in/dima-vakatsiienko-a20271100/'>
                             Linkedin
-                        </a>
-                        <a
-                            href = 'https://t.me/shining1488'
-                            rel = 'noreferrer noopener'
-                            target = '_blank'>
-                            Telegram
-                        </a>
+                        </ExternalLink>
+                        <ExternalLink href = 'https://t.me/shining1488'>Telegram</ExternalLink>
                     </span>
+
+                    <Image
+                        fill
+                        alt = 'Picture of the author'
+                        blurDataURL = '/my-photo.jpeg'
+                        placeholder = 'blur'
+                        src = '/my-photo.jpeg'
+                        style = {{ objectFit: 'contain' }}
+                    />
                 </div>
             </section>
 
@@ -92,7 +91,7 @@ export default () => {
                         <ul>
                             <li>
                                 ★ ★ ★ ☆ ☆ — Node.js, Prisma, express.js, MongoDB, Mongoose.js,
-                                Headless CMS’s, zshell,, Docker
+                                Headless CMS's, zshell,, Docker
                             </li>
                         </ul>
                     </span>
@@ -130,6 +129,120 @@ export default () => {
                         </ul>
                         <ul>
                             <li>Development workflow management experience</li>
+                        </ul>
+                    </span>
+                </div>
+            </section>
+
+            <section>
+                <h1>Portfolio</h1>
+
+                <div style = {{ position: 'relative' }}>
+                    <span className = 'key'>employer</span>
+                    <span className = 'value'>
+                        <ExternalLink href = 'https://www.corva.ai/'>Corva.ai</ExternalLink>
+                    </span>
+
+                    <Image
+                        fill
+                        alt = 'Picture of the author'
+                        blurDataURL = '/logo.jpeg'
+                        placeholder = 'blur'
+                        src = '/logo.jpeg'
+                        style = {{ objectFit: 'contain' }}
+                    />
+                </div>
+
+                <div>
+                    <span className = 'key'>position</span>
+                    <span className = 'value'>Senior Frontend Engineer</span>
+                </div>
+
+                <div>
+                    <span className = 'key'>project</span>
+                    <span className = 'value'>Geoscience LINK TO EXAMPLES</span>
+                </div>
+
+                <div>
+                    <span className = 'key'>manager</span>
+                    <span className = 'value'>
+                        Artem Sychov —{' '}
+                        <ExternalLink href = 'https://www.linkedin.com/in/suchov/'>
+                            LinkedIn
+                        </ExternalLink>
+                        , <ExternalLink href = 'https://t.me/artem_sychov'>Telegram</ExternalLink>
+                    </span>
+                </div>
+
+                <div>
+                    <span className = 'key'>achievements</span>
+                    <span className = 'value'>
+                        <ul>
+                            <li>Prototyped product's new frontend architecture, mentored team</li>
+                            <li>
+                                Coordinated the migration from the old tech stack to the new one
+                            </li>
+                            <li>
+                                Implemented the new web-platform MVP using Gatsby.js, Next.js and
+                                Strapi CMS
+                            </li>
+                            <li>Optimized frontend codebase using monorepo</li>
+                        </ul>
+                    </span>
+                </div>
+
+                <div style = {{ position: 'relative' }}>
+                    <span className = 'key'>employer</span>
+                    <span className = 'value'>
+                        <ExternalLink href = 'https://boosta.biz/en/'>Boosta</ExternalLink>
+                    </span>
+
+                    <Image
+                        fill
+                        alt = 'Picture of the author'
+                        blurDataURL = '/logo.jpeg'
+                        placeholder = 'blur'
+                        src = '/logo.jpeg'
+                        style = {{ objectFit: 'contain' }}
+                    />
+                </div>
+
+                <div>
+                    <span className = 'key'>position</span>
+                    <span className = 'value'>Senior Frontend Engineer</span>
+                </div>
+
+                <div>
+                    <span className = 'key'>project</span>
+                    <span className = 'value'>Essay</span>
+                </div>
+
+                <div>
+                    <span className = 'key'>manager</span>
+                    <span className = 'value'>
+                        Vlad Muzychenko —
+                        <ExternalLink href = 'https://www.linkedin.com/in/vladyslav-muzychenko-796392127/'>
+                            LinkedIn
+                        </ExternalLink>
+                        , <ExternalLink href = 'https://t.me/vlmuzychenko'>Telegram</ExternalLink>
+                    </span>
+                </div>
+
+                <div>
+                    <span className = 'key'>achievements</span>
+                    <span className = 'value'>
+                        <ul>
+                            <li>Re-architected problematic project fundament</li>
+                            <li>Project rewrite from JavaScript to TypeScript</li>
+                            <li>
+                                Introduced best practices of code organization, UI layout
+                                principles, performance metrics Conducted platform audit and
+                                invested hi-end technical solutions
+                            </li>
+                            <li>
+                                Integrated cutting-edge rust-based tooling to the development
+                                toolchain
+                            </li>
                         </ul>
                     </span>
                 </div>
