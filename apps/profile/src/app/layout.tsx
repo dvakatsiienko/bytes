@@ -1,3 +1,6 @@
+/* Components */
+import { Providers } from '@/lib';
+
 /* Instruments */
 import '@/theme/global.scss';
 
@@ -5,7 +8,9 @@ export default (props: React.PropsWithChildren) => {
     return (
         <html lang = 'en'>
             <body>
-                <main>{props.children}</main>
+                <Providers>
+                    <main>{props.children}</main>
+                </Providers>
             </body>
         </html>
     );
