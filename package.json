@@ -8,6 +8,7 @@
         "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
         "start:@space-explorer/ui": "turbo start --filter='@space-explorer/ui'",
         "start:@space-explorer/api": "turbo start --filter='@space-explorer/api' --color",
+        "start:profile": "turbo start --filter=profile",
         "start:@simple": "turbo start --filter='@simple/*'",
         "build": "turbo build",
         "build:hackernews": "turbo build --filter=hackernews",
