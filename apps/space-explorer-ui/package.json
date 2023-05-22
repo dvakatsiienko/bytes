@@ -37,7 +37,7 @@
         "@graphql-codegen/typescript-apollo-client-helpers": "2.2.6",
         "@graphql-codegen/typescript-operations": "3.0.4",
         "@graphql-codegen/typescript-react-apollo": "3.3.7",
-        "@types/debug": "4.1.7",
+        "@types/debug": "4.1.8",
         "@types/node": "20.2.3",
         "@types/react": "18.2.6",
         "@types/react-dom": "18.2.4",
