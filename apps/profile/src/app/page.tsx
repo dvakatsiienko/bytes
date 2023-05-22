@@ -16,7 +16,14 @@ export default () => {
 
             <section>
                 <Entry content = 'Dima Vakatsiienko' name = 'name' />
-                <Entry content = 'imagnum.satellite@gmail.com' name = 'email' />
+                <Entry
+                    name = 'email'
+                    content = { (
+                        <a href = 'mailto:imagnum.satellite@gmail.com '>
+                            imagnum.satellite@gmail.com{' '}
+                        </a>
+                      ) }
+                />
                 <Entry content = 'Ukraine, Kyiv' name = 'location' />
                 <Entry
                     name = 'links'
