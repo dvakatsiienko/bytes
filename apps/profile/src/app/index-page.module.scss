@@ -4,29 +4,71 @@
     gap: 24px;
     width: 1280px;
     margin: 0 auto;
-    color: var(--color-1);
-
-    & img {
-        z-index: -1;
-    }
+    --line-v-gap: 4px;
 
     & section {
         position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: var(--line-v-gap);
+
+        & img {
+            position: absolute;
+            right: 0;
+            z-index: -1;
+            border-radius: 8px;
+            border: 1px solid #00000050;
+        }
 
         & :global(.entry) {
             display: flex;
+            width: calc(100% - 200px);
 
-            & :global(.key) {
-                display: inline-block;
-                width: 180px;
-                text-transform: uppercase;
-                color: grey;
-                height: auto;
-            }
+            & span {
+                line-height: 24px;
 
-            & :global(.value) {
-                width: 100%;
+                &:global(.name) {
+                    display: inline-block;
+                    min-width: 180px;
+                    text-transform: uppercase;
+                    color: grey;
+                }
+
+                &:global(.value) {
+                    // width: calc(100% - 400px);
+
+                    & b {
+                        font-weight: 800;
+                    }
+
+                    & ul {
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--line-v-gap);
+
+                        list-style: disc;
+                    }
+                }
             }
+        }
+
+        & :global(.job-entry) {
+            margin-bottom: 24px;
+        }
+    }
+
+    & a {
+        color: var(--color-3);
+        text-decoration: none;
+        font-weight: 600;
+
+        &:visited {
+            color: var(--color-4);
+        }
+
+        &:hover,
+        &:hover:visited {
+            text-decoration: underline;
         }
     }
 }

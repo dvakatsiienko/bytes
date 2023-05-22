@@ -1,17 +1,32 @@
+@import 'reset-css';
+
 :root {
     & body,
     & main {
         min-height: 100vh;
-        font-family: system-ui, sans-serif;
     }
 
+    color: var(--color-1);
     background-color: var(--color-2);
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
 
     --color-1: #030304;
-    --color-2: #eeeefd;
+    --color-2: #f6f1fd;
+    --color-3: #7700ff;
+    --color-4: #ff6f00;
 }
 
 [data-theme='dark'] {
-    --color-1: #eeeefd;
+    --color-1: #f6f1fd;
     --color-2: #030304;
+    --color-3: #ad67fe;
+    --color-4: #ff8c00;
+}
+
+h1,
+thead {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 24px;
 }

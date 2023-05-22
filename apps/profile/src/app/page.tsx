@@ -1,26 +1,29 @@
 /* Core */
-import Image from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 
 /* Components */
 import { ExternalLink, ThemeSwitcher } from '@/app/elements';
 
 /* Instruments */
 import styles from './index-page.module.scss';
+import meJpeg from 'public/my-photo.jpeg';
+import logoJpeg from 'public/logo.jpeg';
 
 export default () => {
     return (
         <main className = { styles.profile }>
             <ThemeSwitcher />
 
-            <h1>Profile</h1>
-
             <section>
+                <h1>👨🏼‍✈️ Profile</h1>
+
+                <Image alt = 'Picture of the author' placeholder = 'blur' src = { meJpeg } width = { 200 } />
                 <Entry content = 'Dima Vakatsiienko' name = 'name' />
                 <Entry
                     name = 'email'
                     content = { (
                         <a href = 'mailto:imagnum.satellite@gmail.com '>
-                            imagnum.satellite@gmail.com{' '}
+                            imagnum.satellite@gmail.com
                         </a>
                       ) }
                 />
@@ -45,22 +48,8 @@ export default () => {
                         </>
                       ) }
                 />
-
-                <div>
-                    <Image
-                        fill
-                        alt = 'Picture of the author'
-                        blurDataURL = '/my-photo.jpeg'
-                        placeholder = 'blur'
-                        src = '/my-photo.jpeg'
-                        style = {{ objectFit: 'contain' }}
-                    />
-                </div>
-            </section>
-
-            <section>
                 <Entry
-                    content = 'Frontend developer, frontend team/tech lead, hybrid'
+                    content = { <b>Frontend Developer, Frontend Team/Tech Lead, Hybrid</b> }
                     name = 'desired position'
                 />
                 <Entry
@@ -70,7 +59,7 @@ export default () => {
             </section>
 
             <section>
-                <h1>Skills</h1>
+                <h1>🔮 Skills</h1>
 
                 <Entry
                     name = 'core'
@@ -90,7 +79,6 @@ export default () => {
                         </ul>
                       ) }
                 />
-
                 <Entry
                     name = 'peripheral'
                     content = { (
@@ -101,7 +89,6 @@ export default () => {
                         </ul>
                       ) }
                 />
-
                 <Entry
                     name = 'Other'
                     content = { (
@@ -119,10 +106,10 @@ export default () => {
             </section>
 
             <section>
-                <h1>Portfolio</h1>
+                <h1>🖥️ Portfolio</h1>
 
                 <JobEntry
-                    comapnyLogoUrl = '/logo.jpeg'
+                    comapnyLogoUrl = { logoJpeg }
                     employer = { <ExternalLink href = 'https://www.corva.ai/'>Corva.ai</ExternalLink> }
                     position = 'Senior Frontend Engineer'
                     project = 'Geoscience LINK TO EXAMPLES'
@@ -149,9 +136,8 @@ export default () => {
                         </>
                       ) }
                 />
-
                 <JobEntry
-                    comapnyLogoUrl = '/logo.jpeg'
+                    comapnyLogoUrl = { logoJpeg }
                     employer = { <ExternalLink href = 'https://boosta.biz/en/'>Boosta</ExternalLink> }
                     position = 'Senior Frontend Engineer'
                     project = 'Essay'
@@ -188,7 +174,7 @@ export default () => {
 const Entry = (props: EntryProps) => {
     return (
         <div className = 'entry'>
-            <span className = 'key'>{props.name}</span>
+            <span className = 'name'>{props.name}</span>
             <span className = 'value'>{props.content}</span>
         </div>
     );
@@ -201,24 +187,15 @@ interface EntryProps {
 
 const JobEntry = (props: JobEntryProps) => {
     return (
-        <>
-            <div style = {{ position: 'relative' }}>
-                <Image
-                    fill
-                    alt = 'Company logo'
-                    blurDataURL = { props.comapnyLogoUrl }
-                    placeholder = 'blur'
-                    src = { props.comapnyLogoUrl }
-                    style = {{ objectFit: 'contain' }}
-                />
+        <section className = 'job-entry'>
+            <Image alt = 'Company logo' src = { props.comapnyLogoUrl } width = { 100 } />
 
-                <Entry content = { props.employer } name = 'employer' />
-            </div>
+            <Entry content = { props.employer } name = 'employer' />
             <Entry content = { props.position } name = 'position' />
             <Entry content = { props.project } name = 'project' />
             <Entry content = { props.manager } name = 'manager' />
             <Entry content = { props.achievements } name = 'achievements' />
-        </>
+        </section>
     );
 };
 
@@ -228,5 +205,5 @@ interface JobEntryProps {
     project:        string,
     manager:        string | React.ReactNode,
     achievements:   string | React.ReactNode,
-    comapnyLogoUrl: string,
+    comapnyLogoUrl: StaticImageData,
 }
