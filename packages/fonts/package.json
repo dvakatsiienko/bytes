@@ -9,9 +9,9 @@
     "dependencies": {
         "next": "13.4.3"
     },
-    "types": "./src/next-fonts.ts",
+    "types": "./types/next-fonts.d.ts",
     "exports": {
-        "./next-fonts": "./src/next-fonts.ts",
+        ".": "./src/next-fonts.ts",
         "./manrope-vrr-font-face": "./src/manrope-vrr.scss",
         "./manrope-vrr-font": "./src/Manrope[wght].woff2",
         "./roboto-flex-vrr-font-face": "./src/roboto-flex-vrr.scss",

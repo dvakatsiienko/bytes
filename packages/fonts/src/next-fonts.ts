@@ -11,7 +11,7 @@ export const manropeVRFont = localNextFont({
     src:      './Manrope[wght].woff2',
 });
 
-export const nextFont = {
+export const nextFonts = {
     robotoFlexVRFont,
     manropeVRFont,
 };
