@@ -4,3 +4,4 @@
     will be fixed by them https://github.com/pnpm/pnpm/issues/6451
 - test 1
 - test 2
+- test 3
