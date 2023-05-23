@@ -3,7 +3,9 @@ import { Children } from 'react';
 import Document, { Html, Head, Main, NextScript, type DocumentContext } from 'next/document';
 import { ServerStyleSheet as SCServerStyleSheet } from 'styled-components';
 import { CssBaseline as NextUiCssBaseline } from '@nextui-org/react';
-import { nextFonts } from 'fonts';
+
+/* Instruments */
+import { nextFonts } from '@/theme';
 
 export default class extends Document {
     public static async getInitialProps (ctx: DocumentContext) {

@@ -11,10 +11,11 @@ const exec = promisify(nodeExec);
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-    i18n:       { locales: [ 'en' ], defaultLocale: 'en' },
-    typescript: { ignoreBuildErrors: true },
-    eslint:     { ignoreDuringBuilds: true },
-    compiler:   {
+    reactStrictMode: true,
+    i18n:            { locales: [ 'en' ], defaultLocale: 'en' },
+    typescript:      { ignoreBuildErrors: true },
+    eslint:          { ignoreDuringBuilds: true },
+    compiler:        {
         styledComponents: {
             ssr:         true,
             cssProp:     false,
@@ -64,7 +65,7 @@ try {
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
  * This is especially useful for Docker builds.
  */
-!process.env.SKIP_ENV_VALIDATION && await import('./src/env.mjs');
+!process.env.SKIP_ENV_VALIDATION && (await import('./src/env.mjs'));
 
 console.info(`
     ${ message1 }
