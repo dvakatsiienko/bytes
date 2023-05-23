@@ -1,10 +1,8 @@
-/* Core */
-import { nextFonts } from 'fonts';
-
 /* Components */
 import { Providers } from '@/lib';
 
 /* Instruments */
+import { nextFonts } from '@/theme';
 import '@/theme/global.scss';
 
 export default (props: React.PropsWithChildren) => {

@@ -13,17 +13,14 @@
         "module": "ESNext",
         "moduleResolution": "Node",
         "resolveJsonModule": true,
-        // "isolatedModules": true,
+        "isolatedModules": true,
         "noFallthroughCasesInSwitch": true,
         "strictNullChecks": true,
 
-        /* build*/
+        /* build */
         "noEmit": false,
         "emitDeclarationOnly": true,
         "declaration": true,
-        // "declarationDir": "./types"
         "outDir": "types"
-
-        // "outFile": "build/types.d.ts"
     }
 }
