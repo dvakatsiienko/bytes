@@ -113,19 +113,12 @@ export default () => {
                     employer = { <ExternalLink href = 'https://www.corva.ai/'>Corva.ai</ExternalLink> }
                     position = 'Senior Frontend Engineer'
                     project = 'Geoscience LINK TO EXAMPLES'
-                    achievements = { (
-                        <ul>
-                            <li>Prototyped product's new frontend architecture, mentored team</li>
-                            <li>
-                                Coordinated the migration from the old tech stack to the new one
-                            </li>
-                            <li>
-                                Implemented the new web-platform MVP using Gatsby.js, Next.js and
-                                Strapi CMS
-                            </li>
-                            <li>Optimized frontend codebase using monorepo</li>
-                        </ul>
-                      ) }
+                    achievementList = { [
+                        'Prototyped product\'s new frontend architecture, mentored team',
+                        'Coordinated the migration from the old tech stack to the new one',
+                        'Implemented the new web-platform MVP using Gatsby.js, Next.js and Strapi CMS',
+                        'Optimized frontend codebase using monorepo',
+                    ] }
                     manager = { (
                         <>
                             Artem Sychov —{' '}
@@ -141,21 +134,12 @@ export default () => {
                     employer = { <ExternalLink href = 'https://boosta.biz/en/'>Boosta</ExternalLink> }
                     position = 'Senior Frontend Engineer'
                     project = 'Essay'
-                    achievements = { (
-                        <ul>
-                            <li>Re-architected problematic project fundament</li>
-                            <li>Project rewrite from JavaScript to TypeScript</li>
-                            <li>
-                                Introduced best practices of code organization, UI layout
-                                principles, performance metrics Conducted platform audit and
-                                invested hi-end technical solutions
-                            </li>
-                            <li>
-                                Integrated cutting-edge rust-based tooling to the development
-                                toolchain
-                            </li>
-                        </ul>
-                      ) }
+                    achievementList = { [
+                        'Re-architected problematic project fundament',
+                        'Project rewrite from JavaScript to TypeScript',
+                        'Introduced best practices of code organization, UI layout principles, performance metrics Conducted platform audit and invested hi-end technical solutions',
+                        'Integrated cutting-edge rust-based tooling to the development toolchain',
+                    ] }
                     manager = { (
                         <>
                             Vlad Muzychenko —
@@ -186,6 +170,10 @@ interface EntryProps {
 }
 
 const JobEntry = (props: JobEntryProps) => {
+    const achievementListJSX = props.achievementList.map((achievement) => {
+        return <li key = { achievement }>✅ {achievement}</li>;
+    });
+
     return (
         <section className = 'job-entry'>
             <Image alt = 'Company logo' src = { props.comapnyLogoUrl } width = { 100 } />
@@ -194,16 +182,16 @@ const JobEntry = (props: JobEntryProps) => {
             <Entry content = { props.position } name = 'position' />
             <Entry content = { props.project } name = 'project' />
             <Entry content = { props.manager } name = 'manager' />
-            <Entry content = { props.achievements } name = 'achievements' />
+            <Entry content = { <ul>{achievementListJSX}</ul> } name = 'achievements' />
         </section>
     );
 };
 
 interface JobEntryProps {
-    employer:       string | React.ReactNode,
-    position:       string,
-    project:        string,
-    manager:        string | React.ReactNode,
-    achievements:   string | React.ReactNode,
-    comapnyLogoUrl: StaticImageData,
+    employer:        string | React.ReactNode,
+    position:        string,
+    project:         string,
+    manager:         string | React.ReactNode,
+    achievementList: string[],
+    comapnyLogoUrl:  StaticImageData,
 }

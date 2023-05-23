@@ -35,8 +35,6 @@
                 }
 
                 &:global(.value) {
-                    // width: calc(100% - 400px);
-
                     & b {
                         font-weight: 800;
                     }
@@ -45,8 +43,6 @@
                         display: flex;
                         flex-direction: column;
                         gap: var(--line-v-gap);
-
-                        list-style: disc;
                     }
                 }
             }

@@ -1,3 +1,4 @@
+/* Core */
 import localNextFont from 'next/font/local';
 
 export const robotoFlexVRFont = localNextFont({
