@@ -1,0 +1,31 @@
+{
+    /* File inclusion */
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["node_modules"],
+    "compilerOptions": {
+        /* Module resolution */
+        "baseUrl": ".",
+        "paths": { "@/*": ["src/*"] },
+        "target": "ESNext",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "resolveJsonModule": true,
+        // "isolatedModules": true,
+        "noFallthroughCasesInSwitch": true,
+        "strictNullChecks": true,
+
+        /* build*/
+        "noEmit": false,
+        "emitDeclarationOnly": true,
+        "declaration": true,
+        // "declarationDir": "./types"
+        "outDir": "dist"
+
+        // "outFile": "build/types.d.ts"
+    }
+}

@@ -1,3 +1,6 @@
+/* Core */
+import { nextFont } from 'fonts/next-fonts';
+
 /* Components */
 import { Providers } from '@/lib';
 
@@ -6,7 +9,7 @@ import '@/theme/global.scss';
 
 export default (props: React.PropsWithChildren) => {
     return (
-        <html lang = 'en'>
+        <html className = { nextFont.manropeVRFont.className } lang = 'en'>
             <body>
                 <Providers>
                     <main>{props.children}</main>

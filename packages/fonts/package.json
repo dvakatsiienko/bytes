@@ -1,0 +1,20 @@
+{
+    "name": "fonts",
+    "version": "0.0.1",
+    "scripts": {
+        "lint": "TIMING=1 eslint .",
+        "typecheck": "tsc --noEmit",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "next": "13.4.3"
+    },
+    "types": "./src/next-fonts.ts",
+    "exports": {
+        "./next-fonts": "./src/next-fonts.ts",
+        "./manrope-vrr-font-face": "./src/manrope-vrr.scss",
+        "./manrope-vrr-font": "./src/Manrope[wght].woff2",
+        "./roboto-flex-vrr-font-face": "./src/roboto-flex-vrr.scss",
+        "./roboto-flex-vrr-font": "./src/RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf"
+    }
+}
