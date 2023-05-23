@@ -3,8 +3,7 @@ import { Children } from 'react';
 import Document, { Html, Head, Main, NextScript, type DocumentContext } from 'next/document';
 import { ServerStyleSheet as SCServerStyleSheet } from 'styled-components';
 import { CssBaseline as NextUiCssBaseline } from '@nextui-org/react';
-
-import { nextFont } from '@/theme';
+import { nextFonts } from 'fonts';
 
 export default class extends Document {
     public static async getInitialProps (ctx: DocumentContext) {
@@ -41,7 +40,7 @@ export default class extends Document {
 
     public render () {
         return (
-            <Html className = { nextFont.robotoFlexVRFont.className } lang = 'en'>
+            <Html className = { nextFonts.robotoFlexVRFont.className } lang = 'en'>
                 <Head>{NextUiCssBaseline.flush()}</Head>
                 <body>
                     <Main />
