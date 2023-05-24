@@ -18,7 +18,13 @@ export default () => {
             <section>
                 <h1>👨🏼‍✈️ Profile</h1>
 
-                <Image alt = 'Picture of the author' placeholder = 'blur' src = { meJpeg } width = { 200 } />
+                <Image
+                    priority
+                    alt = 'Picture of the author'
+                    placeholder = 'blur'
+                    src = { meJpeg }
+                    width = { 200 }
+                />
                 <Entry content = 'Dima Vakatsiienko' name = 'name' />
                 <Entry
                     name = 'email'

@@ -11,7 +11,13 @@ export const JobEntry = (props: JobEntryProps) => {
 
     return (
         <section className = 'job-entry'>
-            <Image alt = 'Company logo' src = { props.comapnyLogoUrl } width = { 100 } />
+            <Image
+                priority
+                alt = 'Company logo'
+                placeholder = 'blur'
+                src = { props.comapnyLogoUrl }
+                width = { 100 }
+            />
 
             <Entry content = { props.employer } name = 'employer' />
             <Entry content = { props.position } name = 'position' />
