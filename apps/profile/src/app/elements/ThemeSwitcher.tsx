@@ -15,11 +15,10 @@ export const ThemeSwitcher = () => {
         return null;
     }
 
-    return (
-        <>
-            The current theme is: {theme}
-            <button onClick = { () => setTheme('light') }>Light Mode</button>
-            <button onClick = { () => setTheme('dark') }>Dark Mode</button>
-        </>
-    );
+    const switchTheme = () => {
+        if (theme === 'light') setTheme('dark');
+        if (theme === 'dark') setTheme('light');
+    };
+
+    return <button onClick = { () => switchTheme() }>{theme}</button>;
 };
