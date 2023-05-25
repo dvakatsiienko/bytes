@@ -1,10 +1,11 @@
 @import 'reset-css';
 
 :root {
-    & body,
-    & main {
-        min-height: 100vh;
-    }
+    // min-height: 100vh;
+    // & body,
+    // & main {
+    //     min-height: 100vh;
+    // }
 
     color: var(--color-1);
     background-color: var(--color-2);
@@ -15,6 +16,9 @@
     --color-2: #faf7fe;
     --color-3: #7700ff;
     --color-4: #ff6f00;
+    --color-5: #ffffff;
+    --color-6: #eaeaeb;
+    --color-7: #eceef0;
 }
 
 [data-theme='dark'] {
@@ -22,6 +26,9 @@
     --color-2: #030304;
     --color-3: #ad67fe;
     --color-4: #ff8c00;
+    --color-5: #16181a;
+    --color-6: #16181a;
+    --color-7: #26292b;
 }
 
 h1,

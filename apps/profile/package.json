@@ -12,6 +12,8 @@
         "validate": "run-p lint typecheck"
     },
     "dependencies": {
+        "@styled-icons/ionicons-sharp": "10.46.0",
+        "@styled-icons/styled-icon": "10.7.0",
         "next": "13.4.3",
         "next-themes": "0.2.1",
         "react": "18.2.0",
