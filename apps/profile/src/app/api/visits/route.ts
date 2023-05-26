@@ -1,30 +1,31 @@
 /* Core */
 import { kv } from '@vercel/kv';
 import { NextResponse, type NextRequest } from 'next/server';
-import requestIp from 'request-ip';
 
 /* Instruments */
 import type { GetVisitsResponse } from '@/api';
 
 export async function GET (req: NextRequest) {
-    await kv.incr('visits:all');
-
-    let ip = req.ip ?? req.headers.get('x-real-ip');
     const forwardedFor = req.headers.get('x-forwarded-for');
+    const realIp = req.headers.get('x-real-ip');
 
-    if (!ip && forwardedFor) {
-        ip = forwardedFor.split(',').at(0) ?? 'Unknown';
+    let ip = null;
+
+    if (forwardedFor) {
+        ip = forwardedFor?.split(',')[ 0 ];
+    } else if (realIp) {
+        ip = realIp;
     }
 
-    // @ts-expect-error due to a request-ip type mismatch. It expects standard Reqsuest, but NextRequest is a Request wrapper anyawys.
-    const cip = requestIp.getClientIp(req);
-
-    console.log('🚀 ~ GET ~ detectedIp:', cip);
+    await Promise.all([ kv.incr(VISITS_ALL_KEY), kv.sadd(UNIQUE_IP_KEY, ip) ]);
 
     const [ visitsAll, visitsUnique ] = await Promise.all([
-        kv.get<number>('visits:all'),
-        kv.scard('unique-ip-set'),
+        kv.get<number>(VISITS_ALL_KEY),
+        kv.scard(UNIQUE_IP_KEY),
     ]);
 
-    return NextResponse.json<GetVisitsResponse>({ ip, cip, visitsAll, visitsUnique });
+    return NextResponse.json<GetVisitsResponse>({ ip, visitsAll, visitsUnique });
 }
+
+const VISITS_ALL_KEY = 'visits:all';
+const UNIQUE_IP_KEY = 'unique-ip-set';

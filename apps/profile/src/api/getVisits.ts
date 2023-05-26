@@ -17,7 +17,6 @@ export const getVisits = async (): Promise<GetVisitsResponse | null> => {
 /* Types */
 export interface GetVisitsResponse {
     ip:           string | null,
-    cip:          string | null,
     visitsAll:    number | null,
     visitsUnique: number,
 }
