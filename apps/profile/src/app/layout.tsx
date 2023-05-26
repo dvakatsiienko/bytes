@@ -1,3 +1,6 @@
+/* Core */
+// import { kv } from '@vercel/kv';
+
 /* Components */
 import { Providers } from '@/lib';
 
@@ -5,7 +8,11 @@ import { Providers } from '@/lib';
 import { nextFonts } from '@/theme';
 import '@/theme/global.scss';
 
-export default (props: React.PropsWithChildren) => {
+export default async (props: React.PropsWithChildren) => {
+    // const cart = await kv.get<{ id: string, quantity: number }[]>('test');
+
+    // console.log('render');
+
     return (
         <html className = { nextFonts.manropeVRFont.className } lang = 'en'>
             <body>
