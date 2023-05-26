@@ -25,5 +25,5 @@ Built with the following technology stack:
 
 ### DevOps
 
--   Vercel cloud deployment or application
+-   Vercel serverless cloud deployment for application
 -   Planetscale cloud deployment for database
