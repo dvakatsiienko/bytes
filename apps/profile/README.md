@@ -15,4 +15,4 @@ Built with the following technology stack:
 
 ### DevOps
 
--   Vercel cloud deployment or application
+-   Vercel serverless cloud deployment
