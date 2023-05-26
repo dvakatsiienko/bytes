@@ -1,6 +1,6 @@
 export const getVisits = async (): Promise<GetVisitsResponse | null> => {
     try {
-        const visitsJSON = await fetch('http://localhost:3000/api/visits', { method: 'GET' }).then((res) => res.text());
+        const visitsJSON = await fetch(`${ process.env.NEXT_PUBLIC_API_URL }/api/visits`, { method: 'GET' }).then((res) => res.text());
         const visits = JSON.parse(visitsJSON);
 
         return visits;
