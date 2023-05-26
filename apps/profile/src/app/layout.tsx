@@ -5,8 +5,7 @@ import { Providers } from '@/lib';
 import { nextFonts } from '@/theme';
 import '@/theme/global.scss';
 
-export default async (props: React.PropsWithChildren) => {
-
+export default (props: React.PropsWithChildren) => {
     return (
         <html className = { nextFonts.manropeVRFont.className } lang = 'en'>
             <body>
