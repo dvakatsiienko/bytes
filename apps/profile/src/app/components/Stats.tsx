@@ -9,6 +9,7 @@ export const Stats = async () => {
             <span>Visits ALL: {visits?.visitsAll}</span>
             <span>Visits UNIQUE: {visits?.visitsUnique}</span>
             <span>IP: {visits?.ip}</span>
+            <span>socket: {visits?.socket}</span>
         </>
     );
 };

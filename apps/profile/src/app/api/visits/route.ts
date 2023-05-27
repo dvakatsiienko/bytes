@@ -17,6 +17,9 @@ export async function GET (req: NextRequest) {
         headers[ key ] = value;
     });
 
+    // @ts-ignore
+    console.log(req?.socket?.localAddress);
+
     const ip = requestIp.getClientIp({ ...req, headers });
 
     if (process.env.NODE_ENV === 'production') {
@@ -28,7 +31,8 @@ export async function GET (req: NextRequest) {
         kv.scard(UNIQUE_IP_SET_KEY),
     ]);
 
-    return NextResponse.json<GetVisitsResponse>({ ip, visitsAll, visitsUnique });
+    // @ts-ignore
+    return NextResponse.json<GetVisitsResponse>({ ip, visitsAll, visitsUnique, socket: req?.socket?.localAddress });
 }
 
 const VISITS_ALL_KEY = 'visits-all';
