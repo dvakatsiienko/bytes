@@ -6,7 +6,7 @@ import requestIp from 'request-ip';
 /* Instruments */
 import type { GetVisitsResponse } from '@/api';
 
-export const config = { runtime: 'edge' };
+export const runtime = 'edge';
 
 export async function GET (req: NextRequest) {
     /**
@@ -19,7 +19,7 @@ export async function GET (req: NextRequest) {
         headers[ key ] = value;
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     console.log(req?.socket?.localAddress);
 
     const ip = requestIp.getClientIp({ ...req, headers });
@@ -37,7 +37,7 @@ export async function GET (req: NextRequest) {
         ip,
         visitsAll,
         visitsUnique,
-    // @ts-ignore
+        // @ts-expect-error
         socket: req?.socket?.localAddress,
     });
 }
