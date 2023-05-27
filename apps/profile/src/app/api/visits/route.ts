@@ -6,6 +6,8 @@ import requestIp from 'request-ip';
 /* Instruments */
 import type { GetVisitsResponse } from '@/api';
 
+export const config = { runtime: 'edge' };
+
 export async function GET (req: NextRequest) {
     /**
      * ? transform headers into a plain object,
@@ -17,7 +19,7 @@ export async function GET (req: NextRequest) {
         headers[ key ] = value;
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     console.log(req?.socket?.localAddress);
 
     const ip = requestIp.getClientIp({ ...req, headers });
@@ -31,8 +33,13 @@ export async function GET (req: NextRequest) {
         kv.scard(UNIQUE_IP_SET_KEY),
     ]);
 
-    // @ts-ignore
-    return NextResponse.json<GetVisitsResponse>({ ip, visitsAll, visitsUnique, socket: req?.socket?.localAddress });
+    // @ts-expect-error
+    return NextResponse.json<GetVisitsResponse>({
+        ip,
+        visitsAll,
+        visitsUnique,
+        socket: req?.socket?.localAddress,
+    });
 }
 
 const VISITS_ALL_KEY = 'visits-all';
