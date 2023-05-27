@@ -33,11 +33,11 @@ export async function GET (req: NextRequest) {
         kv.scard(UNIQUE_IP_SET_KEY),
     ]);
 
-    // @ts-ignore
     return NextResponse.json<GetVisitsResponse>({
         ip,
         visitsAll,
         visitsUnique,
+    // @ts-ignore
         socket: req?.socket?.localAddress,
     });
 }
