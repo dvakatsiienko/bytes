@@ -19,5 +19,4 @@ export interface GetVisitsResponse {
     ip:           string | null,
     visitsAll:    number | null,
     visitsUnique: number,
-    socket:       string,
 }
