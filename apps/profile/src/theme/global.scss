@@ -1,15 +1,8 @@
 @import 'reset-css';
 
 :root {
-    // min-height: 100vh;
-    // & body,
-    // & main {
-    //     min-height: 100vh;
-    // }
-
     color: var(--color-1);
     background-color: var(--color-2);
-    font-family: system-ui, sans-serif;
     font-size: 16px;
 
     --color-1: #030304;
