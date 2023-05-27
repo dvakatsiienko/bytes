@@ -19,7 +19,7 @@ export async function GET (req: NextRequest) {
         headers[ key ] = value;
     });
 
-    // @ts-expect-error
+    // @ts-ignore
     console.log(req?.socket?.localAddress);
 
     const ip = requestIp.getClientIp({ ...req, headers });
@@ -33,7 +33,7 @@ export async function GET (req: NextRequest) {
         kv.scard(UNIQUE_IP_SET_KEY),
     ]);
 
-    // @ts-expect-error
+    // @ts-ignore
     return NextResponse.json<GetVisitsResponse>({
         ip,
         visitsAll,
