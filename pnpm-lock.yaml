@@ -36,7 +36,7 @@ importers:
     dependencies:
       '@hookform/resolvers':
         specifier: 3.1.0
-        version: 3.1.0(react-hook-form@7.44.1)
+        version: 3.1.0(react-hook-form@7.44.2)
       '@next-auth/prisma-adapter':
         specifier: 1.0.6
         version: 1.0.6(@prisma/client@4.14.1)(next-auth@4.22.1)
@@ -59,20 +59,20 @@ importers:
         specifier: 10.7.0
         version: 10.7.0(react@18.2.0)(styled-components@5.3.11)
       '@tanstack/react-query':
-        specifier: 4.29.11
-        version: 4.29.11(react-dom@18.2.0)(react@18.2.0)
+        specifier: 4.29.12
+        version: 4.29.12(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query-devtools':
-        specifier: 4.29.11
-        version: 4.29.11(@tanstack/react-query@4.29.11)(react-dom@18.2.0)(react@18.2.0)
+        specifier: 4.29.12
+        version: 4.29.12(@tanstack/react-query@4.29.12)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client':
         specifier: 10.28.0
         version: 10.28.0(@trpc/server@10.28.0)
       '@trpc/next':
         specifier: 10.28.0
-        version: 10.28.0(@tanstack/react-query@4.29.11)(@trpc/client@10.28.0)(@trpc/react-query@10.28.0)(@trpc/server@10.28.0)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0)
+        version: 10.28.0(@tanstack/react-query@4.29.12)(@trpc/client@10.28.0)(@trpc/react-query@10.28.0)(@trpc/server@10.28.0)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/react-query':
         specifier: 10.28.0
-        version: 10.28.0(@tanstack/react-query@4.29.11)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0)
+        version: 10.28.0(@tanstack/react-query@4.29.12)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server':
         specifier: 10.28.0
         version: 10.28.0
@@ -81,7 +81,7 @@ importers:
         version: 1.0.1
       autoprefixer:
         specifier: 10.4.14
-        version: 10.4.14(postcss@8.4.23)
+        version: 10.4.14(postcss@8.4.24)
       bcrypt:
         specifier: 5.1.0
         version: 5.1.0
@@ -101,8 +101,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1(next@13.4.4)(react-dom@18.2.0)(react@18.2.0)
       postcss:
-        specifier: 8.4.23
-        version: 8.4.23
+        specifier: 8.4.24
+        version: 8.4.24
       prettier-plugin-tailwindcss:
         specifier: 0.3.0
         version: 0.3.0(prettier@2.8.8)
@@ -116,8 +116,8 @@ importers:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
       react-hook-form:
-        specifier: 7.44.1
-        version: 7.44.1(react@18.2.0)
+        specifier: 7.44.2
+        version: 7.44.2(react@18.2.0)
       react-redux:
         specifier: 8.0.5
         version: 8.0.5(@types/react-dom@18.2.4)(@types/react@18.2.7)(react-dom@18.2.0)(react@18.2.0)(redux@4.2.1)
@@ -359,7 +359,7 @@ importers:
         version: 3.7.14(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
       '@hookform/resolvers':
         specifier: 3.1.0
-        version: 3.1.0(react-hook-form@7.44.1)
+        version: 3.1.0(react-hook-form@7.44.2)
       '@types/styled-components':
         specifier: 5.1.26
         version: 5.1.26
@@ -388,8 +388,8 @@ importers:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
       react-hook-form:
-        specifier: 7.44.1
-        version: 7.44.1(react@18.2.0)
+        specifier: 7.44.2
+        version: 7.44.2(react@18.2.0)
       react-router-dom:
         specifier: 6.11.2
         version: 6.11.2(react-dom@18.2.0)(react@18.2.0)
@@ -447,7 +447,7 @@ importers:
         version: 0.0.7(vite@4.3.9)
       vite-tsconfig-paths:
         specifier: 4.2.0
-        version: 4.2.0(typescript@5.0.4)(vite@4.3.9)
+        version: 4.2.0(vite@4.3.9)
 
   packages/eslint-config-polished:
     dependencies:
@@ -3185,12 +3185,12 @@ packages:
     dependencies:
       graphql: 16.6.0
 
-  /@hookform/resolvers@3.1.0(react-hook-form@7.44.1):
+  /@hookform/resolvers@3.1.0(react-hook-form@7.44.2):
     resolution: {integrity: sha512-z0A8K+Nxq+f83Whm/ajlwE6VtQlp/yPHZnXw7XWVPIGm1Vx0QV8KThU3BpbBRfAZ7/dYqCKKBNnQh85BkmBKkA==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
-      react-hook-form: 7.44.1(react@18.2.0)
+      react-hook-form: 7.44.2(react@18.2.0)
     dev: false
 
   /@humanwhocodes/config-array@0.11.8:
@@ -4512,23 +4512,23 @@ packages:
     resolution: {integrity: sha512-8C+hF6SFAb/TlFZyS9FItgNwrw4PMa7YeX+KQYe2ZAiEz6uzg6yIr+QBzPkUwZ/L0bXvGd1sufTm3wotoz+GwQ==}
     dev: false
 
-  /@tanstack/react-query-devtools@4.29.11(@tanstack/react-query@4.29.11)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-paOSRfNtUbeo3anTtKgRSaMGplAN2VilmzLR9a3lbVZVCF4EzvL1Xmp4Xv9cDN8kGuv2CZTvUP6lvyxPlKSpew==}
+  /@tanstack/react-query-devtools@4.29.12(@tanstack/react-query@4.29.12)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-ug4YGQhMhh6QI8/sWJhjXxuvdeehxf1cyxpTifGMH5qreQ5ECHT6vzqG/aKvADQDzqLBGrF0q4wTDnRRYvvtrA==}
     peerDependencies:
-      '@tanstack/react-query': 4.29.11
+      '@tanstack/react-query': 4.29.12
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       '@tanstack/match-sorter-utils': 8.8.4
-      '@tanstack/react-query': 4.29.11(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       superjson: 1.12.3
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  /@tanstack/react-query@4.29.11(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-aLaOAhBnCr12YKPjDsZOc0fAtkyaW7f9KfVfw49oYpfe0H9EPXBUgDBIKJ8qdHF3uGzTVSMcmpiw1Za41BLZlw==}
+  /@tanstack/react-query@4.29.12(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-zhcN6+zF6cxprxhTHQajHGlvxgK8npnp9uLe9yaWhGc6sYcPWXzyO4raL4HomUzQOPzu3jLvkriJQ7BOrDM8vA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -4553,7 +4553,7 @@ packages:
       '@trpc/server': 10.28.0
     dev: false
 
-  /@trpc/next@10.28.0(@tanstack/react-query@4.29.11)(@trpc/client@10.28.0)(@trpc/react-query@10.28.0)(@trpc/server@10.28.0)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0):
+  /@trpc/next@10.28.0(@tanstack/react-query@4.29.12)(@trpc/client@10.28.0)(@trpc/react-query@10.28.0)(@trpc/server@10.28.0)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-sD98gQu/vZhXhC4hEPqyQStWhUIgZCWQuE4N//eZodAtb8Lyosg/UUs/Mo6IFAcdjcXKuyMYlu27ZIRjaG3txw==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
@@ -4564,9 +4564,9 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
-      '@tanstack/react-query': 4.29.11(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client': 10.28.0(@trpc/server@10.28.0)
-      '@trpc/react-query': 10.28.0(@tanstack/react-query@4.29.11)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0)
+      '@trpc/react-query': 10.28.0(@tanstack/react-query@4.29.12)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server': 10.28.0
       next: 13.4.4(react-dom@18.2.0)(react@18.2.0)(sass@1.62.1)
       react: 18.2.0
@@ -4574,7 +4574,7 @@ packages:
       react-ssr-prepass: 1.5.0(react@18.2.0)
     dev: false
 
-  /@trpc/react-query@10.28.0(@tanstack/react-query@4.29.11)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0):
+  /@trpc/react-query@10.28.0(@tanstack/react-query@4.29.12)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-ssXaZbtNHrgvUW/bmwpiEttF1t1TMZAp/FQ98puXE7MqpodEi2aIum1Ou9Cb1w0lEc4mPwOwztzwuUSGsdCD6Q==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
@@ -4583,7 +4583,7 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
-      '@tanstack/react-query': 4.29.11(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client': 10.28.0(@trpc/server@10.28.0)
       '@trpc/server': 10.28.0
       react: 18.2.0
@@ -5248,7 +5248,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /autoprefixer@10.4.14(postcss@8.4.23):
+  /autoprefixer@10.4.14(postcss@8.4.24):
     resolution: {integrity: sha512-FQzyfOsTlwVzjHxKEqRIAdJx9niO6VCBCoEwax/VLSoQF29ggECcPuBqUMZ+u8jCZOPSy8b8/8KnuFbp0SaFZQ==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
@@ -5260,7 +5260,7 @@ packages:
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
-      postcss: 8.4.23
+      postcss: 8.4.24
       postcss-value-parser: 4.2.0
     dev: false
 
@@ -7936,7 +7936,7 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       sass: 1.62.1
-      styled-jsx: 5.1.1(@babel/core@7.22.1)(react@18.2.0)
+      styled-jsx: 5.1.1(react@18.2.0)
       zod: 3.21.4
     optionalDependencies:
       '@next/swc-darwin-arm64': 13.4.4
@@ -8441,29 +8441,29 @@ packages:
       '@babel/runtime': 7.21.0
     dev: false
 
-  /postcss-import@15.1.0(postcss@8.4.23):
+  /postcss-import@15.1.0(postcss@8.4.24):
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       postcss: ^8.0.0
     dependencies:
-      postcss: 8.4.23
+      postcss: 8.4.24
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.2
     dev: false
 
-  /postcss-js@4.0.1(postcss@8.4.23):
+  /postcss-js@4.0.1(postcss@8.4.24):
     resolution: {integrity: sha512-dDLF8pEO191hJMtlHFPRa8xsizHaM82MLfNkUHdUtVEV3tgTp5oj+8qbEqYM57SLfc74KSbw//4SeJma2LRVIw==}
     engines: {node: ^12 || ^14 || >= 16}
     peerDependencies:
       postcss: ^8.4.21
     dependencies:
       camelcase-css: 2.0.1
-      postcss: 8.4.23
+      postcss: 8.4.24
     dev: false
 
-  /postcss-load-config@4.0.1(postcss@8.4.23):
+  /postcss-load-config@4.0.1(postcss@8.4.24):
     resolution: {integrity: sha512-vEJIc8RdiBRu3oRAI0ymerOn+7rPuMvRXslTvZUKZonDHFIczxztIyJ1urxM1x9JXEikvpWWTUUqal5j/8QgvA==}
     engines: {node: '>= 14'}
     peerDependencies:
@@ -8476,17 +8476,17 @@ packages:
         optional: true
     dependencies:
       lilconfig: 2.1.0
-      postcss: 8.4.23
+      postcss: 8.4.24
       yaml: 2.2.2
     dev: false
 
-  /postcss-nested@6.0.1(postcss@8.4.23):
+  /postcss-nested@6.0.1(postcss@8.4.24):
     resolution: {integrity: sha512-mEp4xPMi5bSWiMbsgoPfcP74lsWLHkQbZc3sY+jWYd65CUwXrUaTp0fmNpa01ZcETKlIgUdFN/MpS2xZtqL9dQ==}
     engines: {node: '>=12.0'}
     peerDependencies:
       postcss: ^8.2.14
     dependencies:
-      postcss: 8.4.23
+      postcss: 8.4.24
       postcss-selector-parser: 6.0.11
     dev: false
 
@@ -8518,6 +8518,16 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /postcss@8.4.24:
+    resolution: {integrity: sha512-M0RzbcI0sO/XJNucsGjvWU9ERWxb/ytp1w6dKtxTKgixdtQDq4rmx/g8W1hnaheq9jgwL/oyEdH5Bc4WwJKMqg==}
+    engines: {node: ^10 || ^12 || >=14}
+    dependencies:
+      nanoid: 3.3.6
+      picocolors: 1.0.0
+      source-map-js: 1.0.2
+    dev: false
 
   /preact-render-to-string@5.2.6(preact@10.13.2):
     resolution: {integrity: sha512-JyhErpYOvBV1hEPwIxc/fHWXPfnEGdRKxc8gFdAZ7XV4tlzyzG847XAyEZqoDnynP88akM4eaHcSOzNcLWFguw==}
@@ -8719,8 +8729,8 @@ packages:
       scheduler: 0.23.0
     dev: false
 
-  /react-hook-form@7.44.1(react@18.2.0):
-    resolution: {integrity: sha512-ZVmDuQQCq6agpVE2eoGjH3ZMDgo/aFV4JVobUQGOQ0/tgfcY/WY30mBSVnxmFOpzS+iSqD2ax7hw9Thg5F931A==}
+  /react-hook-form@7.44.2(react@18.2.0):
+    resolution: {integrity: sha512-IyihmIbCwzDI/iqlecTRa7+4BCnzNx40upSlGvIU7qwENhTf6APatm4bmL9ANtWKPYlD67SIlxfls7GwCUe+Lg==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
@@ -9447,6 +9457,23 @@ packages:
       react: 18.2.0
     dev: false
 
+  /styled-jsx@5.1.1(react@18.2.0):
+    resolution: {integrity: sha512-pW7uC1l4mBZ8ugbiZrcIsiIvVx1UmTfw7UkC3Um2tmfUq9Bhk8IiyEIPl6F8agHgjzku6j0xQEZbfA5uSgSaCw==}
+    engines: {node: '>= 12.0.0'}
+    peerDependencies:
+      '@babel/core': '*'
+      babel-plugin-macros: '*'
+      react: '>= 16.8.0 || 17.x.x || ^18.0.0-0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      babel-plugin-macros:
+        optional: true
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+    dev: false
+
   /sucrase@3.32.0:
     resolution: {integrity: sha512-ydQOU34rpSyj2TGyz4D2p8rbktIOZ8QY9s+DGLvFU1i5pWJE8vkpruCjGCMHsdXwnD7JDcS+noSwM/a7zyNFDQ==}
     engines: {node: '>=8'}
@@ -9521,11 +9548,11 @@ packages:
       normalize-path: 3.0.0
       object-hash: 3.0.0
       picocolors: 1.0.0
-      postcss: 8.4.23
-      postcss-import: 15.1.0(postcss@8.4.23)
-      postcss-js: 4.0.1(postcss@8.4.23)
-      postcss-load-config: 4.0.1(postcss@8.4.23)
-      postcss-nested: 6.0.1(postcss@8.4.23)
+      postcss: 8.4.24
+      postcss-import: 15.1.0(postcss@8.4.24)
+      postcss-js: 4.0.1(postcss@8.4.24)
+      postcss-load-config: 4.0.1(postcss@8.4.24)
+      postcss-nested: 6.0.1(postcss@8.4.24)
       postcss-selector-parser: 6.0.11
       postcss-value-parser: 4.2.0
       resolve: 1.22.2
@@ -9624,7 +9651,7 @@ packages:
     resolution: {integrity: sha512-PGcnJoTBnVGy6yYNFxWVNkdcAuAMstvutN9MgDJIV6L0oG8fB+ZNNy1T+wJzah8RPGor1mZuPQkVfXNDpy9eHA==}
     dev: true
 
-  /tsconfck@2.1.1(typescript@5.0.4):
+  /tsconfck@2.1.1:
     resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
     engines: {node: ^14.13.1 || ^16 || >=18}
     hasBin: true
@@ -9633,8 +9660,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-    dependencies:
-      typescript: 5.0.4
     dev: true
 
   /tsconfig-paths@3.14.2:
@@ -9911,7 +9936,7 @@ packages:
       vite: 4.3.9(@types/node@20.2.5)
     dev: true
 
-  /vite-tsconfig-paths@4.2.0(typescript@5.0.4)(vite@4.3.9):
+  /vite-tsconfig-paths@4.2.0(vite@4.3.9):
     resolution: {integrity: sha512-jGpus0eUy5qbbMVGiTxCL1iB9ZGN6Bd37VGLJU39kTDD6ZfULTTb1bcc5IeTWqWJKiWV5YihCaibeASPiGi8kw==}
     peerDependencies:
       vite: '*'
@@ -9921,7 +9946,7 @@ packages:
     dependencies:
       debug: 4.3.4(supports-color@5.5.0)
       globrex: 0.1.2
-      tsconfck: 2.1.1(typescript@5.0.4)
+      tsconfck: 2.1.1
       vite: 4.3.9(@types/node@20.2.5)
     transitivePeerDependencies:
       - supports-color

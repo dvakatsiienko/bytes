@@ -17,6 +17,10 @@ export async function GET (req: NextRequest) {
         headers[ key ] = value;
     });
 
+    console.log(req.headers);
+    // console.log(req.headers instanceof Map, // False!
+    // );
+
     const ip = requestIp.getClientIp({ ...req, headers });
 
     if (process.env.NODE_ENV === 'production') {
