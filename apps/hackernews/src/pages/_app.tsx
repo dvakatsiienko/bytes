@@ -1,6 +1,7 @@
 /* Core */
 import Head from 'next/head';
 import * as reactQuery from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider as StyledComponentsProvider } from 'styled-components';
 import { Provider as ReduxProvider } from 'react-redux';
 import { NextUIProvider } from '@nextui-org/react';
@@ -41,9 +42,10 @@ const App: AppType<{ session: Session | null }> = (props) => {
 
                                 <Layout>
                                     <props.Component { ...props.pageProps } />
-
-                                    <Analytics />
                                 </Layout>
+
+                                <Analytics />
+                                <ReactQueryDevtools initialIsOpen = { false } />
                             </ReduxProvider>
                         </StyledComponentsProvider>
                     </NextUIProvider>
