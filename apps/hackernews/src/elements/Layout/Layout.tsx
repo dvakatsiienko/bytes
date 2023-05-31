@@ -10,7 +10,7 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 /* Instruments */
 import { useDispatch, useSelector, browserSlice } from '@/lib';
 
-export const Layout = (props: { children: React.ReactElement[] }) => {
+export const Layout = (props: React.PropsWithChildren) => {
     const { isDark } = useTheme();
 
     const dispatch = useDispatch();
