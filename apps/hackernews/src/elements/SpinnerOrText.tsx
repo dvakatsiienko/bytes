@@ -1,7 +1,8 @@
 /* Core */
 import { Loading } from '@nextui-org/react';
 
-export const SpinnerOrText = (props: SpinnerOrTextProps) => {
+export const SpinnerOrText = (p: SpinnerOrTextProps) => {
+    const props = structuredClone(p);
     props.isLogin ||= false;
     props.loginText ||= '';
 
