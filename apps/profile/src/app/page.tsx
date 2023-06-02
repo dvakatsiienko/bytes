@@ -33,7 +33,6 @@ export default () => {
 
                 <section className = 'content'>
                     <section className = 'section'>
-                        {/* @ts-expect-error due to lack of Next.js APP router typings */}
                         <Stats />
                     </section>
                     <section className = 'section'>
