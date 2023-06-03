@@ -18,7 +18,6 @@
         "strictNullChecks": true,
 
         /* build */
-        "noEmit": false,
         "emitDeclarationOnly": true,
         "declaration": true,
         "outDir": "types"

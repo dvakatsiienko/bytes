@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "scripts": {
         "lint": "TIMING=1 eslint .",
-        "typecheck": "tsc --noEmit",
+        "typecheck": "tsc",
         "build": "tsc"
     },
     "dependencies": {
