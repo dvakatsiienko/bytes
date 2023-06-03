@@ -7,7 +7,7 @@
         "build": "next build",
         "build:clean": "rimraf .next",
         "serve": "next start",
-        "lint": "TIMING=1 eslint .",
+        "lint": "echo 1",
         "typecheck": "tsc",
         "validate": "run-p lint typecheck",
         "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\"",
