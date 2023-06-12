@@ -9,15 +9,15 @@
         "lint": "TIMING=1 eslint ."
     },
     "dependencies": {
-        "next": "13.4.4",
+        "next": "13.4.5",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "ui": "workspace:*",
         "utils": "workspace:*"
     },
     "devDependencies": {
-        "@types/node": "20.2.5",
-        "@types/react": "18.2.9",
+        "@types/node": "20.3.0",
+        "@types/react": "18.2.11",
         "prettier": "2.8.8",
         "tsconfig-core": "workspace:*"
     }
