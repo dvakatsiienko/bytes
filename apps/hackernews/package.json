@@ -73,7 +73,7 @@
         "@types/cookies": "0.7.7",
         "@types/node": "20.3.0",
         "@types/react": "18.2.11",
-        "@types/react-dom": "18.2.4",
+        "@types/react-dom": "18.2.5",
         "@types/redux-logger": "3.0.9",
         "@types/styled-components": "5.1.26",
         "dotenv-cli": "7.2.1",
