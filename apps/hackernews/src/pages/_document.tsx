@@ -43,7 +43,7 @@ export default class extends Document {
     public render () {
         return (
             <Html className = { nextFonts.robotoFlexVRFont.className } lang = 'en'>
-                {/* <Head>{NextUiCssBaseline.flush()}</Head> */}
+                <Head>{NextUiCssBaseline.flush()}</Head>
                 <body>
                     <Main />
                     <NextScript />
