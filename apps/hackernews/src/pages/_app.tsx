@@ -31,14 +31,14 @@ const App: AppType<{ session: Session | null }> = (props) => {
                     <NextUIProvider>
                         <StyledComponentsProvider theme = {{}}>
                             <ReduxProvider store = { reduxStore }>
-                                <Head>
+                                {/* <Head>
                                     <link href = '/favicon.ico' rel = 'icon' />
                                     <title>Hackernews</title>
                                     <meta
                                         content = 'user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, shrink-to-fit=no"'
                                         name = 'viewport'
                                     />
-                                </Head>
+                                </Head> */}
 
                                 <Layout>
                                     <props.Component { ...props.pageProps } />
