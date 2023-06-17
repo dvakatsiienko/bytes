@@ -16,8 +16,8 @@
         "utils": "workspace:*"
     },
     "devDependencies": {
-        "@types/node": "20.3.0",
-        "@types/react": "18.2.11",
+        "@types/node": "20.3.1",
+        "@types/react": "18.2.12",
         "prettier": "2.8.8",
         "tsconfig-core": "workspace:*"
     }
