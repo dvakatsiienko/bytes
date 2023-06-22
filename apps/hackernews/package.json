@@ -56,7 +56,7 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-hook-form": "7.45.0",
-        "react-redux": "8.1.0",
+        "react-redux": "8.1.1",
         "reset-css": "5.0.1",
         "sass": "1.63.4",
         "styled-components": "5.3.11",
