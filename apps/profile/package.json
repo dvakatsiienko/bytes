@@ -14,7 +14,7 @@
     "dependencies": {
         "@styled-icons/ionicons-sharp": "10.46.0",
         "@styled-icons/styled-icon": "10.7.0",
-        "@vercel/kv": "0.2.1",
+        "@vercel/kv": "0.2.2",
         "next": "13.4.6",
         "next-themes": "0.2.1",
         "react": "18.2.0",
