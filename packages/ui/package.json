@@ -6,7 +6,7 @@
         "typecheck": "tsc"
     },
     "devDependencies": {
-        "@types/react": "18.2.12",
+        "@types/react": "18.2.14",
         "@types/react-dom": "18.2.6"
     },
     "types": "./index.tsx",
