@@ -9,14 +9,14 @@ import { nextFonts } from '@/theme';
 
 export default class extends Document {
     public static async getInitialProps (ctx: DocumentContext) {
-        const scserverStylesheet = new SCServerStyleSheet();
+        const scServerStylesheet = new SCServerStyleSheet();
         const originalRenderPage = ctx.renderPage;
 
         try {
             ctx.renderPage = () => {
                 return originalRenderPage({
                     enhanceApp: (App) => (props) => {
-                        const scServerStleSheetResult = scserverStylesheet.collectStyles(<App { ...props } />);
+                        const scServerStleSheetResult = scServerStylesheet.collectStyles(<App { ...props } />);
 
                         return scServerStleSheetResult;
                     },
@@ -30,13 +30,13 @@ export default class extends Document {
                 styles: (
                     <>
                         {initialProps.styles}
-                        {scserverStylesheet.getStyleElement()}
+                        {scServerStylesheet.getStyleElement()}
                         {Children.toArray([ initialProps.styles ])}
                     </>
                 ),
             };
         } finally {
-            scserverStylesheet.seal();
+            scServerStylesheet.seal();
         }
     }
 
