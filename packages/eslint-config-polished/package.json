@@ -6,9 +6,9 @@
         "lint": "TIMING=1 eslint ."
     },
     "dependencies": {
-        "@babel/core": "7.22.5",
-        "@babel/eslint-parser": "7.22.5",
-        "@babel/preset-env": "7.22.5",
+        "@babel/core": "7.22.9",
+        "@babel/eslint-parser": "7.22.9",
+        "@babel/preset-env": "7.22.9",
         "@babel/preset-react": "7.22.5",
         "@typescript-eslint/eslint-plugin": "5.61.0",
         "@typescript-eslint/parser": "5.61.0",
