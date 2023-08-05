@@ -15,15 +15,15 @@
         "@styled-icons/ionicons-sharp": "10.46.0",
         "@styled-icons/styled-icon": "10.7.0",
         "@vercel/kv": "0.2.2",
-        "next": "13.4.10",
+        "next": "13.4.12",
         "next-themes": "0.2.1",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "request-ip": "3.3.0",
-        "reset-css": "5.0.1"
+        "reset-css": "5.0.2"
     },
     "devDependencies": {
-        "@types/react": "18.2.15",
+        "@types/react": "18.2.18",
         "@types/react-dom": "18.2.7",
         "@types/request-ip": "0.0.38",
         "prettier": "2.8.8"
