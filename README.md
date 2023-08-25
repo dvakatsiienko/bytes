@@ -30,7 +30,7 @@
 [npm](https://www.npmjs.com/package/eslint-config-polished) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished)
 
-###### 💄 eslint-config-polished
+###### 💄 prettier-config-polished
 
 [npm](https://www.npmjs.com/package/prettier-config-polished) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished)
