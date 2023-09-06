@@ -7,7 +7,7 @@
         "build": "tsc"
     },
     "dependencies": {
-        "next": "13.4.12"
+        "next": "13.4.19"
     },
     "types": "./types/next-fonts.d.ts",
     "exports": {
