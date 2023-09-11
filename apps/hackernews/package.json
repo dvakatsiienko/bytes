@@ -10,7 +10,6 @@
         "lint": "TIMING=1 eslint .",
         "typecheck": "tsc",
         "validate": "run-p lint typecheck",
-        "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\"",
         "release:patch": "release-it --ci",
         "release:minor": "release-it --ci minor",
         "release:major": "release-it --ci major",
