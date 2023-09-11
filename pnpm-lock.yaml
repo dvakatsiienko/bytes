@@ -172,8 +172,8 @@ importers:
         specifier: 3.0.9
         version: 3.0.9
       '@types/styled-components':
-        specifier: 5.1.26
-        version: 5.1.26
+        specifier: 5.1.27
+        version: 5.1.27
       dotenv-cli:
         specifier: 7.3.0
         version: 7.3.0
@@ -362,8 +362,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1(react-hook-form@7.46.1)
       '@types/styled-components':
-        specifier: 5.1.26
-        version: 5.1.26
+        specifier: 5.1.27
+        version: 5.1.27
       apollo-link-logger:
         specifier: 2.0.1
         version: 2.0.1(@apollo/client@3.8.3)
@@ -447,8 +447,8 @@ importers:
         specifier: 0.0.7
         version: 0.0.7(vite@4.4.9)
       vite-tsconfig-paths:
-        specifier: 4.2.0
-        version: 4.2.0(typescript@5.2.2)(vite@4.4.9)
+        specifier: 4.2.1
+        version: 4.2.1(vite@4.4.9)
 
   packages/eslint-config-polished:
     dependencies:
@@ -4838,8 +4838,8 @@ packages:
       '@types/mime': 3.0.1
       '@types/node': 20.6.0
 
-  /@types/styled-components@5.1.26:
-    resolution: {integrity: sha512-KuKJ9Z6xb93uJiIyxo/+ksS7yLjS1KzG6iv5i78dhVg/X3u5t1H7juRWqVmodIdz6wGVaIApo1u01kmFRdJHVw==}
+  /@types/styled-components@5.1.27:
+    resolution: {integrity: sha512-oY9c1SdztRRF0QDQdwXEenfAjGN4WGUkaMpx5hvdTbYYqw01qoY2GrHi+kAR6SVofynzD6KbGoF5ITP0zh5pvg==}
     dependencies:
       '@types/hoist-non-react-statics': 3.3.1
       '@types/react': 18.2.21
@@ -9566,8 +9566,8 @@ packages:
     resolution: {integrity: sha512-PGcnJoTBnVGy6yYNFxWVNkdcAuAMstvutN9MgDJIV6L0oG8fB+ZNNy1T+wJzah8RPGor1mZuPQkVfXNDpy9eHA==}
     dev: true
 
-  /tsconfck@2.1.1(typescript@5.2.2):
-    resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
+  /tsconfck@2.1.2:
+    resolution: {integrity: sha512-ghqN1b0puy3MhhviwO2kGF8SeMDNhEbnKxjK7h6+fvY9JAxqvXi8y5NAHSQv687OVboS2uZIByzGd45/YxrRHg==}
     engines: {node: ^14.13.1 || ^16 || >=18}
     hasBin: true
     peerDependencies:
@@ -9575,8 +9575,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-    dependencies:
-      typescript: 5.2.2
     dev: true
 
   /tslib@1.14.1:
@@ -9880,8 +9878,8 @@ packages:
       vite: 4.4.9(@types/node@20.6.0)
     dev: true
 
-  /vite-tsconfig-paths@4.2.0(typescript@5.2.2)(vite@4.4.9):
-    resolution: {integrity: sha512-jGpus0eUy5qbbMVGiTxCL1iB9ZGN6Bd37VGLJU39kTDD6ZfULTTb1bcc5IeTWqWJKiWV5YihCaibeASPiGi8kw==}
+  /vite-tsconfig-paths@4.2.1(vite@4.4.9):
+    resolution: {integrity: sha512-GNUI6ZgPqT3oervkvzU+qtys83+75N/OuDaQl7HmOqFTb0pjZsuARrRipsyJhJ3enqV8beI1xhGbToR4o78nSQ==}
     peerDependencies:
       vite: '*'
     peerDependenciesMeta:
@@ -9890,7 +9888,7 @@ packages:
     dependencies:
       debug: 4.3.4(supports-color@5.5.0)
       globrex: 0.1.2
-      tsconfck: 2.1.1(typescript@5.2.2)
+      tsconfck: 2.1.2
       vite: 4.4.9(@types/node@20.6.0)
     transitivePeerDependencies:
       - supports-color
