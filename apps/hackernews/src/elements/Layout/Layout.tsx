@@ -1,5 +1,5 @@
 /* Core */
-import { Card, Text, Tooltip, theme, useTheme } from '@nextui-org/react';
+import { Card, Tooltip } from '@nextui-org/react';
 import { Triangle } from '@styled-icons/ionicons-sharp/Triangle';
 import styled from 'styled-components';
 
@@ -11,8 +11,6 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 import { useDispatch, useSelector, browserSlice } from '@/lib';
 
 export const Layout = (props: React.PropsWithChildren) => {
-    const { isDark } = useTheme();
-
     const dispatch = useDispatch();
     const browser = useSelector((state) => state.browser);
 
@@ -22,26 +20,26 @@ export const Layout = (props: React.PropsWithChildren) => {
 
     const closedContent = 'Okay...';
     const openedContent = (
-        <Browser>
-            <Header $isDark = { isDark }>
+        <Browser className = 'shadow-lg'>
+            <Header>
                 <Controls>
-                    <Tooltip color = 'invert' content = 'Close'>
+                    <Tooltip content = 'Close'>
                         <div className = 'dot close' onPointerUp = { handleCloseBrowser } />
                     </Tooltip>
 
-                    <Tooltip color = 'invert' content = 'Minimize'>
+                    <Tooltip content = 'Minimize'>
                         <div className = 'dot minimize' />
                     </Tooltip>
-                    <Tooltip color = 'invert' content = 'Maximize'>
+                    <Tooltip content = 'Maximize'>
                         <div className = 'dot maximize' />
                     </Tooltip>
                 </Controls>
 
                 <div className = 'title'>
-                    <Text blockquote>
+                    <span>
                         <Triangle width = { 14 } />
                         λackernews
-                    </Text>
+                    </span>
                 </div>
 
                 <ThemeSwitcher />
@@ -98,10 +96,9 @@ const Browser = styled.section`
     grid-template-rows: auto 1fr;
     height: 100%;
     border-radius: var(--nextui-radii-lg);
-    box-shadow: ${ theme.shadows.lg.value };
 `;
 
-const Header = styled.header<{ $isDark: ReturnType<typeof useTheme>['isDark'] }>`
+const Header = styled.header`
     position: relative;
     display: flex;
     height: 40px;
@@ -109,16 +106,9 @@ const Header = styled.header<{ $isDark: ReturnType<typeof useTheme>['isDark'] }>
     align-items: center;
     width: 100%;
     padding: 0 var(--content-h-padding);
-    border: 1px solid ${ theme.colors.accents1.value };
+    border: 1px solid gray;
     border-top-left-radius: var(--nextui-radii-lg);
     border-top-right-radius: var(--nextui-radii-lg);
-
-    ${ (p) => !p.$isDark &&
-        `
-        border-left: 0;
-        border-top: 0;
-        border-right: 0;
-    ` }
 
     & .title {
         display: flex;
@@ -153,25 +143,15 @@ const Controls = styled.div`
         background-color: var(--bg);
 
         &.close {
-            --bg: ${ theme.colors.red600.value };
-
-            &:hover {
-                --bg: ${ theme.colors.red700.value };
-            }
+            background-color: red;
         }
+
         &.minimize {
-            --bg: ${ theme.colors.yellow600.value };
-
-            &:hover {
-                --bg: ${ theme.colors.yellow700.value };
-            }
+            background-color: yellow;
         }
-        &.maximize {
-            --bg: ${ theme.colors.green600.value };
 
-            &:hover {
-                --bg: ${ theme.colors.green700.value };
-            }
+        &.maximize {
+            background-color: green;
         }
     }
 `;

@@ -11,9 +11,5 @@ export const LogoutButton = () => {
         router.push('/login');
     };
 
-    return (
-        <Link underline color = 'text' onPointerUp = { logout }>
-            logout
-        </Link>
-    );
+    return <Link onPointerUp = { logout }>logout</Link>;
 };

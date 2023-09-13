@@ -6,12 +6,7 @@ import cx from 'classnames';
 export const NavLink = (props: NavLinkProps) => {
     return (
         <NextLink legacyBehavior passHref href = { props.href }>
-            <NexTUiLink
-                underline
-                className = { cx({ active: props.active }) }
-                color = { props.active ? 'primary' : 'text' }>
-                {props.content}
-            </NexTUiLink>
+            <NexTUiLink className = { cx({ active: props.active }) }>{props.content}</NexTUiLink>
         </NextLink>
     );
 };

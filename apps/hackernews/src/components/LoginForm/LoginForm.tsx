@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { signIn } from 'next-auth/react';
-import { Text, Button } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 import styled from 'styled-components';
 import waait from 'waait';
 
@@ -42,8 +42,8 @@ export const LoginForm = () => {
         if (result?.ok) router.push('/');
     };
 
-    const signup = async () => {
-        console.log('signup');
+    const signup = () => {
+        console.info('signup');
     };
 
     const submit = async () => {
@@ -61,9 +61,7 @@ export const LoginForm = () => {
 
     return (
         <form onSubmit = { form.handleSubmit(submit) }>
-            <Text h1 css = {{ marginBottom: '48px' }} size = 'xxx-large' weight = 'bold'>
-                {isLogin ? 'Login' : 'Sign Up'}
-            </Text>
+            <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
 
             <Fieldset disabled = { isFetching }>
                 {!isLogin && (
@@ -101,14 +99,7 @@ export const LoginForm = () => {
 
                 <Controls>
                     <section className = 'credentials'>
-                        <Button
-                            // bordered
-                            ghost
-                            // flat
-                            // light
-                            disabled = { isFetching }
-                            size = 'sm'
-                            type = 'submit'>
+                        <Button disabled = { isFetching } size = 'sm' type = 'submit'>
                             <SpinnerOrText
                                 isFetching = { isFetching }
                                 isLogin = { isLogin }
@@ -118,10 +109,6 @@ export const LoginForm = () => {
                         </Button>
 
                         <Button
-                            // bordered
-                            ghost
-                            // flat
-                            // light
                             color = 'secondary'
                             disabled = { isFetching }
                             size = 'sm'
@@ -137,18 +124,9 @@ export const LoginForm = () => {
 
                     {isLogin ? (
                         <section className = 'github-provider'>
-                            <Text
-                                css = {{ textGradient: '45deg, $blue600 -20%, $pink600 50%' }}
-                                size = { 60 }
-                                weight = 'bold'>
-                                OR
-                            </Text>
+                            <h1>OR</h1>
 
                             <Button
-                                bordered
-                                ghost
-                                shadow
-                                color = 'gradient'
                                 disabled = { isFetching }
                                 size = 'sm'
                                 type = 'button'
