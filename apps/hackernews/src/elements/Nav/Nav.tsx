@@ -1,6 +1,6 @@
 /* Core */
 import { useRouter } from 'next/router';
-import { Tooltip, theme } from '@nextui-org/react';
+import { Tooltip } from '@nextui-org/react';
 import styled from 'styled-components';
 import { Aperture as ApertureIcon } from '@styled-icons/feather/Aperture';
 import { useSession } from 'next-auth/react';
@@ -21,7 +21,6 @@ export const Nav = () => {
     return (
         <Container>
             <Tooltip
-                color = 'invert'
                 content = { `
                 App version: ${ packageJson.version }
             ` }>
@@ -85,9 +84,9 @@ const Container = styled.nav`
 
 const Aperture = styled(ApertureIcon)<StyledIconProps & { $isLoggedIn: boolean }>`
     cursor: pointer;
-    color: ${ (p) => (p.$isLoggedIn ? theme.colors.green600.value : theme.colors.red600.value) };
+    color: ${ (p) => (p.$isLoggedIn ? 'green' : 'red') };
 
     &:hover {
-        color: ${ theme.colors.link.value };
+        color: purple;
     }
 `;

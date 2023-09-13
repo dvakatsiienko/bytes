@@ -17,9 +17,7 @@ export const Pagination = () => {
 
     return (
         <NextUiPagination
-            shadow
             boundaries = { 2 }
-            color = 'gradient'
             initialPage = { Number(router.query.page) }
             size = 'sm'
             total = { 20 }

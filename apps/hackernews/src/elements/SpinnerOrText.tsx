@@ -1,12 +1,12 @@
 /* Core */
-import { Loading } from '@nextui-org/react';
+import { Spinner } from '@nextui-org/react';
 
 export const SpinnerOrText = (p: SpinnerOrTextProps) => {
     const props = structuredClone(p);
     props.isLogin ||= false;
     props.loginText ||= '';
 
-    if (props.isFetching) return <Loading color = 'currentColor' size = 'sm' type = 'spinner' />;
+    if (props.isFetching) return <Spinner size = 'sm' />;
     if (props.isLogin) return <>{props.loginText}</>;
 
     return <>{props.text}</>;
