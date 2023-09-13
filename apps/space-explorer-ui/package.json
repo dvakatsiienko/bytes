@@ -17,7 +17,6 @@
         "*": "link:F=@simple/*",
         "@apollo/client": "3.8.3",
         "@hookform/resolvers": "3.3.1",
-        "@types/styled-components": "5.1.27",
         "apollo-link-logger": "2.0.1",
         "debug": "4.3.4",
         "graphql": "16.8.0",
@@ -28,7 +27,7 @@
         "react-dom": "18.2.0",
         "react-hook-form": "7.46.1",
         "react-router-dom": "6.15.0",
-        "styled-components": "5.3.11",
+        "styled-components": "6.0.7",
         "zod": "3.22.2"
     },
     "devDependencies": {
