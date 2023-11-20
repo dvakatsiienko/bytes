@@ -24,14 +24,14 @@
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
-        "concurrently": "8.2.1",
+        "concurrently": "8.2.2",
         "eslint": "8.49.0",
         "eslint-config-polished": "workspace:*",
         "prettier": "2.8.8",
         "prettier-config-polished": "workspace:*",
-        "rimraf": "5.0.1",
+        "rimraf": "5.0.5",
         "tsconfig-core": "workspace:*",
-        "turbo": "1.10.13",
+        "turbo": "1.10.16",
         "typescript": "5.2.2"
     },
     "engines": {
