@@ -14,22 +14,22 @@
     },
     "dependencies": {
         "@apollo/datasource-rest": "6.1.1",
-        "@apollo/server": "4.9.3",
+        "@apollo/server": "4.9.5",
         "@graphql-tools/graphql-file-loader": "8.0.0",
         "@graphql-tools/load": "8.0.0",
         "@prisma/client": "5.2.0",
         "chalk": "5.3.0",
         "dotenv": "16.3.1",
-        "graphql": "16.8.0",
+        "graphql": "16.8.1",
         "prisma": "5.2.0",
-        "zod": "3.22.2"
+        "zod": "3.22.4"
     },
     "devDependencies": {
         "@graphql-codegen/cli": "5.0.0",
         "@graphql-codegen/typescript": "4.0.1",
-        "@swc-node/register": "1.6.7",
-        "@swc/core": "1.3.84",
-        "@types/node": "20.6.0",
+        "@swc-node/register": "1.6.8",
+        "@swc/core": "1.3.96",
+        "@types/node": "20.9.2",
         "nodemon": "3.0.1",
         "prettier": "2.8.8"
     }
