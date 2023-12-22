@@ -8,9 +8,9 @@ export const Profile = () => {
     const { data, loading } = gql.useUserProfileQuery({ fetchPolicy: 'cache-and-network' });
 
     const tripsListJSX =
-    data?.userProfile?.trips.map((trip) => {
-        return <LaunchTile key = { trip.id } launch = { trip.launch } trip = { trip } />;
-    }) ?? [];
+        data?.userProfile?.trips.map((trip) => {
+            return <LaunchTile key = { trip.id } launch = { trip.launch } trip = { trip } />;
+        }) ?? [];
 
     return (
         <>
