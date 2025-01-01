@@ -29,7 +29,7 @@
         "eslint-config-polished": "workspace:*",
         "prettier": "2.8.8",
         "prettier-config-polished": "workspace:*",
-        "rimraf": "5.0.5",
+        "rimraf": "6.0.1",
         "tsconfig-core": "workspace:*",
         "turbo": "1.10.16",
         "typescript": "5.2.2"
