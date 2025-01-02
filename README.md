@@ -34,7 +34,3 @@
 
 [npm](https://www.npmjs.com/package/prettier-config-polished) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished)
-
-### 💡 Utilities
-
--   ...
