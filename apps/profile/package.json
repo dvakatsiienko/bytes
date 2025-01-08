@@ -27,6 +27,6 @@
         "@types/react": "18.2.48",
         "@types/react-dom": "18.2.18",
         "@types/request-ip": "0.0.41",
-        "prettier": "2.8.8"
+        "prettier": "3.4.2"
     }
 }
