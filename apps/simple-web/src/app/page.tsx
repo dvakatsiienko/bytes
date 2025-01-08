@@ -3,8 +3,8 @@ import { Button } from 'ui';
 import { sum } from 'utils';
 
 export default () => {
-    return (
-        <section>
+            return (
+                <section>
             <h1>
                 Web
                 <br />
