@@ -81,7 +81,9 @@ module.exports = {
                 'no-extra-semi':                             0,
                 '@typescript-eslint/no-extra-semi':          1, // ? Not declared literally in JS config (extended from eslint-recommended), thus not using getJsRule.
                 'no-invalid-this':                           0,
-                '@typescript-eslint/no-invalid-this':        getJsRule('no-invalid-this'),
+                // ? Disabled during major version upgrade. Review during new eslint config creation.
+                // '@typescript-eslint/no-invalid-this':        getJsRule('no-invalid-this'),
+                '@typescript-eslint/no-empty-function':      0,
                 'no-loop-func':                              0,
                 '@typescript-eslint/no-loop-func':           getJsRule('no-loop-func'),
                 'no-loss-of-precision':                      0,
