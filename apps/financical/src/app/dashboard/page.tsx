@@ -1,7 +1,4 @@
-/* Core */
-import type { NextPage } from 'next';
-
-const Dashboard: NextPage = () => {
+const Dashboard = () => {
     return <p>Dashboard Page</p>;
 };
 
