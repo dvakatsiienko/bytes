@@ -17,7 +17,7 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-export async function fetchRevenue () {
+export async function fetchRevenueList () {
     try {
         // Artificially delay a response for demo purposes.
         // Don't do this in production :)
@@ -37,7 +37,7 @@ export async function fetchRevenue () {
     }
 }
 
-export async function fetchLatestInvoices () {
+export async function fetchLatestInvoicesList () {
     try {
         const data = await client.sql<LatestInvoiceRaw>`
         SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id

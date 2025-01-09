@@ -7,7 +7,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/ui/fonts';
 import type { LatestInvoice } from '@/lib/definitions';
 
-export const LatestInvoices = ({ latestInvoices }: LatestInvoicesProps) => {
+export const LatestInvoices = ({ latestInvoicesList: latestInvoices }: LatestInvoicesProps) => {
     const latestInvoicesListJSX = latestInvoices.map((invoice, i) => {
         return (
             <div
@@ -53,5 +53,5 @@ export const LatestInvoices = ({ latestInvoices }: LatestInvoicesProps) => {
 
 /* Types */
 interface LatestInvoicesProps {
-    latestInvoices: LatestInvoice[],
+    latestInvoicesList: LatestInvoice[],
 }
