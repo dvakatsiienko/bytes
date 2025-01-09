@@ -1,5 +1,5 @@
 /* Instruments */
-import { inter } from '@/app/_ui/fonts';
+import { inter } from '@/app/ui/fonts';
 import '@/app/ui/global.css';
 
 export default (props: { children: React.ReactNode }) => {

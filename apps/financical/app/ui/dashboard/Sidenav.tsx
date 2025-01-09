@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import NavLinks from '@/app/_ui/dashboard/NavLinks';
-import AcmeLogo from '@/app/_ui/AcmeLogo';
+import NavLinks from '@/app/ui/dashboard/NavLinks';
+import AcmeLogo from '@/app/ui/AcmeLogo';
 import { PowerIcon } from '@heroicons/react/24/outline';
 
 export default function SideNav() {

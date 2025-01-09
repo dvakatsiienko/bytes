@@ -3,10 +3,10 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 /* Components */
-import { AcmeLogo } from '@/app/_ui/AcmeLogo';
+import { AcmeLogo } from '@/app/ui/AcmeLogo';
 
 /* Instruments */
-import { lusitana } from '@/app/_ui/fonts';
+import { lusitana } from '@/app/ui/fonts';
 
 export default () => {
     return (
