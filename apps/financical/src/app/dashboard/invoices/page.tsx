@@ -1,7 +1,4 @@
-/* Core */
-import type { NextPage } from 'next';
-
-const InvoicesPage: NextPage = () => {
+const InvoicesPage = () => {
     return <p>Invoices Page</p>;
 };
 
