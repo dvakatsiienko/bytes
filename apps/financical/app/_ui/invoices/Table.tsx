@@ -2,8 +2,8 @@
 import Image from 'next/image';
 
 /* Components */
-import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
-import { InvoiceStatus } from '@/app/ui/invoices/status';
+import { UpdateInvoice, DeleteInvoice } from '@/app/_ui/invoices/Buttons';
+import { InvoiceStatus } from '@/app/_ui/invoices/Status';
 
 /* Instruments */
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
