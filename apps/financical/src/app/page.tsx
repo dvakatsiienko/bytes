@@ -1,6 +1,8 @@
 /* Core */
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import NextImage from 'next/image';
+import type { NextPage } from 'next';
 
 /* Components */
 import { AcmeLogo } from '@/app/ui/AcmeLogo';
@@ -8,7 +10,7 @@ import { AcmeLogo } from '@/app/ui/AcmeLogo';
 /* Instruments */
 import { lusitana } from '@/app/ui/fonts';
 
-export default () => {
+export const RootPage: NextPage = () => {
     return (
         <main className = 'flex min-h-screen flex-col p-6'>
             <div className = 'flex h-20 shrink-0 items-end rounded-lg bg-blue-500 p-4 md:h-52'>
@@ -33,9 +35,24 @@ export default () => {
                     </Link>
                 </div>
                 <div className = 'flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12'>
-                    {/* Add Hero Images Here */}
+                    <NextImage
+                        alt = 'Screenshots of the dashboard project showing desktop version'
+                        className = 'hidden md:block'
+                        height = { 760 }
+                        src = '/hero-desktop.png'
+                        width = { 1000 }
+                    />
+                    <NextImage
+                        alt = 'Screenshots of the dashboard project showing mobile version'
+                        className = 'md:hidden'
+                        height = { 620 }
+                        src = '/hero-mobile.png'
+                        width = { 560 }
+                    />
                 </div>
             </div>
         </main>
     );
 };
+
+export default RootPage;
