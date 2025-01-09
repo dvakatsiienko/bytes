@@ -14,13 +14,13 @@ import type { Revenue } from '@/lib/definitions';
 export const RevenueChart = (props: RevenueChartProps) => {
     const chartHeight = 350;
 
-    const { yAxisLabels, topLabel } = generateYAxis(props.revenue);
+    const { yAxisLabels, topLabel } = generateYAxis(props.revenueList);
 
-    if (!props.revenue || props.revenue.length === 0) {
+    if (!props.revenueList || props.revenueList.length === 0) {
         return <p className = 'mt-4 text-gray-400'>No data available.</p>;
     }
 
-    const revenueListJSX = props.revenue.map((month) => (
+    const revenueListJSX = props.revenueList.map((month) => (
         <div key = { month.month } className = 'flex flex-col items-center gap-2'>
             <div
                 className = 'w-full rounded-md bg-blue-300'
@@ -58,5 +58,5 @@ export const RevenueChart = (props: RevenueChartProps) => {
 
 /* Types */
 interface RevenueChartProps {
-    revenue: Revenue[],
+    revenueList: Revenue[],
 }
