@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
+import { CustomerField, InvoiceForm } from '@/lib/definitions';
 import {
     CheckIcon,
     ClockIcon,
@@ -8,7 +8,7 @@ import {
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { Button } from '@/app/ui/Button';
+import { Button } from '@/ui/Button';
 
 const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField[] }) => {
     const { invoice, customers } = props;

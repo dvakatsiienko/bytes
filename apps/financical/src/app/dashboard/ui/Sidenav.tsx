@@ -4,7 +4,7 @@ import { PowerIcon } from '@heroicons/react/24/outline';
 
 /* Components */
 import { NavLinks } from './NavLinks';
-import { AcmeLogo } from '@/app/ui/AcmeLogo';
+import { AcmeLogo } from '@/ui/AcmeLogo';
 
 export const SideNav = () => {
     return (

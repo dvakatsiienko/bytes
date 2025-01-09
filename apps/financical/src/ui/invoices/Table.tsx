@@ -2,12 +2,12 @@
 import Image from 'next/image';
 
 /* Components */
-import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/Buttons';
-import { InvoiceStatus } from '@/app/ui/invoices/Status';
+import { UpdateInvoice, DeleteInvoice } from '@/ui/invoices/Buttons';
+import { InvoiceStatus } from '@/ui/invoices/Status';
 
 /* Instruments */
-import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
-import { fetchFilteredInvoices } from '@/app/lib/data';
+import { formatDateToLocal, formatCurrency } from '@/lib/utils';
+import { fetchFilteredInvoices } from '@/lib/data';
 
 export const InvoicesTable = async (props: { query: string, currentPage: number }) => {
     const invoices = await fetchFilteredInvoices(props.query, props.currentPage);
