@@ -1,0 +1,5 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "buildCommand": "turbo build --filter=financical --color",
+    "installCommand": "pnpm install --filter=financical"
+}
