@@ -4,7 +4,7 @@ import { RevenueChart } from './ui/RevenueChart';
 import { LatestInvoices } from './ui/LatestInvocies';
 
 /* Instruments */
-import { fetchRevenueList, fetchLatestInvoicesList, fetchCardData } from '@/lib/data';
+import { fetchRevenueList, fetchLatestInvoicesList, fetchCardData } from '@/lib/sql';
 import { lusitana } from '@/ui/fonts';
 
 const Dashboard = async () => {
