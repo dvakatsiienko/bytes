@@ -1,5 +1,10 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
     "buildCommand": "turbo build --filter=profile --color",
-    "installCommand": "pnpm install --filter=profile"
+    "installCommand": "pnpm install --filter=profile",
+    "git": {
+        "deploymentEnabled": {
+            "main": false
+        }
+    }
 }
