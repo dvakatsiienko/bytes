@@ -1,13 +1,10 @@
-/* eslint no-tabs: 0 */
 /* eslint camelcase: 0 */
 
 /* Core */
 import { sql, db } from '@vercel/postgres';
 
-const client = await db.connect();
-
 /* Instruments */
-import {
+import type {
     CustomerField,
     CustomersTableType,
     InvoiceForm,
@@ -16,6 +13,8 @@ import {
     Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
+
+const client = await db.connect();
 
 export async function fetchRevenueList () {
     try {
@@ -192,22 +191,22 @@ export async function fetchCustomers () {
 export async function fetchFilteredCustomers (query: string) {
     try {
         const data = await sql<CustomersTableType>`
-		SELECT
-		  customers.id,
-		  customers.name,
-		  customers.email,
-		  customers.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-		FROM customers
-		LEFT JOIN invoices ON customers.id = invoices.customer_id
-		WHERE
-		  customers.name ILIKE ${ `%${ query }%` } OR
-        customers.email ILIKE ${ `%${ query }%` }
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
-		ORDER BY customers.name ASC
-	  `;
+            SELECT
+            customers.id,
+            customers.name,
+            customers.email,
+            customers.image_url,
+            COUNT(invoices.id) AS total_invoices,
+            SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
+            SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
+            FROM customers
+            LEFT JOIN invoices ON customers.id = invoices.customer_id
+            WHERE
+            customers.name ILIKE ${ `%${ query }%` } OR
+            customers.email ILIKE ${ `%${ query }%` }
+            GROUP BY customers.id, customers.name, customers.email, customers.image_url
+            ORDER BY customers.name ASC
+        `;
 
         const customers = data.rows.map((customer) => ({
             ...customer,

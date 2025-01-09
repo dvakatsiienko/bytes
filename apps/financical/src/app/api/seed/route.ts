@@ -1,9 +1,9 @@
 /* Core */
-import bcrypt from 'bcrypt';
 import { db } from '@vercel/postgres';
+import bcrypt from 'bcrypt';
 
 /* Instruments */
-import { invoices, customers, revenue, users } from '@/lib/placeholder-data';
+import { invoices, customers, revenue, users } from './placeholder-data';
 
 const client = await db.connect();
 
@@ -11,12 +11,12 @@ async function seedUsers () {
     await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
     await client.sql`
     CREATE TABLE IF NOT EXISTS users (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
     );
-  `;
+    `;
 
     const insertedUsers = await Promise.all(users.map(async (user) => {
             const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -25,7 +25,7 @@ async function seedUsers () {
         INSERT INTO users (id, name, email, password)
         VALUES (${ user.id }, ${ user.name }, ${ user.email }, ${ hashedPassword })
         ON CONFLICT (id) DO NOTHING;
-      `;
+    `;
         }));
 
     return insertedUsers;
@@ -35,12 +35,12 @@ async function seedInvoices () {
     await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
     await client.sql`
-    CREATE TABLE IF NOT EXISTS invoices (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      customer_id UUID NOT NULL,
-      amount INT NOT NULL,
-      status VARCHAR(255) NOT NULL,
-      date DATE NOT NULL
+        CREATE TABLE IF NOT EXISTS invoices (
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        customer_id UUID NOT NULL,
+        amount INT NOT NULL,
+        status VARCHAR(255) NOT NULL,
+        date DATE NOT NULL
     );
   `;
 

@@ -7,7 +7,7 @@ import { InvoiceStatus } from '@/ui/invoices/Status';
 
 /* Instruments */
 import { formatDateToLocal, formatCurrency } from '@/lib/utils';
-import { fetchFilteredInvoices } from '@/lib/data';
+import { fetchFilteredInvoices } from '@/lib/sql';
 
 export const InvoicesTable = async (props: { query: string, currentPage: number }) => {
     const invoices = await fetchFilteredInvoices(props.query, props.currentPage);
