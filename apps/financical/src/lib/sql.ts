@@ -91,8 +91,8 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const invoices = await sql<InvoicesTable>`
-      SELECT
+        const invoices = await client.sql<InvoicesTable>`
+        SELECT
         invoices.id,
         invoices.amount,
         invoices.date,
@@ -100,16 +100,16 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
         customers.name,
         customers.email,
         customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      WHERE
+        FROM invoices
+        JOIN customers ON invoices.customer_id = customers.id
+        WHERE
         customers.name ILIKE ${ `%${ query }%` } OR
         customers.email ILIKE ${ `%${ query }%` } OR
         invoices.amount::text ILIKE ${ `%${ query }%` } OR
         invoices.date::text ILIKE ${ `%${ query }%` } OR
         invoices.status ILIKE ${ `%${ query }%` }
-      ORDER BY invoices.date DESC
-      LIMIT ${ ITEMS_PER_PAGE } OFFSET ${ offset }
+        ORDER BY invoices.date DESC
+        LIMIT ${ ITEMS_PER_PAGE } OFFSET ${ offset }
     `;
 
         return invoices.rows;
