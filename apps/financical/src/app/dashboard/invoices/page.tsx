@@ -9,10 +9,15 @@ import { lusitana } from '@/ui/fonts';
 import { InvoicesTableSkeleton } from '@/ui/Skeletons';
 import { Pagination } from './ui/Pagination';
 
+/* Instruments */
+import { fetchInvoicesPages } from '@/lib/sql';
+
 const InvoicesPage = async (props: InvoicesPageProps) => {
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
+
+    const totalPages = await fetchInvoicesPages(query);
 
     return (
         <div className = 'w-full'>
@@ -30,7 +35,7 @@ const InvoicesPage = async (props: InvoicesPageProps) => {
             </Suspense>
 
             <div className = 'mt-5 flex w-full justify-center'>
-                {/* <Pagination totalPages={totalPages} /> */}
+                <Pagination totalPages = { totalPages } />
             </div>
         </div>
     );
