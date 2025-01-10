@@ -1,19 +1,23 @@
+/* Core */
+import { Suspense } from 'react';
+
 /* Components */
-import { Card } from './ui/Card';
-import { RevenueChart } from './ui/RevenueChart';
-import { LatestInvoices } from './ui/LatestInvocies';
+import { RevenueChartSkeleton } from '@/ui/skeletons';
+import { Card } from '../ui/Card';
+import { RevenueChart } from '../ui/RevenueChart';
+import { LatestInvoices } from '../ui/LatestInvocies';
 
 /* Instruments */
 import { fetchRevenueList, fetchLatestInvoicesList, fetchCardData } from '@/lib/sql';
 import { lusitana } from '@/ui/fonts';
 
 const Dashboard = async () => {
-    const revenueListPromise = fetchRevenueList();
+    // const revenueListPromise = fetchRevenueList();
     const latestInvoicesListPromise = fetchLatestInvoicesList();
     const cardDataPromise = fetchCardData();
 
-    const [ revenueList, latestInvoicesList, cardData ] = await Promise.all([
-        revenueListPromise,
+    const [ latestInvoicesList, cardData ] = await Promise.all([
+        // revenueListPromise,
         latestInvoicesListPromise,
         cardDataPromise,
     ]);
@@ -28,7 +32,9 @@ const Dashboard = async () => {
                 <Card title = 'Total Customers' type = 'customers' value = { cardData.numberOfCustomers } />
             </div>
             <div className = 'mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8'>
-                <RevenueChart revenueList = { revenueList } />
+                <Suspense fallback = { <RevenueChartSkeleton /> }>
+                    <RevenueChart />
+                </Suspense>
                 <LatestInvoices latestInvoicesList = { latestInvoicesList } />
             </div>
         </main>
