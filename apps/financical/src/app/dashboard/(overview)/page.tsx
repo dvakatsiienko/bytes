@@ -10,7 +10,7 @@ import { LatestInvoices } from '../ui/LatestInvocies';
 /* Instruments */
 import { lusitana } from '@/ui/fonts';
 
-const Dashboard = () => {
+const DashboardPage = () => {
     return (
         <main>
             <h1 className = { `${ lusitana.className } mb-4 text-xl md:text-2xl` }>Dashboard</h1>
@@ -31,4 +31,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default DashboardPage;
