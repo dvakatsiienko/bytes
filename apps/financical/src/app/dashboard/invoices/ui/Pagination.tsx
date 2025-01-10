@@ -1,13 +1,11 @@
 'use client';
 
-/* eslint-disable */
-
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { generatePagination } from '@/lib/utils';
 
-export default function Pagination ({ totalPages }: { totalPages: number }) {
+export const Pagination = ({ totalPages }: { totalPages: number }) => {
     // NOTE: Uncomment this code in Chapter 11
 
     // const allPages = generatePagination(currentPage, totalPages);
@@ -52,7 +50,7 @@ export default function Pagination ({ totalPages }: { totalPages: number }) {
       </div> */}
         </>
     );
-}
+};
 
 const PaginationNumber = ({
     page,

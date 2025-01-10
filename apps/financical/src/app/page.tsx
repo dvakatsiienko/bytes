@@ -4,10 +4,10 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 
 /* Components */
-import { AcmeLogo } from '@/ui/AcmeLogo';
+import { AcmeLogo } from '@/_ui/AcmeLogo';
 
 /* Instruments */
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/_ui/fonts';
 
 const RootPage = () => {
     return (
