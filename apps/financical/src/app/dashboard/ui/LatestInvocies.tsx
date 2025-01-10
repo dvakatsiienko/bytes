@@ -5,7 +5,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 /* Instruments */
 import { fetchLatestInvoicesList } from '@/lib/sql';
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/_ui/fonts';
 import type { LatestInvoice } from '@/lib/definitions';
 
 export const LatestInvoices = async () => {

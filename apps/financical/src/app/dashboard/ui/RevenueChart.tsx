@@ -4,7 +4,7 @@ import { CalendarIcon } from '@heroicons/react/24/outline';
 /* Instruments */
 import { fetchRevenueList } from '@/lib/sql';
 import { generateYAxis } from '@/lib/utils';
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/_ui/fonts';
 
 // This component is representational only.
 // For data visualization UI, check out:

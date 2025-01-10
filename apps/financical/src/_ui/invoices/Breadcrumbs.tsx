@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 import Link from 'next/link';
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/_ui/fonts';
 
 const Breadcrumbs = ({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) => {
     return (
