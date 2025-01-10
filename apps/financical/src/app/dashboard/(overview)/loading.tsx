@@ -1,5 +1,5 @@
 /* Components */
-import { DashboardSkeleton } from '@/app/dashboard/ui/_Skeletons';
+import { DashboardSkeleton } from '../ui/Skeletons';
 
 export default () => {
     return <DashboardSkeleton />;
