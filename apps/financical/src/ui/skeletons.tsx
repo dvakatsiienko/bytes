@@ -78,7 +78,7 @@ export const LatestInvoicesSkeleton = () => {
     );
 };
 
-const DashboardSkeleton = () => {
+export const DashboardSkeleton = () => {
     return (
         <>
             <div
@@ -97,7 +97,6 @@ const DashboardSkeleton = () => {
         </>
     );
 };
-export default DashboardSkeleton;
 
 export const TableRowSkeleton = () => {
     return (

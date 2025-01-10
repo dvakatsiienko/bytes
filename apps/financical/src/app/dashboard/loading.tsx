@@ -1,3 +1,6 @@
+/* Components */
+import { DashboardSkeleton } from '@/ui/skeletons';
+
 export default () => {
-    return <div>Loading...</div>;
+    return <DashboardSkeleton />;
 };
