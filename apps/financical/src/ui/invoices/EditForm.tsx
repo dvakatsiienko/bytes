@@ -8,7 +8,7 @@ import {
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { Button } from '@/_ui/Button';
+import { Button } from '@/ui/Button';
 
 const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField[] }) => {
     const { invoice, customers } = props;

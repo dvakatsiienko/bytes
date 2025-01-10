@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import { lusitana } from '@/_ui/fonts';
-import { Search } from '@/_ui/Search';
+import { lusitana } from '@/ui/fonts';
+import { Search } from '@/ui/Search';
 import { CustomersTableType, FormattedCustomersTable } from '@/lib/definitions';
 
 const CustomersTable = ({ customers }: { customers: FormattedCustomersTable[] }) => {
