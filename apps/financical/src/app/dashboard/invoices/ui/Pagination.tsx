@@ -9,14 +9,12 @@ import clsx from 'clsx';
 /* Instruments */
 import { generatePagination } from '@/lib/utils';
 
-export const Pagination = ({ totalPages }: PaginationProps) => {
-    // NOTE: Uncomment this code in Chapter 11
-
-    // const allPages = generatePagination(currentPage, totalPages);
-
+export const Pagination = (props: PaginationProps) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get('page')) || 1;
+
+    const allPages = generatePagination(currentPage, props.totalPages);
 
     const createPageURL = (pageNumber: number | string) => {
         const params = new URLSearchParams(searchParams);
@@ -26,58 +24,46 @@ export const Pagination = ({ totalPages }: PaginationProps) => {
     };
 
     return (
-        <>
-            {/*  NOTE: Uncomment this code in Chapter 11 */}
+        <div className = 'inline-flex'>
+            <PaginationArrow
+                direction = 'left'
+                href = { createPageURL(currentPage - 1) }
+                isDisabled = { currentPage <= 1 }
+            />
 
-            <div className = 'inline-flex'>
-                <PaginationArrow
-                    direction = 'left'
-                    href = { createPageURL(currentPage - 1) }
-                    isDisabled = { currentPage <= 1 }
-                />
+            <div className = 'flex -space-x-px'>
+                {allPages.map((page, index) => {
+                    let position: UPosition = null;
 
-                <div className = 'flex -space-x-px'>
-                    {/* {allPages.map((page, index) => {
-                        let position: 'first' | 'last' | 'single' | 'middle' | undefined;
+                    if (index === 0) position = 'first';
+                    if (index === allPages.length - 1) position = 'last';
+                    if (allPages.length === 1) position = 'single';
+                    if (page === '...') position = 'middle';
 
-                        if (index === 0) position = 'first';
-                        if (index === allPages.length - 1) position = 'last';
-                        if (allPages.length === 1) position = 'single';
-                        if (page === '...') position = 'middle';
-
-                        return (
-                            <PaginationNumber
-                                key = { page }
-                                href = { createPageURL(page) }
-                                isActive = { currentPage === page }
-                                page = { page }
-                                position = { position }
-                            />
-                        );
-                    })} */}
-                </div>
-
-                <PaginationArrow
-                    direction = 'right'
-                    href = { createPageURL(currentPage + 1) }
-                    isDisabled = { currentPage >= totalPages }
-                />
+                    return (
+                        <PaginationNumber
+                            key = { page }
+                            href = { createPageURL(page) }
+                            isActive = { currentPage === page }
+                            page = { page }
+                            position = { position }
+                        />
+                    );
+                })}
             </div>
-        </>
+
+            <PaginationArrow
+                direction = 'right'
+                href = { createPageURL(currentPage + 1) }
+                isDisabled = { currentPage >= props.totalPages }
+            />
+        </div>
     );
 };
 
-const PaginationNumber = ({
-    page,
-    href,
-    isActive,
-    position,
-}: {
-    page:      number | string,
-    href:      string,
-    position?: 'first' | 'last' | 'middle' | 'single',
-    isActive:  boolean,
-}) => {
+const PaginationNumber = (props: PaginationNumberProps) => {
+    const { page, href, position, isActive } = props;
+
     const className = clsx('flex h-10 w-10 items-center justify-center text-sm border', {
         'rounded-l-md':                                position === 'first' || position === 'single',
         'rounded-r-md':                                position === 'last' || position === 'single',
@@ -95,15 +81,9 @@ const PaginationNumber = ({
     );
 };
 
-const PaginationArrow = ({
-    href,
-    direction,
-    isDisabled,
-}: {
-    href:        string,
-    direction:   'left' | 'right',
-    isDisabled?: boolean,
-}) => {
+const PaginationArrow = (props: PaginationArrowProps) => {
+    const { href, direction, isDisabled } = props;
+
     const className = clsx('flex h-10 w-10 items-center justify-center rounded-md border', {
         'pointer-events-none text-gray-300': isDisabled,
         'hover:bg-gray-100':                 !isDisabled,
@@ -131,3 +111,18 @@ const PaginationArrow = ({
 interface PaginationProps {
     totalPages: number,
 }
+
+interface PaginationNumberProps {
+    page:      number | string,
+    href:      string,
+    position?: UPosition,
+    isActive:  boolean,
+}
+
+interface PaginationArrowProps {
+    href:        string,
+    direction:   'left' | 'right',
+    isDisabled?: boolean,
+}
+
+type UPosition = 'first' | 'last' | 'single' | 'middle' | null;
