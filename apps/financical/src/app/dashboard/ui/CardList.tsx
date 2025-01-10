@@ -2,26 +2,23 @@
 import { BanknotesIcon, ClockIcon, UserGroupIcon, InboxIcon } from '@heroicons/react/24/outline';
 
 /* Instruments */
+import { fetchCardData } from '@/lib/sql';
 import { lusitana } from '@/ui/fonts';
 
-export const CardWrapper = () => {
+export const CardList = async () => {
+    const card = await fetchCardData();
+
     return (
         <>
-            {/* NOTE: Uncomment this code in Chapter 9 */}
-
-            {/* <Card title="Collected" value={totalPaidInvoices} type="collected" />
-      <Card title="Pending" value={totalPendingInvoices} type="pending" />
-      <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
-      <Card
-        title="Total Customers"
-        value={numberOfCustomers}
-        type="customers"
-      /> */}
+            <Card title = 'Collected' type = 'collected' value = { card.totalPaidInvoices } />
+            <Card title = 'Pending' type = 'pending' value = { card.totalPendingInvoices } />
+            <Card title = 'Total Invoices' type = 'invoices' value = { card.numberOfInvoices } />
+            <Card title = 'Total Customers' type = 'customers' value = { card.numberOfCustomers } />
         </>
     );
 };
 
-export const Card = (props: CardProps) => {
+const Card = (props: CardProps) => {
     const Icon = iconMap[ props.type ];
 
     return (
