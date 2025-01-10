@@ -1,5 +1,8 @@
+/* Core */
+import NextLink from 'next/link';
 import { clsx } from 'clsx';
-import Link from 'next/link';
+
+/* Instruments */
 import { lusitana } from '@/ui/fonts';
 
 const Breadcrumbs = ({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) => {
@@ -11,7 +14,7 @@ const Breadcrumbs = ({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) => {
                         key = { breadcrumb.href }
                         aria-current = { breadcrumb.active }
                         className = { clsx(breadcrumb.active ? 'text-gray-900' : 'text-gray-500') }>
-                        <Link href = { breadcrumb.href }>{breadcrumb.label}</Link>
+                        <NextLink href = { breadcrumb.href }>{breadcrumb.label}</NextLink>
                         {index < breadcrumbs.length - 1 ? (
                             <span className = 'mx-3 inline-block'>/</span>
                         ) : null}

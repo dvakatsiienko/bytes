@@ -1,5 +1,5 @@
 /* Core */
-import Image from 'next/image';
+import NextImage from 'next/image';
 
 /* Components */
 import { UpdateInvoice, DeleteInvoice } from '@/ui/invoices/Buttons';
@@ -22,7 +22,7 @@ export const InvoicesTable = async (props: { query: string, currentPage: number 
                                 <div className = 'flex items-center justify-between border-b pb-4'>
                                     <div>
                                         <div className = 'mb-2 flex items-center'>
-                                            <Image
+                                            <NextImage
                                                 alt = { `${ invoice.name }'s profile picture` }
                                                 className = 'mr-2 rounded-full'
                                                 height = { 28 }
@@ -80,7 +80,7 @@ export const InvoicesTable = async (props: { query: string, currentPage: number 
                                     className = 'w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg'>
                                     <td className = 'whitespace-nowrap py-3 pl-6 pr-3'>
                                         <div className = 'flex items-center gap-3'>
-                                            <Image
+                                            <NextImage
                                                 alt = { `${ invoice.name }'s profile picture` }
                                                 className = 'rounded-full'
                                                 height = { 28 }
