@@ -3,6 +3,7 @@
 /* Core */
 import { useRef, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
 
 /* Instruments */
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -14,8 +15,9 @@ export const Search = (props: SearchProps) => {
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSearch = (term: string) => {
+    const handleSearch = useDebouncedCallback((term: string) => {
         const params = new URLSearchParams(searchParams);
+        params.set('page', '1');
 
         if (term) {
             params.set('query', term);
@@ -24,7 +26,7 @@ export const Search = (props: SearchProps) => {
         }
 
         router.replace(`${ pathname }?${ params.toString() }`);
-    };
+    }, 300);
 
     useEffect(() => {
         searchInputRef.current?.focus();
