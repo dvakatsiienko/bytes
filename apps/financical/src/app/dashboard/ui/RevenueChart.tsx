@@ -2,6 +2,7 @@
 import { CalendarIcon } from '@heroicons/react/24/outline';
 
 /* Instruments */
+import { fetchRevenueList } from '@/lib/sql';
 import { generateYAxis } from '@/lib/utils';
 import { lusitana } from '@/ui/fonts';
 import type { Revenue } from '@/lib/definitions';
@@ -11,16 +12,18 @@ import type { Revenue } from '@/lib/definitions';
 // https://www.tremor.so/
 // https://www.chartjs.org/
 // https://airbnb.io/visx/
-export const RevenueChart = (props: RevenueChartProps) => {
+export const RevenueChart = async () => {
+    const revenueList = await fetchRevenueList();
+
     const chartHeight = 350;
 
-    const { yAxisLabels, topLabel } = generateYAxis(props.revenueList);
+    const { yAxisLabels, topLabel } = generateYAxis(revenueList);
 
-    if (!props.revenueList || props.revenueList.length === 0) {
+    if (!revenueList || revenueList.length === 0) {
         return <p className = 'mt-4 text-gray-400'>No data available.</p>;
     }
 
-    const revenueListJSX = props.revenueList.map((month) => (
+    const revenueListJSX = revenueList.map((month) => (
         <div key = { month.month } className = 'flex flex-col items-center gap-2'>
             <div
                 className = 'w-full rounded-md bg-blue-300'
@@ -55,8 +58,3 @@ export const RevenueChart = (props: RevenueChartProps) => {
         </div>
     );
 };
-
-/* Types */
-interface RevenueChartProps {
-    revenueList: Revenue[],
-}
