@@ -4,11 +4,14 @@ import clsx from 'clsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 /* Instruments */
+import { fetchLatestInvoicesList } from '@/lib/sql';
 import { lusitana } from '@/ui/fonts';
 import type { LatestInvoice } from '@/lib/definitions';
 
-export const LatestInvoices = ({ latestInvoicesList: latestInvoices }: LatestInvoicesProps) => {
-    const latestInvoicesListJSX = latestInvoices.map((invoice, i) => {
+export const LatestInvoices = async () => {
+    const latestInvoicesList = await fetchLatestInvoicesList();
+
+    const latestInvoicesListJSX = latestInvoicesList.map((invoice, i) => {
         return (
             <div
                 key = { invoice.id }
@@ -50,8 +53,3 @@ export const LatestInvoices = ({ latestInvoicesList: latestInvoices }: LatestInv
         </div>
     );
 };
-
-/* Types */
-interface LatestInvoicesProps {
-    latestInvoicesList: LatestInvoice[],
-}
