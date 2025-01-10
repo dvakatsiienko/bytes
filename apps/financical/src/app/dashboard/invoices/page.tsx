@@ -2,11 +2,11 @@
 import waait from 'waait';
 
 import { Pagination } from './ui/Pagination';
-import { Search } from '@/ui/search';
-import { InvoicesTable } from '@/_ui/invoices/InvoicesTable';
-import { CreateInvoice } from '@/_ui/invoices/Buttons';
-import { lusitana } from '@/_ui/fonts';
-import { InvoicesTableSkeleton } from '@/_ui/Skeletons';
+import { Search } from '@/ui/Search';
+import { InvoicesTable } from '@/ui/invoices/InvoicesTable';
+import { CreateInvoice } from '@/ui/invoices/Buttons';
+import { lusitana } from '@/ui/fonts';
+import { InvoicesTableSkeleton } from '@/ui/Skeletons';
 import { Suspense } from 'react';
 
 const InvoicesPage = async () => {

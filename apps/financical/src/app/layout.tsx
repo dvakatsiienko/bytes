@@ -1,5 +1,5 @@
 /* Instruments */
-import { inter } from '@/_ui/fonts';
+import { inter } from '@/ui/fonts';
 import '@/ui/global.css';
 
 // eslint-disable-next-line camelcase
