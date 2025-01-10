@@ -26,6 +26,7 @@ export type Invoice = {
     status:      'pending' | 'paid',
 };
 
+// TODO to be deleted
 export type Revenue = {
     month:   string,
     revenue: number,
