@@ -14,7 +14,7 @@ export const Pagination = (props: PaginationProps) => {
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get('page')) || 1;
 
-    const allPages = generatePagination(currentPage, props.totalPages);
+    const paginationNumberList = generatePagination(currentPage, props.totalPages);
 
     const createPageURL = (pageNumber: number | string) => {
         const params = new URLSearchParams(searchParams);
@@ -22,6 +22,25 @@ export const Pagination = (props: PaginationProps) => {
 
         return `${ pathname }?${ params.toString() }`;
     };
+
+    const paginationNumberListJSX = paginationNumberList.map((page, index) => {
+        let position: UPosition = null;
+
+        if (index === 0) position = 'first';
+        if (index === paginationNumberList.length - 1) position = 'last';
+        if (paginationNumberList.length === 1) position = 'single';
+        if (page === '...') position = 'middle';
+
+        return (
+            <PaginationNumber
+                key = { page }
+                href = { createPageURL(page) }
+                isActive = { currentPage === page }
+                page = { page }
+                position = { position }
+            />
+        );
+    });
 
     return (
         <div className = 'inline-flex'>
@@ -31,26 +50,7 @@ export const Pagination = (props: PaginationProps) => {
                 isDisabled = { currentPage <= 1 }
             />
 
-            <div className = 'flex -space-x-px'>
-                {allPages.map((page, index) => {
-                    let position: UPosition = null;
-
-                    if (index === 0) position = 'first';
-                    if (index === allPages.length - 1) position = 'last';
-                    if (allPages.length === 1) position = 'single';
-                    if (page === '...') position = 'middle';
-
-                    return (
-                        <PaginationNumber
-                            key = { page }
-                            href = { createPageURL(page) }
-                            isActive = { currentPage === page }
-                            page = { page }
-                            position = { position }
-                        />
-                    );
-                })}
-            </div>
+            <div className = 'flex -space-x-px'>{paginationNumberListJSX}</div>
 
             <PaginationArrow
                 direction = 'right'
