@@ -2,9 +2,6 @@
 import { inter } from '@/ui/fonts';
 import '@/ui/global.css';
 
-// eslint-disable-next-line camelcase
-export const experimental_ppr = true;
-
 export default (props: { children: React.ReactNode }) => {
     return (
         <html lang = 'en'>

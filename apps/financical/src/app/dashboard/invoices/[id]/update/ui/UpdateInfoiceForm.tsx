@@ -1,21 +1,34 @@
 'use client';
 
-import { CustomerField, InvoiceForm } from '@/lib/definitions';
+/* Core */
+import NextLink from 'next/link';
 import {
     CheckIcon,
     ClockIcon,
     CurrencyDollarIcon,
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import Link from 'next/link';
+
+/* Components */
 import { Button } from '@/ui/Button';
 
-const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField[] }) => {
-    const { invoice, customers } = props;
+/* Instruments */
+import { updateInvoice, type CustomerField, type InvoiceForm } from '@/lib';
+
+export const UpdateInfoiceForm = (props: UpdateInfoiceFormProps) => {
+    const customerListJSX = props.customerList.map((customer) => (
+        <option key = { customer.id } value = { customer.id }>
+            {customer.name}
+        </option>
+    ));
+
+    const updateInvoiceWithId = updateInvoice.bind(null, props.invoice.id);
 
     return (
-        <form>
+        <form action = { updateInvoiceWithId }>
             <div className = 'rounded-md bg-gray-50 p-4 md:p-6'>
+                <input name = 'id' type = 'hidden' value = { props.invoice.id } />
+
                 {/* Customer Name */}
                 <div className = 'mb-4'>
                     <label className = 'mb-2 block text-sm font-medium' htmlFor = 'customer'>
@@ -24,17 +37,13 @@ const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField
                     <div className = 'relative'>
                         <select
                             className = 'peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
-                            defaultValue = { invoice.customer_id }
+                            defaultValue = { props.invoice.customer_id }
                             id = 'customer'
                             name = 'customerId'>
                             <option disabled value = ''>
                                 Select a customer
                             </option>
-                            {customers.map((customer) => (
-                                <option key = { customer.id } value = { customer.id }>
-                                    {customer.name}
-                                </option>
-                            ))}
+                            {customerListJSX}
                         </select>
                         <UserCircleIcon className = 'pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500' />
                     </div>
@@ -49,7 +58,7 @@ const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField
                         <div className = 'relative'>
                             <input
                                 className = 'peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
-                                defaultValue = { invoice.amount }
+                                defaultValue = { props.invoice.amount }
                                 id = 'amount'
                                 name = 'amount'
                                 placeholder = 'Enter USD amount'
@@ -71,7 +80,7 @@ const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField
                             <div className = 'flex items-center'>
                                 <input
                                     className = 'h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
-                                    defaultChecked = { invoice.status === 'pending' }
+                                    defaultChecked = { props.invoice.status === 'pending' }
                                     id = 'pending'
                                     name = 'status'
                                     type = 'radio'
@@ -86,7 +95,7 @@ const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField
                             <div className = 'flex items-center'>
                                 <input
                                     className = 'h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
-                                    defaultChecked = { invoice.status === 'paid' }
+                                    defaultChecked = { props.invoice.status === 'paid' }
                                     id = 'paid'
                                     name = 'status'
                                     type = 'radio'
@@ -102,16 +111,33 @@ const EditInvoiceForm = (props: { invoice: InvoiceForm, customers: CustomerField
                     </div>
                 </fieldset>
             </div>
+
             <div className = 'mt-6 flex justify-end gap-4'>
-                <Link
+                <NextLink
                     className = 'flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200'
                     href = '/dashboard/invoices'>
                     Cancel
-                </Link>
+                </NextLink>
+
                 <Button type = 'submit'>Edit Invoice</Button>
             </div>
         </form>
     );
 };
 
-export default EditInvoiceForm;
+/* Helpers */
+// const InvoiceSchema = z.object({
+//     id:         z.string(),
+//     customerId: z.string(),
+//     amount:     z.coerce.number(),
+//     status:     z.enum([ 'pending', 'paid' ]),
+//     date:       z.string(),
+// });
+
+// const UpdateInvoice = InvoiceSchema.omit({ id: true, date: true });
+
+/* Types */
+interface UpdateInfoiceFormProps {
+    invoice:      InvoiceForm,
+    customerList: CustomerField[],
+}
