@@ -2,10 +2,7 @@
 
 /* Instruments */
 import { formatCurrency } from './utils';
-// import { sqlClient } from './sqlClient';
-
-import { db } from '@vercel/postgres';
-const sqlClient = await db.connect();
+import { sqlClient } from './sqlClient';
 
 import type {
     CustomerField,
