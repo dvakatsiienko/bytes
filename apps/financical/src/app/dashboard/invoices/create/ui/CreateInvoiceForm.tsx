@@ -11,6 +11,7 @@ import {
 import { Button } from '@/ui/Button';
 
 /* Instruments */
+import { createInvoice } from '@/lib';
 import type { CustomerField } from '@/lib/definitions';
 
 export const CreateInvoiceForm = (props: CreateInvoiceFormProps) => {
@@ -21,7 +22,7 @@ export const CreateInvoiceForm = (props: CreateInvoiceFormProps) => {
     ));
 
     return (
-        <form>
+        <form action = { createInvoice }>
             <div className = 'rounded-md bg-gray-50 p-4 md:p-6'>
                 {/* Customer Name */}
                 <div className = 'mb-4'>
