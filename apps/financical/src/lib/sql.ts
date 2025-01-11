@@ -168,12 +168,12 @@ export async function fetchInvoiceById (id: string) {
 
 export async function fetchCustomers () {
     try {
-        const data = await sql<CustomerField>`
-      SELECT
+        const data = await client.sql<CustomerField>`
+        SELECT
         id,
         name
-      FROM customers
-      ORDER BY name ASC
+        FROM customers
+        ORDER BY name ASC
     `;
 
         const customers = data.rows;
