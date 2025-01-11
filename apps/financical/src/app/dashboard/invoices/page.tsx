@@ -10,9 +10,9 @@ import { InvoicesTableSkeleton } from '@/ui/Skeletons';
 import { Pagination } from './ui/Pagination';
 
 /* Instruments */
-import { fetchInvoicesPages } from '@/lib/sql';
+import { fetchInvoicesPages, type NextPageProps } from '@/lib';
 
-const InvoicesPage = async (props: InvoicesPageProps) => {
+const InvoicesPage = async (props: NextPageProps) => {
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
@@ -40,13 +40,5 @@ const InvoicesPage = async (props: InvoicesPageProps) => {
         </div>
     );
 };
-
-/* Types */
-interface InvoicesPageProps {
-    searchParams?: Promise<{
-        query?: string,
-        page?:  string,
-    }>,
-}
 
 export default InvoicesPage;

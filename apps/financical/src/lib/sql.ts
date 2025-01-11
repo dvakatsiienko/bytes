@@ -1,9 +1,12 @@
 /* eslint camelcase: 0 */
 
-/* Core */
-import { sql, db } from '@vercel/postgres';
-
 /* Instruments */
+import { formatCurrency } from './utils';
+// import { sqlClient } from './sqlClient';
+
+import { db } from '@vercel/postgres';
+const sqlClient = await db.connect();
+
 import type {
     CustomerField,
     CustomersTableType,
@@ -12,16 +15,13 @@ import type {
     LatestInvoiceRaw,
     Revenue,
 } from './definitions';
-import { formatCurrency } from './utils';
-
-const client = await db.connect();
 
 export async function fetchRevenueList () {
     try {
         console.log('Fetching revenue data...');
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
-        const data = await client.sql<Revenue>`SELECT * FROM revenue`;
+        const data = await sqlClient.sql<Revenue>`SELECT * FROM revenue`;
 
         console.log('Data fetch completed after 3 seconds.');
 
@@ -35,7 +35,7 @@ export async function fetchRevenueList () {
 
 export async function fetchLatestInvoicesList () {
     try {
-        const data = await client.sql<LatestInvoiceRaw>`
+        const data = await sqlClient.sql<LatestInvoiceRaw>`
         SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
         FROM invoices
         JOIN customers ON invoices.customer_id = customers.id
@@ -56,9 +56,9 @@ export async function fetchLatestInvoicesList () {
 
 export async function fetchCardData () {
     try {
-        const invoiceCountPromise = client.sql`SELECT COUNT(*) FROM invoices`;
-        const customerCountPromise = client.sql`SELECT COUNT(*) FROM customers`;
-        const invoiceStatusPromise = client.sql`SELECT
+        const invoiceCountPromise = sqlClient.sql`SELECT COUNT(*) FROM invoices`;
+        const customerCountPromise = sqlClient.sql`SELECT COUNT(*) FROM customers`;
+        const invoiceStatusPromise = sqlClient.sql`SELECT
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
@@ -91,7 +91,7 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const invoices = await client.sql<InvoicesTable>`
+        const invoices = await sqlClient.sql<InvoicesTable>`
         SELECT
         invoices.id,
         invoices.amount,
@@ -121,7 +121,7 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
 
 export async function fetchInvoicesPages (query: string) {
     try {
-        const count = await client.sql`SELECT COUNT(*)
+        const count = await sqlClient.sql`SELECT COUNT(*)
     FROM invoices
     JOIN customers ON invoices.customer_id = customers.id
     WHERE
@@ -143,14 +143,14 @@ export async function fetchInvoicesPages (query: string) {
 
 export async function fetchInvoiceById (id: string) {
     try {
-        const data = await sql<InvoiceForm>`
-      SELECT
+        const data = await sqlClient.sql<InvoiceForm>`
+        SELECT
         invoices.id,
         invoices.customer_id,
         invoices.amount,
         invoices.status
-      FROM invoices
-      WHERE invoices.id = ${ id };
+        FROM invoices
+        WHERE invoices.id = ${ id };
     `;
 
         const invoice = data.rows.map((invoice) => ({
@@ -168,7 +168,7 @@ export async function fetchInvoiceById (id: string) {
 
 export async function fetchCustomers () {
     try {
-        const data = await client.sql<CustomerField>`
+        const data = await sqlClient.sql<CustomerField>`
         SELECT
         id,
         name
@@ -187,7 +187,7 @@ export async function fetchCustomers () {
 
 export async function fetchFilteredCustomers (query: string) {
     try {
-        const data = await sql<CustomersTableType>`
+        const data = await sqlClient.sql<CustomersTableType>`
             SELECT
             customers.id,
             customers.name,

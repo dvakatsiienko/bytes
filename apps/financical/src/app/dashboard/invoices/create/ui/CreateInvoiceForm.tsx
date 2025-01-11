@@ -11,8 +11,7 @@ import {
 import { Button } from '@/ui/Button';
 
 /* Instruments */
-import { createInvoice } from '@/lib';
-import type { CustomerField } from '@/lib/definitions';
+import { createInvoice, type CustomerField } from '@/lib';
 
 export const CreateInvoiceForm = (props: CreateInvoiceFormProps) => {
     const customerListJSX = props.customerList.map((customer) => (
@@ -74,11 +73,12 @@ export const CreateInvoiceForm = (props: CreateInvoiceFormProps) => {
                         <div className = 'flex gap-4'>
                             <div className = 'flex items-center'>
                                 <input
+                                    defaultChecked
                                     className = 'h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                                    defaultValue = 'pending'
                                     id = 'pending'
                                     name = 'status'
                                     type = 'radio'
-                                    value = 'pending'
                                 />
                                 <label
                                     className = 'ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'
