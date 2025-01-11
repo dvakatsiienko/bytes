@@ -2,9 +2,11 @@
 
 🏎️ The monorepositry is wired up with [Turborepo](https://turbo.build/).
 
+🐶 I use it to store my pet projects, and tools.
+
 ### 🛸 Applications
 
-###### 🧑🏼‍✈️ My CV
+###### ✈️ My CV
 
 [Website](https://ripeluokte.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile)
