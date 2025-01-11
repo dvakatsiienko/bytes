@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+
 'use server';
 
 /* Core */
@@ -9,19 +11,28 @@ import to from 'await-to-js';
 /* Instruments */
 import { sqlClient } from './sqlClient';
 
-export const createInvoice = async (formData: FormData) => {
-    const { customerId, amount, status } = CreateInvoice.parse({
+export const createInvoice = async (/* prevState: State ,*/ formData: FormData) => {
+    const validatedFields = CreateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount:     formData.get('amount'),
         status:     formData.get('status'),
     });
 
-    const amountInCents = amount * 100;
+    console.log('🚀 ~ createInvoice ~ validatedFields:', validatedFields);
+
+    if (!validatedFields.success) {
+        return {
+            errors:  validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to Create Invoice.',
+        };
+    }
+
+    const amountInCents = validatedFields.data.amount * 100;
     const date = new Date().toISOString().split('T')[ 0 ];
 
     const sqlPromise = sqlClient.sql`
         INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${ customerId }, ${ amountInCents }, ${ status }, ${ date })
+        VALUES (${ validatedFields.data.customerId }, ${ amountInCents }, ${ validatedFields.data.status }, ${ date })
         `;
 
     await to(sqlPromise);
@@ -65,11 +76,21 @@ export async function deleteInvoice (id: string) {
 /* Helpers */
 const InvoiceSchema = z.object({
     id:         z.string(),
-    customerId: z.string(),
-    amount:     z.coerce.number(),
-    status:     z.enum([ 'pending', 'paid' ]),
+    customerId: z.string({ invalid_type_error: 'Please select a customer.' }),
+    amount:     z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
+    status:     z.enum([ 'pending', 'paid' ], { invalid_type_error: 'Please select an invoice status.' }),
     date:       z.string(),
 });
 
 const CreateInvoice = InvoiceSchema.omit({ id: true, date: true });
 const UpdateInvoice = InvoiceSchema.omit({ id: true, date: true });
+
+/* Types */
+export type State = {
+    errors?: {
+        customerId?: string[],
+        amount?:     string[],
+        status?:     string[],
+    },
+    message?: string | null,
+};

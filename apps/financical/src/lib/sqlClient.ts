@@ -1,4 +1,13 @@
 /* Core */
-import { db } from '@vercel/postgres';
+import { db, type VercelPoolClient } from '@vercel/postgres';
 
-export const sqlClient = await db.connect();
+let sqlClient = null as unknown as VercelPoolClient;
+
+// ? bug: db.connect() instance causes a crash when leaks to
+// ? the React Client Component due to the absence of process.env.POSTGRES_URL
+// TODO replace with prisma
+if (process.env.POSTGRES_URL) sqlClient = await db.connect();
+
+sqlClient as VercelPoolClient;
+
+export { sqlClient };

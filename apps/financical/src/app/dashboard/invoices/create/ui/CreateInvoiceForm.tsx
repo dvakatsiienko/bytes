@@ -1,3 +1,5 @@
+'use client';
+
 /* Core */
 import Link from 'next/link';
 import {
@@ -6,14 +8,19 @@ import {
     CurrencyDollarIcon,
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import { useActionState } from 'react';
 
 /* Components */
 import { Button } from '@/ui/Button';
 
 /* Instruments */
-import { createInvoice, type CustomerField } from '@/lib';
+import { createInvoice, type CustomerField, type State } from '@/lib';
 
 export const CreateInvoiceForm = (props: CreateInvoiceFormProps) => {
+    const initialState: State = { message: null, errors: {}};
+
+    // const [ state, createInvoiceAction ] = useActionState(createInvoice, initialState);
+
     const customerListJSX = props.customerList.map((customer) => (
         <option key = { customer.id } value = { customer.id }>
             {customer.name}
@@ -52,6 +59,7 @@ export const CreateInvoiceForm = (props: CreateInvoiceFormProps) => {
                     <div className = 'relative mt-2 rounded-md'>
                         <div className = 'relative'>
                             <input
+                                required
                                 className = 'peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
                                 id = 'amount'
                                 name = 'amount'
