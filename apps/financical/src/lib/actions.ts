@@ -11,14 +11,12 @@ import to from 'await-to-js';
 /* Instruments */
 import { sqlClient } from './sqlClient';
 
-export const createInvoice = async (/* prevState: State ,*/ formData: FormData) => {
+export const createInvoice = async (_: State, formData: FormData) => {
     const validatedFields = CreateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount:     formData.get('amount'),
         status:     formData.get('status'),
     });
-
-    console.log('🚀 ~ createInvoice ~ validatedFields:', validatedFields);
 
     if (!validatedFields.success) {
         return {
@@ -27,12 +25,13 @@ export const createInvoice = async (/* prevState: State ,*/ formData: FormData) 
         };
     }
 
-    const amountInCents = validatedFields.data.amount * 100;
+    const { customerId, amount, status } = validatedFields.data;
+    const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[ 0 ];
 
     const sqlPromise = sqlClient.sql`
         INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${ validatedFields.data.customerId }, ${ amountInCents }, ${ validatedFields.data.status }, ${ date })
+        VALUES (${ customerId }, ${ amountInCents }, ${ status }, ${ date })
         `;
 
     await to(sqlPromise);
@@ -42,13 +41,21 @@ export const createInvoice = async (/* prevState: State ,*/ formData: FormData) 
     redirect('/dashboard/invoices');
 };
 
-export const updateInvoice = async (id: string, formData: FormData) => {
-    const { customerId, amount, status } = UpdateInvoice.parse({
+export const updateInvoice = async (id: string, prevState: State, formData: FormData) => {
+    const validatedFields = UpdateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount:     formData.get('amount'),
         status:     formData.get('status'),
     });
 
+    if (!validatedFields.success) {
+        return {
+            errors:  validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to Update Invoice.',
+        };
+    }
+
+    const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
 
     await to(sqlClient.sql`
