@@ -1,3 +1,5 @@
+'use client';
+
 /* Core */
 import NextLink from 'next/link';
 import {
@@ -6,24 +8,27 @@ import {
     CurrencyDollarIcon,
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import { useActionState } from 'react';
 
 /* Components */
 import { Button } from '@/ui/Button';
 
 /* Instruments */
-import { updateInvoice, type CustomerField, type InvoiceForm } from '@/lib';
+import { updateInvoice, type CustomerField, type InvoiceForm, type State } from '@/lib';
 
 export const UpdateInfoiceForm = (props: UpdateInfoiceFormProps) => {
+    const initialState: State = { message: null, errors: {}};
+    const updateInvoiceWithId = updateInvoice.bind(null, props.invoice.id);
+    const [ actionState, formAction ] = useActionState(updateInvoiceWithId, initialState);
+
     const customerListJSX = props.customerList.map((customer) => (
         <option key = { customer.id } value = { customer.id }>
             {customer.name}
         </option>
     ));
 
-    const updateInvoiceWithId = updateInvoice.bind(null, props.invoice.id);
-
     return (
-        <form action = { updateInvoiceWithId }>
+        <form action = { formAction }>
             <div className = 'rounded-md bg-gray-50 p-4 md:p-6'>
                 <input name = 'id' type = 'hidden' value = { props.invoice.id } />
 
@@ -55,6 +60,7 @@ export const UpdateInfoiceForm = (props: UpdateInfoiceFormProps) => {
                     <div className = 'relative mt-2 rounded-md'>
                         <div className = 'relative'>
                             <input
+                                aria-describedby = 'amount-error'
                                 className = 'peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
                                 defaultValue = { props.invoice.amount }
                                 id = 'amount'
@@ -64,6 +70,14 @@ export const UpdateInfoiceForm = (props: UpdateInfoiceFormProps) => {
                                 type = 'number'
                             />
                             <CurrencyDollarIcon className = 'pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
+
+                            <div aria-atomic = 'true' aria-live = 'polite' id = 'amount-error'>
+                                {actionState.errors?.amount?.map((error: string) => (
+                                    <p key = { error } className = 'mt-2 text-sm text-red-500'>
+                                        {error}
+                                    </p>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
