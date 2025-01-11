@@ -4,6 +4,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import to from 'await-to-js';
 
 /* Instruments */
 import { sqlClient } from './sqlClient';
@@ -18,10 +19,12 @@ export const createInvoice = async (formData: FormData) => {
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[ 0 ];
 
-    await sqlClient.sql`
+    const sqlPromise = sqlClient.sql`
         INSERT INTO invoices (customer_id, amount, status, date)
         VALUES (${ customerId }, ${ amountInCents }, ${ status }, ${ date })
-    `;
+        `;
+
+    await to(sqlPromise);
 
     // TODO check if revalidatePath is needed, since /dashboard/invoices page is dynamic and not cached
     revalidatePath('/dashboard/invoices');
@@ -37,11 +40,11 @@ export const updateInvoice = async (id: string, formData: FormData) => {
 
     const amountInCents = amount * 100;
 
-    await sqlClient.sql`
-        UPDATE invoices
-        SET customer_id = ${ customerId }, amount = ${ amountInCents }, status = ${ status }
-        WHERE id = ${ id }
-    `;
+    await to(sqlClient.sql`
+            UPDATE invoices
+            SET customer_id = ${ customerId }, amount = ${ amountInCents }, status = ${ status }
+            WHERE id = ${ id }
+    `);
 
     // TODO check if revalidatePath is needed, since /dashboard/invoices page is dynamic and not cached
     revalidatePath('/dashboard/invoices');
@@ -49,9 +52,14 @@ export const updateInvoice = async (id: string, formData: FormData) => {
 };
 
 export async function deleteInvoice (id: string) {
-    await sqlClient.sql`DELETE FROM invoices WHERE id = ${ id }`;
+    try {
+        await sqlClient.sql`DELETE FROM invoices WHERE id = ${ id }`;
+        revalidatePath('/dashboard/invoices');
 
-    revalidatePath('/dashboard/invoices');
+        // return { message: 'Deleted Invoice.' };
+    } catch (error) {
+        // return { message: 'Database Error: Failed to Delete Invoice.' };
+    }
 }
 
 /* Helpers */

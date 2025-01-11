@@ -1,4 +1,3 @@
-/* Core */
 /* Components */
 import { CreateInvoiceForm } from './ui/CreateInvoiceForm';
 import { Breadcrumbs } from './ui/Breadcrumbs';
