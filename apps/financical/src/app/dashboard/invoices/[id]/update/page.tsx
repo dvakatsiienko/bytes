@@ -1,3 +1,6 @@
+/* Core */
+import { notFound } from 'next/navigation';
+
 /* Components */
 import { Breadcrumbs } from '@/app/dashboard/invoices/create/ui';
 import { UpdateInfoiceForm } from './ui/UpdateInfoiceForm';
@@ -12,6 +15,8 @@ const UpdateInvoicePage = async (props: NextPageProps) => {
         fetchInvoiceById(params.id),
         fetchCustomers(),
     ]);
+
+    if (!invoice) notFound();
 
     return (
         <main>

@@ -1,5 +1,3 @@
-'use client';
-
 /* Core */
 import NextLink from 'next/link';
 import {
