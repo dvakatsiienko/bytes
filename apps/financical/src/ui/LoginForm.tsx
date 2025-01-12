@@ -33,6 +33,7 @@ export const LoginForm = () => {
                             <input
                                 required
                                 className = 'peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500'
+                                defaultValue = 'user@nextmail.com'
                                 id = 'email'
                                 name = 'email'
                                 placeholder = 'Enter your email address'
@@ -51,6 +52,7 @@ export const LoginForm = () => {
                             <input
                                 required
                                 className = 'peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500'
+                                defaultValue = '123456'
                                 id = 'password'
                                 minLength = { 6 }
                                 name = 'password'

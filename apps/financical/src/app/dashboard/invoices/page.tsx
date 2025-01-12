@@ -1,4 +1,5 @@
 /* Core */
+import { Metadata } from 'next';
 import { Suspense } from 'react';
 
 /* Components */
@@ -11,6 +12,8 @@ import { Pagination } from './ui/Pagination';
 
 /* Instruments */
 import { fetchInvoicesPages, type NextPageProps } from '@/lib';
+
+export const metadata: Metadata = { title: 'Invoices' };
 
 const InvoicesPage = async (props: NextPageProps) => {
     const searchParams = await props.searchParams;
