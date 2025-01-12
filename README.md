@@ -25,6 +25,11 @@
 
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
 
+<!-- ###### 🏄‍♂️ Financial -->
+
+<!-- [Website](https://hackernews-modern.vercel.app) | -->
+<!-- [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financical) -->
+
 ### 🧰 Libraries
 
 ###### 💅🏼 eslint-config-polished
