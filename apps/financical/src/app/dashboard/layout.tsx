@@ -1,5 +1,5 @@
 /* Components */
-import { SideNav } from './ui/Sidenav';
+import { SideNav } from './ui/_SideNav';
 
 const DashboardLayout = (props: DashboardLayoutProps) => {
     return (
