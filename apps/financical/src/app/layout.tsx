@@ -1,6 +1,9 @@
 /* Core */
 import { Metadata } from 'next';
 
+/* Components */
+import { AppProviders } from './AppProviders';
+
 /* Instruments */
 import { inter } from '@/ui/fonts';
 import '@/ui/global.css';
@@ -10,14 +13,16 @@ export const metadata: Metadata = {
         template: 'Financical | %s',
         default:  'Financical',
     },
-    description:  'A Next.js App Router app, buil with TypeScript, Prisma, and NextAuth.js',
-    metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+    description: 'A Next.js App Router app, buil with TypeScript, Prisma, and NextAuth.js',
+    // metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
 };
 
 export default (props: { children: React.ReactNode }) => {
     return (
         <html lang = 'en'>
-            <body className = { `${ inter.className } antialiased` }>{props.children}</body>
+            <body className = { `${ inter.className } antialiased` }>
+                <AppProviders>{props.children}</AppProviders>
+            </body>
         </html>
     );
 };

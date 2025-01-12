@@ -1,6 +1,7 @@
 /* Core */
 import { Metadata } from 'next';
 import { Suspense } from 'react';
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 
 /* Components */
 import { Search } from '@/ui/Search';
@@ -16,9 +17,16 @@ import { fetchInvoicesPages, type NextPageProps } from '@/lib';
 export const metadata: Metadata = { title: 'Invoices' };
 
 const InvoicesPage = async (props: NextPageProps) => {
+    const queryClient = new QueryClient();
+
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
+
+    await queryClient.prefetchQuery({
+        queryKey: [ 'totalPages', query ],
+        queryFn:  () => fetchInvoicesPages(query),
+    });
 
     const totalPages = await fetchInvoicesPages(query);
 
@@ -38,7 +46,9 @@ const InvoicesPage = async (props: NextPageProps) => {
             </Suspense>
 
             <div className = 'mt-5 flex w-full justify-center'>
-                <Pagination totalPages = { totalPages } />
+                <HydrationBoundary state = { dehydrate(queryClient) }>
+                    <Pagination query = { query } totalPages = { totalPages } />
+                </HydrationBoundary>
             </div>
         </div>
     );

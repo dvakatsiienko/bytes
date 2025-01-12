@@ -2,17 +2,25 @@
 
 /* Core */
 import { usePathname, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import NextLink from 'next/link';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 
 /* Instruments */
-import { generatePagination } from '@/lib/utils';
+import { fetchInvoicesPages, generatePagination, type NextPageProps } from '@/lib';
 
 export const Pagination = (props: PaginationProps) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get('page')) || 1;
+
+    const totalPages = useQuery({
+        queryKey: [ 'totalPages', props.query ],
+        queryFn:  () => fetchInvoicesPages(props.query),
+    });
+
+    console.log('🚀 ~ Pagination ~ totalPages:', totalPages);
 
     const paginationNumberList = generatePagination(currentPage, props.totalPages);
 
@@ -75,9 +83,9 @@ const PaginationNumber = (props: PaginationNumberProps) => {
     return isActive || position === 'middle' ? (
         <div className = { className }>{page}</div>
     ) : (
-        <Link className = { className } href = { href }>
+        <NextLink className = { className } href = { href }>
             {page}
-        </Link>
+        </NextLink>
     );
 };
 
@@ -101,15 +109,16 @@ const PaginationArrow = (props: PaginationArrowProps) => {
     return isDisabled ? (
         <div className = { className }>{icon}</div>
     ) : (
-        <Link className = { className } href = { href }>
+        <NextLink className = { className } href = { href }>
             {icon}
-        </Link>
+        </NextLink>
     );
 };
 
 /* Types */
 interface PaginationProps {
     totalPages: number,
+    query:      string,
 }
 
 interface PaginationNumberProps {
