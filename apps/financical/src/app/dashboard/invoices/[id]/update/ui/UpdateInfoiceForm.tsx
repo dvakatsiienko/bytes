@@ -2,13 +2,14 @@
 
 /* Core */
 import NextLink from 'next/link';
+import { useActionState } from 'react';
 import {
     CheckIcon,
     ClockIcon,
     CurrencyDollarIcon,
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import { useActionState } from 'react';
+import { type invoices } from '@prisma/client';
 
 /* Components */
 import { Button } from '@/ui/Button';

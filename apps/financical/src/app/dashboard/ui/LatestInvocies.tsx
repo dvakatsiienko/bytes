@@ -6,7 +6,6 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 /* Instruments */
 import { fetchLatestInvoicesList } from '@/lib/sql';
 import { lusitana } from '@/ui/fonts';
-import type { LatestInvoice } from '@/lib/definitions';
 
 export const LatestInvoices = async () => {
     const latestInvoicesList = await fetchLatestInvoicesList();
@@ -21,7 +20,7 @@ export const LatestInvoices = async () => {
                         alt = { `${ invoice.name }'s profile picture` }
                         className = 'mr-4 rounded-full'
                         height = { 32 }
-                        src = { invoice.image_url }
+                        src = { invoice.image_url ?? '' }
                         width = { 32 }
                     />
                     <div className = 'min-w-0'>

@@ -1,9 +1,10 @@
+import { customers } from '@prisma/client';
 import Image from 'next/image';
 import { lusitana } from '@/ui/fonts';
 import { Search } from '@/ui/Search';
 import { CustomersTableType, FormattedCustomersTable } from '@/lib/definitions';
 
-const CustomersTable = ({ customers }: { customers: FormattedCustomersTable[] }) => {
+export const CustomersTable = ({ customers }: { customers: customers[] }) => {
     return (
         <div className = 'w-full'>
             <h1 className = { `${ lusitana.className } mb-8 text-xl md:text-2xl` }>Customers</h1>
@@ -40,15 +41,18 @@ const CustomersTable = ({ customers }: { customers: FormattedCustomersTable[] })
                                             <div className = 'flex w-1/2 flex-col'>
                                                 <p className = 'text-xs'>Pending</p>
                                                 <p className = 'font-medium'>
+                                                    {/* @ts-expect-error: add this field to prisma query */}
                                                     {customer.total_pending}
                                                 </p>
                                             </div>
                                             <div className = 'flex w-1/2 flex-col'>
                                                 <p className = 'text-xs'>Paid</p>
+                                                {/* @ts-expect-error: add this field to prisma query */}
                                                 <p className = 'font-medium'>{customer.total_paid}</p>
                                             </div>
                                         </div>
                                         <div className = 'pt-4 text-sm'>
+                                            {/* @ts-expect-error: add this field to prisma query */}
                                             <p>{customer.total_invoices} invoices</p>
                                         </div>
                                     </div>
@@ -94,12 +98,15 @@ const CustomersTable = ({ customers }: { customers: FormattedCustomersTable[] })
                                                 {customer.email}
                                             </td>
                                             <td className = 'whitespace-nowrap bg-white px-4 py-5 text-sm'>
+                                                {/* @ts-expect-error: add this field to prisma query */}
                                                 {customer.total_invoices}
                                             </td>
                                             <td className = 'whitespace-nowrap bg-white px-4 py-5 text-sm'>
+                                                {/* @ts-expect-error: add this field to prisma query */}
                                                 {customer.total_pending}
                                             </td>
                                             <td className = 'whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md'>
+                                                {/* @ts-expect-error: add this field to prisma query */}
                                                 {customer.total_paid}
                                             </td>
                                         </tr>
@@ -113,5 +120,3 @@ const CustomersTable = ({ customers }: { customers: FormattedCustomersTable[] })
         </div>
     );
 };
-
-export default CustomersTable;
