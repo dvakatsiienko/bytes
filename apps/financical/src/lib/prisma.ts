@@ -1,4 +1,5 @@
 /* Core */
+import { PrismaClient } from '@prisma/client';
 import { db, type VercelPoolClient } from '@vercel/postgres';
 
 let sqlClient = null as unknown as VercelPoolClient;
@@ -11,3 +12,5 @@ if (process.env.POSTGRES_URL) sqlClient = await db.connect();
 sqlClient as VercelPoolClient;
 
 export { sqlClient };
+
+export const prisma = new PrismaClient();

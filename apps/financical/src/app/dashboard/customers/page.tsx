@@ -1,10 +1,18 @@
-/* Core */
-import waait from 'waait';
+/* Components */
+import { CustomersTable } from '@/app/dashboard/customers/ui/CustomersTable';
+
+/* Instruments */
+import { fetchCustomers } from '@/lib';
 
 const CustomersPage = async () => {
-    // await waait(2000);
+    const customers = await fetchCustomers();
 
-    return <p>Customers Page</p>;
+    return (
+        <section>
+            <h1>Customers</h1>
+            <CustomersTable customers = { customers } />
+        </section>
+    );
 };
 
 export default CustomersPage;

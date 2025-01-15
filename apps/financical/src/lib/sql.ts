@@ -2,27 +2,15 @@
 
 /* Instruments */
 import { formatCurrency } from './utils';
-import { sqlClient } from './sqlClient';
+import { sqlClient, prisma } from './prisma';
 
-import type {
-    CustomerField,
-    CustomersTableType,
-    InvoiceForm,
-    InvoicesTable,
-    LatestInvoiceRaw,
-    Revenue,
-} from './definitions';
+import type { CustomersTableType, InvoicesTable } from './definitions';
 
 export async function fetchRevenueList () {
     try {
-        console.log('Fetching revenue data...');
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const revenueList = await prisma.revenue.findMany();
 
-        const data = await sqlClient.sql<Revenue>`SELECT * FROM revenue`;
-
-        console.log('Data fetch completed after 3 seconds.');
-
-        return data.rows;
+        return revenueList;
     } catch (error) {
         console.error('Database Error:', error);
 
@@ -32,17 +20,20 @@ export async function fetchRevenueList () {
 
 export async function fetchLatestInvoicesList () {
     try {
-        const data = await sqlClient.sql<LatestInvoiceRaw>`
-        SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
-        FROM invoices
-        JOIN customers ON invoices.customer_id = customers.id
-        ORDER BY invoices.date DESC
-        LIMIT 5`;
+        const invoiceList = await prisma.invoices.findMany();
+        const customerList = await prisma.customers.findMany();
 
-        const latestInvoices = data.rows.map((invoice) => ({
-            ...invoice,
-            amount: formatCurrency(invoice.amount),
-        }));
+        const latestInvoices = invoiceList.map((invoice) => {
+            const customer = customerList.find((customer) => customer.id === invoice.customer_id);
+
+            return {
+                ...invoice,
+                amount:    formatCurrency(invoice.amount),
+                name:      customer?.name,
+                image_url: customer?.image_url,
+                email:     customer?.email,
+            };
+        });
 
         return latestInvoices;
     } catch (error) {
@@ -53,23 +44,27 @@ export async function fetchLatestInvoicesList () {
 
 export async function fetchCardData () {
     try {
-        const invoiceCountPromise = sqlClient.sql`SELECT COUNT(*) FROM invoices`;
-        const customerCountPromise = sqlClient.sql`SELECT COUNT(*) FROM customers`;
-        const invoiceStatusPromise = sqlClient.sql`SELECT
-         SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
-         SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
-         FROM invoices`;
+        const numberOfInvoices = await prisma.invoices.count();
+        const numberOfCustomers = await prisma.customers.count();
+        const invoiceList = await prisma.invoices.findMany();
 
-        const data = await Promise.all([
-            invoiceCountPromise,
-            customerCountPromise,
-            invoiceStatusPromise,
-        ]);
+        const invoiceStatusMap = {
+            paid: invoiceList.reduce((acc, curr) => {
+                // eslint-disable-next-line no-param-reassign
+                if (curr.status === 'paid') acc += curr.amount;
 
-        const numberOfInvoices = Number(data[ 0 ].rows[ 0 ].count ?? '0');
-        const numberOfCustomers = Number(data[ 1 ].rows[ 0 ].count ?? '0');
-        const totalPaidInvoices = formatCurrency(data[ 2 ].rows[ 0 ].paid ?? '0');
-        const totalPendingInvoices = formatCurrency(data[ 2 ].rows[ 0 ].pending ?? '0');
+                return acc;
+            }, 0),
+            pending: invoiceList.reduce((acc, curr) => {
+                // eslint-disable-next-line no-param-reassign
+                if (curr.status === 'pending') acc += curr.amount;
+
+                return acc;
+            }, 0),
+        };
+
+        const totalPaidInvoices = formatCurrency(invoiceStatusMap.paid);
+        const totalPendingInvoices = formatCurrency(invoiceStatusMap.pending);
 
         return {
             numberOfCustomers,
@@ -79,11 +74,13 @@ export async function fetchCardData () {
         };
     } catch (error) {
         console.error('Database Error:', error);
+
         throw new Error('Failed to fetch card data.');
     }
 }
 
 const ITEMS_PER_PAGE = 6;
+
 export async function fetchFilteredInvoices (query: string, currentPage: number) {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
@@ -140,25 +137,14 @@ export async function fetchInvoicesPages (query: string) {
 
 export async function fetchInvoiceById (id: string) {
     try {
-        const data = await sqlClient.sql<InvoiceForm>`
-        SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-        FROM invoices
-        WHERE invoices.id = ${ id };
-    `;
+        const invoice = await prisma.invoices.findUnique({ where: { id }});
 
-        const invoice = data.rows.map((invoice) => ({
+        const nextInvoice = {
             ...invoice,
-            // Convert amount from cents to dollars
-            amount: invoice.amount / 100,
-        }));
+            amount: invoice?.amount ?? 0 / 100,
+        };
 
-        console.log('🚀 ~ fetchInvoiceById ~ invoice[ 0 ]:', invoice[ 0 ]);
-
-        return invoice[ 0 ];
+        return nextInvoice;
     } catch (error) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch invoice.');
@@ -167,17 +153,9 @@ export async function fetchInvoiceById (id: string) {
 
 export async function fetchCustomers () {
     try {
-        const data = await sqlClient.sql<CustomerField>`
-        SELECT
-        id,
-        name
-        FROM customers
-        ORDER BY name ASC
-    `;
+        const customerList = await prisma.customers.findMany();
 
-        const customers = data.rows;
-
-        return customers;
+        return customerList;
     } catch (err) {
         console.error('Database Error:', err);
         throw new Error('Failed to fetch all customers.');

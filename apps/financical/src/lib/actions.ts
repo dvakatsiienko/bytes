@@ -11,7 +11,7 @@ import { z } from 'zod';
 import to from 'await-to-js';
 
 /* Instruments */
-import { sqlClient } from './sqlClient';
+import { sqlClient } from './prisma';
 
 export const createInvoice = async (_: State, formData: FormData) => {
     const validatedFields = CreateInvoice.safeParse({
