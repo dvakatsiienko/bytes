@@ -28,6 +28,7 @@
         "zod": "3.24.1"
     },
     "devDependencies": {
+        "prisma": "6.2.1",
         "@tanstack/react-query-devtools": "5.64.1",
         "@types/bcrypt": "5.0.2",
         "@types/node": "22.10.6",
