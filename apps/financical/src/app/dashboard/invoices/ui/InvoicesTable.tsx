@@ -6,7 +6,7 @@ import { UpdateInvoice, DeleteInvoice } from '@/ui/invoices/Buttons';
 import { InvoiceStatus } from '@/app/dashboard/invoices/ui/InvoiceStatus';
 
 /* Instruments */
-import { fetchFilteredInvoices } from '@/lib/sql';
+import { fetchFilteredInvoices } from '@/lib/queries';
 import { formatDateToLocal, formatCurrency } from '@/lib/utils';
 
 export const InvoicesTable = async (props: InvoicesTableProps) => {
@@ -21,7 +21,7 @@ export const InvoicesTable = async (props: InvoicesTableProps) => {
                             alt = { `${ invoice.name }'s profile picture` }
                             className = 'mr-2 rounded-full'
                             height = { 28 }
-                            src = { invoice.image_url }
+                            src = { invoice.image_url ?? '' }
                             width = { 28 }
                         />
                         <p>{invoice.name}</p>

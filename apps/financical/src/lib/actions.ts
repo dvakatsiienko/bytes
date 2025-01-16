@@ -9,9 +9,10 @@ import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { z } from 'zod';
 import to from 'await-to-js';
+import { randomUUID } from 'crypto';
 
 /* Instruments */
-import { sqlClient } from './prisma';
+import { prisma } from './prisma';
 
 export const createInvoice = async (_: State, formData: FormData) => {
     const validatedFields = CreateInvoice.safeParse({
@@ -29,12 +30,16 @@ export const createInvoice = async (_: State, formData: FormData) => {
 
     const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
-    const date = new Date().toISOString().split('T')[ 0 ];
 
-    const sqlPromise = sqlClient.sql`
-        INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${ customerId }, ${ amountInCents }, ${ status }, ${ date })
-        `;
+    const sqlPromise = prisma.invoices.create({
+        data: {
+            id:          randomUUID(),
+            amount:      amountInCents,
+            customer_id: customerId,
+            date:        new Date(),
+            status,
+        },
+    });
 
     await to(sqlPromise);
 
@@ -60,11 +65,20 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
     const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
 
-    await to(sqlClient.sql`
-            UPDATE invoices
-            SET customer_id = ${ customerId }, amount = ${ amountInCents }, status = ${ status }
-            WHERE id = ${ id }
-    `);
+    await to(prisma.invoices.update({
+            where: { id },
+            data:  {
+                customer_id: customerId,
+                amount:      amountInCents,
+                status,
+            },
+        }));
+
+    // await to(sqlClient.sql`
+    //         UPDATE invoices
+    //         SET customer_id = ${ customerId }, amount = ${ amountInCents }, status = ${ status }
+    //         WHERE id = ${ id }
+    // `);
 
     // TODO check if revalidatePath is needed, since /dashboard/invoices page is dynamic and not cached
     revalidatePath('/dashboard/invoices');
@@ -73,7 +87,7 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
 
 export async function deleteInvoice (id: string) {
     try {
-        await sqlClient.sql`DELETE FROM invoices WHERE id = ${ id }`;
+        await prisma.invoices.delete({ where: { id }});
         revalidatePath('/dashboard/invoices');
 
         // return { message: 'Deleted Invoice.' };

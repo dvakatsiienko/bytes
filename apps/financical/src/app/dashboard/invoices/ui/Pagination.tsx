@@ -15,12 +15,13 @@ export const Pagination = (props: PaginationProps) => {
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get('page')) || 1;
 
-    const totalPages = useQuery({
-        queryKey: [ 'totalPages', props.query ],
-        queryFn:  () => fetchInvoicesPages(props.query),
-    });
+    // TODO connect rQuery
+    // const totalPages = useQuery({
+    //     queryKey: [ 'totalPages', props.query ],
+    //     queryFn:  () => fetchInvoicesPages(props.query),
+    // });
 
-    console.log('🚀 ~ Pagination ~ totalPages:', totalPages);
+    // console.log('🚀 ~ Pagination ~ totalPages:', totalPages);
 
     const paginationNumberList = generatePagination(currentPage, props.totalPages);
 

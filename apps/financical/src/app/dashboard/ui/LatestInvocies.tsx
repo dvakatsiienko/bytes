@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 /* Instruments */
-import { fetchLatestInvoicesList } from '@/lib/sql';
+import { fetchLatestInvoicesList } from '@/lib/queries';
 import { lusitana } from '@/ui/fonts';
 
 export const LatestInvoices = async () => {

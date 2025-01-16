@@ -9,13 +9,13 @@ import {
     CurrencyDollarIcon,
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import { type invoices } from '@prisma/client';
+import type { invoices } from '@prisma/client';
 
 /* Components */
 import { Button } from '@/ui/Button';
 
 /* Instruments */
-import { updateInvoice, type CustomerField, type InvoiceForm, type State } from '@/lib';
+import { updateInvoice, type CustomerField, type State } from '@/lib';
 
 export const UpdateInfoiceForm = (props: UpdateInfoiceFormProps) => {
     const initialState: State = { message: null, errors: {}};
@@ -151,6 +151,6 @@ export const UpdateInfoiceForm = (props: UpdateInfoiceFormProps) => {
 
 /* Types */
 interface UpdateInfoiceFormProps {
-    invoice:      InvoiceForm,
+    invoice:      invoices,
     customerList: CustomerField[],
 }

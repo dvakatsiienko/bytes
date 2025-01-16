@@ -1,10 +1,8 @@
 /* eslint camelcase: 0 */
 
 /* Instruments */
+import { prisma } from './prisma';
 import { formatCurrency } from './utils';
-import { sqlClient, prisma } from './prisma';
-
-import type { CustomersTableType, InvoicesTable } from './definitions';
 
 export async function fetchRevenueList () {
     try {
@@ -85,28 +83,30 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const invoices = await sqlClient.sql<InvoicesTable>`
-        SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-        FROM invoices
-        JOIN customers ON invoices.customer_id = customers.id
-        WHERE
-        customers.name ILIKE ${ `%${ query }%` } OR
-        customers.email ILIKE ${ `%${ query }%` } OR
-        invoices.amount::text ILIKE ${ `%${ query }%` } OR
-        invoices.date::text ILIKE ${ `%${ query }%` } OR
-        invoices.status ILIKE ${ `%${ query }%` }
-        ORDER BY invoices.date DESC
-        LIMIT ${ ITEMS_PER_PAGE } OFFSET ${ offset }
-    `;
+        const invoiceList = await prisma.invoices.findMany();
+        const customerList = await prisma.customers.findMany();
 
-        return invoices.rows;
+        // TODO filter by:
+        // - customer name
+        // - customer email
+        // - invoice amount
+        // - invoice date
+        // - invoice status
+        const inv = invoiceList
+            .map((invoice) => {
+                const customer = customerList.find((customer) => customer.id === invoice.customer_id);
+
+                return {
+                    ...invoice,
+                    name:      customer?.name,
+                    image_url: customer?.image_url,
+                    email:     customer?.email,
+                };
+            })
+            .filter((invoice) => invoice.name?.toLowerCase().includes(query.toLowerCase()))
+            .slice(offset, offset + ITEMS_PER_PAGE);
+
+        return inv;
     } catch (error) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch invoices.');
@@ -115,18 +115,33 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
 
 export async function fetchInvoicesPages (query: string) {
     try {
-        const count = await sqlClient.sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE
-    customers.name ILIKE ${ `%${ query }%` } OR
-    customers.email ILIKE ${ `%${ query }%` } OR
-    invoices.amount::text ILIKE ${ `%${ query }%` } OR
-    invoices.date::text ILIKE ${ `%${ query }%` } OR
-    invoices.status ILIKE ${ `%${ query }%` }
-    `;
+        const invoiceList = await prisma.invoices.findMany();
+        const customerList = await prisma.customers.findMany();
 
-        const totalPages = Math.ceil(Number(count.rows[ 0 ].count) / ITEMS_PER_PAGE);
+        // TODO filter by:
+        // - customer name
+        // - customer email
+        // - invoice amount
+        // - invoice date
+        // - invoice status
+        const inv = invoiceList
+            .map((invoice) => {
+                const customer = customerList.find((customer) => customer.id === invoice.customer_id);
+
+                return {
+                    ...invoice,
+                    name:      customer?.name,
+                    image_url: customer?.image_url,
+                    email:     customer?.email,
+                };
+            })
+            .filter((invoice) => {
+                if (query.length === 0) return true;
+
+                return invoice.name?.toLowerCase().includes(query.toLowerCase());
+            });
+
+        const totalPages = Math.ceil((inv.length + 1) / ITEMS_PER_PAGE);
 
         return totalPages;
     } catch (error) {
@@ -141,7 +156,7 @@ export async function fetchInvoiceById (id: string) {
 
         const nextInvoice = {
             ...invoice,
-            amount: invoice?.amount ?? 0 / 100,
+            amount: (invoice?.amount ?? 0) / 100,
         };
 
         return nextInvoice;
@@ -162,35 +177,7 @@ export async function fetchCustomers () {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function fetchFilteredCustomers (query: string) {
-    try {
-        const data = await sqlClient.sql<CustomersTableType>`
-            SELECT
-            customers.id,
-            customers.name,
-            customers.email,
-            customers.image_url,
-            COUNT(invoices.id) AS total_invoices,
-            SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-            SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-            FROM customers
-            LEFT JOIN invoices ON customers.id = invoices.customer_id
-            WHERE
-            customers.name ILIKE ${ `%${ query }%` } OR
-            customers.email ILIKE ${ `%${ query }%` }
-            GROUP BY customers.id, customers.name, customers.email, customers.image_url
-            ORDER BY customers.name ASC
-        `;
-
-        const customers = data.rows.map((customer) => ({
-            ...customer,
-            total_pending: formatCurrency(customer.total_pending),
-            total_paid:    formatCurrency(customer.total_paid),
-        }));
-
-        return customers;
-    } catch (err) {
-        console.error('Database Error:', err);
-        throw new Error('Failed to fetch customer table.');
-    }
+    // TODO implement
 }
