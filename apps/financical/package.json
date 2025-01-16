@@ -9,7 +9,8 @@
         "prisma:migrate:reset": "prisma db push --force-reset",
         "prisma:db:push": "prisma db push",
         "prisma:db:seed": "prisma db seed",
-        "seed": "run-s prisma:migrate:reset prisma:db:seed"
+        "seed": "run-s prisma:migrate:reset prisma:db:seed",
+        "postinstall": "prisma generate"
     },
     "dependencies": {
         "@heroicons/react": "2.2.0",
