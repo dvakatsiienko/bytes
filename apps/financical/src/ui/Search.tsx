@@ -3,10 +3,8 @@
 /* Core */
 import { useRef, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce';
-
-/* Instruments */
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useDebouncedCallback } from 'use-debounce';
 
 export const Search = (props: SearchProps) => {
     const router = useRouter();
