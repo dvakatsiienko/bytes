@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 
 /* Instruments */
-import { sqlClient, type User } from '@/lib';
+import { prisma, type User } from '@/lib';
 import { authConfig } from './auth.config';
 
 export const { auth, signIn, signOut } = NextAuth({
@@ -38,9 +38,12 @@ export const { auth, signIn, signOut } = NextAuth({
 
 async function getUser (email: string): Promise<User | undefined> {
     try {
-        const user = await sqlClient.sql<User>`SELECT * FROM users WHERE email=${ email }`;
+        // const user = await sqlClient.sql<User>`SELECT * FROM users WHERE email=${ email }`;
+        const user = await prisma.users.findUnique({ where: { email }});
 
-        return user.rows[ 0 ];
+        if (!user) return;
+
+        return user;
     } catch (error) {
         console.error('Failed to fetch user:', error);
         throw new Error('Failed to fetch user.');

@@ -3,7 +3,7 @@ import { BanknotesIcon, ClockIcon, UserGroupIcon, InboxIcon } from '@heroicons/r
 import waait from 'waait';
 
 /* Instruments */
-import { fetchCardData } from '@/lib/sql';
+import { fetchCardData } from '@/lib/queries';
 import { lusitana } from '@/ui/fonts';
 
 export const CardList = async () => {

@@ -31,6 +31,7 @@ const UpdateInvoicePage = async (props: NextPageProps) => {
                     },
                 ] }
             />
+            {/* @ts-expect-error Fix type model by correcting model shape */}
             <UpdateInfoiceForm customerList = { customerList } invoice = { invoice } />
         </main>
     );

@@ -8,6 +8,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// TODO: Uppercase, Singular
 model customers {
   id        String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name      String @db.VarChar(255)
