@@ -1,12 +1,10 @@
-/* eslint-disable camelcase */
-
 'use server';
 
 /* Core */
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 // import { signIn } from '@/auth';
-import { AuthError } from 'next-auth';
+// import { AuthError } from 'next-auth';
 import { z } from 'zod';
 import to from 'await-to-js';
 import { randomUUID } from 'crypto';
@@ -31,12 +29,12 @@ export const createInvoice = async (_: State, formData: FormData) => {
     const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
 
-    const sqlPromise = prisma.invoices.create({
+    const sqlPromise = prisma.invoice.create({
         data: {
-            id:          randomUUID(),
-            amount:      amountInCents,
-            customerId: customerId,
-            date:        new Date(),
+            id:     randomUUID(),
+            amount: amountInCents,
+            customerId,
+            date:   new Date(),
             status,
         },
     });
@@ -65,20 +63,14 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
     const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
 
-    await to(prisma.invoices.update({
+    await to(prisma.invoice.update({
             where: { id },
             data:  {
-                customerId: customerId,
-                amount:      amountInCents,
+                customerId,
+                amount: amountInCents,
                 status,
             },
         }));
-
-    // await to(sqlClient.sql`
-    //         UPDATE invoices
-    //         SET customerId = ${ customerId }, amount = ${ amountInCents }, status = ${ status }
-    //         WHERE id = ${ id }
-    // `);
 
     // TODO check if revalidatePath is needed, since /dashboard/invoices page is dynamic and not cached
     revalidatePath('/dashboard/invoices');
@@ -87,7 +79,7 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
 
 export async function deleteInvoice (id: string) {
     try {
-        await prisma.invoices.delete({ where: { id }});
+        await prisma.invoice.delete({ where: { id }});
         revalidatePath('/dashboard/invoices');
 
         // return { message: 'Deleted Invoice.' };
@@ -117,11 +109,13 @@ export async function deleteInvoice (id: string) {
 
 /* Helpers */
 const InvoiceSchema = z.object({
+    /* eslint-disable camelcase */
     id:         z.string(),
     customerId: z.string({ invalid_type_error: 'Please select a customer.' }),
     amount:     z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
     status:     z.enum([ 'pending', 'paid' ], { invalid_type_error: 'Please select an invoice status.' }),
     date:       z.string(),
+    /* eslint-enable camelcase */
 });
 
 const CreateInvoice = InvoiceSchema.omit({ id: true, date: true });
