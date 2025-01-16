@@ -3,9 +3,10 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
+import type { User } from '@prisma/client';
 
 /* Instruments */
-import { prisma, type User } from '@/lib';
+import { prisma } from '@/lib';
 import { authConfig } from './auth.config';
 
 export const { auth, signIn, signOut } = NextAuth({
