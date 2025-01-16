@@ -21,7 +21,7 @@ export const InvoicesTable = async (props: InvoicesTableProps) => {
                             alt = { `${ invoice.name }'s profile picture` }
                             className = 'mr-2 rounded-full'
                             height = { 28 }
-                            src = { invoice.image_url ?? '' }
+                            src = { invoice.imageUrl ?? '' }
                             width = { 28 }
                         />
                         <p>{invoice.name}</p>
@@ -53,7 +53,7 @@ export const InvoicesTable = async (props: InvoicesTableProps) => {
                         alt = { `${ invoice.name }'s profile picture` }
                         className = 'rounded-full'
                         height = { 28 }
-                        src = { invoice.image_url }
+                        src = { invoice.imageUrl }
                         width = { 28 }
                     />
                     <p>{invoice.name}</p>

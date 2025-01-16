@@ -8,30 +8,33 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// TODO: Uppercase, Singular
-model customers {
-  id        String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name      String @db.VarChar(255)
-  email     String @db.VarChar(255)
-  image_url String @db.VarChar(255)
-}
-
-model invoices {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  customer_id String   @db.Uuid
-  amount      Int
-  status      String   @db.VarChar(255)
-  date        DateTime @db.Date
-}
-
-model revenue {
-  month   String @unique @db.VarChar(4)
-  revenue Int
-}
-
-model users {
-  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name     String @db.VarChar(255)
-  email    String @unique
+model User {
+  id       String @id @unique @default(uuid())
+  name     String
+  email    String
   password String
+}
+
+model Customer {
+  id       String    @id @unique @default(uuid())
+  name     String
+  email    String    @unique
+  imageUrl String
+  invoice  Invoice[]
+}
+
+model Invoice {
+  id     String   @id @unique @default(uuid())
+  amount Int
+  status String
+  date   DateTime @default(now())
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+}
+
+model Revenue {
+  id      String @id @unique @default(uuid())
+  revenue Int
+  month   String
 }
