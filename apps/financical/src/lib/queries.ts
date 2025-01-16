@@ -1,3 +1,6 @@
+/* Core */
+import type { Invoice } from '@prisma/client';
+
 /* Instruments */
 import { prisma } from './prisma';
 import { formatCurrency } from './utils';
@@ -155,7 +158,7 @@ export async function fetchInvoiceById (id: string) {
         const nextInvoice = {
             ...invoice,
             amount: (invoice?.amount ?? 0) / 100,
-        };
+        } as Invoice;
 
         return nextInvoice;
     } catch (error) {
