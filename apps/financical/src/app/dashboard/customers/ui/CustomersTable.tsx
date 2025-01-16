@@ -1,10 +1,10 @@
-import { customers } from '@prisma/client';
+/* Core */
 import Image from 'next/image';
 import { lusitana } from '@/ui/fonts';
 import { Search } from '@/ui/Search';
-import { CustomersTableType, FormattedCustomersTable } from '@/lib/definitions';
+import type { Customer } from '@prisma/client';
 
-export const CustomersTable = ({ customers }: { customers: customers[] }) => {
+export const CustomersTable = ({ customers }: { customers: Customer[] }) => {
     return (
         <div className = 'w-full'>
             <h1 className = { `${ lusitana.className } mb-8 text-xl md:text-2xl` }>Customers</h1>
