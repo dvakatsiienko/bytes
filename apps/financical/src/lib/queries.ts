@@ -1,5 +1,3 @@
-/* eslint camelcase: 0 */
-
 /* Instruments */
 import { prisma } from './prisma';
 import { formatCurrency } from './utils';
@@ -18,18 +16,18 @@ export async function fetchRevenueList () {
 
 export async function fetchLatestInvoicesList () {
     try {
-        const invoiceList = await prisma.invoices.findMany();
-        const customerList = await prisma.customers.findMany();
+        const invoiceList = await prisma.invoice.findMany();
+        const customerList = await prisma.customer.findMany();
 
         const latestInvoices = invoiceList.map((invoice) => {
             const customer = customerList.find((customer) => customer.id === invoice.customerId);
 
             return {
                 ...invoice,
-                amount:    formatCurrency(invoice.amount),
-                name:      customer?.name,
+                amount:   formatCurrency(invoice.amount),
+                name:     customer?.name,
                 imageUrl: customer?.imageUrl,
-                email:     customer?.email,
+                email:    customer?.email,
             };
         });
 
@@ -42,9 +40,9 @@ export async function fetchLatestInvoicesList () {
 
 export async function fetchCardData () {
     try {
-        const numberOfInvoices = await prisma.invoices.count();
-        const numberOfCustomers = await prisma.customers.count();
-        const invoiceList = await prisma.invoices.findMany();
+        const numberOfInvoices = await prisma.invoice.count();
+        const numberOfCustomers = await prisma.customer.count();
+        const invoiceList = await prisma.invoice.findMany();
 
         const invoiceStatusMap = {
             paid: invoiceList.reduce((acc, curr) => {
@@ -83,8 +81,8 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const invoiceList = await prisma.invoices.findMany();
-        const customerList = await prisma.customers.findMany();
+        const invoiceList = await prisma.invoice.findMany();
+        const customerList = await prisma.customer.findMany();
 
         // TODO filter by:
         // - customer name
@@ -98,9 +96,9 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
 
                 return {
                     ...invoice,
-                    name:      customer?.name,
+                    name:     customer?.name,
                     imageUrl: customer?.imageUrl,
-                    email:     customer?.email,
+                    email:    customer?.email,
                 };
             })
             .filter((invoice) => invoice.name?.toLowerCase().includes(query.toLowerCase()))
@@ -115,8 +113,8 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
 
 export async function fetchInvoicesPages (query: string) {
     try {
-        const invoiceList = await prisma.invoices.findMany();
-        const customerList = await prisma.customers.findMany();
+        const invoiceList = await prisma.invoice.findMany();
+        const customerList = await prisma.customer.findMany();
 
         // TODO filter by:
         // - customer name
@@ -130,9 +128,9 @@ export async function fetchInvoicesPages (query: string) {
 
                 return {
                     ...invoice,
-                    name:      customer?.name,
+                    name:     customer?.name,
                     imageUrl: customer?.imageUrl,
-                    email:     customer?.email,
+                    email:    customer?.email,
                 };
             })
             .filter((invoice) => {
@@ -152,7 +150,7 @@ export async function fetchInvoicesPages (query: string) {
 
 export async function fetchInvoiceById (id: string) {
     try {
-        const invoice = await prisma.invoices.findUnique({ where: { id }});
+        const invoice = await prisma.invoice.findUnique({ where: { id }});
 
         const nextInvoice = {
             ...invoice,
@@ -168,7 +166,7 @@ export async function fetchInvoiceById (id: string) {
 
 export async function fetchCustomers () {
     try {
-        const customerList = await prisma.customers.findMany();
+        const customerList = await prisma.customer.findMany();
 
         return customerList;
     } catch (err) {

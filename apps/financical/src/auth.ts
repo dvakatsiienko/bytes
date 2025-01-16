@@ -38,8 +38,7 @@ export const { auth, signIn, signOut } = NextAuth({
 
 async function getUser (email: string): Promise<User | undefined> {
     try {
-        // const user = await sqlClient.sql<User>`SELECT * FROM users WHERE email=${ email }`;
-        const user = await prisma.users.findUnique({ where: { email }});
+        const user = await prisma.user.findUnique({ where: { email }});
 
         if (!user) return;
 
