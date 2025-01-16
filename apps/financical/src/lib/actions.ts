@@ -89,6 +89,7 @@ export async function deleteInvoice (id: string) {
 }
 
 export async function authenticate (prevState: string | undefined, formData: FormData) {
+    return Promise.resolve(void 0);
     // try {
     //     await signIn('credentials', formData);
     // } catch (error) {
