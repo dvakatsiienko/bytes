@@ -5,7 +5,7 @@
 /* Core */
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { signIn } from '@/auth';
+// import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { z } from 'zod';
 import to from 'await-to-js';
@@ -35,7 +35,7 @@ export const createInvoice = async (_: State, formData: FormData) => {
         data: {
             id:          randomUUID(),
             amount:      amountInCents,
-            customer_id: customerId,
+            customerId: customerId,
             date:        new Date(),
             status,
         },
@@ -68,7 +68,7 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
     await to(prisma.invoices.update({
             where: { id },
             data:  {
-                customer_id: customerId,
+                customerId: customerId,
                 amount:      amountInCents,
                 status,
             },
@@ -76,7 +76,7 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
 
     // await to(sqlClient.sql`
     //         UPDATE invoices
-    //         SET customer_id = ${ customerId }, amount = ${ amountInCents }, status = ${ status }
+    //         SET customerId = ${ customerId }, amount = ${ amountInCents }, status = ${ status }
     //         WHERE id = ${ id }
     // `);
 
@@ -96,24 +96,24 @@ export async function deleteInvoice (id: string) {
     }
 }
 
-export async function authenticate (prevState: string | undefined, formData: FormData) {
-    try {
-        await signIn('credentials', formData);
-    } catch (error) {
-        if (error instanceof AuthError) {
-            // eslint-disable-next-line smells/no-switch
-            switch (error.type) {
-                case 'CredentialsSignin':
-                    return 'Invalid credentials.';
+// export async function authenticate (prevState: string | undefined, formData: FormData) {
+//     try {
+//         await signIn('credentials', formData);
+//     } catch (error) {
+//         if (error instanceof AuthError) {
+//             // eslint-disable-next-line smells/no-switch
+//             switch (error.type) {
+//                 case 'CredentialsSignin':
+//                     return 'Invalid credentials.';
 
-                default:
-                    return 'Something went wrong.';
-            }
-        }
+//                 default:
+//                     return 'Something went wrong.';
+//             }
+//         }
 
-        throw error;
-    }
-}
+//         throw error;
+//     }
+// }
 
 /* Helpers */
 const InvoiceSchema = z.object({

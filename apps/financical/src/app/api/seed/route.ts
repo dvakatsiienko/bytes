@@ -35,7 +35,7 @@ async function seedInvoices () {
     await sqlClient.sql`
         CREATE TABLE IF NOT EXISTS invoices (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        customer_id UUID NOT NULL,
+        customerId UUID NOT NULL,
         amount INT NOT NULL,
         status VARCHAR(255) NOT NULL,
         date DATE NOT NULL
@@ -43,8 +43,8 @@ async function seedInvoices () {
   `;
 
     const insertedInvoices = await Promise.all(invoices.map((invoice) => sqlClient.sql`
-        INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${ invoice.customer_id }, ${ invoice.amount }, ${ invoice.status }, ${ invoice.date })
+        INSERT INTO invoices (customerId, amount, status, date)
+        VALUES (${ invoice.customerId }, ${ invoice.amount }, ${ invoice.status }, ${ invoice.date })
         ON CONFLICT (id) DO NOTHING;
       `));
 
@@ -59,13 +59,13 @@ async function seedCustomers () {
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL,
-      image_url VARCHAR(255) NOT NULL
+      imageUrl VARCHAR(255) NOT NULL
     );
   `;
 
     const insertedCustomers = await Promise.all(customers.map((customer) => sqlClient.sql`
-        INSERT INTO customers (id, name, email, image_url)
-        VALUES (${ customer.id }, ${ customer.name }, ${ customer.email }, ${ customer.image_url })
+        INSERT INTO customers (id, name, email, imageUrl)
+        VALUES (${ customer.id }, ${ customer.name }, ${ customer.email }, ${ customer.imageUrl })
         ON CONFLICT (id) DO NOTHING;
       `));
 

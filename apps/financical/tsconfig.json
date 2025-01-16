@@ -28,8 +28,7 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "src/app/api/seed/placeholder-data.ts",
-        "scripts/seed.js"
+        "prisma/seed/*"
     ],
     "exclude": ["node_modules"]
 }

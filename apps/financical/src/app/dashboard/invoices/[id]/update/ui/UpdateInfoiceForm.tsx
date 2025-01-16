@@ -41,7 +41,7 @@ export const UpdateInfoiceForm = (props: UpdateInfoiceFormProps) => {
                     <div className = 'relative'>
                         <select
                             className = 'peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
-                            defaultValue = { props.invoice.customer_id }
+                            defaultValue = { props.invoice.customerId }
                             id = 'customer'
                             name = 'customerId'>
                             <option disabled value = ''>

@@ -20,7 +20,7 @@ export const LatestInvoices = async () => {
                         alt = { `${ invoice.name }'s profile picture` }
                         className = 'mr-4 rounded-full'
                         height = { 32 }
-                        src = { invoice.image_url ?? '' }
+                        src = { invoice.imageUrl ?? '' }
                         width = { 32 }
                     />
                     <div className = 'min-w-0'>

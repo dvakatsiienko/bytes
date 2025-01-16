@@ -26,7 +26,7 @@ export const CustomersTable = ({ customers }: { customers: customers[] }) => {
                                                             alt = { `${ customer.name }'s profile picture` }
                                                             className = 'rounded-full'
                                                             height = { 28 }
-                                                            src = { customer.image_url }
+                                                            src = { customer.imageUrl }
                                                             width = { 28 }
                                                         />
                                                         <p>{customer.name}</p>
@@ -88,7 +88,7 @@ export const CustomersTable = ({ customers }: { customers: customers[] }) => {
                                                         alt = { `${ customer.name }'s profile picture` }
                                                         className = 'rounded-full'
                                                         height = { 28 }
-                                                        src = { customer.image_url }
+                                                        src = { customer.imageUrl }
                                                         width = { 28 }
                                                     />
                                                     <p>{customer.name}</p>

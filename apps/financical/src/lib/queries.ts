@@ -22,13 +22,13 @@ export async function fetchLatestInvoicesList () {
         const customerList = await prisma.customers.findMany();
 
         const latestInvoices = invoiceList.map((invoice) => {
-            const customer = customerList.find((customer) => customer.id === invoice.customer_id);
+            const customer = customerList.find((customer) => customer.id === invoice.customerId);
 
             return {
                 ...invoice,
                 amount:    formatCurrency(invoice.amount),
                 name:      customer?.name,
-                image_url: customer?.image_url,
+                imageUrl: customer?.imageUrl,
                 email:     customer?.email,
             };
         });
@@ -94,12 +94,12 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
         // - invoice status
         const inv = invoiceList
             .map((invoice) => {
-                const customer = customerList.find((customer) => customer.id === invoice.customer_id);
+                const customer = customerList.find((customer) => customer.id === invoice.customerId);
 
                 return {
                     ...invoice,
                     name:      customer?.name,
-                    image_url: customer?.image_url,
+                    imageUrl: customer?.imageUrl,
                     email:     customer?.email,
                 };
             })
@@ -126,12 +126,12 @@ export async function fetchInvoicesPages (query: string) {
         // - invoice status
         const inv = invoiceList
             .map((invoice) => {
-                const customer = customerList.find((customer) => customer.id === invoice.customer_id);
+                const customer = customerList.find((customer) => customer.id === invoice.customerId);
 
                 return {
                     ...invoice,
                     name:      customer?.name,
-                    image_url: customer?.image_url,
+                    imageUrl: customer?.imageUrl,
                     email:     customer?.email,
                 };
             })
