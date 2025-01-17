@@ -16,7 +16,7 @@
         "utils": "workspace:*"
     },
     "devDependencies": {
-        "@types/node": "20.11.20",
+        "@types/node": "22.10.7",
         "@types/react": "18.2.48",
         "tsconfig-core": "workspace:*"
     }
