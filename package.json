@@ -17,7 +17,7 @@
         "build:space-explorer/ui": "turbo build --filter='@space-explorer/ui'",
         "build:profile": "turbo build --filter=profile",
         "build:simple": "turbo build --filter='@simple/*'",
-        "build:financical": "turbo build --filter=financical",
+        "build:financical": "turbo financical#build",
         "lint": "turbo lint",
         "lint:eslint": "TIMING=1 eslint .",
         "typecheck": "turbo typecheck",
