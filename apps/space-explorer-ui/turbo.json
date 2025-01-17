@@ -1,17 +1,10 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "extends": [
-    "//"
-  ],
-  "tasks": {
-    "build": {
-      "outputs": [
-        "dist/**"
-      ],
-      "dependsOn": [
-        "lint",
-        "typecheck"
-      ]
+    "$schema": "https://turbo.build/schema.json",
+    "extends": ["//"],
+    "tasks": {
+        "build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["lint", "typecheck"]
+        }
     }
-  }
 }
