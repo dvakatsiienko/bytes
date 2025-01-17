@@ -1,6 +1,7 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "extends": ["//"],
+    "globalEnv": ["DATABASE_URL"],
     "tasks": {
         "seed": {
             "dependsOn": ["prisma:migrate:reset"],
