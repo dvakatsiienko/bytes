@@ -10,6 +10,8 @@
             "outputs": [".next/**", "!.next/cache/**"]
         },
         "lint": {},
-        "typecheck": {}
+        "typecheck": {
+            "inputs": ["**/*.{ts,tsx}"]
+        }
     }
 }
