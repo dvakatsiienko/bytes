@@ -9,6 +9,10 @@
         "target": "ESNext",
         "module": "ESNext",
         "lib": ["ESNext"],
+        // ? 17.01.2025 skipLibCheck is enabled as an escape hatch
+        // ? to fix this TS error https://github.com/isaacs/node-lru-cache/issues/354
+        // ? should be resolved in TypeScript 5.8.0+
+        "skipLibCheck": true,
         "sourceMap": true,
         "outDir": "dist",
         "strict": true,
