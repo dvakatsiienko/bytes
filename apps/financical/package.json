@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "start": "next --turbopack",
-        "build": "next build",
+        "build": "dotenv -- next build",
         "dev": "next dev --turbopack",
         "lint": "eslint .",
         "typecheck": "tsc --noEmit",
