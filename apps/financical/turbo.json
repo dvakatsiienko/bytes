@@ -2,8 +2,6 @@
     "$schema": "https://turbo.build/schema.json",
     "extends": ["//"],
     "tasks": {
-        "lint": {},
-        "typecheck": {},
         "seed": {
             "dependsOn": ["prisma:migrate:reset"],
             "cache": false
