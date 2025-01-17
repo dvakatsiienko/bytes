@@ -10,7 +10,8 @@
         "typecheck": "tsc --noEmit",
         "prisma:migrate:reset": "prisma db push --force-reset",
         "prisma:db:push": "prisma db push",
-        "seed": "prisma db seed",
+        "prisma:db:seed": "prisma db seed",
+        "seed": "turbo prisma:db:seed",
         "postinstall": "prisma generate"
     },
     "dependencies": {

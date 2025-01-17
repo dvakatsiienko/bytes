@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "license": "MIT",
+    "private": true,
     "scripts": {
         "start:hackernews": "turbo start --filter=hackernews",
         "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
