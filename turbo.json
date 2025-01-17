@@ -1,15 +1,21 @@
 {
-    "$schema": "https://turbo.build/schema.json",
-    "pipeline": {
-        "start": {
-            "cache": false,
-            "persistent": true
-        },
-        "build": {
-            "dependsOn": ["^build", "lint"],
-            "outputs": [".next/**", "!.next/cache/**"]
-        },
-        "lint": {},
-        "typecheck": {}
-    }
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": [
+        "^build",
+        "lint"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "lint": {},
+    "typecheck": {}
+  }
 }
