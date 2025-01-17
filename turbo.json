@@ -6,11 +6,12 @@
             "persistent": true
         },
         "build": {
-            "dependsOn": ["^build", "lint"],
+            "dependsOn": ["^build"],
             "outputs": [".next/**", "!.next/cache/**"]
         },
         "lint": {},
         "typecheck": {
+            "dependsOn": ["^typecheck"],
             "inputs": ["**/*.{ts,tsx}"]
         }
     }
