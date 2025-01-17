@@ -2,7 +2,7 @@
 
 🏎️ The monorepositry is wired up with [Turborepo](https://turbo.build/).
 
-🐶 I use it to store my pet projects, and tools.
+🐶 I use it to store my pet projects and tools.
 
 ### 🛸 Applications
 
