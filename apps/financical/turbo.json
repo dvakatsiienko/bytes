@@ -5,7 +5,7 @@
     "tasks": {
         "build": {
             "cache": true,
-            "env": []
+            "env": ["DATABASE_URL", "DIRECT_URL", "AUTH_SECRET", "SUPABASE_*", "POSTGRES_*"]
         },
         "seed": {
             "dependsOn": ["prisma:migrate:reset"],
