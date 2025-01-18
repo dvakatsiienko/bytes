@@ -1,4 +1,4 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
-    "buildCommand": "turbo build --env-mode=loose financical#build"
+    "buildCommand": "turbo build financical#build"
 }
