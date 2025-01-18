@@ -1,24 +1,14 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "extends": [
-    "//"
-  ],
-  "tasks": {
-    "build": {
-      "dependsOn": [
-        "prisma:generate",
-        "lint",
-        "typecheck"
-      ]
-    },
-    "prisma:generate": {
-      "cache": true,
-      "env": [
-        "DATABASE_URL"
-      ],
-      "inputs": [
-        "prisma/schema.prisma"
-      ]
+    "$schema": "https://turbo.build/schema.json",
+    "extends": ["//"],
+    "tasks": {
+        "build": {
+            "dependsOn": ["prisma:generate", "lint", "typecheck"]
+        },
+        "prisma:generate": {
+            "cache": true,
+            "env": ["DATABASE_URL"],
+            "inputs": ["prisma/schema.prisma"]
+        }
     }
-  }
 }
