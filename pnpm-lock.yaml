@@ -219,9 +219,6 @@ importers:
       superjson:
         specifier: 1.13.1
         version: 1.13.1
-      typescript:
-        specifier: 5.2.2
-        version: 5.2.2
       waait:
         specifier: 1.0.5
         version: 1.0.5
@@ -277,6 +274,9 @@ importers:
       tailwindcss:
         specifier: 3.3.5
         version: 3.3.5(ts-node@10.9.2(@swc/core@1.3.102(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.2.2))
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
 
   apps/profile:
     dependencies:
@@ -327,14 +327,14 @@ importers:
   apps/simple-docs:
     dependencies:
       next:
-        specifier: 13.4.19
-        version: 13.4.19(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.6)
+        specifier: 15.1.5
+        version: 15.1.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.6)
       react:
-        specifier: 18.2.0
-        version: 18.2.0
+        specifier: 19.0.0
+        version: 19.0.0
       react-dom:
-        specifier: 18.2.0
-        version: 18.2.0(react@18.2.0)
+        specifier: 19.0.0
+        version: 19.0.0(react@19.0.0)
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -346,11 +346,8 @@ importers:
         specifier: 22.10.7
         version: 22.10.7
       '@types/react':
-        specifier: 18.2.48
-        version: 18.2.48
-      prettier:
-        specifier: 3.4.2
-        version: 3.4.2
+        specifier: 19.0.7
+        version: 19.0.7
       tsconfig-core:
         specifier: workspace:*
         version: link:../../packages/tsconfig-core
@@ -358,14 +355,14 @@ importers:
   apps/simple-web:
     dependencies:
       next:
-        specifier: 13.4.19
-        version: 13.4.19(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.6)
+        specifier: 15.1.5
+        version: 15.1.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.6)
       react:
-        specifier: 18.2.0
-        version: 18.2.0
+        specifier: 19.0.0
+        version: 19.0.0
       react-dom:
-        specifier: 18.2.0
-        version: 18.2.0(react@18.2.0)
+        specifier: 19.0.0
+        version: 19.0.0(react@19.0.0)
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -377,8 +374,8 @@ importers:
         specifier: 22.10.7
         version: 22.10.7
       '@types/react':
-        specifier: 18.2.48
-        version: 18.2.48
+        specifier: 19.0.7
+        version: 19.0.7
       tsconfig-core:
         specifier: workspace:*
         version: link:../../packages/tsconfig-core
@@ -2234,6 +2231,7 @@ packages:
 
   '@nextui-org/react@2.1.12':
     resolution: {integrity: sha512-VQeB261cOIBiJKHP8Bkxkk0bE5lvLsUlwfGlI/AK5l5L75Cjte5D9kFIpQOGzaT8EHxM9SZVHMkbKqc1MFQ/iw==}
+    deprecated: This package has been deprecated. Please use @heroui/react instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
@@ -10679,7 +10677,7 @@ snapshots:
 
   '@types/hoist-non-react-statics@3.3.6':
     dependencies:
-      '@types/react': 18.2.48
+      '@types/react': 19.0.7
       hoist-non-react-statics: 3.3.2
 
   '@types/http-cache-semantics@4.0.4': {}
