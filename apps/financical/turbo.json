@@ -3,10 +3,6 @@
     "extends": ["//"],
     "globalEnv": ["DATABASE_URL", "DIRECT_URL", "AUTH_SECRET", "SUPABASE_*", "POSTGRES_*"],
     "tasks": {
-        "build": {
-            "cache": true,
-            "env": ["DATABASE_URL", "DIRECT_URL", "AUTH_SECRET", "SUPABASE_*", "POSTGRES_*"]
-        },
         "seed": {
             "dependsOn": ["prisma:migrate:reset"],
             "cache": false
