@@ -11,8 +11,8 @@
         "prisma:migrate:reset": "prisma db push --force-reset",
         "prisma:db:push": "prisma db push",
         "prisma:db:seed": "prisma db seed",
-        "seed": "turbo prisma:db:seed",
-        "postinstall": "prisma generate"
+        "prisma:generate": "prisma generate",
+        "seed": "turbo prisma:db:seed"
     },
     "dependencies": {
         "@heroicons/react": "2.2.0",
@@ -27,7 +27,6 @@
         "dotenv-cli": "8.0.0",
         "next": "15.1.5",
         "next-auth": "5.0.0-beta.19",
-        "npm-run-all": "4.1.5",
         "postcss": "8.5.1",
         "react": "19.0.0",
         "react-dom": "19.0.0",
