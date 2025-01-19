@@ -13,6 +13,8 @@
         "prisma:migrate:reset": {
             "cache": false
         },
-        "prisma:generate": {}
+        "prisma:generate": {
+            "inputs": ["./prisma/**/*"]
+        }
     }
 }
