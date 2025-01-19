@@ -9,9 +9,12 @@
             "dependsOn": ["^build", "lint", "typecheck"],
             "outputs": [".next/**", "!.next/cache/**"]
         },
-        "lint": {},
+        "lint": {
+            "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"]
+        },
         "typecheck": {
-            "dependsOn": ["^typecheck"]
+            "dependsOn": ["^typecheck"],
+            "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"]
         }
     }
 }
