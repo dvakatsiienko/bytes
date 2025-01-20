@@ -1,12 +1,12 @@
 # Turborepo
 
-🏎️ The monorepositry is wired up with [Turborepo](https://turbo.build/).
+🏎️ The monorepository is wired up with [Turborepo](https://turbo.build/).
 
 🐶 I use it to store my pet projects and tools.
 
 ### 🛸 Applications
 
-###### ✈️ My CV
+###### ✈️ My CV 🚧 WIP 🚧
 
 [Website](https://ripeluokte.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile)
@@ -15,6 +15,11 @@
 
 [Website](https://hackernews-modern.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews)
+
+###### 🏄‍♂️ Financial
+
+[Website](https://hackernews-modern.vercel.app)
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financical) 
 
 ###### 🛰️ Space Explorer UI
 
@@ -25,10 +30,6 @@
 
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
 
-<!-- ###### 🏄‍♂️ Financial -->
-
-<!-- [Website](https://hackernews-modern.vercel.app) | -->
-<!-- [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financical) -->
 
 ### 🧰 Libraries
 
