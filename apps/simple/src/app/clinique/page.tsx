@@ -62,14 +62,14 @@ export default () => {
                     </section>
 
                     <section className = 'mb-14 grid grid-cols-2 items-center gap-y-7 font-bold'>
-                        <span className = 'flex gap-4'>
+                        <span className = 'flex gap-4 sm:col-span-2 md:col-auto'>
                             Quantity
                             <span>
                                 &#x2212; <span className = 'ml-2 mr-2'>1</span> +
                             </span>
                         </span>
 
-                        <span>One time purchase</span>
+                        <span className = 'sm:col-start-1 md:col-auto'>One time purchase</span>
                         <span className = 'text-xl'>$29.00</span>
 
                         <button className = 'col-span-2 row-start-3 h-14 bg-black text-white lg:col-auto lg:row-auto lg:max-w-64'>
@@ -104,9 +104,19 @@ const Feature = (props: FeatureProps) => {
 
 const Product = (props: ProductProps) => {
     return (
-        <div className = 'h-[340px] w-full bg-gray-100 sm:h-[344px] sm:w-[276px]'>
+        <div className = 'flex h-[340px] w-full bg-gray-100 sm:h-[344px] sm:w-[276px]'>
             <p className = 'font-bold'>{props.title}</p>
+
+            <Button text = 'Shop now' />
         </div>
+    );
+};
+
+const Button = (props: ButtonProps) => {
+    return (
+        <button className = 'col-span-2 row-start-3 h-14 w-full self-end bg-black text-white lg:col-auto lg:row-auto lg:max-w-64'>
+            {props.text ?? 'Click'}
+        </button>
     );
 };
 
@@ -118,4 +128,8 @@ interface FeatureProps {
 
 interface ProductProps {
     title?: string,
+}
+
+interface ButtonProps {
+    text?: string,
 }
