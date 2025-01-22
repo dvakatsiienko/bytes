@@ -1,7 +1,7 @@
 /* Core */
 import { Inter } from 'next/font/google';
 
-export const inter = Inter({ subsets: [ 'latin' ]});
+const inter = Inter({ subsets: [ 'latin' ]});
 
 /* Instruments */
 import '../theme/globals.css';

@@ -357,6 +357,9 @@ importers:
       tsconfig-core:
         specifier: workspace:*
         version: link:../../packages/tsconfig-core
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
 
   apps/space-explorer-api:
     dependencies:
