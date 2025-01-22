@@ -352,8 +352,8 @@ importers:
   apps/simple-web:
     dependencies:
       next:
-        specifier: 15.1.5
-        version: 15.1.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.6)
+        specifier: 15.1.6
+        version: 15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.6)
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -434,9 +434,6 @@ importers:
 
   apps/space-explorer-ui:
     dependencies:
-      '*':
-        specifier: link:F=@simple/*
-        version: link:F=@simple/*
       '@apollo/client':
         specifier: 3.8.8
         version: 3.8.8(graphql-ws@5.16.1(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)

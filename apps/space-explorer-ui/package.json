@@ -14,7 +14,6 @@
         "build:clean": "rimraf dist"
     },
     "dependencies": {
-        "*": "link:F=@simple/*",
         "@apollo/client": "3.8.8",
         "@hookform/resolvers": "3.3.2",
         "apollo-link-logger": "2.0.1",
