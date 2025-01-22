@@ -321,35 +321,7 @@ importers:
         specifier: 3.4.2
         version: 3.4.2
 
-  apps/simple-docs:
-    dependencies:
-      next:
-        specifier: 15.1.5
-        version: 15.1.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.6)
-      react:
-        specifier: 19.0.0
-        version: 19.0.0
-      react-dom:
-        specifier: 19.0.0
-        version: 19.0.0(react@19.0.0)
-      ui:
-        specifier: workspace:*
-        version: link:../../packages/ui
-      utils:
-        specifier: workspace:*
-        version: link:../../packages/utils
-    devDependencies:
-      '@types/node':
-        specifier: 22.10.7
-        version: 22.10.7
-      '@types/react':
-        specifier: 19.0.7
-        version: 19.0.7
-      tsconfig-core:
-        specifier: workspace:*
-        version: link:../../packages/tsconfig-core
-
-  apps/simple-web:
+  apps/simple:
     dependencies:
       next:
         specifier: 15.1.6
@@ -373,6 +345,15 @@ importers:
       '@types/react':
         specifier: 19.0.7
         version: 19.0.7
+      autoprefixer:
+        specifier: 10.4.20
+        version: 10.4.20(postcss@8.5.1)
+      postcss:
+        specifier: 8.5.1
+        version: 8.5.1
+      tailwindcss:
+        specifier: 3.4.17
+        version: 3.4.17(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.7.3))
       tsconfig-core:
         specifier: workspace:*
         version: link:../../packages/tsconfig-core
@@ -3346,9 +3327,6 @@ packages:
   '@types/node@10.17.60':
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
 
-  '@types/node@22.10.5':
-    resolution: {integrity: sha512-F8Q+SeGimwOo86fiovQh8qiXfFEh2/ocYv7tU5pJ3EXMSSxk1Joj5wefpFK2fHTf/N6HKGSxIDBT9f3gCxXPkQ==}
-
   '@types/node@22.10.7':
     resolution: {integrity: sha512-V09KvXxFiutGp6B7XkpaDXlNadZxrzajcY50EuoLIpQ6WWYCSvf19lVIazzfIzQvhUN2HjX12spLojTnhuKlGg==}
 
@@ -5669,10 +5647,6 @@ packages:
 
   postcss@8.4.32:
     resolution: {integrity: sha512-D/kj5JNu6oo2EIy+XL/26JEDTlIbB8hw85G8StOE6L74RQAVVP5rej6wxCNqyMbR4RkPfqvezVbPw81Ngd6Kcw==}
-    engines: {node: ^10 || ^12 || >=14}
-
-  postcss@8.4.49:
-    resolution: {integrity: sha512-OCVPnIObs4N29kxTjzLfUryOkvZEq+pf8jTF0lg8E7uETuWHA+v7j3c/xJmiqpX450191LlmZfUKkXxkTry7nA==}
     engines: {node: ^10 || ^12 || >=14}
 
   postcss@8.5.1:
@@ -10706,7 +10680,7 @@ snapshots:
 
   '@types/bcrypt@5.0.2':
     dependencies:
-      '@types/node': 22.10.5
+      '@types/node': 22.10.7
 
   '@types/body-parser@1.19.5':
     dependencies:
@@ -10820,10 +10794,6 @@ snapshots:
 
   '@types/node@10.17.60': {}
 
-  '@types/node@22.10.5':
-    dependencies:
-      undici-types: 6.20.0
-
   '@types/node@22.10.7':
     dependencies:
       undici-types: 6.20.0
@@ -10836,7 +10806,7 @@ snapshots:
 
   '@types/react-dom@18.2.18':
     dependencies:
-      '@types/react': 18.2.48
+      '@types/react': 19.0.7
 
   '@types/react-dom@19.0.3(@types/react@19.0.7)':
     dependencies:
@@ -13416,13 +13386,6 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-import@15.1.0(postcss@8.4.49):
-    dependencies:
-      postcss: 8.4.49
-      postcss-value-parser: 4.2.0
-      read-cache: 1.0.0
-      resolve: 1.22.10
-
   postcss-import@15.1.0(postcss@8.5.1):
     dependencies:
       postcss: 8.5.1
@@ -13430,22 +13393,17 @@ snapshots:
       read-cache: 1.0.0
       resolve: 1.22.10
 
-  postcss-js@4.0.1(postcss@8.4.49):
-    dependencies:
-      camelcase-css: 2.0.1
-      postcss: 8.4.49
-
   postcss-js@4.0.1(postcss@8.5.1):
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.5.1
 
-  postcss-load-config@4.0.2(postcss@8.4.49)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.7.3)):
+  postcss-load-config@4.0.2(postcss@8.5.1)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.7.3)):
     dependencies:
       lilconfig: 3.1.3
       yaml: 2.7.0
     optionalDependencies:
-      postcss: 8.4.49
+      postcss: 8.5.1
       ts-node: 10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.7.3)
 
   postcss-load-config@4.0.2(postcss@8.5.1)(ts-node@10.9.2(@swc/core@1.3.102(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.2.2)):
@@ -13455,11 +13413,6 @@ snapshots:
     optionalDependencies:
       postcss: 8.5.1
       ts-node: 10.9.2(@swc/core@1.3.102(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.2.2)
-
-  postcss-nested@6.2.0(postcss@8.4.49):
-    dependencies:
-      postcss: 8.4.49
-      postcss-selector-parser: 6.1.2
 
   postcss-nested@6.2.0(postcss@8.5.1):
     dependencies:
@@ -13486,12 +13439,6 @@ snapshots:
       source-map-js: 1.2.1
 
   postcss@8.4.32:
-    dependencies:
-      nanoid: 3.3.8
-      picocolors: 1.1.1
-      source-map-js: 1.2.1
-
-  postcss@8.4.49:
     dependencies:
       nanoid: 3.3.8
       picocolors: 1.1.1
@@ -14316,11 +14263,11 @@ snapshots:
       normalize-path: 3.0.0
       object-hash: 3.0.0
       picocolors: 1.1.1
-      postcss: 8.4.49
-      postcss-import: 15.1.0(postcss@8.4.49)
-      postcss-js: 4.0.1(postcss@8.4.49)
-      postcss-load-config: 4.0.2(postcss@8.4.49)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.7.3))
-      postcss-nested: 6.2.0(postcss@8.4.49)
+      postcss: 8.5.1
+      postcss-import: 15.1.0(postcss@8.5.1)
+      postcss-js: 4.0.1(postcss@8.5.1)
+      postcss-load-config: 4.0.2(postcss@8.5.1)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.15))(@types/node@22.10.7)(typescript@5.7.3))
+      postcss-nested: 6.2.0(postcss@8.5.1)
       postcss-selector-parser: 6.1.2
       resolve: 1.22.10
       sucrase: 3.35.0
@@ -14659,7 +14606,7 @@ snapshots:
   vite@4.4.9(@types/node@22.10.7)(sass@1.69.6):
     dependencies:
       esbuild: 0.18.20
-      postcss: 8.4.49
+      postcss: 8.5.1
       rollup: 3.29.5
     optionalDependencies:
       '@types/node': 22.10.7
