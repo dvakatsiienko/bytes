@@ -1,3 +1,8 @@
+/* Core */
+import { Inter } from 'next/font/google';
+
+export const inter = Inter({ subsets: [ 'latin' ]});
+
 /* Instruments */
 import '../theme/globals.css';
 
@@ -7,7 +12,7 @@ export default (props: React.PropsWithChildren) => {
             <head>
                 <title>Simple</title>
             </head>
-            <body>{props.children}</body>
+            <body className = { inter.className }>{props.children}</body>
         </html>
     );
 };
