@@ -11,6 +11,7 @@ export default (props: React.PropsWithChildren) => {
         <html lang = 'en'>
             <head>
                 <title>Simple</title>
+                <link href = '/dist/styles.css' rel = 'stylesheet' />
             </head>
             <body className = { inter.className }>{props.children}</body>
         </html>
