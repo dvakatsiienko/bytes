@@ -5,6 +5,10 @@
             "cache": false,
             "persistent": true
         },
+        "serve": {
+            "cache": false,
+            "persistent": true
+        },
         "build": {
             "dependsOn": ["^build", "lint", "typecheck"],
             "outputs": [".next/**", "!.next/cache/**"]
