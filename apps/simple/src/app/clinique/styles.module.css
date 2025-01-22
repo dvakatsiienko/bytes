@@ -1,0 +1,26 @@
+.layout-hero {
+    @media (min-width: 640px) {
+        grid-template-areas:
+            'image breadcrumbs'
+            'image description';
+        grid-template-rows: max-content 1fr;
+    }
+
+    grid-template-areas:
+        'breadcrumbs'
+        'image'
+        'description';
+    grid-template-rows: auto 500px auto;
+
+    & [class~='image'] {
+        grid-area: image;
+    }
+
+    & [class~='breadcrumbs'] {
+        grid-area: breadcrumbs;
+    }
+
+    & [class~='description'] {
+        grid-area: description;
+    }
+}
