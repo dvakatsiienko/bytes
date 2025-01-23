@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: [ 'latin' ]});
 
 /* Instruments */
-import '../theme/globals.css';
+import '../theme/global.css';
 
 export default (props: React.PropsWithChildren) => {
     return (
