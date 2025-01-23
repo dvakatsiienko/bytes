@@ -7,14 +7,9 @@ import { SvgLogo } from './svg/SvgLogo';
 /* Instruments */
 import styles from './styles.module.css';
 
-const Link = (props: LinkProps) => {
-    return <div className = 'underline-offset-3 cursor-pointer hover:underline'>{props.text}</div>;
-};
-
-interface LinkProps {
-    text: string,
-}
-
+// TODO unify buttons
+// TODO improve images resonpsivness
+// TODO improve page
 export default () => {
     return (
         <main className = 'px-5 sm:px-16 sm:text-lg'>
@@ -22,10 +17,10 @@ export default () => {
                 <SvgLogo />
 
                 <nav className = 'hidden gap-4 font-bold sm:flex md:gap-8 lg:gap-12'>
-                    <Link text = 'New' />
-                    <Link text = 'clinique iD™' />
-                    <Link text = 'Best Sellers' />
-                    <Link text = 'Shop All' />
+                    <NavLink text = 'New' />
+                    <NavLink text = 'clinique iD™' />
+                    <NavLink text = 'Best Sellers' />
+                    <NavLink text = 'Shop All' />
                 </nav>
             </header>
 
@@ -33,12 +28,12 @@ export default () => {
                 className = { `${ styles[ 'layout-hero' ] } mb-5 grid min-h-[calc(100vh-80px)] gap-x-16 gap-y-3 border-b border-gray-200 sm:grid-cols-2` }>
                 <Image
                     alt = 'Product image'
-                    className = 'image place-self-center'
-                    height = { 232 }
+                    className = 'image place-self-center md:w-64 md:h-[470px]'
+                    height = { 292 }
                     src = '/clinique/product-1.png'
-                    width = { 135 }
+                    width = { 105 }
                 />
-                <section className = 'breadrumbs font-extralight text-slate-500'>
+                <section className = 'breadrumbs cursor-pointer font-extralight text-slate-500 underline-offset-4 hover:underline'>
                     Makeup / Foundations
                 </section>
 
@@ -80,25 +75,56 @@ export default () => {
                         <span className = 'sm:col-start-1 md:col-auto'>One time purchase</span>
                         <span className = 'text-xl'>$29.00</span>
 
-                        <button className = 'col-span-2 row-start-3 h-14 bg-black text-white lg:col-auto lg:row-auto lg:max-w-64'>
+                        <button className = 'col-span-2 row-start-3 h-14 cursor-pointer bg-black text-white lg:col-auto lg:row-auto lg:max-w-64'>
                             Add to Bag
                         </button>
                     </section>
                 </section>
             </section>
 
-            <section className = 'mb-12 text-2xl font-bold'>
-                <h1 className = 'mb-8 sm:text-3xl'>Works Well With</h1>
+            <section className = 'mb-12 text-2xl'>
+                <h1 className = 'mb-8 font-bold sm:text-3xl'>Works Well With</h1>
 
-                <section className = 'flex flex-col justify-between gap-12 sm:flex-row sm:gap-6'>
-                    <Product />
-                    <Product />
-                    <Product />
-                    <Product />
+                <section className = 'grid justify-center gap-12 sm:gap-6 xl:grid-flow-col'>
+                    <Product
+                        imageHeight = { 178 }
+                        imageSrc = '/clinique/product-2.png'
+                        imageWidth = { 164 }
+                        price = '$42.00'
+                        title = 'Turnaround™ Overnight Revitalizing Moisturizer'
+                    />
+
+                    <Product
+                        imageHeight = { 160 }
+                        imageSrc = '/clinique/product-3.png'
+                        imageWidth = { 164 }
+                        price = '$48.00'
+                        title = 'Superdefense™ Daily Defense Moisturizer Broad Spectrum SPF 20'
+                    />
+
+                    <Product
+                        imageHeight = { 160 }
+                        imageSrc = '/clinique/product-4.png'
+                        imageWidth = { 152 }
+                        price = '$50.00'
+                        title = 'Even Better™ Skin Tone Correcting Moisturizer Broad Spectrum SPF 20'
+                    />
+
+                    <Product
+                        imageHeight = { 236 }
+                        imageSrc = '/clinique/product-5.png'
+                        imageWidth = { 50 }
+                        price = '$39.00'
+                        title = 'Moisture Surge™ Hydrating Supercharged Concentrate'
+                    />
                 </section>
             </section>
         </main>
     );
+};
+
+const NavLink = (props: NavLinkProps) => {
+    return <div className = 'underline-offset-3 cursor-pointer hover:underline'>{props.text}</div>;
 };
 
 const Feature = (props: FeatureProps) => {
@@ -112,32 +138,52 @@ const Feature = (props: FeatureProps) => {
 
 const Product = (props: ProductProps) => {
     return (
-        <div className = 'flex h-[340px] w-full bg-gray-100 sm:h-[344px] sm:w-[276px]'>
-            <p className = 'font-bold'>{props.title}</p>
+        <div className = 'max-w-85 grid min-h-[440px] w-full flex-col gap-2 text-lg font-light sm:max-w-72'>
+            <picture className = 'grid aspect-square w-full place-content-center justify-self-center bg-gray-100'>
+                <Image
+                    alt = 'product image'
+                    // className = 'h-40 w-40'
+                    height = { props.imageHeight }
+                    src = { props.imageSrc }
+                    width = { props.imageWidth }
+                />
+            </picture>
 
-            <Button text = 'Shop now' />
+            <p>{props.title}</p>
+            <p className = 'text-gray-500'>{props.price}</p>
+
+            <Button text = 'Shop now' variant = 'list' />
         </div>
     );
 };
 
 const Button = (props: ButtonProps) => {
     return (
-        <button className = 'col-span-2 row-start-3 h-14 w-full self-end bg-black text-white lg:col-auto lg:row-auto lg:max-w-64'>
+        <button className = 'max-w-84 h-14 w-full cursor-pointer self-end justify-self-center bg-black font-bold text-white lg:max-w-72'>
             {props.text ?? 'Click'}
         </button>
     );
 };
 
 /* Types */
+interface NavLinkProps {
+    text: string,
+}
+
 interface FeatureProps {
     title:       string,
     description: string,
 }
 
 interface ProductProps {
-    title?: string,
+    price:       string,
+    title:       string,
+    imageSrc:    string,
+    imageHeight: number,
+    imageWidth:  number,
 }
 
 interface ButtonProps {
-    text?: string,
+    text?:    string,
+    variant?: 'hero' | 'list',
 }
