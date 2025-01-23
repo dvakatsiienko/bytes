@@ -348,9 +348,6 @@ importers:
       '@types/react':
         specifier: 19.0.8
         version: 19.0.8
-      autoprefixer:
-        specifier: 10.4.20
-        version: 10.4.20(postcss@8.5.1)
       postcss:
         specifier: 8.5.1
         version: 8.5.1
