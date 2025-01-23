@@ -35,7 +35,7 @@
         "@graphql-codegen/typescript-operations": "4.0.1",
         "@graphql-codegen/typescript-react-apollo": "3.3.7",
         "@types/debug": "4.1.12",
-        "@types/node": "22.10.7",
+        "@types/node": "22.10.10",
         "@types/react": "19.0.7",
         "@types/react-dom": "19.0.3",
         "@vitejs/plugin-react-swc": "3.3.2",
