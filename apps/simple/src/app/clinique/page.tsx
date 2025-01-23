@@ -7,6 +7,14 @@ import { SvgLogo } from './svg/SvgLogo';
 /* Instruments */
 import styles from './styles.module.css';
 
+const Link = (props: LinkProps) => {
+    return <div className = 'underline-offset-3 cursor-pointer hover:underline'>{props.text}</div>;
+};
+
+interface LinkProps {
+    text: string,
+}
+
 export default () => {
     return (
         <main className = 'px-5 sm:px-16 sm:text-lg'>
@@ -14,10 +22,10 @@ export default () => {
                 <SvgLogo />
 
                 <nav className = 'hidden gap-4 font-bold sm:flex md:gap-8 lg:gap-12'>
-                    <div>New</div>
-                    <div>clinique iD™</div>
-                    <div>Best Sellers</div>
-                    <div>Shop All</div>
+                    <Link text = 'New' />
+                    <Link text = 'clinique iD™' />
+                    <Link text = 'Best Sellers' />
+                    <Link text = 'Shop All' />
                 </nav>
             </header>
 

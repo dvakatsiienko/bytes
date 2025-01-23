@@ -18,7 +18,7 @@
 
 ###### 🏄‍♂️ Financial 🚧 WIP 🚧
 
-[Website](https://hackernews-modern.vercel.app)
+[Website](https://hackernews-modern.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financical)
 
 ###### 🛰️ Space Explorer UI 🚧 WIP 🚧
@@ -32,7 +32,7 @@
 
 ### 🎨 Simple CSSourcery
 
-###### ☘️ Clinique
+###### ☘️ Clinique 🚧 WIP 🚧
 
 [Website](https://cssorcery.vercel.app/clinique) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/simple)
