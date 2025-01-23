@@ -1,11 +1,4 @@
 .layout-hero {
-    @media (min-width: 640px) {
-        grid-template-areas:
-            'image breadcrumbs'
-            'image description';
-        grid-template-rows: max-content 1fr;
-    }
-
     grid-template-areas:
         'breadcrumbs'
         'image'
@@ -22,5 +15,12 @@
 
     & [class~='description'] {
         grid-area: description;
+    }
+
+    @media (min-width: 640px) {
+        grid-template-areas:
+            'image breadcrumbs'
+            'image description';
+        grid-template-rows: max-content 1fr;
     }
 }
