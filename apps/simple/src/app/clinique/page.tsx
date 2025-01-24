@@ -1,5 +1,6 @@
 /* Core */
 import Image from 'next/image';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 /* Components */
 import { SvgLogo } from './svg/SvgLogo';
@@ -7,7 +8,6 @@ import { SvgLogo } from './svg/SvgLogo';
 /* Instruments */
 import styles from './styles.module.css';
 
-// TODO unify buttons
 // TODO improve images resonpsivness
 // TODO improve page
 export default () => {
@@ -28,7 +28,7 @@ export default () => {
                 className = { `${ styles[ 'layout-hero' ] } mb-5 grid min-h-[calc(100vh-80px)] gap-x-16 gap-y-3 border-b border-gray-200 sm:grid-cols-2` }>
                 <Image
                     alt = 'Product image'
-                    className = 'image place-self-center md:w-64 md:h-[470px]'
+                    className = 'image place-self-center md:h-[470px] md:w-64'
                     height = { 292 }
                     src = '/clinique/product-1.png'
                     width = { 105 }
@@ -75,9 +75,7 @@ export default () => {
                         <span className = 'sm:col-start-1 md:col-auto'>One time purchase</span>
                         <span className = 'text-xl'>$29.00</span>
 
-                        <button className = 'col-span-2 row-start-3 h-14 cursor-pointer bg-black text-white lg:col-auto lg:row-auto lg:max-w-64'>
-                            Add to Bag
-                        </button>
+                        <Button intent = 'buy' text = 'Add to Bag' />
                     </section>
                 </section>
             </section>
@@ -152,18 +150,42 @@ const Product = (props: ProductProps) => {
             <p>{props.title}</p>
             <p className = 'text-gray-500'>{props.price}</p>
 
-            <Button text = 'Shop now' variant = 'list' />
+            <Button intent = 'shop' text = 'Shop now' />
         </div>
     );
 };
 
 const Button = (props: ButtonProps) => {
-    return (
-        <button className = 'max-w-84 h-14 w-full cursor-pointer self-end justify-self-center bg-black font-bold text-white lg:max-w-72'>
-            {props.text ?? 'Click'}
-        </button>
-    );
+    return <button className = { button({ intent: props.intent }) }>{props.text ?? 'Click'}</button>;
 };
+
+const button = cva([], {
+    variants: {
+        intent: {
+            buy: [
+                'col-span-2 row-start-3 h-14 cursor-pointer bg-black text-white lg:col-auto lg:row-auto lg:max-w-64',
+            ],
+            shop: [
+                'bg-white',
+                'text-black',
+                'border',
+                'border-grey-100',
+                'lg:max-w-72',
+                'max-w-84',
+                'h-14',
+                'w-full',
+                'cursor-pointer',
+                'self-end',
+                'justify-self-center',
+                'font-bold',
+            ],
+        },
+    },
+    defaultVariants: { intent: 'buy' },
+});
+
+const buttonBuy = button({ intent: 'buy' });
+const buttonShop = button({ intent: 'shop' });
 
 /* Types */
 interface NavLinkProps {
@@ -183,7 +205,8 @@ interface ProductProps {
     imageWidth:  number,
 }
 
-interface ButtonProps {
-    text?:    string,
-    variant?: 'hero' | 'list',
+export type ButtonPropsCva = VariantProps<typeof button>;
+
+interface ButtonProps extends ButtonPropsCva {
+    text?: string,
 }
