@@ -9,6 +9,7 @@
         "lint": "TIMING=1 eslint ."
     },
     "dependencies": {
+        "class-variance-authority": "0.7.1",
         "next": "15.1.6",
         "react": "19.0.0",
         "react-dom": "19.0.0",

@@ -323,6 +323,9 @@ importers:
 
   apps/simple:
     dependencies:
+      class-variance-authority:
+        specifier: 0.7.1
+        version: 0.7.1
       next:
         specifier: 15.1.6
         version: 15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.69.6)
@@ -2118,6 +2121,7 @@ packages:
 
   '@nextui-org/accordion@2.0.22':
     resolution: {integrity: sha512-Y4yhrH4FzOdbLDNwheit0ni4WcRtX8IPRIX4pAeGKTLQeK23j8iWrDSedEjqIcBGcdunSuL5zpC0UWCIcISh6w==}
+    deprecated: This package has been deprecated. Please use @heroui/accordion instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
@@ -2129,46 +2133,55 @@ packages:
 
   '@nextui-org/avatar@2.0.20':
     resolution: {integrity: sha512-2qZmwRtPHb1Y3Lquzmow+2JIZaScL48YaBXiiApCxFmqCPEN1bpZxdKO3i+PdtWn3s0/Yjwuiw+J4mkPUFARSQ==}
+    deprecated: This package has been deprecated. Please use @heroui/avatar instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/badge@2.0.18':
     resolution: {integrity: sha512-hsDvtoOp0IV3rgGEmYEf2CnEOPRZq4W4XTg2XB+I9a0gk7W7FJFlqk174H9LCEgSFvt/qmpeJFZ4GEIeq3OujQ==}
+    deprecated: This package has been deprecated. Please use @heroui/badge instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/button@2.0.20':
     resolution: {integrity: sha512-TwqFCK/HRDn4uDDplwDec84bjT2Hal4BSmOWs98cTCEYyUFj9osbANXy2TQ2F3292xJ8xuNtft24fVZfyLuWyw==}
+    deprecated: This package has been deprecated. Please use @heroui/button instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/card@2.0.20':
     resolution: {integrity: sha512-mbuUp6IM8wseck5HEJHOtXqZEyLsMHpeLT4FivIsPsD3byXYn8ePib2r+fAUucPZK2NqOdhKtiRXrLx9dv3S/A==}
+    deprecated: This package has been deprecated. Please use @heroui/card instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/checkbox@2.0.21':
     resolution: {integrity: sha512-4XyrI9WLWItIvgGXji66D6QXK2EINzod5H1e5zAeOKG40dRST08pzSvkdCuXEiED3sw+0hi5u01eo2qK8f5ftw==}
+    deprecated: This package has been deprecated. Please use @heroui/checkbox instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/chip@2.0.20':
     resolution: {integrity: sha512-Bq6sqr/XcmDhOO+7yexhSjdwgc1ACLOMbANYoeoZxH9vjEUAkR5od6LrFQKM3WtlX5BOnFpMGsNjX187tnWfPQ==}
+    deprecated: This package has been deprecated. Please use @heroui/chip instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/code@2.0.18':
     resolution: {integrity: sha512-TIWsRr+SoTN+FRgQ1D3hL6lpH7p1Yer0qzVSR+O89Ldjy7Ptyh/QxyPZhrJWZQN9Sypu+9pxOxMqRg69IJ84Bw==}
+    deprecated: This package has been deprecated. Please use @heroui/code instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/divider@2.0.19':
     resolution: {integrity: sha512-kl/l0R70dPJhraaJvNuPVILBrjLitKjlKPaHFhUaRPlPDp1T8KYxHIaAr1Q1WjQaPLY5u1MOJ2q4awWhP8wGOw==}
+    deprecated: This package has been deprecated. Please use @heroui/divider instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/dropdown@2.1.9':
     resolution: {integrity: sha512-4CFKAZqAuF2zD9Y2oNevBoXIZcROJ9hxqoOJK76PHkoLTA+DOcd2j5x1zFS1S2qi5EuQiA4UfjfWCBARh6X37g==}
+    deprecated: This package has been deprecated. Please use @heroui/dropdown instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
@@ -2181,64 +2194,76 @@ packages:
 
   '@nextui-org/image@2.0.20':
     resolution: {integrity: sha512-AXZQhg5kEvVBFmzqERmz27MQfKgHLtfWwXkFIB55hzdWmlb7v+YtKngC3+5zx/cOz0yr7eRK8H0WcHFaxRV0jA==}
+    deprecated: This package has been deprecated. Please use @heroui/image instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/input@2.1.8':
     resolution: {integrity: sha512-nLMkCQ2Z3p9/N5VYUULav6qT3/ccQ0OcKi4LhQc6hcb003kFHQcP87I+d7gTfRkCDigBcccFvvt8AUrQopN6qQ==}
+    deprecated: This package has been deprecated. Please use @heroui/input instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/kbd@2.0.19':
     resolution: {integrity: sha512-bq5em3eImwE7RKqIgvPGwR86MOJTDuQmeq+FbIQGlu738l9eGLU8n1KGm2eU3OyLRLtWDs9h2MgqqD7Ngutffg==}
+    deprecated: This package has been deprecated. Please use @heroui/kbd instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/link@2.0.21':
     resolution: {integrity: sha512-Ete1cRxjf9md0Ohen0PoKrQzjV6FTN/w/9XLExVADqR407MihPlBt0cPDybDmETgbMGZwoLOZ9Y/PJeCmKIz8w==}
+    deprecated: This package has been deprecated. Please use @heroui/link instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/listbox@2.1.9':
     resolution: {integrity: sha512-xKrUfoC47nTpOTgTNUG4NLP5qPgwJ54AYzrFqK3cAj812XvJPWrK+nEe9TmGgEK49GrGPy3jNjpJb8vSbv7QlA==}
+    deprecated: This package has been deprecated. Please use @heroui/listbox instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/menu@2.0.10':
     resolution: {integrity: sha512-l0EUfkhvx0KQyVF80g6qzNQk2wI6M/frm2tCGOm31jtpzfYfeHUx5VRwgV51AHYNVuqTZGGsQR+G1xt/hsOYdg==}
+    deprecated: This package has been deprecated. Please use @heroui/menu instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/modal@2.0.22':
     resolution: {integrity: sha512-zS2rgbHXv56HoF6xFNx8pQsHM2MppMU6D06og4tmHMe351IBP69Cy4APrJ3gWRBgd7C3kOVJ2j2VFNF4Wva8Ng==}
+    deprecated: This package has been deprecated. Please use @heroui/modal instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
 
   '@nextui-org/navbar@2.0.21':
     resolution: {integrity: sha512-cPHTJkS/RZA3vwiao7D2w6+6ajh7/sjgSYcU9riydmAHkFTMrkVrwy1Oa0JXNPBK/CtLeAdjiV0F2PmKCjJA0Q==}
+    deprecated: This package has been deprecated. Please use @heroui/navbar instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
 
   '@nextui-org/pagination@2.0.21':
     resolution: {integrity: sha512-6AvJgx71/yvbRzG8H9wUAdO+yhWDrZ2NFrSfG6qeM3zLGoP/kqs8pDVm6rBCw8/rUNPD1VzhjJqwP4VVH+CA0A==}
+    deprecated: This package has been deprecated. Please use @heroui/pagination instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/popover@2.1.8':
     resolution: {integrity: sha512-LvxcdZL1iDO60gMjkZtqIjTxl6khnOPt3/dkh6+NrBrV6nqyA4c+NxPJ8lanf11liGz6r5+CPE3j1MutvD93Bg==}
+    deprecated: This package has been deprecated. Please use @heroui/popover instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
 
   '@nextui-org/progress@2.0.20':
     resolution: {integrity: sha512-asGVEyeMPbbhDmxrzN7agV9S7t9mRqRzpsjE0BDVZPNBQKt/wqrA9RObUVTmFL5CTPuEBDwCW2EEvWB3rHTkSw==}
+    deprecated: This package has been deprecated. Please use @heroui/progress instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/radio@2.0.21':
     resolution: {integrity: sha512-bY4P3tikspdaPDoyXJVVQ5JRCWNiFU+gFonHlqHX9bSV2Ull5ewQl6UdYox048BnzHv2WSJDTueAOluIg2UDAw==}
+    deprecated: This package has been deprecated. Please use @heroui/radio instead.
     peerDependencies:
       react: '>=18'
 
@@ -2259,17 +2284,20 @@ packages:
 
   '@nextui-org/ripple@2.0.20':
     resolution: {integrity: sha512-8cwYJqLhukwzFWYKRqsyquKvhyQIpg1VTGUbVqH9IqOxN8HllIH0nq7LkFTfTqBiKSSSFKWubX1Do5WY/IoXJQ==}
+    deprecated: This package has been deprecated. Please use @heroui/ripple instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
 
   '@nextui-org/scroll-shadow@2.1.8':
     resolution: {integrity: sha512-15hxr0GQlNUZsa3HtGk4BZ8b4l7cqno+xmoqqgyBCkJUM+k0vjEY/iWDS+eQeFXBRgXMgJH+E9B46AJSo0iGOQ==}
+    deprecated: This package has been deprecated. Please use @heroui/scroll-shadow instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/select@2.1.10':
     resolution: {integrity: sha512-h6NvUY/wm2q1DnZT2jGtE75VUMajRxAbUScmtuQTFhcJFYij2cwwrKFT0gM2QET1X55BOdVHi5yVsAH5vB7/5g==}
+    deprecated: This package has been deprecated. Please use @heroui/select instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
@@ -2286,27 +2314,32 @@ packages:
 
   '@nextui-org/skeleton@2.0.18':
     resolution: {integrity: sha512-7W6FE8RyV3RwRd2yUzQ1RxEJd7gi1vaT+j+qQan4JbaHCM/MJAs33FDHYUEGQ5qx2kcvBG2S/FpOgHRZPQqBcw==}
+    deprecated: This package has been deprecated. Please use @heroui/skeleton instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/snippet@2.0.24':
     resolution: {integrity: sha512-AlqjMH4H86CbrIEQREkL8RQFr7awte9pnsitb4Hh+q7QE65cDxVk4NKaYiL/IpjLd3DySp6r9T5RLe+9RmHNFw==}
+    deprecated: This package has been deprecated. Please use @heroui/snippet instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
 
   '@nextui-org/spacer@2.0.18':
     resolution: {integrity: sha512-LKqJeUkPvhsvp3/MtmFFyfejBgN72W8qV7iS2E4fULSv6TI1MIBZKIgwkq/C4eFWzXGLU5xhiRE0usIVeDcOzA==}
+    deprecated: This package has been deprecated. Please use @heroui/spacer instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/spinner@2.0.18':
     resolution: {integrity: sha512-Jg9MIuF64DrTjahWaWEQcFjLDzK63P1+Q6nBknEs10neHw+5U04NzSYD3rqe6LLUGVBIdMFjqhYVtPn8+mcdjg==}
+    deprecated: This package has been deprecated. Please use @heroui/spinner instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/switch@2.0.20':
     resolution: {integrity: sha512-f+Fmgj7BM1+oIaXvJM/3FNlCn25ExDXvGzck1LNq1CwquqJJl6i/qy1AWns2JsIDdD3xcG/anW6sLVA9r2gRDA==}
+    deprecated: This package has been deprecated. Please use @heroui/switch instead.
     peerDependencies:
       react: '>=18'
 
@@ -2322,11 +2355,13 @@ packages:
 
   '@nextui-org/table@2.0.22':
     resolution: {integrity: sha512-dM1qIyq/nKz5yyctOwnbIqxxkMt+pp/jNSrWzH0XsWRvCf38dKVnmfRRAIr2zQqEDG6c1lcL6C4K1YSxvWrE+A==}
+    deprecated: This package has been deprecated. Please use @heroui/table instead.
     peerDependencies:
       react: '>=18'
 
   '@nextui-org/tabs@2.0.20':
     resolution: {integrity: sha512-CIhjG1EJJvspHadjw6m7GgUDYgcijhot2W2ijzlIXVNtDLq/b4xUejdwOR/x6Pa+txQPEN4wWE+Z2nMNUZfvLg==}
+    deprecated: This package has been deprecated. Please use @heroui/tabs instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
@@ -2338,6 +2373,7 @@ packages:
 
   '@nextui-org/tooltip@2.0.23':
     resolution: {integrity: sha512-8fxqg9boRRhtnXOVOIwlqGRaGs6cdkLlaFniTC7pK0QWhRIalLfQc4dW/4yHI6JcYOvQfOIBW0YeoJW8ymYq8g==}
+    deprecated: This package has been deprecated. Please use @heroui/tooltip instead.
     peerDependencies:
       framer-motion: '>=4.0.0'
       react: '>=18'
@@ -2429,6 +2465,7 @@ packages:
 
   '@nextui-org/user@2.0.21':
     resolution: {integrity: sha512-UBGUikFiiUzAQvuUtL2ZcvLWTcTjVkGoKINe0eZvlrOEoRU31VATHeCdIMz1eaUZbd+SyvencWpNEQ6Fmmpgcw==}
+    deprecated: This package has been deprecated. Please use @heroui/user instead.
     peerDependencies:
       react: '>=18'
 
@@ -3920,6 +3957,9 @@ packages:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
 
+  class-variance-authority@0.7.1:
+    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
+
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
 
@@ -5157,6 +5197,7 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
@@ -5172,6 +5213,7 @@ packages:
 
   lodash.omit@4.5.0:
     resolution: {integrity: sha512-XeqSp49hNGmlkj2EJlfrQFIzQ6lXdNro9sddtQzcJY8QaoC2GO0DT7xaIokHeyM+mIT0mPMlPvkYzg2xCuHdZg==}
+    deprecated: This package is deprecated. Use destructuring assignment syntax instead.
 
   lodash.sortby@4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
@@ -11717,6 +11759,10 @@ snapshots:
       fsevents: 2.3.3
 
   chownr@2.0.0: {}
+
+  class-variance-authority@0.7.1:
+    dependencies:
+      clsx: 2.1.1
 
   classnames@2.5.1: {}
 
