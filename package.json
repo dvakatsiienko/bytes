@@ -6,7 +6,7 @@
     "private": true,
     "scripts": {
         "start:hackernews": "turbo start --filter=hackernews",
-        "start:@space-explorer": "turbo space-explorer/*#start",
+        "start:@space-explorer": "turbo @space-explorer/api#start @space-explorer/ui#start",
         "start:@space-explorer/ui": "turbo @space-explorer/ui#start",
         "start:@space-explorer/api": "turbo @space-explorer/api#start ",
         "start:profile": "turbo start --filter=profile",

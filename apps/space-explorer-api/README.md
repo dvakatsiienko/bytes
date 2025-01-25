@@ -10,5 +10,5 @@
 -   **[Official SpaceX API](https://docs.spacexdata.com/)** — external data source
 -   **[SQLite](https://www.sqlite.org/index.html)** — database
 -   **[Prisma](https://www.prisma.io/)** - ORM solution
--   **[Vercel](https://vercel.com/)** — for for UI deployments
+-   **[Vercel](https://vercel.com/)** — for UI deployments
 -   **[Railway](https://railway.app/)** — for API deployments
