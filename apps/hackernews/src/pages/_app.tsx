@@ -6,7 +6,6 @@ import { ThemeProvider as StyledComponentsProvider } from 'styled-components';
 import { Provider as ReduxProvider } from 'react-redux';
 import { NextUIProvider } from '@nextui-org/react';
 import { SessionProvider } from 'next-auth/react';
-import { Analytics } from '@vercel/analytics/react';
 import type { AppType } from 'next/app';
 import type { Session } from 'next-auth';
 
@@ -38,7 +37,6 @@ const App: AppType<{ session: Session | null }> = (props) => {
                                 <props.Component { ...props.pageProps } />
                             </Layout>
 
-                            <Analytics />
                             <ReactQueryDevtools initialIsOpen = { false } />
                         </ReduxProvider>
                     </StyledComponentsProvider>
