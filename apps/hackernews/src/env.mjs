@@ -72,8 +72,8 @@ function createProtectedEnv () {
             // Otherwise it would just be returning `undefined` and be annoying to debug
             if (!isServer && !prop.startsWith('NEXT_PUBLIC_')) {
                 throw new Error(process.env.NODE_ENV === 'production'
-                    ? '❌ Attempted to access a server-side environment variable on the client'
-                    : `❌ Attempted to access a server-side environment variable '${ prop }' on the client`);
+                        ? '❌ Attempted to access a server-side environment variable on the client'
+                        : `❌ Attempted to access a server-side environment variable '${ prop }' on the client`);
             }
 
             return target[ /** @type {keyof typeof target} */ prop ];
