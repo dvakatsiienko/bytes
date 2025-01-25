@@ -227,8 +227,13 @@ export function useLaunchesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<L
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<LaunchesQuery, LaunchesQueryVariables>(LaunchesDocument, options);
         }
+export function useLaunchesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LaunchesQuery, LaunchesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LaunchesQuery, LaunchesQueryVariables>(LaunchesDocument, options);
+        }
 export type LaunchesQueryHookResult = ReturnType<typeof useLaunchesQuery>;
 export type LaunchesLazyQueryHookResult = ReturnType<typeof useLaunchesLazyQuery>;
+export type LaunchesSuspenseQueryHookResult = ReturnType<typeof useLaunchesSuspenseQuery>;
 export type LaunchesQueryResult = Apollo.QueryResult<LaunchesQuery, LaunchesQueryVariables>;
 export const LaunchDocument = gql`
     query Launch($id: ID!) {
@@ -254,7 +259,7 @@ export const LaunchDocument = gql`
  *   },
  * });
  */
-export function useLaunchQuery(baseOptions: Apollo.QueryHookOptions<LaunchQuery, LaunchQueryVariables>) {
+export function useLaunchQuery(baseOptions: Apollo.QueryHookOptions<LaunchQuery, LaunchQueryVariables> & ({ variables: LaunchQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<LaunchQuery, LaunchQueryVariables>(LaunchDocument, options);
       }
@@ -262,8 +267,13 @@ export function useLaunchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Lau
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<LaunchQuery, LaunchQueryVariables>(LaunchDocument, options);
         }
+export function useLaunchSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LaunchQuery, LaunchQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LaunchQuery, LaunchQueryVariables>(LaunchDocument, options);
+        }
 export type LaunchQueryHookResult = ReturnType<typeof useLaunchQuery>;
 export type LaunchLazyQueryHookResult = ReturnType<typeof useLaunchLazyQuery>;
+export type LaunchSuspenseQueryHookResult = ReturnType<typeof useLaunchSuspenseQuery>;
 export type LaunchQueryResult = Apollo.QueryResult<LaunchQuery, LaunchQueryVariables>;
 export const BookTripsDocument = gql`
     mutation BookTrips($launchIds: [ID!]!) {
@@ -362,8 +372,13 @@ export function useIsUserLoggedInLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>(IsUserLoggedInDocument, options);
         }
+export function useIsUserLoggedInSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>(IsUserLoggedInDocument, options);
+        }
 export type IsUserLoggedInQueryHookResult = ReturnType<typeof useIsUserLoggedInQuery>;
 export type IsUserLoggedInLazyQueryHookResult = ReturnType<typeof useIsUserLoggedInLazyQuery>;
+export type IsUserLoggedInSuspenseQueryHookResult = ReturnType<typeof useIsUserLoggedInSuspenseQuery>;
 export type IsUserLoggedInQueryResult = Apollo.QueryResult<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>;
 export const GetCartItemsDocument = gql`
     query GetCartItems {
@@ -394,8 +409,13 @@ export function useGetCartItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetCartItemsQuery, GetCartItemsQueryVariables>(GetCartItemsDocument, options);
         }
+export function useGetCartItemsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetCartItemsQuery, GetCartItemsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetCartItemsQuery, GetCartItemsQueryVariables>(GetCartItemsDocument, options);
+        }
 export type GetCartItemsQueryHookResult = ReturnType<typeof useGetCartItemsQuery>;
 export type GetCartItemsLazyQueryHookResult = ReturnType<typeof useGetCartItemsLazyQuery>;
+export type GetCartItemsSuspenseQueryHookResult = ReturnType<typeof useGetCartItemsSuspenseQuery>;
 export type GetCartItemsQueryResult = Apollo.QueryResult<GetCartItemsQuery, GetCartItemsQueryVariables>;
 export const UserProfileDocument = gql`
     query UserProfile {
@@ -437,8 +457,13 @@ export function useUserProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<UserProfileQuery, UserProfileQueryVariables>(UserProfileDocument, options);
         }
+export function useUserProfileSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<UserProfileQuery, UserProfileQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UserProfileQuery, UserProfileQueryVariables>(UserProfileDocument, options);
+        }
 export type UserProfileQueryHookResult = ReturnType<typeof useUserProfileQuery>;
 export type UserProfileLazyQueryHookResult = ReturnType<typeof useUserProfileLazyQuery>;
+export type UserProfileSuspenseQueryHookResult = ReturnType<typeof useUserProfileSuspenseQuery>;
 export type UserProfileQueryResult = Apollo.QueryResult<UserProfileQuery, UserProfileQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!) {
