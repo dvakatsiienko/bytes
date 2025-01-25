@@ -2,7 +2,7 @@
 import { z } from 'zod';
 
 /* Instruments */
-import { createTRPCRouter, publicProcedure, protectedProcedure } from '@/server/trpc/core';
+import { createTRPCRouter, publicProcedure } from '@/server/trpc/core';
 import { prisma } from '@/server/prisma';
 
 export const userRouter = createTRPCRouter({

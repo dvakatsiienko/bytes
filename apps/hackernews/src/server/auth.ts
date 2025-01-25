@@ -5,7 +5,7 @@ import initCredentialsProvider from 'next-auth/providers/credentials';
 import initGithubProvider from 'next-auth/providers/github';
 import { PrismaAdapter as initPrismaAdapter } from '@next-auth/prisma-adapter';
 import { decode, encode } from 'next-auth/jwt';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import Cookies from 'cookies';
 
@@ -38,7 +38,7 @@ export const createNextAuthOptions = <T>(
         },
         jwt: {
             maxAge: 360 * 24 * 60 * 60,
-            encode: async (options) => {
+            encode: (options) => {
                 if (isCredentialsPostQuery) {
                     const cookies = getCookies();
                     const cookie = cookies.get(NEXT_AUTH_SESSION_TOKEN_COOKIE_NAME);
@@ -52,7 +52,7 @@ export const createNextAuthOptions = <T>(
 
                 return encode({ token, secret, maxAge });
             },
-            decode: async (options) => {
+            decode: (options) => {
                 if (isCredentialsPostQuery) return null;
 
                 const { token, secret } = options;
@@ -61,7 +61,7 @@ export const createNextAuthOptions = <T>(
             },
         },
         callbacks: {
-            async session (options) {
+            session (options) {
                 // console.log('🚀 ~ [...nextauth].callback.session:', options);
 
                 // ? Github profile population
