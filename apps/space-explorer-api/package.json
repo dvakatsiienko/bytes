@@ -6,27 +6,27 @@
     "main": "src/index.ts",
     "scripts": {
         "start": "nodemon ./src/index.ts",
-        "lint": "TIMING=1 eslint .",
+        "lint": "eslint .",
         "typecheck": "tsc",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
         "prisma:generate": "prisma generate",
         "postinstall": "prisma generate"
     },
     "dependencies": {
-        "@apollo/datasource-rest": "6.1.1",
-        "@apollo/server": "4.9.5",
-        "@graphql-tools/graphql-file-loader": "8.0.0",
-        "@graphql-tools/load": "8.0.1",
+        "@apollo/datasource-rest": "6.4.1",
+        "@apollo/server": "4.11.3",
+        "@graphql-tools/graphql-file-loader": "8.0.12",
+        "@graphql-tools/load": "8.0.12",
         "@prisma/client": "5.2.0",
         "chalk": "5.4.1",
         "dotenv": "16.4.7",
-        "graphql": "16.8.1",
+        "graphql": "16.10.0",
         "prisma": "5.2.0",
-        "zod": "3.22.4"
+        "zod": "3.24.1"
     },
     "devDependencies": {
-        "@graphql-codegen/cli": "5.0.0",
-        "@graphql-codegen/typescript": "4.0.1",
+        "@graphql-codegen/cli": "5.0.3",
+        "@graphql-codegen/typescript": "4.1.2",
         "@swc-node/register": "1.10.9",
         "@swc/core": "1.10.9",
         "@types/node": "22.10.10",
