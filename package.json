@@ -6,9 +6,9 @@
     "private": true,
     "scripts": {
         "start:hackernews": "turbo start --filter=hackernews",
-        "start:@space-explorer": "turbo start --filter='@space-explorer/*'",
-        "start:@space-explorer/ui": "turbo start --filter='@space-explorer/ui'",
-        "start:@space-explorer/api": "turbo start --filter='@space-explorer/api' --color",
+        "start:@space-explorer": "turbo space-explorer/*#start",
+        "start:@space-explorer/ui": "turbo @space-explorer/ui#start",
+        "start:@space-explorer/api": "turbo @space-explorer/api#start ",
         "start:profile": "turbo start --filter=profile",
         "start:simple": "turbo start --filter=simple",
         "start:financical": "turbo start financical#start",
