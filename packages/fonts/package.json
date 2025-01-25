@@ -2,7 +2,7 @@
     "name": "fonts",
     "version": "0.0.1",
     "scripts": {
-        "lint": "TIMING=1 eslint .",
+        "lint": "eslint .",
         "typecheck": "tsc",
         "build": "tsc"
     },
