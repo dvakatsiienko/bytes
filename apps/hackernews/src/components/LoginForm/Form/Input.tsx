@@ -44,6 +44,7 @@ interface InputProps {
     formState:         FormState<FieldValues>,
     type?:             React.HTMLInputTypeAttribute,
     placeholder?:      string,
+    // eslint-disable-next-line react/boolean-prop-naming
     autoFocus?:        boolean,
     label?:            string,
     labelPlaceholder?: string,

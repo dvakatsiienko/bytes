@@ -15,5 +15,6 @@ export const NavLink = (props: NavLinkProps) => {
 interface NavLinkProps {
     href:    string,
     content: string,
+    // eslint-disable-next-line react/boolean-prop-naming
     active:  boolean,
 }
