@@ -159,6 +159,7 @@ const Button = (props: ButtonProps) => {
     return <button className = { button({ intent: props.intent }) }>{props.text ?? 'Click'}</button>;
 };
 
+/* Styles */
 const button = cva([], {
     variants: {
         intent: {
@@ -184,9 +185,6 @@ const button = cva([], {
     defaultVariants: { intent: 'buy' },
 });
 
-const buttonBuy = button({ intent: 'buy' });
-const buttonShop = button({ intent: 'shop' });
-
 /* Types */
 interface NavLinkProps {
     text: string,
@@ -205,7 +203,7 @@ interface ProductProps {
     imageWidth:  number,
 }
 
-export type ButtonPropsCva = VariantProps<typeof button>;
+type ButtonPropsCva = VariantProps<typeof button>;
 
 interface ButtonProps extends ButtonPropsCva {
     text?: string,

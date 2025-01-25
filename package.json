@@ -6,7 +6,7 @@
     "private": true,
     "scripts": {
         "start:hackernews": "turbo start --filter=hackernews",
-        "start:@space-explorer": "turbo @space-explorer/api#start @space-explorer/ui#start",
+        "start:@space-explorer": "turbo @space-explorer/api#start @space-explorer/ui#start --ui=tui",
         "start:@space-explorer/ui": "turbo @space-explorer/ui#start",
         "start:@space-explorer/api": "turbo @space-explorer/api#start ",
         "start:profile": "turbo start --filter=profile",
@@ -19,7 +19,7 @@
         "build:simple": "turbo build --filter='simple'",
         "build:financical": "turbo financical#build",
         "lint": "turbo lint",
-        "lint:eslint": "TIMING=1 eslint .",
+        "lint:eslint": "eslint .",
         "typecheck": "turbo typecheck",
         "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force",
         "publish:eslint-config": "pnpm -F='eslint-config-polished' publish",

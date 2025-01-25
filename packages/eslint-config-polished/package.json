@@ -3,7 +3,7 @@
     "version": "0.0.13",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "scripts": {
-        "lint": "TIMING=1 eslint ."
+        "lint": "eslint ."
     },
     "dependencies": {
         "@babel/core": "7.22.17",

@@ -7,7 +7,11 @@ export const Mutation: MutationResolvers = {
     login: async (_, args, { dataSources }) => {
         const userProfile = await dataSources.userAPI.findOrCreate(args.email);
 
-        dataSources.userAPI.login(userProfile?.email ?? null);
+
+        console.log('test', );
+
+
+        dataSources.userAPI.login(userProfile?.email ?? '');
 
         return userProfile;
     },

@@ -7,7 +7,7 @@
         "build": "next build",
         "build:clean": "rimraf .next",
         "serve": "next start",
-        "lint": "TIMING=1 eslint .",
+        "lint": "eslint .",
         "typecheck": "tsc",
         "validate": "run-p lint typecheck",
         "release:patch": "release-it --ci",
