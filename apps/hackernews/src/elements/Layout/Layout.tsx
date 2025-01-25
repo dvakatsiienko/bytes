@@ -7,59 +7,48 @@ import styled from 'styled-components';
 import { Nav } from '@/elements';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
-/* Instruments */
-import { useDispatch, useSelector, browserSlice } from '@/lib';
-
 export const Layout = (props: React.PropsWithChildren) => {
-    const dispatch = useDispatch();
-    const browser = useSelector((state) => state.browser);
+    return (
+        <Container>
+            <Browser className = 'shadow-lg'>
+                <Header>
+                    <Controls>
+                        <Tooltip content = 'Close'>
+                            <div className = 'dot close' />
+                        </Tooltip>
 
-    const handleCloseBrowser = () => {
-        window.confirm('Are you sure?') && dispatch(browserSlice.actions.close());
-    };
+                        <Tooltip content = 'Minimize'>
+                            <div className = 'dot minimize' />
+                        </Tooltip>
+                        <Tooltip content = 'Maximize'>
+                            <div className = 'dot maximize' />
+                        </Tooltip>
+                    </Controls>
 
-    const closedContent = 'Okay...';
-    const openedContent = (
-        <Browser className = 'shadow-lg'>
-            <Header>
-                <Controls>
-                    <Tooltip content = 'Close'>
-                        <div className = 'dot close' onPointerUp = { handleCloseBrowser } />
-                    </Tooltip>
+                    <div className = 'title'>
+                        <span>
+                            <Triangle width = { 14 } />
+                            λackernews
+                        </span>
+                    </div>
 
-                    <Tooltip content = 'Minimize'>
-                        <div className = 'dot minimize' />
-                    </Tooltip>
-                    <Tooltip content = 'Maximize'>
-                        <div className = 'dot maximize' />
-                    </Tooltip>
-                </Controls>
+                    <ThemeSwitcher />
+                </Header>
 
-                <div className = 'title'>
-                    <span>
-                        <Triangle width = { 14 } />
-                        λackernews
-                    </span>
-                </div>
+                <Card
+                    css = {{
+                        borderTopLeftRadius:  0,
+                        borderTopRightRadius: 0,
+                        filter:               'unset',
+                        userSelect:           'none',
+                    }}>
+                    <Nav />
 
-                <ThemeSwitcher />
-            </Header>
-
-            <Card
-                css = {{
-                    borderTopLeftRadius:  0,
-                    borderTopRightRadius: 0,
-                    filter:               'unset',
-                    userSelect:           'none',
-                }}>
-                <Nav />
-
-                <Content>{props.children}</Content>
-            </Card>
-        </Browser>
+                    <Content>{props.children}</Content>
+                </Card>
+            </Browser>
+        </Container>
     );
-
-    return <Container>{browser.isClosed ? closedContent : openedContent}</Container>;
 };
 
 /* Styles */
