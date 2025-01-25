@@ -6,10 +6,10 @@
 
 ### 🛸 Applications
 
-###### ✈️ My CV 🚧 WIP 🚧
+<!-- ###### ✈️ My CV 🚧 WIP 🚧
 
 [Website](https://ripeluokte.vercel.app) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile)
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile) -->
 
 ###### 🖥️ Hackernews 🚧 WIP 🚧
 
@@ -32,7 +32,7 @@
 
 ### 🎨 Simple CSSourcery
 
-###### ☘️ Clinique 🚧 WIP 🚧
+###### ☘️ Clinique
 
 [Website](https://cssorcery.vercel.app/clinique) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/simple)
