@@ -21,7 +21,7 @@
 [Website](https://hackernews-modern.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financical)
 
-###### 🛰️ Space Explorer UI 🚧 WIP 🚧
+###### 🛰️ Space Explorer UI
 
 [Website](https://space-explorer-ui.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-ui)
