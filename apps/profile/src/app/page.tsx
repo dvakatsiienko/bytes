@@ -2,7 +2,7 @@
 import Image from 'next/image';
 
 /* Components */
-import { Entry, JobEntry, Stats } from './components';
+import { Entry, JobEntry } from './components';
 import { ExternalLink, ThemeSwitcher, TriangleSvg } from './elements';
 
 /* Instruments */
@@ -32,9 +32,6 @@ export default () => {
                 </header>
 
                 <section className = 'content'>
-                    <section className = 'section'>
-                        <Stats />
-                    </section>
                     <section className = 'section'>
                         <h1>👨🏼‍✈️ Profile</h1>
 

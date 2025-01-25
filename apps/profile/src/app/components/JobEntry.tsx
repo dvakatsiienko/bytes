@@ -28,6 +28,7 @@ export const JobEntry = (props: JobEntryProps) => {
     );
 };
 
+/* Types */
 interface JobEntryProps {
     employer:        string | React.ReactNode,
     position:        string,

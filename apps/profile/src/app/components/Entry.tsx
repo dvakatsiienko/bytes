@@ -7,6 +7,7 @@ export const Entry = (props: EntryProps) => {
     );
 };
 
+/* Core */
 interface EntryProps {
     name:    string,
     content: string | React.ReactNode,
