@@ -19,7 +19,7 @@ dotenv.config({ path: '.env.development.local' });
 
 const typeDefs = loadSchemaSync(join(getDirname(import.meta.url), './graphql/schema.graphql'), { loaders: [ new GraphQLFileLoader() ]}) as unknown as DocumentNode;
 
-const apolloServer = new ApolloServer({ resolvers, typeDefs });
+    const apolloServer = new ApolloServer({ resolvers, typeDefs });
 
 const { url } = await startStandaloneServer(apolloServer, {
     context: async (expressCtx) => {
