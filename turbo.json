@@ -3,14 +3,15 @@
     "tasks": {
         "start": {
             "cache": false,
-            "persistent": true
+            "persistent": true,
+            "dependsOn": ["^db:generate"]
         },
         "serve": {
             "cache": false,
             "persistent": true
         },
         "build": {
-            "dependsOn": ["^build", "lint", "typecheck"],
+            "dependsOn": ["^build", "lint", "typecheck", "^db:generate"],
             "outputs": [".next/**", "!.next/cache/**"]
         },
         "lint": {
@@ -19,6 +20,16 @@
         "typecheck": {
             "dependsOn": ["^typecheck"],
             "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"]
+        },
+        "db:generate": {
+            "cache": false
+        },
+        "db:migrate": {
+                "cache": false,
+            "persistent": true
+        },
+        "db:deploy": {
+            "cache": false
         }
     }
 }
