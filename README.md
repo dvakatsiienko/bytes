@@ -11,10 +11,10 @@
 [Website](https://ripeluokte.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile) -->
 
-#### 🖥️ Hackernews 🚧 WIP 🚧
+<!-- #### 🖥️ Hackernews 🚧 WIP 🚧
 
 [Website](https://hackernews-modern.vercel.app) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews)
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews) -->
 
 #### 🏄‍♂️ Financial 🚧 WIP 🚧
 
