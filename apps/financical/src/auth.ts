@@ -3,7 +3,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
-import type { User } from '@prisma/client';
+import type { User } from '.prisma/client';
 
 /* Instruments */
 import { prisma } from '@/lib';

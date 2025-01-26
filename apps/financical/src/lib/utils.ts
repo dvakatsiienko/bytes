@@ -1,5 +1,5 @@
 /* Instruments */
-import type { Revenue } from '@prisma/client';
+import type { Revenue } from '.prisma/client';
 
 export const formatCurrency = (amount: number) => {
     return (amount / 100).toLocaleString('en-US', {
