@@ -4,47 +4,47 @@
 
 🐶 I use it to store my pet projects and tools.
 
-### 🛸 Applications
+## 🛸 Applications
 
 <!-- ###### ✈️ My CV 🚧 WIP 🚧
 
 [Website](https://ripeluokte.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile) -->
 
-###### 🖥️ Hackernews 🚧 WIP 🚧
+#### 🖥️ Hackernews 🚧 WIP 🚧
 
 [Website](https://hackernews-modern.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews)
 
-###### 🏄‍♂️ Financial 🚧 WIP 🚧
+#### 🏄‍♂️ Financial 🚧 WIP 🚧
 
 [Website](https://hackernews-modern.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financical)
 
-###### 🛰️ Space Explorer UI
+#### 🛰️ Space Explorer UI
 
 [Website](https://space-explorer-ui.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-ui)
 
-###### 📡 Space Explorer API
+#### 📡 Space Explorer API
 
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
 
-### 🎨 Simple CSSourcery
+## 🎨 Simple CSSourcery
 
-###### ☘️ Clinique
+#### ☘️ Clinique
 
 [Website](https://cssorcery.vercel.app/clinique) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/simple)
 
-### 🧰 Libraries
+## 🧰 Libraries
 
-###### 💅🏼 eslint-config-polished
+#### 💅🏼 eslint-config-polished
 
 [npm](https://www.npmjs.com/package/eslint-config-polished) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished)
 
-###### 💄 prettier-config-polished
+#### 💄 prettier-config-polished
 
 [npm](https://www.npmjs.com/package/prettier-config-polished) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished)
