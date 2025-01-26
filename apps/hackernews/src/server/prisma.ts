@@ -1,5 +1,5 @@
 /* Core */
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '.prisma/client';
 
 /* Instruments */
 import { env } from '@/env.mjs';
