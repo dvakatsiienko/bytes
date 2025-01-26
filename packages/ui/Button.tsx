@@ -1,11 +1,14 @@
 export const Button = (props: ButtonProps) => {
-    const { type = 'button', text = 'Click' } = props;
+    const { type = 'button', text = 'Click', ...restProps } = props;
 
-    return <button type = { type }>{text}</button>;
+    return (
+        <button type = { type } { ...restProps }>
+            {text}
+        </button>
+    );
 };
 
 /* Types */
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     text?: string,
-    type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
 }
