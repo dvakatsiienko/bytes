@@ -1,0 +1,32 @@
+/* Core */
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@theme {
+    --animate-shimmer: shimmer 2s ease-in-out infinite;
+
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    --color-blue-400: #2589fe;
+    --color-blue-500: #0070f3;
+    --color-blue-600: #2f6feb;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
