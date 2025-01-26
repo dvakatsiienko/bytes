@@ -3,7 +3,7 @@
 
 /* Core */
 import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '.prisma/client';
 
 /* Instruments */
 import { invoices, customers, revenue, users } from './seed-data';

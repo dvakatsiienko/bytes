@@ -1,7 +1,7 @@
 /* Core */
 import { Suspense } from 'react';
 import Image from 'next/image';
-import type { Customer } from '@prisma/client';
+import type { Customer } from '.prisma/client';
 
 /* Components */
 import { Search } from '@/ui/Search';
@@ -46,7 +46,7 @@ export const CustomersTable = ({ customers }: { customers: Customer[] }) => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className = 'flex w-full items-center justify-between border-b py-5'>
+                                        <div className = 'flex w-full items-center justify-between border-b py-5 border-gray-200'>
                                             <div className = 'flex w-1/2 flex-col'>
                                                 <p className = 'text-xs'>Pending</p>
                                                 <p className = 'font-medium'>

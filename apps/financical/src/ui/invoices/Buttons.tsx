@@ -19,7 +19,7 @@ export const CreateInvoice = () => {
 export const UpdateInvoice = ({ id }: { id: string }) => {
     return (
         <NextLink
-            className = 'rounded-md border p-2 hover:bg-gray-100'
+            className = 'rounded-md border border-gray-200 p-2 hover:bg-gray-100'
             href = { `/dashboard/invoices/${ id }/update` }>
             <PencilIcon className = 'w-5' />
         </NextLink>
@@ -31,7 +31,7 @@ export const DeleteInvoice = ({ id }: { id: string }) => {
 
     return (
         <form action = { deleteInvoiceWithId }>
-            <button className = 'rounded-md border p-2 hover:bg-gray-100'>
+            <button className = 'rounded-md border border-gray-200 p-2 hover:bg-gray-100'>
                 <span className = 'sr-only'>Delete</span>
                 <TrashIcon className = 'w-5' />
             </button>
