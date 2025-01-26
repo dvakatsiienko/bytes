@@ -6,7 +6,7 @@ import { AppProviders } from './AppProviders';
 
 /* Instruments */
 import { inter } from '@/ui/fonts';
-import '@/ui/global.css';
+import '@/theme/global.css';
 
 export const metadata: Metadata = {
     title: {
