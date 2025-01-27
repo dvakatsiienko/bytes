@@ -31,10 +31,9 @@ export const createInvoice = async (_: State, formData: FormData) => {
 
     const sqlPromise = prisma.invoice.create({
         data: {
-            id:        randomUUID(),
-            amount:    amountInCents,
+            id:     randomUUID(),
+            amount: amountInCents,
             customerId,
-            createdAt: new Date(),
             status,
         },
     });
