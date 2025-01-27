@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
 import { InvoiceFormUpdate } from './ui';
 
 /* Instruments */
-import { fetchInvoiceById, fetchCustomers } from '@/lib';
+import { fetchInvoiceById, fetchCustomerList } from '@/lib';
 import type { NextPageProps } from '@/types';
 
 const UpdateInvoicePage = async (props: NextPageProps) => {
@@ -14,7 +14,7 @@ const UpdateInvoicePage = async (props: NextPageProps) => {
 
     const [ invoice, customerList ] = await Promise.all([
         fetchInvoiceById(params.id),
-        fetchCustomers(),
+        fetchCustomerList(),
     ]);
 
     if (!invoice) notFound();

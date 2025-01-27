@@ -31,10 +31,10 @@ export const createInvoice = async (_: State, formData: FormData) => {
 
     const sqlPromise = prisma.invoice.create({
         data: {
-            id:     randomUUID(),
-            amount: amountInCents,
+            id:        randomUUID(),
+            amount:    amountInCents,
             customerId,
-            date:   new Date(),
+            createdAt: new Date(),
             status,
         },
     });
@@ -113,12 +113,12 @@ const InvoiceSchema = z.object({
     customerId: z.string({ invalid_type_error: 'Please select a customer.' }),
     amount:     z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
     status:     z.enum([ 'pending', 'paid' ], { invalid_type_error: 'Please select an invoice status.' }),
-    date:       z.string(),
+    createdAt:  z.string(),
     /* eslint-enable camelcase */
 });
 
-const CreateInvoice = InvoiceSchema.omit({ id: true, date: true });
-const UpdateInvoice = InvoiceSchema.omit({ id: true, date: true });
+const CreateInvoice = InvoiceSchema.omit({ id: true, createdAt: true });
+const UpdateInvoice = InvoiceSchema.omit({ id: true, createdAt: true });
 
 /* Types */
 export type State = {

@@ -52,82 +52,82 @@ const invoices = [
         customerId: customers[ 0 ].id,
         amount:     15795,
         status:     'pending',
-        date:       '2022-12-06',
+        createdAt:  '2022-12-06',
     },
     {
         customerId: customers[ 1 ].id,
         amount:     20348,
         status:     'pending',
-        date:       '2022-11-14',
+        createdAt:  '2022-11-14',
     },
     {
         customerId: customers[ 4 ].id,
         amount:     3040,
         status:     'paid',
-        date:       '2022-10-29',
+        createdAt:  '2022-10-29',
     },
     {
         customerId: customers[ 3 ].id,
         amount:     44800,
         status:     'paid',
-        date:       '2023-09-10',
+        createdAt:  '2023-09-10',
     },
     {
         customerId: customers[ 5 ].id,
         amount:     34577,
         status:     'pending',
-        date:       '2023-08-05',
+        createdAt:  '2023-08-05',
     },
     {
         customerId: customers[ 2 ].id,
         amount:     54246,
         status:     'pending',
-        date:       '2023-07-16',
+        createdAt:  '2023-07-16',
     },
     {
         customerId: customers[ 0 ].id,
         amount:     666,
         status:     'pending',
-        date:       '2023-06-27',
+        createdAt:  '2023-06-27',
     },
     {
         customerId: customers[ 3 ].id,
         amount:     32545,
         status:     'paid',
-        date:       '2023-06-09',
+        createdAt:  '2023-06-09',
     },
     {
         customerId: customers[ 4 ].id,
         amount:     1250,
         status:     'paid',
-        date:       '2023-06-17',
+        createdAt:  '2023-06-17',
     },
     {
         customerId: customers[ 5 ].id,
         amount:     8546,
         status:     'paid',
-        date:       '2023-06-07',
+        createdAt:  '2023-06-07',
     },
     {
         customerId: customers[ 1 ].id,
         amount:     500,
         status:     'paid',
-        date:       '2023-08-19',
+        createdAt:  '2023-08-19',
     },
     {
         customerId: customers[ 5 ].id,
         amount:     8945,
         status:     'paid',
-        date:       '2023-06-03',
+        createdAt:  '2023-06-03',
     },
     {
         customerId: customers[ 2 ].id,
         amount:     1000,
         status:     'paid',
-        date:       '2022-06-05',
+        createdAt:  '2022-06-05',
     },
 ].map((invoice) => {
-    return { ...invoice, date: new Date(invoice.date).toISOString() };
+    return { ...invoice, createdAt: new Date(invoice.createdAt).toISOString() };
 });
 
 const revenue = [

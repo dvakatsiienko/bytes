@@ -144,10 +144,10 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
 //     customerId: z.string(),
 //     amount:     z.coerce.number(),
 //     status:     z.enum([ 'pending', 'paid' ]),
-//     date:       z.string(),
+//     createdAt:       z.string(),
 // });
 
-// const UpdateInvoice = InvoiceSchema.omit({ id: true, date: true });
+// const UpdateInvoice = InvoiceSchema.omit({ id: true, createdAt: true });
 
 /* Types */
 interface InvoiceFormUpdateProps {
