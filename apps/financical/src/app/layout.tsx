@@ -2,7 +2,7 @@
 import { Metadata } from 'next';
 
 /* Components */
-import { AppProviders } from './lib';
+import { AppProviders } from './AppProviders';
 
 /* Instruments */
 import { inter } from '@/theme/fonts';

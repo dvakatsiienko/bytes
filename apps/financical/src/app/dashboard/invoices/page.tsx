@@ -11,7 +11,8 @@ import { InvoiceTable, Pagination } from './ui';
 import { CreateInvoice } from './ui/Buttons';
 
 /* Instruments */
-import { fetchInvoicesPages, type NextPageProps } from '@/lib';
+import { fetchInvoicesPages } from '@/lib';
+import type { NextPageProps } from '@/types';
 
 export const metadata: Metadata = { title: 'Invoices' };
 

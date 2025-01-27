@@ -8,7 +8,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import cx from 'clsx';
 
 /* Instruments */
-import { fetchInvoicesPages, generatePagination, type NextPageProps } from '@/lib';
+import { fetchInvoicesPages, generatePagination } from '@/lib';
 
 export const Pagination = (props: PaginationProps) => {
     const pathname = usePathname();
