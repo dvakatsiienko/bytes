@@ -1,6 +1,4 @@
 /* Components */
-import { DashboardSkeleton } from '../../../ui/Skeletons';
+import { DashboardSkeleton } from '@/ui/Skeletons';
 
-export default () => {
-    return <DashboardSkeleton />;
-};
+export default () => <DashboardSkeleton />;
