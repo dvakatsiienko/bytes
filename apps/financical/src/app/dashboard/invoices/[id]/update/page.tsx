@@ -2,8 +2,8 @@
 import { notFound } from 'next/navigation';
 
 /* Components */
-import { Breadcrumbs } from '@/app/dashboard/invoices/create/ui';
-import { UpdateInfoiceForm } from './ui/UpdateInfoiceForm';
+import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
+import { InvoiceFormUpdate } from './ui';
 
 /* Instruments */
 import { fetchInvoiceById, fetchCustomers, type NextPageProps } from '@/lib';
@@ -20,7 +20,6 @@ const UpdateInvoicePage = async (props: NextPageProps) => {
 
     return (
         <main>
-            test
             <Breadcrumbs
                 breadcrumbList = { [
                     { label: 'Invoices', href: '/dashboard/invoices' },
@@ -31,7 +30,8 @@ const UpdateInvoicePage = async (props: NextPageProps) => {
                     },
                 ] }
             />
-            <UpdateInfoiceForm customerList = { customerList } invoice = { invoice } />
+
+            <InvoiceFormUpdate customerList = { customerList } invoice = { invoice } />
         </main>
     );
 };

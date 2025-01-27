@@ -2,19 +2,19 @@
 import NextImage from 'next/image';
 
 /* Components */
-import { UpdateInvoice, DeleteInvoice } from '@/ui/invoices/Buttons';
-import { InvoiceStatus } from '@/app/dashboard/invoices/ui/InvoiceStatus';
+import { UpdateInvoice, DeleteInvoice } from './Buttons';
+import { InvoiceStatus } from './InvoiceStatus';
 
 /* Instruments */
 import { fetchFilteredInvoices } from '@/lib/queries';
 import { formatDateToLocal, formatCurrency } from '@/lib/utils';
 
-export const InvoicesTable = async (props: InvoicesTableProps) => {
+export const InvoiceTable = async (props: InvoiceTableProps) => {
     const invoicesList = await fetchFilteredInvoices(props.query, props.currentPage);
 
     const invoiceListMobileJSX = invoicesList?.map((invoice) => (
         <div key = { invoice.id } className = 'mb-2 w-full rounded-md bg-white p-4'>
-            <div className = 'flex items-center justify-between border-gray-200 border-b pb-4'>
+            <div className = 'flex items-center justify-between border-b border-gray-200 pb-4'>
                 xxx
                 <div>
                     <div className = 'mb-2 flex items-center'>
@@ -114,7 +114,7 @@ export const InvoicesTable = async (props: InvoicesTableProps) => {
 };
 
 /* Types */
-interface InvoicesTableProps {
+interface InvoiceTableProps {
     query:       string,
     currentPage: number,
 }

@@ -1,1 +1,1 @@
-export * from './UpdateInfoiceForm';
+export * from './InvoiceFormUpdate';

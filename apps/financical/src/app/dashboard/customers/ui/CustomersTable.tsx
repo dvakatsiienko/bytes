@@ -4,7 +4,7 @@ import Image from 'next/image';
 import type { Customer } from '.prisma/client';
 
 /* Components */
-import { Search } from '@/ui/Search';
+import { SearchField } from '@/ui/SearchField';
 
 /* Instruments */
 import { lusitana } from '@/theme/fonts';
@@ -15,7 +15,7 @@ export const CustomersTable = ({ customers }: { customers: Customer[] }) => {
             <h1 className = { `${ lusitana.className } mb-8 text-xl md:text-2xl` }>Customers</h1>
 
             <Suspense>
-                <Search placeholder = 'Search customers...' />
+                <SearchField placeholder = 'Search customers...' />
             </Suspense>
 
             <div className = 'mt-6 flow-root'>
