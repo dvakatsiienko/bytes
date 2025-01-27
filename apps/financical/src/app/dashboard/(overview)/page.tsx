@@ -8,7 +8,7 @@ import { RevenueChart } from '../ui/RevenueChart';
 import { LatestInvoices } from '../ui/LatestInvocies';
 
 /* Instruments */
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/theme/fonts';
 
 const DashboardPage = () => {
     return (

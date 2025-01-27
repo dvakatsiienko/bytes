@@ -7,7 +7,7 @@ import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query
 import { Search } from '@/ui/Search';
 import { InvoicesTable } from '@/app/dashboard/invoices/ui/InvoicesTable';
 import { CreateInvoice } from '@/ui/invoices/Buttons';
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/theme/fonts';
 import { InvoicesTableSkeleton } from '@/ui/Skeletons';
 import { Pagination } from './ui/Pagination';
 

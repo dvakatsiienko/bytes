@@ -2,20 +2,11 @@
 import { Metadata } from 'next';
 
 /* Components */
-import { AppProviders } from './AppProviders';
+import { AppProviders } from './lib';
 
 /* Instruments */
-import { inter } from '@/ui/fonts';
+import { inter } from '@/theme/fonts';
 import '@/theme/global.css';
-
-export const metadata: Metadata = {
-    title: {
-        template: 'Financical | %s',
-        default:  'Financical',
-    },
-    description: 'A Next.js App Router app, buil with TypeScript, Prisma, and NextAuth.js',
-    // metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
-};
 
 export default (props: { children: React.ReactNode }) => {
     return (
@@ -25,4 +16,12 @@ export default (props: { children: React.ReactNode }) => {
             </body>
         </html>
     );
+};
+
+export const metadata: Metadata = {
+    title: {
+        template: 'Financical | %s',
+        default:  'Financical',
+    },
+    description: 'A Next.js App Router app, buil with TypeScript, Prisma, and NextAuth.js',
 };

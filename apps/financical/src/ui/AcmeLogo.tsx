@@ -2,7 +2,7 @@
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
 
 /* Instruments */
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/theme/fonts';
 
 export const AcmeLogo = () => {
     return (

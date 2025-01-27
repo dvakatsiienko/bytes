@@ -10,7 +10,7 @@ import { Button } from './Button';
 
 /* Instruments */
 import { authenticate } from '@/lib';
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/theme/fonts';
 
 export const LoginForm = () => {
     // eslint-disable-next-line no-undefined

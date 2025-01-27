@@ -7,7 +7,7 @@ import type { Customer } from '.prisma/client';
 import { Search } from '@/ui/Search';
 
 /* Instruments */
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/theme/fonts';
 
 export const CustomersTable = ({ customers }: { customers: Customer[] }) => {
     return (
