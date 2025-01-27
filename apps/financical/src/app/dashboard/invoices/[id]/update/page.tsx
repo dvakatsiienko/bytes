@@ -6,7 +6,8 @@ import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
 import { InvoiceFormUpdate } from './ui';
 
 /* Instruments */
-import { fetchInvoiceById, fetchCustomers, type NextPageProps } from '@/lib';
+import { fetchInvoiceById, fetchCustomers } from '@/lib';
+import type { NextPageProps } from '@/types';
 
 const UpdateInvoicePage = async (props: NextPageProps) => {
     const params = await props.params;
