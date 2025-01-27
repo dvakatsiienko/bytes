@@ -1,6 +1,6 @@
 /* Components */
 import { AcmeLogo } from '@/ui/AcmeLogo';
-import { LoginForm } from '@/ui/LoginForm';
+import { LoginForm } from './ui';
 
 const LoginPage = () => {
     return (
@@ -11,6 +11,7 @@ const LoginPage = () => {
                         <AcmeLogo />
                     </div>
                 </div>
+
                 <LoginForm />
             </div>
         </main>
