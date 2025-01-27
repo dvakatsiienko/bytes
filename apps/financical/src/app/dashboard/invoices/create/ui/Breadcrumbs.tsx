@@ -3,7 +3,7 @@ import NextLink from 'next/link';
 import { clsx } from 'clsx';
 
 /* Instruments */
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/theme/fonts';
 
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
     const breadcrumbListJSX = props.breadcrumbList.map((breadcrumb, index) => (

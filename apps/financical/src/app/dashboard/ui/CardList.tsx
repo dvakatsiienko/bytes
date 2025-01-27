@@ -4,7 +4,7 @@ import waait from 'waait';
 
 /* Instruments */
 import { fetchCardData } from '@/lib/queries';
-import { lusitana } from '@/ui/fonts';
+import { lusitana } from '@/theme/fonts';
 
 export const CardList = async () => {
     const card = await fetchCardData();
