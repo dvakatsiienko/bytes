@@ -6,11 +6,11 @@ import { UpdateInvoice, DeleteInvoice } from './Buttons';
 import { InvoiceStatus } from './InvoiceStatus';
 
 /* Instruments */
-import { fetchFilteredInvoices } from '@/lib/queries';
+import { fetchInvoiceListFiltered } from '@/lib/queries';
 import { formatDateToLocal, formatCurrency } from '@/lib/utils';
 
 export const InvoiceTable = async (props: InvoiceTableProps) => {
-    const invoicesList = await fetchFilteredInvoices(props.query, props.currentPage);
+    const invoicesList = await fetchInvoiceListFiltered(props.query, props.currentPage);
 
     const invoiceListMobileJSX = invoicesList?.map((invoice) => (
         <div key = { invoice.id } className = 'mb-2 w-full rounded-md bg-white p-4'>
@@ -19,22 +19,22 @@ export const InvoiceTable = async (props: InvoiceTableProps) => {
                 <div>
                     <div className = 'mb-2 flex items-center'>
                         <NextImage
-                            alt = { `${ invoice.name }'s profile picture` }
+                            alt = { `${ invoice.customer.name }'s profile picture` }
                             className = 'mr-2 rounded-full'
                             height = { 28 }
-                            src = { invoice.imageUrl ?? '' }
+                            src = { invoice.customer.imageUrl ?? '' }
                             width = { 28 }
                         />
-                        <p>{invoice.name}</p>
+                        <p>{invoice.customer.name}</p>
                     </div>
-                    <p className = 'text-sm text-gray-500'>{invoice.email}</p>
+                    <p className = 'text-sm text-gray-500'>{invoice.customer.email}</p>
                 </div>
                 <InvoiceStatus status = { invoice.status } />
             </div>
             <div className = 'flex w-full items-center justify-between pt-4'>
                 <div>
                     <p className = 'text-xl font-medium'>{formatCurrency(invoice.amount)}</p>
-                    <p>{formatDateToLocal(invoice.date)}</p>
+                    <p>{formatDateToLocal(invoice.createdAt)}</p>
                 </div>
                 <div className = 'flex justify-end gap-2'>
                     <UpdateInvoice id = { invoice.id } />
@@ -51,18 +51,18 @@ export const InvoiceTable = async (props: InvoiceTableProps) => {
             <td className = 'whitespace-nowrap py-3 pl-6 pr-3'>
                 <div className = 'flex items-center gap-3'>
                     <NextImage
-                        alt = { `${ invoice.name }'s profile picture` }
+                        alt = { `${ invoice.customer.name }'s profile picture` }
                         className = 'rounded-full'
                         height = { 28 }
-                        src = { invoice.imageUrl ?? '' }
+                        src = { invoice.customer.imageUrl ?? '' }
                         width = { 28 }
                     />
-                    <p>{invoice.name}</p>
+                    <p>{invoice.customer.name}</p>
                 </div>
             </td>
-            <td className = 'whitespace-nowrap px-3 py-3'>{invoice.email}</td>
+            <td className = 'whitespace-nowrap px-3 py-3'>{invoice.customer.email}</td>
             <td className = 'whitespace-nowrap px-3 py-3'>{formatCurrency(invoice.amount)}</td>
-            <td className = 'whitespace-nowrap px-3 py-3'>{formatDateToLocal(invoice.date)}</td>
+            <td className = 'whitespace-nowrap px-3 py-3'>{formatDateToLocal(invoice.createdAt)}</td>
             <td className = 'whitespace-nowrap px-3 py-3'>
                 <InvoiceStatus status = { invoice.status } />
             </td>

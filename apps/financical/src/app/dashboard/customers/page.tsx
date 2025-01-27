@@ -2,10 +2,10 @@
 import { CustomerTable } from './ui/CustomerTable';
 
 /* Instruments */
-import { fetchCustomers } from '@/lib';
+import { fetchCustomerList } from '@/lib';
 
 const CustomersPage = async () => {
-    const customers = await fetchCustomers();
+    const customers = await fetchCustomerList();
 
     return (
         <section>

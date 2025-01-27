@@ -17,24 +17,29 @@ export async function fetchRevenueList () {
     }
 }
 
-export async function fetchLatestInvoicesList () {
+export async function fetchLatestInvoiceList () {
     try {
-        const invoiceList = await prisma.invoice.findMany();
-        const customerList = await prisma.customer.findMany();
+        const invoiceList = await prisma.invoice.findMany({
+            include: {
+                customer: {
+                    select: {
+                        name:     true,
+                        imageUrl: true,
+                        email:    true,
+                    },
+                },
+            },
+        });
 
-        const latestInvoices = invoiceList.map((invoice) => {
-            const customer = customerList.find((customer) => customer.id === invoice.customerId);
-
+        // TODO sort by date
+        const latestInvoiceList = invoiceList.map((invoice) => {
             return {
                 ...invoice,
-                amount:   formatCurrency(invoice.amount),
-                name:     customer?.name,
-                imageUrl: customer?.imageUrl,
-                email:    customer?.email,
+                amount: formatCurrency(invoice.amount),
             };
         });
 
-        return latestInvoices;
+        return latestInvoiceList;
     } catch (error) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch the latest invoices.');
@@ -80,12 +85,21 @@ export async function fetchCardData () {
 
 const ITEMS_PER_PAGE = 6;
 
-export async function fetchFilteredInvoices (query: string, currentPage: number) {
+export async function fetchInvoiceListFiltered (query: string, currentPage: number) {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const invoiceList = await prisma.invoice.findMany();
-        const customerList = await prisma.customer.findMany();
+        const invoiceList = await prisma.invoice.findMany({
+            include: {
+                customer: {
+                    select: {
+                        name:     true,
+                        imageUrl: true,
+                        email:    true,
+                    },
+                },
+            },
+        });
 
         // TODO filter by:
         // - customer name
@@ -93,21 +107,11 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
         // - invoice amount
         // - invoice date
         // - invoice status
-        const inv = invoiceList
-            .map((invoice) => {
-                const customer = customerList.find((customer) => customer.id === invoice.customerId);
-
-                return {
-                    ...invoice,
-                    name:     customer?.name,
-                    imageUrl: customer?.imageUrl,
-                    email:    customer?.email,
-                };
-            })
-            .filter((invoice) => invoice.name?.toLowerCase().includes(query.toLowerCase()))
+        const invoiceListFiltered = invoiceList
+            .filter((invoice) => invoice.customer.name?.toLowerCase().includes(query.toLowerCase()))
             .slice(offset, offset + ITEMS_PER_PAGE);
 
-        return inv;
+        return invoiceListFiltered;
     } catch (error) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch invoices.');
@@ -116,8 +120,17 @@ export async function fetchFilteredInvoices (query: string, currentPage: number)
 
 export async function fetchInvoicesPages (query: string) {
     try {
-        const invoiceList = await prisma.invoice.findMany();
-        const customerList = await prisma.customer.findMany();
+        const invoiceList = await prisma.invoice.findMany({
+            include: {
+                customer: {
+                    select: {
+                        name:     true,
+                        imageUrl: true,
+                        email:    true,
+                    },
+                },
+            },
+        });
 
         // TODO filter by:
         // - customer name
@@ -125,24 +138,13 @@ export async function fetchInvoicesPages (query: string) {
         // - invoice amount
         // - invoice date
         // - invoice status
-        const inv = invoiceList
-            .map((invoice) => {
-                const customer = customerList.find((customer) => customer.id === invoice.customerId);
+        const invoiceListFiltered = invoiceList.filter((invoice) => {
+            if (query.length === 0) return true;
 
-                return {
-                    ...invoice,
-                    name:     customer?.name,
-                    imageUrl: customer?.imageUrl,
-                    email:    customer?.email,
-                };
-            })
-            .filter((invoice) => {
-                if (query.length === 0) return true;
+            return invoice.customer.name?.toLowerCase().includes(query.toLowerCase());
+        });
 
-                return invoice.name?.toLowerCase().includes(query.toLowerCase());
-            });
-
-        const totalPages = Math.ceil((inv.length + 1) / ITEMS_PER_PAGE);
+        const totalPages = Math.ceil((invoiceListFiltered.length + 1) / ITEMS_PER_PAGE);
 
         return totalPages;
     } catch (error) {
@@ -167,7 +169,7 @@ export async function fetchInvoiceById (id: string) {
     }
 }
 
-export async function fetchCustomers () {
+export async function fetchCustomerList () {
     try {
         const customerList = await prisma.customer.findMany();
 
@@ -179,6 +181,6 @@ export async function fetchCustomers () {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function fetchFilteredCustomers (query: string) {
+export async function fetchCustomerListFiltered (query: string) {
     // TODO implement
 }

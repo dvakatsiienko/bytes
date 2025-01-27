@@ -6,7 +6,7 @@
             "env": ["DATABASE_URL", "DIRECT_URL", "AUTH_SECRET", "SUPABASE_*", "POSTGRES_*"],
             "dependsOn": ["prisma:generate"]
         },
-        "seed": {
+        "db:seed": {
             "dependsOn": ["prisma:migrate:reset"],
             "cache": false
         },

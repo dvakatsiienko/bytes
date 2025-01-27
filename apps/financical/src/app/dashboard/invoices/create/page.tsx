@@ -3,10 +3,10 @@ import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
 import { InvoiceFormCreate } from './ui/InvoiceFormCreate';
 
 /* Instruments */
-import { fetchCustomers } from '@/lib/queries';
+import { fetchCustomerList } from '@/lib/queries';
 
 const CreateInvoicePage = async () => {
-    const customerList = await fetchCustomers();
+    const customerList = await fetchCustomerList();
 
     return (
         <main>

@@ -23,6 +23,7 @@ const DashboardPage = () => {
                 <Suspense fallback = { <RevenueChartSkeleton /> }>
                     <RevenueChart />
                 </Suspense>
+
                 <Suspense fallback = { <LatestInvoicesSkeleton /> }>
                     <LatestInvoices />
                 </Suspense>

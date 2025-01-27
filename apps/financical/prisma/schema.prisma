@@ -25,13 +25,15 @@ model Customer {
 }
 
 model Invoice {
-  id     String   @id @unique @default(uuid())
+  id     String @id @unique @default(uuid())
   amount Int
   status String
-  date   DateTime @default(now())
 
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model Revenue {
