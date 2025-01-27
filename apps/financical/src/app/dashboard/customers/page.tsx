@@ -1,5 +1,5 @@
 /* Components */
-import { CustomersTable } from '@/app/dashboard/customers/ui/CustomersTable';
+import { CustomerTable } from './ui/CustomerTable';
 
 /* Instruments */
 import { fetchCustomers } from '@/lib';
@@ -9,7 +9,7 @@ const CustomersPage = async () => {
 
     return (
         <section>
-            <CustomersTable customers = { customers } />
+            <CustomerTable customerList = { customers } />
         </section>
     );
 };
