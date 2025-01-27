@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import NextLink from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import clsx from 'clsx';
+import cx from 'clsx';
 
 /* Instruments */
 import { fetchInvoicesPages, generatePagination, type NextPageProps } from '@/lib';
@@ -73,7 +73,7 @@ export const Pagination = (props: PaginationProps) => {
 const PaginationNumber = (props: PaginationNumberProps) => {
     const { page, href, position, isActive } = props;
 
-    const className = clsx(
+    const className = cx(
         'flex h-10 w-10 items-center justify-center text-sm border border-gray-400',
         {
             'rounded-l-md':                                position === 'first' || position === 'single',
@@ -96,12 +96,15 @@ const PaginationNumber = (props: PaginationNumberProps) => {
 const PaginationArrow = (props: PaginationArrowProps) => {
     const { href, direction, isDisabled } = props;
 
-    const className = clsx('flex h-10 w-10 items-center justify-center rounded-md border border-gray-400', {
-        'pointer-events-none text-gray-300': isDisabled,
-        'hover:bg-gray-100':                 !isDisabled,
-        'mr-2 md:mr-4':                      direction === 'left',
-        'ml-2 md:ml-4':                      direction === 'right',
-    });
+    const className = cx(
+        'flex h-10 w-10 items-center justify-center rounded-md border border-gray-400',
+        {
+            'pointer-events-none text-gray-300': isDisabled,
+            'hover:bg-gray-100':                 !isDisabled,
+            'mr-2 md:mr-4':                      direction === 'left',
+            'ml-2 md:ml-4':                      direction === 'right',
+        },
+    );
 
     const icon =
         direction === 'left' ? (

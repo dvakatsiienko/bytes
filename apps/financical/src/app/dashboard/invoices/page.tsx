@@ -4,12 +4,11 @@ import { Suspense } from 'react';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 
 /* Components */
-import { Search } from '@/ui/Search';
-import { InvoicesTable } from '@/app/dashboard/invoices/ui/InvoicesTable';
-import { CreateInvoice } from '@/ui/invoices/Buttons';
-import { lusitana } from '@/theme/fonts';
+import { SearchField } from '@/ui/SearchField';
 import { InvoicesTableSkeleton } from '@/ui/Skeletons';
-import { Pagination } from './ui/Pagination';
+import { lusitana } from '@/theme/fonts';
+import { InvoiceTable, Pagination } from './ui';
+import { CreateInvoice } from './ui/Buttons';
 
 /* Instruments */
 import { fetchInvoicesPages, type NextPageProps } from '@/lib';
@@ -37,12 +36,13 @@ const InvoicesPage = async (props: NextPageProps) => {
             </div>
 
             <div className = 'mt-4 flex items-center justify-between gap-2 md:mt-8'>
-                <Search placeholder = 'Search invoices...' />
+                <SearchField placeholder = 'Search invoices...' />
+
                 <CreateInvoice />
             </div>
 
             <Suspense key = { query + currentPage } fallback = { <InvoicesTableSkeleton /> }>
-                <InvoicesTable currentPage = { currentPage } query = { query } />
+                <InvoiceTable currentPage = { currentPage } query = { query } />
             </Suspense>
 
             <div className = 'mt-5 flex w-full justify-center'>

@@ -1,6 +1,5 @@
 /* Core */
 import { BanknotesIcon, ClockIcon, UserGroupIcon, InboxIcon } from '@heroicons/react/24/outline';
-import waait from 'waait';
 
 /* Instruments */
 import { fetchCardData } from '@/lib/queries';
@@ -8,7 +7,6 @@ import { lusitana } from '@/theme/fonts';
 
 export const CardList = async () => {
     const card = await fetchCardData();
-    await waait(1000);
 
     return (
         <>

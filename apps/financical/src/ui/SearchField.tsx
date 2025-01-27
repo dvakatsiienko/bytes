@@ -6,7 +6,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useDebouncedCallback } from 'use-debounce';
 
-export const Search = (props: SearchProps) => {
+export const SearchField = (props: SearchFieldProps) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -50,6 +50,6 @@ export const Search = (props: SearchProps) => {
 };
 
 /* Types */
-interface SearchProps {
+interface SearchFieldProps {
     placeholder: string,
 }
