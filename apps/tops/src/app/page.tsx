@@ -1,10 +1,13 @@
 /* Components */
-import { Example } from './Example';
+import { Header } from './Header';
+import { Hero } from './Hero';
 
 const Home = () => {
     return (
         <main className = ''>
-            <Example />
+            {/* <SignIn /> */}
+            <Header />
+            <Hero />
         </main>
     );
 };
