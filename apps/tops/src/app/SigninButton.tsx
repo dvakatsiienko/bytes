@@ -12,12 +12,8 @@ export const SigninButton = async () => {
     const authText = session ? 'Sign out' : 'Sign in';
 
     return (
-        <form
-            action = { async () => {
-                'use server';
-                session ? await signOut() : await signIn('github');
-            } }>
-            <button className = 'font-semibold text-gray-900' onClick = { handleSignIn }>
+        <form action = { handleSignIn }>
+            <button className = 'font-semibold text-gray-900'>
                 {authText}{' '}
                 <span aria-hidden = 'true' className = 'hidden lg:inline'>
                     &rarr;
