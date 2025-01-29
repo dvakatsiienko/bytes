@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import NextLink from 'next/link';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import cx from 'clsx';
@@ -9,26 +10,26 @@ export const Header = (props: React.PropsWithChildren) => {
     const [ mobileMenuOpen, setMobileMenuOpen ] = useState(false);
 
     const linkListJSX = navigation.map((item) => (
-        <a
+        <NextLink
             key = { item.name }
             className = { cx('font-semibold text-gray-900 lg:text-base/6', { '-mx-3 block rounded-lg px-3 py-2 text-base/7': mobileMenuOpen }) }
             href = { item.href }>
             {item.name}
-        </a>
+        </NextLink>
     ));
 
     return (
         <header className = 'absolute inset-x-0 top-0 z-50'>
             <nav aria-label = 'Global' className = 'flex items-center justify-between p-6 lg:px-8'>
                 <div className = 'flex lg:flex-1'>
-                    <a className = '-m-1.5 p-1.5' href = '#'>
+                    <NextLink className = '-m-1.5 p-1.5' href = '/'>
                         <span className = 'sr-only'>Your Company</span>
                         <img
                             alt = ''
                             className = 'h-8 w-auto'
                             src = 'https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600'
                         />
-                    </a>
+                    </NextLink>
                 </div>
 
                 <div className = 'hidden lg:flex lg:gap-x-12'>{linkListJSX}</div>
@@ -81,6 +82,6 @@ export const Header = (props: React.PropsWithChildren) => {
 
 /* Helpers */
 const navigation = [
-    { name: 'Games', href: '#' },
-    { name: 'Leaderboards', href: '#' },
+    { name: 'Games', href: '/games' },
+    { name: 'Leaderboards', href: '/leaderboard' },
 ];
