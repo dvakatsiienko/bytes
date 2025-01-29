@@ -3,6 +3,10 @@ import type { Metadata } from 'next';
 import { SessionProvider } from 'next-auth/react';
 import { Geist, Geist_Mono } from 'next/font/google';
 
+/* Components */
+import { Header } from './Header';
+import { SigninButton } from './SigninButton';
+
 /* Instruments */
 import './globals.css';
 
@@ -18,11 +22,16 @@ const geistMono = Geist_Mono({
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     return (
-        <html lang = 'en'>
-            <body className = { `${ geistSans.variable } ${ geistMono.variable } antialiased` }>
-                <SessionProvider>{children}</SessionProvider>
-            </body>
-        </html>
+        <SessionProvider>
+            <html lang = 'en'>
+                <body className = { `${ geistSans.variable } ${ geistMono.variable } antialiased` }>
+                    <Header>
+                        <SigninButton />
+                    </Header>
+                    {children}
+                </body>
+            </html>
+        </SessionProvider>
     );
 };
 
