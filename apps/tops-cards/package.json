@@ -1,5 +1,5 @@
 {
-    "name": "tops",
+    "name": "tops-cards",
     "version": "0.0.1",
     "private": true,
     "scripts": {
@@ -19,7 +19,7 @@
     },
     "devDependencies": {
         "@tailwindcss/forms": "0.5.10",
-        "@tailwindcss/postcss": "4.0.0",
+        "@tailwindcss/postcss": "4.0.1",
         "@types/node": "22.12.0",
         "@types/react": "19.0.8",
         "@types/react-dom": "19.0.3",
