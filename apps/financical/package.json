@@ -28,7 +28,6 @@
         "next-auth": "5.0.0-beta.19",
         "react": "19.0.0",
         "react-dom": "19.0.0",
-        "tailwindcss": "4.0.0",
         "use-debounce": "10.0.4",
         "waait": "1.0.5",
         "zod": "3.24.1"
@@ -44,7 +43,8 @@
         "@types/react": "19.0.8",
         "@types/react-dom": "19.0.3",
         "postcss": "8.5.1",
-        "prisma": "6.3.0"
+        "prisma": "6.3.0",
+        "tailwindcss": "4.0.3"
     },
     "prisma": {
         "seed": "node -r @swc-node/register prisma/seed/init"
