@@ -30,16 +30,16 @@
         "react-dom": "19.0.0",
         "use-debounce": "10.0.4",
         "waait": "1.0.5",
-        "zod": "3.24.1"
+        "zod": "3.24.2"
     },
     "devDependencies": {
         "@swc-node/register": "1.10.9",
-        "@swc/core": "1.10.15",
+        "@swc/core": "1.10.16",
         "@tailwindcss/forms": "0.5.10",
         "@tailwindcss/postcss": "4.0.6",
         "@tanstack/react-query-devtools": "5.66.0",
         "@types/bcrypt": "5.0.2",
-        "@types/node": "22.13.1",
+        "@types/node": "22.13.2",
         "@types/react": "19.0.8",
         "@types/react-dom": "19.0.3",
         "postcss": "8.5.2",
