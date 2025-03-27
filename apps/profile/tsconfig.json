@@ -1,6 +1,6 @@
 {
     /* File inclusion */
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next.config.mjs", ".next/types/**/*.ts"],
+    "include": ["next-env.d.ts", "*.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
     "exclude": ["node_modules"],
     "compilerOptions": {
         /* Module resolution */
