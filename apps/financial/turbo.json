@@ -7,10 +7,10 @@
             "dependsOn": ["prisma:generate"]
         },
         "db:seed": {
-            "dependsOn": ["prisma:migrate:reset"],
+            "dependsOn": ["db:migrate"],
             "cache": false
         },
-        "prisma:migrate:reset": {
+        "db:migrate": {
             "cache": false
         },
         "prisma:generate": {
