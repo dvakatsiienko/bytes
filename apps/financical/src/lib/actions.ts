@@ -3,8 +3,8 @@
 /* Core */
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-// import { signIn } from '@/auth';
-// import { AuthError } from 'next-auth';
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 import { z } from 'zod';
 import to from 'await-to-js';
 import { randomUUID } from 'crypto';
@@ -15,13 +15,13 @@ import { prisma } from './prisma';
 export const createInvoice = async (_: State, formData: FormData) => {
     const validatedFields = CreateInvoice.safeParse({
         customerId: formData.get('customerId'),
-        amount:     formData.get('amount'),
-        status:     formData.get('status'),
+        amount: formData.get('amount'),
+        status: formData.get('status'),
     });
 
     if (!validatedFields.success) {
         return {
-            errors:  validatedFields.error.flatten().fieldErrors,
+            errors: validatedFields.error.flatten().fieldErrors,
             message: 'Missing Fields. Failed to Create Invoice.',
         };
     }
@@ -31,7 +31,7 @@ export const createInvoice = async (_: State, formData: FormData) => {
 
     const sqlPromise = prisma.invoice.create({
         data: {
-            id:     randomUUID(),
+            id: randomUUID(),
             amount: amountInCents,
             customerId,
             status,
@@ -48,13 +48,13 @@ export const createInvoice = async (_: State, formData: FormData) => {
 export const updateInvoice = async (id: string, prevState: State, formData: FormData) => {
     const validatedFields = UpdateInvoice.safeParse({
         customerId: formData.get('customerId'),
-        amount:     formData.get('amount'),
-        status:     formData.get('status'),
+        amount: formData.get('amount'),
+        status: formData.get('status'),
     });
 
     if (!validatedFields.success) {
         return {
-            errors:  validatedFields.error.flatten().fieldErrors,
+            errors: validatedFields.error.flatten().fieldErrors,
             message: 'Missing Fields. Failed to Update Invoice.',
         };
     }
@@ -62,23 +62,25 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
     const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
 
-    await to(prisma.invoice.update({
+    await to(
+        prisma.invoice.update({
             where: { id },
-            data:  {
+            data: {
                 customerId,
                 amount: amountInCents,
                 status,
             },
-        }));
+        }),
+    );
 
     // TODO check if revalidatePath is needed, since /dashboard/invoices page is dynamic and not cached
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
 };
 
-export async function deleteInvoice (id: string) {
+export async function deleteInvoice(id: string) {
     try {
-        await prisma.invoice.delete({ where: { id }});
+        await prisma.invoice.delete({ where: { id } });
         revalidatePath('/dashboard/invoices');
 
         // return { message: 'Deleted Invoice.' };
@@ -87,10 +89,12 @@ export async function deleteInvoice (id: string) {
     }
 }
 
-export async function authenticate (prevState: string | undefined, formData: FormData) {
-    return Promise.resolve(void 0);
+export async function authenticate(prevState: string | undefined, formData: FormData) {
+    // TODO implement authentication
+    redirect('/dashboard');
+
     // try {
-    //     await signIn('credentials', formData);
+    //     const result = await signIn('credentials', formData);
     // } catch (error) {
     //     if (error instanceof AuthError) {
     //         // eslint-disable-next-line smells/no-switch
@@ -108,11 +112,11 @@ export async function authenticate (prevState: string | undefined, formData: For
 /* Helpers */
 const InvoiceSchema = z.object({
     /* eslint-disable camelcase */
-    id:         z.string(),
+    id: z.string(),
     customerId: z.string({ invalid_type_error: 'Please select a customer.' }),
-    amount:     z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
-    status:     z.enum([ 'pending', 'paid' ], { invalid_type_error: 'Please select an invoice status.' }),
-    createdAt:  z.string(),
+    amount: z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
+    status: z.enum(['pending', 'paid'], { invalid_type_error: 'Please select an invoice status.' }),
+    createdAt: z.string(),
     /* eslint-enable camelcase */
 });
 
@@ -122,9 +126,9 @@ const UpdateInvoice = InvoiceSchema.omit({ id: true, createdAt: true });
 /* Types */
 export type State = {
     errors?: {
-        customerId?: string[],
-        amount?:     string[],
-        status?:     string[],
-    },
-    message?: string | null,
+        customerId?: string[];
+        amount?: string[];
+        status?: string[];
+    };
+    message?: string | null;
 };
