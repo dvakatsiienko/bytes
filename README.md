@@ -1,5 +1,7 @@
 # Turborepo
 
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/dvakatsiienko/turborepo?utm_source=oss&utm_medium=github&utm_campaign=dvakatsiienko%2Fturborepo&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
 🏎️ The monorepository is wired up with [Turborepo](https://turbo.build/).
 
 🐶 I use it to store my pet projects and tools.
