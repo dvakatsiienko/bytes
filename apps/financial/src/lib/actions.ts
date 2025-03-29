@@ -91,7 +91,11 @@ export async function deleteInvoice(id: string) {
 
 export async function authenticate(prevState: string | undefined, formData: FormData) {
     // TODO implement authentication
-    redirect('/dashboard');
+    return redirect('/dashboard');
+
+
+console.log();
+
 
     // try {
     //     const result = await signIn('credentials', formData);
