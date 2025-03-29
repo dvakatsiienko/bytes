@@ -26,7 +26,7 @@
     },
     "devDependencies": {
         "@graphql-codegen/cli": "5.0.5",
-        "@graphql-codegen/typescript": "4.1.5",
+        "@graphql-codegen/typescript": "4.1.6",
         "@swc-node/register": "1.10.10",
         "@swc/core": "1.11.13",
         "@types/node": "22.13.14",
