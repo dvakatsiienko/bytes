@@ -11,7 +11,7 @@
         "start:@space-explorer/api": "turbo @space-explorer/api#start ",
         "start:profile": "turbo profile#start",
         "start:simple": "turbo simple#start",
-        "start:financical": "turbo start financical#start",
+        "start:financical": "turbo financical#start",
         "build": "turbo build",
         "build:hackernews": "turbo hackernews#build",
         "build:space-explorer/ui": "turbo space-explorer/ui#build",
