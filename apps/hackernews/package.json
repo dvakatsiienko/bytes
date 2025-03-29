@@ -48,9 +48,9 @@
         "prisma": "6.5.0",
         "react": "19.1.0",
         "react-dom": "19.1.0",
-        "react-hook-form": "7.54.2",
-        "sass": "1.85.0",
-        "styled-components": "6.1.15",
+        "react-hook-form": "7.55.0",
+        "sass": "1.86.0",
+        "styled-components": "6.1.16",
         "superjson": "1.13.1",
         "waait": "1.0.5",
         "zod": "3.24.2"
