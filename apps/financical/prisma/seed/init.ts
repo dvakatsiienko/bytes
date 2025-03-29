@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 /* Core */
-import bcrypt from 'bcrypt';
 import { PrismaClient } from '.prisma/client';
 
 /* Instruments */
@@ -11,7 +10,7 @@ import { invoices, customers, revenue, users } from './seed-data';
 
 const prisma = new PrismaClient();
 
-async function seed () {
+async function seed() {
     try {
         await seedUsers();
         await prisma.customer.createMany({ data: customers });
@@ -36,12 +35,16 @@ seed()
     });
 
 /* Helpers */
-async function seedUsers () {
-    const userList = await Promise.all(users.map(async (user) => {
+async function seedUsers() {
+    const userList = await Promise.all(
+        users.map(async (user) => {
             return {
                 ...user,
-                password: await bcrypt.hash(user.password, 10),
+                // TODO hash passwords in future
+                // password: await bcrypt.hash(user.password, 10),
+                password: user.password,
             };
-        }));
+        }),
+    );
     await prisma.user.createMany({ data: userList });
 }

@@ -1,7 +1,6 @@
 /* Core */
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import type { User } from '.prisma/client';
 
@@ -13,7 +12,7 @@ export const { auth, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
         Credentials({
-            async authorize (credentials) {
+            async authorize(credentials) {
                 const parsedCredentials = z
                     .object({ email: z.string().email(), password: z.string().min(6) })
                     .safeParse(credentials);
@@ -24,9 +23,11 @@ export const { auth, signIn, signOut } = NextAuth({
 
                     if (!user) return null;
 
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
+                    // TODO hash passwords in future
+                    // const passwordsMatch = await bcrypt.compare(password, user.password);
+                    // if (passwordsMatch)
 
-                    if (passwordsMatch) return user;
+                    return user;
                 }
 
                 console.log('Invalid credentials');
@@ -37,9 +38,9 @@ export const { auth, signIn, signOut } = NextAuth({
     ],
 });
 
-async function getUser (email: string): Promise<User | undefined> {
+async function getUser(email: string): Promise<User | undefined> {
     try {
-        const user = await prisma.user.findUnique({ where: { email }});
+        const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) return;
 
