@@ -8,8 +8,11 @@
         "titleBar.border": "#000"
     },
     "typescript.tsdk": "node_modules/typescript/lib",
+    // json.schemaDownload.enable": true
+    "json.schemaDownload.enable": true,
+    "yaml.schemaStore.enable": true,
     "yaml.schemas": {
         "file:///Users/furthur/.vscode/extensions/atlassian.atlascode-2.10.12/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
-        "https://coderabbit.ai/integrations/schema.v2.json": "file:///Users/d.vakatsiienko/projects/turborepo/.coderabbit.yaml"
+        "https://coderabbit.ai/integrations/schema.v2.json": ".coderabbit.yaml"
     }
 }
