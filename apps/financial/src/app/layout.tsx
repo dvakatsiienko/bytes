@@ -20,8 +20,8 @@ export default (props: { children: React.ReactNode }) => {
 
 export const metadata: Metadata = {
     title: {
-        template: 'Financical | %s',
-        default:  'Financical',
+        template: 'Financial | %s',
+        default:  'Financial',
     },
     description: 'A Next.js App Router app, buil with TypeScript, Prisma, and NextAuth.js',
 };
