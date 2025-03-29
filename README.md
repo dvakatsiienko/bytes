@@ -32,12 +32,12 @@
 
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
 
-## 🎨 Simple CSSourcery
+## 🎨 CSSorcery
 
 #### ☘️ Clinique
 
 [Website](https://cssorcery.vercel.app/clinique) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/simple)
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cssorcery)
 
 ## 🧰 Libraries
 
