@@ -21,7 +21,7 @@
 #### 🏄‍♂️ Financial 🚧 WIP 🚧
 
 [Website](https://hackernews-modern.vercel.app) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financical)
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financial)
 
 #### 🛰️ Space Explorer UI
 
