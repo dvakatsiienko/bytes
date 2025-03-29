@@ -7,6 +7,7 @@ import { PrismaClient } from '.prisma/client';
 
 /* Instruments */
 import { invoices, customers, revenue, users } from './seed-data';
+import { hashPassword } from '@/lib/security';
 
 const prisma = new PrismaClient();
 
@@ -40,9 +41,7 @@ async function seedUsers() {
         users.map(async (user) => {
             return {
                 ...user,
-                // TODO hash passwords in future
-                // password: await bcrypt.hash(user.password, 10),
-                password: user.password,
+                password: hashPassword(user.password),
             };
         }),
     );
