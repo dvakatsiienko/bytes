@@ -7,5 +7,9 @@
         "titleBar.inactiveBackground": "#ffe100",
         "titleBar.border": "#000"
     },
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "yaml.schemas": {
+        "file:///Users/furthur/.vscode/extensions/atlassian.atlascode-2.10.12/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+        "https://coderabbit.ai/integrations/schema.v2.json": "file:///Users/d.vakatsiienko/projects/turborepo/.coderabbit.yaml"
+    }
 }
