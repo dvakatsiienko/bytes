@@ -6,6 +6,7 @@ import type { User } from '.prisma/client';
 
 /* Instruments */
 import { prisma } from '@/lib';
+import { verifyPassword } from '@/lib/security';
 import { authConfig } from './auth.config';
 
 export const { auth, signIn, signOut } = NextAuth({
@@ -23,15 +24,11 @@ export const { auth, signIn, signOut } = NextAuth({
 
                     if (!user) return null;
 
-                    // TODO hash passwords in future
-                    // const passwordsMatch = await bcrypt.compare(password, user.password);
-                    // if (passwordsMatch)
-
-                    return user;
+                    const passwordsMatch = verifyPassword(password, user.password);
+                    if (passwordsMatch) return user;
                 }
 
-                console.log('Invalid credentials');
-
+                console.log('Invalid credentials!');
                 return null;
             },
         }),
