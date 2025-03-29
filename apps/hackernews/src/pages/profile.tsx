@@ -4,12 +4,9 @@ import { useSession } from 'next-auth/react';
 
 /* Instruments */
 import { useTodo1Query, trpc } from '@/api';
-import { useDispatch, useSelector, counterSlice } from '@/lib';
 import { getServerSideSession } from '@/server/auth';
 
 const ProfilePage: NextPage = () => {
-    const dispatch = useDispatch();
-    const count = useSelector((state) => state.counter.count);
     const todo1query = useTodo1Query();
 
     const session = useSession();
@@ -39,14 +36,6 @@ const ProfilePage: NextPage = () => {
 
             <br />
             <br />
-
-            <button type = 'button' onPointerUp = { () => dispatch(counterSlice.actions.decrement()) }>
-                -
-            </button>
-            {count}
-            <button type = 'button' onPointerUp = { () => dispatch(counterSlice.actions.increment()) }>
-                +
-            </button>
         </section>
     );
 };
