@@ -206,9 +206,6 @@ importers:
       tailwindcss:
         specifier: 4.0.17
         version: 4.0.17
-      tsconfig-core:
-        specifier: workspace:*
-        version: link:../../packages/tsconfig-core
       typescript:
         specifier: 5.8.2
         version: 5.8.2
