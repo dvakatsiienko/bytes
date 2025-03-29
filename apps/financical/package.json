@@ -17,7 +17,7 @@
     "dependencies": {
         "@heroicons/react": "2.2.0",
         "@prisma/client": "6.5.0",
-        "@tanstack/react-query": "5.69.0",
+        "@tanstack/react-query": "5.70.0",
         "autoprefixer": "10.4.21",
         "await-to-js": "3.0.0",
         "bcrypt": "5.1.1",
@@ -26,8 +26,8 @@
         "dotenv-cli": "8.0.0",
         "next": "15.2.4",
         "next-auth": "5.0.0-beta.19",
-        "react": "19.0.0",
-        "react-dom": "19.0.0",
+        "react": "19.1.0",
+        "react-dom": "19.1.0",
         "use-debounce": "10.0.4",
         "waait": "1.0.5",
         "zod": "3.24.2"
@@ -37,7 +37,7 @@
         "@swc/core": "1.11.13",
         "@tailwindcss/forms": "0.5.10",
         "@tailwindcss/postcss": "4.0.17",
-        "@tanstack/react-query-devtools": "5.69.0",
+        "@tanstack/react-query-devtools": "5.70.0",
         "@types/bcrypt": "5.0.2",
         "@types/node": "22.13.14",
         "@types/react": "19.0.12",
