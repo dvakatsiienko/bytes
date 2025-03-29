@@ -10,7 +10,7 @@ export default (props: React.PropsWithChildren) => {
     return (
         <html lang = 'en'>
             <head>
-                <title>Simple</title>
+                <title>cssorcery</title>
                 <link href = '/dist/styles.css' rel = 'stylesheet' />
             </head>
             <body className = { inter.className }>{props.children}</body>
