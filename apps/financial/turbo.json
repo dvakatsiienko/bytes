@@ -3,15 +3,8 @@
     "extends": ["//"],
     "tasks": {
         "build": {
-            "env": ["DATABASE_URL", "DIRECT_URL", "AUTH_SECRET", "SUPABASE_*", "POSTGRES_*"],
+            "env": ["DATABASE_URL", "AUTH_SECRET"],
             "dependsOn": ["prisma:generate"]
-        },
-        "db:seed": {
-            "dependsOn": ["db:migrate"],
-            "cache": false
-        },
-        "db:migrate": {
-            "cache": false
         },
         "prisma:generate": {
             "inputs": ["./prisma/**/*"]
