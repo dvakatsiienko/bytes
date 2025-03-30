@@ -1,5 +1,5 @@
 import { modelID } from "@/ai/providers";
-import { Textarea as ShadcnTextarea } from "@/_components/ui/Textarea";
+import { Textarea as ShadcnTextarea } from "@/components/ui/Textarea";
 import { ArrowUp } from "lucide-react";
 import { ModelPicker } from "./Model-picker";
 
