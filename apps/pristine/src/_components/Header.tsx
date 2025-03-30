@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 /* Components */
-import { GroqIcon } from "./icons";
+import { GroqIcon } from "./Icons";
 
 export const Header = () => {
   return (

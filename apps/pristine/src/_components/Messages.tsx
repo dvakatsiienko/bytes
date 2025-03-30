@@ -1,5 +1,5 @@
 import type { Message as TMessage } from "ai";
-import { Message } from "./message";
+import { Message } from "./Message";
 import { useScrollToBottom } from "@/lib/hooks/use-scroll-to-bottom";
 
 export const Messages = ({
