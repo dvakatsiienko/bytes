@@ -35,6 +35,6 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     );
 };
 
-export const metadata: Metadata = { title: 'Tops cards' };
+export const metadata: Metadata = { title: 'Pristine AI' };
 
 export default RootLayout;

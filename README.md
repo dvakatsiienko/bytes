@@ -8,6 +8,11 @@
 
 ## 🛸 Applications
 
+#### 💎 Pristine AI
+
+[Website](https://pristine-ai.vercel.app) |
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/pristine)
+
 <!-- ###### ✈️ My CV 🚧 WIP 🚧
 
 [Website](https://ripeluokte.vercel.app) |

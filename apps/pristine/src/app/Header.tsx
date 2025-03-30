@@ -82,6 +82,7 @@ export const Header = (props: React.PropsWithChildren) => {
 
 /* Helpers */
 const navigation = [
+    { name: 'Chat', href: '/chat' },
     { name: 'Games', href: '/games' },
     { name: 'Leaderboards', href: '/leaderboard' },
 ];
