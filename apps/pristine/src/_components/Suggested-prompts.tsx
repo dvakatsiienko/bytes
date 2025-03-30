@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Button } from "./ui/button";
+import { Button } from "./ui/Button";
 import { memo } from "react";
 
 interface SuggestedPromptsProps {
