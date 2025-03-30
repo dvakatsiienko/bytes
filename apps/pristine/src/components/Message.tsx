@@ -1,12 +1,10 @@
 'use client';
 
+/* Core */
+import { memo, useCallback, useEffect, useState } from 'react';
 import type { Message as TMessage } from 'ai';
 import { AnimatePresence, motion } from 'motion/react';
-import { memo, useCallback, useEffect, useState } from 'react';
 import equal from 'fast-deep-equal';
-
-import { Markdown } from './Markdown';
-import { cn } from '@/lib/utils';
 import {
     CheckCircle,
     ChevronDownIcon,
@@ -15,19 +13,14 @@ import {
     PocketKnife,
     SparklesIcon,
     StopCircle,
-} from "lucide-react";
+} from 'lucide-react';
+
+/* Components */
+import { Markdown } from './Markdown';
 import { SpinnerIcon } from './Icons';
 
-interface ReasoningPart {
-    type: 'reasoning';
-    reasoning: string;
-    details: Array<{ type: 'text'; text: string }>;
-}
-
-interface ReasoningMessagePartProps {
-    part: ReasoningPart;
-    isReasoning: boolean;
-}
+/* Instruments */
+import { cn } from '@/lib/utils';
 
 export function ReasoningMessagePart({ part, isReasoning }: ReasoningMessagePartProps) {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -139,7 +132,7 @@ const PurePreviewMessage = ({
                                 <SparklesIcon size={14} />
                             </div>
                         </div>
-            )}
+                    )}
 
                     <div className='flex w-full flex-col space-y-4'>
                         {message.parts?.map((part, i) => {
@@ -231,3 +224,15 @@ export const Message = memo(PurePreviewMessage, (prevProps, nextProps) => {
 
     return true;
 });
+
+/* Types */
+interface ReasoningPart {
+    type: 'reasoning';
+    reasoning: string;
+    details: Array<{ type: 'text'; text: string }>;
+}
+
+interface ReasoningMessagePartProps {
+    part: ReasoningPart;
+    isReasoning: boolean;
+}
