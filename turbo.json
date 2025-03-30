@@ -4,32 +4,18 @@
         "start": {
             "cache": false,
             "persistent": true,
-            "dependsOn": ["^db:generate"]
+            "dependsOn": ["^prisma:generate"]
         },
-        "serve": {
-            "cache": false,
-            "persistent": true
-        },
+        "serve": { "cache": false, "persistent": true },
         "build": {
-            "dependsOn": ["^build", "lint", "typecheck", "^db:generate"],
+            "dependsOn": ["^build", "lint", "typecheck", "^prisma:generate"],
             "outputs": [".next/**", "!.next/cache/**"]
         },
-        "lint": {
-            "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"]
-        },
+        "lint": { "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"] },
         "typecheck": {
             "dependsOn": ["^typecheck"],
             "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"]
         },
-        "db:generate": {
-            "cache": false
-        },
-        "db:migrate": {
-                "cache": false,
-            "persistent": true
-        },
-        "db:deploy": {
-            "cache": false
-        }
+        "prisma:generate": { "cache": false }
     }
 }

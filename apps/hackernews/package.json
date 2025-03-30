@@ -16,9 +16,9 @@
         "packages:install": "yarn",
         "packages:reinstall": "run-s build:clean packages:clean packages:install",
         "packages:clean": "rimraf node_modules yarn.lock",
-        "seed": "dotenv -e .env.local run-s prisma:migrate:reset prisma:db:seed",
+        "seed": "dotenv -e .env.local run-s db:migrate prisma:db:seed",
         "prisma:generate": "prisma generate",
-        "prisma:migrate:reset": "prisma db push --force-reset",
+        "db:migrate": "prisma db push --force-reset",
         "prisma:db:seed": "prisma db seed",
         "prisma:studio": "dotenv -e .env.local -- prisma studio",
         "postinstall": "prisma generate"
