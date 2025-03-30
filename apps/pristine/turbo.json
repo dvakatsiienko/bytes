@@ -3,7 +3,13 @@
     "extends": ["//"],
     "tasks": {
         "build": {
-            "env": ["AUTH_SECRET ", "RAWG_KEY", "GROQ_API_KEY" ]
+            "env": [
+                "AUTH_GITHUB_ID",
+                "AUTH_GITHUB_SECRET",
+                "AUTH_SECRET",
+                "RAWG_KEY",
+                "GROQ_API_KEY"
+            ]
         }
     }
 }

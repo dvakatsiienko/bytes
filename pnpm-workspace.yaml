@@ -1,4 +1,4 @@
 packages:
   - "apps/*"
-  - "!apps/hackernews" # until issues are fixed
+  - "!apps/hackernews" # fix or delete
   - "packages/*"

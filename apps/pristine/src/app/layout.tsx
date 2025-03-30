@@ -28,6 +28,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                     <Header>
                         <SigninButton />
                     </Header>
+
                     {children}
                 </body>
             </html>

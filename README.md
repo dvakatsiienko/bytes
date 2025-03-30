@@ -8,7 +8,7 @@
 
 ## 🛸 Applications
 
-#### 💎 Pristine AI
+#### 💎 Pristine AI 🚧 WIP 🚧
 
 [Website](https://pristine-ai.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/pristine)
