@@ -89,6 +89,16 @@ export async function deleteInvoice(id: string) {
     }
 }
 
+/**
+ * Authenticates a user and redirects them to the dashboard.
+ *
+ * This function is a placeholder implementation that bypasses actual authentication logic.
+ * It always returns a redirect response to the dashboard, regardless of the provided state or form data.
+ *
+ * @param prevState - An optional state value that could be used in future authentication logic.
+ * @param formData - The form data containing user credentials.
+ * @returns A redirect response directing the client to the dashboard page.
+ */
 export async function authenticate(prevState: string | undefined, formData: FormData) {
     // TODO implement authentication
     return redirect('/dashboard');
