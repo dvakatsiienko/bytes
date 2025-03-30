@@ -3,7 +3,7 @@ import { Hero } from './Hero';
 
 const Home = () => {
     return (
-        <main className = ''>
+        <main className = 'min-h-[calc(100vh-80px)] grid'>
             {/* <SignIn /> */}
             <Hero />
         </main>
