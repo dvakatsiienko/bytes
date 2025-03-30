@@ -4,7 +4,7 @@ import { modelID } from "@/ai/providers";
 import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
 // import { ModelPicker } from "./model-picker";
-import { Textarea } from "./textarea";
+import { Textarea } from "./Textarea";
 import { ProjectOverview } from "./Project-overview";
 import { Messages } from "./Messages";
 import { Header } from "./Header";
