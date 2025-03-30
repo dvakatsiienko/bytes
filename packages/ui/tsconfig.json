@@ -8,7 +8,6 @@
         "lib": ["DOM", "DOM.ITERABLE", "ESNext"],
         "target": "ESNext",
         "module": "ESNext",
-        "moduleResolution": "Node",
-        "types": ["@types/react", "@types/react-dom"]
+        "moduleResolution": "Node"
     }
 }
