@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { memo, useCallback, useEffect, useState } from 'react';
 import equal from 'fast-deep-equal';
 
-import { Markdown } from './markdown';
+import { Markdown } from './Markdown';
 import { cn } from '@/lib/utils';
 import {
     CheckCircle,
@@ -16,7 +16,7 @@ import {
     SparklesIcon,
     StopCircle,
 } from "lucide-react";
-import { SpinnerIcon } from './icons';
+import { SpinnerIcon } from './Icons';
 
 interface ReasoningPart {
     type: 'reasoning';

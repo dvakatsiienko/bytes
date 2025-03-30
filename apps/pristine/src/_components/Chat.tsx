@@ -5,11 +5,11 @@ import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
 // import { ModelPicker } from "./model-picker";
 import { Textarea } from "./textarea";
-import { ProjectOverview } from "./project-overview";
-import { Messages } from "./messages";
-import { Header } from "./header";
+import { ProjectOverview } from "./Project-overview";
+import { Messages } from "./Messages";
+import { Header } from "./Header";
 
-export default function Chat() {
+export function Chat() {
   const [selectedModel, setSelectedModel] = useState<modelID>("deepseek-r1-distill-llama-70b");
   const {
     messages,

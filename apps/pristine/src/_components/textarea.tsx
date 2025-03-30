@@ -1,7 +1,7 @@
 import { modelID } from "@/ai/providers";
-import { Textarea as ShadcnTextarea } from "@/components/ui/textarea";
+import { Textarea as ShadcnTextarea } from "@/_components/ui/textarea";
 import { ArrowUp } from "lucide-react";
-import { ModelPicker } from "./model-picker";
+import { ModelPicker } from "./Model-picker";
 
 interface InputProps {
   input: string;
