@@ -9,7 +9,7 @@
         "lint": "eslint .",
         "typecheck": "tsc",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
-        "db:generate": "prisma generate",
+        "prisma:generate": "prisma generate",
         "postinstall": "prisma generate"
     },
     "dependencies": {

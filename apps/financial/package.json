@@ -8,10 +8,10 @@
         "dev": "next dev --turbopack",
         "lint": "eslint .",
         "typecheck": "tsc --noEmit",
-        "db:migrate:reset": "prisma db push --force-reset",
         "db:push": "prisma db push",
+        "db:reset": "prisma db push --force-reset",
         "db:seed": "prisma db seed",
-        "db:generate": "prisma generate",
+        "prisma:generate": "prisma generate",
         "postinstall": "prisma generate"
     },
     "dependencies": {
