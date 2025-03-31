@@ -23,7 +23,7 @@ export const Header = (props: React.PropsWithChildren) => {
     ));
 
     return (
-        <header className='header sticky top-0'>
+        <header className='header sticky top-0 z-20'>
             <nav aria-label='Global' className='flex items-center justify-between p-6 lg:px-8'>
                 <div className='flex lg:flex-1'>
                     <NextLink className='-m-1.5 p-1.5' href='/'>

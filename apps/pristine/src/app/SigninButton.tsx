@@ -13,7 +13,7 @@ export const SigninButton = async () => {
 
     return (
         <form action = { handleSignIn }>
-            <button className = 'font-semibold text-gray-900'>
+            <button className = 'font-semibold text-gray-900 cursor-pointer'>
                 {authText}{' '}
                 <span aria-hidden = 'true' className = 'hidden lg:inline'>
                     &rarr;
