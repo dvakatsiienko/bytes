@@ -15,6 +15,7 @@ export const Header = (props: React.PropsWithChildren) => {
             key={item.name}
             className={cx('font-semibold text-gray-900 lg:text-base/6', {
                 '-mx-3 block rounded-lg px-3 py-2 text-base/7': mobileMenuOpen,
+                'cursor-not-allowed opacity-50 hover:text-gray-900': item.name === 'Talk',
             })}
             href={item.href}>
             {item.name}
@@ -22,7 +23,7 @@ export const Header = (props: React.PropsWithChildren) => {
     ));
 
     return (
-        <header className='header sticky inset-x-0 top-0 z-50'>
+        <header className='header sticky top-0'>
             <nav aria-label='Global' className='flex items-center justify-between p-6 lg:px-8'>
                 <div className='flex lg:flex-1'>
                     <NextLink className='-m-1.5 p-1.5' href='/'>
@@ -86,6 +87,6 @@ export const Header = (props: React.PropsWithChildren) => {
 /* Helpers */
 const navigation = [
     { name: 'Chat', href: '/' },
-    { name: 'Games', href: '/games' },
-    { name: 'Leaderboards', href: '/leaderboard' },
+    { name: 'Talk', href: process.env.NODE_ENV === 'production' ? '/' : '/talk' },
+    // { name: 'Leaderboards', href: '/leaderboard' },
 ];
