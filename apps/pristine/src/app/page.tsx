@@ -1,3 +1,6 @@
+/* Core */
+import cx from 'clsx';
+
 /* Components */
 import { Chat } from '@/components/Chat';
 import { Header } from '@/components/Header';
@@ -6,11 +9,9 @@ import { SigninButton } from './SigninButton';
 /* Instruments */
 import styles from './chat-page-layout.module.css';
 
-console.log('🚀 ~ styles:', styles.chatLayout);
-
 const Home = () => {
     return (
-        <main className={styles['chat-page-layout']}>
+        <main className={cx(styles['chat-page-layout'], 'z-10')}>
             <Header>
                 <SigninButton />
             </Header>
