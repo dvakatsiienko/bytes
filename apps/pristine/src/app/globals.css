@@ -123,3 +123,8 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* .layout {
+    display: grid;
+    grid-template-rows: 80px minmax(calc(100vh - 80px), 1fr);
+} */

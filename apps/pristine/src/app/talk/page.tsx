@@ -20,7 +20,7 @@ const GamesPage = async () => {
         <main className = 'grid min-h-screen'>
             <h1>Games</h1>
 
-            <section className = 'mx-auto pt-24'>{gameListJSX}</section>
+            <section className = 'mx-auto pt-24 overflow-y-auto'>{gameListJSX}</section>
         </main>
     );
 };
