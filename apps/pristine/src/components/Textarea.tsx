@@ -16,7 +16,7 @@ export const Textarea = ({
     setSelectedModel,
 }: InputProps) => {
     return (
-        <div className='relative w-full pt-4'>
+        <div className='relative w-full'>
             <ShadcnTextarea
                 className='bg-secondary w-full resize-none rounded-2xl pb-16 pr-12 pt-4'
                 value={input}
