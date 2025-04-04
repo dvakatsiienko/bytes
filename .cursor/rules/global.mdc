@@ -53,6 +53,8 @@ Before responding to any request, follow these steps:
 
 ## Code Style and Structure
 
+Extends [code-style.mdc](mdc:.cursor/rules/code-style.mdc)
+
 ### General Principles
 
 1. Write concise, readable TypeScript code
