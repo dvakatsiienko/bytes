@@ -13,4 +13,17 @@ module.exports = {
     arrowParens:     'always',
     proseWrap:       'always',
     endOfLine:       'lf',
+    overrides: [
+        {
+            files: "*.jsonc",
+            options: {
+                /*
+                 * JSON with Comments (JSONC) supports comments but *must* adhere
+                 * to strict JSON syntax, which forbids trailing commas.
+                 * Override the default 'all' to 'none' for JSONC files.
+                 */
+                trailingComma: 'none'
+            }
+        }
+    ]
 };
