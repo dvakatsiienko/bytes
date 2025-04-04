@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+React Component structure example/template:
+
+```typescript
+/* Core */ // ← meta comment
+import { headers } from 'next/headers';
+import cx from 'clsx';
+import { type User } from '@prisma/client';
+
+/* Components */
+import { Nav } from '@/cpmponents/Nav';
+
+/* Instruments */
+import { prisma, type } from '@/lib/prisma';
+
+export const UserTable: React.FC<UserTableProps> = async (props) => {
+    const userList = await prisma.users.getAll({ where: { role: props.role } });
+
+    const userListJSX = transform(userList).map(user => <li key={user.id}>{user.name}</li>);
+
+    return <section>{ userListJSX }</section>;
+
+};
+
+/* Helpers */
+const transform = (userList: User[]) => /* transformation logic */
+
+/* Types */
+interface UserTableProps {
+    role: 'admin' | 'user';
+}
+```
