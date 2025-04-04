@@ -1,5 +1,4 @@
 {
-    "dotenv.enableAutocloaking": false,
     "workbench.colorCustomizations": {
         "titleBar.activeForeground": "#ffe100",
         "titleBar.activeBackground": "#000",
@@ -8,8 +7,4 @@
         "titleBar.border": "#000"
     },
     "typescript.tsdk": "node_modules/typescript/lib",
-    "yaml.schemas": {
-        "./.vscode/extensions/atlassian.atlascode-2.10.12/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
-        "https://coderabbit.ai/integrations/schema.v2.json": ".coderabbit.yaml"
-    }
 }
