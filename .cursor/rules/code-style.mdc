@@ -1,6 +1,6 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 Print code considering formatting rules defined in by nearest Prettier config and ESLint config to save up on further code movement.
