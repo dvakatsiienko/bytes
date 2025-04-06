@@ -3,7 +3,24 @@ description:
 globs: 
 alwaysApply: true
 ---
-React Component structure example/template:
+# React Component Architecture
+
+- Prefeer arrow function Components over function declaration Components
+- Component body have two parts: body and return.
+  - Body only have logic;
+  - Return returns JSX;
+  - JSX do not contain logic like intertions. refer to Nameing Conventions rule 5.1. for details.
+- Place types for Component props in the end of the page, like shown in the Template / Examples
+- Prefer React Server Components (RSC) where possible
+- Minimize 'use client' directives
+- Implement proper error boundaries
+- Use Suspense for async operations
+
+# Templates / Examples
+
+Use examples below to generate relevant code.
+
+## React Component Structure
 
 ```typescript
 /* Core */ // ← meta comment
