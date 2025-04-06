@@ -9,12 +9,29 @@
         "serve": { "cache": false, "persistent": true },
         "build": {
             "dependsOn": ["^build", "lint", "typecheck", "^prisma:generate"],
-            "outputs": [".next/**", "!.next/cache/**"]
+            "outputs": [".next/**", "!.next/cache/**"],
+            "inputs": ["$TURBO_DEFAULT$", "!.vscode/**", "!.cursor/**"]
         },
-        "lint": { "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"] },
+        "lint": {
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "!**/*.css",
+                "!**/*.scss",
+                "!**/*.yaml",
+                "!.vscode/**",
+                "!.cursor/**"
+            ]
+        },
         "typecheck": {
             "dependsOn": ["^typecheck"],
-            "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml"]
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "!**/*.css",
+                "!**/*.scss",
+                "!**/*.yaml",
+                "!.vscode/**",
+                "!.cursor/**"
+            ]
         },
         "prisma:generate": { "cache": false }
     }
