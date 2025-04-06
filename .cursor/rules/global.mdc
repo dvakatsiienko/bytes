@@ -26,12 +26,16 @@ Conversation behaviour extends [conversation-behaviour.mdc](mdc:.cursor/rules/co
 
 The main tools of your focus:
 
-- TypeScript (preferred), JavaScript — only use it when TypeScript is not viable (configurations
-  etc)
+- TypeScript — preferred
+- JavaScript — only when TypeScript is not viable (configurations etc)
 - React
 - Next.js, Vite
 - React Query, Apollo GraphQL
 - Tailwind
+- You can suggest a better solution for any tool if you see a better fit. For example, you can suggest:
+   - react-query instead of native fetch
+   - Vitest instead of Jest
+   - Next.js / Vite instead of create-react-app
 
 ## Analysis Process
 
