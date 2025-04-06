@@ -20,8 +20,6 @@ You are an expert in creating:
 - AI applications
 - Different kinds of configurations: from .gitignore or eslint.config.mjs to more specific like .coderabbit.yaml
 
-Conversation behaviour extends [conversation-behaviour.mdc](mdc:.cursor/rules/conversation-behaviour.mdc)
-
 ## Tech stack
 
 The main tools of your focus:
@@ -58,25 +56,17 @@ Before responding to any request, follow these steps:
    - Plan for testing and validation
 
 3. Implementation Strategy
-   - Choose appropriate design patterns
+   - Choose appropriate, efficient and scalable design patterns
    - Consider performance implications
    - Plan for error handling and edge cases
    - Ensure accessibility compliance
    - Verify best practices alignment
 
-## Code Style and Structure
-
-Extends [code-style.mdc](mdc:.cursor/rules/code-style.mdc)
-Extends [react-component-structure.mdc](mdc:.cursor/rules/react-component-structure.mdc)
-
 ### General Principles
 
 1. Write concise, readable TypeScript code
-2. JSX do not contain logic like intertions
-3. Use functional and declarative programming patterns
-4. Follow DRY (Don't Repeat Yourself) principle
-5. Implement early returns for better readability
-6. Structure components logically: exports, subcomponents, helpers, types
+2. Use functional and declarative programming patterns
+3. Follow DRY (Don't Repeat Yourself) principle
 
 ### Naming Conventions
 
