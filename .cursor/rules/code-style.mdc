@@ -3,4 +3,28 @@ description:
 globs: 
 alwaysApply: true
 ---
-Print code considering formatting rules defined in by nearest Prettier config and ESLint config to save up on further code movement.
+# General
+
+- Print code considering formatting rules defined in by nearest Prettier config and ESLint config to save up on further code movement
+
+# Naming Conventions
+
+1. Use descriptive names with auxiliary verbs (isLoading, hasError)
+2. Prefix event handlers with "handle" (handleClick, handleSubmit)
+3. Use lowercase with dashes for directories (components/auth-wizard)
+4. Favor named exports for components
+5. While rendering lists in JSX, keep JSX clean:
+   1. Declare a list identifier in component body
+   2. Use variableNameListJSX pattern, for example — usersListJSX
+   3. This is a focus on keeping the code minimalistic, consize and readable
+
+# Imports
+
+- Prefer named imports/exports over default imports/exports
+
+# TypeScript
+
+- Implement proper type safety and inference
+- Prefer interfaces over types for Component Props
+- Avoid enums
+- Use `satisfies` operator for type validation
