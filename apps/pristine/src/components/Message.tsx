@@ -154,6 +154,7 @@ const PurePreviewMessage = ({
                                         </motion.div>
                                     );
                                 case 'tool-invocation':
+                                    // eslint-disable-next-line no-case-declarations
                                     const { toolName, state } = part.toolInvocation;
 
                                     return (

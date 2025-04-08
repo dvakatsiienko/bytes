@@ -2,7 +2,7 @@
     "name": "utils",
     "version": "0.0.1",
     "scripts": {
-        "lint": "eslint ."
+        "lint": "eslint"
     },
     "main": "./calc.ts",
     "types": "./calc.ts",

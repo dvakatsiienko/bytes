@@ -9,6 +9,9 @@ import { SigninButton } from './SigninButton';
 /* Instruments */
 import styles from './chat-page-layout.module.css';
 
+/* eslint-disable */
+const rerrrrrrrrrrrrrr = 2
+
 const Home = () => {
     return (
         <main className={cx(styles['chat-page-layout'], 'z-10')}>
@@ -18,7 +21,7 @@ const Home = () => {
 
             <div className='hero relative isolate grid'>
                 <div
-                    aria-hidden='true'
+                    aria-hidden="true"
                     className='absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80'>
                     <div
                         className='aspect-1155/678 bg-linear-to-tr relative left-[calc(50%-11rem)] w-[36.125rem] -translate-x-1/2 rotate-[30deg] from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]'

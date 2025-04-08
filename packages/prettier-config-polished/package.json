@@ -2,10 +2,11 @@
     "name": "prettier-config-polished",
     "version": "0.0.6",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-    "scripts": {
-        "lint": "eslint ."
-    },
+    "type": "module",
     "main": "./index.js",
+    "scripts": {
+        "lint": "eslint"
+    },
     "exports": {
         ".": "./index.js"
     },
@@ -14,12 +15,15 @@
         "url": "https://github.com/dvakatsiienko/turborepo.git",
         "directory": "packages/prettier-config-polished"
     },
+    "bugs": {
+        "url": "https://github.com/dvakatsiienko/turborepo/issues"
+    },
     "homepage": "https://github.com/dvakatsiienko/turborepo/tree/main/packages/prettier-config-polished#readme",
     "keywords": [
         "prettier",
         "prettierconfig"
     ],
-    "bugs": {
-        "url": "https://github.com/dvakatsiienko/turborepo/issues"
+    "peerDependencies": {
+        "prettier": ">=3.0.0"
     }
 }

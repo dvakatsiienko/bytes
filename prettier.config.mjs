@@ -1,8 +1,10 @@
 /* Core */
 import prettierConfigPolished from 'prettier-config-polished';
-// import x from 'prettier-plugin-tailwindcss';
 
+/**
+ * @type {import("prettier").Config}
+ */
 export default {
     ...prettierConfigPolished,
-    // plugins: [ x ],
+    plugins: ['prettier-plugin-tailwindcss'],
 };

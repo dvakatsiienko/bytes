@@ -42,6 +42,7 @@ export const Header = (props: React.PropsWithChildren) => {
 
                 <div className='flex lg:hidden'>
                     <button
+                        disabled={false}
                         className='-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700'
                         type='button'
                         onClick={() => setMobileMenuOpen(true)}>
