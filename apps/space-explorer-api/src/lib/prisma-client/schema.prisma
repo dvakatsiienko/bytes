@@ -1,0 +1,28 @@
+generator client {
+  provider     = "prisma-client-js"
+  output       = "../src/lib/prisma-client"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @unique @default(uuid())
+  email     String   @unique
+  token     String?
+  trips     Trip[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Trip {
+  id        String   @id @unique @default(uuid())
+  launchId  String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -3,23 +3,30 @@
     "version": "0.0.13",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "scripts": {
-        "lint": "eslint ."
+        "lint": "eslint"
     },
     "dependencies": {
         "@babel/core": "7.26.10",
         "@babel/eslint-parser": "7.27.0",
         "@babel/preset-env": "7.26.9",
         "@babel/preset-react": "7.26.3",
-        "@typescript-eslint/eslint-plugin": "5.61.0",
-        "@typescript-eslint/parser": "5.61.0",
-        "eslint-plugin-react": "7.37.4",
-        "eslint-plugin-react-hooks": "5.1.0",
-        "eslint-plugin-smells": "1.0.1"
+        "@eslint/js": "9.24.0",
+        "eslint-plugin-react": "7.37.5",
+        "eslint-plugin-react-hooks": "5.2.0",
+        "eslint-plugin-smells": "1.0.1",
+        "globals": "16.0.0",
+        "typescript-eslint": "8.29.1"
+    },
+    "peerDependencies": {
+        "eslint": ">=8.57.0",
+        "typescript": ">=5.0.0"
     },
     "main": "./typescript.js",
     "exports": {
+        ".": "./index.mjs",
         "./javascript": "./javascript.js",
-        "./typescript": "./typescript.js"
+        "./typescript": "./typescript.js",
+        "./flat": "./index.mjs"
     },
     "repository": {
         "type": "git",

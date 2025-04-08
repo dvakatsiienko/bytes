@@ -1,1 +1,1 @@
-module.exports = require('./.prettierrc.js');
+export { default } from './.prettierrc.js';

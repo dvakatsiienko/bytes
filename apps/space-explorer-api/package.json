@@ -6,7 +6,7 @@
     "main": "src/index.ts",
     "scripts": {
         "start": "nodemon ./src/index.ts",
-        "lint": "eslint .",
+        "lint": "eslint",
         "typecheck": "tsc",
         "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
         "prisma:generate": "prisma generate",
@@ -14,24 +14,24 @@
     },
     "dependencies": {
         "@apollo/datasource-rest": "6.4.1",
-        "@apollo/server": "4.11.3",
+        "@apollo/server": "4.12.0",
         "@graphql-tools/graphql-file-loader": "8.0.19",
         "@graphql-tools/load": "8.0.19",
-        "@prisma/client": "6.5.0",
+        "@prisma/client": "6.6.0",
         "chalk": "5.4.1",
         "dotenv": "16.4.7",
         "graphql": "16.10.0",
-        "prisma": "6.5.0",
         "zod": "3.24.2"
     },
     "devDependencies": {
         "@graphql-codegen/cli": "5.0.5",
         "@graphql-codegen/typescript": "4.1.6",
         "@swc-node/register": "1.10.10",
-        "@swc/core": "1.11.16",
+        "@swc/core": "1.11.18",
         "@types/node": "22.14.0",
         "nodemon": "3.1.9",
         "prettier": "3.5.3",
-        "prettier-eslint": "16.3.0"
+        "prettier-eslint": "16.3.0",
+        "prisma": "6.6.0"
     }
 }

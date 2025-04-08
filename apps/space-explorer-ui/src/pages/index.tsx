@@ -23,10 +23,10 @@ export const Pages = () => {
 
     useEffect(() => {
         if (location.pathname === '/') {
-            navigate(data?.isLoggedIn ? '/launches' : '/login', { replace: true });
             if (!data?.isLoggedIn) clearLocalStorageAuthItems();
+            navigate(data?.isLoggedIn ? '/launches' : '/login', { replace: true });
         }
-    }, []);
+    }, [data?.isLoggedIn, location.pathname, navigate]);
 
     return (
         <Routes>

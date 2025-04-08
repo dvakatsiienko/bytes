@@ -23,7 +23,7 @@ Use examples below to generate relevant code.
 ## React Component Structure
 
 ```typescript
-/* Core */ // ← meta comment
+/* Core */
 import { headers } from 'next/headers';
 import cx from 'clsx';
 import { type User } from '@prisma/client';
