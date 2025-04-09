@@ -13,7 +13,6 @@ import { authenticate } from '@/lib';
 import { lusitana } from '@/theme/fonts';
 
 export const LoginForm = () => {
-    // eslint-disable-next-line no-undefined
     const [ errorMessage, authenticateAction, isPending ] = useActionState(authenticate, '');
 
     return (

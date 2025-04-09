@@ -1,7 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 /* Core */
 import { PrismaClient } from '.prisma/client';
 

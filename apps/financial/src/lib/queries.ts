@@ -54,13 +54,11 @@ export async function fetchCardData () {
 
         const invoiceStatusMap = {
             paid: invoiceList.reduce((acc, curr) => {
-                // eslint-disable-next-line no-param-reassign
                 if (curr.status === 'paid') acc += curr.amount;
 
                 return acc;
             }, 0),
             pending: invoiceList.reduce((acc, curr) => {
-                // eslint-disable-next-line no-param-reassign
                 if (curr.status === 'pending') acc += curr.amount;
 
                 return acc;
@@ -180,7 +178,6 @@ export async function fetchCustomerList () {
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function fetchCustomerListFiltered (query: string) {
     // TODO implement
 }

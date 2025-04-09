@@ -20,8 +20,9 @@
         "build:pristine": "turbo financial#pristine",
         "lint": "turbo lint",
         "lint:eslint": "eslint",
+        "lint:inspect": "pnpx @eslint/config-inspector@latest",
         "typecheck": "turbo typecheck",
-        "packages:reinstall": "rimraf **/{node_modules,.next} && pnpm install --force",
+        "packages:reinstall": "rimraf pnpm-lock.yaml && rimraf **/{node_modules,.next} && pnpm i --force",
         "publish:eslint-config": "pnpm -F='eslint-config-polished' publish",
         "publish:prettier-config": "pnpm -F='prettier-config-polished' publish",
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
