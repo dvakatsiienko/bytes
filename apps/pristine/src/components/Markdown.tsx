@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /* Core */
 import React, { memo } from 'react';
 import Link from 'next/link';

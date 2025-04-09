@@ -3,13 +3,10 @@
     "version": "0.0.13",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "scripts": {
-        "lint": "eslint"
+        "lint": "eslint",
+        "lint:inspect": "pnpx @eslint/config-inspector@latest"
     },
     "dependencies": {
-        "@babel/core": "7.26.10",
-        "@babel/eslint-parser": "7.27.0",
-        "@babel/preset-env": "7.26.9",
-        "@babel/preset-react": "7.26.3",
         "@eslint/js": "9.24.0",
         "eslint-plugin-react": "7.37.5",
         "eslint-plugin-react-hooks": "5.2.0",

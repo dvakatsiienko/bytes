@@ -9,9 +9,6 @@ import { SigninButton } from './SigninButton';
 /* Instruments */
 import styles from './chat-page-layout.module.css';
 
-/* eslint-disable */
-const rerrrrrrrrrrrrrr = 2
-
 const Home = () => {
     return (
         <main className={cx(styles['chat-page-layout'], 'z-10')}>

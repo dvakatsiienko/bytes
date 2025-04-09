@@ -5,57 +5,89 @@ import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
-const js = ['js', 'jsx', 'mjs', 'mjsx', 'cjs', 'cjsx'];
-const ts = ['ts', 'tsx', 'mts', 'mtsx', 'cts', 'ctsx'];
+const extEsmJSX = ['jsx', 'mjsx'];
+const extEsmTSX = ['tsx', 'mtsx'];
+const extCjsJSX = ['cjsx'];
+const extCjsTSX = ['ctsx'];
+const extEsmJS = ['js', 'mjs'];
+const extEsmTS = ['ts', 'mts'];
+const extCJS = ['cjs'];
+const extCTS = ['cts'];
+
+const extJSX = [...extEsmJSX, ...extCjsJSX];
+const extTSX = [...extEsmTSX, ...extCjsTSX];
+const extJS = [...extEsmJS, ...extCJS, ...extEsmJSX, ...extCjsJSX];
+const extTS = [...extEsmTS, ...extCTS, ...extEsmTSX, ...extCjsTSX];
+
+// const extEsmJSGlob = `**/*.{${extEsmJS.join(',')}}`;
+// const extEsmTSGlob = `**/*.{${extEsmTS.join(',')}}`;
+// const extCjsGlob = `**/*.{${extCJS.join(',')}}`;
+// const extCtsGlob = `**/*.{${extCTS.join(',')}}`;
+
+const extJSXGlob = `**/*.{${extJSX.join(',')}}`;
+const extTSXGlob = `**/*.{${extTSX.join(',')}}`;
+
+const extJSGlob = `**/*.{${extJS.join(',')}}`;
+const extTSGlob = `**/*.{${extTS.join(',')}}`;
 
 export default pluginTS.config(
-    // Base ESLint config
-    // pluginJS.configs.recommended,
-
-    { ignores: ['**/*.d.ts'] },
-
-    // Base ESLint config for JS/TS files
     {
-        files: [`**/*.{${js.join(',')},${ts.join(',')}}`],
+        name: 'eslint-config-polished/ignores-global',
+        ignores: [
+            '**/dist/**',
+            '**/.next/**',
+            '**/.turbo/**',
+            '**/coverage/**',
+            '**/storybook-static/**',
+            '**/*.d.ts',
+            '**/**/prisma-client/**',
+        ],
+    },
+
+    {
+        name: 'eslint-config-polished/base-recommended',
+        files: [extJSGlob, extTSGlob],
+        plugins: { js: pluginJS },
         extends: [pluginJS.configs.recommended],
+        linterOptions: {
+            // todo check for .ts, .tsx etc
+            reportUnusedDisableDirectives: 1,
+            reportUnusedInlineConfigs: 1,
+        },
         languageOptions: {
             globals: {
                 ...globals.browser,
                 ...globals.node,
-                React: true,
-                __ENV__: true,
-                __DEV__: true,
-                __STAGE__: true,
-                __PROD__: true,
-                __TEST__: true,
+                React: 'readonly',
+                __ENV__: 'readonly',
+                __DEV__: 'readonly',
+                __STAGE__: 'readonly',
+                __PROD__: 'readonly',
+                __TEST__: 'readonly',
             },
-            parserOptions: {
-                ecmaVersion: 'latest',
-                sourceType: 'module',
-            },
+            parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
         },
         rules: {
+            /* Possible problems */
+            'no-duplicate-imports': [1, { includeExports: true }],
+            'no-irregular-whitespace': 1,
+            'no-promise-executor-return': 2,
+            'no-self-compare': 2,
+            'no-template-curly-in-string': 2,
+            'no-unmodified-loop-condition': 2,
+            'no-unreachable': 1,
+            'no-unreachable-loop': 2,
             'no-unused-vars': 1,
+            'no-useless-assignment': 1,
+            'require-atomic-updates': 2,
         },
     },
 
-    // JS-specific rules
-    {
-        files: [`**/*.{${js.join(',')}}`],
-        rules: {
-            'no-undef': 2,
-        },
-    },
+    // todo split no-unused-vars for .ts, .tsx etc
 
-    // todo js-only
-    // {
-    //     files: ['**/*.{' + js.join(',') + '}'],
-    //     plugins: { js: pluginJS },
-    // },
-
-    // TypeScript: All TS files
     {
-        files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts', '**/*.mtsx', '**/*.ctsx'],
+        name: 'eslint-config-polished/typescript',
+        files: [extTSGlob],
         languageOptions: {
             parser: pluginTS.parser,
             parserOptions: {
@@ -96,14 +128,22 @@ export default pluginTS.config(
         },
     },
 
-    // React JSX files
     {
-        files: ['**/*.{jsx,tsx,mjsx,mtjsx,cjsx,ctjsx}'],
+        name: 'eslint-config-polished/react',
+        files: [extJSXGlob, extTSXGlob],
         plugins: {
             react: pluginReact,
             'react-hooks': pluginReactHooks,
         },
         settings: { react: { version: 'detect' } },
+        languageOptions: {
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true, // todo check if needed
+                },
+            },
+        },
+
         rules: {
             'react/react-in-jsx-scope': 0,
             'react/jsx-uses-react': 0,
@@ -114,14 +154,6 @@ export default pluginTS.config(
             // todo review
             'react/jsx-uses-vars': 2,
             'react/boolean-prop-naming': 2,
-        },
-    },
-
-    {
-        files: ['**/*.{js,jsx,ts,tsx}'],
-        rules: {
-            // quotes: [2, 'single'],
-            // 'no-undef': 0, // typescript checks this
         },
     },
 );
