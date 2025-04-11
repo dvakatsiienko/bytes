@@ -2,7 +2,6 @@
 
 /* Core */
 import { memo, useCallback, useEffect, useState } from 'react';
-import type { Message as TMessage } from 'ai';
 import { AnimatePresence, motion } from 'motion/react';
 import equal from 'fast-deep-equal';
 import {
@@ -14,6 +13,7 @@ import {
     SparklesIcon,
     StopCircle,
 } from 'lucide-react';
+import type { Message as TMessage } from 'ai';
 
 /* Components */
 import { Markdown } from './Markdown';
