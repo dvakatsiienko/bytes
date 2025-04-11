@@ -17,9 +17,10 @@ export const Messages = ({
     status: 'error' | 'submitted' | 'streaming' | 'ready';
 }) => {
     const [containerRef, endRef] = useScrollToBottom();
+
     return (
         <div className='h-full flex-1 space-y-4 overflow-y-auto py-8' ref={containerRef}>
-            <div className='mx-auto max-w-xl pt-8 overflow-hidden'>
+            <div className='mx-auto max-w-xl overflow-hidden pt-8'>
                 {messages.map((m, i) => (
                     <Message
                         key={i}
