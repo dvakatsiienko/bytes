@@ -33,11 +33,7 @@ export const Chat = () => {
     if (error) return <div>{error.message}</div>;
 
     return (
-        <section
-            className={cx(
-                styles['chat-layout'],
-                'w-xl relative mx-auto max-w-2xl',
-            )}>
+        <section className={cx(styles['chat-layout'], 'relative mx-auto w-xl max-w-2xl')}>
             {/* TODO check Header */}
             {/* <Header /> */}
 
@@ -52,7 +48,7 @@ export const Chat = () => {
 
             <form
                 onSubmit={handleSubmit}
-                className='sticky bottom-0 mx-auto w-full min-w-80 max-w-xl self-end pt-8 px-4 sm:px-0 dark:bg-black'>
+                className='sticky bottom-0 mx-auto w-full max-w-xl min-w-80 self-end px-4 pt-8 sm:px-0 dark:bg-black'>
                 {/* <Input
                     handleInputChange={handleInputChange}
                     input={input}
