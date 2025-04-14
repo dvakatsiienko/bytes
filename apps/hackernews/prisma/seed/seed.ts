@@ -5,11 +5,11 @@
 import { prisma } from './client';
 import { createUsers } from './createUsers';
 
-async function main () {
+async function main() {
     console.info('🌠 Seeding started.');
     await createUsers();
 
-    await prisma.example.createMany({ data: [{}, {}]});
+    await prisma.example.createMany({ data: [{}, {}] });
 
     console.info('✅ DB seeded.');
 }
