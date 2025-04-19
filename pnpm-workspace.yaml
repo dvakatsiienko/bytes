@@ -1,4 +1,14 @@
 packages:
-  - "apps/*"
-  - "!apps/hackernews" # fix or delete
-  - "packages/*"
+  - apps/*
+  - '!apps/hackernews'
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@apollo/protobufjs'
+  - '@parcel/watcher'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@swc/core'
+  - esbuild
+  - prisma
+  - sharp
