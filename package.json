@@ -22,15 +22,16 @@
         "lint:eslint": "eslint",
         "lint:inspect": "pnpx @eslint/config-inspector@latest",
         "typecheck": "turbo typecheck",
+        "check": "turbo lint typecheck",
         "packages:reinstall": "rimraf pnpm-lock.yaml && rimraf **/{node_modules,.next} && pnpm i --force",
         "publish:eslint-config": "pnpm -F='eslint-config-polished' publish",
         "publish:prettier-config": "pnpm -F='prettier-config-polished' publish",
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
-        "@eslint/js": "9.25.0",
+        "@eslint/js": "9.25.1",
         "concurrently": "9.1.2",
-        "eslint": "9.25.0",
+        "eslint": "9.25.1",
         "eslint-config-polished": "workspace:*",
         "prettier": "3.5.3",
         "prettier-config-polished": "workspace:*",
@@ -40,7 +41,7 @@
         "tsconfig-core": "workspace:*",
         "turbo": "2.5.0",
         "typescript": "5.8.3",
-        "typescript-eslint": "8.30.1"
+        "typescript-eslint": "8.31.0"
     },
     "engines": {
         "node": ">=22.12.0"

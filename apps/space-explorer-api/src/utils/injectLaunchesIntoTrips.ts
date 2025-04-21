@@ -1,5 +1,5 @@
 /* Core */
-import type { Trip } from '@prisma/client';
+import type { Trip } from '../lib/prisma-client';
 
 /* Instruments */
 import type { LaunchModel } from '../datasources';
