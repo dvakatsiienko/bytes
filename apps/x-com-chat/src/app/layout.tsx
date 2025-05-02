@@ -26,7 +26,7 @@ import { prisma } from '@/lib/orm';
 
 export default async function RootLayout(props: React.PropsWithChildren) {
     // todo make it with convex or delete
-    const friendListx  = await prisma.friend.findMany();
+    const friendListx = await prisma.friend.findMany();
 
     console.log('🚀 . RootLayout . friendListx:', friendListx);
 
@@ -73,8 +73,8 @@ export default async function RootLayout(props: React.PropsWithChildren) {
                                         <Monitoring
                                             apiKey='tQpGsVtVhEjqxiH9U4P_TwEV0OrH3kRb'
                                             url='https://monitoring.react-scan.com/api/v1/ingest'
-                                            // commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA} // optional but recommended
-                                            // branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF} // optional but recommended
+                                            commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
+                                            branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
                                         />
                                         {props.children}
                                     </section>
@@ -84,6 +84,7 @@ export default async function RootLayout(props: React.PropsWithChildren) {
                             </ThemeProvider>
                         </body>
                     </html>
+                    {/* eslint-disable-next-line -- this is for debugging */}
                     {false && <ReactQueryDevtools />}
                 </ReactQueryProvider>
             </ClerkProvider>

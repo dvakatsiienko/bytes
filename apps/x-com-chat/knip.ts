@@ -1,5 +1,5 @@
 /* Core */
-import { type KnipConfig } from 'knip';
+import type { KnipConfig } from 'knip';
 
 export default {
     /**
@@ -12,9 +12,7 @@ export default {
         'convex/**/*.{js,jsx,ts,tsx}',
         '!convex/__generated/*.{js,jsx,ts,tsx,d.ts}',
     ],
-    ignore: [
-        'convex/__generated/*.{js,jsx,ts,tsx,d.ts}',
-    ],
+    ignore: ['convex/__generated/*.{js,jsx,ts,tsx,d.ts}'],
     ignoreDependencies: [
         /* knip's tw plugin doesn't support tw v4 */
         '@tailwindcss/forms',

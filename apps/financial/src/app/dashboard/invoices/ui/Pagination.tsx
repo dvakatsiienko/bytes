@@ -3,12 +3,12 @@
 /* Core */
 import { usePathname, useSearchParams } from 'next/navigation';
 import NextLink from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+// import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import cx from 'clsx';
 
 /* Instruments */
-import { fetchInvoicesPages, generatePagination } from '@/lib';
+import { /* fetchInvoicesPages, */ generatePagination } from '@/lib';
 
 export const Pagination = (props: PaginationProps) => {
     const pathname = usePathname();
@@ -29,7 +29,7 @@ export const Pagination = (props: PaginationProps) => {
         const params = new URLSearchParams(searchParams);
         params.set('page', pageNumber.toString());
 
-        return `${ pathname }?${ params.toString() }`;
+        return `${pathname}?${params.toString()}`;
     };
 
     const paginationNumberListJSX = paginationNumberList.map((page, index) => {
@@ -42,29 +42,25 @@ export const Pagination = (props: PaginationProps) => {
 
         return (
             <PaginationNumber
-                key = { page }
-                href = { createPageURL(page) }
-                isActive = { currentPage === page }
-                page = { page }
-                position = { position }
+                key={page}
+                href={createPageURL(page)}
+                isActive={currentPage === page}
+                page={page}
+                position={position}
             />
         );
     });
 
     return (
-        <div className = 'inline-flex'>
-            <PaginationArrow
-                direction = 'left'
-                href = { createPageURL(currentPage - 1) }
-                isDisabled = { currentPage <= 1 }
-            />
+        <div className='inline-flex'>
+            <PaginationArrow direction='left' href={createPageURL(currentPage - 1)} isDisabled={currentPage <= 1} />
 
-            <div className = 'flex -space-x-px'>{paginationNumberListJSX}</div>
+            <div className='flex -space-x-px'>{paginationNumberListJSX}</div>
 
             <PaginationArrow
-                direction = 'right'
-                href = { createPageURL(currentPage + 1) }
-                isDisabled = { currentPage >= props.totalPages }
+                direction='right'
+                href={createPageURL(currentPage + 1)}
+                isDisabled={currentPage >= props.totalPages}
             />
         </div>
     );
@@ -73,21 +69,18 @@ export const Pagination = (props: PaginationProps) => {
 const PaginationNumber = (props: PaginationNumberProps) => {
     const { page, href, position, isActive } = props;
 
-    const className = cx(
-        'flex h-10 w-10 items-center justify-center text-sm border border-gray-400',
-        {
-            'rounded-l-md':                                position === 'first' || position === 'single',
-            'rounded-r-md':                                position === 'last' || position === 'single',
-            'z-10 bg-blue-600 border-blue-600 text-white': isActive,
-            'hover:bg-gray-100':                           !isActive && position !== 'middle',
-            'text-gray-300':                               position === 'middle',
-        },
-    );
+    const className = cx('flex h-10 w-10 items-center justify-center text-sm border border-gray-400', {
+        'rounded-l-md': position === 'first' || position === 'single',
+        'rounded-r-md': position === 'last' || position === 'single',
+        'z-10 bg-blue-600 border-blue-600 text-white': isActive,
+        'hover:bg-gray-100': !isActive && position !== 'middle',
+        'text-gray-300': position === 'middle',
+    });
 
     return isActive || position === 'middle' ? (
-        <div className = { className }>{page}</div>
+        <div className={className}>{page}</div>
     ) : (
-        <NextLink className = { className } href = { href }>
+        <NextLink className={className} href={href}>
             {page}
         </NextLink>
     );
@@ -96,27 +89,19 @@ const PaginationNumber = (props: PaginationNumberProps) => {
 const PaginationArrow = (props: PaginationArrowProps) => {
     const { href, direction, isDisabled } = props;
 
-    const className = cx(
-        'flex h-10 w-10 items-center justify-center rounded-md border border-gray-400',
-        {
-            'pointer-events-none text-gray-300': isDisabled,
-            'hover:bg-gray-100':                 !isDisabled,
-            'mr-2 md:mr-4':                      direction === 'left',
-            'ml-2 md:ml-4':                      direction === 'right',
-        },
-    );
+    const className = cx('flex h-10 w-10 items-center justify-center rounded-md border border-gray-400', {
+        'pointer-events-none text-gray-300': isDisabled,
+        'hover:bg-gray-100': !isDisabled,
+        'mr-2 md:mr-4': direction === 'left',
+        'ml-2 md:ml-4': direction === 'right',
+    });
 
-    const icon =
-        direction === 'left' ? (
-            <ArrowLeftIcon className = 'w-4' />
-        ) : (
-            <ArrowRightIcon className = 'w-4' />
-        );
+    const icon = direction === 'left' ? <ArrowLeftIcon className='w-4' /> : <ArrowRightIcon className='w-4' />;
 
     return isDisabled ? (
-        <div className = { className }>{icon}</div>
+        <div className={className}>{icon}</div>
     ) : (
-        <NextLink className = { className } href = { href }>
+        <NextLink className={className} href={href}>
             {icon}
         </NextLink>
     );
@@ -124,21 +109,21 @@ const PaginationArrow = (props: PaginationArrowProps) => {
 
 /* Types */
 interface PaginationProps {
-    totalPages: number,
-    query:      string,
+    totalPages: number;
+    query: string;
 }
 
 interface PaginationNumberProps {
-    page:      number | string,
-    href:      string,
-    position?: UPosition,
-    isActive:  boolean,
+    page: number | string;
+    href: string;
+    position?: UPosition;
+    isActive: boolean;
 }
 
 interface PaginationArrowProps {
-    href:        string,
-    direction:   'left' | 'right',
-    isDisabled?: boolean,
+    href: string;
+    direction: 'left' | 'right';
+    isDisabled?: boolean;
 }
 
 type UPosition = 'first' | 'last' | 'single' | 'middle' | null;

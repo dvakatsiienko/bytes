@@ -41,6 +41,7 @@ export default pluginTS.config(
             '**/storybook-static/**',
             '**/*.d.ts',
             '**/**/prisma-client/**',
+            '**/**/convex/_generated/**',
         ],
     },
 
@@ -83,7 +84,14 @@ export default pluginTS.config(
         },
     },
 
-    // todo split no-unused-vars for .ts, .tsx etc
+    // todo properly split no-unused-vars for .ts, .tsx etc
+    {
+        name: 'eslint-config-polished/eslint-to-ts-correction',
+        files: [extTSGlob],
+        rules: {
+            'no-unused-vars': 0,
+        },
+    },
 
     {
         name: 'eslint-config-polished/typescript',
@@ -104,6 +112,9 @@ export default pluginTS.config(
 
             'no-undef': 0, // typescript checks this
 
+            // todo review this
+            '@typescript-eslint/no-unused-vars': 1,
+
             // Override rules from our existing config
             '@typescript-eslint/ban-ts-comment': 'warn',
             '@typescript-eslint/consistent-type-definitions': 'off',
@@ -112,7 +123,7 @@ export default pluginTS.config(
             '@typescript-eslint/no-duplicate-enum-values': 'error',
             '@typescript-eslint/no-empty-interface': ['warn', { allowSingleExtends: true }],
             '@typescript-eslint/no-explicit-any': ['warn', { fixToUnknown: true }],
-            '@typescript-eslint/no-import-type-side-effects': 'warn',
+            '@typescript-eslint/no-import-type-side-effects': 2,
             '@typescript-eslint/no-misused-new': 'error',
             '@typescript-eslint/no-namespace': 'error',
             '@typescript-eslint/no-non-null-assertion': 'error',

@@ -3,8 +3,8 @@
 /* Core */
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { signIn } from '@/auth';
-import { AuthError } from 'next-auth';
+// import { signIn } from '@/auth';
+// import { AuthError } from 'next-auth';
 import { z } from 'zod';
 import to from 'await-to-js';
 import { randomUUID } from 'crypto';
@@ -78,6 +78,7 @@ export const updateInvoice = async (id: string, prevState: State, formData: Form
     redirect('/dashboard/invoices');
 };
 
+/* eslint-disable */
 export async function deleteInvoice(id: string) {
     try {
         await prisma.invoice.delete({ where: { id } });
@@ -107,6 +108,7 @@ export async function authenticate(prevState: string | undefined, formData: Form
     //     throw error;
     // }
 }
+/* eslint-enable */
 
 /* Helpers */
 const InvoiceSchema = z.object({

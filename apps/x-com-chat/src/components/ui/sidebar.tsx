@@ -10,13 +10,7 @@ import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -162,10 +156,7 @@ function Sidebar({
         return (
             <div
                 data-slot='sidebar'
-                className={cn(
-                    'bg-sidear w-(--sidebar-width) text-sidebar-foreground flex h-full flex-col',
-                    className,
-                )}
+                className={cn('bg-sidear w-(--sidebar-width) text-sidebar-foreground flex h-full flex-col', className)}
                 {...props}>
                 {children}
             </div>
@@ -514,12 +505,7 @@ function SidebarMenuButton({
     return (
         <Tooltip>
             <TooltipTrigger asChild>{button}</TooltipTrigger>
-            <TooltipContent
-                side='right'
-                align='center'
-                hidden={state !== 'collapsed' || isMobile}
-                {...tooltip}
-            />
+            <TooltipContent side='right' align='center' hidden={state !== 'collapsed' || isMobile} {...tooltip} />
         </Tooltip>
     );
 }
@@ -593,9 +579,7 @@ function SidebarMenuSkeleton({
             data-sidebar='menu-skeleton'
             className={cn('flex h-8 items-center gap-2 rounded-md px-2', className)}
             {...props}>
-            {showIcon && (
-                <Skeleton className='size-4 rounded-md' data-sidebar='menu-skeleton-icon' />
-            )}
+            {showIcon && <Skeleton className='size-4 rounded-md' data-sidebar='menu-skeleton-icon' />}
             <Skeleton
                 className='max-w-(--skeleton-width) h-4 flex-1'
                 data-sidebar='menu-skeleton-text'

@@ -109,7 +109,7 @@ export function MessageReasoningPart({ part, isReasoning }: MessageReasoningPart
     );
 }
 
-const MessagePreview = ({ message, isLatestMessage, status }: MessagePreview) => {
+const MessagePreview = ({ message, isLatestMessage, status }: MessagePreviewProps) => {
     const messegePartListJSX = message.parts?.map((part, i) => {
         if (part.type === 'text') {
             return (
@@ -233,7 +233,7 @@ export const Message = memo(MessagePreview, (prevProps, nextProps) => {
 });
 
 /* Types */
-interface MessagePreview {
+interface MessagePreviewProps {
     message: TMessage;
     isLoading: boolean;
     status: 'error' | 'submitted' | 'streaming' | 'ready';
