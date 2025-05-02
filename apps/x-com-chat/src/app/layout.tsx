@@ -69,6 +69,7 @@ export default async function RootLayout(props: React.PropsWithChildren) {
                                             commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
                                             branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
                                         />
+
                                         {props.children}
                                     </section>
                                 </SidebarProvider>
@@ -77,6 +78,7 @@ export default async function RootLayout(props: React.PropsWithChildren) {
                             </ThemeProvider>
                         </body>
                     </html>
+
                     {/* eslint-disable-next-line -- this is for debugging */}
                     {false && <ReactQueryDevtools />}
                 </ReactQueryProvider>
