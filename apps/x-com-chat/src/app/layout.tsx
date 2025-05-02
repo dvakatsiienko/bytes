@@ -22,14 +22,7 @@ import { api } from '@/convex/_generated/api';
 import { cn } from '@/utils/cn';
 import '@/theme/init.css';
 
-import { prisma } from '@/lib/orm';
-
 export default async function RootLayout(props: React.PropsWithChildren) {
-    // todo make it with convex or delete
-    const friendListx = await prisma.friend.findMany();
-
-    console.log('🚀 . RootLayout . friendListx:', friendListx);
-
     const friendList = preloadedQueryResult(await preloadQuery(api.chat.getFriendList));
 
     return (
