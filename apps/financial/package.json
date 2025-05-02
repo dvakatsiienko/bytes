@@ -3,9 +3,9 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
+        "dev": "next dev --turbopack",
         "start": "next --turbopack",
         "build": "next build",
-        "dev": "next dev --turbopack",
         "lint": "eslint",
         "typecheck": "tsc",
         "db:push": "prisma db push",

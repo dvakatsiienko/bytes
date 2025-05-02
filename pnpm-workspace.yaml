@@ -5,6 +5,7 @@ packages:
 
 onlyBuiltDependencies:
   - '@apollo/protobufjs'
+  - '@clerk/shared'
   - '@parcel/watcher'
   - '@prisma/client'
   - '@prisma/engines'
