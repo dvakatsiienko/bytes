@@ -8,7 +8,7 @@ export default function NotFound() {
                 <p>There is no page here. If an issue persists, please call me.</p>
 
                 <a href='tel:+6494461709' className='text-link-active'>
-                    +1-442-617-0944
+                    +1-442-617-094
                 </a>
 
                 <p>Otherwise, tap my head in Header which will bring you to a chat page.</p>
