@@ -5,7 +5,7 @@ import type { Invoice } from '.prisma/client';
 import { prisma } from './prisma';
 import { formatCurrency } from './utils';
 
-export async function fetchRevenueList () {
+export async function fetchRevenueList() {
     try {
         const revenueList = await prisma.revenue.findMany();
 
@@ -17,15 +17,15 @@ export async function fetchRevenueList () {
     }
 }
 
-export async function fetchLatestInvoiceList () {
+export async function fetchLatestInvoiceList() {
     try {
         const invoiceList = await prisma.invoice.findMany({
             include: {
                 customer: {
                     select: {
-                        name:     true,
+                        name: true,
                         imageUrl: true,
-                        email:    true,
+                        email: true,
                     },
                 },
             },
@@ -46,7 +46,7 @@ export async function fetchLatestInvoiceList () {
     }
 }
 
-export async function fetchCardData () {
+export async function fetchCardData() {
     try {
         const numberOfInvoices = await prisma.invoice.count();
         const numberOfCustomers = await prisma.customer.count();
@@ -83,7 +83,7 @@ export async function fetchCardData () {
 
 const ITEMS_PER_PAGE = 6;
 
-export async function fetchInvoiceListFiltered (query: string, currentPage: number) {
+export async function fetchInvoiceListFiltered(query: string, currentPage: number) {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
@@ -91,9 +91,9 @@ export async function fetchInvoiceListFiltered (query: string, currentPage: numb
             include: {
                 customer: {
                     select: {
-                        name:     true,
+                        name: true,
                         imageUrl: true,
-                        email:    true,
+                        email: true,
                     },
                 },
             },
@@ -116,15 +116,15 @@ export async function fetchInvoiceListFiltered (query: string, currentPage: numb
     }
 }
 
-export async function fetchInvoicesPages (query: string) {
+export async function fetchInvoicesPages(query: string) {
     try {
         const invoiceList = await prisma.invoice.findMany({
             include: {
                 customer: {
                     select: {
-                        name:     true,
+                        name: true,
                         imageUrl: true,
-                        email:    true,
+                        email: true,
                     },
                 },
             },
@@ -151,9 +151,9 @@ export async function fetchInvoicesPages (query: string) {
     }
 }
 
-export async function fetchInvoiceById (id: string) {
+export async function fetchInvoiceById(id: string) {
     try {
-        const invoice = await prisma.invoice.findUnique({ where: { id }});
+        const invoice = await prisma.invoice.findUnique({ where: { id } });
 
         const nextInvoice = {
             ...invoice,
@@ -167,7 +167,7 @@ export async function fetchInvoiceById (id: string) {
     }
 }
 
-export async function fetchCustomerList () {
+export async function fetchCustomerList() {
     try {
         const customerList = await prisma.customer.findMany();
 
@@ -178,6 +178,6 @@ export async function fetchCustomerList () {
     }
 }
 
-export async function fetchCustomerListFiltered (query: string) {
+export async function fetchCustomerListFiltered(/* query: string */) {
     // TODO implement
 }

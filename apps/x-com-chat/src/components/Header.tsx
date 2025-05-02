@@ -7,7 +7,7 @@ import { useAtomValue } from 'jotai';
 import { useTheme } from 'next-themes';
 import { dark } from '@clerk/themes';
 import { AnimatePresence, motion } from 'motion/react';
-import { type Friend } from '@prisma/client';
+import type { Friend } from '.prisma/client/edge';
 
 /* Components */
 import { Button } from '@/components/ui/button';
@@ -49,9 +49,7 @@ export const Header = (props: HeaderProps) => {
                     'brand:bg-gradient-to-bl brand:from-gradient-layout-secondary-1 brand:to-gradient-layout-secondary-2',
                     'shadow-lg',
                 )}>
-                <NextLink
-                    href='/'
-                    className='text-red-550 text-centertext-lg text-shadow-2xs font-semibold'>
+                <NextLink href='/' className='text-red-550 text-centertext-lg text-shadow-2xs font-semibold'>
                     <LogoSvg className={cn('h-8 w-8 cursor-pointer')} />
                 </NextLink>
 
@@ -68,10 +66,7 @@ export const Header = (props: HeaderProps) => {
                         <AnimatePresence mode='wait'>
                             {isLoaded && !isSignedIn && (
                                 <motion.div key='sign-in' {...fadeAnimation}>
-                                    <SignInButton
-                                        appearance={{ baseTheme: baseTheme }}
-                                        oauthFlow='popup'
-                                        mode='modal'>
+                                    <SignInButton appearance={{ baseTheme: baseTheme }} oauthFlow='popup' mode='modal'>
                                         <Button variant='ghost' size='icon'>
                                             🔑
                                         </Button>
