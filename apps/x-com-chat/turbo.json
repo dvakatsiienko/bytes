@@ -1,0 +1,21 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "extends": ["//"],
+    "tasks": {
+        "build": {
+            "dependsOn": ["lint", "typecheck", "prisma:generate"],
+            "outputs": [".next/**"],
+            "env": [
+                "CLERK_SECRET_KEY",
+                "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+                "DATABASE_URL",
+                "GROQ_API_KEY"
+            ]
+        },
+        "lint": {
+            "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml", "!.vscode/**", "!.cursor/**"]
+        },
+        "typecheck": { "inputs": ["package.json", "**/*.{ts,tsx}"] },
+        "db:generate": { "cache": false }
+    }
+}

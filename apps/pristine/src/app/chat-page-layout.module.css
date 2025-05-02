@@ -1,9 +1,0 @@
-.chat-page-layout {
-    display: grid;
-    /* grid-template-rows: 80px minmax(calc(100vh - 80px), 1fr); */
-    grid-template-rows: 80px calc(100vh - 80px);
-    grid-template-areas:
-        'header'
-        'messages';
-        /* 'textarea'; */
-}

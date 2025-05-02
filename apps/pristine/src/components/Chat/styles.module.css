@@ -1,4 +1,0 @@
-.chat-layout {
-    display: grid;
-    grid-template-rows: calc(100vh - 80px - 100px) 100px;
-}

@@ -7,4 +7,5 @@
         "titleBar.border": "#000"
     },
     "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true
 }

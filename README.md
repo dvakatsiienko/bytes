@@ -11,10 +11,7 @@
 #### 👽 X-COM Chat AI
 
 [Website](https://x-com-chat.vercel.app)
-
-#### 💎 Pristine AI 🚧 WIP 🚧
-
-[Website](https://pristine-ai.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/pristine)
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/x-com-chat) -->
 
 <!-- ###### ✈️ My CV 🚧 WIP 🚧
 

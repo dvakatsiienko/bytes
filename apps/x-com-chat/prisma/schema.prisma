@@ -1,0 +1,37 @@
+generator client {
+  provider     = "prisma-client-js"
+  output       = "../node_modules/.prisma/client"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String          @id @unique @default(uuid())
+  name              String
+  email             String          @unique
+  password          String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  systemSettingList SystemSetting[]
+}
+
+model SystemSetting {
+  id       String @id @unique @default(uuid())
+  name     String
+  value    String
+  friend   Friend @relation(fields: [friendId], references: [id])
+  friendId String
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+}
+
+model Friend {
+  id            String          @id @unique @default(uuid())
+  name          String
+  system        String
+  systemSetting SystemSetting[]
+}

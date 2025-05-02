@@ -9,6 +9,7 @@
         "start:@space-explorer/ui": "turbo @space-explorer/ui#start",
         "start:@space-explorer/api": "turbo @space-explorer/api#start ",
         "start:profile": "turbo profile#start",
+        "start:x-com-chat": "turbo x-com-chat#dev x-com-chat#convex --ui=tui",
         "start:cssorcery": "turbo cssorcery#start",
         "start:financial": "turbo financial#start",
         "start:pristine": "turbo pristine#start",

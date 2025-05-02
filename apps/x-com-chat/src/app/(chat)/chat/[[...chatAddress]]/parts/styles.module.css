@@ -1,0 +1,22 @@
+.chat-layout {
+    --textarea-height: 128px;
+
+    grid-template-areas:
+        'chat'
+        'textarea';
+    grid-template-columns: 1fr;
+    grid-template-rows:
+        /* TODO extract 8px instances to vars */
+        /** first 8px compensates bottom offset of sticky positioned textarea */
+        /** second 8px — MessageList margin offest (check) */
+        calc(100dvh - var(--header-height) - var(--textarea-height) - 8px - 8px)
+        var(--textarea-height);
+
+    /* TODO: reference tw breakpoints from vars */
+    @media screen and (min-width: 768px) {
+        grid-template-areas:
+            'image chat'
+            'textarea chat';
+        grid-template-columns: 1fr 1fr;
+    }
+}
