@@ -10,13 +10,12 @@
 
 #### 👽 X-COM Chat AI
 
-[Website](https://x-com-chat.vercel.app)
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/x-com-chat) -->
+[Website](https://x-com-chat.vercel.app) |
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/x-com-chat)
 
-<!-- ###### ✈️ My CV 🚧 WIP 🚧
+###### ✈️ My Cover
 
-[Website](https://ripeluokte.vercel.app) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/profile) -->
+[Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cv)
 
 <!-- #### 🖥️ Hackernews 🚧 WIP 🚧
 

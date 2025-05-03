@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@import './gray.css';
+@import './accent.css';
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+@layer base {
+    & a {
+        @apply text-purple-500;
+
+        &:visited {
+            @apply text-purple-600;
+        }
+
+        &:hover,
+        &:hover:visited {
+            @apply text-purple-600 underline;
+        }
+    }
+}
+
+:root {
+    --gradient-layout-primary-1: var(--gray-1);
+    --gradient-layout-primary-2: var(--gray-4);
+
+    --color-background: #f0f1e7;
+    --color-foreground: #161619;
+
+    --color-background-header: var(--accent-2);
+    --color-background-header-link: var(--color-background);
+
+    --color-surface-1: var(--gray-1);
+    --color-surface-2: #f6f1fd;
+    --color-surface-3: #f6f1fd;
+    --color-surface-4: #f6f1fd;
+}
+
+:root.dark,
+:root[data-theme='dark'] {
+    --gradient-layout-primary-1: var(--gray-1);
+    --gradient-layout-primary-2: var(--gray-2);
+
+    --color-background: var(--gray-1);
+    --color-foreground: var(--gray-12);
+
+    --color-background-header: var(--gray-1);
+
+    --color-surface-1: var(--gray-2);
+    --color-surface-2: #f6f1fd;
+    --color-surface-3: #f6f1fd;
+    --color-surface-4: #f6f1fd;
+}
+
+@theme inline {
+    --color-gradient-layout-primary-1: var(--gradient-layout-primary-1);
+    --color-gradient-layout-primary-2: var(--gradient-layout-primary-2);
+
+    --color-background: var(--color-background);
+    --color-foreground: var(--color-foreground);
+
+    --color-background-header: var(--color-background-header);
+
+    --color-surface-1: var(--color-surface-1);
+    --color-surface-2: var(--color-surface-2);
+    --color-surface-3: var(--color-surface-3);
+    --color-surface-4: var(--color-surface-4);
+}
