@@ -2,11 +2,11 @@
 
 /* Core */
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
+import { useTheme, } from 'next-themes';
 
 export const ThemeSwitcher = () => {
     const [mounted, setMounted] = useState(false);
-    const { theme, setTheme } = useTheme();
+    const { setTheme, resolvedTheme } = useTheme();
 
     useEffect(() => {
         setMounted(true);
@@ -15,15 +15,14 @@ export const ThemeSwitcher = () => {
     if (!mounted) return null;
 
     const switchTheme = () => {
-        console.log('test');
-
-        if (theme === 'light') setTheme('dark');
-        if (theme === 'dark') setTheme('light');
+        if (resolvedTheme === 'light') setTheme('dark');
+        if (resolvedTheme === 'dark') setTheme('light');
     };
 
     return (
         <button className='cursor-pointer text-white print:invisible' onClick={switchTheme}>
-            {theme === 'light' ? 'light 🌙' : 'dark ☀️'}
+            {resolvedTheme === 'light' && 'light 🌙'}
+            {resolvedTheme === 'dark' && 'dark ☀️'}
         </button>
     );
 };
