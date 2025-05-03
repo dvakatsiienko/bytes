@@ -27,6 +27,24 @@ export default function CoverPage() {
                 collaborative mindset to a great team and product.
             </p>
 
+            <p>
+                Behind me there are many successful projects with emphasis on high-quality functionality, UI/UX, and
+                simplicity.
+            </p>
+
+            <p>
+                I look for a cool new project, maybe a startup, to build a great consumer product with AI. <br /> Check
+                out my most recent side project: an AI-driven{' '}
+                <a target='_blank' rel='noopener noreferrer' href={process.env.NEXT_PUBLIC_X_COM_CHAT_LINK}>
+                    X-COM Chat
+                </a>
+                , where each character has its own personality. I would be happy to{' '}
+                <a target='_blank' rel='noopener noreferrer' href='mailto:imagnum.satellite@gmail.com'>
+                    meet and talk
+                </a>
+                . 🙂
+            </p>
+
             <h3>My expertise</h3>
 
             <ul className='list-inside list-disc'>
@@ -82,7 +100,7 @@ const yearExperienceTypescript = yearCurrent - YEAR_STARTED_TYPESCRIPT;
 const techStack = [
     {
         category: 'Languages & Frameworks',
-        items: ['JavaScript/TypeScript', 'React', 'Next.js', 'Vite'],
+        items: ['JavaScript/TypeScript', 'React', 'Next.js App Router', 'Vite'],
     },
     {
         category: 'State Management',

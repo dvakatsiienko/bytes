@@ -20,8 +20,8 @@ export default (props: React.PropsWithChildren) => {
             suppressHydrationWarning
             className={cx(
                 fontManrope.className,
-                'bg-background',
-                // 'bg-linear-to-tl from-gradient-layout-primary-1 to-gradient-layout-primary-2',
+                // 'bg-background',
+                'bg-linear-to-tl from-gradient-layout-primary-1 to-gradient-layout-primary-2',
             )}
             lang='en'>
             <body className='grid min-h-[100dvh]'>

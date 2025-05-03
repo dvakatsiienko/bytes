@@ -9,8 +9,6 @@ import { BrowserLink } from './BrowserLink';
 /* Instruments */
 import { FEATURE_CV_READY } from '@/falgs';
 
-console.log('🚀 . FEATURE_CV_READY:', FEATURE_CV_READY);
-
 export const Browser = (props: React.PropsWithChildren) => {
     return (
         <section className='browser rounded-xl shadow-2xl'>
@@ -33,7 +31,7 @@ export const Browser = (props: React.PropsWithChildren) => {
             <section
                 className={cx(
                     'rounded-b-xl p-2 md:p-6 md:pt-0',
-                    'bg-linear-to-tl from-gradient-layout-primary-1 to-gradient-layout-primary-2',
+                    'bg-background'
                 )}>
                 <nav className='flex items-center gap-2 pt-2 text-gray-400 md:mb-8'>
                     {FEATURE_CV_READY && (

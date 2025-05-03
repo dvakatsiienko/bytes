@@ -22,11 +22,11 @@
 }
 
 :root {
-    --gradient-layout-primary-1: var(--gray-1);
-    --gradient-layout-primary-2: var(--gray-4);
+    --gradient-layout-primary-1: var(--gray-4);
+    --gradient-layout-primary-2: var(--gray-1);
 
-    --color-background: #f0f1e7;
-    --color-foreground: #161619;
+    --color-background: var(--gray-1);
+    --color-foreground: var(--gray-12);
 
     --color-background-header: var(--accent-2);
     --color-background-header-link: var(--color-background);
@@ -42,7 +42,7 @@
     --gradient-layout-primary-1: var(--gray-1);
     --gradient-layout-primary-2: var(--gray-2);
 
-    --color-background: var(--gray-1);
+    --color-background: var(--gray-3);
     --color-foreground: var(--gray-12);
 
     --color-background-header: var(--gray-1);
