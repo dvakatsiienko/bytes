@@ -15,7 +15,6 @@ export default function CoverPage() {
                 'mx-auto max-w-7xl',
                 // 'px-8 pb-4 pt-8',
                 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl dark:prose-invert',
-                'prose-headings:underline',
             )}>
             <h2>Hi there,</h2>
 
@@ -24,16 +23,19 @@ export default function CoverPage() {
             <p>
                 With <b>{yearExperience} years</b> of experience in <b>frontend development</b>, including specialized
                 expertise in <b>React ({yearExperienceReact} years)</b>, <b>Next.js ({yearExperienceNextjs} years)</b>,
-                and <b>TypeScript ({yearExperienceTypescript} years)</b>—I am eager to contribute my technical skills
-                and collaborative mindset to your team.
+                and <b>TypeScript ({yearExperienceTypescript} years)</b> — I am eager to contribute my skills and
+                collaborative mindset to a great team and product.
             </p>
 
-            <p>
-                My expertise: - Languages & Frameworks: JavaScript/TypeScript, React, Next.js, Vite - State Management:
-                React-Query, Apollo GraphQL, Jotai, Zustand, Redux - Styling & Animation: Tailwind, Styled Components,
-                motion.dev, Radix UI, Headless UI, chadcn/ui - LLM & prompt engineering: Vercel AI SDK, OpenAI, GroQ,
-                OpenRouter - Tools: Figma, Storybook, NPM module publishing
-            </p>
+            <h3>My expertise</h3>
+
+            <ul className='list-inside list-disc'>
+                {techStack.map(({ category, items }) => (
+                    <li key={category}>
+                        <b>{category}</b>: {items.join(', ')}
+                    </li>
+                ))}
+            </ul>
 
             <p>
                 Key Achievements: - Architected high-performance solutions with a focus on maintainability and
@@ -47,7 +49,7 @@ export default function CoverPage() {
 
             <p>
                 There is my CV attached with additional details. I welcome the opportunity to discuss how my experience
-                can support your team’s objectives.
+                can support your team's objectives.
             </p>
 
             <p>
@@ -76,6 +78,29 @@ const yearExperienceNextjs = yearCurrent - YEAR_STARTED_NEXTJS;
 
 const YEAR_STARTED_TYPESCRIPT = 2017;
 const yearExperienceTypescript = yearCurrent - YEAR_STARTED_TYPESCRIPT;
+
+const techStack = [
+    {
+        category: 'Languages & Frameworks',
+        items: ['JavaScript/TypeScript', 'React', 'Next.js', 'Vite'],
+    },
+    {
+        category: 'State Management',
+        items: ['React-Query', 'Apollo GraphQL', 'Jotai', 'Zustand', 'Redux'],
+    },
+    {
+        category: 'Styling & Animation',
+        items: ['Tailwind', 'Styled Components', 'motion.dev', 'Radix UI', 'Headless UI', 'chadcn/ui'],
+    },
+    {
+        category: 'LLM & prompt engineering',
+        items: ['Vercel AI SDK', 'OpenAI', 'GroQ', 'OpenRouter'],
+    },
+    {
+        category: 'Tools',
+        items: ['Figma', 'Storybook', 'NPM module publishing'],
+    },
+];
 
 export const metadata: Metadata = {
     title: 'Dima Vakatsiienko Cover',
