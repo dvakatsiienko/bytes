@@ -15,7 +15,7 @@ import logoJpeg from '/public/logo.jpeg';
 import { FEATURE_CV_READY } from '@/falgs';
 
 export default function CVPage() {
-    if (FEATURE_CV_READY) {
+    if (!FEATURE_CV_READY) {
         redirect('/cover');
     }
 

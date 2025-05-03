@@ -14,7 +14,8 @@ export default function CoverPage() {
             className={cx(
                 'mx-auto max-w-7xl',
                 // 'px-8 pb-4 pt-8',
-                'prose prose-sm prose-neutral sm:prose-base lg:prose-lg xl:prose-xl dark:prose-invert',
+                'prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl dark:prose-invert',
+                'prose-headings:underline',
             )}>
             <h2>Hi there,</h2>
 
