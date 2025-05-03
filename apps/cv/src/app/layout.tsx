@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { Manrope } from 'next/font/google';
 
 /* Components */
-import { Browser } from '@/components/Browser';
+import { Browser } from '@/components/Browser/Browser';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 /* Instruments */
