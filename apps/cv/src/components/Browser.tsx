@@ -30,18 +30,24 @@ export const Browser = (props: React.PropsWithChildren) => {
 
             <section
                 className={cx(
-                    'rounded-b-xl p-2 md:p-6 md:pt-0',
-                    'bg-background'
+                    'rounded-b-xl p-2 pt-0 md:p-6 md:pt-4',
+                    'bg-background',
+                    'max-h-[90dvh] overflow-y-auto print:overflow-y-visible print:max-h-none',
                 )}>
-                <nav className='flex items-center gap-2 pt-2 text-gray-400 md:mb-8'>
+                <nav
+                    className={cx(
+                        'mb-2 flex items-center gap-2 md:mb-4',
+                        'text-gray-600 dark:text-gray-400',
+                        'print:hidden',
+                    )}>
                     {FEATURE_CV_READY && (
                         <>
                             <Link className={breadcrumbLinkCn} href='/'>
-                                Cv
+                                cv
                             </Link>
                             /
                             <Link className={breadcrumbLinkCn} href='/cover'>
-                                Cover
+                                cover
                             </Link>
                         </>
                     )}
@@ -54,7 +60,7 @@ export const Browser = (props: React.PropsWithChildren) => {
 };
 
 const breadcrumbLinkCn = cva({
-    base: 'text-gray-400 hover:text-gray-500 p-1',
+    base: 'text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
 })();
 
 const dotCn = cva({

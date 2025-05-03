@@ -32,9 +32,9 @@
     --color-background-header-link: var(--color-background);
 
     --color-surface-1: var(--gray-1);
-    --color-surface-2: #f6f1fd;
-    --color-surface-3: #f6f1fd;
-    --color-surface-4: #f6f1fd;
+    --color-surface-2: var(--gray-2);
+    --color-surface-3: var(--gray-3);
+    --color-surface-4: var(--gray-4);
 }
 
 :root.dark,
@@ -47,10 +47,10 @@
 
     --color-background-header: var(--gray-1);
 
-    --color-surface-1: var(--gray-2);
-    --color-surface-2: #f6f1fd;
-    --color-surface-3: #f6f1fd;
-    --color-surface-4: #f6f1fd;
+    --color-surface-1: var(--gray-1);
+    --color-surface-2: var(--gray-2);
+    --color-surface-3: var(--gray-3);
+    --color-surface-4: var(--gray-4);
 }
 
 @theme inline {

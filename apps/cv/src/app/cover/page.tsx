@@ -22,8 +22,9 @@ export default function CoverPage() {
 
             <p>
                 With <b>{yearExperience} years</b> of experience in <b>frontend development</b>, including specialized
-                expertise in <b>React ({yearExperienceReact} years)</b>, <b>Next.js ({yearExperienceNextjs} years)</b>,
-                and <b>TypeScript ({yearExperienceTypescript} years)</b> — I am eager to contribute my skills and
+                expertise with <b>{yearExperienceReact} years of React</b>,{' '}
+                <b>{yearExperienceNextjs} years of Next.js</b>, <b>{yearExperienceTypescript} years of TypeScript</b>{' '}
+                and <b>{yearExperienceTailwind} years of Tailwind</b> — I am eager to contribute my skills and
                 collaborative mindset to a great team and product.
             </p>
 
@@ -33,19 +34,28 @@ export default function CoverPage() {
             </p>
 
             <p>
-                I look for a cool new project, maybe a startup, to build a great consumer product with AI. <br /> Check
-                out my most recent side project: an AI-driven{' '}
+                I look for a cool new project, maybe a startup, to build a great consumer product. <br /> Check out my
+                most recent side project: an AI-driven{' '}
                 <a target='_blank' rel='noopener noreferrer' href={process.env.NEXT_PUBLIC_X_COM_CHAT_LINK}>
                     X-COM Chat
                 </a>
-                , where each character has its own personality. I would be happy to{' '}
+                , where each character has its own personality. 👽 <br />
+                Look into my{' '}
+                <a target='_blank' rel='noopener noreferrer' href='https://github.com/dvakatsiienko'>
+                    GitHub
+                </a>{' '}
+                for more projects.
+            </p>
+
+            <p>
+                Let's{' '}
                 <a target='_blank' rel='noopener noreferrer' href='mailto:imagnum.satellite@gmail.com'>
                     meet and talk
                 </a>
-                . 🙂
+                . 😁
             </p>
 
-            <h3>My expertise</h3>
+            <h3>My main tools</h3>
 
             <ul className='list-inside list-disc'>
                 {techStack.map(({ category, items }) => (
@@ -55,29 +65,22 @@ export default function CoverPage() {
                 ))}
             </ul>
 
-            <p>
-                Key Achievements: - Architected high-performance solutions with a focus on maintainability and
-                robustness - Led platform redesigns, migrating legacy systems to modern tech stacks with up to 40%
-                faster load times post-optimization - Built shared component libraries adopted across organizations,
-                reducing development time by 20% - Mentored junior developers, improving team code quality and
-                productivity
-            </p>
+            <h3>My key achievements</h3>
 
-            <p>I thrive in environments that value user-centric design, technical precision and great UX.</p>
+            <ul className='list-inside list-disc'>
+                {keyAchievements.map((achievement) => (
+                    <li key={achievement}>{achievement}</li>
+                ))}
+            </ul>
 
-            <p>
-                There is my CV attached with additional details. I welcome the opportunity to discuss how my experience
-                can support your team's objectives.
-            </p>
-
-            <p>
-                Also, check my most recent side project: an AI-driven chat app, X-COM Chat.
-                https://x-com-chat.vercel.app/
-            </p>
-
-            <p>I would be glad to know more about this role!</p>
-
-            <p>Best regards, Dima Vakatsiienko</p>
+            <div
+                className={cx(
+                    'fixed bottom-4 right-4 flex h-12 items-center justify-center rounded-md px-4',
+                    'dark:bg-surface-1 bg-surface-4 print:hidden',
+                )}>
+                Write me on&nbsp;<a href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>Telegram</a>&nbsp;or by an&nbsp;
+                <a href='mailto:imagnum.satellite@gmail.com'>email</a>.
+            </div>
         </section>
     );
 }
@@ -97,21 +100,31 @@ const yearExperienceNextjs = yearCurrent - YEAR_STARTED_NEXTJS;
 const YEAR_STARTED_TYPESCRIPT = 2017;
 const yearExperienceTypescript = yearCurrent - YEAR_STARTED_TYPESCRIPT;
 
+const YEAR_STARTED_TAILWIND = 2022;
+const yearExperienceTailwind = yearCurrent - YEAR_STARTED_TAILWIND;
+
+const keyAchievements = [
+    'Architected high-performance solutions with a focus on maintainability and robustness',
+    'Led platform redesigns, migrating legacy systems to modern tech stacks with up to 40% faster load times post-optimization',
+    'Built shared component libraries adopted across organizations, reducing development time by 20%',
+    'Mentored teammates, improving code quality and productivity',
+];
+
 const techStack = [
     {
         category: 'Languages & Frameworks',
         items: ['JavaScript/TypeScript', 'React', 'Next.js App Router', 'Vite'],
     },
     {
-        category: 'State Management',
+        category: 'State & Network',
         items: ['React-Query', 'Apollo GraphQL', 'Jotai', 'Zustand', 'Redux'],
     },
     {
         category: 'Styling & Animation',
-        items: ['Tailwind', 'Styled Components', 'motion.dev', 'Radix UI', 'Headless UI', 'chadcn/ui'],
+        items: ['Tailwind', 'motion.dev', 'Radix UI', 'Headless UI', 'chadcn/ui', 'Styled Components'],
     },
     {
-        category: 'LLM & prompt engineering',
+        category: 'LLM prompt engineering',
         items: ['Vercel AI SDK', 'OpenAI', 'GroQ', 'OpenRouter'],
     },
     {
