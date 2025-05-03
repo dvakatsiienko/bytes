@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 
 export const ThemeSwitcher = () => {
-    const [ mounted, setMounted ] = useState(false);
-
+    const [mounted, setMounted] = useState(false);
     const { theme, setTheme } = useTheme();
+
     useEffect(() => {
         setMounted(true);
     }, []);
@@ -20,5 +20,9 @@ export const ThemeSwitcher = () => {
         if (theme === 'dark') setTheme('light');
     };
 
-    return <button onClick = { () => switchTheme() }>{theme}</button>;
+    return (
+        <button className='cursor-pointer text-white print:invisible' onClick={() => switchTheme()}>
+            {theme === 'light' ? 'light 🌙' : 'dark ☀️'}
+        </button>
+    );
 };

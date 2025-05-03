@@ -7,7 +7,7 @@
         "lint:inspect": "pnpx @eslint/config-inspector@latest"
     },
     "dependencies": {
-        "@eslint/js": "9.25.1",
+        "@eslint/js": "9.26.0",
         "eslint-plugin-react": "7.37.5",
         "eslint-plugin-react-hooks": "5.2.0",
         "eslint-plugin-smells": "1.0.1",

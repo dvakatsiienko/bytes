@@ -1,7 +1,7 @@
 export const Entry = (props: EntryProps) => {
     return (
-        <div className = 'entry'>
-            <span className = 'name'>{props.name}</span>
+        <div className = 'entry flex'>
+            <span className = 'name min-w-46 uppercase text-gray-500'>{props.name}</span>
             <span className = 'value'>{props.content}</span>
         </div>
     );
