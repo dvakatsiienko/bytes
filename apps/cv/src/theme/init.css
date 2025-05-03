@@ -8,25 +8,26 @@
 
 @layer base {
     & a {
-        @apply text-purple-500;
+        @apply text-link font-semibold;
 
-        &:visited {
-            @apply text-purple-600;
-        }
-
-        &:hover,
-        &:hover:visited {
-            @apply text-purple-600 underline;
+        &:hover {
+            @apply underline;
         }
     }
 }
 
-:root {
+:root,
+:root.light,
+:root[data-theme='light'] {
     --gradient-layout-primary-1: var(--gray-4);
     --gradient-layout-primary-2: var(--gray-1);
 
     --color-background: var(--gray-1);
     --color-foreground: var(--gray-12);
+
+    --color-link: var(--color-violet-600);
+    --color-link-hover: var(--accent-5);
+    --color-link-active: var(--accent-11);
 
     --color-background-header: var(--accent-2);
     --color-background-header-link: var(--color-background);
@@ -35,6 +36,7 @@
     --color-surface-2: var(--gray-2);
     --color-surface-3: var(--gray-3);
     --color-surface-4: var(--gray-4);
+    --color-surface-12: var(--gray-12);
 }
 
 :root.dark,
@@ -46,6 +48,10 @@
     --color-foreground: var(--gray-12);
 
     --color-background-header: var(--gray-1);
+
+    --color-link: var(--accent-10);
+    --color-link-hover: var(--accent-9);
+    --color-link-active: var(--accent-11);
 
     --color-surface-1: var(--gray-1);
     --color-surface-2: var(--gray-2);
@@ -60,10 +66,15 @@
     --color-background: var(--color-background);
     --color-foreground: var(--color-foreground);
 
+    --color-link: var(--color-link);
+    --color-link-hover: var(--color-link-hover);
+    --color-link-active: var(--color-link-active);
+
     --color-background-header: var(--color-background-header);
 
     --color-surface-1: var(--color-surface-1);
     --color-surface-2: var(--color-surface-2);
     --color-surface-3: var(--color-surface-3);
     --color-surface-4: var(--color-surface-4);
+    --color-surface-12: var(--color-surface-12);
 }
