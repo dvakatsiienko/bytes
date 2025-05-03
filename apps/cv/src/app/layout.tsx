@@ -22,6 +22,7 @@ export default (props: React.PropsWithChildren) => {
                 fontManrope.className,
                 // 'bg-background',
                 'bg-linear-to-tl from-gradient-layout-primary-1 to-gradient-layout-primary-2',
+                'overflow-hidden print:overflow-auto',
             )}
             lang='en'>
             <body className='grid min-h-[100dvh]'>
