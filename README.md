@@ -13,9 +13,9 @@
 [Website](https://x-com-chat.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/x-com-chat)
 
-###### ✈️ My Cover
+<!-- ###### ✈️ My Cover
 
-[Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cv)
+[Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cv) -->
 
 <!-- #### 🖥️ Hackernews 🚧 WIP 🚧
 
