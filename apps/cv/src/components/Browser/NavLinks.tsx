@@ -12,7 +12,7 @@ export const NavLinks = () => {
         <nav
             className={cx(
                 'grid h-5 grid-cols-[1fr_1fr] grid-rows-[1fr] place-content-center place-items-center',
-                'bg-surface-7 dark:bg-surface-2 rounded-sm',
+                'bg-surface-5 dark:bg-surface-2 rounded-sm',
             )}>
             <Link
                 className={breadcrumbLinkCn({

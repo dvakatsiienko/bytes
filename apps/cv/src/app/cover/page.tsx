@@ -11,21 +11,21 @@ import { EMAIL_TO } from '@/falgs';
 export default function CoverPage() {
     return (
         <main className={cx('prose-custom prose-style prose-hr:mb-6 mx-auto')}>
-            <h3>Hi there, I'm Dima. I do Frontend.</h3>
+            <h3 className='mt-4'>Hi there, I'm Dima. I do Frontend.</h3>
             <hr />
 
             <p>
                 I bring <b>{yearExperience} years</b> of <b>frontend development</b> experience, with deep expertise in{' '}
                 <b>React ({yearExperienceReact} years)</b>, <b>Next.js ({yearExperienceNextjs} years)</b>,{' '}
                 <b>TypeScript ({yearExperienceTypescript} years)</b> and{' '}
-                <b>Tailwind ({yearExperienceTailwind} years)</b>. I’m excited to join a great team where I can put my
-                skills and collaborative spirit to work on something impactful.
+                <b>Tailwind ({yearExperienceTailwind} years)</b>. I’ve delivered many successful projects, focusing on
+                high-quality functionality, clean UI/UX, and simplicity — challenges included.
             </p>
 
             <p>
-                I’ve delivered many successful projects, focusing on high-quality functionality, clean UI/UX, and
-                simplicity. I’m looking for a cool new project, maybe a startup, where I can help build an awesome
-                consumer product. <br />
+                I’m looking for a cool new project, maybe a startup, where I can help build an awesome consumer-facing
+                product. I’m excited to join a great team where I can put my skills and collaborative spirit to work on
+                something impactful.
             </p>
 
             <p>

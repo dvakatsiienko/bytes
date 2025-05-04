@@ -41,7 +41,7 @@
         "@radix-ui/react-tooltip": "1.2.4",
         "@tailwindcss/forms": "0.5.10",
         "@tailwindcss/typography": "0.5.16",
-        "@tanstack/react-query": "5.75.1",
+        "@tanstack/react-query": "5.75.2",
         "@use-it/event-listener": "0.1.7",
         "ai": "4.3.13",
         "babel-plugin-react-compiler": "19.1.0-rc.1",
@@ -67,7 +67,7 @@
     "devDependencies": {
         "@swc-node/register": "1.10.10",
         "@tailwindcss/postcss": "4.1.5",
-        "@tanstack/react-query-devtools": "5.75.1",
+        "@tanstack/react-query-devtools": "5.75.2",
         "@types/node": "22.15.3",
         "@types/react": "19.1.2",
         "@types/react-dom": "19.1.3",
