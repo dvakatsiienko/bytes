@@ -2,10 +2,10 @@
 import { cva, cx, type VariantProps } from 'cva';
 
 export function SectionHeading(props: SectionHeadingProps) {
-    const { color = 'sky', text, disableMt = false } = props;
+    const { color = 'sky', text, className } = props;
 
     return (
-        <h4 className={cx('col-span-2 flex items-center gap-x-1.5 font-normal')}>
+        <h4 className={cx('col-span-2 flex items-center gap-x-1.5 font-normal', className)}>
             <b className={sectionHeadingCn({ color })} />
             {text}
         </h4>
@@ -28,5 +28,5 @@ type SectionHeadingCn = VariantProps<typeof sectionHeadingCn>;
 
 interface SectionHeadingProps extends SectionHeadingCn {
     text: string;
-    disableMt?: boolean;
+    className?: string;
 }

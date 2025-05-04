@@ -2,7 +2,7 @@
 import { cva, cx } from 'cva';
 
 /* Components */
-import { ThemeSwitcher } from '@/elements/ThemeSwitcher';
+import { ThemeSwitcher } from '@/components/service/ThemeSwitcher';
 import { NavLinks } from './NavLinks';
 
 export const Browser = (props: React.PropsWithChildren) => {
@@ -24,7 +24,14 @@ export const Browser = (props: React.PropsWithChildren) => {
                 className={cx(
                     'rounded-b-xl p-2 pt-0 md:p-6 md:pt-4',
                     'bg-background',
-                    'max-h-[90dvh] overflow-y-auto print:max-h-none print:overflow-y-visible',
+                    'max-h-[90dvh] overflow-y-scroll print:max-h-none print:overflow-y-visible',
+                    /* Scrollbar */
+                    'scrollbar scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-w-1',
+                    'scrollbar-thumb-surface-12 scrollbar-track-transparent',
+                    'scrollbar-hover:scrollbar-thumb-surface-11 scrollbar-active:scrollbar-thumb-surface-10',
+                    'scrollbar-hover:cursor-grab scrollbar-active:cursor-grabbing',
+
+                    // 'scrollbar-thumb-slate-700 scrollbar-track-slate-300'
                 )}>
                 {props.children}
             </section>

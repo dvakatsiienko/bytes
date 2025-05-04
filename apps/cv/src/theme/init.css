@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@plugin 'tailwind-scrollbar' {
+    nocompatible: true;
+    preferredstrategy: 'pseudoelements';
+}
 
 @import './gray.css';
 @import './accent.css';
@@ -20,6 +24,7 @@
     .prose-custom {
         @apply prose prose-a:text-link prose-a:no-underline prose-a:hover:underline;
     }
+
     .prose-style {
         @apply prose-sm md:prose-base dark:prose-invert;
     }

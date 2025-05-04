@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 /* Components */
 import { Entry } from '@/components/Entry';
 import { JobEntry } from '@/components/JobEntry';
+import { Tool } from '@/components/Tool';
 import { ExternalLink } from '@/elements';
 import { SectionHeading } from '@/components/SectionHeading';
 
@@ -23,9 +24,16 @@ export default function CVPage() {
 
     const articleCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
 
+    const toolListCn = cx(
+        'grid h-max gap-2',
+        // 'grid-cols-4',
+        'grid-cols-[repeat(auto-fill,minmax(80px,1fr))]',
+        'grid-rows-[repeat(auto-fill,minmax(40px,1fr))]',
+    );
+
     return (
         <main className={cx('mx-auto', 'prose-custom prose-style')}>
-            <SectionHeading color='sky' text='Brief' />
+            <SectionHeading className='mt-4' color='sky' text='brief' />
 
             <article className='grid grid-cols-[1fr_auto]'>
                 <section className={articleCn}>
@@ -63,9 +71,37 @@ export default function CVPage() {
             </article>
 
             <article>
-                <SectionHeading color='purple' text='Stuff that I use' />
+                <SectionHeading color='purple' text='stuff I use' />
 
-                <Entry
+                <h5>core</h5>
+                <section className={toolListCn}>
+                    {toolListCore.map((tool) => (
+                        <Tool key={tool.name} name={tool.name} />
+                    ))}
+                </section>
+
+                <h5>state · network</h5>
+                <section className={toolListCn}>
+                    {toolListState.map((tool) => (
+                        <Tool key={tool.name} name={tool.name} />
+                    ))}
+                </section>
+
+                <h5>styles · animations</h5>
+                <section className={toolListCn}>
+                    {toolListStyles.map((tool) => (
+                        <Tool key={tool.name} name={tool.name} />
+                    ))}
+                </section>
+
+                <h5>AI · LLM promting</h5>
+                <section className={toolListCn}>
+                    {toolListAnimations.map((tool) => (
+                        <Tool key={tool.name} name={tool.name} />
+                    ))}
+                </section>
+
+                {/* <Entry
                     name='core'
                     content={
                         <ul>
@@ -80,8 +116,8 @@ export default function CVPage() {
                             </li>
                         </ul>
                     }
-                />
-                <Entry
+                /> */}
+                {/* <Entry
                     name='peripheral'
                     content={
                         <ul>
@@ -90,8 +126,8 @@ export default function CVPage() {
                             <li>★ ★ ★ ☆ ☆ — mobile first, responsive fluid design</li>
                         </ul>
                     }
-                />
-                <Entry
+                /> */}
+                {/* <Entry
                     name='Other'
                     content={
                         <ul>
@@ -101,7 +137,7 @@ export default function CVPage() {
                             <li>Development workflow management experience</li>
                         </ul>
                     }
-                />
+                /> */}
             </article>
 
             {/* <article>
@@ -151,6 +187,120 @@ export default function CVPage() {
         </main>
     );
 }
+
+const toolListCore = [
+    {
+        name: 'ESNext',
+        icon: 'https://esnext.io/icon.png',
+    },
+    {
+        name: 'TypeScript',
+        icon: 'https://www.typescriptlang.org/static/images/logo.svg',
+    },
+    {
+        name: 'Node.js',
+        icon: 'https://nodejs.org/static/images/logo.svg',
+    },
+    {
+        name: 'React',
+        icon: 'https://react.dev/static/images/logo-og.png',
+    },
+    {
+        name: 'Next.js',
+        icon: 'https://nextjs.org/static/images/logo-og.png',
+    },
+    {
+        name: 'Vite',
+        icon: 'https://vitejs.dev/logo.svg',
+    },
+
+    // fillers
+    {
+        name: 'GraphQL',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'REST',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+];
+
+const toolListState = [
+    {
+        name: 'React Query',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Apollo GraphQL',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Jotai',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Zustand',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Prisma',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'PostgreSQL',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+];
+
+const toolListStyles = [
+    {
+        name: 'Tailwind',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Radix UI',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Chadcn UI',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Headless UI',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'motion.dev',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Figma',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Storybook',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+];
+
+const toolListAnimations = [
+    {
+        name: 'Vercel AI',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'OpenAI',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'GroQ',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'OpenRouter',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+];
 
 export const metadata: Metadata = {
     title: 'Dima Vakatsiienko CV',
