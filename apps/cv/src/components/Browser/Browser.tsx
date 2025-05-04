@@ -1,36 +1,28 @@
 /* Core */
-import Link from 'next/link';
 import { cva, cx } from 'cva';
 
 /* Components */
 import { ThemeSwitcher } from '@/elements/ThemeSwitcher';
 import { NavLinks } from './NavLinks';
 
-/* Instruments */
-import { FEATURE_CV_READY } from '@/falgs';
-
 export const Browser = (props: React.PropsWithChildren) => {
     return (
-        <section className='browser rounded-xl shadow-2xl'>
-            <header className='bg-background-header relative flex h-10 items-center justify-between rounded-t-xl border border-gray-900 px-4'>
+        <section className='browser max-w-7xl rounded-xl shadow-2xl'>
+            <header className='bg-background-header relative grid h-10 grid-cols-[1fr_minmax(auto,150px)_1fr] items-center justify-between gap-x-4 rounded-t-xl border border-gray-900 px-4'>
                 <div className='flex h-full w-max items-center gap-2'>
                     <b className={dotCn({ intent: 'close' })} />
                     <b className={dotCn({ intent: 'minimize' })} />
                     <b className={dotCn({ intent: 'maximize' })} />
                 </div>
 
-                <div className='title'>
-                    <blockquote className='bg-surface-4 dark:bg-surface-2 flex max-w-52 items-center justify-center gap-2 rounded-sm px-4 sm:w-52'>
-                        {FEATURE_CV_READY && <NavLinks />}
-                    </blockquote>
-                </div>
+                <NavLinks />
 
                 <ThemeSwitcher />
             </header>
 
             <section
                 className={cx(
-                    'relative rounded-b-xl p-2 pt-0 md:p-6 md:pt-4',
+                    'rounded-b-xl p-2 pt-0 md:p-6 md:pt-4',
                     'bg-background',
                     'max-h-[90dvh] overflow-y-auto print:max-h-none print:overflow-y-visible',
                 )}>

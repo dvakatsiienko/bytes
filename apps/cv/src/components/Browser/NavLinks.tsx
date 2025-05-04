@@ -8,27 +8,42 @@ import { cva, cx } from 'cva';
 export const NavLinks = () => {
     const pathname = usePathname();
 
-    console.log('🚀 . NavLinks . pathname:', pathname);
-
     return (
-        <>
-            <Link className={breadcrumbLinkCn({ intent: pathname === '/' ? 'active' : void 0 })} href='/'>
+        <nav
+            className={cx(
+                'grid h-5 grid-cols-[1fr_1fr] grid-rows-[1fr] place-content-center place-items-center',
+                'bg-surface-7 dark:bg-surface-2 rounded-sm',
+            )}>
+            <Link
+                className={breadcrumbLinkCn({
+                    intent: pathname === '/' ? 'active' : void 0,
+                    className: 'rounded-l-sm border-r',
+                })}
+                href='/'>
                 cv
             </Link>
-            |
-            <Link className={breadcrumbLinkCn({ intent: pathname === '/cover' ? 'active' : void 0 })} href='/cover'>
+            <Link
+                className={breadcrumbLinkCn({
+                    intent: pathname === '/cover' ? 'active' : void 0,
+                    className: 'rounded-r-sm border-l',
+                })}
+                href='/cover'>
                 cover
             </Link>
-        </>
+        </nav>
     );
 };
 
 /* Styles */
 const breadcrumbLinkCn = cva({
-    base: 'text-foreground dark:text-gray-400',
+    base: cx(
+        'text-foreground w-full grid items-center h-full dark:text-gray-400 text-xs text-center',
+        ' hover:bg-surface-2 dark:hover:bg-surface-4',
+        'border-surface-4 dark:border-surface-2',
+    ),
     variants: {
         intent: {
-            active: 'text-link dark:text-link',
+            active: 'text-link dark:text-link bg-surface-2 dark:bg-surface-4 ',
         },
     },
 });

@@ -16,6 +16,15 @@
     }
 }
 
+@layer components {
+    .prose-custom {
+        @apply prose prose-a:text-link prose-a:no-underline prose-a:hover:underline;
+    }
+    .prose-style {
+        @apply prose-sm md:prose-base dark:prose-invert;
+    }
+}
+
 :root,
 :root.light,
 :root[data-theme='light'] {
@@ -36,6 +45,13 @@
     --color-surface-2: var(--gray-2);
     --color-surface-3: var(--gray-3);
     --color-surface-4: var(--gray-4);
+    --color-surface-5: var(--gray-5);
+    --color-surface-6: var(--gray-6);
+    --color-surface-7: var(--gray-7);
+    --color-surface-8: var(--gray-8);
+    --color-surface-9: var(--gray-9);
+    --color-surface-10: var(--gray-10);
+    --color-surface-11: var(--gray-11);
     --color-surface-12: var(--gray-12);
 }
 
@@ -57,6 +73,14 @@
     --color-surface-2: var(--gray-2);
     --color-surface-3: var(--gray-3);
     --color-surface-4: var(--gray-4);
+    --color-surface-5: var(--gray-5);
+    --color-surface-6: var(--gray-6);
+    --color-surface-7: var(--gray-7);
+    --color-surface-8: var(--gray-8);
+    --color-surface-9: var(--gray-9);
+    --color-surface-10: var(--gray-10);
+    --color-surface-11: var(--gray-11);
+    --color-surface-12: var(--gray-12);
 }
 
 @theme inline {
@@ -76,5 +100,12 @@
     --color-surface-2: var(--color-surface-2);
     --color-surface-3: var(--color-surface-3);
     --color-surface-4: var(--color-surface-4);
+    --color-surface-5: var(--color-surface-5);
+    --color-surface-6: var(--color-surface-6);
+    --color-surface-7: var(--color-surface-7);
+    --color-surface-8: var(--color-surface-8);
+    --color-surface-9: var(--color-surface-9);
+    --color-surface-10: var(--color-surface-10);
+    --color-surface-11: var(--color-surface-11);
     --color-surface-12: var(--color-surface-12);
 }

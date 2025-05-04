@@ -2,87 +2,68 @@
 import { cx } from 'cva';
 import type { Metadata } from 'next';
 
-// prose-slate	Slate
-// prose-zinc	Zinc
-// prose-neutral	Neutral
-// prose-stone	Stone
-//
+/* Components */
+import { ExternalLink } from '@/elements/ExternalLink';
+
+/* Instruments */
+import { EMAIL_TO } from '@/falgs';
 
 export default function CoverPage() {
     return (
-        <>
-            <section
-                className={cx(
-                    'mx-auto max-w-7xl',
-                    'prose prose-a:text-link prose-sm sm:prose-base lg:prose-lg xl:prose-xl dark:prose-invert',
-                )}>
-                {/* <div
-                    className={cx(
-                        'sticky -right-0 top-0 z-10 flex h-12 w-max items-center justify-center rounded-md px-4',
-                        'dark:bg-background-header bg-surface-4 print:hidden',
-                    )}>
-                    Write me on&nbsp;<a href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>Telegram</a>&nbsp;or by an&nbsp;
-                    <a href='mailto:imagnum.satellite@gmail.com'>email</a>.
-                </div> */}
+        <main className={cx('prose-custom prose-style prose-hr:mb-6 mx-auto')}>
+            <h3>Hi there, I'm Dima. I do Frontend.</h3>
+            <hr />
 
-                <h2>Hi there,</h2>
+            <p>
+                I bring <b>{yearExperience} years</b> of <b>frontend development</b> experience, with deep expertise in{' '}
+                <b>React ({yearExperienceReact} years)</b>, <b>Next.js ({yearExperienceNextjs} years)</b>,{' '}
+                <b>TypeScript ({yearExperienceTypescript} years)</b> and{' '}
+                <b>Tailwind ({yearExperienceTailwind} years)</b>. I’m excited to join a great team where I can put my
+                skills and collaborative spirit to work on something impactful.
+            </p>
 
-                <p>I'm Dima, a Frontend Engineer.</p>
+            <p>
+                I’ve delivered many successful projects, focusing on high-quality functionality, clean UI/UX, and
+                simplicity. I’m looking for a cool new project, maybe a startup, where I can help build an awesome
+                consumer product. <br />
+            </p>
 
-                <p>
-                    I bring <b>{yearExperience} years</b> of <b>frontend development</b> experience, with deep expertise
-                    in <b>React ({yearExperienceReact} years)</b>, <b>Nex.js ({yearExperienceNextjs} years)</b>,{' '}
-                    <b>TypeScript ({yearExperienceTypescript} years)</b> and{' '}
-                    <b>Tailwind ({yearExperienceTailwind} years)</b>. I’m excited to join a great team where I can put
-                    my skills and collaborative spirit to work on something impactful.
-                </p>
+            <p>
+                👽 Check out my latest side project: an AI-driven{' '}
+                <ExternalLink href={process.env.NEXT_PUBLIC_LINK_X_COM_CHAT}>X-COM Chat</ExternalLink>, where each
+                character has its own personality. <br />
+            </p>
+            <blockquote>
+                💡 You can find more of my work on&nbsp;
+                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>GitHub</ExternalLink>.
+            </blockquote>
 
-                <p>
-                    I’ve delivered many successful projects, focusing on high-quality functionality, clean UI/UX, and
-                    simplicity.
-                </p>
+            <p>
+                Let's{' '}
+                <a target='_blank' rel='noopener noreferrer' href={EMAIL_TO}>
+                    meet and talk
+                </a>
+                . 😁
+            </p>
 
-                <p>
-                    I’m looking for a cool new project, maybe a startup, where I can help build an awesome consumer
-                    product. <br /> Check out my latest side project: an AI-driven{' '}
-                    <a target='_blank' rel='noopener noreferrer' href={process.env.NEXT_PUBLIC_X_COM_CHAT_LINK}>
-                        X-COM Chat
-                    </a>
-                    , where each character has its own personality. 👽 <br />
-                    You can find more of my work on&nbsp;
-                    <a target='_blank' rel='noopener noreferrer' href='https://github.com/dvakatsiienko'>
-                        GitHub
-                    </a>
-                    .
-                </p>
+            <h3>My main tools</h3>
 
-                <p>
-                    Let's{' '}
-                    <a target='_blank' rel='noopener noreferrer' href='mailto:imagnum.satellite@gmail.com'>
-                        meet and talk
-                    </a>
-                    . 😁
-                </p>
+            <ul className='list-inside list-disc'>
+                {techStack.map(({ category, items }) => (
+                    <li key={category}>
+                        <b>{category}</b>: {items.join(', ')}
+                    </li>
+                ))}
+            </ul>
 
-                <h3>My main tools</h3>
+            <h3>My key achievements</h3>
 
-                <ul className='list-inside list-disc'>
-                    {techStack.map(({ category, items }) => (
-                        <li key={category}>
-                            <b>{category}</b>: {items.join(', ')}
-                        </li>
-                    ))}
-                </ul>
-
-                <h3>My key achievements</h3>
-
-                <ul className='list-inside list-disc'>
-                    {keyAchievements.map((achievement) => (
-                        <li key={achievement}>{achievement}</li>
-                    ))}
-                </ul>
-            </section>
-        </>
+            <ul className='list-inside list-disc'>
+                {keyAchievements.map((achievement) => (
+                    <li key={achievement}>{achievement}</li>
+                ))}
+            </ul>
+        </main>
     );
 }
 
