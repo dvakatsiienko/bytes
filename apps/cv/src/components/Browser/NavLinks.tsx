@@ -13,6 +13,7 @@ export const NavLinks = () => {
             className={cx(
                 'grid h-5 grid-cols-[1fr_1fr] grid-rows-[1fr] place-content-center place-items-center',
                 'bg-surface-5 dark:bg-surface-2 rounded-sm',
+                'prose-custom prose-style',
             )}>
             <Link
                 className={breadcrumbLinkCn({
@@ -37,13 +38,14 @@ export const NavLinks = () => {
 /* Styles */
 const breadcrumbLinkCn = cva({
     base: cx(
-        'text-foreground w-full grid items-center h-full dark:text-gray-400 text-xs text-center',
-        ' hover:bg-surface-2 dark:hover:bg-surface-4',
+        'text-gray-500 w-full grid items-center h-full dark:text-gray-400 ',
+        'text-center font-semibold text-xs',
+        'hover:bg-surface-2 dark:hover:bg-surface-4',
         'border-surface-4 dark:border-surface-2',
     ),
     variants: {
         intent: {
-            active: 'text-link dark:text-link bg-surface-2 dark:bg-surface-4 ',
+            active: 'text-indigo-600 dark:text-link bg-surface-2 dark:bg-surface-4 ',
         },
     },
 });

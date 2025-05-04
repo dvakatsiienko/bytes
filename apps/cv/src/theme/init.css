@@ -22,7 +22,7 @@
 
 @layer components {
     .prose-custom {
-        @apply prose prose-a:text-link prose-a:no-underline prose-a:hover:underline;
+        @apply prose prose-indigo dark:prose-a:text-link prose-a:no-underline prose-a:hover:underline;
     }
 
     .prose-style {
