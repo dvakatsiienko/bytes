@@ -1,14 +1,15 @@
 export const Entry = (props: EntryProps) => {
     return (
-        <div className = 'entry flex'>
-            <span className = 'name min-w-46 uppercase text-gray-500'>{props.name}</span>
-            <span className = 'value'>{props.content}</span>
-        </div>
+        <>
+            {/* TODO adjust text-gray for light/dark */}
+            <span className='name w-full max-w-46 lowercase text-gray-500'>{props.name}</span>
+            <span className='value'>{props.content}</span>
+        </>
     );
 };
 
 /* Core */
 interface EntryProps {
-    name:    string,
-    content: string | React.ReactNode,
+    name: string;
+    content: string | React.ReactNode;
 }

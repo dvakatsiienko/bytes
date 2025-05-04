@@ -2,7 +2,7 @@
 
 /* Core */
 import { useState, useEffect } from 'react';
-import { useTheme, } from 'next-themes';
+import { useTheme } from 'next-themes';
 
 export const ThemeSwitcher = () => {
     const [mounted, setMounted] = useState(false);
@@ -20,9 +20,13 @@ export const ThemeSwitcher = () => {
     };
 
     return (
-        <button className='cursor-pointer text-white print:invisible' onClick={switchTheme}>
-            {resolvedTheme === 'light' && 'light 🌙'}
-            {resolvedTheme === 'dark' && 'dark ☀️'}
+        <button className='flex items-center justify-end text-white print:invisible'>
+            <span
+                className='text-nowrap text-xs cursor-pointer'
+                onClick={switchTheme}>
+                {resolvedTheme === 'light' && 'light 🌙'}
+                {resolvedTheme === 'dark' && 'dark ☀️'}
+            </span>
         </button>
     );
 };

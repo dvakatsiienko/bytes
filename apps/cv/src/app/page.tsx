@@ -1,77 +1,69 @@
 /* Core */
 import Image from 'next/image';
+import NextLink from 'next/link';
 import { redirect } from 'next/navigation';
+import { cx } from 'cva';
 import type { Metadata } from 'next';
-
 /* Components */
 import { Entry } from '@/components/Entry';
 import { JobEntry } from '@/components/JobEntry';
 import { ExternalLink } from '@/elements';
+import { SectionHeading } from '@/components/SectionHeading';
 
 /* Instruments */
 import meJpeg from '/public/my-photo.jpeg';
 import logoJpeg from '/public/logo.jpeg';
 
-import { FEATURE_CV_READY } from '@/falgs';
+import { FEATURE_CV_READY, EMAIL_TO } from '@/falgs';
 
 export default function CVPage() {
     if (!FEATURE_CV_READY) {
         redirect('/cover');
     }
 
-    return (
-        <>
-            <section className=''>
-                <h1>👨🏼‍✈️ Profile</h1>
+    const articleCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
 
-                <section className='gap-4'>
-                    <picture className='aspect-2/3 relative float-right w-24 md:w-52'>
-                        <Image
-                            fill
-                            sizes='10vw'
-                            priority
-                            alt='Picture of the author'
-                            className='h-full w-full rounded-md object-cover'
-                            placeholder='blur'
-                            src={meJpeg}
-                        />
-                    </picture>
-                    {/* {'text '.repeat(300)} */}
+    return (
+        <main className={cx('mx-auto', 'prose-custom prose-style')}>
+            <SectionHeading color='sky' text='Brief' />
+
+            <article className='grid grid-cols-[1fr_auto]'>
+                <section className={articleCn}>
+                    <Entry content='Dima Vakatsiienko' name='name' />
+                    <Entry name='email' content={<a href={EMAIL_TO}>{process.env.NEXT_PUBLIC_ADDRESS_EMAIL}</a>} />
+                    <Entry content='Ukraine, Kyiv' name='location' />
+                    <Entry
+                        name='links'
+                        content={
+                            <>
+                                <NextLink href='/cover'>Cover</NextLink>
+                                ,&nbsp;
+                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>Github</ExternalLink>
+                                ,&nbsp;
+                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>Linkedin</ExternalLink>
+                                ,&nbsp;
+                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>Telegram</ExternalLink>
+                            </>
+                        }
+                    />
+                    <Entry content={<b>Frontend Engineer, Frontend Lead, Hybrid</b>} name='role' />
                 </section>
 
-                <Entry content='Dima Vakatsiienko' name='name' />
-                <Entry
-                    name='email'
-                    content={<a href='mailto:imagnum.satellite@gmail.com '>imagnum.satellite@gmail.com</a>}
-                />
-                <Entry content='Ukraine, Kyiv' name='location' />
-                <Entry
-                    name='links'
-                    content={
-                        <>
-                            <ExternalLink href='https://telegra.ph/SeniorLead-Frontend-Developer-10-02'>
-                                Cover Letter
-                            </ExternalLink>
-                            ,&nbsp;
-                            <ExternalLink href='https://github.com/dvakatsiienko'>Github</ExternalLink>
-                            ,&nbsp;
-                            <ExternalLink href='https://www.linkedin.com/in/dima-vakatsiienko-a20271100/'>
-                                Linkedin
-                            </ExternalLink>
-                            ,&nbsp;
-                            <ExternalLink href='https://t.me/shining1488'>Telegram</ExternalLink>
-                        </>
-                    }
-                />
-                <Entry content={<b>Frontend Developer, Frontend Team/Tech Lead, Hybrid</b>} name='desired position' />
-                <Entry
-                    content="Hello! I have a deep expertise of modern web development. As a tutor I\'ve taught over 500+ students with cutting edge JavaScript, React, Next.js, Redux, Redux Saga, webpack, Immutable.js and Flowtype. My goal is to join a great team of enthusiasts who want to write perfect code and develop top notch web applications of the future."
-                    name='objective'
-                />
-            </section>
+                <picture className='aspect-2/3 m-0! relative hidden w-20 sm:block'>
+                    <Image
+                        fill
+                        sizes='10vw'
+                        priority
+                        alt='Picture of the author'
+                        className='rounded-md object-cover'
+                        placeholder='blur'
+                        src={meJpeg}
+                    />
+                </picture>
+            </article>
 
-            <section className='section'>
-                <h1>🔮 Skills</h1>
+            <article>
+                <SectionHeading color='purple' text='Stuff that I use' />
 
                 <Entry
                     name='core'
@@ -110,10 +102,10 @@ export default function CVPage() {
                         </ul>
                     }
                 />
-            </section>
+            </article>
 
-            <section className='section'>
-                <h1>🖥️ Portfolio</h1>
+            {/* <article>
+                <h2>Portfolio</h2>
 
                 <JobEntry
                     comapnyLogoUrl={logoJpeg}
@@ -155,8 +147,8 @@ export default function CVPage() {
                         </>
                     }
                 />
-            </section>
-        </>
+            </article> */}
+        </main>
     );
 }
 

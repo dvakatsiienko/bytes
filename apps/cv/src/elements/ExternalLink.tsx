@@ -1,6 +1,6 @@
 export const ExternalLink = (props: ExternalLinkProps) => {
     return (
-        <a href = { props.href } rel = 'noreferrer noopener' target = '_blank'>
+        <a href = { props.href ?? '#' } rel = 'noreferrer noopener' target = '_blank'>
             {props.children}
         </a>
     );
@@ -8,5 +8,5 @@ export const ExternalLink = (props: ExternalLinkProps) => {
 
 /* Types */
 interface ExternalLinkProps extends React.PropsWithChildren {
-    href: string,
+    href?: string,
 }

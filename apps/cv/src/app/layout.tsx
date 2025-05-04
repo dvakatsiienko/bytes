@@ -22,14 +22,15 @@ export default (props: React.PropsWithChildren) => {
                 fontManrope.className,
                 // 'bg-background',
                 'bg-linear-to-tl from-gradient-layout-primary-1 to-gradient-layout-primary-2',
-                'overflow-hidden print:overflow-auto',
+                'overflow-y-hidden print:overflow-visible',
             )}
             lang='en'>
             <body className='grid min-h-[100dvh]'>
                 <ThemeProvider>
-                    <main className='mx-auto mb-8 mt-4 max-w-7xl px-4 md:mt-10 md:px-8'>
+                    {/* TODO clean max-w at page level everywhere */}
+                    <section className='mx-auto grid place-content-center px-4 md:px-8'>
                         <Browser>{props.children}</Browser>
-                    </main>
+                    </section>
                 </ThemeProvider>
             </body>
         </html>
