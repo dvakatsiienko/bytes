@@ -1,10 +1,14 @@
 /* Core */
 import { cva, cx } from 'cva';
+import { ITool } from './toolConfig';
 
 export const Tool = (props: ToolProps) => {
+    const Icon = props.Icon;
+
     return (
         <div className={toolCn()}>
-            <span className='text-xs text-gray-500 dark:text-gray-400'>{props.name}</span>
+            {typeof Icon === 'function' && <Icon size={18} />}
+            <span className='text-[11px] text-gray-600 dark:text-gray-300'>{props.name}</span>
         </div>
     );
 };
@@ -12,7 +16,7 @@ export const Tool = (props: ToolProps) => {
 /* Styles */
 const toolCn = cva({
     base: cx(
-        'grid rounded-lg p-1',
+        'grid grid-flow-col rounded-lg p-1 gap-2',
         'bg-surface-5 dark:bg-surface-1 hover:bg-surface-4 dark:hover:bg-surface-2',
         'place-content-center place-items-center',
         'cursor-pointer ',
@@ -21,5 +25,6 @@ const toolCn = cva({
 
 /* Types */
 interface ToolProps extends React.PropsWithChildren {
-    name: string;
+    name: ITool['name'];
+    Icon?: ITool['icon'];
 }
