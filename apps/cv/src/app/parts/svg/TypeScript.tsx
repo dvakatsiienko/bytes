@@ -2,7 +2,7 @@
 import type { TSvgProps } from './types';
 
 export const TypeScript = (props: TSvgProps) => {
-    const { size = 10, ...rest } = props;
+    const { size = 10, ...restProps } = props;
 
     return (
         <svg
@@ -11,7 +11,7 @@ export const TypeScript = (props: TSvgProps) => {
             height={size}
             xmlns='http://www.w3.org/2000/svg'
             preserveAspectRatio='xMidYMid'
-            {...rest}>
+            {...restProps}>
             <path
                 d='M20 0h216c11.046 0 20 8.954 20 20v216c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20V20C0 8.954 8.954 0 20 0Z'
                 fill='#3178C6'

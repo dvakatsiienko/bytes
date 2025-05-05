@@ -14,6 +14,7 @@ export const NavLinks = () => {
                 'grid h-5 grid-cols-[1fr_1fr] grid-rows-[1fr] place-content-center place-items-center',
                 'bg-surface-5 dark:bg-surface-2 rounded-sm',
                 'prose-custom prose-style',
+                'select-none',
             )}>
             <Link
                 className={breadcrumbLinkCn({

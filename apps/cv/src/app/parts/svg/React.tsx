@@ -2,7 +2,7 @@
 import type { TSvgProps } from './types';
 
 export const React = (props: TSvgProps) => {
-    const { size = 10, ...rest } = props;
+    const { size = 10, ...restProps } = props;
 
     return (
         <svg
@@ -12,7 +12,7 @@ export const React = (props: TSvgProps) => {
             version='1.1'
             xmlns='http://www.w3.org/2000/svg'
             xmlnsXlink='http://www.w3.org/1999/xlink'
-            {...rest}>
+            {...restProps}>
             <g fill='none' fillRule='evenodd'>
                 <g fill='#087EA4' fillRule='nonzero'>
                     <path

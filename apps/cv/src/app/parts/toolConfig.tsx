@@ -11,15 +11,18 @@ export const toolListCore = [
         icon: svg.TypeScript,
     },
     {
-        name: 'Node.js',
+        name: 'Node',
         icon: svg.Node,
     },
     {
         name: 'React',
         icon: svg.React,
     },
+];
+
+export const toolListFrameworks = [
     {
-        name: 'Next.js',
+        name: 'Next',
         icon: svg.Next,
     },
     {
@@ -28,7 +31,25 @@ export const toolListCore = [
     },
 ];
 
+export const toolListAuth = [
+    {
+        name: 'Clerk',
+        icon: svg.Clerk,
+    },
+];
+
 export const toolListState = [
+    {
+        name: 'Jotai',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Zustand',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+];
+
+export const toolListNetwork = [
     {
         name: 'Apollo GraphQL',
         icon: svg.GraphQL,
@@ -38,19 +59,22 @@ export const toolListState = [
         icon: svg.ReactQuery,
     },
     {
-        name: 'Jotai',
-        icon: 'https://tailwindcss.com/icon.png',
+        name: 'Vercel',
+        icon: svg.Vercel,
     },
-    {
-        name: 'Zustand',
-        icon: 'https://tailwindcss.com/icon.png',
-    },
+];
+
+export const toolListDb = [
     {
         name: 'Prisma',
         icon: 'https://tailwindcss.com/icon.png',
     },
     {
         name: 'PostgreSQL',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Convex',
         icon: 'https://tailwindcss.com/icon.png',
     },
 ];
@@ -62,7 +86,7 @@ export const toolListStyles = [
     },
     {
         name: 'Radix UI',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.RadixUI,
     },
     {
         name: 'Chadcn UI',
@@ -70,10 +94,6 @@ export const toolListStyles = [
     },
     {
         name: 'Headless UI',
-        icon: 'https://tailwindcss.com/icon.png',
-    },
-    {
-        name: 'motion.dev',
         icon: 'https://tailwindcss.com/icon.png',
     },
     {
@@ -87,6 +107,13 @@ export const toolListStyles = [
 ];
 
 export const toolListAnimations = [
+    {
+        name: 'motion.dev',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+];
+
+export const toolListAi = [
     {
         name: 'Vercel AI',
         icon: 'https://tailwindcss.com/icon.png',
@@ -103,10 +130,59 @@ export const toolListAnimations = [
         name: 'OpenRouter',
         icon: 'https://tailwindcss.com/icon.png',
     },
+    {
+        name: 'Claude',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Perplexity',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'Cursor',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
+    {
+        name: 'CodeRabbit',
+        icon: 'https://tailwindcss.com/icon.png',
+    },
 ];
+
+export const stuff = [
+    {
+        area: 'core',
+        toolList: toolListCore,
+    },
+    {
+        area: 'frameworks',
+        toolList: toolListFrameworks,
+    },
+    {
+        area: 'auth',
+        toolList: toolListAuth,
+    },
+    {
+        area: 'state',
+        toolList: toolListState,
+    },
+    {
+        area: 'styles',
+        toolList: toolListStyles,
+    },
+    {
+        area: 'animations',
+        toolList: toolListAi,
+    },
+    {
+        area: 'AI',
+        toolList: toolListAi,
+    },
+];
+
+export type Stuff = (typeof stuff)[number];
 
 export type ITool =
     | (typeof toolListCore)[number]
     | (typeof toolListState)[number]
     | (typeof toolListStyles)[number]
-    | (typeof toolListAnimations)[number];
+    | (typeof toolListAi)[number];

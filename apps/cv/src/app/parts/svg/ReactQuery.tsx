@@ -2,7 +2,7 @@
 import type { TSvgProps } from './types';
 
 export const ReactQuery = (props: TSvgProps) => {
-    const { size = 10, ...rest } = props;
+    const { size = 10, ...restProps } = props;
 
     return (
         <svg
@@ -11,7 +11,7 @@ export const ReactQuery = (props: TSvgProps) => {
             width={size}
             height={size}
             viewBox='0 0 256 230'
-            {...rest}>
+            {...restProps}>
             <path
                 d='m158 142.5-5 8.5a8.3 8.3 0 0 1-7.1 4.2h-37.6c-3 0-5.7-1.6-7.2-4.2l-5-8.5H158Zm13.7-23.9-8.6 15H91l-8.7-15h89.3Zm-8.3-23.3 8.3 14.5H82.4l8.4-14.5h72.6Zm-17.5-22c3 0 5.7 1.5 7.2 4l5.2 9.1H95.9l5.2-9a8.3 8.3 0 0 1 7.2-4.2h37.6Z'
                 fill='#00435B'

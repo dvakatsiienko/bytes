@@ -1,3 +1,4 @@
+'use client';
 /* Core */
 import Image from 'next/image';
 import NextLink from 'next/link';
@@ -18,7 +19,23 @@ import meJpeg from '/public/my-photo.jpeg';
 import logoJpeg from '/public/logo.jpeg';
 
 import { FEATURE_CV_READY, EMAIL_TO } from '@/falgs';
-import { toolListCore, toolListState, toolListStyles, toolListAnimations } from './parts/toolConfig';
+import {
+    stuff,
+    toolListCore,
+    toolListState,
+    toolListStyles,
+    toolListAi,
+    toolListFrameworks,
+    toolListAuth,
+    toolListNetwork,
+    toolListDb,
+    toolListAnimations,
+} from './parts/toolConfig';
+
+import * as React from 'react';
+import { EasyMasonryComponent } from './EasyMasonryComponent';
+
+import { Masonry } from 'masonic';
 
 export default function CVPage() {
     if (!FEATURE_CV_READY) {
@@ -28,29 +45,30 @@ export default function CVPage() {
     const articleCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
 
     return (
-        <main className={cx('mx-auto', 'prose-custom prose-style')}>
+        <main className={cx('prose-custom prose-style w-full max-w-7xl')}>
+            {/* <EasyMasonryComponent /> */}
             <SectionHeading className='mt-4' color='sky' text='brief' />
 
             <article className='grid grid-cols-[1fr_auto]'>
                 <section className={articleCn}>
-                    <Entry content='Dima Vakatsiienko' name='name' />
+                    <Entry content='dima vakatsiienko' name='name' />
                     <Entry name='email' content={<a href={EMAIL_TO}>{process.env.NEXT_PUBLIC_ADDRESS_EMAIL}</a>} />
-                    <Entry content='Ukraine, Kyiv' name='location' />
+                    <Entry content='ukraine, kyiv' name='location' />
                     <Entry
                         name='links'
                         content={
                             <>
-                                <NextLink href='/cover'>Cover</NextLink>
+                                <NextLink href='/cover'>cover</NextLink>
                                 ,&nbsp;
-                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>Github</ExternalLink>
+                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>github</ExternalLink>
                                 ,&nbsp;
-                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>Linkedin</ExternalLink>
+                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>linkedin</ExternalLink>
                                 ,&nbsp;
-                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>Telegram</ExternalLink>
+                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>telegram</ExternalLink>
                             </>
                         }
                     />
-                    <Entry content={<b>Frontend Engineer, Frontend Lead, Hybrid</b>} name='role' />
+                    <Entry content='frontend engineer, frontend lead, hybrid' name='role' />
                 </section>
 
                 <picture className='aspect-2/3 m-0! relative hidden w-20 sm:block'>
@@ -59,20 +77,43 @@ export default function CVPage() {
                         sizes='10vw'
                         priority
                         alt='Picture of the author'
-                        className='rounded-md object-cover'
+                        className='select-none rounded-md object-cover'
                         placeholder='blur'
                         src={meJpeg}
                     />
                 </picture>
             </article>
 
-            <article>
-                <SectionHeading color='purple' text='stuff I use' />
+            <article className='grid grid-cols-12 gap-0.5'>
+                <SectionHeading className='col-span-full' color='purple' text='stuff I use' />
 
-                <ToolSection title='core' toolList={toolListCore} />
-                <ToolSection title='state · network · db' toolList={toolListState} />
-                <ToolSection title='styles · animations' toolList={toolListStyles} />
-                <ToolSection title='AI · LLM · prompting' toolList={toolListAnimations} />
+                {/* <Masonry
+                    items={stuff}
+                    render={ToolSection}
+                    //  items={items}
+                    // Adds 8px of space between the grid cells
+                    maxColumnCount={6}
+                    columnGutter={8}
+                    // Sets the minimum column width to 172px
+                    columnWidth={220}
+                    overscanBy={5}
+                /> */}
+                {/* {stuff.map(({ area, toolList }) => (
+                    <ToolSection key={area} area={area} toolList={toolList} />
+                ))} */}
+
+                <ToolSection className='col-span-6' title='core' toolList={toolListCore} />
+                <ToolSection className='col-span-4' title='frameworks' toolList={toolListFrameworks} />
+                <ToolSection className='col-span-2' title='auth' toolList={toolListAuth} />
+
+                <ToolSection className='col-span-3' title='state' toolList={toolListState} />
+                <ToolSection className='col-span-5' title='network' toolList={toolListNetwork} />
+                <ToolSection className='col-span-4 row-span-2' title='db' toolList={toolListDb} />
+
+                <ToolSection className='col-span-8' title='style' toolList={toolListStyles} />
+
+                <ToolSection className='col-span-2' title='animation' toolList={toolListAnimations} />
+                <ToolSection className='col-span-10' title='AI · LLM' toolList={toolListAi} />
 
                 {/* <Entry
                     name='core'
@@ -160,8 +201,3 @@ export default function CVPage() {
         </main>
     );
 }
-
-export const metadata: Metadata = {
-    title: 'Dima Vakatsiienko CV',
-    description: 'Dima Vakatsiienko CV, Dima Vakatsiienko, Vakatsiienko Dmytro Viktorovytch',
-};

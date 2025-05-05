@@ -5,7 +5,7 @@ export function SectionHeading(props: SectionHeadingProps) {
     const { color = 'sky', text, className } = props;
 
     return (
-        <h4 className={cx('col-span-2 flex items-center gap-x-1.5 font-normal', className)}>
+        <h4 className={cx('col-span-2 flex items-center gap-x-1.5 select-none', className)}>
             <b className={sectionHeadingCn({ color })} />
             {text}
         </h4>

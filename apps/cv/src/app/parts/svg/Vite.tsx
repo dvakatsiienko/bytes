@@ -2,7 +2,7 @@
 import type { TSvgProps } from './types';
 
 export const Vite = (props: TSvgProps) => {
-    const { size = 10, ...rest } = props;
+    const { size = 10, ...restProps } = props;
 
     return (
         <svg
@@ -11,7 +11,7 @@ export const Vite = (props: TSvgProps) => {
             height={size}
             xmlns='http://www.w3.org/2000/svg'
             preserveAspectRatio='xMidYMid'
-            {...rest}>
+            {...restProps}>
             <defs>
                 <linearGradient x1='-.828%' y1='7.652%' x2='57.636%' y2='78.411%' id='vite-a'>
                     <stop stopColor='#41D1FF' offset='0%' />
