@@ -20,7 +20,8 @@ const nextConfig = {
     ],
     experimental: {
         reactCompiler: true,
-        ppr: 'incremental',
+        // ppr: 'incremental',
+        ppr: false,
         taint: true,
 
         // typedRoutes: true, // ? not supported by turbopack yet
