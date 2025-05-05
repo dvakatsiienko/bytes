@@ -10,19 +10,11 @@
 
 @custom-variant dark (&:is(.dark, .dark *));
 
-:root::selection {
-    /* @apply bg-amber-500!; */
-}
-
-:root {
-    /* ::selection { */
-    @apply selection:bg-link/60 dark:selection:bg-link/90 selection:text-white dark:selection:text-black;
-    /* } */
-}
-
 @layer base {
+    @apply selection:bg-link/60 dark:selection:bg-link/90 selection:text-white dark:selection:text-black;
+
     & *:focus-visible {
-        @apply rounded-sm outline-[2px] outline-offset-0 outline-indigo-400 dark:outline-link ring-0;
+        @apply dark:outline-link rounded-sm outline-[2px] outline-offset-0 outline-indigo-400 ring-0;
     }
 
     & a {

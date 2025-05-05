@@ -39,11 +39,9 @@ export default function CoverPage() {
             </blockquote>
 
             <p>
-                Let's{' '}
-                <a target='_blank' rel='noopener noreferrer' href={EMAIL_TO}>
-                    meet and talk
-                </a>
-                . 😁
+                Let's talk via <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>Telegram</ExternalLink>,{' '}
+                <ExternalLink href={EMAIL_TO}>email</ExternalLink> or{' '}
+                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>LinkedIn</ExternalLink>. 😁
             </p>
 
             <h3>My main tools</h3>

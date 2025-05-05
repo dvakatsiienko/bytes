@@ -34,9 +34,9 @@ import {
 } from './parts/toolConfig';
 
 import * as React from 'react';
-import { EasyMasonryComponent } from './EasyMasonryComponent';
+// import { EasyMasonryComponent } from './EasyMasonryComponent';
 
-import { Masonry } from 'masonic';
+// import { Masonry } from 'masonic';
 
 export default function CVPage() {
     if (!FEATURE_CV_READY) {

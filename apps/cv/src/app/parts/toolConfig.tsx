@@ -71,18 +71,22 @@ export const toolListDb = [
     },
     {
         name: 'PostgreSQL',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.PostgreSQL,
+    },
+    {
+        name: 'SQLite',
+        icon: svg.SQLite,
     },
     {
         name: 'Convex',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Convex,
     },
 ];
 
 export const toolListStyles = [
     {
         name: 'Tailwind',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Tailwind,
     },
     {
         name: 'Radix UI',
@@ -90,72 +94,76 @@ export const toolListStyles = [
     },
     {
         name: 'Chadcn UI',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.ChadCN,
     },
     {
         name: 'Headless UI',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.HeadlessUI,
     },
     {
         name: 'Figma',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Figma,
     },
     {
         name: 'Storybook',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Storybook,
     },
 ];
 
 export const toolListAnimations = [
     {
         name: 'motion.dev',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Motion,
     },
 ];
 
 export const toolListAi = [
     {
         name: 'Vercel AI',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Vercel,
     },
     {
         name: 'OpenAI',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.OpenAI,
     },
     {
-        name: 'GroQ',
-        icon: 'https://tailwindcss.com/icon.png',
+        name: 'Groq',
+        icon: svg.GroqAI,
     },
     {
         name: 'OpenRouter',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.OpenRouter,
     },
     {
         name: 'Claude',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.ClaudeAI,
     },
     {
         name: 'Perplexity',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.PerplexityAI,
     },
     {
         name: 'Cursor',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Cursor,
     },
     {
         name: 'CodeRabbit',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.CodeRabbit,
     },
 ];
 
 export const toolListBundlers = [
     {
         name: 'swc',
-        icon: 'swc',
+        icon: svg.Swc,
     },
     {
         name: 'esbuild',
-        icon: 'esbuild',
+        icon: svg.Esbuild,
+    },
+    {
+        name: 'Webpack',
+        icon: svg.Webpack,
     },
 ];
 
