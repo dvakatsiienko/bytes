@@ -16,11 +16,15 @@
 
 :root {
     /* ::selection { */
-    @apply selection:bg-link/60 dark:selection:bg-link/90 dark:selection:text-black selection:text-white;
+    @apply selection:bg-link/60 dark:selection:bg-link/90 selection:text-white dark:selection:text-black;
     /* } */
 }
 
 @layer base {
+    & *:focus-visible {
+        @apply rounded-sm outline-[2px] outline-offset-0 outline-indigo-400 dark:outline-link ring-0;
+    }
+
     & a {
         @apply text-link font-semibold;
 
@@ -36,7 +40,7 @@
     }
 
     .prose-style {
-        @apply prose-sm  dark:prose-invert;
+        @apply prose-sm dark:prose-invert;
     }
 }
 

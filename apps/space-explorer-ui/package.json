@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "start": "vite",
+        "dev": "vite",
         "build": "run-p typecheck build:vite",
         "build:vite": "vite build",
         "serve": "run-s build:clean build:vite preview",

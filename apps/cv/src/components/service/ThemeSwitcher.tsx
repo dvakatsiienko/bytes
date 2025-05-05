@@ -20,10 +20,8 @@ export const ThemeSwitcher = () => {
     };
 
     return (
-        <button className='flex items-center justify-end text-white print:invisible'>
-            <span
-                className='text-nowrap text-xs cursor-pointer select-none'
-                onClick={switchTheme}>
+        <button className='flex max-w-max items-center justify-self-end text-white print:invisible'>
+            <span className='cursor-pointer select-none text-xs' onClick={switchTheme}>
                 {resolvedTheme === 'light' && 'light 🌙'}
                 {resolvedTheme === 'dark' && 'dark ☀️'}
             </span>

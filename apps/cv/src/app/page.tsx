@@ -30,6 +30,7 @@ import {
     toolListNetwork,
     toolListDb,
     toolListAnimations,
+    toolListBundlers,
 } from './parts/toolConfig';
 
 import * as React from 'react';
@@ -114,6 +115,7 @@ export default function CVPage() {
 
                 <ToolSection className='col-span-2' title='animation' toolList={toolListAnimations} />
                 <ToolSection className='col-span-10' title='AI · LLM' toolList={toolListAi} />
+                <ToolSection className='col-span-10' title='bundlers' toolList={toolListBundlers} />
 
                 {/* <Entry
                     name='core'

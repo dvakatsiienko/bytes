@@ -41,11 +41,11 @@ export const toolListAuth = [
 export const toolListState = [
     {
         name: 'Jotai',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Jotai,
     },
     {
         name: 'Zustand',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Zustand,
     },
 ];
 
@@ -67,7 +67,7 @@ export const toolListNetwork = [
 export const toolListDb = [
     {
         name: 'Prisma',
-        icon: 'https://tailwindcss.com/icon.png',
+        icon: svg.Prisma,
     },
     {
         name: 'PostgreSQL',
@@ -145,6 +145,17 @@ export const toolListAi = [
     {
         name: 'CodeRabbit',
         icon: 'https://tailwindcss.com/icon.png',
+    },
+];
+
+export const toolListBundlers = [
+    {
+        name: 'swc',
+        icon: 'swc',
+    },
+    {
+        name: 'esbuild',
+        icon: 'esbuild',
     },
 ];
 

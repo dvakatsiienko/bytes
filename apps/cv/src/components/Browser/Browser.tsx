@@ -22,7 +22,7 @@ export const Browser = (props: React.PropsWithChildren) => {
 
             <section
                 className={cx(
-                    'rounded-b-xl p- pt-0 md:px-2.5',
+                    'rounded-b-xl pb-4 md:px-2.5',
                     'bg-background',
                     'max-h-[90dvh] overflow-y-scroll print:max-h-none print:overflow-y-visible',
                     /* Scrollbar */
