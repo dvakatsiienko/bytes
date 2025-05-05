@@ -8,10 +8,7 @@ import { Tool } from './Tool';
 /* Instruments */
 import type { ITool, Stuff } from './toolConfig';
 
-// export const ToolSection =
-
 export const ToolSection = (props: ToolSectionProps) => {
-    console.log(props.data);
     return (
         <section className={cx('mb-4x w-full p-1', 'bg-surface-5 dark:bg-surface-1', 'rounded-md', props.className)}>
             <h5 className='flex select-none items-center gap-1.5 pl-1 text-xs text-gray-500 dark:text-gray-400'>
@@ -38,4 +35,9 @@ const toolListCn = cva({
 });
 
 /* Types */
-interface ToolSectionProps extends RenderComponentProps<Stuff> {}
+// interface ToolSectionProps extends RenderComponentProps<Stuff> {
+interface ToolSectionProps {
+    className?: string;
+    title: string;
+    toolList: ITool[];
+}
