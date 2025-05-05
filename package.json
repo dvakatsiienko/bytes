@@ -28,9 +28,7 @@
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
-        "@eslint/js": "9.26.0",
         "concurrently": "9.1.2",
-        "eslint": "9.26.0",
         "eslint-config-polished": "workspace:*",
         "prettier": "3.5.3",
         "prettier-config-polished": "workspace:*",
@@ -39,11 +37,13 @@
         "rimraf": "6.0.1",
         "tsconfig-core": "workspace:*",
         "turbo": "2.5.2",
-        "typescript": "5.8.3",
-        "typescript-eslint": "8.32.0"
+        "typescript": "5.8.3"
     },
     "engines": {
         "node": ">=22.14.0"
     },
-    "packageManager": "pnpm@10.8.0"
+    "packageManager": "pnpm@10.8.0",
+    "dependencies": {
+        "eslint": "9.26.0"
+    }
 }
