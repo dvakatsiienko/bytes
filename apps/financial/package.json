@@ -4,8 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "next dev --turbopack",
-        "start": "next --turbopack",
+        "start": "next dev --turbopack",
         "build": "next build",
+        "serve": "next start",
         "lint": "eslint",
         "typecheck": "tsc",
         "db:push": "prisma db push",

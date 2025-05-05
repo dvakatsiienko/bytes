@@ -19,15 +19,16 @@ export const NavLinks = () => {
             <Link
                 className={breadcrumbLinkCn({
                     intent: pathname === '/' ? 'active' : void 0,
-                    className: 'rounded-l-sm border-r',
+                    className: 'rounded-l-sm',
                 })}
                 href='/'>
                 cv
             </Link>
+
             <Link
                 className={breadcrumbLinkCn({
                     intent: pathname === '/cover' ? 'active' : void 0,
-                    className: 'rounded-r-sm border-l',
+                    className: 'rounded-r-sm',
                 })}
                 href='/cover'>
                 cover
