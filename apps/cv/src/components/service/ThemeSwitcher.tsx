@@ -22,7 +22,7 @@ export const ThemeSwitcher = () => {
     return (
         <button className='flex items-center justify-end text-white print:invisible'>
             <span
-                className='text-nowrap text-xs cursor-pointer'
+                className='text-nowrap text-xs cursor-pointer select-none'
                 onClick={switchTheme}>
                 {resolvedTheme === 'light' && 'light 🌙'}
                 {resolvedTheme === 'dark' && 'dark ☀️'}

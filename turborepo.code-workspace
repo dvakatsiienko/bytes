@@ -3,6 +3,10 @@
         {
             "name": "🚀 cv",
             "path": "apps/cv"
+        },
+        {
+            "name": "🚀 x-com-chat",
+            "path": "apps/x-com-chat"
         }
     ],
     "settings": {

@@ -10,6 +10,16 @@
 
 @custom-variant dark (&:is(.dark, .dark *));
 
+:root::selection {
+    /* @apply bg-amber-500!; */
+}
+
+:root {
+    /* ::selection { */
+    @apply selection:bg-link/60 dark:selection:bg-link/90 dark:selection:text-black selection:text-white;
+    /* } */
+}
+
 @layer base {
     & a {
         @apply text-link font-semibold;
@@ -26,7 +36,7 @@
     }
 
     .prose-style {
-        @apply prose-sm md:prose-base dark:prose-invert;
+        @apply prose-sm  dark:prose-invert;
     }
 }
 

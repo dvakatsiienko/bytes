@@ -2,7 +2,7 @@
 import type { TSvgProps } from './types';
 
 export const GraphQL = (props: TSvgProps) => {
-    const { size = 10, ...rest } = props;
+    const { size = 10, ...restProps } = props;
 
     return (
         <svg
@@ -12,7 +12,7 @@ export const GraphQL = (props: TSvgProps) => {
             height={size}
             fill='#e10098'
             style={{ fill: 'color(display-p3 0.8824 0 0.5961)' }}
-            {...rest}>
+            {...restProps}>
             <path
                 fillRule='evenodd'
                 clipRule='evenodd'

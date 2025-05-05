@@ -2,7 +2,7 @@
 import type { TSvgProps } from './types';
 
 export const Node = (props: TSvgProps) => {
-    const { size = 10, ...rest } = props;
+    const { size = 10, ...restProps } = props;
 
     return (
         <svg
@@ -11,7 +11,7 @@ export const Node = (props: TSvgProps) => {
             xmlnsXlink='http://www.w3.org/1999/xlink'
             width={size}
             height={size}
-            {...rest}>
+            {...restProps}>
             <defs>
                 <linearGradient id='node-a' x1='68.188%' x2='27.823%' y1='17.487%' y2='89.755%'>
                     <stop offset='0%' stopColor='#41873F' />

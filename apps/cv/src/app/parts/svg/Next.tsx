@@ -2,10 +2,10 @@
 import type { TSvgProps } from './types';
 
 export const Next = (props: TSvgProps) => {
-    const { size = 10, ...rest } = props;
+    const { size = 10, ...restProps } = props;
 
     return (
-        <svg width={size} height={size} viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg' {...rest}>
+        <svg width={size} height={size} viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg' {...restProps}>
             <mask
                 id='mask0_408_139'
                 style={{ maskType: 'alpha' }}

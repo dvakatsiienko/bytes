@@ -8,7 +8,7 @@ export const Tool = (props: ToolProps) => {
     return (
         <div className={toolCn()}>
             {typeof Icon === 'function' && <Icon size={18} />}
-            <span className='text-[11px] text-gray-600 dark:text-gray-300'>{props.name}</span>
+            <span className='text-center text-[10px] leading-none text-gray-600 dark:text-gray-400'>{props.name}</span>
         </div>
     );
 };
@@ -16,10 +16,11 @@ export const Tool = (props: ToolProps) => {
 /* Styles */
 const toolCn = cva({
     base: cx(
-        'grid grid-flow-col rounded-lg p-1 gap-2',
-        'bg-surface-5 dark:bg-surface-1 hover:bg-surface-4 dark:hover:bg-surface-2',
+        // 'flex',
+        'grid rounded-lg p-1 py-1.5 gap-1',
+        'bg-surface-7 dark:bg-surface-4 hover:bg-surface-4 dark:hover:bg-surface-3',
         'place-content-center place-items-center',
-        'cursor-pointer ',
+        'cursor-pointer select-none',
     ),
 });
 
