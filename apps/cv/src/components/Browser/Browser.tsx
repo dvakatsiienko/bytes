@@ -7,8 +7,13 @@ import { NavLinks } from './NavLinks';
 
 export const Browser = (props: React.PropsWithChildren) => {
     return (
-        <section className='browser max-w-7xl rounded-xl shadow-2xl'>
-            <header className='bg-background-header relative grid h-10 grid-cols-[1fr_minmax(auto,150px)_1fr] items-center justify-between gap-x-4 rounded-t-xl border border-gray-900 px-4'>
+        <section
+            className={cx(
+                'browser max-h-[90dvh] w-full max-w-3xl rounded-xl shadow-2xl',
+                '[--header-height:32px]',
+                //
+            )}>
+            <header className='bg-background-header h-(--header-height) relative grid grid-cols-[1fr_minmax(auto,150px)_1fr] items-center justify-between gap-x-4 rounded-t-xl border border-gray-900 px-4'>
                 <div className='flex h-full w-max items-center gap-2'>
                     <b className={dotCn({ intent: 'close' })} />
                     <b className={dotCn({ intent: 'minimize' })} />
@@ -22,12 +27,13 @@ export const Browser = (props: React.PropsWithChildren) => {
 
             <section
                 className={cx(
-                    'rounded-b-xl pb-4 md:px-2.5',
+                    'max-h-[calc(90dvh-var(--header-height))]',
+                    'rounded-b-xl px-4 pb-4 md:px-6',
                     'bg-background',
-                    'max-h-[90dvh] overflow-y-scroll print:max-h-none print:overflow-y-visible',
+                    'overflow-y-scroll print:max-h-none print:overflow-y-visible',
                     /* Scrollbar */
                     'scrollbar scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-w-1',
-                    'scrollbar-thumb-surface-12 scrollbar-track-transparent',
+                    'scrollbar-thumb-surface-7 scrollbar-track-transparent',
                     'scrollbar-hover:scrollbar-thumb-surface-11 scrollbar-active:scrollbar-thumb-surface-10',
                     'scrollbar-hover:cursor-grab scrollbar-active:cursor-grabbing',
 

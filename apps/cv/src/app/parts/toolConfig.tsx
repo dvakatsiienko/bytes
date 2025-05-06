@@ -18,16 +18,9 @@ export const toolListCore = [
         name: 'React',
         icon: svg.React,
     },
-];
-
-export const toolListFrameworks = [
     {
         name: 'Next',
         icon: svg.Next,
-    },
-    {
-        name: 'Vite',
-        icon: svg.Vite,
     },
 ];
 
@@ -35,6 +28,10 @@ export const toolListAuth = [
     {
         name: 'Clerk',
         icon: svg.Clerk,
+    },
+    {
+        name: 'NextAuth',
+        icon: svg.NextAuth,
     },
 ];
 
@@ -51,12 +48,12 @@ export const toolListState = [
 
 export const toolListNetwork = [
     {
-        name: 'Apollo GraphQL',
-        icon: svg.GraphQL,
+        name: 'Query',
+        icon: svg.ReactQuery,
     },
     {
-        name: 'React Query',
-        icon: svg.ReactQuery,
+        name: 'GraphQL',
+        icon: svg.GraphQL,
     },
     {
         name: 'Vercel',
@@ -70,7 +67,7 @@ export const toolListDb = [
         icon: svg.Prisma,
     },
     {
-        name: 'PostgreSQL',
+        name: 'Postgre',
         icon: svg.PostgreSQL,
     },
     {
@@ -89,6 +86,13 @@ export const toolListStyles = [
         icon: svg.Tailwind,
     },
     {
+        name: 'CSS',
+        icon: svg.CSS,
+    },
+];
+
+export const toolListComponents = [
+    {
         name: 'Radix UI',
         icon: svg.RadixUI,
     },
@@ -101,10 +105,6 @@ export const toolListStyles = [
         icon: svg.HeadlessUI,
     },
     {
-        name: 'Figma',
-        icon: svg.Figma,
-    },
-    {
         name: 'Storybook',
         icon: svg.Storybook,
     },
@@ -112,32 +112,16 @@ export const toolListStyles = [
 
 export const toolListAnimations = [
     {
+        name: 'Figma',
+        icon: svg.Figma,
+    },
+    {
         name: 'motion.dev',
         icon: svg.Motion,
     },
 ];
 
 export const toolListAi = [
-    {
-        name: 'Vercel AI',
-        icon: svg.Vercel,
-    },
-    {
-        name: 'OpenAI',
-        icon: svg.OpenAI,
-    },
-    {
-        name: 'Groq',
-        icon: svg.GroqAI,
-    },
-    {
-        name: 'OpenRouter',
-        icon: svg.OpenRouter,
-    },
-    {
-        name: 'Claude',
-        icon: svg.ClaudeAI,
-    },
     {
         name: 'Perplexity',
         icon: svg.PerplexityAI,
@@ -154,6 +138,10 @@ export const toolListAi = [
 
 export const toolListBundlers = [
     {
+        name: 'Vite',
+        icon: svg.Vite,
+    },
+    {
         name: 'swc',
         icon: svg.Swc,
     },
@@ -167,15 +155,51 @@ export const toolListBundlers = [
     },
 ];
 
+export const toolListLLM = [
+    {
+        name: 'Vercel AI',
+        icon: svg.Vercel,
+    },
+    {
+        name: 'OpenAI',
+        icon: svg.OpenAI,
+    },
+    {
+        name: 'Anthropic',
+        icon: svg.Anthropic,
+    },
+    {
+        name: 'Groq',
+        icon: svg.GroqAI,
+    },
+    {
+        name: 'OpenRouter',
+        icon: svg.OpenRouter,
+    },
+];
+
+// TODO delete if not used
+export const toolListCodeQuality = [
+    {
+        name: 'ESLint',
+        icon: svg.ESLint,
+    },
+    {
+        name: 'Prettier',
+        icon: svg.Prettier,
+    },
+];
+
+// TODO delete if not used
 export const stuff = [
     {
         area: 'core',
         toolList: toolListCore,
     },
-    {
-        area: 'frameworks',
-        toolList: toolListFrameworks,
-    },
+    // {
+    //     area: 'frameworks',
+    //     toolList: toolListFrameworks,
+    // },
     {
         area: 'auth',
         toolList: toolListAuth,
@@ -190,11 +214,11 @@ export const stuff = [
     },
     {
         area: 'animations',
-        toolList: toolListAi,
+        toolList: toolListLLM,
     },
     {
         area: 'AI',
-        toolList: toolListAi,
+        toolList: toolListLLM,
     },
 ];
 
@@ -204,4 +228,4 @@ export type ITool =
     | (typeof toolListCore)[number]
     | (typeof toolListState)[number]
     | (typeof toolListStyles)[number]
-    | (typeof toolListAi)[number];
+    | (typeof toolListLLM)[number];

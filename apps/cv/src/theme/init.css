@@ -28,11 +28,11 @@
 
 @layer components {
     .prose-custom {
-        @apply prose prose-indigo dark:prose-a:text-link prose-a:no-underline prose-a:hover:underline;
+        @apply prose prose-indigo dark:prose-a:text-link prose-a:no-underline prose-a:hover:underline max-w-full;
     }
 
     .prose-style {
-        @apply prose-sm dark:prose-invert;
+        @apply prose-sm dark:prose-invert md:prose-base;
     }
 }
 
