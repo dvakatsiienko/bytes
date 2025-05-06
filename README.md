@@ -6,26 +6,16 @@
 
 🐶 I use it to store my pet projects and tools.
 
-## 🛸 Applications
+## 🛸 Apps
 
-#### 👽 X-COM Chat AI
+###### ✈️ My CV and Cover
+
+[Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cv)
+
+#### 👽 X-COM AI Chat
 
 [Website](https://x-com-chat.vercel.app) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/x-com-chat)
-
-<!-- ###### ✈️ My Cover
-
-[Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cv) -->
-
-<!-- #### 🖥️ Hackernews 🚧 WIP 🚧
-
-[Website](https://hackernews-modern.vercel.app) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews) -->
-
-#### 🏄‍♂️ Financial 🚧 WIP 🚧
-
-[Website](https://hackernews-modern.vercel.app) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financial)
 
 #### 🛰️ Space Explorer UI
 
@@ -35,6 +25,17 @@
 #### 📡 Space Explorer API
 
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/space-explorer-api)
+
+#### 🏄‍♂️ Financial 🚧 WIP 🚧
+
+[Website](https://hackernews-modern.vercel.app) |
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financial)
+
+<!-- TODO delete -->
+<!-- #### 🖥️ Hackernews 🚧 WIP 🚧
+
+[Website](https://hackernews-modern.vercel.app) |
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews) -->
 
 ## 🎨 CSSorcery
 
