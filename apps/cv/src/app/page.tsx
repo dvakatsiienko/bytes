@@ -2,7 +2,6 @@
 /* Core */
 import Image from 'next/image';
 import NextLink from 'next/link';
-import { redirect } from 'next/navigation';
 import { cx } from 'cva';
 import type { Metadata } from 'next';
 
@@ -69,13 +68,13 @@ export default function CVPage() {
                     <Entry content='frontend engineer, frontend lead, hybrid' name='role' />
                 </section>
 
-                <picture className='aspect-2/3 m-0! relative hidden w-20 sm:block'>
+                <picture className='aspect-2/3 m-0! relative hidden w-28 sm:block'>
                     <Image
                         fill
                         sizes='10vw'
                         priority
                         alt='Picture of the author'
-                        className='select-none rounded-md object-cover'
+                        className='select-none rounded-2xl object-cover'
                         placeholder='blur'
                         src={meJpeg}
                     />
