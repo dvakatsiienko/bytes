@@ -17,20 +17,21 @@ import { ToolSection } from './parts/ToolSection';
 /* Instruments */
 import meJpeg from '/public/my-photo.jpeg';
 import logoJpeg from '/public/logo.jpeg';
+import { LINK_ID_CV_TOOLS } from '@/ids';
 
-import { FEATURE_CV_READY, EMAIL_TO } from '@/falgs';
+import { EMAIL_TO } from '@/falgs';
 import {
-    stuff,
     toolListCore,
     toolListState,
     toolListStyles,
-    toolListAi,
-    toolListFrameworks,
+    toolListLLM,
     toolListAuth,
     toolListNetwork,
     toolListDb,
     toolListAnimations,
     toolListBundlers,
+    toolListComponents,
+    toolListAi,
 } from './parts/toolConfig';
 
 import * as React from 'react';
@@ -39,19 +40,15 @@ import * as React from 'react';
 // import { Masonry } from 'masonic';
 
 export default function CVPage() {
-    if (!FEATURE_CV_READY) {
-        redirect('/cover');
-    }
-
-    const articleCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
+    const briefSectionCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
 
     return (
-        <main className={cx('prose-custom prose-style w-full max-w-7xl')}>
+        <main className={cx('prose-custom prose-style mx-auto')}>
             {/* <EasyMasonryComponent /> */}
             <SectionHeading className='mt-4' color='sky' text='brief' />
 
             <article className='grid grid-cols-[1fr_auto]'>
-                <section className={articleCn}>
+                <section className={briefSectionCn}>
                     <Entry content='dima vakatsiienko' name='name' />
                     <Entry name='email' content={<a href={EMAIL_TO}>{process.env.NEXT_PUBLIC_ADDRESS_EMAIL}</a>} />
                     <Entry content='ukraine, kyiv' name='location' />
@@ -85,8 +82,8 @@ export default function CVPage() {
                 </picture>
             </article>
 
-            <article className='grid grid-cols-12 gap-0.5'>
-                <SectionHeading className='col-span-full' color='purple' text='stuff I use' />
+            <article className='grid grid-flow-dense grid-cols-9 gap-1'>
+                <SectionHeading id={LINK_ID_CV_TOOLS} className='col-span-full' color='purple' text='tools I use' />
 
                 {/* <Masonry
                     items={stuff}
@@ -103,19 +100,21 @@ export default function CVPage() {
                     <ToolSection key={area} area={area} toolList={toolList} />
                 ))} */}
 
-                <ToolSection className='col-span-6' title='core' toolList={toolListCore} />
-                <ToolSection className='col-span-4' title='frameworks' toolList={toolListFrameworks} />
-                <ToolSection className='col-span-2' title='auth' toolList={toolListAuth} />
+                {/* <ToolSection className='col-span-3' title='frameworks' toolList={toolListFrameworks} /> */}
+                <ToolSection color='orange' className='col-span-5' title='core' toolList={toolListCore} />
+                <ToolSection color='indigo' className='col-span-2' title='style' toolList={toolListStyles} />
+                <ToolSection color='sky' className='col-span-2' title='state' toolList={toolListState} />
 
-                <ToolSection className='col-span-3' title='state' toolList={toolListState} />
-                <ToolSection className='col-span-5' title='network' toolList={toolListNetwork} />
-                <ToolSection className='col-span-4 row-span-2' title='db' toolList={toolListDb} />
+                <ToolSection color='fuchsia' className='col-span-3' title='network' toolList={toolListNetwork} />
+                <ToolSection color='blue' className='col-span-4' title='components' toolList={toolListComponents} />
+                <ToolSection color='rose' className='col-span-2' title='UX · motion' toolList={toolListAnimations} />
 
-                <ToolSection className='col-span-8' title='style' toolList={toolListStyles} />
+                <ToolSection color='cyan' className='col-span-2' title='auth' toolList={toolListAuth} />
+                <ToolSection color='purple' className='col-span-4' title='db' toolList={toolListDb} />
+                <ToolSection color='lime' className='col-span-3' title='AI' toolList={toolListAi} />
 
-                <ToolSection className='col-span-2' title='animation' toolList={toolListAnimations} />
-                <ToolSection className='col-span-10' title='AI · LLM' toolList={toolListAi} />
-                <ToolSection className='col-span-10' title='bundlers' toolList={toolListBundlers} />
+                <ToolSection color='violet' className='col-span-4' title='bundlers' toolList={toolListBundlers} />
+                <ToolSection color='emerald' className='col-span-5' title='LLM' toolList={toolListLLM} />
 
                 {/* <Entry
                     name='core'

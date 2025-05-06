@@ -26,7 +26,12 @@ export default (props: React.PropsWithChildren) => {
             lang='en'>
             <body className='grid min-h-[100dvh]'>
                 <ThemeProvider>
-                    <section className='mx-auto grid place-content-center px-4 md:px-8'>
+                    <section
+                        className={cx(
+                            'grid grid-cols-[1fr,minmax(auto,1280px),1fr]',
+                            'place-items-center',
+                            'px-4 md:px-8',
+                        )}>
                         <Browser>{props.children}</Browser>
                     </section>
                 </ThemeProvider>

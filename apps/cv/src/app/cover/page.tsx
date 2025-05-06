@@ -1,5 +1,6 @@
 /* Core */
 import { cx } from 'cva';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 /* Components */
@@ -7,6 +8,7 @@ import { ExternalLink } from '@/elements/ExternalLink';
 
 /* Instruments */
 import { EMAIL_TO } from '@/falgs';
+import { LINK_ID_CV_TOOLS } from '@/ids';
 
 export default function CoverPage() {
     return (
@@ -18,8 +20,9 @@ export default function CoverPage() {
                 I bring <b>{yearExperience} years</b> of <b>frontend development</b> experience, with deep expertise in{' '}
                 <b>React ({yearExperienceReact} years)</b>, <b>Next.js ({yearExperienceNextjs} years)</b>,{' '}
                 <b>TypeScript ({yearExperienceTypescript} years)</b> and{' '}
-                <b>Tailwind ({yearExperienceTailwind} years)</b>. I’ve delivered many successful projects, focusing on
-                high-quality functionality, clean UI/UX, and simplicity — challenges included.
+                <b>Tailwind ({yearExperienceTailwind} years)</b>.{' '}
+                <Link href={`/#${LINK_ID_CV_TOOLS}`}>See more tools I use</Link>. I’ve delivered many successful
+                projects, focusing on high-quality functionality, clean UI/UX, and simplicity — challenges included.
             </p>
 
             <p>
@@ -44,7 +47,7 @@ export default function CoverPage() {
                 <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>LinkedIn</ExternalLink>. 😁
             </p>
 
-            <h3>My main tools</h3>
+            {/* <h3>My main tools</h3>
 
             <ul className='list-inside list-disc'>
                 {techStack.map(({ category, items }) => (
@@ -60,7 +63,7 @@ export default function CoverPage() {
                 {keyAchievements.map((achievement) => (
                     <li key={achievement}>{achievement}</li>
                 ))}
-            </ul>
+            </ul> */}
         </main>
     );
 }
