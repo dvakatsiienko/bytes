@@ -4,8 +4,6 @@
 
 🏎️ The monorepository is wired up with [Turborepo](https://turbo.build/).
 
-🐶 I use it to store my pet projects and tools.
-
 ## 🛸 Apps
 
 #### ✈️ My CV and Cover
