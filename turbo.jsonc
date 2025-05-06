@@ -8,7 +8,7 @@
         "build": {
             "dependsOn": ["^build", "lint", "typecheck", "^prisma:generate"],
             "outputs": [".next/**", "!.next/cache/**"],
-            "inputs": ["$TURBO_DEFAULT$", "!.vscode/**", "!.cursor/**"]
+            "inputs": ["$TURBO_DEFAULT$", "!.vscode/**", "!.cursor/**", "!**/**/README.md"]
         },
         "lint": {
             "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml", "!.vscode/**", "!.cursor/**"]
