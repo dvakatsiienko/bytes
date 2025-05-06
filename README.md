@@ -8,7 +8,7 @@
 
 ## 🛸 Apps
 
-###### ✈️ My CV and Cover
+#### ✈️ My CV and Cover
 
 [Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cv)
 
