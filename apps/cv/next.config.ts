@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
         reactCompiler: true,
         ppr: true,
     },
-    transpilePackages: ['ui'],
+    transpilePackages: ['@workspace/ui'],
 };
 
 export default nextConfig;
