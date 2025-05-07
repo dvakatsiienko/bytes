@@ -28,7 +28,7 @@
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
-        "concurrently": "9.1.2",
+        "eslint": "9.26.0",
         "eslint-config-polished": "workspace:*",
         "prettier": "3.5.3",
         "prettier-config-polished": "workspace:*",
@@ -36,8 +36,7 @@
         "prettier-plugin-tailwindcss": "0.6.11",
         "rimraf": "6.0.1",
         "turbo": "2.5.3",
-        "typescript": "5.8.3",
-        "eslint": "9.26.0"
+        "typescript": "5.8.3"
     },
     "engines": {
         "node": ">=22.14.0"
