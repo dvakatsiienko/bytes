@@ -11,8 +11,10 @@ export const Browser = (props: React.PropsWithChildren) => {
             className={cx(
                 'browser max-h-[90dvh] w-full max-w-3xl rounded-xl shadow-2xl',
                 '[--header-height:32px]',
+                // 'max-w-lg sm:max-w-lg md:max-w-xl lg:max-w-full',
                 //
             )}>
+            {/* todo look for better line height */}
             <header className='bg-background-header h-(--header-height) relative grid grid-cols-[1fr_minmax(auto,150px)_1fr] items-center justify-between gap-x-4 rounded-t-xl border border-gray-900 px-4'>
                 <div className='flex h-full w-max items-center gap-2'>
                     <b className={dotCn({ intent: 'close' })} />

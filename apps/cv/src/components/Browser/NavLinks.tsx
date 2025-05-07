@@ -8,12 +8,13 @@ import { cva, cx } from 'cva';
 export const NavLinks = () => {
     const pathname = usePathname();
 
+    // return nu
     return (
         <nav
             className={cx(
-                'grid h-5 grid-cols-[1fr_1fr] grid-rows-[1fr] place-content-center place-items-center',
+                'grid h-5 grid-cols-[1fr_1fr] place-content-center place-items-center',
                 'bg-surface-5 dark:bg-surface-2 rounded-sm',
-                'prose-custom prose-style',
+                '  max-w-full',
                 'select-none',
             )}>
             <Link
