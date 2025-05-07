@@ -1,61 +1,61 @@
 /* core */
-export * from './ESNext';
-export * from './TypeScript';
-export * from './Node';
-export * from './React';
+export * from './ESNextSVG';
+export * from './TypeScriptSVG';
+export * from './NodeSVG';
+export * from './ReactSVG';
 
 /* frameworks */
-export * from './Next';
-export * from './Vite';
+export * from './NextSVG';
+export * from './ViteSVG';
 
 /* auth */
-export * from './Clerk';
-export * from './NextAuth';
+export * from './ClerkSVG';
+export * from './NextAuthSVG';
 
 /* state  */
-export * from './Jotai';
-export * from './Zustand';
+export * from './JotaiSVG';
+export * from './ZustandSVG';
 
 /* networks */
-export * from './GraphQL';
-export * from './ReactQuery';
-export * from './Vercel';
+export * from './GraphQLSVG';
+export * from './ReactQuerySVG';
+export * from './VercelSVG';
 
 /* db */
-export * from './Prisma';
-export * from './PostgreSQL';
-export * from './SQLite';
-export * from './Convex';
+export * from './PrismaSVG';
+export * from './PostgreSVG';
+export * from './SQLiteSVG';
+export * from './ConvexSVG';
 
 /* style */
-export * from './Tailwind';
-export * from './RadixUI';
-export * from './ChadCN';
-export * from './HeadlessUI';
-export * from './Figma';
-export * from './Storybook';
-export * from './CSS';
+export * from './TailwindSVG';
+export * from './RadixUiSVG';
+export * from './ChadcnSVG';
+export * from './HeadlessUISVG';
+export * from './FigmaSVG';
+export * from './StorybookSVG';
+export * from './CssSVG';
 
 /* animation */
-export * from './Motion';
+export * from './MotionSVG';
 
 /* ai */
-export * from './PerplexityAI';
-export * from './ClaudeAI';
-export * from './Cursor';
-export * from './CodeRabbit';
+export * from './PerplexityAiSVG';
+export * from './ClaudeAiSVG';
+export * from './CursorLightSVG';
+export * from './CodeRabbitSVG';
 
 /* llm */
-export * from './OpenAI';
-export * from './GroqAI';
-export * from './OpenRouterAI';
-export * from './Anthropic';
+export * from './OpenAiSVG';
+export * from './GroqAiSVG';
+export * from './OpenRouterAaSVG';
+export * from './AnthropicSVG';
 
 /* compilers */
-export * from './Swc';
-export * from './Esbuild';
-export * from './Webpack';
+export * from './SwcSVG';
+export * from './ESBuildSVG';
+export * from './WebpackSVG';
 
 /* code quality */
-export * from './Prettier';
-export * from './ESLint';
+export * from './PrettierSVG';
+export * from './ESLintSVG';
