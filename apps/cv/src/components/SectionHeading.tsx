@@ -5,10 +5,10 @@ export function SectionHeading(props: SectionHeadingProps) {
     const { color = 'sky', text, className, id } = props;
 
     return (
-        <h4 id={id} className={cx('col-span-2 flex select-none items-center gap-x-1.5', className)}>
+        <h3 id={id} className={cx('col-span-2 flex select-none items-center gap-x-1.5', className)}>
             <b className={sectionHeadingCn({ color })} />
             {text}
-        </h4>
+        </h3>
     );
 }
 

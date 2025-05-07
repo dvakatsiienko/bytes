@@ -28,7 +28,7 @@
 
 @layer components {
     .prose-custom {
-        @apply prose prose-indigo dark:prose-a:text-link prose-a:no-underline prose-a:hover:underline max-w-full;
+        @apply prose prose-indigo dark:prose-a:text-link prose-a:hover:text-link/80! prose-a:active:text-orange-600! prose-a:no-underline prose-a:hover:underline prose-headings:text-shadow-2xs prose-headings:text-shadow-link/15 dark:prose-headings:text-shadow-link/40 max-w-full;
     }
 
     .prose-style {

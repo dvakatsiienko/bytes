@@ -41,24 +41,35 @@ import * as React from 'react';
 export default function CVPage() {
     const briefSectionCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
 
+    const NEXT_PUBLIC_ADDRESS_EMAIL = process.env.NEXT_PUBLIC_ADDRESS_EMAIL;
+    const emailParts = NEXT_PUBLIC_ADDRESS_EMAIL?.split('@');
+
+    console.log('🚀 . CVPage . emailParts:', emailParts);
+
+    const email = emailParts?.map((part, index) => <span key={index}>{index === 0 ? part + '@' : part}</span>);
+
+    console.log('🚀 . CVPage . email:', email);
+
     return (
         <main className={cx('prose-custom prose-style mx-auto')}>
             {/* <EasyMasonryComponent /> */}
             <SectionHeading className='mt-4' color='sky' text='brief' />
 
-            <article className='grid grid-cols-[1fr_auto]'>
+            <article className='grid grid-cols-[1fr_auto] '>
                 <section className={briefSectionCn}>
                     <Entry content='dima vakatsiienko' name='name' />
-                    <Entry name='email' content={<a href={EMAIL_TO}>{process.env.NEXT_PUBLIC_ADDRESS_EMAIL}</a>} />
+                    <Entry
+                        className='break-all'
+                        name='email'
+                        content={<a href={EMAIL_TO}>{process.env.NEXT_PUBLIC_ADDRESS_EMAIL}</a>}
+                    />
                     <Entry content='ukraine, kyiv' name='location' />
                     <Entry
                         name='links'
                         content={
                             <>
-                                <NextLink href='/cover'>cover</NextLink>
-                                ,&nbsp;
-                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>github</ExternalLink>
-                                ,&nbsp;
+                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>github</ExternalLink>,
+                                {/* ,&nbsp; */}{' '}
                                 <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>linkedin</ExternalLink>
                                 ,&nbsp;
                                 <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>telegram</ExternalLink>
@@ -81,7 +92,7 @@ export default function CVPage() {
                 </picture>
             </article>
 
-            <article className='grid grid-flow-dense grid-cols-9 gap-1'>
+            <article className='grid grid-flow-dense grid-cols-4 sm:grid-cols-9 gap-1'>
                 <SectionHeading id={LINK_ID_CV_TOOLS} className='col-span-full' color='purple' text='tools I use' />
 
                 {/* <Masonry
@@ -100,20 +111,20 @@ export default function CVPage() {
                 ))} */}
 
                 {/* <ToolSection className='col-span-3' title='frameworks' toolList={toolListFrameworks} /> */}
-                <ToolSection color='orange' className='col-span-5' title='core' toolList={toolListCore} />
-                <ToolSection color='indigo' className='col-span-2' title='style' toolList={toolListStyles} />
-                <ToolSection color='sky' className='col-span-2' title='state' toolList={toolListState} />
+                <ToolSection color='orange' className='col-span-2 sm:col-span-5' title='core' toolList={toolListCore} />
+                <ToolSection color='indigo' className='col-span-2 sm:col-span-2' title='style' toolList={toolListStyles} />
+                <ToolSection color='sky' className='col-span-2 sm:col-span-2' title='state' toolList={toolListState} />
 
-                <ToolSection color='fuchsia' className='col-span-3' title='network' toolList={toolListNetwork} />
-                <ToolSection color='blue' className='col-span-4' title='components' toolList={toolListComponents} />
-                <ToolSection color='rose' className='col-span-2' title='UX · motion' toolList={toolListAnimations} />
+                <ToolSection color='fuchsia' className='col-span-2 sm:col-span-3' title='network' toolList={toolListNetwork} />
+                <ToolSection color='blue' className='col-span-2 sm:col-span-4' title='components' toolList={toolListComponents} />
+                <ToolSection color='rose' className='col-span-2 sm:col-span-2' title='UX · motion' toolList={toolListAnimations} />
 
-                <ToolSection color='cyan' className='col-span-2' title='auth' toolList={toolListAuth} />
-                <ToolSection color='purple' className='col-span-4' title='db' toolList={toolListDb} />
-                <ToolSection color='lime' className='col-span-3' title='AI' toolList={toolListAi} />
+                <ToolSection color='cyan' className='col-span-2 sm:col-span-2' title='auth' toolList={toolListAuth} />
+                <ToolSection color='purple' className='col-span-2 sm:col-span-4' title='db' toolList={toolListDb} />
+                <ToolSection color='lime' className='col-span-2 sm:col-span-3' title='AI' toolList={toolListAi} />
 
-                <ToolSection color='violet' className='col-span-4' title='bundlers' toolList={toolListBundlers} />
-                <ToolSection color='emerald' className='col-span-5' title='LLM' toolList={toolListLLM} />
+                <ToolSection color='violet' className='col-span-2 sm:col-span-4' title='bundlers' toolList={toolListBundlers} />
+                <ToolSection color='emerald' className='col-span-2 sm:col-span-5' title='LLM' toolList={toolListLLM} />
 
                 {/* <Entry
                     name='core'
