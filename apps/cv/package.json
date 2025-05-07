@@ -13,6 +13,7 @@
         "validate": "run-p lint typecheck"
     },
     "dependencies": {
+        "@workspace/ui": "workspace:*",
         "@styled-icons/ionicons-sharp": "10.46.0",
         "@styled-icons/styled-icon": "10.7.1",
         "@tailwindcss/postcss": "4.1.5",
