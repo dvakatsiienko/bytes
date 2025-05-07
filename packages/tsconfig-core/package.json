@@ -2,13 +2,7 @@
     "name": "tsconfig-core",
     "version": "0.0.1",
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-    "main": "nextjs.json",
-    "exports": {
-        ".": "./nextjs.json"
-    },
-    "keywords": [
-        "typescript",
-        "tsconfig",
-        "dvakatsiienko"
-    ]
+    "publishConfig": {
+        "access": "public"
+    }
 }

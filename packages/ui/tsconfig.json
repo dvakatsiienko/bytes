@@ -1,13 +1,11 @@
 {
-    "$schema": "https://json.schemastore.org/tsconfig",
-    "include": ["."],
-    "exclude": ["dist", "build", "node_modules"],
+    "extends": "tsconfig-core/react-library.json",
     "compilerOptions": {
-        "jsx": "preserve",
-        "noEmit": true,
-        "lib": ["DOM", "DOM.ITERABLE", "ESNext"],
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "Node"
-    }
-}
+      "baseUrl": ".",
+      "paths": {
+        "@workspace/ui/*": ["./src/*"]
+      }
+    },
+    "include": ["."],
+    "exclude": ["node_modules", "dist"]
+  }
