@@ -15,7 +15,6 @@
         "next": "15.3.2",
         "react": "19.1.0",
         "react-dom": "19.1.0",
-        "ui": "workspace:*",
         "utils": "workspace:*"
     },
     "devDependencies": {
