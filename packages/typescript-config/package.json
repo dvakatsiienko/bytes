@@ -1,6 +1,7 @@
 {
-    "name": "tsconfig-core",
+    "name": "@workspace/typescript-config",
     "version": "0.0.1",
+    "private": true,
     "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
     "publishConfig": {
         "access": "public"
