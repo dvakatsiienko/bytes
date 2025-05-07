@@ -6,6 +6,6 @@ export default [
     ...polishedConfig,
     {
         name: 'root-config/ignores',
-        ignores: ['./apps/hackernews', '**/graphql/**'],
+        ignores: ['**/graphql/**'],
     },
 ];

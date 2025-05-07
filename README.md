@@ -26,14 +26,8 @@
 
 #### 🏄‍♂️ Financial 🚧 WIP 🚧
 
-[Website](https://hackernews-modern.vercel.app) |
+[Website](https://financical.vercel.app/) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financial)
-
-<!-- TODO delete -->
-<!-- #### 🖥️ Hackernews 🚧 WIP 🚧
-
-[Website](https://hackernews-modern.vercel.app) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/hackernews) -->
 
 ## 🎨 CSSorcery
 
