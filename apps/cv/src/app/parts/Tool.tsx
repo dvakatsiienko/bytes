@@ -18,7 +18,6 @@ export const Tool = (props: ToolProps) => {
 /* Styles */
 const toolCn = cva({
     base: cx(
-        // 'flex',
         'grid rounded-lg px-1.5 py-2 gap-y-1.5',
         'bg-surface-7 dark:bg-surface-4 hover:bg-surface-4 dark:hover:bg-surface-3',
         'place-content-center place-items-center',

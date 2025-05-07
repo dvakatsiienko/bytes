@@ -1,7 +1,7 @@
 /* Core */
 import type { Metadata } from 'next';
 
-import { Manrope } from 'next/font/google';
+import { Manrope, Geist_Mono } from 'next/font/google';
 
 /* Components */
 import { Browser } from '@/components/Browser/Browser';
@@ -12,14 +12,17 @@ import '@/theme/init.css';
 
 import { cx } from 'cva';
 
-const fontManrope = Manrope({ subsets: ['latin'] });
+const fontManrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
+const fontGeistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
 
 export default (props: React.PropsWithChildren) => {
     return (
         <html
             suppressHydrationWarning
             className={cx(
-                fontManrope.className,
+                fontManrope.variable,
+                fontGeistMono.variable,
+                'font-manrope',
                 'bg-linear-to-tl from-gradient-layout-primary-1 to-gradient-layout-primary-2',
                 'overflow-y-hidden print:overflow-visible',
             )}
