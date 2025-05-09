@@ -5,11 +5,11 @@
     "license": "MIT",
     "private": true,
     "scripts": {
-        "dev:@space-explorer": "turbo @space-explorer/api#dev @space-explorer/ui#dev --ui=tui",
+        "dev:@space-explorer": "turbo @space-explorer/api#dev @space-explorer/ui#dev",
         "dev:@space-explorer/ui": "turbo @space-explorer/ui#dev",
         "dev:@space-explorer/api": "turbo @space-explorer/api#dev ",
         "dev:cv": "turbo cv#dev",
-        "dev:x-com-chat": "turbo x-com-chat#dev x-com-chat#convex --ui=tui",
+        "dev:x-com-chat": "turbo x-com-chat#dev x-com-chat#convex",
         "dev:cssorcery": "turbo cssorcery#dev",
         "dev:financial": "turbo financial#dev",
         "build": "turbo build",
