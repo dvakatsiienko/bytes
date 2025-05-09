@@ -1,4 +1,4 @@
-// import { Button } from '@workspace/ui/components/button';
+// import { Button } from '@ui/kit/components/button';
 
 export default function NotFoundPage() {
     return (

@@ -81,6 +81,9 @@ importers:
 
   apps/cv:
     dependencies:
+      '@ui/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
       '@styled-icons/ionicons-sharp':
         specifier: 10.46.0
         version: 10.46.0(react@19.1.0)(styled-components@6.1.18(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
@@ -90,9 +93,6 @@ importers:
       '@tailwindcss/postcss':
         specifier: 4.1.6
         version: 4.1.6
-      '@workspace/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       cva:
         specifier: 1.0.0-beta.3
         version: 1.0.0-beta.3(typescript@5.8.3)
@@ -576,17 +576,7 @@ importers:
         specifier: 15.3.2
         version: 15.3.2(@babel/core@7.27.1)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@19.1.0-rc.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
-  packages/prettier-config-polished:
-    dependencies:
-      prettier:
-        specifier: '>=3.0.0'
-        version: 3.5.3
-
-  packages/reinstall: {}
-
-  packages/typescript-config: {}
-
-  packages/ui:
+  packages/kit:
     dependencies:
       '@radix-ui/react-slot':
         specifier: 1.2.2
@@ -637,6 +627,16 @@ importers:
       tailwindcss:
         specifier: 4.1.6
         version: 4.1.6
+
+  packages/prettier-config-polished:
+    dependencies:
+      prettier:
+        specifier: '>=3.0.0'
+        version: 3.5.3
+
+  packages/reinstall: {}
+
+  packages/typescript-config: {}
 
   packages/utils: {}
 

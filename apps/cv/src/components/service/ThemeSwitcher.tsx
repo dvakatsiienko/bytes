@@ -4,13 +4,13 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 
-import { Tabs, TabsTrigger, TabsContent, TabsList } from '@workspace/ui/components/tabs';
+import { Tabs, TabsTrigger, TabsContent, TabsList } from '@ui/kit/components/tabs';
 import { Bold, Italic, Underline } from 'lucide-react';
 
-import { ToggleGroup, ToggleGroupItem } from '@workspace/ui/components/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
 
 /* Instruments */
-import { cn } from '@workspace/ui/lib/utils';
+import { cn } from '@ui/kit/lib/utils';
 
 export const ThemeSwitcher = () => {
     const [mounted, setMounted] = useState(false);

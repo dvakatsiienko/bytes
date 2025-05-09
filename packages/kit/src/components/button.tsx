@@ -4,7 +4,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'cva';
 
 /* Instruments */
-import { cn } from '@workspace/ui/lib/utils';
+import { cn } from '@ui/kit/lib/utils';
 
 function Button({
     className,

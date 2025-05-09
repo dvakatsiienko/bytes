@@ -8,7 +8,7 @@ import { Browser } from '@/components/Browser/Browser';
 import { ThemeProvider } from '@/components/service/ThemeProvider';
 
 /* Instruments */
-import '@workspace/ui/globals.css';
+import '@ui/kit/globals.css';
 import '@/theme/init.css';
 
 import { cx } from 'cva';

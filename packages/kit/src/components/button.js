@@ -2,7 +2,7 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'cva';
 /* Instruments */
-import { cn } from '@workspace/ui/lib/utils';
+import { cn } from '@ui/kit/lib/utils';
 function Button({ className, variant, size, asChild = false, ...props }) {
     const Comp = asChild ? Slot : 'button';
     return _jsx(Comp, { "data-slot": 'button', className: cn(buttonVariants({ variant, size, className })), ...props });
