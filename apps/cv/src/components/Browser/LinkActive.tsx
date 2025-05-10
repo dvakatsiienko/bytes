@@ -10,7 +10,7 @@ export const LinkActive = (props: NavLinksProps) => {
 
     return (
         <Link
-            className={breadcrumbLinkCn({
+            className={linkActiveCn({
                 intent: pathname === props.href ? 'active' : void 0,
                 className: props.className,
             })}
@@ -21,8 +21,9 @@ export const LinkActive = (props: NavLinksProps) => {
 };
 
 /* Styles */
-const breadcrumbLinkCn = cva({
+const linkActiveCn = cva({
     base: cx(
+        // TODO put into theme
         'text-gray-500 w-full grid items-center h-full dark:text-gray-400 ',
         'text-center font-semibold text-xs',
         'border-none',
