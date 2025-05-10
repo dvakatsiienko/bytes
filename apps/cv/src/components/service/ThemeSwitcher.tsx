@@ -12,7 +12,7 @@ import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
 /* Instruments */
 import { cn } from '@ui/kit/lib/utils';
 
-export const ThemeSwitcher = () => {
+export const ThemeSwitcher = (props: ThemeSwitcherProps) => {
     const [mounted, setMounted] = useState(false);
     const { setTheme, resolvedTheme, theme } = useTheme();
 
@@ -41,10 +41,25 @@ export const ThemeSwitcher = () => {
             value={theme}
             onValueChange={change}
             defaultValue='light'
-            className='w-[auto] justify-self-end'>
+            className={cn(
+                'justify-elf-end z-10 h-fit w-[auto] p-0.5',
+                'bg-background self-center',
+                props.className,
+                //
+            )}>
             {themeList.map((theme) => (
                 <ToggleGroupItem
-                    className={cn('h-5', theme.value === theme && 'text-link!', 'cursor-pointer')}
+                    className={cn(
+                        'z-20 h-5',
+                        theme.value === theme && 'text-link!',
+                        'cursor-pointer',
+                        'hover:bg-background',
+                        'bg-gray-200',
+                        'dark:data-[state=on]:bg-background-header',
+                        'dark:bg-background',
+                        // 'h-6',
+                        // 'data-[state=active]:bg-amber-200!',
+                    )}
                     key={theme.value}
                     value={theme.value}
                     aria-label={theme.label}>
@@ -75,3 +90,8 @@ export const themeList = [
         icon: <Monitor className='size-[0.9rem] text-current transition-all' />,
     },
 ] as const;
+
+/* Types */
+interface ThemeSwitcherProps {
+    className?: string;
+}
