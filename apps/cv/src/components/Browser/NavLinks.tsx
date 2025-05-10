@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cva, cx } from 'cva';
 
-export const NavLinks = () => {
+export const NavLinks = (props: NavLinksProps) => {
     const pathname = usePathname();
 
     // return nu
@@ -14,8 +14,10 @@ export const NavLinks = () => {
             className={cx(
                 'grid h-5 grid-cols-[1fr_1fr] place-content-center place-items-center',
                 'bg-surface-5 dark:bg-surface-2 rounded-sm',
-                '  max-w-full',
+                'max-w-full',
                 'select-none',
+                'rounded-bl-md rounded-br-md',
+                'bg-white',
             )}>
             <Link
                 className={breadcrumbLinkCn({
@@ -52,3 +54,8 @@ const breadcrumbLinkCn = cva({
         },
     },
 });
+
+/* Types */
+interface NavLinksProps {
+    className?: string;
+}
