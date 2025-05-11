@@ -128,49 +128,83 @@ export default function CVPage() {
 
             {__DEV__ && (
                 <>
-                    <article className='grid grid-cols-2 place-items-start gap-x-2 gap-y-1'>
+                    {/* TODO extract and reuse article grid cn */}
+                    <article className='grid grid-cols-2 place-items-start gap-x-2 gap-y-2'>
                         <SectionHeading className='col-span-full' accentColor='emerald' text='projects' />
 
-                        {/* Corva */}
+                        {/* turbo stars */}
+                        {/* Jan 2025 - Present */}
                         <Project
-                            employer={<ExternalLink href='https://www.corva.ai/'>Corva.ai</ExternalLink>}
-                            role='Senior Frontend Engineer'
+                            employer={<ExternalLink href={consts.LINK_TURBO_STARS}>Turbo Stars</ExternalLink>}
+                            role='Lead Frontend Engineer'
+                            project={<ExternalLink href={consts.LINK_TURBO_STARS_SPORTSBOOK}>Sportsbook</ExternalLink>}
+                            achievementList={[
+                                'Upgraded the legacy Frontend build pipeline to a modern standards',
+                                'Integrated Rust Frontend toolchain',
+                                'Incorporated a project upscale plan',
+                                <>
+                                    Streamlined code review company-wide by utilizing{' '}
+                                    <ExternalLink href='http://coderabbit.ai/'>CodeRabbitAI</ExternalLink>
+                                </>,
+                                'Coordinated and mentored Frontend team',
+                            ]}
+                            comapnyLogoUrl={logoJpeg}
+                        />
+
+                        {/* Anadea */}
+                        {/* Jun 2022 - Oct 2023 */}
+                        <Project
+                            employer={<ExternalLink href={consts.LINK_ANADAEA}>Anadea</ExternalLink>}
+                            role='Lead Frontend Engineer'
                             project={
                                 <>
-                                    Geoscience{' '}
-                                    <ExternalLink href='https://drive.google.com/file/d/1KXjt-9Kja2aRQj3-3hOFUJmHrHzHdEfG/view'>
-                                        ex 1
-                                    </ExternalLink>
-                                    ,{' '}
-                                    <ExternalLink href='https://drive.google.com/file/d/1OV1GAm6M3h_DDKFj6cjPq4LOkd261y9V/view'>
-                                        ex 2
-                                    </ExternalLink>
-                                    ,{' '}
-                                    <ExternalLink href='https://drive.google.com/file/d/1-DR5b_rJmcpS4Ca2ioM5ZrRn_KhRVjdy/view'>
-                                        ex 3
-                                    </ExternalLink>
+                                    <ExternalLink href={consts.LINK_ANADAEA_ROCKY}>Rocky</ExternalLink>, Keystone (NDA)
                                 </>
                             }
                             achievementList={[
-                                'Re-architected problematic project fundament',
-                                'Project rewrite from JavaScript to TypeScript',
-                                'Introduced best practices of code organization, UI layout principles, performance metrics',
-                                'Conducted platform audit and invested hi-end technical solutions',
-                                'Integrated cutting-edge rust-based tooling to the development toolchain',
+                                // 'Rocky',
+                                'Developed a social media platform from scratch',
+                                'Coordinated Frontend team dev flow',
+                                'Mentored Frontend team',
+                                'Refined product features with client',
+
+                                // 'Keystone',
+                                'Migrated a drilling platform from PHP to Next.js',
+                                'Created a component library using Vite and Storybook',
+                                'Implemented a cross-team Frontend training program',
+                            ]}
+                            comapnyLogoUrl={logoJpeg}
+                        />
+
+                        {/* Corva */}
+                        {/* 2020 - 2021 */}
+                        {/* Sep 2020 - Feb 2021 */}
+                        <Project
+                            employer={<ExternalLink href={consts.LINK_CORVA}>Corva.ai</ExternalLink>}
+                            role='Senior Frontend Engineer'
+                            project={
+                                <ExternalLink href={consts.LINK_CORVA_GEODRILLING}>Geoscience Drilling</ExternalLink>
+                            }
+                            achievementList={[
+                                'Re-architected project Frontend',
+                                'Migrated codebase to TypeScript',
+                                'Improved performance stats by 40%',
+                                'Integrated rust-based tooling',
                             ]}
                             comapnyLogoUrl={logoJpeg}
                         />
 
                         {/* Boosta */}
+                        {/* Feb 2021 - May 2021 */}
                         <Project
                             employer={<ExternalLink href={consts.LINK_BOOSTA}>Boosta</ExternalLink>}
                             role='Senior Frontend Engineer'
                             project='Essay'
                             achievementList={[
-                                "Prototyped product's new frontend architecture, mentored team",
-                                'Coordinated the migration from the old tech stack to the new one',
-                                'Implemented the new web-platform MVP using Gatsby.js, Next.js and Strapi CMS',
-                                'Colocated frontend codebase using monorepo',
+                                'Prototyped Frontend v2 architecture',
+                                'Implemented Frontend using Gatsby.js and Strapi CMS',
+                                'Coordinated legacy PHP backend migration',
+                                'Colocated frontend codebase into a monorepo',
                             ]}
                             comapnyLogoUrl={logoJpeg}
                         />

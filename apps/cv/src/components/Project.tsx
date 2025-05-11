@@ -8,8 +8,8 @@ import { BriefEntry } from './BriefEntry';
 import { cn } from '@ui/kit/lib/utils';
 
 export const Project = (props: PrjectProps) => {
-    const achievementListJSX = props.achievementList.map((achievement) => {
-        return <li key={achievement}>{achievement}</li>;
+    const achievementListJSX = props.achievementList.map((achievement, index) => {
+        return <li key={index}>{achievement}</li>;
     });
 
     return (
@@ -40,6 +40,6 @@ interface PrjectProps {
     role: string;
     courses?: React.ReactNode;
     project?: React.ReactNode;
-    achievementList: string[];
+    achievementList: React.ReactNode[];
     comapnyLogoUrl: StaticImageData;
 }
