@@ -18,6 +18,7 @@ const accentCn = cva({
     base: 'block h-1.5 w-3.5 rounded-full bg-link',
     variants: {
         accentColor: {
+            orange: 'bg-orange-600',
             sky: 'bg-sky-600',
             purple: 'bg-purple-600',
             lime: 'bg-lime-600',
