@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+/* TODO learn how @source directive works presicely */
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../../../components/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
@@ -121,7 +122,8 @@
     * {
         @apply border-border outline-ring/50;
     }
-    body {
+
+    html {
         @apply bg-background text-foreground;
     }
 }

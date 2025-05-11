@@ -33,6 +33,7 @@
 
     .prose-style {
         @apply prose-sm dark:prose-invert md:prose-base;
+        @apply prose-ul:m-0;
     }
 }
 

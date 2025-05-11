@@ -1,17 +1,15 @@
 /* Core */
+import { Manrope, Geist_Mono } from 'next/font/google';
+import { cx } from 'cva';
 import type { Metadata } from 'next';
 
-import { Manrope, Geist_Mono } from 'next/font/google';
-
 /* Components */
-import { Browser } from '@/components/Browser/Browser';
+import { Browser } from '@/components/Browser';
 import { ThemeProvider } from '@/components/service/ThemeProvider';
 
 /* Instruments */
 import '@ui/kit/globals.css';
 import '@/theme/init.css';
-
-import { cx } from 'cva';
 
 const fontManrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
 const fontGeistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });

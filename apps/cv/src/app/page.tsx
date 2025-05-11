@@ -41,7 +41,7 @@ export default function CVPage() {
     return (
         <main className={cx('prose-custom prose-style mx-auto')}>
             {/* <EasyMasonryComponent /> */}
-            <SectionHeading className='mt-4' color='sky' text='brief' />
+            <SectionHeading className='mt-4' accentColor='sky' text='brief' />
 
             <article className='grid grid-cols-[1fr_auto]'>
                 <section className={briefSectionCn}>
@@ -80,7 +80,7 @@ export default function CVPage() {
             </article>
 
             <article className='grid grid-flow-dense grid-cols-4 gap-1 sm:grid-cols-9'>
-                <SectionHeading id={LINK_ID_CV_TOOLS} className='col-span-full' color='purple' text='tools I use' />
+                <SectionHeading id={LINK_ID_CV_TOOLS} className='col-span-full' accentColor='purple' text='tools I use' />
 
                 {/* <Masonry
                     items={stuff}
@@ -137,48 +137,10 @@ export default function CVPage() {
                     toolList={toolListBundlers}
                 />
                 <ToolSection color='emerald' className='col-span-2 sm:col-span-5' title='LLM' toolList={toolListLLM} />
-
-                {/* <Entry
-                    name='core'
-                    content={
-                        <ul>
-                            <li>
-                                ★ ★ ★ ★ ★ — ESNext, TypeScript, React, Next.js, Redux, Apollo GraphQL, react-query,
-                                webpack
-                            </li>
-                            <li>★ ★ ★ ★ ☆ — Gatsby.js, Jest, Enzyme, REST, backend processes, Vercel</li>
-                            <li>
-                                ★ ★ ★ ☆ ☆ — Node.js, Prisma, express.js, MongoDB, Mongoose.js, Headless CMS's, zshell,,
-                                Docker
-                            </li>
-                        </ul>
-                    }
-                /> */}
-                {/* <Entry
-                    name='peripheral'
-                    content={
-                        <ul>
-                            <li>★ ★ ★ ★ ★ — styled-components, , sass, PostCSS, yarn, npm, pnpm</li>
-                            <li>★ ★ ★ ★ ☆ — HTML, CSS, Figma, Adobe XD, Zepplin</li>
-                            <li>★ ★ ★ ☆ ☆ — mobile first, responsive fluid design</li>
-                        </ul>
-                    }
-                /> */}
-                {/* <Entry
-                    name='Other'
-                    content={
-                        <ul>
-                            <li>Rich tutoring and mentoring experience</li>
-                            <li>Rich online/offline live performance experience — webinars, workshops, courses</li>
-                            <li>Good understanding of QA processes</li>
-                            <li>Development workflow management experience</li>
-                        </ul>
-                    }
-                /> */}
             </article>
 
-            {/* <article>
-                <h2>Portfolio</h2>
+            <article className='grid grid-cols-2 gap-4'>
+                <SectionHeading className='col-span-full' accentColor='cyan' text='projects' />
 
                 <JobEntry
                     comapnyLogoUrl={logoJpeg}
@@ -220,7 +182,7 @@ export default function CVPage() {
                         </>
                     }
                 />
-            </article> */}
+            </article>
         </main>
     );
 }

@@ -2,23 +2,16 @@
 import { cva, cx } from 'cva';
 
 /* Components */
-import { ThemeSwitcher } from '@/components/service/ThemeSwitcher';
+import { ThemeSwitcher } from '../service/ThemeSwitcher';
 import { LinkActive } from './LinkActive';
-
-const linkCn = cva({
-    base: cx('w-full h-min bg-background rounded-md'),
-});
 
 export const Browser = (props: React.PropsWithChildren) => {
     return (
         <section
             className={cx(
                 '[--header-height:40px]',
-                'browser relative mt-20 max-h-[90dvh] w-full max-w-3xl self-start',
+                'browser mt-20 max-h-[90dvh] w-full max-w-3xl self-start',
                 'rounded-xl shadow-2xl',
-
-                // '[--header-height-mobile:px]',
-                // 'max-w-lg sm:max-w-lg md:max-w-xl lg:max-w-full',
             )}>
             {/* todo look for better line height */}
 
@@ -28,14 +21,8 @@ export const Browser = (props: React.PropsWithChildren) => {
                     'relative gap-x-4 px-4',
                     'grid grid-cols-[auto_1fr_auto] items-center justify-between',
                     'bg-background-header rounded-t-xl',
-                    // 'bg-background bordr border-gra-900',
-                    // 'items-center'
                 )}>
-                <div
-                    className={cx(
-                        'relative flex h-full w-max items-center gap-2',
-                        // 'bg-white',
-                    )}>
+                <div className={cx('relative flex h-full w-max items-center gap-2')}>
                     <b className={dotCn({ intent: 'close' })} />
                     <b className={dotCn({ intent: 'minimize' })} />
                     <b className={dotCn({ intent: 'maximize' })} />
@@ -49,6 +36,7 @@ export const Browser = (props: React.PropsWithChildren) => {
                         cover
                     </LinkActive>
                 </nav>
+
                 <ThemeSwitcher className='justify-self-end' />
             </header>
 
@@ -82,4 +70,7 @@ const dotCn = cva({
             maximize: 'bg-green-500 hover:bg-green-600',
         },
     },
+});
+const linkCn = cva({
+    base: cx('w-full h-min bg-background rounded-md'),
 });

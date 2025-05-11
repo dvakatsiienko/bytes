@@ -7,10 +7,7 @@ Built with the following technology stack:
 - Next.js
 - TypeScript
 - Tailwind
-
-### API
-
-- TypeScript
+- Chadcn UI
 
 ### DevOps
 
