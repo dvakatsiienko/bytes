@@ -8,7 +8,6 @@ import { Browser } from '@/components/Browser';
 import { ThemeProvider } from '@/components/service/ThemeProvider';
 
 /* Instruments */
-import '@ui/kit/globals.css';
 import '@/theme/init.css';
 
 const fontManrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });

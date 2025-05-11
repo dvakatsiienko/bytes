@@ -1,10 +1,11 @@
-@import 'tailwindcss';
+@import '@ui/kit/globals.css';
 @plugin '@tailwindcss/typography';
 @plugin 'tailwind-scrollbar' {
     nocompatible: true;
     preferredstrategy: 'pseudoelements';
 }
 
+@import './accent.css';
 @import './gray.css';
 @import './accent.css';
 
@@ -121,6 +122,10 @@
     --color-surface-11: var(--color-surface-11);
     --color-surface-12: var(--color-surface-12);
 
+    /* Fonts */
     --font-manrope: var(--font-manrope);
     --font-geist-mono: var(--font-geist-mono);
+    --breakpoint-3xl: 120rem;
+
+    /* --spacing: 0.25rem; */
 }

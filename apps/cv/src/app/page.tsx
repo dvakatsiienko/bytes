@@ -11,7 +11,7 @@ import { SectionHeading } from '@/components/SectionHeading';
 import { ToolSection } from './parts/ToolSection';
 
 /* Instruments */
-import * as consts from '@/const';
+import * as links from '@/links';
 import { __DEV__, EMAIL_TO } from '@/falgs';
 import {
     toolListCore,
@@ -36,7 +36,12 @@ export default function CVPage() {
     const briefSectionCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
 
     return (
-        <main className={cx('prose-custom prose-style mx-auto')}>
+        <main
+            className={cx(
+                'prose-custom prose-style mx-auto',
+                // todo do something with txt size and line height
+                'max-w-8xl text-sm/snug',
+            )}>
             {/* <EasyMasonryComponent /> */}
             <SectionHeading className='mt-4' accentColor='sky' text='brief' />
 
@@ -46,17 +51,17 @@ export default function CVPage() {
                     <BriefEntry
                         className='break-all'
                         name='email'
-                        content={<a href={EMAIL_TO}>{consts.ADDRESS_EMAIL_PERSONAL}</a>}
+                        content={<a href={EMAIL_TO}>{links.ADDRESS_EMAIL_PERSONAL}</a>}
                     />
                     <BriefEntry content='ukraine, kyiv' name='location' />
                     <BriefEntry
                         name='links'
                         content={
                             <>
-                                <ExternalLink href={consts.ADDRESS_GITHUB_PERSONAL}>github</ExternalLink>,{' '}
-                                <ExternalLink href={consts.ADDRESS_LINKEDIN_PERSONAL}>linkedin</ExternalLink>
+                                <ExternalLink href={links.ADDRESS_GITHUB_PERSONAL}>github</ExternalLink>,{' '}
+                                <ExternalLink href={links.ADDRESS_LINKEDIN_PERSONAL}>linkedin</ExternalLink>
                                 ,&nbsp;
-                                <ExternalLink href={consts.ADDRESS_TELEGRAM_PERSONAL}>telegram</ExternalLink>
+                                <ExternalLink href={links.ADDRESS_TELEGRAM_PERSONAL}>telegram</ExternalLink>
                             </>
                         }
                     />
@@ -79,7 +84,7 @@ export default function CVPage() {
 
             <article className='grid grid-flow-dense grid-cols-4 gap-1 sm:grid-cols-9'>
                 <SectionHeading
-                    id={consts.LINK_ID_CV_TOOLS}
+                    id={links.LINK_ID_CV_TOOLS}
                     className='col-span-full'
                     accentColor='purple'
                     text='tools I use'
@@ -135,9 +140,9 @@ export default function CVPage() {
                         {/* turbo stars */}
                         {/* Jan 2025 - Present */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_TURBO_STARS}>Turbo Stars</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_TURBO_STARS}>Turbo Stars</ExternalLink>}
                             role='Lead Frontend Engineer'
-                            project={<ExternalLink href={consts.LINK_TURBO_STARS_SPORTSBOOK}>Sportsbook</ExternalLink>}
+                            project={<ExternalLink href={links.LINK_TURBO_STARS_SPORTSBOOK}>Sportsbook</ExternalLink>}
                             achievementList={[
                                 'Upgraded the legacy Frontend build pipeline to a modern standards',
                                 'Integrated Rust Frontend toolchain',
@@ -154,11 +159,11 @@ export default function CVPage() {
                         {/* Anadea */}
                         {/* Jun 2022 - Oct 2023 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_ANADAEA}>Anadea</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_ANADAEA}>Anadea</ExternalLink>}
                             role='Lead Frontend Engineer'
                             project={
                                 <>
-                                    <ExternalLink href={consts.LINK_ANADAEA_ROCKY}>Rocky</ExternalLink>, Keystone (NDA)
+                                    <ExternalLink href={links.LINK_ANADAEA_ROCKY}>Rocky</ExternalLink>, Keystone (NDA)
                                 </>
                             }
                             achievementList={[
@@ -180,10 +185,10 @@ export default function CVPage() {
                         {/* 2020 - 2021 */}
                         {/* Sep 2020 - Feb 2021 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_CORVA}>Corva.ai</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_CORVA}>Corva.ai</ExternalLink>}
                             role='Senior Frontend Engineer'
                             project={
-                                <ExternalLink href={consts.LINK_CORVA_GEODRILLING}>Geoscience Drilling</ExternalLink>
+                                <ExternalLink href={links.LINK_CORVA_GEODRILLING}>Geoscience Drilling</ExternalLink>
                             }
                             achievementList={[
                                 'Re-architected project Frontend',
@@ -197,7 +202,7 @@ export default function CVPage() {
                         {/* Boosta */}
                         {/* Feb 2021 - May 2021 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_BOOSTA}>Boosta</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_BOOSTA}>Boosta</ExternalLink>}
                             role='Senior Frontend Engineer'
                             project='Essay'
                             achievementList={[
@@ -212,9 +217,9 @@ export default function CVPage() {
                         {/* Temy */}
                         {/* Dec 2019 − Nov 2020 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_TEMY}>Temy</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_TEMY}>Temy</ExternalLink>}
                             role='Senior Frontend Engineer'
-                            project={<ExternalLink href={consts.LINK_TEMY_CCT}>CCT Marketplace</ExternalLink>}
+                            project={<ExternalLink href={links.LINK_TEMY_CCT}>CCT Marketplace</ExternalLink>}
                             achievementList={[
                                 'Prototyped and developed Frontend v2 architecture rebranding',
                                 'Improved a product business model by polishing features with CTO',
@@ -226,9 +231,9 @@ export default function CVPage() {
                         {/* Buki */}
                         {/* Nov 2019 − Apr 2020, part time */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_BUKI}>Buki</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_BUKI}>Buki</ExternalLink>}
                             role='Frontend Team Lead, Tutor'
-                            project={<ExternalLink href={consts.LINK_BUKI_MARKETPLACE}>Tutor marketplace</ExternalLink>}
+                            project={<ExternalLink href={links.LINK_BUKI_MARKETPLACE}>Tutor marketplace</ExternalLink>}
                             achievementList={[
                                 'Coordinated Frontend team dev flow',
                                 'Tutored and mentored team',
@@ -240,11 +245,11 @@ export default function CVPage() {
                         {/* Lectrum */}
                         {/* Nov 2016 − Aug 2019 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_LECTRUM}>Lectrum.io</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_LECTRUM}>Lectrum.io</ExternalLink>}
                             role='Frontend Engineer, Tutor'
                             courses={
                                 <>
-                                    <ExternalLink href={consts.LINK_LECTRUM_COURSE_NEXT_JS}>Next.js</ExternalLink>,
+                                    <ExternalLink href={links.LINK_LECTRUM_COURSE_NEXT_JS}>Next.js</ExternalLink>,
                                     React, JavaScript
                                 </>
                             }
@@ -261,7 +266,7 @@ export default function CVPage() {
                         {/* WebPal */}
                         {/* Dec 2016 − May 2017 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_WEB_PAL}>WebPal</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_WEB_PAL}>WebPal</ExternalLink>}
                             role='Junior Frontend Engineer'
                             project='NDA'
                             achievementList={['Developed internal company product with React, Redux and Electron']}
@@ -271,9 +276,9 @@ export default function CVPage() {
                         {/* Ubisoft Lead */}
                         {/* Jul 2016 − Dec 2016 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_UBISOFT}>Ubisoft</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_UBISOFT}>Ubisoft</ExternalLink>}
                             role='Associate Lead QC'
-                            project={<ExternalLink href={consts.LINK_UBISOFT_CONNECT}>Ubisoft Connect</ExternalLink>}
+                            project={<ExternalLink href={links.LINK_UBISOFT_CONNECT}>Ubisoft Connect</ExternalLink>}
                             achievementList={[
                                 'Coordinated QC team workflow',
                                 'Organised milestone validation',
@@ -285,9 +290,9 @@ export default function CVPage() {
                         {/* Ubisoft Dev Tester */}
                         {/* Nov 2015 − Jul 2016 */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_UBISOFT}>Ubisoft</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_UBISOFT}>Ubisoft</ExternalLink>}
                             role='Junior Dev Tester'
-                            project={<ExternalLink href={consts.LINK_WATCH_DOGS_2}>Watch Dogs 2</ExternalLink>}
+                            project={<ExternalLink href={links.LINK_WATCH_DOGS_2}>Watch Dogs 2</ExternalLink>}
                             achievementList={[
                                 'Conducted a video game console-to-PC port QA verification',
                                 'Created weekly QA report graphs',
@@ -302,12 +307,11 @@ export default function CVPage() {
                         {/* Lectrum */}
                         {/* Nov 2020 − May 2021, part time */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_LECTRUM}>Lectrum.io</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_LECTRUM}>Lectrum.io</ExternalLink>}
                             role='Course developer, Tutor'
                             courses={
                                 <>
-                                    <ExternalLink href={consts.LINK_LECTRUM_COURSE_NEXT_JS}>Next.js</ExternalLink>,
-                                    React
+                                    <ExternalLink href={links.LINK_LECTRUM_COURSE_NEXT_JS}>Next.js</ExternalLink>, React
                                 </>
                             }
                             achievementList={[
@@ -320,11 +324,11 @@ export default function CVPage() {
                         {/* DAN.IT */}
                         {/* Oct 2019 − Jan 2020, part time */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_DAN_IT}>DAN.IT</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_DAN_IT}>DAN.IT</ExternalLink>}
                             role='Tutor'
                             courses={
                                 <>
-                                    <ExternalLink href={consts.LINK_DAN_IT_FRONTEND_COURSE}>Frontend</ExternalLink>,
+                                    <ExternalLink href={links.LINK_DAN_IT_FRONTEND_COURSE}>Frontend</ExternalLink>,
                                     React
                                 </>
                             }
@@ -335,7 +339,7 @@ export default function CVPage() {
                         {/* QA Startup */}
                         {/* Dec 2019, part time */}
                         <Project
-                            employer={<ExternalLink href={consts.LINK_QA_STARTUP}>QA Startup</ExternalLink>}
+                            employer={<ExternalLink href={links.LINK_QA_STARTUP}>QA Startup</ExternalLink>}
                             role='Tutor'
                             courses='Web Services'
                             achievementList={['Tutored and mentored students']}

@@ -14,7 +14,7 @@ import {
     ADDRESS_GITHUB_PERSONAL,
     ADDRESS_LINKEDIN_PERSONAL,
     ADDRESS_TELEGRAM_PERSONAL,
-} from '@/const';
+} from '@/links';
 
 export default function CoverPage() {
     return (
