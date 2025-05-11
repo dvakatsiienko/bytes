@@ -23,7 +23,6 @@ export const JobEntry = (props: JobEntryProps) => {
             <Entry content={props.employer} name='employer' />
             <Entry content={props.position} name='position' />
             <Entry content={props.project} name='project' />
-            <Entry content={props.manager} name='manager' />
             <Entry content={<ul>{achievementListJSX}</ul>} name='achievements' className='col-span-full' />
 
             {/* <Image priority alt='Company logo' placeholder='blur' src={props.comapnyLogoUrl} width={100} /> */}
@@ -33,10 +32,9 @@ export const JobEntry = (props: JobEntryProps) => {
 
 /* Types */
 interface JobEntryProps {
-    employer: string | React.ReactNode;
+    employer: React.ReactNode;
     position: string;
-    project: string;
-    manager: string | React.ReactNode;
+    project: React.ReactNode;
     achievementList: string[];
     comapnyLogoUrl: StaticImageData;
 }

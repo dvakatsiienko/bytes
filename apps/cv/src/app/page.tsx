@@ -40,7 +40,7 @@ export default function CVPage() {
             {/* <EasyMasonryComponent /> */}
             <SectionHeading className='mt-4' accentColor='sky' text='brief' />
 
-            <article className='grid grid-cols-[1fr_auto]'>
+            <article className='grid grid-cols-[1fr_auto] place-items-start'>
                 <section className={briefSectionCn}>
                     <Entry content='dima vakatsiienko' name='name' />
                     <Entry
@@ -63,7 +63,7 @@ export default function CVPage() {
                     <Entry content='frontend engineer, frontend lead, hybrid' name='role' />
                 </section>
 
-                <picture className='aspect-2/3 m-0! relative hidden w-28 sm:block'>
+                <picture className='aspect-2/3 relative m-0 hidden w-23 sm:block'>
                     <Image
                         fill
                         sizes='10vw'
@@ -127,13 +127,28 @@ export default function CVPage() {
             </article>
 
             {__DEV__ && (
-                <article className='grid grid-cols-2 gap-4'>
+                <article className='grid grid-cols-2 place-items-start gap-4'>
                     <SectionHeading className='col-span-full' accentColor='cyan' text='projects' />
 
                     <JobEntry
                         comapnyLogoUrl={logoJpeg}
                         position='Senior Frontend Engineer'
-                        project='Geoscience LINK TO EXAMPLES'
+                        project={
+                            <>
+                                Geoscience{' '}
+                                <ExternalLink href='https://drive.google.com/file/d/1KXjt-9Kja2aRQj3-3hOFUJmHrHzHdEfG/view'>
+                                    ex 1
+                                </ExternalLink>
+                                ,{' '}
+                                <ExternalLink href='https://drive.google.com/file/d/1OV1GAm6M3h_DDKFj6cjPq4LOkd261y9V/view'>
+                                    ex 2
+                                </ExternalLink>
+                                ,{' '}
+                                <ExternalLink href='https://drive.google.com/file/d/1-DR5b_rJmcpS4Ca2ioM5ZrRn_KhRVjdy/view'>
+                                    ex 3
+                                </ExternalLink>
+                            </>
+                        }
                         achievementList={[
                             "Prototyped product's new frontend architecture, mentored team",
                             'Coordinated the migration from the old tech stack to the new one',
@@ -141,13 +156,6 @@ export default function CVPage() {
                             'Optimized frontend codebase using monorepo',
                         ]}
                         employer={<ExternalLink href='https://www.corva.ai/'>Corva.ai</ExternalLink>}
-                        manager={
-                            <>
-                                Artem Sychov —{' '}
-                                <ExternalLink href='https://www.linkedin.com/in/suchov/'>LinkedIn</ExternalLink>,{' '}
-                                <ExternalLink href='https://t.me/artem_sychov'>Telegram</ExternalLink>
-                            </>
-                        }
                     />
                     <JobEntry
                         comapnyLogoUrl={logoJpeg}
@@ -159,16 +167,7 @@ export default function CVPage() {
                             'Introduced best practices of code organization, UI layout principles, performance metrics Conducted platform audit and invested hi-end technical solutions',
                             'Integrated cutting-edge rust-based tooling to the development toolchain',
                         ]}
-                        employer={<ExternalLink href='https://boosta.biz/en/'>Boosta</ExternalLink>}
-                        manager={
-                            <>
-                                Vlad Muzychenko —
-                                <ExternalLink href='https://www.linkedin.com/in/vladyslav-muzychenko-796392127/'>
-                                    LinkedIn
-                                </ExternalLink>
-                                , <ExternalLink href='https://t.me/vlmuzychenko'>Telegram</ExternalLink>
-                            </>
-                        }
+                        employer={<ExternalLink href='https://boosta.biz/'>Boosta</ExternalLink>}
                     />
                 </article>
             )}
