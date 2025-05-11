@@ -1,6 +1,7 @@
+/* Core */
 import { cx } from 'cva';
 
-export const Entry = (props: EntryProps) => {
+export const BriefEntry = (props: BriefEntryProps) => {
     return (
         <>
             {/* TODO adjust text-gray for light/dark */}
@@ -13,7 +14,7 @@ export const Entry = (props: EntryProps) => {
 };
 
 /* Core */
-interface EntryProps {
+interface BriefEntryProps {
     className?: string;
     name: string;
     content: string | React.ReactNode;

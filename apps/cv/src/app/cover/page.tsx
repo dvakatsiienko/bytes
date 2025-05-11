@@ -8,7 +8,13 @@ import { ExternalLink } from '@/elements/ExternalLink';
 
 /* Instruments */
 import { EMAIL_TO } from '@/falgs';
-import { LINK_ID_CV_TOOLS } from '@/ids';
+import {
+    LINK_ID_CV_TOOLS,
+    LINK_X_COM_CHAT,
+    ADDRESS_GITHUB_PERSONAL,
+    ADDRESS_LINKEDIN_PERSONAL,
+    ADDRESS_TELEGRAM_PERSONAL,
+} from '@/const';
 
 export default function CoverPage() {
     return (
@@ -33,37 +39,19 @@ export default function CoverPage() {
 
             <p>
                 👽 Check out my latest side project: an AI-driven{' '}
-                <ExternalLink href={process.env.NEXT_PUBLIC_LINK_X_COM_CHAT}>X-COM Chat</ExternalLink>, where each
-                character has its own personality. <br />
+                <ExternalLink href={LINK_X_COM_CHAT}>X-COM Chat</ExternalLink>, where each character has its own
+                personality. <br />
             </p>
             <blockquote>
                 💡 You can find more of my work on&nbsp;
-                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>GitHub</ExternalLink>.
+                <ExternalLink href={ADDRESS_GITHUB_PERSONAL}>GitHub</ExternalLink>.
             </blockquote>
 
             <p>
-                Let's talk via <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>Telegram</ExternalLink>,{' '}
-                <ExternalLink href={EMAIL_TO}>email</ExternalLink> or{' '}
-                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>LinkedIn</ExternalLink>. 😁
+                💬 Reach me out via <ExternalLink href={ADDRESS_TELEGRAM_PERSONAL}>Telegram</ExternalLink>,{' '}
+                <ExternalLink href={EMAIL_TO}>Email</ExternalLink> or{' '}
+                <ExternalLink href={ADDRESS_LINKEDIN_PERSONAL}>LinkedIn</ExternalLink>.
             </p>
-
-            {/* <h3>My main tools</h3>
-
-            <ul className='list-inside list-disc'>
-                {techStack.map(({ category, items }) => (
-                    <li key={category}>
-                        <b>{category}</b>: {items.join(', ')}
-                    </li>
-                ))}
-            </ul>
-
-            <h3>My key achievements</h3>
-
-            <ul className='list-inside list-disc'>
-                {keyAchievements.map((achievement) => (
-                    <li key={achievement}>{achievement}</li>
-                ))}
-            </ul> */}
         </main>
     );
 }
@@ -86,35 +74,13 @@ const yearExperienceTypescript = yearCurrent - YEAR_STARTED_TYPESCRIPT;
 const YEAR_STARTED_TAILWIND = 2022;
 const yearExperienceTailwind = yearCurrent - YEAR_STARTED_TAILWIND;
 
-const keyAchievements = [
-    'Architected high-performance solutions with a focus on maintainability and robustness',
-    'Led platform redesigns, migrating legacy systems to modern tech stacks with up to 40% faster load times post-optimization',
-    'Built shared component libraries adopted across organizations, reducing development time by 20%',
-    'Mentored teammates, improving code quality and productivity',
-];
-
-const techStack = [
-    {
-        category: 'Languages & Frameworks',
-        items: ['JavaScript/TypeScript', 'React', 'Next.js App Router', 'Vite'],
-    },
-    {
-        category: 'State & Network',
-        items: ['React-Query', 'Apollo GraphQL', 'Jotai', 'Zustand', 'Redux'],
-    },
-    {
-        category: 'Styling & Animation',
-        items: ['Tailwind', 'motion.dev', 'Radix UI', 'Headless UI', 'chadcn/ui', 'Styled Components'],
-    },
-    {
-        category: 'LLM prompt engineering',
-        items: ['Vercel AI SDK', 'OpenAI', 'GroQ', 'OpenRouter'],
-    },
-    {
-        category: 'Tools',
-        items: ['Figma', 'Storybook', 'NPM module publishing'],
-    },
-];
+// TODO turn into text and delete
+// const keyAchievements = [
+//     'Architected high-performance solutions with a focus on maintainability and robustness',
+//     'Led platform redesigns, migrating legacy systems to modern tech stacks with up to 40% faster load times post-optimization',
+//     'Built shared component libraries adopted across organizations, reducing development time by 20%',
+//     'Mentored teammates, improving code quality and productivity',
+// ];
 
 export const metadata: Metadata = {
     title: 'Dima Vakatsiienko Cover',
