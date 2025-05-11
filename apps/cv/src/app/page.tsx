@@ -4,14 +4,25 @@ import Image from 'next/image';
 import { cx } from 'cva';
 
 /* Components */
-import { Entry } from '@/components/Entry';
-import { JobEntry } from '@/components/JobEntry';
+import { BriefEntry } from '@/components/BriefEntry';
+import { Project } from '@/components/Project';
 import { ExternalLink } from '@/elements';
 import { SectionHeading } from '@/components/SectionHeading';
 import { ToolSection } from './parts/ToolSection';
 
 /* Instruments */
-import { LINK_ID_CV_TOOLS } from '@/ids';
+import {
+    LINK_UBISOFT,
+    LINK_UBISOFT_CONNECT,
+    LINK_WATCH_DOGS_2,
+    LINK_WEB_PAL,
+    LINK_BOOSTA,
+    LINK_ID_CV_TOOLS,
+    ADDRESS_EMAIL_PERSONAL,
+    ADDRESS_GITHUB_PERSONAL,
+    ADDRESS_LINKEDIN_PERSONAL,
+    ADDRESS_TELEGRAM_PERSONAL,
+} from '@/const';
 import { __DEV__, EMAIL_TO } from '@/falgs';
 import {
     toolListCore,
@@ -42,28 +53,28 @@ export default function CVPage() {
 
             <article className='grid grid-cols-[1fr_auto] place-items-start'>
                 <section className={briefSectionCn}>
-                    <Entry content='dima vakatsiienko' name='name' />
-                    <Entry
+                    <BriefEntry content='dima vakatsiienko' name='name' />
+                    <BriefEntry
                         className='break-all'
                         name='email'
-                        content={<a href={EMAIL_TO}>{process.env.NEXT_PUBLIC_ADDRESS_EMAIL}</a>}
+                        content={<a href={EMAIL_TO}>{ADDRESS_EMAIL_PERSONAL}</a>}
                     />
-                    <Entry content='ukraine, kyiv' name='location' />
-                    <Entry
+                    <BriefEntry content='ukraine, kyiv' name='location' />
+                    <BriefEntry
                         name='links'
                         content={
                             <>
-                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_GITHUB}>github</ExternalLink>,{' '}
-                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_LINKEDIN}>linkedin</ExternalLink>
+                                <ExternalLink href={ADDRESS_GITHUB_PERSONAL}>github</ExternalLink>,{' '}
+                                <ExternalLink href={ADDRESS_LINKEDIN_PERSONAL}>linkedin</ExternalLink>
                                 ,&nbsp;
-                                <ExternalLink href={process.env.NEXT_PUBLIC_ADDRESS_TELEGRAM}>telegram</ExternalLink>
+                                <ExternalLink href={ADDRESS_TELEGRAM_PERSONAL}>telegram</ExternalLink>
                             </>
                         }
                     />
-                    <Entry content='frontend engineer, frontend lead, hybrid' name='role' />
+                    <BriefEntry content='frontend engineer, frontend lead, hybrid' name='role' />
                 </section>
 
-                <picture className='aspect-2/3 relative m-0 hidden w-23 sm:block'>
+                <picture className='aspect-2/3 w-23 relative m-0 hidden sm:block'>
                     <Image
                         fill
                         sizes='10vw'
@@ -84,7 +95,6 @@ export default function CVPage() {
                     text='tools I use'
                 />
 
-                {/* <ToolSection className='col-span-3' title='frameworks' toolList={toolListFrameworks} /> */}
                 <ToolSection color='orange' className='col-span-2 sm:col-span-5' title='core' toolList={toolListCore} />
                 <ToolSection
                     color='indigo'
@@ -127,12 +137,13 @@ export default function CVPage() {
             </article>
 
             {__DEV__ && (
-                <article className='grid grid-cols-2 place-items-start gap-4'>
-                    <SectionHeading className='col-span-full' accentColor='cyan' text='projects' />
+                <article className='grid grid-cols-2 place-items-start gap-x-2 gap-y-1'>
+                    <SectionHeading className='col-span-full' accentColor='emerald' text='projects' />
 
-                    <JobEntry
-                        comapnyLogoUrl={logoJpeg}
-                        position='Senior Frontend Engineer'
+                    {/* Corva */}
+                    <Project
+                        employer={<ExternalLink href='https://www.corva.ai/'>Corva.ai</ExternalLink>}
+                        role='Senior Frontend Engineer'
                         project={
                             <>
                                 Geoscience{' '}
@@ -150,24 +161,60 @@ export default function CVPage() {
                             </>
                         }
                         achievementList={[
-                            "Prototyped product's new frontend architecture, mentored team",
-                            'Coordinated the migration from the old tech stack to the new one',
-                            'Implemented the new web-platform MVP using Gatsby.js, Next.js and Strapi CMS',
-                            'Optimized frontend codebase using monorepo',
-                        ]}
-                        employer={<ExternalLink href='https://www.corva.ai/'>Corva.ai</ExternalLink>}
-                    />
-                    <JobEntry
-                        comapnyLogoUrl={logoJpeg}
-                        position='Senior Frontend Engineer'
-                        project='Essay'
-                        achievementList={[
                             'Re-architected problematic project fundament',
                             'Project rewrite from JavaScript to TypeScript',
                             'Introduced best practices of code organization, UI layout principles, performance metrics Conducted platform audit and invested hi-end technical solutions',
                             'Integrated cutting-edge rust-based tooling to the development toolchain',
                         ]}
-                        employer={<ExternalLink href='https://boosta.biz/'>Boosta</ExternalLink>}
+                        comapnyLogoUrl={logoJpeg}
+                    />
+
+                    {/* Boosta */}
+                    <Project
+                        employer={<ExternalLink href={LINK_BOOSTA}>Boosta</ExternalLink>}
+                        role='Senior Frontend Engineer'
+                        project='Essay'
+                        achievementList={[
+                            "Prototyped product's new frontend architecture, mentored team",
+                            'Coordinated the migration from the old tech stack to the new one',
+                            'Implemented the new web-platform MVP using Gatsby.js, Next.js and Strapi CMS',
+                            'Optimized frontend codebase using monorepo',
+                        ]}
+                        comapnyLogoUrl={logoJpeg}
+                    />
+
+                    {/* WebPal */}
+                    <Project
+                        employer={<ExternalLink href={LINK_WEB_PAL}>WebPal</ExternalLink>}
+                        role='Junior Frontend Engineer'
+                        project='NDA'
+                        achievementList={['Developed internal company product with React, Redux and Electron']}
+                        comapnyLogoUrl={logoJpeg}
+                    />
+
+                    {/* Ubisoft Lead */}
+                    <Project
+                        employer={<ExternalLink href={LINK_UBISOFT}>Ubisoft</ExternalLink>}
+                        role='Associate Lead QC'
+                        project={<ExternalLink href={LINK_UBISOFT_CONNECT}>Ubisoft Connect</ExternalLink>}
+                        achievementList={[
+                            'Coordinated QC team workflow',
+                            'Organised milestone validation',
+                            'Created guidelines and test cases',
+                        ]}
+                        comapnyLogoUrl={logoJpeg}
+                    />
+
+                    {/* Ubisoft Dev Tester */}
+                    <Project
+                        employer={<ExternalLink href={LINK_UBISOFT}>Ubisoft</ExternalLink>}
+                        role='Junior Dev Tester'
+                        project={<ExternalLink href={LINK_WATCH_DOGS_2}>Watch Dogs 2</ExternalLink>}
+                        achievementList={[
+                            'Conducted a video game console-to-PC port QA verification',
+                            'Created weekly QA report graphs',
+                        ]}
+                        comapnyLogoUrl={logoJpeg}
                     />
                 </article>
             )}

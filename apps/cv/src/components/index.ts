@@ -1,2 +1,2 @@
-export * from './Entry';
-export * from './JobEntry';
+export * from './BriefEntry';
+export * from './Project';

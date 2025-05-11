@@ -2,12 +2,12 @@
 import Image, { type StaticImageData } from 'next/image';
 
 /* Components */
-import { Entry } from './Entry';
+import { BriefEntry } from './BriefEntry';
 
 /* Instruments */
 import { cn } from '@ui/kit/lib/utils';
 
-export const JobEntry = (props: JobEntryProps) => {
+export const Project = (props: PrjectProps) => {
     const achievementListJSX = props.achievementList.map((achievement) => {
         return <li key={achievement}>{achievement}</li>;
     });
@@ -15,15 +15,18 @@ export const JobEntry = (props: JobEntryProps) => {
     return (
         <section
             className={cn(
+                'gap-x-2',
                 'prose-li:m-0 grid grid-cols-[auto_1fr] rounded-md px-4 py-2',
                 'bg-surface-5 dark:bg-surface-1',
                 'shadow-md',
-                'gap-x-2',
+
+                // TODO reconsier text-pretty/balance
+                'text-pretty'
             )}>
-            <Entry content={props.employer} name='employer' />
-            <Entry content={props.position} name='position' />
-            <Entry content={props.project} name='project' />
-            <Entry content={<ul>{achievementListJSX}</ul>} name='achievements' className='col-span-full' />
+            <BriefEntry content={props.employer} name='employer' />
+            <BriefEntry content={props.role} name='role' />
+            <BriefEntry content={props.project} name='project' />
+            <BriefEntry content={<ul>{achievementListJSX}</ul>} name='achievements' className='col-span-full' />
 
             {/* <Image priority alt='Company logo' placeholder='blur' src={props.comapnyLogoUrl} width={100} /> */}
         </section>
@@ -31,9 +34,9 @@ export const JobEntry = (props: JobEntryProps) => {
 };
 
 /* Types */
-interface JobEntryProps {
+interface PrjectProps {
     employer: React.ReactNode;
-    position: string;
+    role: string;
     project: React.ReactNode;
     achievementList: string[];
     comapnyLogoUrl: StaticImageData;
