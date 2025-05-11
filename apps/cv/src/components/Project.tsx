@@ -21,11 +21,12 @@ export const Project = (props: PrjectProps) => {
                 'shadow-md',
 
                 // TODO reconsier text-pretty/balance
-                'text-pretty'
+                'text-pretty',
             )}>
             <BriefEntry content={props.employer} name='employer' />
             <BriefEntry content={props.role} name='role' />
-            <BriefEntry content={props.project} name='project' />
+            {props.courses && <BriefEntry content={props.courses} name='courses' />}
+            {props.project && <BriefEntry content={props.project} name='project' />}
             <BriefEntry content={<ul>{achievementListJSX}</ul>} name='achievements' className='col-span-full' />
 
             {/* <Image priority alt='Company logo' placeholder='blur' src={props.comapnyLogoUrl} width={100} /> */}
@@ -37,7 +38,8 @@ export const Project = (props: PrjectProps) => {
 interface PrjectProps {
     employer: React.ReactNode;
     role: string;
-    project: React.ReactNode;
+    courses?: React.ReactNode;
+    project?: React.ReactNode;
     achievementList: string[];
     comapnyLogoUrl: StaticImageData;
 }

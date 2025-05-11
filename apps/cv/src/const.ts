@@ -8,6 +8,25 @@ export const ADDRESS_GITHUB_PERSONAL = 'https://github.com/dvakatsiienko';
 /* boosta */
 export const LINK_BOOSTA = 'https://boosta.biz/';
 
+/* temy */
+export const LINK_TEMY = 'https://www.temy.co/';
+export const LINK_TEMY_CCT = 'https://www.linkedin.com/company/community-capital-technology';
+
+/* buki */
+export const LINK_BUKI = 'https://buki.com.ua/en/';
+export const LINK_BUKI_MARKETPLACE = 'https://buki.com.ua/tutors/';
+
+/* dan.it */
+export const LINK_DAN_IT = 'https://dan-it.com.ua/uk/';
+export const LINK_DAN_IT_FRONTEND_COURSE = 'https://dan-it.com.ua/uk/program/front-end/';
+
+/* QA Startup */
+export const LINK_QA_STARTUP = 'https://qastartup.net/';
+
+/* lectrum */
+export const LINK_LECTRUM = 'https://lectrum.io/';
+export const LINK_LECTRUM_COURSE_NEXT_JS = 'https://www.lectrum.ua/course/next-js';
+
 /* web pal */
 export const LINK_WEB_PAL = 'https://web-pal.com/';
 
