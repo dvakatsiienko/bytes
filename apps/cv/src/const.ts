@@ -5,6 +5,21 @@ export const ADDRESS_TELEGRAM_PERSONAL = 'https://t.me/shining1488';
 export const ADDRESS_LINKEDIN_PERSONAL = 'https://www.linkedin.com/in/dmytro-vakatsiienko-a20271100';
 export const ADDRESS_GITHUB_PERSONAL = 'https://github.com/dvakatsiienko';
 
+/* turbo stars */
+export const LINK_TURBO_STARS = 'https://turbostars.io/';
+export const LINK_TURBO_STARS_SPORTSBOOK = 'https://cosmos.casino/betting';
+
+/* anadea */
+export const LINK_ANADAEA = 'https://anadea.info/';
+export const LINK_ANADAEA_ROCKY = 'https://wearerocky.com/';
+
+
+/* corva */
+export const LINK_CORVA = 'https://www.corva.ai/';
+export const LINK_CORVA_GEOSCIENCE = 'https://www.corva.ai/energy/geoscience';
+export const LINK_CORVA_GEODRILLING = 'https://www.corva.ai/energy/geoscience/geodrilling';
+export const LINK_CORVA_GEOCOMPLETIONS = 'https://www.corva.ai/energy/geoscience/geocompletions';
+
 /* boosta */
 export const LINK_BOOSTA = 'https://boosta.biz/';
 
