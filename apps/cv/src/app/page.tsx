@@ -1,23 +1,18 @@
 'use client';
 /* Core */
 import Image from 'next/image';
-import NextLink from 'next/link';
 import { cx } from 'cva';
 
 /* Components */
 import { Entry } from '@/components/Entry';
 import { JobEntry } from '@/components/JobEntry';
-import { Tool } from '@/app/parts/Tool';
 import { ExternalLink } from '@/elements';
 import { SectionHeading } from '@/components/SectionHeading';
 import { ToolSection } from './parts/ToolSection';
 
 /* Instruments */
-import meJpeg from '/public/my-photo.jpeg';
-import logoJpeg from '/public/logo.jpeg';
 import { LINK_ID_CV_TOOLS } from '@/ids';
-
-import { EMAIL_TO } from '@/falgs';
+import { __DEV__, EMAIL_TO } from '@/falgs';
 import {
     toolListCore,
     toolListState,
@@ -31,6 +26,8 @@ import {
     toolListComponents,
     toolListAi,
 } from './parts/toolConfig';
+import meJpeg from '/public/my-photo.jpeg';
+import logoJpeg from '/public/logo.jpeg';
 
 // import { Masonry } from 'masonic';
 // import { EasyMasonryComponent } from './EasyMasonryComponent';
@@ -80,22 +77,12 @@ export default function CVPage() {
             </article>
 
             <article className='grid grid-flow-dense grid-cols-4 gap-1 sm:grid-cols-9'>
-                <SectionHeading id={LINK_ID_CV_TOOLS} className='col-span-full' accentColor='purple' text='tools I use' />
-
-                {/* <Masonry
-                    items={stuff}
-                    render={ToolSection}
-                    //  items={items}
-                    // Adds 8px of space between the grid cells
-                    maxColumnCount={6}
-                    columnGutter={8}
-                    // Sets the minimum column width to 172px
-                    columnWidth={220}
-                    overscanBy={5}
-                /> */}
-                {/* {stuff.map(({ area, toolList }) => (
-                    <ToolSection key={area} area={area} toolList={toolList} />
-                ))} */}
+                <SectionHeading
+                    id={LINK_ID_CV_TOOLS}
+                    className='col-span-full'
+                    accentColor='purple'
+                    text='tools I use'
+                />
 
                 {/* <ToolSection className='col-span-3' title='frameworks' toolList={toolListFrameworks} /> */}
                 <ToolSection color='orange' className='col-span-2 sm:col-span-5' title='core' toolList={toolListCore} />
@@ -139,50 +126,52 @@ export default function CVPage() {
                 <ToolSection color='emerald' className='col-span-2 sm:col-span-5' title='LLM' toolList={toolListLLM} />
             </article>
 
-            <article className='grid grid-cols-2 gap-4'>
-                <SectionHeading className='col-span-full' accentColor='cyan' text='projects' />
+            {__DEV__ && (
+                <article className='grid grid-cols-2 gap-4'>
+                    <SectionHeading className='col-span-full' accentColor='cyan' text='projects' />
 
-                <JobEntry
-                    comapnyLogoUrl={logoJpeg}
-                    position='Senior Frontend Engineer'
-                    project='Geoscience LINK TO EXAMPLES'
-                    achievementList={[
-                        "Prototyped product's new frontend architecture, mentored team",
-                        'Coordinated the migration from the old tech stack to the new one',
-                        'Implemented the new web-platform MVP using Gatsby.js, Next.js and Strapi CMS',
-                        'Optimized frontend codebase using monorepo',
-                    ]}
-                    employer={<ExternalLink href='https://www.corva.ai/'>Corva.ai</ExternalLink>}
-                    manager={
-                        <>
-                            Artem Sychov —{' '}
-                            <ExternalLink href='https://www.linkedin.com/in/suchov/'>LinkedIn</ExternalLink>,{' '}
-                            <ExternalLink href='https://t.me/artem_sychov'>Telegram</ExternalLink>
-                        </>
-                    }
-                />
-                <JobEntry
-                    comapnyLogoUrl={logoJpeg}
-                    position='Senior Frontend Engineer'
-                    project='Essay'
-                    achievementList={[
-                        'Re-architected problematic project fundament',
-                        'Project rewrite from JavaScript to TypeScript',
-                        'Introduced best practices of code organization, UI layout principles, performance metrics Conducted platform audit and invested hi-end technical solutions',
-                        'Integrated cutting-edge rust-based tooling to the development toolchain',
-                    ]}
-                    employer={<ExternalLink href='https://boosta.biz/en/'>Boosta</ExternalLink>}
-                    manager={
-                        <>
-                            Vlad Muzychenko —
-                            <ExternalLink href='https://www.linkedin.com/in/vladyslav-muzychenko-796392127/'>
-                                LinkedIn
-                            </ExternalLink>
-                            , <ExternalLink href='https://t.me/vlmuzychenko'>Telegram</ExternalLink>
-                        </>
-                    }
-                />
-            </article>
+                    <JobEntry
+                        comapnyLogoUrl={logoJpeg}
+                        position='Senior Frontend Engineer'
+                        project='Geoscience LINK TO EXAMPLES'
+                        achievementList={[
+                            "Prototyped product's new frontend architecture, mentored team",
+                            'Coordinated the migration from the old tech stack to the new one',
+                            'Implemented the new web-platform MVP using Gatsby.js, Next.js and Strapi CMS',
+                            'Optimized frontend codebase using monorepo',
+                        ]}
+                        employer={<ExternalLink href='https://www.corva.ai/'>Corva.ai</ExternalLink>}
+                        manager={
+                            <>
+                                Artem Sychov —{' '}
+                                <ExternalLink href='https://www.linkedin.com/in/suchov/'>LinkedIn</ExternalLink>,{' '}
+                                <ExternalLink href='https://t.me/artem_sychov'>Telegram</ExternalLink>
+                            </>
+                        }
+                    />
+                    <JobEntry
+                        comapnyLogoUrl={logoJpeg}
+                        position='Senior Frontend Engineer'
+                        project='Essay'
+                        achievementList={[
+                            'Re-architected problematic project fundament',
+                            'Project rewrite from JavaScript to TypeScript',
+                            'Introduced best practices of code organization, UI layout principles, performance metrics Conducted platform audit and invested hi-end technical solutions',
+                            'Integrated cutting-edge rust-based tooling to the development toolchain',
+                        ]}
+                        employer={<ExternalLink href='https://boosta.biz/en/'>Boosta</ExternalLink>}
+                        manager={
+                            <>
+                                Vlad Muzychenko —
+                                <ExternalLink href='https://www.linkedin.com/in/vladyslav-muzychenko-796392127/'>
+                                    LinkedIn
+                                </ExternalLink>
+                                , <ExternalLink href='https://t.me/vlmuzychenko'>Telegram</ExternalLink>
+                            </>
+                        }
+                    />
+                </article>
+            )}
         </main>
     );
 }
