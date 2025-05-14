@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@apollo/datasource-rest": "6.4.1",
-        "@apollo/server": "4.12.0",
+        "@apollo/server": "4.12.1",
         "@graphql-tools/graphql-file-loader": "8.0.19",
         "@graphql-tools/load": "8.1.0",
         "@prisma/client": "6.7.0",
@@ -29,7 +29,7 @@
         "@graphql-codegen/typescript": "4.1.6",
         "@swc-node/register": "1.10.10",
         "@swc/core": "1.11.24",
-        "@types/node": "22.15.17",
+        "@types/node": "22.15.18",
         "nodemon": "3.1.10",
         "prettier": "3.5.3",
         "prettier-eslint": "16.4.2",
