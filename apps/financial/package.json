@@ -17,7 +17,7 @@
     },
     "dependencies": {
         "@heroicons/react": "2.2.0",
-        "@prisma/client": "6.7.0",
+        "@prisma/client": "6.8.2",
         "@tanstack/react-query": "5.76.1",
         "autoprefixer": "10.4.21",
         "await-to-js": "3.0.0",
@@ -36,14 +36,14 @@
         "@swc-node/register": "1.10.10",
         "@swc/core": "1.11.24",
         "@tailwindcss/forms": "0.5.10",
-        "@tailwindcss/postcss": "4.1.6",
+        "@tailwindcss/postcss": "4.1.7",
         "@tanstack/react-query-devtools": "5.76.1",
         "@types/node": "22.15.18",
         "@types/react": "19.1.4",
         "@types/react-dom": "19.1.5",
         "postcss": "8.5.3",
-        "prisma": "6.7.0",
-        "tailwindcss": "4.1.6"
+        "prisma": "6.8.2",
+        "tailwindcss": "4.1.7"
     },
     "prisma": {
         "seed": "node -r @swc-node/register prisma/seed/init"

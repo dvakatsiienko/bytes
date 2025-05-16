@@ -18,7 +18,7 @@
         "@apollo/server": "4.12.1",
         "@graphql-tools/graphql-file-loader": "8.0.19",
         "@graphql-tools/load": "8.1.0",
-        "@prisma/client": "6.7.0",
+        "@prisma/client": "6.8.2",
         "chalk": "5.4.1",
         "dotenv": "16.5.0",
         "graphql": "16.11.0",
@@ -33,6 +33,6 @@
         "nodemon": "3.1.10",
         "prettier": "3.5.3",
         "prettier-eslint": "16.4.2",
-        "prisma": "6.7.0"
+        "prisma": "6.8.2"
     }
 }
