@@ -28,7 +28,7 @@
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
-        "eslint": "9.26.0",
+        "eslint": "9.27.0",
         "eslint-config-polished": "workspace:*",
         "prettier": "3.5.3",
         "prettier-config-polished": "workspace:*",
