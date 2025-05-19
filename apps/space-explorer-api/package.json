@@ -22,14 +22,14 @@
         "chalk": "5.4.1",
         "dotenv": "16.5.0",
         "graphql": "16.11.0",
-        "zod": "3.24.4"
+        "zod": "3.25.4"
     },
     "devDependencies": {
         "@graphql-codegen/cli": "5.0.6",
         "@graphql-codegen/typescript": "4.1.6",
         "@swc-node/register": "1.10.10",
         "@swc/core": "1.11.24",
-        "@types/node": "22.15.18",
+        "@types/node": "22.15.19",
         "nodemon": "3.1.10",
         "prettier": "3.5.3",
         "prettier-eslint": "16.4.2",
