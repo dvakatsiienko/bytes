@@ -4,7 +4,6 @@
     "scripts": {
         "dev": "next dev --turbopack",
         "vercel": "vercel dev",
-        "start": "next dev --turbopack",
         "restart": "run-s build:clean start",
         "build": "next build",
         "build:clean": "rimraf .next",

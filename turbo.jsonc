@@ -3,7 +3,6 @@
     "ui": "tui",
     "tasks": {
         "dev": { "cache": false, "persistent": true, "dependsOn": ["^prisma:generate"] },
-        "start": { "cache": false, "persistent": true, "dependsOn": ["^prisma:generate"] },
         "serve": { "cache": false, "persistent": true },
         "convex": { "cache": false, "persistent": true },
         "build": {
