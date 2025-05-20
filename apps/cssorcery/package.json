@@ -6,7 +6,8 @@
         "dev": "next dev --turbopack",
         "build": "next build",
         "serve": "next start",
-        "lint": "eslint"
+        "lint": "eslint",
+        "typecheck": "tsc"
     },
     "dependencies": {
         "@tailwindcss/typography": "0.5.16",
@@ -18,7 +19,7 @@
     },
     "devDependencies": {
         "@tailwindcss/postcss": "4.1.7",
-        "@types/node": "22.15.19",
+        "@types/node": "22.15.20",
         "@types/react": "19.1.4",
         "@types/react-dom": "19.1.5",
         "postcss": "8.5.3",

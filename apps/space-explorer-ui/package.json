@@ -7,12 +7,12 @@
         "dev": "vite",
         "build": "run-p typecheck build:vite",
         "build:vite": "vite build",
+        "build:clean": "rimraf dist",
         "serve": "run-s build:clean build:vite preview",
         "preview": "vite preview",
         "lint": "eslint",
         "typecheck": "tsc",
-        "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\"",
-        "build:clean": "rimraf dist"
+        "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\""
     },
     "dependencies": {
         "@apollo/client": "3.13.8",
@@ -27,7 +27,7 @@
         "react-hook-form": "7.56.4",
         "react-router-dom": "7.6.0",
         "styled-components": "6.1.18",
-        "zod": "3.25.4"
+        "zod": "3.25.7"
     },
     "devDependencies": {
         "@graphql-codegen/cli": "5.0.6",
@@ -36,7 +36,7 @@
         "@graphql-codegen/typescript-operations": "4.6.1",
         "@graphql-codegen/typescript-react-apollo": "4.3.2",
         "@types/debug": "4.1.12",
-        "@types/node": "22.15.19",
+        "@types/node": "22.15.20",
         "@types/react": "19.1.4",
         "@types/react-dom": "19.1.5",
         "@vitejs/plugin-react-swc": "3.9.0",
