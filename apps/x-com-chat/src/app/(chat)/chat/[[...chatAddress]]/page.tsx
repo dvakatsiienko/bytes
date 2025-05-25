@@ -37,9 +37,7 @@ export default async function ChatPage(props: ChatPageProps) {
         redirectToValidAddress = true;
     }
 
-    const friendName = friendList
-        .find((friend) => friend._id === friendId)
-        ?.name?.toLocaleLowerCase();
+    const friendName = friendList.find((friend) => friend._id === friendId)?.name?.toLocaleLowerCase();
 
     const chat = await fetchMutation(api.chat.initChat, { chatId, friendId });
     if (!chat) redirect(`/404`);
@@ -52,16 +50,10 @@ export default async function ChatPage(props: ChatPageProps) {
 
     if (redirectToValidAddress) redirect(`/chat/${chat._id}/${friendId}`);
 
-    const chatHistory = preloadedQueryResult(
-        await preloadQuery(api.chat.getChatHistory, { chatId }),
-    );
+    const chatHistory = preloadedQueryResult(await preloadQuery(api.chat.getChatHistory, { chatId }));
 
     return (
-        <section
-            className={cn(
-                styles['chat-layout'],
-                'mx-auto grid w-full max-w-7xl gap-4 px-2 xl:pr-0',
-            )}>
+        <section className={cn(styles['chat-layout'], 'mx-auto grid w-full max-w-7xl gap-4 px-2 xl:pr-0')}>
             <section className='hidden place-items-center [grid-area:image] md:grid'>
                 <Image
                     priority

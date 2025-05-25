@@ -15,6 +15,7 @@
         "build": "turbo build",
         "build:space-explorer/ui": "turbo space-explorer/ui#build",
         "build:cv": "turbo cv#build",
+        "build:x-com-chat": "turbo x-com-chat#build",
         "build:cssorcery": "turbo cssorcery#build",
         "build:financial": "turbo financial#build",
         "lint": "turbo lint",
