@@ -12,7 +12,7 @@ import { ToolSection } from './parts/ToolSection';
 
 /* Instruments */
 import * as links from '@/links';
-import { __DEV__, EMAIL_TO } from '@/falgs';
+import { __DEV__, EMAIL_TO } from '@/frags';
 import {
     toolListCore,
     toolListState,
