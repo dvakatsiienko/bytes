@@ -13,6 +13,7 @@ import {
     Edge,
     Handle,
     Position,
+    ConnectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -47,10 +48,14 @@ export default function HomePage() {
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
+                onConnect={undefined}
                 fitView
                 className='bg-transparent'
-                nodeTypes={nodeTypes}>
+                nodeTypes={nodeTypes}
+                nodesDraggable={true}
+                nodesConnectable={false}
+                elementsSelectable={true}
+                connectionMode={ConnectionMode.Loose}>
                 <Background color='#94a3b8' gap={20} />
                 <Controls className='rounded-lg border border-slate-200 bg-white/80 backdrop-blur-sm' />
                 <MiniMap
@@ -75,46 +80,46 @@ interface CustomNodeProps {
 // Custom node components
 const RouteNode = ({ data }: CustomNodeProps) => (
     <div className='min-w-48 rounded-lg border-2 border-blue-200 bg-blue-50 px-4 py-3 shadow-sm'>
-        <Handle type="target" position={Position.Top} />
+        <Handle type='target' position={Position.Top} />
         <div className='text-sm font-semibold text-blue-900'>{data.label}</div>
         <div className='mt-1 text-xs text-blue-700'>{data.description}</div>
-        <Handle type="source" position={Position.Bottom} />
+        <Handle type='source' position={Position.Bottom} />
     </div>
 );
 
 const ApiNode = ({ data }: CustomNodeProps) => (
     <div className='min-w-48 rounded-lg border-2 border-green-200 bg-green-50 px-4 py-3 shadow-sm'>
-        <Handle type="target" position={Position.Top} />
+        <Handle type='target' position={Position.Top} />
         <div className='text-sm font-semibold text-green-900'>{data.label}</div>
         <div className='mt-1 text-xs text-green-700'>{data.description}</div>
-        <Handle type="source" position={Position.Bottom} />
+        <Handle type='source' position={Position.Bottom} />
     </div>
 );
 
 const DatabaseNode = ({ data }: CustomNodeProps) => (
     <div className='min-w-48 rounded-lg border-2 border-purple-200 bg-purple-50 px-4 py-3 shadow-sm'>
-        <Handle type="target" position={Position.Top} />
+        <Handle type='target' position={Position.Top} />
         <div className='text-sm font-semibold text-purple-900'>{data.label}</div>
         <div className='mt-1 text-xs text-purple-700'>{data.description}</div>
-        <Handle type="source" position={Position.Bottom} />
+        <Handle type='source' position={Position.Bottom} />
     </div>
 );
 
 const ComponentNode = ({ data }: CustomNodeProps) => (
     <div className='min-w-48 rounded-lg border-2 border-orange-200 bg-orange-50 px-4 py-3 shadow-sm'>
-        <Handle type="target" position={Position.Top} />
+        <Handle type='target' position={Position.Top} />
         <div className='text-sm font-semibold text-orange-900'>{data.label}</div>
         <div className='mt-1 text-xs text-orange-700'>{data.description}</div>
-        <Handle type="source" position={Position.Bottom} />
+        <Handle type='source' position={Position.Bottom} />
     </div>
 );
 
 const ExternalNode = ({ data }: CustomNodeProps) => (
     <div className='min-w-48 rounded-lg border-2 border-slate-300 bg-slate-50 px-4 py-3 shadow-sm'>
-        <Handle type="target" position={Position.Top} />
+        <Handle type='target' position={Position.Top} />
         <div className='text-sm font-semibold text-slate-900'>{data.label}</div>
         <div className='mt-1 text-xs text-slate-700'>{data.description}</div>
-        <Handle type="source" position={Position.Bottom} />
+        <Handle type='source' position={Position.Bottom} />
     </div>
 );
 
@@ -211,7 +216,7 @@ const initialNodes = [
     {
         id: 'chat-component',
         type: 'component',
-        position: { x: 150, y: 450 },
+        position: { x: 10, y: 450 },
         data: {
             label: 'Chat Component',
             description: 'Main chat interface with useChat hook',
@@ -231,7 +236,7 @@ const initialNodes = [
     {
         id: 'chat-api',
         type: 'api',
-        position: { x: 150, y: 600 },
+        position: { x: 10, y: 600 },
         data: {
             label: 'POST /api/chat',
             description: 'Streams AI responses using Groq/OpenRouter LLMs',
@@ -240,7 +245,7 @@ const initialNodes = [
     {
         id: 'friends-api',
         type: 'api',
-        position: { x: 400, y: 600 },
+        position: { x: 350, y: 600 },
         data: {
             label: 'GET /api/friends',
             description: 'Fetches available AI friends from Prisma',
@@ -271,7 +276,7 @@ const initialNodes = [
     {
         id: 'convex-db',
         type: 'database',
-        position: { x: 150, y: 750 },
+        position: { x: 10, y: 750 },
         data: {
             label: 'Convex Database',
             description: 'Real-time database for chats and friends',
@@ -280,7 +285,7 @@ const initialNodes = [
     {
         id: 'convex-functions',
         type: 'database',
-        position: { x: 400, y: 750 },
+        position: { x: 300, y: 750 },
         data: {
             label: 'Convex Functions',
             description: 'getFriendList, getChatHistory, saveChatHistory, initChat',
@@ -325,10 +330,3 @@ const initialEdges = [
     { id: 'e4', source: 'root-layout', target: 'settings-route' },
     { id: 'e5', source: 'chat-route', target: 'chat-component' },
 ];
-
-// export default function App() {
-//   return (
-//     <div style={{ width: '100vw', height: '100vh' }}>
-//     </div>
-//   );
-// }
