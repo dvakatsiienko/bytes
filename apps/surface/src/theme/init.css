@@ -1,0 +1,22 @@
+@import '@ui/kit/globals.css';
+@plugin '@tailwindcss/typography';
+@plugin 'tailwind-scrollbar' {
+    nocompatible: true;
+    preferredstrategy: 'pseudoelements';
+}
+
+@import './accent.css';
+@import './gray.css';
+@import './accent.css';
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+@layer base {
+}
+
+@layer components {
+}
+
+@theme inline {
+    --color-test: #141617;
+}

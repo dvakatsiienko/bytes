@@ -7,7 +7,7 @@ import type { Metadata } from 'next';
 import { ExternalLink } from '@/elements/ExternalLink';
 
 /* Instruments */
-import { EMAIL_TO } from '@/frags';
+import { EMAIL_TO } from '@/falgs';
 import {
     LINK_ID_CV_TOOLS,
     LINK_X_COM_CHAT,
