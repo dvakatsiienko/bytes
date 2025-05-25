@@ -5,13 +5,14 @@ import { cva, cx } from 'cva';
 import { ThemeSwitcher } from '../service/ThemeSwitcher';
 import { LinkActive } from './LinkActive';
 
-export const Browser = (props: React.PropsWithChildren) => {
+export const Browser = (props: BrowserProps) => {
     return (
         <section
             className={cx(
                 '[--header-height:40px]',
-                'browser mt-20 max-h-[90dvh] w-full max-w-3xl self-start',
+                'browser max-h-[90dvh] w-full max-w-3xl',
                 'rounded-xl shadow-2xl',
+                props.className,
             )}>
             {/* todo look for better line height */}
 
@@ -42,7 +43,7 @@ export const Browser = (props: React.PropsWithChildren) => {
 
             <section
                 className={cx(
-                    'max-h-[calc(90dvh-var(--header-height))]',
+                    'max-h-[calc(var(--browser-height)-var(--header-height))]',
                     'rounded-b-xl px-4 pb-4 md:px-6',
                     'bg-background',
                     'overflow-y-scroll print:max-h-none print:overflow-y-visible',
@@ -74,3 +75,8 @@ const dotCn = cva({
 const linkCn = cva({
     base: cx('w-full h-min bg-background rounded-md'),
 });
+
+/* Types */
+interface BrowserProps extends React.PropsWithChildren {
+    className?: string;
+}
