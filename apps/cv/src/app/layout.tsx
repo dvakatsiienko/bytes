@@ -29,11 +29,14 @@ export default (props: React.PropsWithChildren) => {
                 <ThemeProvider>
                     <section
                         className={cx(
-                            'grid grid-cols-[1fr,minmax(auto,1280px),1fr]',
-                            'place-items-center',
+                            '[--browser-height:90dvh]',
+                            'grid',
+                            'grid-rows-[5vh_var(--browser-height)_5vh]',
                             'px-4 md:px-8',
+                            'place-items-center',
+                            //
                         )}>
-                        <Browser>{props.children}</Browser>
+                        <Browser className='row-start-2 self-start'>{props.children}</Browser>
                     </section>
                 </ThemeProvider>
             </body>
