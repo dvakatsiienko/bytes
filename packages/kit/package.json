@@ -17,8 +17,8 @@
         "react": "19.1.0",
         "react-dom": "19.1.0",
         "tailwind-merge": "3.3.0",
-        "tw-animate-css": "1.3.0",
-        "zod": "3.25.32"
+        "tw-animate-css": "1.3.2",
+        "zod": "3.25.39"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "4.1.8",
