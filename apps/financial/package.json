@@ -31,7 +31,7 @@
         "rimraf": "6.0.1",
         "use-debounce": "10.0.4",
         "waait": "1.0.5",
-        "zod": "3.25.39"
+        "zod": "3.25.42"
     },
     "devDependencies": {
         "@swc-node/register": "1.10.10",
@@ -39,7 +39,7 @@
         "@tailwindcss/forms": "0.5.10",
         "@tailwindcss/postcss": "4.1.8",
         "@tanstack/react-query-devtools": "5.79.0",
-        "@types/node": "22.15.26",
+        "@types/node": "22.15.29",
         "@types/react": "19.1.6",
         "@types/react-dom": "19.1.5",
         "postcss": "8.5.4",

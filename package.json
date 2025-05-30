@@ -29,14 +29,14 @@
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
-        "eslint": "9.27.0",
+        "eslint": "9.28.0",
         "eslint-config-polished": "workspace:*",
         "prettier": "3.5.3",
         "prettier-config-polished": "workspace:*",
         "prettier-eslint": "16.4.2",
-        "prettier-plugin-tailwindcss": "0.6.11",
+        "prettier-plugin-tailwindcss": "0.6.12",
         "rimraf": "6.0.1",
-        "turbo": "2.5.3",
+        "turbo": "2.5.4",
         "typescript": "5.8.3"
     },
     "engines": {
