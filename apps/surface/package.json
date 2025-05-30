@@ -18,7 +18,7 @@
         "@tailwindcss/postcss": "4.1.8",
         "@ui/kit": "workspace:*",
         "@xyflow/react": "12.6.4",
-        "cva": "1.0.0-beta.3",
+        "cva": "1.0.0-beta.4",
         "lucide-react": "0.511.0",
         "next": "15.4.0-canary.18",
         "next-themes": "0.4.6",
