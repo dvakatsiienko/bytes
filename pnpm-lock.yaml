@@ -36,49 +36,6 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
 
-  apps/cssorcery:
-    dependencies:
-      '@tailwindcss/typography':
-        specifier: 0.5.16
-        version: 0.5.16(tailwindcss@4.1.8)
-      class-variance-authority:
-        specifier: 0.7.1
-        version: 0.7.1
-      next:
-        specifier: 15.3.3
-        version: 15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      react:
-        specifier: 19.1.0
-        version: 19.1.0
-      react-dom:
-        specifier: 19.1.0
-        version: 19.1.0(react@19.1.0)
-      utils:
-        specifier: workspace:*
-        version: link:../../packages/utils
-    devDependencies:
-      '@tailwindcss/postcss':
-        specifier: 4.1.8
-        version: 4.1.8
-      '@types/node':
-        specifier: 22.15.29
-        version: 22.15.29
-      '@types/react':
-        specifier: 19.1.6
-        version: 19.1.6
-      '@types/react-dom':
-        specifier: 19.1.5
-        version: 19.1.5(@types/react@19.1.6)
-      postcss:
-        specifier: 8.5.4
-        version: 8.5.4
-      tailwindcss:
-        specifier: 4.1.8
-        version: 4.1.8
-      typescript:
-        specifier: 5.8.3
-        version: 5.8.3
-
   apps/cv:
     dependencies:
       '@styled-icons/ionicons-sharp':
@@ -87,9 +44,6 @@ importers:
       '@styled-icons/styled-icon':
         specifier: 10.7.1
         version: 10.7.1(react@19.1.0)(styled-components@6.1.18(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      '@tailwindcss/postcss':
-        specifier: 4.1.8
-        version: 4.1.8
       '@ui/kit':
         specifier: workspace:*
         version: link:../../packages/kit
@@ -105,19 +59,16 @@ importers:
       next-themes:
         specifier: 0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      postcss:
-        specifier: 8.5.4
-        version: 8.5.4
       react:
         specifier: 19.1.0
         version: 19.1.0
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
-      tailwindcss:
+    devDependencies:
+      '@tailwindcss/postcss':
         specifier: 4.1.8
         version: 4.1.8
-    devDependencies:
       '@tailwindcss/typography':
         specifier: 0.5.16
         version: 0.5.16(tailwindcss@4.1.8)
@@ -139,12 +90,64 @@ importers:
       mosaic:
         specifier: 1.1.0
         version: 1.1.0
+      postcss:
+        specifier: 8.5.4
+        version: 8.5.4
       prettier:
         specifier: 3.5.3
         version: 3.5.3
       tailwind-scrollbar:
         specifier: 4.0.2
         version: 4.0.2(react@19.1.0)(tailwindcss@4.1.8)
+      tailwindcss:
+        specifier: 4.1.8
+        version: 4.1.8
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+
+  apps/figmentation:
+    dependencies:
+      '@ui/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+      class-variance-authority:
+        specifier: 0.7.1
+        version: 0.7.1
+      next:
+        specifier: 15.3.3
+        version: 15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: 19.1.0
+        version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: 4.1.8
+        version: 4.1.8
+      '@tailwindcss/typography':
+        specifier: 0.5.16
+        version: 0.5.16(tailwindcss@4.1.8)
+      '@types/node':
+        specifier: 22.15.29
+        version: 22.15.29
+      '@types/react':
+        specifier: 19.1.6
+        version: 19.1.6
+      '@types/react-dom':
+        specifier: 19.1.5
+        version: 19.1.5(@types/react@19.1.6)
+      postcss:
+        specifier: 8.5.4
+        version: 8.5.4
+      prettier:
+        specifier: 3.5.3
+        version: 3.5.3
+      tailwindcss:
+        specifier: 4.1.8
+        version: 4.1.8
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -700,6 +703,12 @@ importers:
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      postcss:
+        specifier: 8.5.4
+        version: 8.5.4
+      prettier:
+        specifier: 3.5.3
+        version: 3.5.3
       tailwindcss:
         specifier: 4.1.8
         version: 4.1.8
@@ -5222,6 +5231,7 @@ packages:
     resolution: {integrity: sha512-Quz3MvAwHxVYNXsOByL7xI5EB2WYOeFswqaHIA3qOK3isRWTxiplBEocmmru6XmxDB2L7jDNYtYA4FyimoAFEw==}
     engines: {node: '>=8.17.0'}
     hasBin: true
+    bundledDependencies: []
 
   jsondiffpatch@0.6.0:
     resolution: {integrity: sha512-3QItJOXp2AP1uv7waBkao5nCvhEv+QmJAd38Ybq7wNI74Q+BBmnLn4EDKz6yI9xGAIQoUF87qHt+kc1IVxB4zQ==}

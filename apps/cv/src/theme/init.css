@@ -7,7 +7,6 @@
 
 @import './accent.css';
 @import './gray.css';
-@import './accent.css';
 
 @custom-variant dark (&:is(.dark, .dark *));
 

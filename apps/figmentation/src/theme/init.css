@@ -1,0 +1,10 @@
+/* @import '@ui/kit/globals.css'; */
+@import '@ui/kit/globals.css';
+@plugin '@tailwindcss/typography';
+
+@layer base {
+    @font-face {
+        font-family: roboto, system-ui, sans-serif;
+        font-style: normal;
+    }
+}

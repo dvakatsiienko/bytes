@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* TODO learn how @source directive works presicely */
+/* Tailwind classes scan scope */
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../../../components/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";

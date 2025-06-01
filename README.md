@@ -6,6 +6,8 @@
 
 ## 🛸 Apps
 
+Apps made during my r'n'd or vibe coded.
+
 #### ✈️ My CV and Cover
 
 [Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cv)
@@ -29,12 +31,14 @@
 [Website](https://financical.vercel.app/) |
 [Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/financial)
 
-## 🎨 CSSorcery
+## 🎨 Engineering and Design
+
+Apps made during my Figma UI prototyping exploration.
 
 #### ☘️ Clinique
 
-[Website](https://cssorcery.vercel.app/clinique) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/cssorcery)
+[Website](https://figmentation.vercel.app/clinique) |
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/figmentation)
 
 ## 🧰 Libraries
 

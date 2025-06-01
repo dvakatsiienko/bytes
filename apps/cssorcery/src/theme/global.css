@@ -1,9 +1,0 @@
-@import 'tailwindcss';
-@plugin '@tailwindcss/typography';
-
-@layer base {
-    @font-face {
-        font-family: roboto, system-ui, sans-serif;
-        font-style: normal;
-    }
-}
