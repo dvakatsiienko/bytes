@@ -38,7 +38,8 @@ Apps made during my Figma UI prototyping exploration.
 #### ☘️ Clinique
 
 [Website](https://figmentation.vercel.app/clinique) |
-[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/figmentation)
+[Source](https://github.com/dvakatsiienko/turborepo/tree/main/apps/figmentation) |
+[Figma file](https://www.figma.com/design/C83qYEFPJ8C66yIrTjEk29/Clinique?m=auto&t=p08olW2Pvhdsl68U-6)
 
 ## 🧰 Libraries
 
