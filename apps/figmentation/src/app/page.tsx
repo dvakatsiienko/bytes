@@ -19,6 +19,16 @@ const WelcomePage = () => {
                 </div>
 
                 <section className='grid gap-8 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3'>
+                    {process.env.NODE_ENV === 'development' && (
+                        <ProjectCard
+                            title='Tesla Landing'
+                            description='A Tesla landing page recreated leveraging Figma components, styles and variables.'
+                            hrefApp='/tesla-landing'
+                            hrefFigmaFile='https://www.figma.com/design/Y3EMdzRixSbFPYE016vexe/tesla-landing?m=auto&t=p08olW2Pvhdsl68U-1'
+                            imageSrc='/tesla-landing/landing-american-heroes.jpg'
+                            imageAlt='Tesla landing page preview image'
+                        />
+                    )}
                     <ProjectCard
                         title='Clinique'
                         description='Clinique is an online store for cosmetics and makeup tools. While learning Figma basics, I`ve made a simple prototype and reflected it in the code.'
@@ -26,15 +36,6 @@ const WelcomePage = () => {
                         imageSrc='/clinique/preface.jpg'
                         imageAlt='Clinique store preface image'
                         hrefFigmaFile='https://www.figma.com/design/C83qYEFPJ8C66yIrTjEk29/Clinique?m=auto&t=p08olW2Pvhdsl68U-6'
-                    />
-
-                    <ProjectCard
-                        title='Tesla Landing'
-                        description='A Tesla landing page recreated leveraging Figma components, styles and variables.'
-                        hrefApp='/tesla-landing'
-                        hrefFigmaFile='https://www.figma.com/design/Y3EMdzRixSbFPYE016vexe/tesla-landing?m=auto&t=p08olW2Pvhdsl68U-1'
-                        imageSrc='/tesla-landing/landing-american-heroes.jpg'
-                        imageAlt='Tesla landing page preview image'
                     />
                 </section>
             </div>
@@ -47,7 +48,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
     const { title, description, hrefApp, hrefFigmaFile, imageSrc, imageAlt } = props;
 
     return (
-        <article className='group grid cursor-pointer grid-rows-[auto_1fr] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'>
+        <article className='group relative grid cursor-pointer grid-rows-[auto_1fr] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'>
             <div className='relative overflow-hidden'>
                 <NextImage
                     alt={imageAlt}
@@ -72,7 +73,11 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
                             'bg-gray-900 hover:bg-gray-700',
                             'text-sm font-medium text-white',
                         )}>
-                        <NextLink href={hrefApp}>Visit</NextLink>
+                        <NextLink href={hrefApp}>
+                            Visit
+                            {/* this span makes entire card to act as a link */}
+                            <span className='z-1 absolute inset-0' />
+                        </NextLink>
                     </Button>
 
                     {hrefFigmaFile && (
@@ -84,6 +89,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
                                 'hover:bg-gray-50',
                                 'text-sm font-medium text-gray-700',
                                 'border border-gray-300',
+                                'z-2',
                             )}>
                             <NextLink href={hrefFigmaFile} target='_blank' rel='noopener noreferrer'>
                                 <FigmaSVG className='size-3' />
