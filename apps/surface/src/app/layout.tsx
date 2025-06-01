@@ -27,6 +27,5 @@ export default (props: React.PropsWithChildren) => {
 };
 
 export const metadata: Metadata = {
-    title: 'Dima Vakatsiienko',
-    description: 'Dima Vakatsiienko CV, Dima Vakatsiienko, Vakatsiienko Dmytro Viktorovytch',
+    title: 'Surface',
 };
