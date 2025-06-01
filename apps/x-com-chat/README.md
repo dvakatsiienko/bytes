@@ -15,7 +15,7 @@
 - 🏗️ [Radix primitives](https://www.radix-ui.com/) — a really good headless component lib,
   [chadcn/ui](https://ui.shadcn.com/) probably also worth to consider
 - 🎨 [Radix palette creator](https://www.radix-ui.com/colors/custom) — for creating theming color pallettes
-- 💈 [class-variance-authority](https://beta.cva.style/) — a small but powerful utility intended for creating robust
+- 💈 [cva](https://beta.cva.style/) — a small but powerful utility intended for creating robust
   component styles composition
 - 🎞️ [motion](https://motion.dev/) — one of the best-in-class animation libs out there
 
