@@ -48,7 +48,12 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
     const { title, description, hrefApp, hrefFigmaFile, imageSrc, imageAlt } = props;
 
     return (
-        <article className='group relative grid cursor-pointer grid-rows-[auto_1fr] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'>
+        <article
+            className={cn(
+                'group relative isolate grid grid-rows-[auto_1fr] overflow-hidden rounded-2xl',
+                'bg-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl',
+                'cursor-pointer',
+            )}>
             <div className='relative overflow-hidden'>
                 <NextImage
                     alt={imageAlt}

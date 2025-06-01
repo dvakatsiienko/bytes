@@ -1,6 +1,6 @@
 /* Types */
 import type { Node, Edge } from '@xyflow/react';
-import type { NodeData } from '@/components/FlowNodes';
+import type { NodeData } from '@/elements/FlowNode';
 
 export const initialNodes: Node<NodeData>[] = [
     // Root Layout - Top Level
