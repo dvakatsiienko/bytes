@@ -1,16 +1,16 @@
 /* Core */
-import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'cva';
 
 /* Instruments */
-import { cn } from '@ui/kit/lib/utils';
+import { cn } from '../lib';
 
-function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
+const Button: React.FC<ButtonProps> = (props) => {
+    const { className, variant, size, asChild = false, ...restProps } = props;
     const Comp = asChild ? Slot : 'button';
 
-    return <Comp data-slot='button' className={cn(buttonVariants({ variant, size, className }))} {...props} />;
-}
+    return <Comp data-slot='button' className={cn(buttonVariants({ variant, size, className }))} {...restProps} />;
+};
 
 /* Styles */
 const buttonVariants = cva({

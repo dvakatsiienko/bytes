@@ -13,7 +13,7 @@ This is a Turborepo-powered monorepo containing several web applications and sha
 - **space-explorer-ui** - Apollo GraphQL frontend built with Vite and React
 - **space-explorer-api** - GraphQL API server using Apollo Server and Prisma
 - **financial** - Financial dashboard app built with Next.js (WIP)
-- **cssorcery** - CSS showcase with Clinique demo using Next.js
+- **figmentation** - CSS showcase with Clinique demo using Next.js
 
 ## Shared Packages
 
@@ -29,13 +29,13 @@ This is a Turborepo-powered monorepo containing several web applications and sha
 pnpm dev:cv              # Run CV app
 pnpm dev:x-com-chat      # Run X-COM Chat app with Convex
 pnpm dev:@space-explorer # Run both Space Explorer UI and API
-pnpm dev:cssorcery       # Run CSSorcery app
+pnpm dev:figmentation       # Run figmentation app
 pnpm dev:financial       # Run Financial app
 
 # Building
 pnpm build               # Build all apps
 pnpm build:cv            # Build CV app
-pnpm build:cssorcery     # Build CSSorcery app
+pnpm build:figmentation     # Build figmentation app
 pnpm build:financial     # Build Financial app
 pnpm build:space-explorer/ui # Build Space Explorer UI
 
@@ -52,7 +52,7 @@ pnpm packages:reinstall  # Reinstall all dependencies
 
 Each app has its own scripts that follow similar patterns:
 
-#### Next.js Apps (cv, x-com-chat, financial, cssorcery)
+#### Next.js Apps (cv, x-com-chat, financial, figmentation)
 
 ```bash
 # Inside app directory

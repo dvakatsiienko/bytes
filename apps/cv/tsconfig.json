@@ -1,4 +1,7 @@
 {
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "exclude": ["node_modules", ".next"],
     "compilerOptions": {
         "target": "ES2017",
         "lib": ["dom", "dom.iterable", "esnext"],
@@ -15,7 +18,5 @@
         "incremental": true,
         "plugins": [{ "name": "next" }],
         "paths": { "@/*": ["./src/*"], "/public/*": ["./public/*"], "@ui/kit/*": ["../../packages/ui/src/*"] }
-    },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-    "exclude": ["node_modules", ".next"]
+    }
 }

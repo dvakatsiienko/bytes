@@ -31,6 +31,8 @@ import logoJpeg from '/public/logo.jpeg';
 
 // import { Masonry } from 'masonic';
 // import { EasyMasonryComponent } from './EasyMasonryComponent';
+import { ExternalLinkSvg } from '@ui/kit/icons/ExternalLinkSvg';
+import { Button } from '@ui/kit/components/button';
 
 export default function CVPage() {
     const briefSectionCn = cx('grid grid-cols-[minmax(auto,max-content)_auto] gap-x-4');
@@ -42,6 +44,8 @@ export default function CVPage() {
                 // todo do something with txt size and line height
                 'max-w-8xl text-sm/snug',
             )}>
+            <Button variant='destructive'>Click me <ExternalLinkSvg /></Button>
+
             {/* <EasyMasonryComponent /> */}
             <SectionHeading className='mt-4' accentColor='sky' text='brief' />
 
