@@ -2,7 +2,7 @@
 import type { SVGProps } from 'react';
 
 /* Instruments */
-import { cn } from '../lib/utils.ts';
+import { cn } from '../lib/utils';
 
 export const ExternalLinkSvg = (props: SVGProps<SVGSVGElement>) => {
     const { className, ...restProps } = props;
