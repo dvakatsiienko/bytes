@@ -8,10 +8,19 @@ import type { Metadata } from 'next';
 import { Button } from '@ui/kit/components/button';
 import { LogoTeslaSvg, GlobeSvg, QuestionmarkSvg, UserSvg } from './svg';
 
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from '@ui/kit/components/drawer';
+
 /* Instruments */
 import { cn } from '@ui/kit/lib/utils';
-// import './tesla-landing-theme.css';
-//
 
 const buttonTesla = cva({
     base: cn('rounded-sm flex-1 min-w-[160px] max-w-[200px] h-10', ''),
@@ -61,9 +70,25 @@ const Header = () => {
                 <UserSvg />
             </div>
 
-            <Button className='xl:hidden' variant='link'>
-                Menu
-            </Button>
+            <Drawer direction='top'>
+                <DrawerTrigger asChild>
+                    <Button className='xl:hidden' variant='link'>
+                        Menu
+                    </Button>
+                </DrawerTrigger>
+                <DrawerContent className='top-14! after:unset!'>
+                    <DrawerHeader>
+                        <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+                        <DrawerDescription>This action cannot be undone.</DrawerDescription>
+                    </DrawerHeader>
+                    <DrawerFooter>
+                        <Button>Submit</Button>
+                        <DrawerClose>
+                            <Button variant='outline'>Cancel</Button>
+                        </DrawerClose>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
         </header>
     );
 };
