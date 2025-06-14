@@ -95,7 +95,6 @@ const modelProvider = customProvider({
             middleware: extractReasoningMiddleware({ tagName: 'think' }),
             model: groq('deepseek-r1-distill-llama-70b'),
         }),
-        'llama-3.3-70b-versatile': groq('llama-3.3-70b-versatile'),
     },
 });
 
