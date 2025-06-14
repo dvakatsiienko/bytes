@@ -2,7 +2,7 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
-import type { User } from '.prisma/client/edge';
+import type { User } from '~/prisma/client/edge';
 
 /* Instruments */
 import { prisma } from '@/lib';
