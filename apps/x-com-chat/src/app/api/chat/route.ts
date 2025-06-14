@@ -50,7 +50,7 @@ export async function POST(req: Request) {
             // model: openrouter('google/gemini-2.0-flash-001'),
             // model: openrouter('deepseek/deepseek-chat-v3-0324:free'),
             // model: modelProvider.languageModel('llama-3.1-8b-instant'), // ? quick
-            model: modelProvider.languageModel('llama3-70b-8192'), // ? conversational // TODO deprecates on august 31, find another one
+            model: modelProvider.languageModel('llama-3.3-70b-versatile'), // ? conversational // TODO deprecates on august 31, find another one
             system: chatFriend?.system,
             messages: allMessages,
             experimental_generateMessageId: createIdGenerator({
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- for testing
 const modelProvider = customProvider({
     languageModels: {
-        'llama3-70b-8192': groq('llama3-70b-8192'),
+        'llama-3.3-70b-versatile': groq('llama-3.3-70b-versatile'),
         'llama-3.1-8b-instant': groq('llama-3.1-8b-instant'),
         'deepseek-r1-distill-llama-70b': wrapLanguageModel({
             middleware: extractReasoningMiddleware({ tagName: 'think' }),
