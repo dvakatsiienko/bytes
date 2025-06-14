@@ -1,5 +1,5 @@
 /* Core */
-import type { Invoice } from '.prisma/client';
+import type { Invoice } from '.prisma/client/edge';
 
 /* Instruments */
 import { prisma } from './prisma';

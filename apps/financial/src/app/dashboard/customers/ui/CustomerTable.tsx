@@ -1,7 +1,7 @@
 /* Core */
 import { Suspense } from 'react';
 import Image from 'next/image';
-import type { Customer } from '.prisma/client';
+import type { Customer } from '.prisma/client/edge';
 
 /* Components */
 import { SearchField } from '@/ui/SearchField';
