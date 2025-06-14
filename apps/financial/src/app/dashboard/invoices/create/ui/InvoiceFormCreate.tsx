@@ -9,7 +9,7 @@ import {
     CurrencyDollarIcon,
     UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import type { Customer } from '.prisma/client/edge';
+import type { Customer } from '~/prisma/client/edge';
 
 /* Components */
 import { Button } from '@/ui/Button';
