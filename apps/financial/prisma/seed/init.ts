@@ -1,5 +1,5 @@
 /* Core */
-import { PrismaClient } from '.prisma/client';
+import { PrismaClient } from '.prisma/client/edge';
 
 /* Instruments */
 import { invoices, customers, revenue, users } from './seed-data';
