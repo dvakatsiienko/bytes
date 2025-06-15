@@ -1,6 +1,7 @@
 /* Core */
 import Image from 'next/image';
 import NextLink from 'next/link';
+import NextImage from 'next/image';
 import { cva, type VariantProps } from 'cva';
 import type { Metadata } from 'next';
 
@@ -21,6 +22,7 @@ import {
 
 /* Instruments */
 import { cn } from '@ui/kit/lib/utils';
+import landingModelYMobile from '/public/tesla-landing/landing-model-y-mobile.avif';
 
 const buttonTesla = cva({
     base: cn('rounded-sm flex-1 min-w-[160px] max-w-[200px] h-10', ''),
@@ -28,17 +30,26 @@ const buttonTesla = cva({
 
 const TeslaLandingPage = () => {
     return (
-        <main className='px-5 sm:px-16 sm:text-lg'>
+        <main className='sm:text-lg'>
             <Header />
 
-            <section className='hero grid min-h-screen'>
-                <section className='meta mx-auto grid w-full max-w-md content-center gap-4'>
-                    <section className='grid place-items-center gap-2'>
-                        <h1 className='text-6xl font-medium'>Model Y</h1>
+            <section className='hero relative -mt-14 max-h-[500px] min-h-[600px] pt-20'>
+                <NextImage
+                    placeholder='blur'
+                    src={landingModelYMobile}
+                    fill
+                    alt='Tesla Model Y'
+                    className='z-0 max-h-[500px] w-full object-cover'
+                    sizes='(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                />
+
+                <section className='meta isolate z-10 mx-auto grid w-full max-w-md content-center gap-4 px-6'>
+                    <section className='grid place-items-center gap-2 text-white'>
+                        <h1 className='text-5xl font-medium'>Model Y</h1>
                         <p className='text-lg'>1.99% APR Ending June 16</p>
                     </section>
 
-                    <section className='mx-auto flex w-full max-w-[408px] gap-2'>
+                    <section className='mx-auto flex w-full max-w-[408px] flex-col items-center gap-2'>
                         <Button className={buttonTesla()}>Order Now</Button>
                         <Button variant='outline' className={buttonTesla()}>
                             View Inventory
@@ -47,7 +58,7 @@ const TeslaLandingPage = () => {
                 </section>
             </section>
 
-            <div className='bg-tesla-accent-500 size-40'></div>
+            {/* <div className='bg-tesla-accent-500 size-40'></div> */}
         </main>
     );
 };
@@ -61,14 +72,14 @@ const Header = () => {
 
     return (
         <header className={headerVariants()}>
-            <LogoTeslaSvg />
-            <nav className='hidden xl:flex'>{navLinkListJSX}</nav>
+            <LogoTeslaSvg className='tesla-tablet:fill-black fill-white' />
+            {/* <nav className='hidden xl:flex'>{navLinkListJSX}</nav> */}
 
-            <div className='hidden items-center gap-4 xl:flex'>
+            {/* <div className='hidden items-center gap-4 xl:flex'>
                 <GlobeSvg />
                 <QuestionmarkSvg />
                 <UserSvg />
-            </div>
+            </div> */}
 
             <Drawer direction='top'>
                 <DrawerTrigger asChild>
@@ -76,6 +87,7 @@ const Header = () => {
                         Menu
                     </Button>
                 </DrawerTrigger>
+
                 <DrawerContent className='top-14! after:unset!'>
                     <DrawerHeader>
                         <DrawerTitle>Are you absolutely sure?</DrawerTitle>
@@ -93,8 +105,13 @@ const Header = () => {
     );
 };
 
+/* Styles */
 const headerVariants = cva({
-    base: cn('flex items-center justify-between h-14'),
+    base: cn(
+        'flex sticky top-0 items-center justify-between h-14 z-10 isolate px-2',
+        'bg-transparent tesla-tablet:bg-white',
+        // test
+    ),
 });
 
 export const metadata: Metadata = {
