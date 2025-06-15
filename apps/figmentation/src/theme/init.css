@@ -1,17 +1,11 @@
 @import '@ui/kit/globals.css';
 @plugin '@tailwindcss/typography';
 
+@import './theme-tesla-landing.css';
+
 @layer base {
     @font-face {
         font-family: roboto, system-ui, sans-serif;
         font-style: normal;
     }
-}
-
-@theme {
-    --color-tesla-gray-200: #f2f2f2;
-    --color-tesla-gray-300: #eee;
-    --color-tesla-gray-400: #e2e3e3;
-    --color-tesla-gray-600: #5c5e62;
-    --color-tesla-gray-950: #171a20;
 }
