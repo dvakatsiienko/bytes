@@ -17,19 +17,19 @@
         "@apollo/server": "4.12.2",
         "@graphql-tools/graphql-file-loader": "8.0.20",
         "@graphql-tools/load": "8.1.0",
-        "@prisma/client": "6.9.0",
+        "@prisma/client": "6.10.1",
         "chalk": "5.4.1",
         "dotenv": "16.5.0",
         "graphql": "16.11.0",
-        "zod": "3.25.64"
+        "zod": "3.25.67"
     },
     "devDependencies": {
         "@graphql-codegen/cli": "5.0.7",
         "@graphql-codegen/typescript": "4.1.6",
-        "@types/node": "24.0.1",
+        "@types/node": "24.0.3",
         "prettier": "3.5.3",
         "prettier-eslint": "16.4.2",
-        "prisma": "6.9.0",
+        "prisma": "6.10.1",
         "tsx": "4.20.3"
     }
 }
