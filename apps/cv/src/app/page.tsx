@@ -44,7 +44,7 @@ export default function CVPage() {
                 // todo do something with txt size and line height
                 'max-w-8xl text-sm/snug',
             )}>
-            <Button variant='destructive'>Click me <ExternalLinkSvg /></Button>
+            {/* <Button variant='destructive'>Click me <ExternalLinkSvg /></Button> */}
 
             {/* <EasyMasonryComponent /> */}
             <SectionHeading className='mt-4' accentColor='sky' text='brief' />
