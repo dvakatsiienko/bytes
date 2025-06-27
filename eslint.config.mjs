@@ -6,6 +6,6 @@ export default [
     ...polishedConfig,
     {
         name: 'root-config/ignores',
-        ignores: ['**/graphql/**'],
+        ignores: ['**/graphql/**', '**/prisma/migrations/**', '**/.generated/**'],
     },
 ];
