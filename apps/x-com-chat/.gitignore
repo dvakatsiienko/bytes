@@ -40,10 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Turborepo
-.turbo
-
-# clerk configuration (can include secrets)
-/.clerk/
 
 .chats
