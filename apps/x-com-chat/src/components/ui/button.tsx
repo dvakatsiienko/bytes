@@ -33,7 +33,8 @@ export const buttonVariants = cva({
     ),
     variants: {
         variant: {
-            turboSportsbook: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
+            primary: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
+            secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
             destructive:
                 'bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40',
             outline:
