@@ -77,6 +77,9 @@ const selectContentCva = cva({
     base: '',
 });
 
+console.log(selectTriggerCva());
+
+
 /* Types */
 interface SelectProps {
     name: string;
