@@ -43,3 +43,7 @@ yarn-error.log*
 pscale.txt
 
 **/**/prisma/migrations
+
+# TypeScript build info
+*.tsbuildinfo
+tsconfig.tsbuildinfo
