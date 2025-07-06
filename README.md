@@ -2,7 +2,7 @@
 
 # Bytes
 
-🏎️ The monorepo is wired up with [Turborepo](https://turbo.build/).
+🏎️ The monorepo is wired up with [turborepo](https://turbo.build/).
 
 ## 🛸 Apps
 
