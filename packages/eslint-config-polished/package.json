@@ -27,15 +27,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/dvakatsiienko/turborepo.git",
+        "url": "https://github.com/dvakatsiienko/bytes.git",
         "directory": "packages/eslint-config-polished"
     },
-    "homepage": "https://github.com/dvakatsiienko/turborepo/tree/main/packages/eslint-config-polished#readme",
+    "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/eslint-config-polished#readme",
     "keywords": [
         "eslint",
         "eslintconfig"
     ],
     "bugs": {
-        "url": "https://github.com/dvakatsiienko/turborepo/issues"
+        "url": "https://github.com/dvakatsiienko/bytes/issues"
     }
 }
