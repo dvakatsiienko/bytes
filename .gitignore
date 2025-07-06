@@ -31,19 +31,13 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# yarn specifics
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-
-pscale.txt
-
-**/**/prisma/migrations
-
 # TypeScript build info
 *.tsbuildinfo
 tsconfig.tsbuildinfo
+
+# db
+pscale.txt
+**/**/prisma/migrations
+
+# clerk configuration (can include secrets)
+/.clerk/
