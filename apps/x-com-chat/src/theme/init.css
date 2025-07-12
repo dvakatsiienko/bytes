@@ -48,12 +48,6 @@
         @apply text-black;
     }
 
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-        animation: none;
-        mix-blend-mode: normal;
-    }
-
     /* Undo @tailwindcss/forms styles */
     textarea:not([data-slot='increase-selector-specificity']):focus {
         @apply ring-0;
@@ -115,6 +109,34 @@
         animation: shimmer 20s linear infinite;
         background-size: 600% 100%;
     }
+
+
+    /* gradient outline */
+    @keyframes border-spin {
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    .gradient-outline-container {
+        @apply relative overflow-hidden bg-gradient-to-b from-slate-700 to-slate-800;
+    }
+
+    /* Gradient */
+    .gradient-outline-container::before {
+        background: conic-gradient(rgba(244, 114, 182, 0.4) 0deg, rgba(192, 132, 252, 0.4) 0deg, transparent 80deg);
+        /* spinning conic gradient that makes animated outline effect */
+        animation: border-spin 7s linear infinite;
+
+        /* setting gradient offset to make it centered */
+        @apply absolute left-[-25%] top-[-25%] h-[150%] w-[150%] content-[''];
+    }
+
+    .gradient-outline-content {
+        /* stretch content absolutely to cover the most of conic gradient but keep offest (by inset) that reveal animated part of conic gradient */
+        @apply absolute inset-[1px] h-[calc(100%-2px)] w-[calc(100%-2px)] bg-gradient-to-b from-slate-800 to-slate-900;
+    }
+    /* gradient outline */
 
     @keyframes shimmer {
         0% {

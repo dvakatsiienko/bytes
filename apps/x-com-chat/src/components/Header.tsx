@@ -65,10 +65,10 @@ export const Header = (props: HeaderProps) => {
                     <section className='min-w-9'>
                         <AnimatePresence mode='wait'>
                             {isLoaded && !isSignedIn && (
-                                <motion.div key='sign-in' {...fadeAnimation}>
+                                <motion.div key='sign-in' {...fadeAnimation} className=''>
                                     <SignInButton appearance={{ baseTheme: baseTheme }} oauthFlow='popup' mode='modal'>
-                                        <Button variant='ghost' size='icon'>
-                                            🔑
+                                        <Button variant='ghost' size='icon' className='gradient-outline-container'>
+                                            <span className='gradient-outline-content grid place-items-center rounded-md'>🔑</span>
                                         </Button>
                                     </SignInButton>
                                 </motion.div>
