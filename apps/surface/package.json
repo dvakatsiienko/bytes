@@ -17,7 +17,7 @@
         "@styled-icons/styled-icon": "10.7.1",
         "@tailwindcss/postcss": "4.1.11",
         "@ui/kit": "workspace:*",
-        "@xyflow/react": "12.8.1",
+        "@xyflow/react": "12.8.2",
         "cva": "1.0.0-beta.4",
         "lucide-react": "0.525.0",
         "next": "15.4.0-canary.18",
@@ -29,7 +29,7 @@
     },
     "devDependencies": {
         "@tailwindcss/typography": "0.5.16",
-        "@types/node": "24.0.10",
+        "@types/node": "24.0.13",
         "@types/react": "19.1.8",
         "@types/react-dom": "19.1.6",
         "babel-plugin-react-compiler": "19.1.0-rc.2",
