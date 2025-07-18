@@ -14,8 +14,7 @@ Apps made during my r'n'd or vibe coded.
 
 #### 👽 X-COM AI Chat
 
-[Website](https://x-com-chat.vercel.app) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/x-com-chat)
+[Website](https://x-com-chat.vercel.app) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/x-com-chat)
 
 #### 🛰️ Space Explorer UI
 
@@ -26,10 +25,13 @@ Apps made during my r'n'd or vibe coded.
 
 [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/space-explorer-api)
 
+#### 📜 Blog
+
+[Website](https://bytes-astro.vercel.app/) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/astro)
+
 #### 🏄‍♂️ Financial 🚧 WIP 🚧
 
-[Website](https://financical.vercel.app/) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/financial)
+[Website](https://financical.vercel.app/) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/financial)
 
 ## 🎨 Engineering and Design
 
