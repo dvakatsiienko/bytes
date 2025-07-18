@@ -11,5 +11,7 @@ onlyBuiltDependencies:
   - '@swc/core'
   - '@tailwindcss/oxide'
   - esbuild
+  - napi-postinstall
+  - oxc-resolver
   - prisma
   - sharp
