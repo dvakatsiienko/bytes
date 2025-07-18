@@ -1,21 +1,13 @@
 ---
-import '../theme/init.css';
+import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
-<html lang='en'>
-    <head>
-        <meta charset='utf-8' />
-        <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
-        <meta name='viewport' content='width=device-width' />
-        <meta name='generator' content={Astro.generator} />
-        <title>Astro</title>
-    </head>
-
-    <body>
+<BaseLayout title='Home'>
+    <div>
         <a href='/'>Home</a>
         <a href='/about'>About</a>
         <a href='/blog'>Blog</a>
 
         <h1 class='text-3xl font-bold underline'>My Astro Site</h1>
-    </body>
-</html>
+    </div>
+</BaseLayout>
