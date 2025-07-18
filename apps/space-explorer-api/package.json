@@ -15,7 +15,7 @@
     "dependencies": {
         "@apollo/datasource-rest": "6.4.1",
         "@apollo/server": "5.0.0",
-        "@graphql-tools/graphql-file-loader": "8.0.20",
+        "@graphql-tools/graphql-file-loader": "8.0.21",
         "@graphql-tools/load": "8.1.1",
         "@prisma/client": "6.12.0",
         "chalk": "5.4.1",
