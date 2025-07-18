@@ -1,0 +1,13 @@
+---
+import { cva } from 'cva';
+
+const navLink = cva({
+    base: 'text-blue-500 hover:text-blue-600 hover:underline',
+});
+---
+
+<nav class='flex gap-4'>
+    <a class={navLink()} href='/'>Home</a>
+    <a class={navLink()} href='/about/'>About</a>
+    <a class={navLink()} href='/blog/'>Blog</a>
+</nav>
