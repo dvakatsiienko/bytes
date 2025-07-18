@@ -1,5 +1,15 @@
 ---
 import '../theme/init.css';
+
+const pageTitle = 'About Me';
+
+const identity = {
+    firstName: 'Dima',
+    country: 'Ukraine',
+    occupation: 'Adeptus Mechanicus',
+    hobbies: ['thinking', 'smoking', 'gaming'],
+};
+const skills = ['TypeScript', 'React', 'Next.js', 'Tailwind', 'Astro', 'AI', 'LLM', 'Writing Docs'];
 ---
 
 <html lang='en'>
@@ -8,7 +18,7 @@ import '../theme/init.css';
         <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
         <meta name='viewport' content='width=device-width' />
         <meta name='generator' content={Astro.generator} />
-        <title>About</title>
+        <title>{pageTitle}</title>
     </head>
 
     <body>
@@ -16,6 +26,23 @@ import '../theme/init.css';
         <a href='/about'>About</a>
         <a href='/blog'>Blog</a>
 
-        <h1 class='text-3xl font-bold underline'>About</h1>
+        <h1 class='text-3xl font-bold underline'>{pageTitle}</h1>
+
+        <p>Here are a few facts about me:</p>
+        <ul>
+            <li>My name is {identity.firstName}.</li>
+            <li>I live in {identity.country} and work as an {identity.occupation}.</li>
+            {
+                identity.hobbies.length >= 2 && (
+                    <li>
+                        Two of my hobbies are: {identity.hobbies[0]} and {identity.hobbies[1]}
+                    </li>
+                )
+            }
+        </ul>
+        <p>I'm skilled with:</p>
+        <ul>
+            {skills.map((skill) => <li>{skill}</li>)}
+        </ul>
     </body>
 </html>
