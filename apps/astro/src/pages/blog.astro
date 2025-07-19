@@ -1,6 +1,8 @@
 ---
 import LayoutBase from '../layouts/LayoutBase.astro';
 import Link from '@/elements/Link.astro';
+
+const allPosts = Object.values(import.meta.glob('./posts/*.md', { eager: true }));
 ---
 
 <LayoutBase title='Blog'>
@@ -8,9 +10,13 @@ import Link from '@/elements/Link.astro';
         <h1 class='text-3xl font-bold underline'>My Astro Learning Blog</h1>
         <p>This is where I will post about my journey learning Astro.</p>
         <ul>
-            <li><Link href='/posts/post-1'>Post 1</Link></li>
-            <li><Link href='/posts/post-2'>Post 2</Link></li>
-            <li><Link href='/posts/post-3'>Post 3</Link></li>
+            {
+                allPosts.map((post: any) => (
+                    <li>
+                        <Link href={post.url}>{post.frontmatter.title}</Link>
+                    </li>
+                ))
+            }
         </ul>
     </div>
 </LayoutBase>
