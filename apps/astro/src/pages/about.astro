@@ -1,6 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '@/components/Header.astro';
+import LayoutBase from '../layouts/LayoutBase.astro';
 
 const pageTitle = 'About Me';
 
@@ -13,10 +12,8 @@ const identity = {
 const skills = ['TypeScript', 'React', 'Next.js', 'Tailwind', 'Astro', 'AI', 'LLM', 'Writing Docs'];
 ---
 
-<BaseLayout title={pageTitle}>
+<LayoutBase title={pageTitle}>
     <div>
-        <Header />
-
         <h1 class='text-3xl font-bold underline'>{pageTitle}</h1>
 
         <p>Here are a few facts about me:</p>
@@ -36,4 +33,4 @@ const skills = ['TypeScript', 'React', 'Next.js', 'Tailwind', 'Astro', 'AI', 'LL
             {skills.map((skill) => <li>{skill}</li>)}
         </ul>
     </div>
-</BaseLayout>
+</LayoutBase>

@@ -1,8 +1,8 @@
 ---
-layout: '@/layouts/BaseLayout.astro'
+layout: '@/layouts/LayoutMD.astro'
 title: 'My Second Blog Post'
 description: "After learning some Astro, I couldn't stop!"
-author: Astro Learner
+author: 'ripeluokte'
 image:
     url: 'https://docs.astro.build/assets/arc.webp'
     alt: 'The Astro logo on a dark background with a purple gradient arc.'
