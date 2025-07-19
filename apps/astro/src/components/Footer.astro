@@ -1,0 +1,12 @@
+---
+import Link from '@/elements/Link.astro';
+
+const platform = 'github';
+const username = 'dvakatsiienko';
+---
+
+<footer>
+    <p>
+        Learn more about my projects on <Link href={`https://www.${platform}.com/${username}`}>{platform}</Link>.
+    </p>
+</footer>
