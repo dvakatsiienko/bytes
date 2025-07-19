@@ -1,0 +1,35 @@
+---
+import LayoutBase from '@/layouts/LayoutBase.astro';
+import Link from '@/elements/Link.astro';
+import TagEl from '@/elements/Tag.astro';
+
+export async function getStaticPaths() {
+    const postList = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
+
+    const uniqueTags = [...new Set(postList.map((post: any) => post.frontmatter.tags).flat())];
+
+    const paths = uniqueTags.map((tag) => ({
+        params: { tag },
+        props: { postList },
+    }));
+
+    return paths;
+}
+
+const { tag } = Astro.params;
+const { postList } = Astro.props;
+const filteredPosts = postList.filter((post: any) => post.frontmatter.tags?.includes(tag));
+---
+
+<LayoutBase title={tag}>
+    <p>Posts tagged with <TagEl tag={tag}>{tag}</TagEl></p>
+    <ul>
+        {
+            filteredPosts.map((post: any) => (
+                <li>
+                    <Link href={post.url}>{post.frontmatter.title}</Link>
+                </li>
+            ))
+        }
+    </ul>
+</LayoutBase>

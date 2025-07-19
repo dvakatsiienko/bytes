@@ -15,6 +15,7 @@
         "tailwindcss": "4.1.11"
     },
     "devDependencies": {
+        "@astrojs/rss": "4.0.12",
         "eslint-config-polished": "workspace:*",
         "prettier-plugin-astro": "0.14.1"
     }
