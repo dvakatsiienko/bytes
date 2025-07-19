@@ -1,5 +1,5 @@
 ---
-layout: '@/layouts/LayoutMD.astro'
+# layout: '@/layouts/LayoutMD.astro'
 title: My Fourth Blog Post
 author: ripeluokte
 description: 'This post will show up on its own!'
