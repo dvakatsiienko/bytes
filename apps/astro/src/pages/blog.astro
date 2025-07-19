@@ -1,13 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '@/components/Header.astro';
+import LayoutBase from '../layouts/LayoutBase.astro';
 import Link from '@/elements/Link.astro';
 ---
 
-<BaseLayout title='Blog'>
+<LayoutBase title='Blog'>
     <div>
-        <Header />
-
         <h1 class='text-3xl font-bold underline'>My Astro Learning Blog</h1>
         <p>This is where I will post about my journey learning Astro.</p>
         <ul>
@@ -16,4 +13,4 @@ import Link from '@/elements/Link.astro';
             <li><Link href='/posts/post-3'>Post 3</Link></li>
         </ul>
     </div>
-</BaseLayout>
+</LayoutBase>
