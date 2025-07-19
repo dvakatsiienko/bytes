@@ -1,0 +1,22 @@
+---
+import LayoutBase from '@/layouts/LayoutBase.astro';
+import Link from '@/elements/Link.astro';
+import Tag from '@/elements/Tag.astro';
+
+const postList = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
+const tagList = [...new Set(postList.map((post: any) => post.frontmatter.tags).flat())];
+---
+
+<LayoutBase title='Tags'>
+    <h1 class='text-3xl font-bold underline'>Tags</h1>
+
+    <ul class='flex flex-row gap-2 flex-wrap'>
+        {
+            tagList.map((tag) => (
+                <li>
+                    <Tag tag={tag}>{tag}</Tag>
+                </li>
+            ))
+        }
+    </ul>
+</LayoutBase>

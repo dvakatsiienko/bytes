@@ -1,0 +1,11 @@
+---
+import { cva } from 'cva';
+
+export const tagCn = cva({
+    base: 'bg-indigo-200 hover:bg-indigo-400 text-indigo-800 px-2 py-1 rounded-sm',
+});
+
+const { tag } = Astro.props;
+---
+
+<a class={tagCn()} href={`/tags/${tag}`}><slot /></a>
