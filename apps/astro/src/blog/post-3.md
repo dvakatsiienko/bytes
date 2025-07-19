@@ -1,5 +1,5 @@
 ---
-layout: '@/layouts/LayoutMD.astro'
+# layout: '@/layouts/LayoutMD.astro'
 title: My Third Blog Post
 description: 'I had some challenges, but asking in the community really helped!'
 author: 'ripeluokte'

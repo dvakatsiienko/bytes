@@ -1,10 +1,10 @@
 ---
+import { getCollection } from 'astro:content';
 import LayoutBase from '@/layouts/LayoutBase.astro';
-import Link from '@/elements/Link.astro';
 import Tag from '@/elements/Tag.astro';
 
-const postList = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
-const tagList = [...new Set(postList.map((post: any) => post.frontmatter.tags).flat())];
+const postList = await getCollection('blog');
+const tagList = [...new Set(postList.map((post: any) => post.data.tags).flat())];
 ---
 
 <LayoutBase title='Tags'>

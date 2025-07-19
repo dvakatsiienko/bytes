@@ -1,8 +1,11 @@
 ---
+import { getCollection } from 'astro:content';
 import LayoutBase from '../layouts/LayoutBase.astro';
 import Link from '@/elements/Link.astro';
 
-const allPosts = Object.values(import.meta.glob('./posts/*.md', { eager: true }));
+const allPosts = await getCollection('blog');
+
+console.log('📡 · blog.astro:8 · allPosts:', allPosts);
 ---
 
 <LayoutBase title='Blog'>
@@ -13,7 +16,7 @@ const allPosts = Object.values(import.meta.glob('./posts/*.md', { eager: true })
             {
                 allPosts.map((post: any) => (
                     <li>
-                        <Link href={post.url}>{post.frontmatter.title}</Link>
+                        <Link href={`/posts/${post.id}`}>{post.data.title}</Link>
                     </li>
                 ))
             }
