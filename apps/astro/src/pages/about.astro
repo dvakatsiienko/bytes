@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Nav from '@/components/Nav.astro';
+import Header from '@/components/Header.astro';
 
 const pageTitle = 'About Me';
 
@@ -15,7 +15,7 @@ const skills = ['TypeScript', 'React', 'Next.js', 'Tailwind', 'Astro', 'AI', 'LL
 
 <BaseLayout title={pageTitle}>
     <div>
-        <Nav />
+        <Header />
 
         <h1 class='text-3xl font-bold underline'>{pageTitle}</h1>
 
