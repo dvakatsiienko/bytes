@@ -25,9 +25,9 @@ Apps made during my r'n'd or vibe coded.
 
 [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/space-explorer-api)
 
-#### 📜 Blog
+<!-- #### 📜 Blog
 
-[Website](https://bytes-astro.vercel.app/) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/astro)
+[Website](https://bytes-astro.vercel.app/) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/astro) -->
 
 #### 🏄‍♂️ Financial 🚧 WIP 🚧
 
