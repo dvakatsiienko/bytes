@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     typescript: { ignoreBuildErrors: true },
     experimental: {
         reactCompiler: true,
-        ppr: true,
+        // ppr: true,
     },
     transpilePackages: ['@ui/kit'],
 };
