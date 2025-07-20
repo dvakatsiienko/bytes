@@ -1,4 +1,6 @@
 ---
+import { ClientRouter } from 'astro:transitions';
+
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import '../theme/init.css';
@@ -20,9 +22,12 @@ const { title } = Astro.props;
         <meta name='generator' content={Astro.generator} />
         <title>{title}</title>
     </head>
+    <ClientRouter />
     <body>
         <Header />
         <slot />
         <Footer />
     </body>
+
+
 </html>
