@@ -37,7 +37,7 @@ export const Select = (props: SelectProps) => {
       onOpenChange={(open: boolean) => setIsOpen(open)}
       onValueChange={props.onValueChange}
       open={isOpen}
-      value={props.value ?? void 0}>
+      value={props.value ?? undefined}>
       <Button asChild variant='secondary'>
         <SelectTrigger
           className={selectTriggerCva({

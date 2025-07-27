@@ -68,26 +68,28 @@ export const MessageList = (props: MessageListProps) => {
       )}
       ref={containerRef}>
       <AnimatePresence mode='popLayout'>
-        {!props.testMessages &&
-          !isChatInitRef.current &&
-          !messageListJSX.length && (
-            <motion.div
-              className='mx-auto grid w-full max-w-sm place-content-center gap-4 self-center justify-self-center text-balance'
-              exit={{ opacity: 0 }}
-              key='empty'>
-              <h2 className='font-semibold text-xl sm:text-2xl'>
-                👽 Welcome to X-COM Chat
-              </h2>
-              <p className='text-lg'>
-                Here you can chat with friends. Each friend has its own
-                personality and unique quirks.
-              </p>
-              <p className='font flex font-semibold'>
-                Start chatting with {props.selectedFriendName}
-              </p>
-              {promptSuggestionListJSX}
-            </motion.div>
-          )}
+        {!(
+          props.testMessages ||
+          isChatInitRef.current ||
+          messageListJSX.length
+        ) && (
+          <motion.div
+            className='mx-auto grid w-full max-w-sm place-content-center gap-4 self-center justify-self-center text-balance'
+            exit={{ opacity: 0 }}
+            key='empty'>
+            <h2 className='font-semibold text-xl sm:text-2xl'>
+              👽 Welcome to X-COM Chat
+            </h2>
+            <p className='text-lg'>
+              Here you can chat with friends. Each friend has its own
+              personality and unique quirks.
+            </p>
+            <p className='font flex font-semibold'>
+              Start chatting with {props.selectedFriendName}
+            </p>
+            {promptSuggestionListJSX}
+          </motion.div>
+        )}
         {props.testMessages && testMessageListJSX}
 
         {!props.testMessages && !!messageListJSX.length && messageListJSX}

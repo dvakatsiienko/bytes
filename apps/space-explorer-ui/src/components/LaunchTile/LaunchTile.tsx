@@ -70,7 +70,8 @@ export const LaunchTile = (props: LaunchTileProps) => {
         {!props.trip && isBooked ? '✓ Trip Booked' : null}
         {props.trip && isBooked ? 'Cancel trip' : null}
         {!isBooked && isInCart ? 'Remove from Cart' : null}
-        {!isBooked && !isInCart ? 'Add to Cart' : null}
+
+        {isBooked || isInCart ? null : 'Add to Cart'}
       </Button>
     </StyledLink>
   );

@@ -199,7 +199,7 @@ export const Chat = (props: ChatProps) => {
             'rounded-tr-none rounded-bl-none text-sm',
             'border border-border border-solid',
           )}
-          onClick={isLoading ? stop : void 0}
+          onClick={isLoading ? stop : undefined}
           type={isLoading ? 'button' : 'submit'}
           variant='primary'>
           {isLoading ? <SpinnerSvg spin /> : 'Send'}
