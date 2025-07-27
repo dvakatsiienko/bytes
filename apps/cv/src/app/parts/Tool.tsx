@@ -1,4 +1,4 @@
-/* Core */
+
 import { cva, cx } from 'cva';
 import { ITool } from './toolConfig';
 
@@ -8,7 +8,7 @@ export const Tool = (props: ToolProps) => {
     return (
         <div className={toolCn()}>
             {typeof Icon === 'function' && <Icon size={18} />}
-            <span className='text-nowrap text-center text-[12px] leading-none text-gray-600 dark:text-gray-400'>
+            <span className='text-nowrap text-center text-[12px] text-gray-600 leading-none dark:text-gray-400'>
                 {props.name}
             </span>
         </div>
@@ -18,8 +18,8 @@ export const Tool = (props: ToolProps) => {
 /* Styles */
 const toolCn = cva({
     base: cx(
-        'grid rounded-lg px-1.5 py-2 gap-y-1.5',
-        'bg-surface-7 dark:bg-surface-4 hover:bg-surface-4 dark:hover:bg-surface-3',
+        'grid gap-y-1.5 rounded-lg px-1.5 py-2',
+        'bg-surface-7 hover:bg-surface-4 dark:bg-surface-4 dark:hover:bg-surface-3',
         'place-content-center place-items-center',
         'cursor-pointer select-none',
     ),

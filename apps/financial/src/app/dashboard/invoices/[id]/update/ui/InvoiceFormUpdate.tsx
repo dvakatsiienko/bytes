@@ -1,6 +1,6 @@
 'use client';
 
-/* Core */
+
 import NextLink from 'next/link';
 import { useActionState } from 'react';
 import {
@@ -11,10 +11,10 @@ import {
 } from '@heroicons/react/24/outline';
 import type { Invoice, Customer } from '~/prisma/client/edge';
 
-/* Components */
+
 import { Button } from '@/ui/Button';
 
-/* Instruments */
+
 import { updateInvoice, type State } from '@/lib';
 
 export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
@@ -35,7 +35,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
 
                 {/* Customer Name */}
                 <div className = 'mb-4'>
-                    <label className = 'mb-2 block text-sm font-medium' htmlFor = 'customer'>
+                    <label className = 'mb-2 block font-medium text-sm' htmlFor = 'customer'>
                         Choose customer
                     </label>
                     <div className = 'relative'>
@@ -49,13 +49,13 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
                             </option>
                             {customerListJSX}
                         </select>
-                        <UserCircleIcon className = 'pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500' />
+                        <UserCircleIcon className = '-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] text-gray-500' />
                     </div>
                 </div>
 
                 {/* Invoice Amount */}
                 <div className = 'mb-4'>
-                    <label className = 'mb-2 block text-sm font-medium' htmlFor = 'amount'>
+                    <label className = 'mb-2 block font-medium text-sm' htmlFor = 'amount'>
                         Choose an amount
                     </label>
                     <div className = 'relative mt-2 rounded-md'>
@@ -70,11 +70,11 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
                                 step = '0.01'
                                 type = 'number'
                             />
-                            <CurrencyDollarIcon className = 'pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
+                            <CurrencyDollarIcon className = '-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] text-gray-500 peer-focus:text-gray-900' />
 
                             <div aria-atomic = 'true' aria-live = 'polite' id = 'amount-error'>
                                 {actionState.errors?.amount?.map((error: string) => (
-                                    <p key = { error } className = 'mt-2 text-sm text-red-500'>
+                                    <p key = { error } className = 'mt-2 text-red-500 text-sm'>
                                         {error}
                                     </p>
                                 ))}
@@ -85,7 +85,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
 
                 {/* Invoice Status */}
                 <fieldset>
-                    <legend className = 'mb-2 block text-sm font-medium'>
+                    <legend className = 'mb-2 block font-medium text-sm'>
                         Set the invoice status
                     </legend>
                     <div className = 'rounded-md border border-gray-200 bg-white px-[14px] py-3'>
@@ -100,7 +100,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
                                     value = 'pending'
                                 />
                                 <label
-                                    className = 'ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'
+                                    className = 'ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 text-xs'
                                     htmlFor = 'pending'>
                                     Pending <ClockIcon className = 'h-4 w-4' />
                                 </label>
@@ -115,7 +115,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
                                     value = 'paid'
                                 />
                                 <label
-                                    className = 'ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white'
+                                    className = 'ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 font-medium text-white text-xs'
                                     htmlFor = 'paid'>
                                     Paid <CheckIcon className = 'h-4 w-4' />
                                 </label>
@@ -127,7 +127,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
 
             <div className = 'mt-6 flex justify-end gap-4'>
                 <NextLink
-                    className = 'flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200'
+                    className = 'flex h-10 items-center rounded-lg bg-gray-100 px-4 font-medium text-gray-600 text-sm transition-colors hover:bg-gray-200'
                     href = '/dashboard/invoices'>
                     Cancel
                 </NextLink>

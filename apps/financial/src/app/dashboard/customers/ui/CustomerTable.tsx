@@ -1,12 +1,12 @@
-/* Core */
+
 import { Suspense } from 'react';
 import Image from 'next/image';
 import type { Customer } from '~/prisma/client/edge';
 
-/* Components */
+
 import { SearchField } from '@/ui/SearchField';
 
-/* Instruments */
+
 import { lusitana } from '@/theme/fonts';
 
 export const CustomerTable = (props: CustomerTableProps) => {
@@ -26,10 +26,10 @@ export const CustomerTable = (props: CustomerTableProps) => {
                             <p>{customer.name}</p>
                         </div>
                     </div>
-                    <p className = 'text-sm text-gray-500'>{customer.email}</p>
+                    <p className = 'text-gray-500 text-sm'>{customer.email}</p>
                 </div>
             </div>
-            <div className = 'flex w-full items-center justify-between border-b border-gray-200 py-5'>
+            <div className = 'flex w-full items-center justify-between border-gray-200 border-b py-5'>
                 <div className = 'flex w-1/2 flex-col'>
                     <p className = 'text-xs'>Pending</p>
                     <p className = 'font-medium'>
@@ -52,7 +52,7 @@ export const CustomerTable = (props: CustomerTableProps) => {
 
     const customerListBodyJSX = props.customerList.map((customer) => (
         <tr key = { customer.id } className = 'group'>
-            <td className = 'whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6'>
+            <td className = 'whitespace-nowrap bg-white py-5 pr-3 pl-4 text-black text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6'>
                 <div className = 'flex items-center gap-3'>
                     <Image
                         alt = { `${ customer.name }'s profile picture` }
@@ -95,7 +95,7 @@ export const CustomerTable = (props: CustomerTableProps) => {
                             <div className = 'md:hidden'>{customerListHeadJSX}</div>
 
                             <table className = 'hidden min-w-full rounded-md text-gray-900 md:table'>
-                                <thead className = 'rounded-md bg-gray-50 text-left text-sm font-normal'>
+                                <thead className = 'rounded-md bg-gray-50 text-left font-normal text-sm'>
                                     <tr>
                                         <th className = 'px-4 py-5 font-medium sm:pl-6' scope = 'col'>
                                             Name

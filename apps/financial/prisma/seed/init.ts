@@ -1,9 +1,7 @@
-/* Core */
-import { PrismaClient } from '~/prisma/client/edge';
-
-/* Instruments */
-import { invoices, customers, revenue, users } from './seed-data';
 import { hashPassword } from '@/lib/security';
+
+import { customers, invoices, revenue, users } from './seed-data';
+import { PrismaClient } from '~/prisma/client/edge';
 
 const prisma = new PrismaClient();
 
@@ -13,9 +11,9 @@ async function seed() {
         await prisma.customer.createMany({ data: customers });
         await prisma.invoice.createMany({ data: invoices });
         await prisma.revenue.createMany({ data: revenue });
-        console.log('✅ Seed succseeded.');
+        console.info('✅ Seed succseeded.');
     } catch (error) {
-        console.log(error);
+        console.info(error);
     }
 }
 
@@ -34,7 +32,7 @@ seed()
 /* Helpers */
 async function seedUsers() {
     const userList = await Promise.all(
-        users.map(async (user) => {
+        users.map((user) => {
             return {
                 ...user,
                 password: hashPassword(user.password),

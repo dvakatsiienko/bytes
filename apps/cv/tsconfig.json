@@ -17,6 +17,10 @@
         "jsx": "preserve",
         "incremental": true,
         "plugins": [{ "name": "next" }],
-        "paths": { "@/*": ["./src/*"], "/public/*": ["./public/*"], "@ui/kit/*": ["../../packages/ui/src/*"] }
+        "paths": {
+            "@/*": ["./src/*"],
+            "/public/*": ["./public/*"],
+            "@ui/kit/*": ["../../packages/ui/src/*"]
+        }
     }
 }

@@ -1,4 +1,3 @@
-/* Instruments */
 import { ADDRESS_EMAIL_PERSONAL } from '@/links';
 
 export const __DEV__ = process.env.NODE_ENV === 'development';

@@ -3,7 +3,7 @@ export default function NotFound() {
         <section className='page-layout-error gap-4'>
             <h1 className='justify-self-start'>👽 Hi there! I&apos;m AECSS.</h1>
 
-            <div className='grid gap-2 text-base font-medium'>
+            <div className='grid gap-2 font-medium text-base'>
                 <p>It stands for Alien Emergency Client Support Server.</p>
                 <p>There is no page here. If an issue persists, please call me.</p>
 

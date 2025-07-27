@@ -1,4 +1,4 @@
-/* Instruments */
+
 import type { Resolver } from '../types';
 import type * as gql from '../graphql';
 

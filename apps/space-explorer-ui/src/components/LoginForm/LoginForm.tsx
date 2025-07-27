@@ -1,13 +1,13 @@
-/* Core */
+
 import styled, { css } from 'styled-components';
 import { size } from 'polished';
 import { useForm } from 'react-hook-form';
 
-/* Components */
+
 import { Button, LogoSvg } from '@/components';
 import { CurveSvg, RocketSvg } from './SVG';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 import { COLORS, SPACING } from '@/styles';
 import { resolver } from './resolver';

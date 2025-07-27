@@ -1,4 +1,4 @@
-/* Instruments */
+
 const { getJsRule } = require('./getJsRule');
 
 exports.banTsComment = [

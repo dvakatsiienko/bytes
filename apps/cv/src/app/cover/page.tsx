@@ -1,12 +1,12 @@
-/* Core */
+
 import { cx } from 'cva';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
-/* Components */
+
 import { ExternalLink } from '@/elements/ExternalLink';
 
-/* Instruments */
+
 import { EMAIL_TO } from '@/frags';
 import {
     LINK_ID_CV_TOOLS,
@@ -18,7 +18,7 @@ import {
 
 export default function CoverPage() {
     return (
-        <main className={cx('prose-custom prose-style prose-hr:mb-6 mx-auto')}>
+        <main className={cx('prose-custom prose-style mx-auto prose-hr:mb-6')}>
             <h3 className='mt-4'>Hi there, I'm Dima. I do Frontend.</h3>
             <hr />
 

@@ -3,7 +3,7 @@ export const CardSkeleton = () => {
         <div className = { `${ shimmer } relative overflow-hidden rounded-xl bg-gray-100 p-2 shadow-sm` }>
             <div className = 'flex p-4'>
                 <div className = 'h-5 w-5 rounded-md bg-gray-200' />
-                <div className = 'ml-2 h-6 w-16 rounded-md bg-gray-200 text-sm font-medium' />
+                <div className = 'ml-2 h-6 w-16 rounded-md bg-gray-200 font-medium text-sm' />
             </div>
             <div className = 'flex items-center justify-center truncate rounded-xl bg-white px-4 py-8'>
                 <div className = 'h-7 w-20 rounded-md bg-gray-200' />
@@ -28,8 +28,8 @@ export const RevenueChartSkeleton = () => {
         <div className = { `${ shimmer } relative w-full overflow-hidden md:col-span-4` }>
             <div className = 'mb-4 h-8 w-36 rounded-md bg-gray-100' />
             <div className = 'rounded-xl bg-gray-100 p-4'>
-                <div className = 'sm:grid-cols-13 mt-0 grid h-[410px] grid-cols-12 items-end gap-2 rounded-md bg-white p-4 md:gap-4' />
-                <div className = 'flex items-center pb-2 pt-6'>
+                <div className = 'mt-0 grid h-[410px] grid-cols-12 items-end gap-2 rounded-md bg-white p-4 sm:grid-cols-13 md:gap-4' />
+                <div className = 'flex items-center pt-6 pb-2'>
                     <div className = 'h-5 w-5 rounded-full bg-gray-200' />
                     <div className = 'ml-2 h-4 w-20 rounded-md bg-gray-200' />
                 </div>
@@ -40,7 +40,7 @@ export const RevenueChartSkeleton = () => {
 
 export const InvoiceSkeleton = () => {
     return (
-        <div className = 'flex flex-row items-center justify-between border-b border-gray-100 py-4'>
+        <div className = 'flex flex-row items-center justify-between border-gray-100 border-b py-4'>
             <div className = 'flex items-center'>
                 <div className = 'mr-2 h-8 w-8 rounded-full bg-gray-200' />
                 <div className = 'min-w-0'>
@@ -65,7 +65,7 @@ export const LatestInvoicesSkeleton = () => {
                     <InvoiceSkeleton />
                     <InvoiceSkeleton />
                 </div>
-                <div className = 'flex items-center pb-2 pt-6'>
+                <div className = 'flex items-center pt-6 pb-2'>
                     <div className = 'h-5 w-5 rounded-full bg-gray-200' />
                     <div className = 'ml-2 h-4 w-20 rounded-md bg-gray-200' />
                 </div>
@@ -96,9 +96,9 @@ export const DashboardSkeleton = () => {
 
 export const TableRowSkeleton = () => {
     return (
-        <tr className = 'w-full border-b border-gray-100 last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg'>
+        <tr className = 'w-full border-gray-100 border-b last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg'>
             {/* Customer Name and Image */}
-            <td className = 'relative overflow-hidden whitespace-nowrap py-3 pl-6 pr-3'>
+            <td className = 'relative overflow-hidden whitespace-nowrap py-3 pr-3 pl-6'>
                 <div className = 'flex items-center gap-3'>
                     <div className = 'h-8 w-8 rounded-full bg-gray-100' />
                     <div className = 'h-6 w-24 rounded bg-gray-100' />
@@ -121,7 +121,7 @@ export const TableRowSkeleton = () => {
                 <div className = 'h-6 w-16 rounded bg-gray-100' />
             </td>
             {/* Actions */}
-            <td className = 'whitespace-nowrap py-3 pl-6 pr-3'>
+            <td className = 'whitespace-nowrap py-3 pr-3 pl-6'>
                 <div className = 'flex justify-end gap-3'>
                     <div className = 'h-[38px] w-[38px] rounded bg-gray-100' />
                     <div className = 'h-[38px] w-[38px] rounded bg-gray-100' />
@@ -134,7 +134,7 @@ export const TableRowSkeleton = () => {
 export const InvoicesMobileSkeleton = () => {
     return (
         <div className = 'mb-2 w-full rounded-md bg-white p-4'>
-            <div className = 'flex items-center justify-between border-b border-gray-100 pb-8'>
+            <div className = 'flex items-center justify-between border-gray-100 border-b pb-8'>
                 <div className = 'flex items-center'>
                     <div className = 'mr-2 h-8 w-8 rounded-full bg-gray-100' />
                     <div className = 'h-6 w-16 rounded bg-gray-100' />
@@ -169,7 +169,7 @@ export const InvoicesTableSkeleton = () => {
                         <InvoicesMobileSkeleton />
                     </div>
                     <table className = 'hidden min-w-full text-gray-900 md:table'>
-                        <thead className = 'rounded-lg text-left text-sm font-normal'>
+                        <thead className = 'rounded-lg text-left font-normal text-sm'>
                             <tr>
                                 <th className = 'px-4 py-5 font-medium sm:pl-6' scope = 'col'>
                                     Customer
@@ -186,7 +186,7 @@ export const InvoicesTableSkeleton = () => {
                                 <th className = 'px-3 py-5 font-medium' scope = 'col'>
                                     Status
                                 </th>
-                                <th className = 'relative pb-4 pl-3 pr-6 pt-2 sm:pr-6' scope = 'col'>
+                                <th className = 'relative pt-2 pr-6 pb-4 pl-3 sm:pr-6' scope = 'col'>
                                     <span className = 'sr-only'>Edit</span>
                                 </th>
                             </tr>

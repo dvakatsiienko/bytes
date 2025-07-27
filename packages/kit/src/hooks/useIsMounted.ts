@@ -1,6 +1,6 @@
 'use client';
 
-/* Core */
+
 import { useState, useEffect } from 'react';
 
 export const useIsMounted = () => {

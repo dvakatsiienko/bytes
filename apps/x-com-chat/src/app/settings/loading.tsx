@@ -1,4 +1,4 @@
-/* Components */
+
 import { SpinnerSvg } from '@/components/svg/SpinnerIcon';
 
 export default function ProfilePageSkeleton() {

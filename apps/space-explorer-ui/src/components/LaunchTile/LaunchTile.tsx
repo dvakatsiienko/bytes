@@ -1,12 +1,12 @@
-/* Core */
+
 import { useReactiveVar } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-/* Components */
+
 import { Button } from '../Button';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 import { SPACING } from '@/styles';
 import { cartItemsVar } from '@/lib/apollo';

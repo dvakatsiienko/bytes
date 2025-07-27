@@ -1,4 +1,4 @@
-/* Core */
+
 import { cx, type ClassValue } from 'cva';
 import { twMerge } from 'tailwind-merge';
 

@@ -1,11 +1,16 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const ESLintSVG = (props: TSvgProps) => {
     const { size = 10, ...restProps } = props;
 
     return (
-        <svg xmlns='http://www.w3.org/2000/svg' width={size} height={size} viewBox='0 0 70 58' {...restProps}>
+        <svg
+            height={size}
+            viewBox='0 0 70 58'
+            width={size}
+            xmlns='http://www.w3.org/2000/svg'
+            {...restProps}>
+            <title>ESLint</title>
             <path
                 d='m46.557 21.11-12.54-7.24a1.014 1.014 0 0 0-1.015 0l-12.54 7.24a1.015 1.015 0 0 0-.508.878v14.48c0 .362.194.697.508.879l12.54 7.24c.314.181.7.181 1.015 0l12.54-7.24c.314-.181.507-.516.507-.879v-14.48c0-.363-.193-.697-.507-.879Z'
                 fill='#8080F2'

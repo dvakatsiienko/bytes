@@ -1,7 +1,7 @@
-/* Core */
+
 import Link from 'next/link';
 
-/* Components */
+
 import { ThemeSettings } from './ThemeSettings';
 import {
     Sidebar,
@@ -18,7 +18,7 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarHeader className='pt-6'>
                 <header className='flex items-center justify-center'>
-                    <Link href='/' className='text-lg font-bold'>
+                    <Link href='/' className='font-bold text-lg'>
                         X-COM Chat
                     </Link>
                 </header>

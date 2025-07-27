@@ -1,10 +1,10 @@
-/* Core */
+
 import { useState } from 'react';
 
-/* Components */
+
 import { Header, LaunchTile, Loading, Button } from '@/components';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 
 export const Launches = () => {

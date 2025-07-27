@@ -1,11 +1,10 @@
 'use client';
 
-/* Components */
 import { Button } from '@/components/ui/button';
 
-/* Instruments */
-import { useChatHistoryQuery } from '@/queries/chat';
 import { cn } from '@/utils/cn';
+
+import { useChatHistoryQuery } from '@/queries/chat';
 
 export default function ProtoPage() {
     const { chatHistoryQuery } = useChatHistoryQuery('123');
@@ -16,9 +15,11 @@ export default function ProtoPage() {
 
     return (
         <section className='grid auto-rows-min justify-center gap-4 pt-8'>
-            <h1 className='mb-12 text-4xl font-bold'>Proto</h1>
+            <h1 className='mb-12 font-bold text-4xl'>Proto</h1>
 
-            {chatHistoryQuery?.map(({ id, content }) => <div key={id}>{content}</div>)}
+            {chatHistoryQuery?.map(({ id, content }) => (
+                <div key={id}>{content}</div>
+            ))}
 
             <section className='flex gap-2'>
                 <Button variant='primary'>Click</Button>
@@ -29,11 +30,21 @@ export default function ProtoPage() {
             </section>
 
             <section className='flex gap-2'>
-                <button className={buttonCn}>Click</button>
-                <button className={buttonCn}>Click</button>
-                <button className={buttonCn}>Click</button>
-                <button className={buttonCn}>Click</button>
-                <button className={buttonCn}>Click</button>
+                <button className={buttonCn} type='button'>
+                    Click
+                </button>
+                <button className={buttonCn} type='button'>
+                    Click
+                </button>
+                <button className={buttonCn} type='button'>
+                    Click
+                </button>
+                <button className={buttonCn} type='button'>
+                    Click
+                </button>
+                <button className={buttonCn} type='button'>
+                    Click
+                </button>
             </section>
 
             {/* TODO: find a way to outline all elements with keyboard focus only */}

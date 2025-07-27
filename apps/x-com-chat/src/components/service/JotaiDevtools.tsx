@@ -1,10 +1,10 @@
 'use client';
 
-/* Core */
+
 import { DevTools, type DevToolsProps } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
 
-/* Instruments */
+
 import { useIsMounted } from '@/hooks/useIsMounted';
 
 export const JotaiDevtools = (props: JotaiDevtoolsProps) => {

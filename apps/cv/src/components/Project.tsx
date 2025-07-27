@@ -1,16 +1,15 @@
-/* Core */
-import Image, { type StaticImageData } from 'next/image';
+import { cn } from '@ui/kit/lib/utils';
+import { type StaticImageData } from 'next/image';
 
-/* Components */
 import { BriefEntry } from './BriefEntry';
 
-/* Instruments */
-import { cn } from '@ui/kit/lib/utils';
-
 export const Project = (props: PrjectProps) => {
-    const achievementListJSX = props.achievementList.map((achievement, index) => {
-        return <li key={index}>{achievement}</li>;
-    });
+    const achievementListJSX = props.achievementList.map(
+        (achievement, index) => {
+            // biome-ignore lint/suspicious/noArrayIndexKey: no id for this
+            return <li key={index}>{achievement}</li>;
+        },
+    );
 
     return (
         <section
@@ -24,10 +23,18 @@ export const Project = (props: PrjectProps) => {
                 'text-pretty',
             )}>
             <BriefEntry content={props.employer} name='employer' />
-            <BriefEntry content={props.role} name='role' />
-            {props.courses && <BriefEntry content={props.courses} name='courses' />}
-            {props.project && <BriefEntry content={props.project} name='project' />}
-            <BriefEntry content={<ul>{achievementListJSX}</ul>} name='achievements' className='col-span-full' />
+            <BriefEntry content={props.projectRole} name='role' />
+            {props.courses && (
+                <BriefEntry content={props.courses} name='courses' />
+            )}
+            {props.projectName && (
+                <BriefEntry content={props.projectName} name='project' />
+            )}
+            <BriefEntry
+                className='col-span-full'
+                content={<ul>{achievementListJSX}</ul>}
+                name='achievements'
+            />
 
             {/* <Image priority alt='Company logo' placeholder='blur' src={props.comapnyLogoUrl} width={100} /> */}
         </section>
@@ -37,9 +44,9 @@ export const Project = (props: PrjectProps) => {
 /* Types */
 interface PrjectProps {
     employer: React.ReactNode;
-    role: string;
+    projectRole: string;
+    projectName?: React.ReactNode;
     courses?: React.ReactNode;
-    project?: React.ReactNode;
     achievementList: React.ReactNode[];
     comapnyLogoUrl: StaticImageData;
 }

@@ -1,7 +1,9 @@
+// biome-ignore-all lint/style/noDefaultExport: prettier config file is default-exported
+
 /** @type {import("prettier").Config} */
 export default {
-    tabWidth: 4,
-    printWidth: 120,
+    tabWidth: 2,
+    printWidth: 80,
     useTabs: false,
     semi: true,
     singleQuote: true,

@@ -1,4 +1,4 @@
-/* Core */
+
 import { useEffect, useRef } from 'react';
 
 export function useScrollToBottom<C extends HTMLElement, E extends HTMLElement>() {

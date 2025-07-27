@@ -1,11 +1,11 @@
-/* Core */
+
 import styled, { css } from 'styled-components';
 import { size } from 'polished';
 
-/* Components */
+
 import { LogoSvg } from './SVG';
 
-/* Instruments */
+
 import { COLORS } from '@/styles';
 
 const spin = css`

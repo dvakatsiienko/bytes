@@ -1,4 +1,4 @@
-/* Core */
+
 import { clerkMiddleware } from '@clerk/nextjs/server';
 
 export const config = {

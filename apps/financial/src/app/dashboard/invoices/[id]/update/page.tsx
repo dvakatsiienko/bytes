@@ -1,11 +1,11 @@
-/* Core */
+
 import { notFound } from 'next/navigation';
 
-/* Components */
+
 import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
 import { InvoiceFormUpdate } from './ui';
 
-/* Instruments */
+
 import { fetchInvoiceById, fetchCustomerList } from '@/lib';
 import type { NextPageProps } from '@/types';
 

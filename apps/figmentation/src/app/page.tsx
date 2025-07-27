@@ -1,8 +1,8 @@
-/* Core */
+
 import NextLink from 'next/link';
 import NextImage from 'next/image';
 
-/* Components */
+
 import { ExternalLinkSvg } from '@ui/kit/icons/ExternalLinkSvg';
 import { FigmaSVG } from '@ui/kit/icons/FigmaSVG';
 import { Button } from '@ui/kit/components/button';
@@ -43,7 +43,7 @@ const WelcomePage = () => {
     );
 };
 
-/* Components */
+
 const ProjectCard: React.FC<ProjectCardProps> = (props) => {
     const { title, description, hrefApp, hrefFigmaFile, imageSrc, imageAlt } = props;
 
@@ -51,7 +51,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
         <article
             className={cn(
                 'group relative isolate grid grid-rows-[auto_1fr] overflow-hidden rounded-2xl',
-                'bg-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl',
+                'hover:-translate-y-0.5 bg-white shadow-lg transition-all duration-300 hover:shadow-2xl',
                 'cursor-pointer',
             )}>
             <div className='relative overflow-hidden'>
@@ -66,22 +66,22 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
             </div>
 
             <section className='grid grid-rows-[auto_1fr_auto] items-start gap-4 p-6'>
-                <h3 className='text-xl font-semibold text-gray-900'>{title}</h3>
-                <p className='text-sm leading-relaxed text-gray-600'>{description}</p>
+                <h3 className='font-semibold text-gray-900 text-xl'>{title}</h3>
+                <p className='text-gray-600 text-sm leading-relaxed'>{description}</p>
 
                 <nav className='grid grid-flow-col flex-wrap gap-3 self-end'>
                     <Button
                         asChild
                         variant='link'
                         className={cn(
-                            'transition-color inline-flex items-center gap-1 rounded-lg px-4 py-2',
+                            'inline-flex items-center gap-1 rounded-lg px-4 py-2 transition-color',
                             'bg-gray-900 hover:bg-gray-700',
-                            'text-sm font-medium text-white',
+                            'font-medium text-sm text-white',
                         )}>
                         <NextLink href={hrefApp}>
                             Visit
                             {/* this span makes entire card to act as a link */}
-                            <span className='z-1 absolute inset-0' />
+                            <span className='absolute inset-0 z-1' />
                         </NextLink>
                     </Button>
 
@@ -92,7 +92,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
                             className={cn(
                                 'inline-flex items-center gap-0.5 rounded-lg px-4 py-2 transition-colors',
                                 'hover:bg-gray-50',
-                                'text-sm font-medium text-gray-700',
+                                'font-medium text-gray-700 text-sm',
                                 'border border-gray-300',
                                 'z-2',
                             )}>

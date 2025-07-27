@@ -1,23 +1,28 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const SQLiteSVG = (props: TSvgProps) => {
     const { size = 10, ...restProps } = props;
 
     return (
-        <svg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg' width={size} height={size} {...restProps}>
+        <svg
+            height={size}
+            viewBox='0 0 128 128'
+            width={size}
+            xmlns='http://www.w3.org/2000/svg'
+            {...restProps}>
+            <title>SQLite</title>
             <defs>
                 <linearGradient
+                    gradientTransform='rotate(90 -90.486 64.634) scale(9.2712)'
+                    gradientUnits='userSpaceOnUse'
                     id='sqlite-original-a'
                     x1='-15.615'
                     x2='-6.741'
                     y1='-9.108'
-                    y2='-9.108'
-                    gradientTransform='rotate(90 -90.486 64.634) scale(9.2712)'
-                    gradientUnits='userSpaceOnUse'>
-                    <stop stopColor='#95D7F4' offset='0' />
-                    <stop stopColor='#0F7FCC' offset='.92' />
-                    <stop stopColor='#0F7FCC' offset='1' />
+                    y2='-9.108'>
+                    <stop offset='0' stopColor='#95D7F4' />
+                    <stop offset='.92' stopColor='#0F7FCC' />
+                    <stop offset='1' stopColor='#0F7FCC' />
                 </linearGradient>
             </defs>
             <path

@@ -1,7 +1,7 @@
-/* Core */
+
 import NextAuth from 'next-auth';
 
-/* Instruments */
+
 import { authConfig } from './auth.config';
 
 // ? User creds

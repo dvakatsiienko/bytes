@@ -1,4 +1,4 @@
-/* Core */
+
 import { useQuery } from '@tanstack/react-query';
 import type { Friend } from '.prisma/client/edge';
 

@@ -1,8 +1,8 @@
-/* Components */
+
 import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
 import { InvoiceFormCreate } from './ui/InvoiceFormCreate';
 
-/* Instruments */
+
 import { fetchCustomerList } from '@/lib/queries';
 
 const CreateInvoicePage = async () => {
@@ -10,8 +10,8 @@ const CreateInvoicePage = async () => {
 
     return (
         <main>
-            <Breadcrumbs breadcrumbList = { breadcrumbList } />
-            <InvoiceFormCreate customerList = { customerList } />
+            <Breadcrumbs breadcrumbList={breadcrumbList} />
+            <InvoiceFormCreate customerList={customerList} />
         </main>
     );
 };
@@ -20,8 +20,8 @@ const CreateInvoicePage = async () => {
 const breadcrumbList = [
     { label: 'Invoices', href: '/dashboard/invoices' },
     {
-        label:  'Create Invoice',
-        href:   '/dashboard/invoices/create',
+        label: 'Create Invoice',
+        href: '/dashboard/invoices/create',
         active: true,
     },
 ];

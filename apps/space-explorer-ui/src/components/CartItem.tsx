@@ -1,7 +1,7 @@
-/* Components */
+
 import { LaunchTile } from './LaunchTile';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 
 export const CartItem = (props: CartItemProps) => {

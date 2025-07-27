@@ -1,10 +1,10 @@
-/* Core */
+
 import { Metadata } from 'next';
 
-/* Components */
+
 import { AppProviders } from './AppProviders';
 
-/* Instruments */
+
 import { inter } from '@/theme/fonts';
 import '@/theme/global.css';
 

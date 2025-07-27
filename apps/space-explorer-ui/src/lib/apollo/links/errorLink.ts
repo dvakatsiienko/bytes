@@ -1,4 +1,4 @@
-/* Core */
+
 import { onError } from '@apollo/client/link/error';
 import debug from 'debug';
 

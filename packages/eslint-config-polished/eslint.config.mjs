@@ -1,4 +1,3 @@
-/* Core */
 import polishedConfig from './index.mjs';
 
 /** @type {import('eslint').Linter.Config[]} */

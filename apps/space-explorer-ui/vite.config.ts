@@ -1,4 +1,4 @@
-/* Core */
+
 import { defineConfig } from 'vite';
 import vitePluginReactSwc from '@vitejs/plugin-react-swc';
 import vitePluginProgress from 'vite-plugin-progress';

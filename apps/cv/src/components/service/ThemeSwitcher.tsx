@@ -1,13 +1,13 @@
 'use client';
 
-/* Core */
+
 import { useTheme } from 'next-themes';
 import { Moon, Sun, Monitor } from 'lucide-react';
 
-/* Components */
+
 import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
 
-/* Instruments */
+
 import { cn } from '@ui/kit/lib/utils';
 import { useIsMounted } from '@ui/kit/hooks/useIsMounted';
 
@@ -23,7 +23,7 @@ export const ThemeSwitcher = (props: ThemeSwitcherProps) => {
         <ToggleGroupItem
             className={cn(
                 'grid h-6 items-center',
-                'dark:hover:text-link text-center text-xs font-semibold text-gray-600 dark:text-gray-400',
+                'text-center font-semibold text-gray-600 text-xs dark:text-gray-400 dark:hover:text-link',
                 'cursor-pointer',
                 themePreset.value === theme && 'text-link!',
 

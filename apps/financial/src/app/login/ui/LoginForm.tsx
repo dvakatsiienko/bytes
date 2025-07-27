@@ -1,14 +1,14 @@
 'use client';
 
-/* Core */
+
 import { AtSymbolIcon, KeyIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { useActionState } from 'react';
 
-/* Components */
+
 import { Button } from '@/ui/Button';
 
-/* Instruments */
+
 import { authenticate } from '@/lib';
 import { lusitana } from '@/theme/fonts';
 
@@ -17,14 +17,14 @@ export const LoginForm = () => {
 
     return (
         <form action = { authenticateAction } className = 'space-y-3'>
-            <div className = 'flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8'>
+            <div className = 'flex-1 rounded-lg bg-gray-50 px-6 pt-8 pb-4'>
                 <h1 className = { `${ lusitana.className } mb-3 text-2xl` }>
                     Please log in to continue.
                 </h1>
 
                 <fieldset className = 'w-full'>
                     <label
-                        className = 'mb-3 mt-5 block text-xs font-medium text-gray-900'
+                        className = 'mt-5 mb-3 block font-medium text-gray-900 text-xs'
                         htmlFor = 'email'>
                         Email
                     </label>
@@ -38,11 +38,11 @@ export const LoginForm = () => {
                             placeholder = 'Enter your email address'
                             type = 'email'
                         />
-                        <AtSymbolIcon className = 'pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
+                        <AtSymbolIcon className = '-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] text-gray-500 peer-focus:text-gray-900' />
                     </div>
 
                     <label
-                        className = 'mb-3 mt-5 block text-xs font-medium text-gray-900'
+                        className = 'mt-5 mb-3 block font-medium text-gray-900 text-xs'
                         htmlFor = 'password'>
                         Password
                     </label>
@@ -57,7 +57,7 @@ export const LoginForm = () => {
                             placeholder = 'Enter password'
                             type = 'password'
                         />
-                        <KeyIcon className = 'pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
+                        <KeyIcon className = '-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] text-gray-500 peer-focus:text-gray-900' />
                     </div>
                 </fieldset>
 
@@ -69,7 +69,7 @@ export const LoginForm = () => {
                     {errorMessage ? (
                         <>
                             <ExclamationCircleIcon className = 'h-5 w-5 text-red-500' />
-                            <p className = 'text-sm text-red-500'>{errorMessage}</p>
+                            <p className = 'text-red-500 text-sm'>{errorMessage}</p>
                         </>
                     ) : null}
                 </div>

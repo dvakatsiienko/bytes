@@ -1,70 +1,71 @@
-/* Instruments */
-import { Launch, Rocket, Launchpad } from './types';
+import { Launch, Launchpad, Rocket } from './types';
 
 export class LaunchModel implements TLaunchModel {
-    public constructor (launch: Launch, rockets: Rocket[], launchpads: Launchpad[]) {
-        this.id = launch.id;
-        this.flightNumber = launch.flight_number;
+  constructor(launch: Launch, rockets: Rocket[], launchpads: Launchpad[]) {
+    this.id = launch.id;
+    this.flightNumber = launch.flight_number;
 
-        const launchpad = launchpads.find((_launchpad) => _launchpad.id === launch.launchpad);
+    const launchpad = launchpads.find(
+      (_launchpad) => _launchpad.id === launch.launchpad,
+    );
 
-        if (!launchpad) {
-            throw new Error(`Launchpad for a ${ launch.name } launch was not found!`);
-        }
-
-        this.site = launchpad.name;
-        this.mission = {
-            name:              launch.name,
-            missionPatchSmall: launch.links.patch.small,
-            missionPatchLarge: launch.links.patch.large,
-        };
-
-        const rocket = rockets.find((_rocket) => _rocket.id === launch.rocket);
-
-        if (!rocket) {
-            throw new Error(`Rocket for ${ launch.name } launch was not found!`);
-        }
-
-        this.rocket = {
-            id:   rocket.id,
-            name: rocket.name,
-            type: rocket.type,
-        };
+    if (!launchpad) {
+      throw new Error(`Launchpad for a ${launch.name} launch was not found!`);
     }
 
-    public id:           string;
-    public flightNumber: number;
-    public site:         string;
-    public rocket: {
-        id:   string,
-        name: string,
-        type: string,
+    this.site = launchpad.name;
+    this.mission = {
+      missionPatchLarge: launch.links.patch.large,
+      missionPatchSmall: launch.links.patch.small,
+      name: launch.name,
     };
-    public mission: {
-        name:              string,
-        missionPatchSmall: string,
-        missionPatchLarge: string,
+
+    const rocket = rockets.find((_rocket) => _rocket.id === launch.rocket);
+
+    if (!rocket) {
+      throw new Error(`Rocket for ${launch.name} launch was not found!`);
+    }
+
+    this.rocket = {
+      id: rocket.id,
+      name: rocket.name,
+      type: rocket.type,
     };
+  }
+
+  id: string;
+  flightNumber: number;
+  site: string;
+  rocket: {
+    id: string;
+    name: string;
+    type: string;
+  };
+  mission: {
+    name: string;
+    missionPatchSmall: string;
+    missionPatchLarge: string;
+  };
 }
 
 /* Types */
 export interface TLaunchModel {
-    id:           string,
-    flightNumber: number,
-    site:         string,
+  id: string;
+  flightNumber: number;
+  site: string;
 
-    mission: TMission,
-    rocket:  TRocket,
+  mission: TMission;
+  rocket: TRocket;
 }
 
 export interface TMission {
-    name:              string,
-    missionPatchSmall: string,
-    missionPatchLarge: string,
+  name: string;
+  missionPatchSmall: string;
+  missionPatchLarge: string;
 }
 
 export interface TRocket {
-    id:   string,
-    name: string,
-    type: string,
+  id: string;
+  name: string;
+  type: string;
 }

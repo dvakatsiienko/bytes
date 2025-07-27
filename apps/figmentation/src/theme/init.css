@@ -1,11 +1,11 @@
-@import '@ui/kit/globals.css';
+@import "@ui/kit/globals.css";
+@import "./theme-tesla-landing.css";
+
 @plugin '@tailwindcss/typography';
 
-@import './theme-tesla-landing.css';
-
 @layer base {
-    @font-face {
-        font-family: roboto, system-ui, sans-serif;
-        font-style: normal;
-    }
+  @font-face {
+    font-family: roboto, system-ui, sans-serif;
+    font-style: normal;
+  }
 }

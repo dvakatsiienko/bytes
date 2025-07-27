@@ -1,8 +1,8 @@
-/* Core */
+
 import { ApolloClient, InMemoryCache, from } from '@apollo/client';
 import loggerLink from 'apollo-link-logger';
 
-/* Instruments */
+
 import { typeDefs } from './typeDefs';
 import { typePolicies } from './typePolicies';
 import { errorLink, authLink, httpLink } from './links';

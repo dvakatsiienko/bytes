@@ -1,118 +1,122 @@
-/* Core */
 import { RESTDataSource } from '@apollo/datasource-rest';
 
-/* Instruments */
 import { prismaClient } from '@/lib';
 
 export class UserAPI extends RESTDataSource {
-    public constructor (userEmail: string | null) {
-        super();
+  constructor(userEmail: string | null) {
+    super();
 
-        this.userEmail = userEmail;
+    this.userEmail = userEmail;
+  }
+
+  private userEmail: string | null;
+
+  async findOrCreate(email?: string | null) {
+    if (!email) {
+      throw new Error('Email is null!');
     }
 
-    private userEmail: string | null;
+    let user = await prismaClient.user.findUnique({
+      include: { trips: true },
+      where: { email },
+    });
 
-    public async findOrCreate (email?: string | null) {
-        if (!email) {
-            throw new Error('Email is null!');
-        }
-
-        let user = await prismaClient.user.findUnique({
-            where:   { email },
-            include: { trips: true },
-        });
-
-        if (user === null) {
-            user = await prismaClient.user.create({
-                data: {
-                    email,
-                    trips: { create: []},
-                },
-                include: { trips: true },
-            });
-        }
-
-        user.token = Buffer.from(email).toString('base64');
-
-        return user;
+    if (user === null) {
+      user = await prismaClient.user.create({
+        data: {
+          email,
+          trips: { create: [] },
+        },
+        include: { trips: true },
+      });
     }
 
-    public async bookTrips (launchIds: string[]) {
-        this.validateAuth();
+    user.token = Buffer.from(email).toString('base64');
 
-        const results = await Promise.all(launchIds.map((launchId) => this.bookTrip(launchId)));
+    return user;
+  }
 
-        return results;
+  async bookTrips(launchIds: string[]) {
+    this.validateAuth();
+
+    const results = await Promise.all(
+      launchIds.map((launchId) => this.bookTrip(launchId)),
+    );
+
+    return results;
+  }
+
+  async bookTrip(launchId: string) {
+    const email = this.validateAuth();
+
+    const user = await prismaClient.user.findUnique({ where: { email } });
+
+    if (user === null) {
+      throw new Error('User not found.');
     }
 
-    public async bookTrip (launchId: string) {
-        const email = this.validateAuth();
+    const trip = await prismaClient.trip.create({
+      data: { launchId, userId: user.id },
+    });
 
-        const user = await prismaClient.user.findUnique({ where: { email }});
+    return trip;
+  }
 
-        if (user === null) {
-            throw new Error('User not found.');
-        }
+  async cancelTrip(id: string) {
+    this.validateAuth();
 
-        const trip = await prismaClient.trip.create({ data: { launchId, userId: user.id }});
+    await prismaClient.trip.delete({ where: { id } });
+  }
 
-        return trip;
+  async getTrips() {
+    const email = this.validateAuth();
+
+    const user = await prismaClient.user.findUnique({
+      include: { trips: true },
+      where: { email },
+    });
+
+    if (user === null) {
+      throw new Error('User not found.');
     }
 
-    public async cancelTrip (id: string) {
-        this.validateAuth();
+    const { trips } = user;
 
-        await prismaClient.trip.delete({ where: { id }});
+    return trips;
+  }
+
+  async isBookedOnLaunch(launchId: string) {
+    const email = this.validateAuth();
+
+    const user = await prismaClient.user.findUnique({
+      include: { trips: true },
+      where: { email },
+    });
+
+    if (user === null) {
+      throw new Error('User not found.');
     }
 
-    public async getTrips () {
-        const email = this.validateAuth();
+    const userTrips = await prismaClient.trip.findMany({
+      where: { launchId, userId: user.id },
+    });
 
-        const user = await prismaClient.user.findUnique({
-            where:   { email },
-            include: { trips: true },
-        });
+    return userTrips && userTrips.length > 0;
+  }
 
-        if (user === null) {
-            throw new Error('User not found.');
-        }
-
-        const { trips } = user;
-
-        return trips;
+  validateAuth() {
+    if (!this.userEmail) {
+      throw new Error('Not authenticated.');
     }
 
-    public async isBookedOnLaunch (launchId: string) {
-        const email = this.validateAuth();
+    return this.userEmail;
+  }
 
-        const user = await prismaClient.user.findUnique({
-            where:   { email },
-            include: { trips: true },
-        });
+  login(email: string) {
+    this.userEmail = email;
+  }
 
-        if (user === null) {
-            throw new Error('User not found.');
-        }
-
-        const userTrips = await prismaClient.trip.findMany({ where: { userId: user.id, launchId }});
-
-        return userTrips && userTrips.length > 0;
-    }
-
-    public validateAuth () {
-        if (!this.userEmail) {
-            throw new Error('Not authenticated.');
-        }
-
-        return this.userEmail;
-    }
-
-    public login (email: string) {
-        this.userEmail = email;
-    }
-
-    public logout () {
-        this.userEmail = null;
-    }
+  logout() {
+    this.userEmail = null;
+  }
 }

@@ -1,7 +1,7 @@
-/* Core */
+
 import { cx } from 'cva';
 
-/* Components */
+
 import { ExternalLinkSvg } from './icons/ExternalLinkSvg';
 
 export const ExternalLink = (props: ExternalLinkProps) => {
