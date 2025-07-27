@@ -6,7 +6,7 @@ import spaceJpg from './img/space.jpg';
 import { resolver } from './resolver';
 import { CurveSvg, RocketSvg } from './SVG';
 import { Button, LogoSvg } from '@/components';
-import * as gql from '@/graphql';
+import type * as gql from '@/graphql';
 import { COLORS, SPACING } from '@/styles';
 
 export const LoginForm = (props: LoginFormProps) => {

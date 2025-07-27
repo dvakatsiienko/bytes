@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { cva } from 'cva';
-import * as SelectRadix from '@radix-ui/react-select';
+import type * as SelectRadix from '@radix-ui/react-select';
 import useEventListener from '@use-it/event-listener';
 
 import { SpinnerSvg } from '@/components/svg/SpinnerIcon';

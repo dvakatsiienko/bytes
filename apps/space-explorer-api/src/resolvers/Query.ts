@@ -18,10 +18,9 @@ export const Query: QueryResolvers = {
     });
 
     return {
-      cursor: list.length ? list[list.length - 1].flightNumber : null,
+      cursor: list.length ? list.at(-1)?.flightNumber : null,
       hasMore: list.length
-        ? list[list.length - 1].flightNumber !==
-          launches[launches.length - 1].flightNumber
+        ? list.at(-1)?.flightNumber !== launches.at(-1)?.flightNumber
         : false,
       list,
     };

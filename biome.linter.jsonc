@@ -67,27 +67,15 @@
 
       /* rules enforcing a consistent and idiomatic way of writing your code. By default, these rules will only generate warnings instead of errors. */
       "style": {
-        "noDefaultExport": "error",
-        "noParameterAssign": "warn",
-        "useConst": "warn",
-        "useDefaultParameterLast": "warn",
-        "noSubstr": "warn",
-
-        /* TODO enable in future refactoring */
-        "useAtIndex": "off",
-        "noYodaExpression": "off", // logical fix expressions
-        "useCollapsedIf": "off", // nested ifs fix
-        "useExportType": "off", // for future adding TS,
-        "useImportType": "off", // for future adding TS,
-
-        "useFilenamingConvention": "off", // move to kebab-case later
-        "useBlockStatements": "off", // ultracite rule
+        "noDefaultExport": "error", // ultracite rule — exterminate all defaul exports.
+        "useFilenamingConvention": "off", // ultracite rule — move to kebab-case later.
+        "useBlockStatements": "off", // ultracite rule — sometimes if-one-liners are pretty.
 
         /* React */
-        "useComponentExportOnlyModules": "off", // TODO enable after HOC extermination
-        "noImplicitBoolean": "off",
-        "useConsistentCurlyBraces": "on",
-        "useFragmentSyntax": "on"
+        "useComponentExportOnlyModules": "off", // TODO thus rule is probably useful — review it and enable
+        "noImplicitBoolean": "off", // shortstand boolean props are actually cool
+        "useConsistentCurlyBraces": "warn",
+        "useFragmentSyntax": "info"
       },
 
       /* rules that detect code that is likely to be incorrect or useless. */
