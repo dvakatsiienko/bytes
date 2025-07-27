@@ -2,11 +2,8 @@
 
 ## 🔎 Overview
 
-This package provides a fine-grained **Prettier** config as an extensible shared config.
-
-This package is deisgned as an accompaniment formatting tool for
-[eslint-config-polished](https://github.com/dvakatsiienko/bytes/tree/main/packages/eslint-config-polished).
-But can be used standalone too.
+This package provides a fine-grained **Prettier** config as an extensible shared
+config.
 
 ## 🏎️ Install
 

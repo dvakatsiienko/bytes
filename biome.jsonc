@@ -35,9 +35,7 @@
         "**/package.json",
         "**/tsconfig.json",
         "**/components.json",
-        "**/.prettierrc.js",
-
-        "packages/eslint-config-polished/**"
+        "**/.prettierrc.js"
       ]
     },
 
@@ -69,7 +67,6 @@
         // Other configs
         "prettier.config.mjs",
         "**/prettier.config.mjs",
-        "**/eslint.config.mjs",
         "**/postcss.config.mjs",
         "**/knip.ts",
 

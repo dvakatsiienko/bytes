@@ -1,8 +1,0 @@
----
-description:
-globs:
-alwaysApply: true
----
-
-# General
-- While scripting always check if turbo usage is appropriate for example: turbo lint is not the same as eslint .

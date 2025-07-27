@@ -1,11 +1,13 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 # General
 
-- Print code considering formatting rules defined in by nearest Prettier config and ESLint config to save up on further code movement
+- Print code considering formatting rules defined in by nearest Prettier config
+  and Biome config to save up on further code movement
 
 # Naming Conventions
 

@@ -27,7 +27,6 @@ const keyGroq = process.env.GROQ_API_KEY;
 if (!keyOpenRouter) throw new Error('OPENROUTER_API_KEY is not set');
 if (!keyGroq) throw new Error('GROQ_API_KEY is not set');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- for testing
 const openrouter = createOpenRouter({ apiKey: keyOpenRouter });
 const groq = createGroq({ apiKey: keyGroq });
 
@@ -94,7 +93,6 @@ export async function POST(req: Request) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- for testing
 const modelProvider = customProvider({
   languageModels: {
     'llama-3.3-70b-versatile': groq('llama-3.3-70b-versatile'),
