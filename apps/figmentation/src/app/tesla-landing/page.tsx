@@ -61,7 +61,7 @@ const TeslaLandingPage = () => {
 };
 
 const Header = () => {
-  const navLinkListJSX = headerNavLinksList.map((link) => (
+  const _navLinkListJSX = headerNavLinksList.map((link) => (
     <Button asChild key={link.label} variant='link'>
       <NextLink href={link.href}>{link.label}</NextLink>
     </Button>

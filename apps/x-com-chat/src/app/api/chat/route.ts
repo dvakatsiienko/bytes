@@ -1,4 +1,4 @@
-/** biome-ignore-all assist/source/useSortedKeys: this file is better to be sorted manually */
+/* biome-ignore-all assist/source/useSortedKeys: this file is better to be sorted manually */
 
 import { createGroq } from '@ai-sdk/groq';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
@@ -27,7 +27,7 @@ const keyGroq = process.env.GROQ_API_KEY;
 if (!keyOpenRouter) throw new Error('OPENROUTER_API_KEY is not set');
 if (!keyGroq) throw new Error('GROQ_API_KEY is not set');
 
-const openrouter = createOpenRouter({ apiKey: keyOpenRouter });
+const _openrouter = createOpenRouter({ apiKey: keyOpenRouter });
 const groq = createGroq({ apiKey: keyGroq });
 
 // TODO gemma2-9b-it for generating short descriptions

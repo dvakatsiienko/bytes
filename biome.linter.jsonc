@@ -20,20 +20,15 @@
 
       /* rules that detect code that is guaranteed to be incorrect or useless. */
       "correctness": {
-        "noUnusedVariables": "off", // todo scan with this once, prune all unuseds and turn off auto fix for this one
-        //
-        //
-        "noRenderReturnValue": "error",
-        "noUndeclaredDependencies": "off",
-
-        "noUnreachable": "error",
-        "noUnusedFunctionParameters": "warn",
-        "noUnusedImports": "warn",
-        "noUnsafeOptionalChaining": "warn",
-        "noUndeclaredVariables": "off",
+        "noUnusedVariables": {
+          "level": "warn",
+          "fix": "none" // do not let biome fix unused variables by prefixing with _ — review and handle these manually
+        },
+        "noUndeclaredDependencies": "error",
 
         /* React */
-        "useHookAtTopLevel": "warn",
+        "noRenderReturnValue": "error",
+        "useHookAtTopLevel": "error",
         "useExhaustiveDependencies": {
           /* handle useEffect manually */
           "fix": "none",
@@ -44,7 +39,7 @@
           "options": { "checkShorthandFragments": true }
         },
         "noChildrenProp": "warn",
-        "noVoidElementsWithChildren": "on"
+        "noVoidElementsWithChildren": "error"
       },
 
       /* rules under development */
