@@ -83,7 +83,7 @@ export async function deleteInvoice(id: string) {
     await prisma.invoice.delete({ where: { id } });
     revalidatePath('/dashboard/invoices');
     return { message: 'Deleted Invoice.' };
-  } catch (error) {
+  } catch (_error) {
     return { message: 'Database Error: Failed to Delete Invoice.' };
   }
 }
