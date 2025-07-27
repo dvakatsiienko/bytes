@@ -1,8 +1,8 @@
-/* Core */
+
 import styled from 'styled-components';
 import { lighten, darken } from 'polished';
 
-/* Instruments */
+
 import { SPACING, COLORS } from '@/styles';
 
 const height = 50;

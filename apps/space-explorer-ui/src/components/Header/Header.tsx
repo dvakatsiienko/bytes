@@ -1,7 +1,7 @@
-/* Core */
+
 import styled from 'styled-components';
 
-/* Instruments */
+
 import { SPACING, COLORS } from '@/styles';
 import dog1Png from './img/dog-1.png';
 import dog2Png from './img/dog-2.png';

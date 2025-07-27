@@ -1,12 +1,12 @@
-/* Core */
+
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import NextImage from 'next/image';
 
-/* Components */
+
 import { AcmeLogo } from '@/ui/AcmeLogo';
 
-/* Instruments */
+
 import { lusitana } from '@/theme/fonts';
 
 const RootPage = () => {
@@ -19,12 +19,12 @@ const RootPage = () => {
             <div className = 'mt-4 flex grow flex-col gap-4 md:flex-row'>
                 <div className = 'flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20'>
                     <span
-                        className = { `${ lusitana.className } text-xl text-gray-800 md:text-3xl md:leading-normal` }>
+                        className = { `${ lusitana.className } text-gray-800 text-xl md:text-3xl md:leading-normal` }>
                         <strong>Welcome to Acme.</strong>
                     </span>
 
                     <Link
-                        className = 'flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base'
+                        className = 'flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 font-medium text-sm text-white transition-colors hover:bg-blue-400 md:text-base'
                         href = '/login'>
                         <span>Log in</span> <ArrowRightIcon className = 'w-5 md:w-6' />
                     </Link>

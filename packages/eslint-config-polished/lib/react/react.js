@@ -1,6 +1,6 @@
 /* eslint-env: Node */
 
-/* Instruments */
+
 const complexReactRules = require('./complex-react-rules');
 
 /**

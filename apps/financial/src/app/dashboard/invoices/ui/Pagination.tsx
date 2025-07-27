@@ -1,13 +1,11 @@
 'use client';
 
-/* Core */
-import { usePathname, useSearchParams } from 'next/navigation';
-import NextLink from 'next/link';
+import cx from 'clsx';
 // import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import cx from 'clsx';
+import NextLink from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 
-/* Instruments */
 import { /* fetchInvoicesPages, */ generatePagination } from '@/lib';
 
 export const Pagination = (props: PaginationProps) => {
@@ -21,9 +19,10 @@ export const Pagination = (props: PaginationProps) => {
     //     queryFn:  () => fetchInvoicesPages(props.query),
     // });
 
-    // console.log('🚀 ~ Pagination ~ totalPages:', totalPages);
-
-    const paginationNumberList = generatePagination(currentPage, props.totalPages);
+    const paginationNumberList = generatePagination(
+        currentPage,
+        props.totalPages,
+    );
 
     const createPageURL = (pageNumber: number | string) => {
         const params = new URLSearchParams(searchParams);
@@ -42,9 +41,9 @@ export const Pagination = (props: PaginationProps) => {
 
         return (
             <PaginationNumber
-                key={page}
                 href={createPageURL(page)}
                 isActive={currentPage === page}
+                key={page}
                 page={page}
                 position={position}
             />
@@ -53,9 +52,13 @@ export const Pagination = (props: PaginationProps) => {
 
     return (
         <div className='inline-flex'>
-            <PaginationArrow direction='left' href={createPageURL(currentPage - 1)} isDisabled={currentPage <= 1} />
+            <PaginationArrow
+                direction='left'
+                href={createPageURL(currentPage - 1)}
+                isDisabled={currentPage <= 1}
+            />
 
-            <div className='flex -space-x-px'>{paginationNumberListJSX}</div>
+            <div className='-space-x-px flex'>{paginationNumberListJSX}</div>
 
             <PaginationArrow
                 direction='right'
@@ -69,13 +72,16 @@ export const Pagination = (props: PaginationProps) => {
 const PaginationNumber = (props: PaginationNumberProps) => {
     const { page, href, position, isActive } = props;
 
-    const className = cx('flex h-10 w-10 items-center justify-center text-sm border border-gray-400', {
-        'rounded-l-md': position === 'first' || position === 'single',
-        'rounded-r-md': position === 'last' || position === 'single',
-        'z-10 bg-blue-600 border-blue-600 text-white': isActive,
-        'hover:bg-gray-100': !isActive && position !== 'middle',
-        'text-gray-300': position === 'middle',
-    });
+    const className = cx(
+        'flex h-10 w-10 items-center justify-center text-sm border border-gray-400',
+        {
+            'hover:bg-gray-100': !isActive && position !== 'middle',
+            'rounded-l-md': position === 'first' || position === 'single',
+            'rounded-r-md': position === 'last' || position === 'single',
+            'text-gray-300': position === 'middle',
+            'z-10 bg-blue-600 border-blue-600 text-white': isActive,
+        },
+    );
 
     return isActive || position === 'middle' ? (
         <div className={className}>{page}</div>
@@ -89,14 +95,22 @@ const PaginationNumber = (props: PaginationNumberProps) => {
 const PaginationArrow = (props: PaginationArrowProps) => {
     const { href, direction, isDisabled } = props;
 
-    const className = cx('flex h-10 w-10 items-center justify-center rounded-md border border-gray-400', {
-        'pointer-events-none text-gray-300': isDisabled,
-        'hover:bg-gray-100': !isDisabled,
-        'mr-2 md:mr-4': direction === 'left',
-        'ml-2 md:ml-4': direction === 'right',
-    });
+    const className = cx(
+        'flex h-10 w-10 items-center justify-center rounded-md border border-gray-400',
+        {
+            'hover:bg-gray-100': !isDisabled,
+            'ml-2 md:ml-4': direction === 'right',
+            'mr-2 md:mr-4': direction === 'left',
+            'pointer-events-none text-gray-300': isDisabled,
+        },
+    );
 
-    const icon = direction === 'left' ? <ArrowLeftIcon className='w-4' /> : <ArrowRightIcon className='w-4' />;
+    const icon =
+        direction === 'left' ? (
+            <ArrowLeftIcon className='w-4' />
+        ) : (
+            <ArrowRightIcon className='w-4' />
+        );
 
     return isDisabled ? (
         <div className={className}>{icon}</div>

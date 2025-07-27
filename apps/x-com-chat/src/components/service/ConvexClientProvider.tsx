@@ -1,6 +1,6 @@
 'use client';
 
-/* Core */
+
 import { ConvexProvider, ConvexReactClient } from 'convex/react';
 
 // @ts-expect-error todo install t3-env and remove ! typescript assertion

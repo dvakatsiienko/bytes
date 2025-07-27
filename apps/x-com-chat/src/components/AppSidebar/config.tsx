@@ -6,7 +6,7 @@ export const themeList = [
     {
         value: 'light',
         label: 'Light',
-        icon: <Sun className='h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all' />,
+        icon: <Sun className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all' />,
     },
     {
         value: 'dark',

@@ -1,13 +1,13 @@
-/* Core */
+
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { preloadQuery, fetchMutation, preloadedQueryResult } from 'convex/nextjs';
 
-/* Components */
+
 import { Image } from '@/components/Image';
 import { Chat } from './parts';
 
-/* Instruments */
+
 import { api } from '@/convex/_generated/api';
 import { cn } from '@/utils/cn';
 import styles from './parts/styles.module.css';
@@ -40,7 +40,7 @@ export default async function ChatPage(props: ChatPageProps) {
     const friendName = friendList.find((friend) => friend._id === friendId)?.name?.toLocaleLowerCase();
 
     const chat = await fetchMutation(api.chat.initChat, { chatId, friendId });
-    if (!chat) redirect(`/404`);
+    if (!chat) redirect('/404');
 
     // ? if chatId different from chat._id means it's a new chat
     if (chat._id !== chatId) {

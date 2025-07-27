@@ -1,4 +1,4 @@
-/* Core */
+
 import { cva, cx, type VariantProps } from 'cva';
 import { cn } from '@ui/kit/lib/utils';
 
@@ -6,7 +6,7 @@ export function SectionHeading(props: SectionHeadingProps) {
     const { accentColor = 'sky', text, className, id } = props;
 
     return (
-        <h3 id={id} className={cx('font-geist-mono col-span-2 flex select-none items-center gap-x-1.5', className)}>
+        <h3 id={id} className={cx('col-span-2 flex select-none items-center gap-x-1.5 font-geist-mono', className)}>
             <b className={cn(accentCn({ accentColor }))} />
             {text}
         </h3>

@@ -1,4 +1,4 @@
-/* Core */
+
 import { atom } from 'jotai';
 
 export const selectedFriendIdAtom = atom<string | null>(null);

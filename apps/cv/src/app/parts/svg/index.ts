@@ -1,4 +1,4 @@
-/* core */
+
 export * from './ESNextSVG';
 export * from './TypeScriptSVG';
 export * from './NodeSVG';

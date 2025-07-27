@@ -11,7 +11,7 @@ export default function SquadsLayout({
 }) {
     return (
         <div className='grid place-content-center'>
-            <h1 className='text-4xl font-bold'>Squads (layout)</h1>
+            <h1 className='font-bold text-4xl'>Squads (layout)</h1>
             <div className='flex gap-4'>
                 <Link href='/squads/alpha'>Alpha page</Link>
                 <Link href='/squads/beta'>Beta page</Link>

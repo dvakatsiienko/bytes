@@ -1,32 +1,39 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const ChadcnSVG = (props: TSvgProps) => {
     const { size = 10, ...restProps } = props;
 
     return (
-        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' width={size} height={size} {...restProps}>
-            <rect width='256' height='256' fill='none'></rect>
+        <svg
+            height={size}
+            viewBox='0 0 256 256'
+            width={size}
+            xmlns='http://www.w3.org/2000/svg'
+            {...restProps}>
+            <title>shadcn/ui</title>
+            <rect fill='none' height='256' width='256' />
             <line
+                fill='none'
+                stroke='currentColor'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='32'
                 x1='208'
-                y1='128'
                 x2='128'
+                y1='128'
                 y2='208'
-                fill='none'
-                stroke='currentColor'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='32'></line>
+            />
             <line
-                x1='192'
-                y1='40'
-                x2='40'
-                y2='192'
                 fill='none'
                 stroke='currentColor'
                 strokeLinecap='round'
                 strokeLinejoin='round'
-                strokeWidth='32'></line>
+                strokeWidth='32'
+                x1='192'
+                x2='40'
+                y1='40'
+                y2='192'
+            />
         </svg>
     );
 };

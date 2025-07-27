@@ -1,13 +1,12 @@
-/* Core */
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
-import type { User } from '~/prisma/client/edge';
 
-/* Instruments */
 import { prisma } from '@/lib';
 import { verifyPassword } from '@/lib/security';
+
 import { authConfig } from './auth.config';
+import type { User } from '~/prisma/client/edge';
 
 export const { auth, signIn, signOut } = NextAuth({
     ...authConfig,
@@ -15,7 +14,10 @@ export const { auth, signIn, signOut } = NextAuth({
         Credentials({
             async authorize(credentials) {
                 const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
+                    .object({
+                        email: z.string().email(),
+                        password: z.string().min(6),
+                    })
                     .safeParse(credentials);
 
                 if (parsedCredentials.success) {
@@ -24,11 +26,14 @@ export const { auth, signIn, signOut } = NextAuth({
 
                     if (!user) return null;
 
-                    const passwordsMatch = verifyPassword(password, user.password);
+                    const passwordsMatch = verifyPassword(
+                        password,
+                        user.password,
+                    );
                     if (passwordsMatch) return user;
                 }
 
-                console.log('Invalid credentials!');
+                console.info('Invalid credentials!');
                 return null;
             },
         }),

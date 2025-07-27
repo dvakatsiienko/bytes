@@ -1,16 +1,16 @@
-/* Core */
+
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 
-/* Components */
+
 import { SearchField } from '@/ui/SearchField';
 import { InvoicesTableSkeleton } from '@/ui/Skeletons';
 import { lusitana } from '@/theme/fonts';
 import { InvoiceTable, Pagination } from './ui';
 import { CreateInvoice } from './ui/Buttons';
 
-/* Instruments */
+
 import { fetchInvoicesPages } from '@/lib';
 import type { NextPageProps } from '@/types';
 

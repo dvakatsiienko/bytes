@@ -1,4 +1,4 @@
-/* Components */
+
 import * as svg from './svg';
 
 export const toolListCore = [

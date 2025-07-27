@@ -1,10 +1,10 @@
 'use client';
 
-/* Core */
+
 import * as TogglePrimitive from '@radix-ui/react-toggle';
 import { cva, type VariantProps } from 'cva';
 
-/* Instruments */
+
 import { cn } from '@/utils/cn';
 
 function Toggle({
@@ -29,19 +29,19 @@ const toggleVariants = cva({
         'rounded-md outline-none focus-visible:border-ring aria-invalid:border-destructive',
         'focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
         'hover:bg-muted data-[state=on]:bg-accent',
-        'text-sm font-medium whitespace-nowrap hover:text-muted-foreground',
+        'whitespace-nowrap font-medium text-sm hover:text-muted-foreground',
         'data-[state=on]:text-accent-foreground',
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         'transition-[color,box-shadow]',
     ),
     variants: {
         variant: {
             default: 'bg-transparent',
             outline: cn(
-                'border border-solid border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground',
+                'border border-input border-solid bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground',
                 // custom
                 'brand:hover:bg-input/90 brand:data-[state=on]:bg-input',
-                'dark:brand:hover:bg-background/40 dark:brand:data-[state=on]:bg-background/40',
+                'dark:brand:data-[state=on]:bg-background/40 dark:brand:hover:bg-background/40',
             ),
         },
         size: {

@@ -1,9 +1,9 @@
 /* eslint-env: Node */
 
-/* Core */
+
 const { resolve } = require('node:path');
 
-/* Instruments */
+
 const comlexJsRules = require('./complex-js-rules');
 
 /**

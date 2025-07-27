@@ -1,4 +1,4 @@
-/* Core */
+
 import pluginJS from '@eslint/js';
 import pluginTS from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
@@ -30,6 +30,7 @@ const extTSXGlob = `**/*.{${extTSX.join(',')}}`;
 const extJSGlob = `**/*.{${extJS.join(',')}}`;
 const extTSGlob = `**/*.{${extTS.join(',')}}`;
 
+// biome-ignore lint/style/noDefaultExport: eslint config is default-exported
 export default pluginTS.config(
     {
         name: 'eslint-config-polished/ignores-global',

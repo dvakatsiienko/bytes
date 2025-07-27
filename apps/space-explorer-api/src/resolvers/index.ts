@@ -1,4 +1,4 @@
-/* Instruments */
+
 import { Query } from './Query';
 import { Mutation } from './Mutation';
 import { Launch } from './Launch';

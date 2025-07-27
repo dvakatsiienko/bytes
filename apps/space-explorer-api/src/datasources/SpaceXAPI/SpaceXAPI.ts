@@ -1,49 +1,57 @@
-/* Core */
 import { RESTDataSource } from '@apollo/datasource-rest';
 
-/* Instruments */
-import type { Launch, Rocket, Launchpad } from './types';
 import { LaunchModel } from './LaunchModel';
+import type { Launch, Launchpad, Rocket } from './types';
 
 export class SpaceXAPI extends RESTDataSource {
-    public constructor () {
-        super();
+  constructor() {
+    super();
 
-        this.baseURL = 'https://api.spacexdata.com';
-    }
+    this.baseURL = 'https://api.spacexdata.com';
+  }
 
-    public async getLaunches () {
-        const launches = await this.get<Launch[]>('/v5/launches');
+  async getLaunches() {
+    const launches = await this.get<Launch[]>('/v5/launches');
 
-        const { rockets, launchpads } = await this.collectLaunchData(launches);
+    const { rockets, launchpads } = await this.collectLaunchData(launches);
 
-        const launchModels = launches.map((launch) => new LaunchModel(launch, rockets.flat(), launchpads.flat()));
+    const launchModels = launches.map(
+      (launch) => new LaunchModel(launch, rockets.flat(), launchpads.flat()),
+    );
 
-        return launchModels;
-    }
+    return launchModels;
+  }
 
-    public async getLaunch (id: string) {
-        const launch = await this.get<Launch>(`/v5/launches/${ id }`);
+  async getLaunch(id: string) {
+    const launch = await this.get<Launch>(`/v5/launches/${id}`);
 
-        const { rockets, launchpads } = await this.collectLaunchData([ launch ]);
+    const { rockets, launchpads } = await this.collectLaunchData([launch]);
 
-        const launchModel = new LaunchModel(launch, rockets, launchpads);
+    const launchModel = new LaunchModel(launch, rockets, launchpads);
 
-        return launchModel;
-    }
+    return launchModel;
+  }
 
-    public async collectLaunchData (launches: Launch[]) {
-        const [ rockets, launchpads ] = await Promise.all([
-            Promise.all(launches.map((launch) => this.get<Rocket>(`/v4/rockets/${ launch.rocket }`))),
-            Promise.all(launches.map((launch) => this.get<Launchpad>(`/v4/launchpads/${ launch.launchpad }`))),
-        ]);
+  async collectLaunchData(launches: Launch[]) {
+    const [rockets, launchpads] = await Promise.all([
+      Promise.all(
+        launches.map((launch) =>
+          this.get<Rocket>(`/v4/rockets/${launch.rocket}`),
+        ),
+      ),
+      Promise.all(
+        launches.map((launch) =>
+          this.get<Launchpad>(`/v4/launchpads/${launch.launchpad}`),
+        ),
+      ),
+    ]);
 
-        return { rockets, launchpads };
-    }
+    return { launchpads, rockets };
+  }
 
-    public async getLaunchesByIds (ids: string[]) {
-        const launches = await Promise.all(ids.map((id) => this.getLaunch(id)));
+  async getLaunchesByIds(ids: string[]) {
+    const launches = await Promise.all(ids.map((id) => this.getLaunch(id)));
 
-        return launches;
-    }
+    return launches;
+  }
 }

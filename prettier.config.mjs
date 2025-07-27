@@ -1,4 +1,3 @@
-/* Core */
 import prettierConfigPolished from 'prettier-config-polished';
 
 /**

@@ -2,7 +2,7 @@
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'cva';
 
-/* Instruments */
+
 import { cn } from '@/utils/cn';
 
 export const Button = (props: ButtonProps) => {
@@ -26,9 +26,9 @@ export const Button = (props: ButtonProps) => {
 export const buttonVariants = cva({
     base: cn(
         'relative inline-flex shrink-0 items-center justify-center gap-2 rounded-md',
-        'text-sm font-medium whitespace-nowrap',
+        'whitespace-nowrap font-medium text-sm',
         'outline-none focus-visible:border-ring',
-        "focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         'transition-all',
     ),
     variants: {

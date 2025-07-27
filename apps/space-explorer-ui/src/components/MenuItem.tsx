@@ -1,8 +1,8 @@
-/* Core */
+
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
-/* Instruments */
+
 import { COLORS, SPACING } from '@/styles';
 
 export const menuItemClassName = css`

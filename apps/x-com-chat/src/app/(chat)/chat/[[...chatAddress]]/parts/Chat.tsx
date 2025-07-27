@@ -1,6 +1,6 @@
 'use client';
 
-/* Core */
+
 import { useEffect, useRef, type ChangeEvent } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { createIdGenerator, type Message } from 'ai';
@@ -10,7 +10,7 @@ import useEventListener from '@use-it/event-listener';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import type { Friend } from '.prisma/client/edge';
 
-/* Components */
+
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -18,7 +18,7 @@ import { Select } from '@/components/Select';
 import { SpinnerSvg } from '@/components/svg/SpinnerIcon';
 import { MessageList } from './MessageList';
 
-/* Instruments */
+
 import { useChatHistoryQuery } from '@/queries/chat';
 import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
 import { cn } from '@/utils/cn';
@@ -127,7 +127,7 @@ export const Chat = (props: ChatProps) => {
             <form
                 ref={formRef}
                 onSubmit={submitChatPrompt}
-                className='bottom-(--layout-offset) sticky mx-auto grid w-full [grid-area:textarea]'>
+                className='sticky bottom-(--layout-offset) mx-auto grid w-full [grid-area:textarea]'>
                 <Textarea
                     name='chat-textarea'
                     placeholder='To chat...'
@@ -151,8 +151,8 @@ export const Chat = (props: ChatProps) => {
                 <Tooltip>
                     <TooltipTrigger
                         className={cn(
-                            'absolute right-0 top-0 hidden size-8 place-items-center md:grid',
-                            'rounded-bl-md rounded-tr-md bg-transparent',
+                            'absolute top-0 right-0 hidden size-8 place-items-center md:grid',
+                            'rounded-tr-md rounded-bl-md bg-transparent',
                         )}>
                         <InfoCircledIcon />
                     </TooltipTrigger>
@@ -178,7 +178,7 @@ export const Chat = (props: ChatProps) => {
                     classNameTrigger={cn(
                         'absolute bottom-0 left-0',
                         'gird min-w-25 grid-flow-col justify-start gap-1 px-2 text-sm leading-none md:px-2',
-                        'border-border border',
+                        'border border-border',
                         'brand:bg-primary brand:text-primary-foreground',
                     )}
                     onValueChange={selectFriend}
@@ -190,9 +190,9 @@ export const Chat = (props: ChatProps) => {
                     type={isLoading ? 'button' : 'submit'}
                     onClick={isLoading ? stop : void 0}
                     className={cn(
-                        'min-w-30 absolute bottom-0 right-0',
-                        'rounded-bl-none rounded-tr-none text-sm',
-                        'border-border border border-solid',
+                        'absolute right-0 bottom-0 min-w-30',
+                        'rounded-tr-none rounded-bl-none text-sm',
+                        'border border-border border-solid',
                     )}>
                     {isLoading ? <SpinnerSvg spin /> : 'Send'}
                 </Button>

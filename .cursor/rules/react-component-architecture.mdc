@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 # React Component Architecture
@@ -23,15 +23,12 @@ Use examples below to generate relevant code.
 ## React Component Structure
 
 ```typescript
-/* Core */
 import { headers } from 'next/headers';
 import cx from 'clsx';
 import { type User } from '@prisma/client';
 
-/* Components */
 import { Nav } from '@/cpmponents/Nav';
 
-/* Instruments */
 import { prisma, type } from '@/lib/prisma';
 
 export const UserTable: React.FC<UserTableProps> = async (props) => {

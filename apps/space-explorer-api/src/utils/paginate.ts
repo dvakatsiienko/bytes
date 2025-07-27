@@ -1,4 +1,4 @@
-/* Instruments */
+
 import { LaunchModel } from '../datasources';
 
 export const paginate = ({

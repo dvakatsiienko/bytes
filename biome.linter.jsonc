@@ -1,0 +1,180 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "linter": {
+    "domains": {
+      "project": "recommended"
+    },
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+
+      /* rules focused on preventing accessibility problems */
+      "a11y": {
+        "useButtonType": "on",
+        "noStaticElementInteractions": "warn", // change to error
+        "useSemanticElements": "warn", // change to error
+        "useKeyWithClickEvents": "warn", // change to error
+        "useFocusableInteractive": "warn", // change to error
+        "noNoninteractiveElementToInteractiveRole": "warn", // change to error
+        "useIframeTitle": "warn", // change to error
+        "noSvgWithoutTitle": "warn", // change to error
+        "useGenericFontNames": "warn", // change to error
+        "useAltText": "warn", // change to error
+        "useKeyWithMouseEvents": "warn", // change to error
+        "noAutofocus": "warn" // change to error
+      },
+
+      /* rules that focus on inspecting complex code that could be simplified. */
+      "complexity": {
+        "noArguments": "warn", // fix
+        "noBannedTypes": "off", // fix
+        "noCommaOperator": "error",
+        "noEmptyTypeParameters": "warn",
+        "noExcessiveCognitiveComplexity": "off", // good rule for refactoring complex logics,
+        "noExtraBooleanCast": "warn", // fix
+        "noFlatMapIdentity": "error",
+        "noForEach": "off", // for future refactoring, good moment for performance optimizations
+        "noStaticOnlyClass": "error",
+        "noThisInStatic": "error", // fix
+        "noUselessCatch": "warn", // fix unsafe
+        "noUselessConstructor": "error", // fix unsafe
+        "noUselessContinue": "error", // fix unsafe
+        "noUselessEmptyExport": "error", // fix
+        "noUselessEscapeInRegex": "error", // fix unsafe
+        "noUselessLabel": "error", // fix unsafe
+        "noUselessLoneBlockStatements": "error", // fix
+        "noUselessRename": "error", // fix
+        "noUselessStringConcat": "warn", // fix
+        "noUselessStringRaw": "on",
+        "noUselessSwitchCase": "error", // fix unsafe
+        "noUselessTernary": "error", // fix unsafe
+        "noUselessThisAlias": "warn", // fix
+        "noUselessTypeConstraint": "error", // fix | after refactoring and adding all necessary types
+        "noUselessUndefinedInitialization": "error", // fix
+        "noVoid": "off",
+        "useArrowFunction": "off",
+        "useDateNow": "off", // fix unsafe
+        "useFlatMap": "error",
+        "useLiteralKeys": "on",
+        "useNumericLiterals": "error", // fix
+        "useOptionalChain": "warn", // fix unsafe | enable this
+        "useRegexLiterals": "error",
+        "useSimpleNumberKeys": "on",
+        "useSimplifiedLogicExpression": "off", // if (!a && !b) is simpler than !(a || b)
+        "useWhile": "off",
+
+        /* React */
+        "noUselessFragments": "on" // unsafe fix
+      },
+
+      /* rules that detect code that is guaranteed to be incorrect or useless. */
+      "correctness": {
+        "noRenderReturnValue": "error",
+        "noUndeclaredDependencies": "off",
+
+        "noUnreachable": "error",
+        "noUnusedFunctionParameters": "warn",
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "off", // todo scan with this once, prune all unuseds and turn off auto fix for this one
+        "noUnsafeOptionalChaining": "warn",
+        "noUndeclaredVariables": "off",
+
+        /* React */
+        "useHookAtTopLevel": "warn",
+        "useExhaustiveDependencies": {
+          /* handle useEffect manually */
+          "fix": "none",
+          "level": "warn"
+        },
+        "useJsxKeyInIterable": {
+          "level": "error",
+          "options": { "checkShorthandFragments": true }
+        },
+        "noChildrenProp": "warn",
+        "noVoidElementsWithChildren": "on"
+      },
+
+      /* rules under development */
+      "nursery": {
+        /**
+         * TODO 1. turn on when dubious imports are removed e.g. preact instead of react
+         * TODO 2. delegate to ts
+         */
+        "noUnresolvedImports": "off",
+        "useUniqueElementIds": "off",
+        "noFloatingPromises": "off",
+        "noConstantBinaryExpression": "warn",
+        "useIndexOf": "warn",
+
+        "noUnknownAtRule": "off", // ultracite rule
+
+        /* React */
+        "noReactPropAssign": "error",
+        "noNestedComponentDefinitions": "error"
+      },
+
+      /* rules catching ways your code could be written to run faster, or generally be more efficient. */
+      "performance": {
+        "noNamespaceImport": "off", // ultracite rule
+        "noAccumulatingSpread": "off"
+      },
+
+      /* rules that detect ways your code could be exploited or lead to security vulnerabilities. */
+      "security": {
+        /* React */
+        "noBlankTarget": "error",
+        "noDangerouslySetInnerHtml": "info",
+        "noDangerouslySetInnerHtmlWithChildren": "on"
+      },
+
+      /* rules enforcing a consistent and idiomatic way of writing your code. By default, these rules will only generate warnings instead of errors. */
+      "style": {
+        "noDefaultExport": "error",
+        "noParameterAssign": "warn",
+        "useConst": "warn",
+        "useDefaultParameterLast": "warn",
+        "noSubstr": "warn",
+
+        /* TODO enable in future refactoring */
+        "useAtIndex": "off",
+        "noYodaExpression": "off", // logical fix expressions
+        "useCollapsedIf": "off", // nested ifs fix
+        "useExportType": "off", // for future adding TS,
+        "useImportType": "off", // for future adding TS,
+
+        "useFilenamingConvention": "off", // move to kebab-case later
+        "useBlockStatements": "off", // ultracite rule
+
+        /* React */
+        "useComponentExportOnlyModules": "off", // TODO enable after HOC extermination
+        "noImplicitBoolean": "off",
+        "useConsistentCurlyBraces": "on",
+        "useFragmentSyntax": "on"
+      },
+
+      /* rules that detect code that is likely to be incorrect or useless. */
+      "suspicious": {
+        "noDebugger": "error",
+        "noAssignInExpressions": "warn", // todo change to error
+        "noDoubleEquals": "warn", // unsafe fix
+        "noFallthroughSwitchClause": "warn",
+        "noPrototypeBuiltins": "warn",
+        "useNumberToFixedDigitsArgument": "warn",
+        "noExplicitAny": "off",
+
+        "noConsole": {
+          "level": "warn",
+          "options": {
+            "allow": ["assert", "error", "info", "warn"]
+          }
+        },
+
+        /* React */
+        "noArrayIndexKey": "warn",
+        "noDuplicateJsxProps": "warn",
+        "noSuspiciousSemicolonInJsx": "warn",
+        "noCommentText": "on"
+      }
+    }
+  }
+}

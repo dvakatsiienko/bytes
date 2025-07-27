@@ -1,4 +1,4 @@
-/* Components */
+
 import { Sidenav } from './(overview)/ui';
 
 const DashboardLayout = (props: DashboardLayoutProps) => {

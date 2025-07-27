@@ -1,4 +1,3 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const HeadlessUISVG = (props: TSvgProps) => {
@@ -6,20 +5,31 @@ export const HeadlessUISVG = (props: TSvgProps) => {
 
     return (
         <svg
+            height={size}
+            preserveAspectRatio='xMidYMid'
             viewBox='0 0 256 256'
             width={size}
-            height={size}
             xmlns='http://www.w3.org/2000/svg'
-            preserveAspectRatio='xMidYMid'
             {...restProps}>
+            <title>Headless UI</title>
             <defs>
-                <linearGradient x1='35.871%' y1='7.224%' x2='60.314%' y2='115.988%' id='headlessui-a'>
-                    <stop stopColor='#66E3FF' offset='0%' />
-                    <stop stopColor='#7064F9' offset='100%' />
+                <linearGradient
+                    id='headlessui-a'
+                    x1='35.871%'
+                    x2='60.314%'
+                    y1='7.224%'
+                    y2='115.988%'>
+                    <stop offset='0%' stopColor='#66E3FF' />
+                    <stop offset='100%' stopColor='#7064F9' />
                 </linearGradient>
-                <linearGradient x1='39.172%' y1='0%' x2='55.05%' y2='99.181%' id='headlessui-b'>
-                    <stop stopColor='#66E3FF' offset='0%' />
-                    <stop stopColor='#7064F9' offset='100%' />
+                <linearGradient
+                    id='headlessui-b'
+                    x1='39.172%'
+                    x2='55.05%'
+                    y1='0%'
+                    y2='99.181%'>
+                    <stop offset='0%' stopColor='#66E3FF' />
+                    <stop offset='100%' stopColor='#7064F9' />
                 </linearGradient>
             </defs>
 

@@ -1,4 +1,4 @@
-/* Instruments */
+
 import type { TSvgProps } from './types';
 
 export const JotaiSVG = (props: TSvgProps) => {

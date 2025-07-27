@@ -1,4 +1,3 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const TypeScriptSVG = (props: TSvgProps) => {
@@ -6,12 +5,13 @@ export const TypeScriptSVG = (props: TSvgProps) => {
 
     return (
         <svg
+            height={size}
+            preserveAspectRatio='xMidYMid'
             viewBox='0 0 256 256'
             width={size}
-            height={size}
             xmlns='http://www.w3.org/2000/svg'
-            preserveAspectRatio='xMidYMid'
             {...restProps}>
+            <title>TypeScript</title>
             <path
                 d='M20 0h216c11.046 0 20 8.954 20 20v216c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20V20C0 8.954 8.954 0 20 0Z'
                 fill='#3178C6'

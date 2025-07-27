@@ -1,12 +1,12 @@
-/* Core */
+
 import styled from 'styled-components';
 
-/* Components */
+
 import { MenuItem } from '../MenuItem';
 import { LogoutButton } from './LogoutButton';
 import { HomeSvg, CartSvg, ProfileSvg } from './SVG';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 import { COLORS, SPACING } from '@/styles';
 

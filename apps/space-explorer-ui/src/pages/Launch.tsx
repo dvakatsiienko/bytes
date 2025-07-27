@@ -1,10 +1,10 @@
-/* Core */
+
 import { useParams } from 'react-router-dom';
 
-/* Components */
+
 import { Header, Loading, LaunchTile } from '@/components';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 
 export const Launch = () => {

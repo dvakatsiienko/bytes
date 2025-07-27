@@ -1,10 +1,10 @@
-/* Core */
+
 import { useNavigate } from 'react-router-dom';
 
-/* Components */
+
 import { LoginForm, Loading } from '@/components';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 import { isLoggedInVar } from '@/lib/apollo';
 

@@ -1,13 +1,13 @@
-/* Core */
+
 import { Manrope, Geist_Mono } from 'next/font/google';
 import { cx } from 'cva';
 import type { Metadata } from 'next';
 
-/* Components */
+
 import { Browser } from '@/components/Browser';
 import { ThemeProvider } from '@/components/service/ThemeProvider';
 
-/* Instruments */
+
 import '@/theme/init.css';
 
 const fontManrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });

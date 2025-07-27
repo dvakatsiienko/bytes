@@ -1,4 +1,4 @@
-/* Core */
+
 import cx from 'clsx';
 import { CheckIcon, ClockIcon } from '@heroicons/react/24/outline';
 

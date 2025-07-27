@@ -1,11 +1,11 @@
-/* Core */
+
 import { Suspense } from 'react';
 
-/* Components */
+
 import { RevenueChartSkeleton, LatestInvoicesSkeleton, CardsSkeleton } from '@/ui/Skeletons';
 import { CardList, RevenueChart, LatestInvoices } from './ui';
 
-/* Instruments */
+
 import { lusitana } from '@/theme/fonts';
 
 const DashboardPage = () => {

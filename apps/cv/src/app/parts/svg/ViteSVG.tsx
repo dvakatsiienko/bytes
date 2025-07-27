@@ -1,4 +1,3 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const ViteSVG = (props: TSvgProps) => {
@@ -6,21 +5,32 @@ export const ViteSVG = (props: TSvgProps) => {
 
     return (
         <svg
+            height={size}
+            preserveAspectRatio='xMidYMid'
             viewBox='0 0 256 257'
             width={size}
-            height={size}
             xmlns='http://www.w3.org/2000/svg'
-            preserveAspectRatio='xMidYMid'
             {...restProps}>
+            <title>Vite</title>
             <defs>
-                <linearGradient x1='-.828%' y1='7.652%' x2='57.636%' y2='78.411%' id='vite-a'>
-                    <stop stopColor='#41D1FF' offset='0%' />
-                    <stop stopColor='#BD34FE' offset='100%' />
+                <linearGradient
+                    id='vite-a'
+                    x1='-.828%'
+                    x2='57.636%'
+                    y1='7.652%'
+                    y2='78.411%'>
+                    <stop offset='0%' stopColor='#41D1FF' />
+                    <stop offset='100%' stopColor='#BD34FE' />
                 </linearGradient>
-                <linearGradient x1='43.376%' y1='2.242%' x2='50.316%' y2='89.03%' id='vite-b'>
-                    <stop stopColor='#FFEA83' offset='0%' />
-                    <stop stopColor='#FFDD35' offset='8.333%' />
-                    <stop stopColor='#FFA800' offset='100%' />
+                <linearGradient
+                    id='vite-b'
+                    x1='43.376%'
+                    x2='50.316%'
+                    y1='2.242%'
+                    y2='89.03%'>
+                    <stop offset='0%' stopColor='#FFEA83' />
+                    <stop offset='8.333%' stopColor='#FFDD35' />
+                    <stop offset='100%' stopColor='#FFA800' />
                 </linearGradient>
             </defs>
             <path

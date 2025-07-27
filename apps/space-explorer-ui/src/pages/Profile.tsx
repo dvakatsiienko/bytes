@@ -1,7 +1,7 @@
-/* Components */
+
 import { Loading, Header, LaunchTile } from '@/components';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 
 export const Profile = () => {

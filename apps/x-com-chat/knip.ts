@@ -1,4 +1,4 @@
-/* Core */
+
 import type { KnipConfig } from 'knip';
 
 export default {

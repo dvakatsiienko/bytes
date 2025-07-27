@@ -1,7 +1,7 @@
-/* Components */
+
 import { CustomerTable } from './ui/CustomerTable';
 
-/* Instruments */
+
 import { fetchCustomerList } from '@/lib';
 
 const CustomersPage = async () => {

@@ -30,15 +30,18 @@
         "publish:all": "conc --timings -K -n \"eslint,prettier\" -c \"green.bold,red.bold\" \"pnpm:publish:eslint-config\" \"pnpm:publish:prettier-config\""
     },
     "devDependencies": {
+        "@biomejs/biome": "2.1.2",
         "eslint": "9.32.0",
         "eslint-config-polished": "workspace:*",
+        "lefthook": "1.12.2",
         "prettier": "3.6.2",
         "prettier-config-polished": "workspace:*",
         "prettier-eslint": "16.4.2",
         "prettier-plugin-tailwindcss": "0.6.14",
         "rimraf": "6.0.1",
         "turbo": "2.5.5",
-        "typescript": "5.8.3"
+        "typescript": "5.8.3",
+        "ultracite": "5.1.1"
     },
     "engines": {
         "node": ">=22.14.0"

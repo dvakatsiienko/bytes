@@ -1,4 +1,3 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const SwcSVG = (props: TSvgProps) => {
@@ -6,14 +5,21 @@ export const SwcSVG = (props: TSvgProps) => {
 
     return (
         <svg
-            xmlns='http://www.w3.org/2000/svg'
-            xmlnsXlink='http://www.w3.org/1999/xlink'
             enableBackground='new 0 0 976.9 346.4'
-            width={size}
             height={size}
             viewBox='0 0 976.9 346.4'
+            width={size}
+            xmlns='http://www.w3.org/2000/svg'
+            xmlnsXlink='http://www.w3.org/1999/xlink'
             {...restProps}>
-            <linearGradient id='swc-a' gradientUnits='userSpaceOnUse' x1='2.9644' x2='973.6517' y1='172.8813' y2='172.8813'>
+            <title>SWC</title>
+            <linearGradient
+                gradientUnits='userSpaceOnUse'
+                id='swc-a'
+                x1='2.9644'
+                x2='973.6517'
+                y1='172.8813'
+                y2='172.8813'>
                 <stop offset='0' stopColor='#ffa588' />
                 <stop offset='.271' stopColor='#fcb371' />
                 <stop offset='.8357' stopColor='#f4d837' />

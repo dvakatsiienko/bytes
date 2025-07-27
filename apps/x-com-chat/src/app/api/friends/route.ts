@@ -1,7 +1,7 @@
-/* Core */
+
 import { NextResponse } from 'next/server';
 
-/* Instruments */
+
 import { prisma } from '@/lib/orm';
 
 export async function GET() {

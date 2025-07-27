@@ -1,7 +1,7 @@
-/* Core */
+
 import { cva, cx } from 'cva';
 
-/* Components */
+
 import { ThemeSwitcher } from '../service/ThemeSwitcher';
 import { LinkActive } from './LinkActive';
 
@@ -21,7 +21,7 @@ export const Browser = (props: BrowserProps) => {
                     'h-(--header-height)',
                     'relative gap-x-4 px-4',
                     'grid grid-cols-[auto_1fr_auto] items-center justify-between',
-                    'bg-background-header rounded-t-xl',
+                    'rounded-t-xl bg-background-header',
                 )}>
                 <div className={cx('relative flex h-full w-max items-center gap-2')}>
                     <b className={dotCn({ intent: 'close' })} />
@@ -29,7 +29,7 @@ export const Browser = (props: BrowserProps) => {
                     <b className={dotCn({ intent: 'maximize' })} />
                 </div>
 
-                <nav className='bg-background mx-auto flex h-5 w-full max-w-40 items-center gap-x-4 rounded-sm'>
+                <nav className='mx-auto flex h-5 w-full max-w-40 items-center gap-x-4 rounded-sm bg-background'>
                     <LinkActive className={linkCn()} href='/'>
                         cv
                     </LinkActive>
@@ -51,7 +51,7 @@ export const Browser = (props: BrowserProps) => {
                     'scrollbar scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-w-1',
                     'scrollbar-thumb-surface-7 scrollbar-track-transparent',
                     'scrollbar-hover:scrollbar-thumb-surface-11 scrollbar-active:scrollbar-thumb-surface-10',
-                    'scrollbar-hover:cursor-grab scrollbar-active:cursor-grabbing',
+                    'scrollbar-active:cursor-grabbing scrollbar-hover:cursor-grab',
 
                     // 'scrollbar-thumb-slate-700 scrollbar-track-slate-300'
                 )}>
@@ -63,7 +63,7 @@ export const Browser = (props: BrowserProps) => {
 
 /* Styles */
 const dotCn = cva({
-    base: 'size-3 rounded-full cursor-pointer',
+    base: 'size-3 cursor-pointer rounded-full',
     variants: {
         intent: {
             close: 'bg-red-500 hover:bg-red-600',
@@ -73,7 +73,7 @@ const dotCn = cva({
     },
 });
 const linkCn = cva({
-    base: cx('w-full h-min bg-background rounded-md'),
+    base: cx('h-min w-full rounded-md bg-background'),
 });
 
 /* Types */

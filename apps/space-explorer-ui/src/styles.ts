@@ -1,4 +1,4 @@
-/* Core */
+
 import { createGlobalStyle } from 'styled-components';
 
 export const SPACING = 8;

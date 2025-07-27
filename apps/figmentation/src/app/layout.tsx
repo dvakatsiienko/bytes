@@ -1,10 +1,10 @@
-/* Core */
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
 
-/* Instruments */
+
 import '@/theme/init.css';
 
 export default (props: React.PropsWithChildren) => {

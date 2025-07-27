@@ -1,4 +1,3 @@
-/* Instruments */
 import type { TSvgProps } from './types';
 
 export const FigmaSVG = (props: TSvgProps) => {
@@ -6,12 +5,13 @@ export const FigmaSVG = (props: TSvgProps) => {
 
     return (
         <svg
-            width={size}
+            fill='none'
             height={size}
             viewBox='0 0 54 80'
-            fill='none'
+            width={size}
             xmlns='http://www.w3.org/2000/svg'
             {...restProps}>
+            <title>Figma</title>
             <g clipPath='url(#figma-clip0_912_3)'>
                 <path
                     d='M13.3333 80.0002C20.6933 80.0002 26.6667 74.0268 26.6667 66.6668V53.3335H13.3333C5.97333 53.3335 0 59.3068 0 66.6668C0 74.0268 5.97333 80.0002 13.3333 80.0002Z'
@@ -36,7 +36,7 @@ export const FigmaSVG = (props: TSvgProps) => {
             </g>
             <defs>
                 <clipPath id='figma-clip0_912_3'>
-                    <rect width='53.3333' height='80' fill='white' />
+                    <rect fill='white' height='80' width='53.3333' />
                 </clipPath>
             </defs>
         </svg>

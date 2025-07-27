@@ -1,22 +1,17 @@
-@import '@ui/kit/globals.css';
+@import "@ui/kit/globals.css";
+@import "./accent.css";
+@import "./gray.css";
+
 @plugin '@tailwindcss/typography';
 @plugin 'tailwind-scrollbar' {
-    nocompatible: true;
-    preferredstrategy: 'pseudoelements';
+  /* biome-ignore lint/correctness/noUnknownProperty: tailwind-scrollbar unique */
+  nocompatible: true;
+  /* biome-ignore lint/correctness/noUnknownProperty: tailwind-scrollbar unique */
+  preferredstrategy: "pseudoelements";
 }
-
-@import './accent.css';
-@import './gray.css';
-@import './accent.css';
 
 @custom-variant dark (&:is(.dark, .dark *));
 
-@layer base {
-}
-
-@layer components {
-}
-
 @theme inline {
-    --color-test: #141617;
+  --color-test: #141617;
 }

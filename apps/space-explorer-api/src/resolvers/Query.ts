@@ -1,4 +1,4 @@
-/* Instruments */
+
 import { paginate } from '../utils';
 import type * as gql from '../graphql';
 import type { Resolver } from '../types';

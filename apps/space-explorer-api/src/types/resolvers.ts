@@ -1,7 +1,7 @@
-/* Core */
+
 import type { GraphQLFieldResolver } from 'graphql';
 
-/* Instruments */
+
 import { SpaceXAPI, UserAPI } from '../datasources';
 
 export type Resolver<

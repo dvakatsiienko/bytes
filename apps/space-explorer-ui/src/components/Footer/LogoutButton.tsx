@@ -1,12 +1,12 @@
-/* Core */
+
 import { useApolloClient } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-/* Components */
+
 import { LogoutSvg } from './SVG';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 import { isLoggedInVar } from '@/lib/apollo';
 import { clearLocalStorageAuthItems } from '@/utils';

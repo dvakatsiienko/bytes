@@ -1,4 +1,4 @@
-/* Core */
+
 import { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
@@ -9,10 +9,10 @@ import { Launches } from './Launches';
 import { Cart } from './Cart';
 import { Profile } from './Profile';
 
-/* Components */
+
 import { Layout } from '@/components';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 import { clearLocalStorageAuthItems } from '@/utils';
 

@@ -1,4 +1,4 @@
-/* Instruments */
+
 import * as gql from '../graphql';
 import type { Resolver } from '../types';
 import * as types from '../datasources/SpaceXAPI';

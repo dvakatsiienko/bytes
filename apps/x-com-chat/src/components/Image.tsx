@@ -1,11 +1,11 @@
 'use client';
 
-/* Core */
+
 import { useState } from 'react';
 import NextImage, { type ImageProps as NextImageProps } from 'next/image';
 import { cva, type VariantProps } from 'cva';
 
-/* Instruments */
+
 import { cn } from '@/utils/cn';
 
 export const Image = (props: ImageProps) => {
@@ -34,7 +34,7 @@ export const Image = (props: ImageProps) => {
                     // todo change direction different from layout direction
                     'bg-background',
                     'brand:bg-gradient-to-tr brand:from-gradient-layout-primary-1 brand:to-gradient-layout-primary-2',
-                    'outline -outline-offset-1 outline-gray-900/10 dark:outline-gray-100/10',
+                    '-outline-offset-1 outline outline-gray-900/10 dark:outline-gray-100/10',
                     containerClassName,
                 ),
             })}>
@@ -75,7 +75,7 @@ const imageCn = cva({
     base: 'object-cover',
     variants: {
         intent: {
-            card: 'outline -outline-offset-1 outline-gray-900/10 dark:outline-gray-100/10',
+            card: '-outline-offset-1 outline outline-gray-900/10 dark:outline-gray-100/10',
         },
         mask: {
             true: ['dark:mask-l-from-0% dark:mask-l-to-100%'],

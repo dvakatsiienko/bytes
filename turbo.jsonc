@@ -1,22 +1,45 @@
 {
-    "$schema": "https://turbo.build/schema.json",
-    "ui": "tui",
-    "tasks": {
-        "dev": { "cache": false, "persistent": true, "dependsOn": ["^prisma:generate"] },
-        "serve": { "cache": false, "persistent": true },
-        "convex": { "cache": false, "persistent": true },
-        "build": {
-            "dependsOn": ["^build", "lint", "typecheck", "^prisma:generate"],
-            "outputs": [".next/**", "!.next/cache/**"],
-            "inputs": ["$TURBO_DEFAULT$", "!.vscode/**", "!.cursor/**", "!**/**/README.md"]
-        },
-        "lint": {
-            "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml", "!.vscode/**", "!.cursor/**"]
-        },
-        "typecheck": {
-            "dependsOn": ["^typecheck"],
-            "inputs": ["$TURBO_DEFAULT$", "!**/*.css", "!**/*.scss", "!**/*.yaml", "!.vscode/**", "!.cursor/**"]
-        },
-        "prisma:generate": { "cache": false }
-    }
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^prisma:generate"]
+    },
+    "serve": { "cache": false, "persistent": true },
+    "convex": { "cache": false, "persistent": true },
+    "build": {
+      "dependsOn": ["^build", "lint", "typecheck", "^prisma:generate"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!.vscode/**",
+        "!.cursor/**",
+        "!**/**/README.md"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.css",
+        "!**/*.scss",
+        "!**/*.yaml",
+        "!.vscode/**",
+        "!.cursor/**"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.css",
+        "!**/*.scss",
+        "!**/*.yaml",
+        "!.vscode/**",
+        "!.cursor/**"
+      ]
+    },
+    "prisma:generate": { "cache": false }
+  }
 }

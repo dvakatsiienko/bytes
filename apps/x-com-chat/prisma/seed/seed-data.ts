@@ -1,4 +1,4 @@
-/* Instruments */
+
 import type { Friend } from '.prisma/client/edge';
 
 export const friendList: Omit<Friend, 'id'>[] = [

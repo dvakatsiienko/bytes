@@ -1,11 +1,11 @@
-/* Core */
+
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
-/* Components */
+
 import { Footer } from '@/components';
 
-/* Instruments */
+
 import * as gql from '@/graphql';
 import { SPACING, COLORS } from '@/styles';
 

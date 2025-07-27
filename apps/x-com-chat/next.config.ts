@@ -1,4 +1,4 @@
-/* Core */
+
 import withBundleAnalyze from '@next/bundle-analyzer';
 import ReactComponentName from 'react-scan/react-component-name/webpack';
 import type { NextConfig } from 'next';

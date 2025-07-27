@@ -1,6 +1,6 @@
 'use client';
 
-/* Core */
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cva, cx } from 'cva';
@@ -24,7 +24,7 @@ export const LinkActive = (props: NavLinksProps) => {
 const linkActiveCn = cva({
     base: cx(
         // TODO put into theme
-        'text-gray-500 w-full grid items-center h-full dark:text-gray-400 ',
+        'grid h-full w-full items-center text-gray-500 dark:text-gray-400 ',
         'text-center font-semibold text-xs',
         'border-none',
 
