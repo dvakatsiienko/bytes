@@ -12,10 +12,10 @@
     "lint": "biome lint",
     "typecheck": "tsc",
     "db:push": "prisma db push",
-    "db:generate": "prisma generate --no-engine",
+    "prisma:generate": "prisma generate --no-engine",
     "db:reset": "prisma db push --force-reset",
     "db:seed": "prisma db seed",
-    "db:reinit": "pnpm db:reset && pnpm db:generate && pnpm db:seed",
+    "db:reinit": "pnpm db:reset && pnpm prisma:generate && pnpm db:seed",
     "postinstall": "prisma generate --no-engine",
     "knip": "knip"
   },
