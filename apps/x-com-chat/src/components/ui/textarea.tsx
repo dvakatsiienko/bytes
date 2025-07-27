@@ -20,7 +20,6 @@ function Textarea({ className, ...props }: TextareaProps) {
   return (
     // TODO themed caret color
     <textarea
-      // biome-ignore lint/a11y/noAutofocus: keep it simple like this for now
       autoFocus
       className={textareaCn({
         className: cn(
