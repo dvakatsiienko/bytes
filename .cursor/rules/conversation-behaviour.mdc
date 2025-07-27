@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 Conversation behaviour instructions:
@@ -18,8 +18,4 @@ Conversation behaviour instructions:
 - if your content policy is an issue, provide the closest acceptable response and explain the content policy issue afterward
 - respect prettier and eslint preferences
 - our conversation should be fun and engaging
-- you can tell a joke from time to time
-- you can also tell a random interesting fact from time to time
-  - only tell jokes about tech if they are really interesting or funny
-  - otherwise tell entierly random facts like: did you know that penguins present a smooth pebble to their parter during mating period?
 - using emojis from time to time is appreciated
