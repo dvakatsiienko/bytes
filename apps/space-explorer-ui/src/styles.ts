@@ -1,15 +1,14 @@
-
 import { createGlobalStyle } from 'styled-components';
 
 export const SPACING = 8;
 export const COLORS = {
-    primary:       '#220a82',
-    secondary:     '#14cbc4',
-    accent:        '#e535ab',
-    background:    '#f7f8fa',
-    grey:          '#d8d9e0',
-    text:          '#343c5a',
-    textSecondary: '#747790',
+  accent: '#e535ab',
+  background: '#f7f8fa',
+  grey: '#d8d9e0',
+  primary: '#220a82',
+  secondary: '#14cbc4',
+  text: '#343c5a',
+  textSecondary: '#747790',
 };
 
 export const GlobalStyle = createGlobalStyle`
@@ -42,8 +41,8 @@ export const GlobalStyle = createGlobalStyle`
         margin: 0;
         padding: 0;
         font-family: Source Sans Pro, system-ui, sans-serif;
-        background-color: ${ COLORS.background };
-        color: ${ COLORS.text };
+        background-color: ${COLORS.background};
+        color: ${COLORS.text};
     }
 
     h1, h2, h3, h4, h5, h6 {

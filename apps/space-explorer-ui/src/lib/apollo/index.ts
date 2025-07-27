@@ -1,2 +1,2 @@
-export * from './typePolicies';
 export * from './client';
+export * from './typePolicies';

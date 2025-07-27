@@ -1,29 +1,26 @@
 {
-    "name": "prettier-config-polished",
-    "version": "0.0.6",
-    "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-    "type": "module",
-    "main": "./index.js",
-    "scripts": {
-        "lint": "eslint"
-    },
-    "exports": {
-        ".": "./index.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/dvakatsiienko/bytes.git",
-        "directory": "packages/prettier-config-polished"
-    },
-    "bugs": {
-        "url": "https://github.com/dvakatsiienko/bytes/issues"
-    },
-    "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/prettier-config-polished#readme",
-    "keywords": [
-        "prettier",
-        "prettierconfig"
-    ],
-    "peerDependencies": {
-        "prettier": ">=3.0.0"
-    }
+  "name": "prettier-config-polished",
+  "version": "0.0.6",
+  "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
+  "type": "module",
+  "main": "./index.js",
+  "scripts": {
+    "lint": "eslint"
+  },
+  "exports": {
+    ".": "./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dvakatsiienko/bytes.git",
+    "directory": "packages/prettier-config-polished"
+  },
+  "bugs": {
+    "url": "https://github.com/dvakatsiienko/bytes/issues"
+  },
+  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/prettier-config-polished#readme",
+  "keywords": ["prettier", "prettierconfig"],
+  "peerDependencies": {
+    "prettier": ">=3.0.0"
+  }
 }

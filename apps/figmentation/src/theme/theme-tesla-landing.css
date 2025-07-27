@@ -1,14 +1,14 @@
 :root {
-    --primary: #3e6ae1;
+  --primary: #3e6ae1;
 }
 
 @theme {
-    --color-tesla-gray-200: #f2f2f2;
-    --color-tesla-gray-300: #eee;
-    --color-tesla-gray-400: #e2e3e3;
-    --color-tesla-gray-600: #5c5e62;
-    --color-tesla-gray-950: #171a20;
+  --color-tesla-gray-200: #f2f2f2;
+  --color-tesla-gray-300: #eee;
+  --color-tesla-gray-400: #e2e3e3;
+  --color-tesla-gray-600: #5c5e62;
+  --color-tesla-gray-950: #171a20;
 
-    --breakpoint-tesla-tablet: 37.5rem;
-    --breakpoint-tesla-desktop: 75rem;
+  --breakpoint-tesla-tablet: 37.5rem;
+  --breakpoint-tesla-desktop: 75rem;
 }
