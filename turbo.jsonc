@@ -14,23 +14,23 @@
       "outputs": [".next/**", "!.next/cache/**"],
       "inputs": [
         "$TURBO_DEFAULT$",
+
         "!.vscode/**",
         "!.cursor/**",
-        "!**/**/README.md"
+        "!.editorconfig",
+
+        "!CLAUDE.md",
+        "!**/**/README.md",
+
+        "!config/biome.*.jsonc",
+        "!config/biome.jsonc",
+        "!prettier.config.mjs",
+        "!lefthook.yaml",
+        "!coderabbit.yaml"
       ]
     },
-    "lint": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "!**/*.css",
-        "!**/*.scss",
-        "!**/*.yaml",
-        "!.vscode/**",
-        "!.cursor/**"
-      ]
-    },
+    "lint": {},
     "typecheck": {
-      // TODO optimize this pipeline works and align across codebase
       "dependsOn": ["^typecheck"],
       "inputs": [
         "$TURBO_DEFAULT$",
