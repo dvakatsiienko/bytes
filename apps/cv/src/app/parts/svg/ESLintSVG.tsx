@@ -1,5 +1,6 @@
 import type { TSvgProps } from './types';
 
+// TODO replace with Biome icon
 export const ESLintSVG = (props: TSvgProps) => {
   const { size = 10, ...restProps } = props;
 

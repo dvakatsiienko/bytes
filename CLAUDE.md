@@ -1,10 +1,14 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Repository Overview
 
-This is a Turborepo-powered monorepo containing several web applications and shared packages. The repository uses pnpm as the package manager and is structured with apps in the `/apps` directory and shared libraries in `/packages`.
+This is a Turborepo-powered monorepo containing several web applications and
+shared packages. The repository uses pnpm as the package manager and is
+structured with apps in the `/apps` directory and shared libraries in
+`/packages`.
 
 ## Applications
 
@@ -17,7 +21,6 @@ This is a Turborepo-powered monorepo containing several web applications and sha
 
 ## Shared Packages
 
-- **eslint-config-polished** - Custom ESLint configuration
 - **prettier-config-polished** - Custom Prettier configuration
 
 ## Common Commands
@@ -60,7 +63,7 @@ pnpm dev                 # Start development server with Turbopack
 pnpm start               # Alias for dev
 pnpm build               # Build for production
 pnpm serve               # Serve production build
-pnpm lint                # Run ESLint
+pnpm lint                # Run Biome
 pnpm typecheck           # Run TypeScript type checking
 ```
 
@@ -71,7 +74,7 @@ pnpm typecheck           # Run TypeScript type checking
 pnpm dev                 # Start development server
 pnpm build               # Build for production
 pnpm serve               # Build and preview production build
-pnpm lint                # Run ESLint
+pnpm lint                # Run Biome
 pnpm typecheck           # Run TypeScript type checking
 pnpm codegen:graphql     # Generate GraphQL types
 ```
@@ -82,7 +85,7 @@ pnpm codegen:graphql     # Generate GraphQL types
 # Inside app directory
 pnpm dev                 # Start development server with nodemon
 pnpm start               # Alias for dev
-pnpm lint                # Run ESLint
+pnpm lint                # Run Biome
 pnpm typecheck           # Run TypeScript type checking
 pnpm codegen:graphql     # Generate GraphQL types
 pnpm prisma:generate     # Generate Prisma client
@@ -123,8 +126,7 @@ pnpm db:reinit           # Reset, generate, and seed database
    - React Query for data fetching
    - Apollo Client for GraphQL state
 
-5. **Task Dependencies**
-   The `turbo.jsonc` file defines task dependencies:
+5. **Task Dependencies** The `turbo.jsonc` file defines task dependencies:
    - `dev` depends on prisma:generate
    - `build` depends on ^build, lint, typecheck, and ^prisma:generate
    - Proper caching config is set up for all tasks
@@ -136,4 +138,4 @@ pnpm db:reinit           # Reset, generate, and seed database
 - **State**: Jotai, React Query, Apollo Client
 - **API**: GraphQL, REST
 - **Database**: Prisma, SQLite, Convex
-- **Build Tools**: Turbo, SWC, ESLint, Prettier
+- **Build Tools**: Turbo, SWC, Biome, Prettier

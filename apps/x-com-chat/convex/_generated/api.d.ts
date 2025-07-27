@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Generated `api` utility.
  *
@@ -13,6 +12,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from 'convex/server';
+
 import type * as _schema from '../_schema.js';
 import type * as chat from '../chat.js';
 

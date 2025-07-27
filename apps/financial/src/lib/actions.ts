@@ -78,7 +78,6 @@ export const updateInvoice = async (
   redirect('/dashboard/invoices');
 };
 
-/* eslint-disable */
 export async function deleteInvoice(id: string) {
   try {
     await prisma.invoice.delete({ where: { id } });
@@ -101,7 +100,6 @@ export async function authenticate(
   //     const result = await signIn('credentials', formData);
   // } catch (error) {
   //     if (error instanceof AuthError) {
-  //         // eslint-disable-next-line smells/no-switch
   //         switch (error.type) {
   //             case 'CredentialsSignin':
   //                 return 'Invalid credentials.';
@@ -112,7 +110,6 @@ export async function authenticate(
   //     throw error;
   // }
 }
-/* eslint-enable */
 
 /* Helpers */
 const InvoiceSchema = z.object({

@@ -10,11 +10,13 @@ Apps made during my r'n'd or vibe coded.
 
 #### ✈️ My CV and Cover
 
-[Website](https://ripeluokte.vercel.app) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/cv)
+[Website](https://ripeluokte.vercel.app) |
+[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/cv)
 
 #### 👽 X-COM AI Chat
 
-[Website](https://x-com-chat.vercel.app) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/x-com-chat)
+[Website](https://x-com-chat.vercel.app) |
+[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/x-com-chat)
 
 #### 🛰️ Space Explorer UI
 
@@ -27,7 +29,8 @@ Apps made during my r'n'd or vibe coded.
 
 #### 🏄‍♂️ Financial 🚧 WIP 🚧
 
-[Website](https://financical.vercel.app/) | [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/financial)
+[Website](https://financical.vercel.app/) |
+[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/financial)
 
 ## 🎨 Engineering and Design
 
@@ -40,11 +43,6 @@ Apps made during my Figma UI prototyping exploration.
 [Figma file](https://www.figma.com/design/C83qYEFPJ8C66yIrTjEk29/Clinique?m=auto&t=p08olW2Pvhdsl68U-6)
 
 ## 🧰 Libraries
-
-#### 💅🏼 eslint-config-polished
-
-[npm](https://www.npmjs.com/package/eslint-config-polished) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/packages/eslint-config-polished)
 
 #### 💄 prettier-config-polished
 
