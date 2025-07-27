@@ -4,8 +4,9 @@
   "extends": [
     // order matters
     "ultracite",
-    "./biome.formatter.jsonc",
-    "./biome.linter.jsonc"
+    "./config/biome.formatter.jsonc",
+    "./config/biome.linter.jsonc",
+    "./config/biome.overrides.jsonc"
   ],
   "files": {
     "ignoreUnknown": false,
@@ -16,74 +17,5 @@
     "defaultBranch": "master",
     "enabled": true,
     "useIgnoreFile": true
-  },
-  "overrides": [
-    // do not sort special files — they are better to organize manually
-    {
-      "assist": {
-        "actions": {
-          "source": {
-            "useSortedKeys": "off"
-          }
-        }
-      },
-      "includes": [
-        "biome.jsonc",
-        "biome.*.jsonc",
-        "biome.formatter.jsonc",
-        "biome.linter.jsonc",
-        "**/package.json",
-        "**/tsconfig.json",
-        "**/components.json",
-        "**/.prettierrc.js"
-      ]
-    },
-
-    // some frameworks and tools expect entities to be exported due to buil-in api
-    // disable noDefaultExport for these cases
-    {
-      "linter": {
-        "rules": {
-          "style": {
-            "noDefaultExport": {
-              "level": "off"
-            }
-          }
-        }
-      },
-      "includes": [
-        // Next.js
-        "apps/**/next.config.ts",
-        "apps/**/{layout,page,loading,error,not-found,default}.tsx",
-        "apps/**/middleware.ts",
-        "apps/**/_middleware.ts",
-
-        // Vite
-        "**/vite.config.ts",
-
-        // Convex
-        "**/convex/**",
-
-        // Other configs
-        "prettier.config.mjs",
-        "**/prettier.config.mjs",
-        "**/postcss.config.mjs",
-        "**/knip.ts",
-
-        // TypeScript
-        "**/*.d.ts"
-      ]
-    },
-
-    // disable linter enitrely for generated files
-    {
-      "linter": {
-        "enabled": false
-      },
-      "includes": [
-        "apps/**/convex/_generated/**",
-        "apps/**/graphql/index.{ts,tsx}"
-      ]
-    }
-  ]
+  }
 }
