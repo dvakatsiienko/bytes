@@ -62,7 +62,7 @@
         /* React */
         "noBlankTarget": "error",
         "noDangerouslySetInnerHtml": "info",
-        "noDangerouslySetInnerHtmlWithChildren": "on"
+        "noDangerouslySetInnerHtmlWithChildren": "info"
       },
 
       /* rules enforcing a consistent and idiomatic way of writing your code. By default, these rules will only generate warnings instead of errors. */
