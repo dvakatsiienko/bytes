@@ -44,27 +44,17 @@
 
       /* rules under development */
       "nursery": {
-        /**
-         * TODO 1. turn on when dubious imports are removed e.g. preact instead of react
-         * TODO 2. delegate to ts
-         */
-        "noUnresolvedImports": "off",
-        "useUniqueElementIds": "off",
-        "noFloatingPromises": "off",
-        "noConstantBinaryExpression": "warn",
-        "useIndexOf": "warn",
-
-        "noUnknownAtRule": "off", // ultracite rule
+        "noUnknownAtRule": "off", // ultracite rule — there are too much custom at-rules from tailwind. review this rule when it will go out from nursery.
 
         /* React */
+        "useUniqueElementIds": "off", // TODO it is useful — fix and enable
         "noReactPropAssign": "error",
         "noNestedComponentDefinitions": "error"
       },
 
       /* rules catching ways your code could be written to run faster, or generally be more efficient. */
       "performance": {
-        "noNamespaceImport": "off", // ultracite rule
-        "noAccumulatingSpread": "off"
+        "noNamespaceImport": "off" // ultracite rule — namespace imports are useful. rely on your own fell when to use it.
       },
 
       /* rules that detect ways your code could be exploited or lead to security vulnerabilities. */
