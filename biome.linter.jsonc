@@ -10,18 +10,7 @@
 
       /* rules focused on preventing accessibility problems */
       "a11y": {
-        "useButtonType": "on",
-        "noStaticElementInteractions": "warn", // change to error
-        "useSemanticElements": "warn", // change to error
-        "useKeyWithClickEvents": "warn", // change to error
-        "useFocusableInteractive": "warn", // change to error
-        "noNoninteractiveElementToInteractiveRole": "warn", // change to error
-        "useIframeTitle": "warn", // change to error
-        "noSvgWithoutTitle": "warn", // change to error
-        "useGenericFontNames": "warn", // change to error
-        "useAltText": "warn", // change to error
-        "useKeyWithMouseEvents": "warn", // change to error
-        "noAutofocus": "warn" // change to error
+        "useButtonType": "warn" // ultracite rule
       },
 
       /* rules that focus on inspecting complex code that could be simplified. */
