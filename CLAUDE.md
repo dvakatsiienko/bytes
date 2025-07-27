@@ -88,7 +88,7 @@ pnpm start               # Alias for dev
 pnpm lint                # Run Biome
 pnpm typecheck           # Run TypeScript type checking
 pnpm codegen:graphql     # Generate GraphQL types
-pnpm db:generate     # Generate Prisma client
+pnpm prisma:generate     # Generate Prisma client
 ```
 
 #### Database-related Commands (x-com-chat, financial, space-explorer-api)
@@ -96,7 +96,7 @@ pnpm db:generate     # Generate Prisma client
 ```bash
 # Inside app directory
 pnpm db:push             # Update database schema (Prisma)
-pnpm db:generate         # Generate Prisma client
+pnpm prisma:generate         # Generate Prisma client
 pnpm db:seed             # Seed database with test data
 pnpm db:reset            # Reset database (force)
 pnpm db:reinit           # Reset, generate, and seed database
@@ -127,8 +127,8 @@ pnpm db:reinit           # Reset, generate, and seed database
    - Apollo Client for GraphQL state
 
 5. **Task Dependencies** The `turbo.jsonc` file defines task dependencies:
-   - `dev` depends on db:generate
-   - `build` depends on ^build, lint, typecheck, and ^db:generate
+   - `dev` depends on prisma:generate
+   - `build` depends on ^build, lint, typecheck, and ^prisma:generate
    - Proper caching config is set up for all tasks
 
 ## Technology Stack
