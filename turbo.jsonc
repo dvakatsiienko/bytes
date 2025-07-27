@@ -5,12 +5,12 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["^prisma:generate"]
+      "dependsOn": ["^db:generate"]
     },
     "serve": { "cache": false, "persistent": true },
     "convex": { "cache": false, "persistent": true },
     "build": {
-      "dependsOn": ["^build", "lint", "typecheck", "^prisma:generate"],
+      "dependsOn": ["^build", "lint", "typecheck", "^db:generate"],
       "outputs": [".next/**", "!.next/cache/**"],
       "inputs": [
         "$TURBO_DEFAULT$",
@@ -34,13 +34,16 @@
       "dependsOn": ["^typecheck"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "!**/*.css",
-        "!**/*.scss",
-        "!**/*.yaml",
-        "!.vscode/**",
-        "!.cursor/**"
+        "package.json",
+        "tsconfig.json",
+
+        "**/*.{ts,tsx}",
+        "**/*.d.ts"
       ]
     },
-    "prisma:generate": { "cache": false }
+
+    "db:generate": {
+      "inputs": ["./prisma/**/*"]
+    }
   }
 }

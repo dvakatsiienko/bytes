@@ -1,5 +1,7 @@
 {
   "extends": "@workspace/typescript-config/react-library.json",
+  "include": ["."],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "noEmit": true,
     "module": "ESNext",
@@ -9,7 +11,5 @@
       "@/*": ["./src/*"],
       "@ui/kit/*": ["./src/*"]
     }
-  },
-  "include": ["."],
-  "exclude": ["node_modules", "dist"]
+  }
 }

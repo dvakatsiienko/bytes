@@ -3,11 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "env": ["DATABASE_URL", "AUTH_SECRET"],
-      "dependsOn": ["lint", "typecheck", "prisma:generate"]
-    },
-    "prisma:generate": {
-      "inputs": ["./prisma/**/*"]
+      "env": ["DATABASE_URL", "AUTH_SECRET"]
     }
   }
 }

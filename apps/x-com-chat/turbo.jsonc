@@ -3,19 +3,13 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["lint", "typecheck", "prisma:generate"],
-      "outputs": [".next/**"],
       "env": [
-        // TODO extract these ENV vars into upper config lvl and inherit global turbo build script
         "CLERK_SECRET_KEY",
         "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
         "DATABASE_URL",
         "GROQ_API_KEY",
         "CONVEX_DEPLOY_KEY"
       ]
-    },
-    // TODO optimize this pipeline works and align across codebase
-    "typecheck": { "inputs": ["package.json", "**/*.{ts,tsx}"] },
-    "db:generate": { "cache": false }
+    }
   }
 }
