@@ -79,7 +79,8 @@ export default async function RootLayout(props: React.PropsWithChildren) {
             </body>
           </html>
 
-          {/** biome-ignore lint/nursery/noConstantBinaryExpression: this is for debugging */}
+          {/** biome-ignore lint/complexity/useSimplifiedLogicExpression: for debugging */}
+          {/** biome-ignore lint/nursery/noConstantBinaryExpression: for debugging */}
           {false && <ReactQueryDevtools />}
         </ReactQueryProvider>
       </ClerkProvider>

@@ -16,8 +16,10 @@ export const Profile = () => {
       <Header title='My Trips' />
 
       {loading && !data ? <Loading /> : null}
+
       {tripsListJSX}
-      {!loading && !data?.userProfile?.trips.length && (
+
+      {!(loading || data?.userProfile?.trips.length) && (
         <h4>You haven't booked any trips.</h4>
       )}
     </>

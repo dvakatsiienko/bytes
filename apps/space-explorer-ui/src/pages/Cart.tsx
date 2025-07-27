@@ -35,7 +35,8 @@ export const Cart = () => {
   let message: string | null = null;
   if (bookTripsMeta.called && bookTripsMeta.data?.bookTrips.length)
     message = 'Trips booked.';
-  if (!bookTripsMeta.called && !cartItems.length) message = 'Cart empty.';
+
+  if (!(bookTripsMeta.called || cartItems.length)) message = 'Cart empty.';
 
   return (
     <>

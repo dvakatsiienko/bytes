@@ -66,7 +66,8 @@ export const ThemeSettings = () => {
     prevPreset: AppColorPreset,
     nextPreset: AppColorPreset,
   ) => {
-    if (!prevPreset || !nextPreset) return null;
+    if (!(prevPreset && nextPreset)) return null;
+
     const root = document.documentElement;
     root.classList.remove(prevPreset);
     root.classList.add(nextPreset);

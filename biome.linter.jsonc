@@ -6,8 +6,6 @@
     },
     "enabled": true,
     "rules": {
-      "recommended": true,
-
       /* rules focused on preventing accessibility problems */
       "a11y": {
         "useButtonType": "warn" // ultracite rule
@@ -15,56 +13,22 @@
 
       /* rules that focus on inspecting complex code that could be simplified. */
       "complexity": {
-        "noArguments": "warn", // fix
-        "noBannedTypes": "off", // fix
-        "noCommaOperator": "error",
-        "noEmptyTypeParameters": "warn",
-        "noExcessiveCognitiveComplexity": "off", // good rule for refactoring complex logics,
-        "noExtraBooleanCast": "warn", // fix
-        "noFlatMapIdentity": "error",
-        "noForEach": "off", // for future refactoring, good moment for performance optimizations
-        "noStaticOnlyClass": "error",
-        "noThisInStatic": "error", // fix
-        "noUselessCatch": "warn", // fix unsafe
-        "noUselessConstructor": "error", // fix unsafe
-        "noUselessContinue": "error", // fix unsafe
-        "noUselessEmptyExport": "error", // fix
-        "noUselessEscapeInRegex": "error", // fix unsafe
-        "noUselessLabel": "error", // fix unsafe
-        "noUselessLoneBlockStatements": "error", // fix
-        "noUselessRename": "error", // fix
-        "noUselessStringConcat": "warn", // fix
-        "noUselessStringRaw": "on",
-        "noUselessSwitchCase": "error", // fix unsafe
-        "noUselessTernary": "error", // fix unsafe
-        "noUselessThisAlias": "warn", // fix
-        "noUselessTypeConstraint": "error", // fix | after refactoring and adding all necessary types
-        "noUselessUndefinedInitialization": "error", // fix
-        "noVoid": "off",
-        "useArrowFunction": "off",
-        "useDateNow": "off", // fix unsafe
-        "useFlatMap": "error",
-        "useLiteralKeys": "on",
-        "useNumericLiterals": "error", // fix
-        "useOptionalChain": "warn", // fix unsafe | enable this
-        "useRegexLiterals": "error",
-        "useSimpleNumberKeys": "on",
-        "useSimplifiedLogicExpression": "off", // if (!a && !b) is simpler than !(a || b)
-        "useWhile": "off",
-
+        "noExcessiveCognitiveComplexity": "off", // when code do smell, clean up the spell.
         /* React */
-        "noUselessFragments": "on" // unsafe fix
+        "noUselessFragments": "error"
       },
 
       /* rules that detect code that is guaranteed to be incorrect or useless. */
       "correctness": {
+        "noUnusedVariables": "off", // todo scan with this once, prune all unuseds and turn off auto fix for this one
+        //
+        //
         "noRenderReturnValue": "error",
         "noUndeclaredDependencies": "off",
 
         "noUnreachable": "error",
         "noUnusedFunctionParameters": "warn",
         "noUnusedImports": "warn",
-        "noUnusedVariables": "off", // todo scan with this once, prune all unuseds and turn off auto fix for this one
         "noUnsafeOptionalChaining": "warn",
         "noUndeclaredVariables": "off",
 

@@ -38,7 +38,7 @@ export const Header = (props: HeaderProps) => {
 
   const finalFriendName = friendName.length ? friendName : defaultFriendName;
 
-  const baseTheme = resolvedTheme === 'dark' ? dark : void 0;
+  const baseTheme = resolvedTheme === 'dark' ? dark : undefined;
 
   return (
     <section className={cn('flex gap-4', 'sticky top-2 z-1 pr-2 md:pr-4')}>

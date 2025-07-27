@@ -11,7 +11,7 @@ export const LinkActive = (props: NavLinksProps) => {
     <Link
       className={linkActiveCn({
         className: props.className,
-        intent: pathname === props.href ? 'active' : void 0,
+        intent: pathname === props.href ? 'active' : undefined,
       })}
       href={props.href}>
       {props.children}
