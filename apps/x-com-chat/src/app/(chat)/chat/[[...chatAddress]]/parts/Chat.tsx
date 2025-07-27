@@ -49,7 +49,7 @@ export const Chat = (props: ChatProps) => {
       // ? only send the last message to the server to save bandwith
       return {
         id,
-        message: messages[messages.length - 1],
+        message: messages.at(-1),
       };
     },
     generateId: createIdGenerator({

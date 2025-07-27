@@ -1,4 +1,4 @@
-import { LaunchModel } from '../datasources';
+import type { LaunchModel } from '../datasources';
 
 export const paginate = ({
   after: cursor,

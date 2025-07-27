@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { cva, VariantProps } from 'cva';
+import { cva, type VariantProps } from 'cva';
 import useEventListener from '@use-it/event-listener';
 
 import { cn } from '@/utils/cn';

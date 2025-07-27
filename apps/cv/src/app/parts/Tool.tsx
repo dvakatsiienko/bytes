@@ -1,6 +1,6 @@
 import { cva, cx } from 'cva';
 
-import { ITool } from './toolConfig';
+import type { ITool } from './toolConfig';
 
 export const Tool = (props: ToolProps) => {
   const Icon = props.Icon;

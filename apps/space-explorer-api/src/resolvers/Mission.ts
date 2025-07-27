@@ -1,4 +1,4 @@
-import * as types from '../datasources/SpaceXAPI';
+import type * as types from '../datasources/SpaceXAPI';
 import * as gql from '../graphql';
 import type { Resolver } from '../types';
 

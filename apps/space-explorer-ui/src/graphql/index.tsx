@@ -1,6 +1,6 @@
 import * as Apollo from '@apollo/client';
 import { gql } from '@apollo/client';
-import {
+import type {
   FieldPolicy,
   FieldReadFunction,
   TypePolicies,

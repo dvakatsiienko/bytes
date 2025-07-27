@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { cn } from '@ui/kit/lib/utils';
 import { Drawer as DrawerPrimitive } from 'vaul';
 

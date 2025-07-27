@@ -1,11 +1,11 @@
 import {
-  FieldPolicy,
-  FieldReadFunction,
+  type FieldPolicy,
+  type FieldReadFunction,
   makeVar,
-  TypePolicy,
+  type TypePolicy,
 } from '@apollo/client';
 
-import * as gql from '@/graphql';
+import type * as gql from '@/graphql';
 
 export const typePolicies: TTypePolicies = {
   Query: {

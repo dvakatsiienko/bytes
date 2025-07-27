@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
 import { friendList } from '../prisma/seed/seed-data';
-import { Id } from './_generated/dataModel';
+import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { SchemaMessageList } from './_schema';
 

@@ -1,4 +1,4 @@
-import { Launch, Launchpad, Rocket } from './types';
+import type { Launch, Launchpad, Rocket } from './types';
 
 export class LaunchModel implements TLaunchModel {
   constructor(launch: Launch, rockets: Rocket[], launchpads: Launchpad[]) {

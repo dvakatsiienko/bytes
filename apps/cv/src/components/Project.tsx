@@ -1,5 +1,5 @@
 import { cn } from '@ui/kit/lib/utils';
-import { type StaticImageData } from 'next/image';
+import type { StaticImageData } from 'next/image';
 
 import { BriefEntry } from './BriefEntry';
 

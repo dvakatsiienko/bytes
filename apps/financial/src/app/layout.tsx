@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 import { AppProviders } from './AppProviders';
 import { inter } from '@/theme/fonts';

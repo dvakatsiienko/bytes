@@ -1,6 +1,6 @@
 import type { GraphQLFieldResolver } from 'graphql';
 
-import { SpaceXAPI, UserAPI } from '../datasources';
+import type { SpaceXAPI, UserAPI } from '../datasources';
 
 export type Resolver<
   TArgs = Record<string, unknown>,
