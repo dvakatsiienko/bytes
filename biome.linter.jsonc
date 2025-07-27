@@ -80,15 +80,8 @@
 
       /* rules that detect code that is likely to be incorrect or useless. */
       "suspicious": {
-        "noDebugger": "error",
-        "noAssignInExpressions": "warn", // todo change to error
-        "noDoubleEquals": "warn", // unsafe fix
-        "noFallthroughSwitchClause": "warn",
-        "noPrototypeBuiltins": "warn",
-        "useNumberToFixedDigitsArgument": "warn",
-        "noExplicitAny": "off",
-
         "noConsole": {
+          // ultracite rule — lint for console.log only, allow everything else
           "level": "warn",
           "options": {
             "allow": ["assert", "error", "info", "warn"]
@@ -96,10 +89,10 @@
         },
 
         /* React */
-        "noArrayIndexKey": "warn",
-        "noDuplicateJsxProps": "warn",
-        "noSuspiciousSemicolonInJsx": "warn",
-        "noCommentText": "on"
+        "noArrayIndexKey": "error",
+        "noDuplicateJsxProps": "error",
+        "noSuspiciousSemicolonInJsx": "error",
+        "noCommentText": "error"
       }
     }
   }

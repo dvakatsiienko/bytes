@@ -23,6 +23,7 @@ export default function HomePage() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback(
+    // biome-ignore lint/suspicious/noExplicitAny: fix this later
     (params: any) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
