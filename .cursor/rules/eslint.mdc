@@ -1,8 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-# Configuration
-
-- To mark a rule severity use number not strings — 0, 1, 2 instead of 'off', 'warn', 'error'
