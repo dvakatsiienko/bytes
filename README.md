@@ -6,7 +6,7 @@
 
 ## 🛸 Apps
 
-Apps made during my r'n'd or vibe coded.
+Apps R&D-ed or vibe coded.
 
 #### ✈️ My CV and Cover
 
