@@ -24,8 +24,8 @@ export const Header = (props: HeaderProps) => {
   const { resolvedTheme } = useTheme();
   const { isLoaded, isSignedIn } = useAuth();
 
-  // @ts-expect-error TODO fix this later
   const selectedFriend = props.friendList.find(
+    // @ts-expect-error TODO fix this later
     (friend) => friend._id === selectedFriendId,
   ) ?? {
     name: '',

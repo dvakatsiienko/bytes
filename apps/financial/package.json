@@ -7,7 +7,7 @@
     "build": "next build",
     "build:clean": "rimraf .next",
     "serve": "next start",
-    "lint": "eslint",
+    "lint": "biome lint",
     "typecheck": "tsc",
     "db:push": "prisma db push",
     "db:generate": "prisma generate --no-engine",
