@@ -1,35 +1,35 @@
 # Query
 query IsUserLoggedIn {
-    isLoggedIn @client
+  isLoggedIn @client
 }
 
 query GetCartItems {
-    cartItems @client
+  cartItems @client
 }
 
 query UserProfile {
-    userProfile {
-        id
-        email
-        token
-        trips {
-            id
-            createdAt
-            launch {
-                ...LaunchFragment
-            }
-        }
+  userProfile {
+    id
+    email
+    token
+    trips {
+      id
+      createdAt
+      launch {
+        ...LaunchFragment
+      }
     }
+  }
 }
 
 # Mutation
 mutation Login($email: String!) {
-    login(email: $email) {
-        id
-        token
-    }
+  login(email: $email) {
+    id
+    token
+  }
 }
 
 mutation Logout {
-    logout
+  logout
 }

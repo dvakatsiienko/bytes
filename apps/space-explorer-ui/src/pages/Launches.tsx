@@ -1,40 +1,38 @@
-
 import { useState } from 'react';
 
-
-import { Header, LaunchTile, Loading, Button } from '@/components';
-
-
+import { Button, Header, LaunchTile, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Launches = () => {
-    const { data, loading, fetchMore } = gql.useLaunchesQuery({ fetchPolicy: 'cache-and-network' });
-    const [ isLoadingMore, setIsLoadingMore ] = useState(false);
+  const { data, loading, fetchMore } = gql.useLaunchesQuery({
+    fetchPolicy: 'cache-and-network',
+  });
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    const launchesListJSX = data?.launches.list.map((launch) => {
-        return <LaunchTile key = { launch.id } launch = { launch } />;
-    });
+  const launchesListJSX = data?.launches.list.map((launch) => {
+    return <LaunchTile key={launch.id} launch={launch} />;
+  });
 
-    const fetchMoreLaunches = async () => {
-        setIsLoadingMore(true);
+  const fetchMoreLaunches = async () => {
+    setIsLoadingMore(true);
 
-        await fetchMore({ variables: { after: data?.launches.cursor }});
+    await fetchMore({ variables: { after: data?.launches.cursor } });
 
-        setIsLoadingMore(false);
-    };
+    setIsLoadingMore(false);
+  };
 
-    return (
-        <>
-            <Header title = 'Space Explorer' />
+  return (
+    <>
+      <Header title='Space Explorer' />
 
-            {loading && !data ? <Loading /> : null}
+      {loading && !data ? <Loading /> : null}
 
-            {launchesListJSX}
+      {launchesListJSX}
 
-            {data?.launches.hasMore && isLoadingMore ? <Loading /> : null}
-            {data?.launches.hasMore && !isLoadingMore
-                ?         <Button onClick = { fetchMoreLaunches }>Load More</Button>
-                : null}
-        </>
-    );
+      {data?.launches.hasMore && isLoadingMore ? <Loading /> : null}
+      {data?.launches.hasMore && !isLoadingMore ? (
+        <Button onClick={fetchMoreLaunches}>Load More</Button>
+      ) : null}
+    </>
+  );
 };

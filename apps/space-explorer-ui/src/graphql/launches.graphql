@@ -1,33 +1,33 @@
 # Query
 query Launches($after: Int) {
-    launches(after: $after) {
-        cursor
-        hasMore
-        list {
-            ...LaunchFragment
-        }
+  launches(after: $after) {
+    cursor
+    hasMore
+    list {
+      ...LaunchFragment
     }
+  }
 }
 
 query Launch($id: ID!) {
-    launch(id: $id) {
-        ...LaunchFragment
-    }
+  launch(id: $id) {
+    ...LaunchFragment
+  }
 }
 
 # Fragment
 fragment LaunchFragment on Launch {
+  id
+  isBooked
+  flightNumber
+  site
+  rocket {
     id
-    isBooked
-    flightNumber
-    site
-    rocket {
-        id
-        name
-        type
-    }
-    mission {
-        name
-        missionPatch
-    }
+    name
+    type
+  }
+  mission {
+    name
+    missionPatch
+  }
 }

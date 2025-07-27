@@ -1,231 +1,230 @@
-
 import * as svg from './svg';
 
 export const toolListCore = [
-    {
-        name: 'ESNext',
-        icon: svg.ESNextSVG,
-    },
-    {
-        name: 'TypeScript',
-        icon: svg.TypeScriptSVG,
-    },
-    {
-        name: 'Node',
-        icon: svg.NodeSVG,
-    },
-    {
-        name: 'React',
-        icon: svg.ReactSVG,
-    },
-    {
-        name: 'Next',
-        icon: svg.NextSVG,
-    },
+  {
+    icon: svg.ESNextSVG,
+    name: 'ESNext',
+  },
+  {
+    icon: svg.TypeScriptSVG,
+    name: 'TypeScript',
+  },
+  {
+    icon: svg.NodeSVG,
+    name: 'Node',
+  },
+  {
+    icon: svg.ReactSVG,
+    name: 'React',
+  },
+  {
+    icon: svg.NextSVG,
+    name: 'Next',
+  },
 ];
 
 export const toolListAuth = [
-    {
-        name: 'Clerk',
-        icon: svg.ClerkSVG,
-    },
-    {
-        name: 'NextAuth',
-        icon: svg.NextAuthSVG,
-    },
+  {
+    icon: svg.ClerkSVG,
+    name: 'Clerk',
+  },
+  {
+    icon: svg.NextAuthSVG,
+    name: 'NextAuth',
+  },
 ];
 
 export const toolListState = [
-    {
-        name: 'Jotai',
-        icon: svg.JotaiSVG,
-    },
-    {
-        name: 'Zustand',
-        icon: svg.ZustandSVG,
-    },
+  {
+    icon: svg.JotaiSVG,
+    name: 'Jotai',
+  },
+  {
+    icon: svg.ZustandSVG,
+    name: 'Zustand',
+  },
 ];
 
 export const toolListNetwork = [
-    {
-        name: 'Query',
-        icon: svg.ReactQuerySVG,
-    },
-    {
-        name: 'GraphQL',
-        icon: svg.GraphQLSVG,
-    },
-    {
-        name: 'Vercel',
-        icon: svg.VercelSVG,
-    },
+  {
+    icon: svg.ReactQuerySVG,
+    name: 'Query',
+  },
+  {
+    icon: svg.GraphQLSVG,
+    name: 'GraphQL',
+  },
+  {
+    icon: svg.VercelSVG,
+    name: 'Vercel',
+  },
 ];
 
 export const toolListDb = [
-    {
-        name: 'Prisma',
-        icon: svg.PrismaSVG,
-    },
-    {
-        name: 'Postgre',
-        icon: svg.PostgreSVG,
-    },
-    {
-        name: 'SQLite',
-        icon: svg.SQLiteSVG,
-    },
-    {
-        name: 'Convex',
-        icon: svg.ConvexSVG,
-    },
+  {
+    icon: svg.PrismaSVG,
+    name: 'Prisma',
+  },
+  {
+    icon: svg.PostgreSVG,
+    name: 'Postgre',
+  },
+  {
+    icon: svg.SQLiteSVG,
+    name: 'SQLite',
+  },
+  {
+    icon: svg.ConvexSVG,
+    name: 'Convex',
+  },
 ];
 
 export const toolListStyles = [
-    {
-        name: 'Tailwind',
-        icon: svg.TailwindSVG,
-    },
-    {
-        name: 'CSS',
-        icon: svg.CssSVG,
-    },
+  {
+    icon: svg.TailwindSVG,
+    name: 'Tailwind',
+  },
+  {
+    icon: svg.CssSVG,
+    name: 'CSS',
+  },
 ];
 
 export const toolListComponents = [
-    {
-        name: 'Radix UI',
-        icon: svg.RadixUiSVG,
-    },
-    {
-        name: 'Chadcn UI',
-        icon: svg.ChadcnSVG,
-    },
-    {
-        name: 'Headless UI',
-        icon: svg.HeadlessUISVG,
-    },
-    {
-        name: 'Storybook',
-        icon: svg.StorybookSVG,
-    },
+  {
+    icon: svg.RadixUiSVG,
+    name: 'Radix UI',
+  },
+  {
+    icon: svg.ChadcnSVG,
+    name: 'Chadcn UI',
+  },
+  {
+    icon: svg.HeadlessUISVG,
+    name: 'Headless UI',
+  },
+  {
+    icon: svg.StorybookSVG,
+    name: 'Storybook',
+  },
 ];
 
 export const toolListAnimations = [
-    {
-        name: 'Figma',
-        icon: svg.FigmaSVG,
-    },
-    {
-        name: 'motion.dev',
-        icon: svg.MotionSVG,
-    },
+  {
+    icon: svg.FigmaSVG,
+    name: 'Figma',
+  },
+  {
+    icon: svg.MotionSVG,
+    name: 'motion.dev',
+  },
 ];
 
 export const toolListAi = [
-    {
-        name: 'Perplexity',
-        icon: svg.PerplexityAiSVG,
-    },
-    {
-        name: 'Cursor',
-        icon: svg.CursorLightSVG,
-    },
-    {
-        name: 'CodeRabbit',
-        icon: svg.CodeRabbitSVG,
-    },
+  {
+    icon: svg.PerplexityAiSVG,
+    name: 'Perplexity',
+  },
+  {
+    icon: svg.CursorLightSVG,
+    name: 'Cursor',
+  },
+  {
+    icon: svg.CodeRabbitSVG,
+    name: 'CodeRabbit',
+  },
 ];
 
 export const toolListBundlers = [
-    {
-        name: 'Vite',
-        icon: svg.ViteSVG,
-    },
-    {
-        name: 'swc',
-        icon: svg.SwcSVG,
-    },
-    {
-        name: 'esbuild',
-        icon: svg.ESBuildSVG,
-    },
-    {
-        name: 'Webpack',
-        icon: svg.WebpackSVG,
-    },
+  {
+    icon: svg.ViteSVG,
+    name: 'Vite',
+  },
+  {
+    icon: svg.SwcSVG,
+    name: 'swc',
+  },
+  {
+    icon: svg.ESBuildSVG,
+    name: 'esbuild',
+  },
+  {
+    icon: svg.WebpackSVG,
+    name: 'Webpack',
+  },
 ];
 
 export const toolListLLM = [
-    {
-        name: 'Vercel AI',
-        icon: svg.VercelSVG,
-    },
-    {
-        name: 'OpenAI',
-        icon: svg.OpenAiSVG,
-    },
-    {
-        name: 'Anthropic',
-        icon: svg.AnthropicSVG,
-    },
-    {
-        name: 'Groq',
-        icon: svg.GroqAiSVG,
-    },
-    {
-        name: 'OpenRouter',
-        icon: svg.OpenRouterAaSVG,
-    },
+  {
+    icon: svg.VercelSVG,
+    name: 'Vercel AI',
+  },
+  {
+    icon: svg.OpenAiSVG,
+    name: 'OpenAI',
+  },
+  {
+    icon: svg.AnthropicSVG,
+    name: 'Anthropic',
+  },
+  {
+    icon: svg.GroqAiSVG,
+    name: 'Groq',
+  },
+  {
+    icon: svg.OpenRouterAaSVG,
+    name: 'OpenRouter',
+  },
 ];
 
 // TODO delete if not used
 export const toolListCodeQuality = [
-    {
-        name: 'ESLint',
-        icon: svg.ESNextSVG,
-    },
-    {
-        name: 'Prettier',
-        icon: svg.PrettierSVG,
-    },
+  {
+    icon: svg.ESNextSVG,
+    name: 'ESLint',
+  },
+  {
+    icon: svg.PrettierSVG,
+    name: 'Prettier',
+  },
 ];
 
 // TODO delete if not used
 export const stuff = [
-    {
-        area: 'core',
-        toolList: toolListCore,
-    },
-    // {
-    //     area: 'frameworks',
-    //     toolList: toolListFrameworks,
-    // },
-    {
-        area: 'auth',
-        toolList: toolListAuth,
-    },
-    {
-        area: 'state',
-        toolList: toolListState,
-    },
-    {
-        area: 'styles',
-        toolList: toolListStyles,
-    },
-    {
-        area: 'animations',
-        toolList: toolListLLM,
-    },
-    {
-        area: 'AI',
-        toolList: toolListLLM,
-    },
+  {
+    area: 'core',
+    toolList: toolListCore,
+  },
+  // {
+  //     area: 'frameworks',
+  //     toolList: toolListFrameworks,
+  // },
+  {
+    area: 'auth',
+    toolList: toolListAuth,
+  },
+  {
+    area: 'state',
+    toolList: toolListState,
+  },
+  {
+    area: 'styles',
+    toolList: toolListStyles,
+  },
+  {
+    area: 'animations',
+    toolList: toolListLLM,
+  },
+  {
+    area: 'AI',
+    toolList: toolListLLM,
+  },
 ];
 
 export type Stuff = (typeof stuff)[number];
 
 export type ITool =
-    | (typeof toolListCore)[number]
-    | (typeof toolListState)[number]
-    | (typeof toolListStyles)[number]
-    | (typeof toolListLLM)[number];
+  | (typeof toolListCore)[number]
+  | (typeof toolListState)[number]
+  | (typeof toolListStyles)[number]
+  | (typeof toolListLLM)[number];

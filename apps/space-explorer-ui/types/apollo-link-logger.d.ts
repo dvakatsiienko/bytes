@@ -1,5 +1,5 @@
 declare module 'apollo-link-logger' {
-    import { ApolloLink } from '@apollo/client';
+  import { ApolloLink } from '@apollo/client';
 
-    export default new ApolloLink();
+  export default new ApolloLink();
 }

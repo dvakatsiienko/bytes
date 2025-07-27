@@ -1,24 +1,25 @@
-
-import { Loading, Header, LaunchTile } from '@/components';
-
-
+import { Header, LaunchTile, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Profile = () => {
-    const { data, loading } = gql.useUserProfileQuery({ fetchPolicy: 'cache-and-network' });
+  const { data, loading } = gql.useUserProfileQuery({
+    fetchPolicy: 'cache-and-network',
+  });
 
-    const tripsListJSX =
-        data?.userProfile?.trips.map((trip) => {
-            return <LaunchTile key = { trip.id } launch = { trip.launch } trip = { trip } />;
-        }) ?? [];
+  const tripsListJSX =
+    data?.userProfile?.trips.map((trip) => {
+      return <LaunchTile key={trip.id} launch={trip.launch} trip={trip} />;
+    }) ?? [];
 
-    return (
-        <>
-            <Header title = 'My Trips' />
+  return (
+    <>
+      <Header title='My Trips' />
 
-            {loading && !data ? <Loading /> : null}
-            {tripsListJSX}
-            {!loading && !data?.userProfile?.trips.length && <h4>You haven't booked any trips.</h4>}
-        </>
-    );
+      {loading && !data ? <Loading /> : null}
+      {tripsListJSX}
+      {!loading && !data?.userProfile?.trips.length && (
+        <h4>You haven't booked any trips.</h4>
+      )}
+    </>
+  );
 };

@@ -1,25 +1,24 @@
-
-@import 'tailwindcss';
+@import "tailwindcss";
 @plugin '@tailwindcss/forms';
 
 @layer base {
-    input,
-    select {
-        border-color: var(--color-gray-200);
-        outline-color: var(--color-gray-200);
-    }
+  input,
+  select {
+    outline-color: var(--color-gray-200);
+    border-color: var(--color-gray-200);
+  }
 }
 
 @theme {
-    --animate-shimmer: shimmer 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s ease-in-out infinite;
 
-    @keyframes shimmer {
-        100% {
-            transform: translateX(100%);
-        }
+  --color-blue-400: #2589fe;
+  --color-blue-500: #0070f3;
+  --color-blue-600: #2f6feb;
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
     }
-
-    --color-blue-400: #2589fe;
-    --color-blue-500: #0070f3;
-    --color-blue-600: #2f6feb;
+  }
 }

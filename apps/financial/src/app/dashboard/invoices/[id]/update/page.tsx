@@ -1,40 +1,38 @@
-
 import { notFound } from 'next/navigation';
 
-
 import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
+
+import { fetchCustomerList, fetchInvoiceById } from '@/lib';
+
 import { InvoiceFormUpdate } from './ui';
-
-
-import { fetchInvoiceById, fetchCustomerList } from '@/lib';
 import type { NextPageProps } from '@/types';
 
 const UpdateInvoicePage = async (props: NextPageProps) => {
-    const params = await props.params;
+  const params = await props.params;
 
-    const [ invoice, customerList ] = await Promise.all([
-        fetchInvoiceById(params.id),
-        fetchCustomerList(),
-    ]);
+  const [invoice, customerList] = await Promise.all([
+    fetchInvoiceById(params.id),
+    fetchCustomerList(),
+  ]);
 
-    if (!invoice) notFound();
+  if (!invoice) notFound();
 
-    return (
-        <main>
-            <Breadcrumbs
-                breadcrumbList = { [
-                    { label: 'Invoices', href: '/dashboard/invoices' },
-                    {
-                        label:  'Update Invoice',
-                        href:   `/dashboard/invoices/${ params.id }/update`,
-                        active: true,
-                    },
-                ] }
-            />
+  return (
+    <main>
+      <Breadcrumbs
+        breadcrumbList={[
+          { href: '/dashboard/invoices', label: 'Invoices' },
+          {
+            active: true,
+            href: `/dashboard/invoices/${params.id}/update`,
+            label: 'Update Invoice',
+          },
+        ]}
+      />
 
-            <InvoiceFormUpdate customerList = { customerList } invoice = { invoice } />
-        </main>
-    );
+      <InvoiceFormUpdate customerList={customerList} invoice={invoice} />
+    </main>
+  );
 };
 
 export default UpdateInvoicePage;

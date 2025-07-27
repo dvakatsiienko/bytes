@@ -1,6 +1,5 @@
-
-const strictRuleSet = require('@typescript-eslint/eslint-plugin').configs.strict;
-
+const strictRuleSet = require('@typescript-eslint/eslint-plugin').configs
+  .strict;
 
 const { rewireRuleSet } = require('./rewireRuleSet');
 

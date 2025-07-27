@@ -1,15 +1,14 @@
-
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-    reactStrictMode: true,
-    eslint: { ignoreDuringBuilds: true },
-    typescript: { ignoreBuildErrors: true },
-    experimental: {
-        reactCompiler: true,
-        ppr: true,
-    },
-    transpilePackages: ['@ui/kit'],
+  eslint: { ignoreDuringBuilds: true },
+  experimental: {
+    ppr: true,
+    reactCompiler: true,
+  },
+  reactStrictMode: true,
+  transpilePackages: ['@ui/kit'],
+  typescript: { ignoreBuildErrors: true },
 };
 
 export default nextConfig;

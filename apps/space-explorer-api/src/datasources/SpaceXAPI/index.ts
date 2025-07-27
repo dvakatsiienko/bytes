@@ -1,2 +1,2 @@
-export * from './SpaceXAPI';
 export * from './LaunchModel';
+export * from './SpaceXAPI';

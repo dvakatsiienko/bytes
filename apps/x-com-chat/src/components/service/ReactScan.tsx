@@ -1,19 +1,19 @@
 'use client';
 
-import { scan } from 'react-scan';
 import { useEffect } from 'react';
+import { scan } from 'react-scan';
 
 export function ReactScan() {
-    useEffect(() => {
-        scan({
-            enabled: true,
-            trackUnnecessaryRenders: true,
-            animationSpeed: 'off',
-            showToolbar: process.env.NODE_ENV === 'development',
-            showNotificationCount: true,
-            showFPS: true,
-        });
-    }, []);
+  useEffect(() => {
+    scan({
+      animationSpeed: 'off',
+      enabled: true,
+      showFPS: true,
+      showNotificationCount: true,
+      showToolbar: process.env.NODE_ENV === 'development',
+      trackUnnecessaryRenders: true,
+    });
+  }, []);
 
-    return null;
+  return null;
 }

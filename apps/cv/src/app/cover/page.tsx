@@ -1,59 +1,61 @@
-
 import { cx } from 'cva';
-import Link from 'next/link';
 import type { Metadata } from 'next';
-
+import Link from 'next/link';
 
 import { ExternalLink } from '@/elements/ExternalLink';
 
-
 import { EMAIL_TO } from '@/frags';
 import {
-    LINK_ID_CV_TOOLS,
-    LINK_X_COM_CHAT,
-    ADDRESS_GITHUB_PERSONAL,
-    ADDRESS_LINKEDIN_PERSONAL,
-    ADDRESS_TELEGRAM_PERSONAL,
+  ADDRESS_GITHUB_PERSONAL,
+  ADDRESS_LINKEDIN_PERSONAL,
+  ADDRESS_TELEGRAM_PERSONAL,
+  LINK_ID_CV_TOOLS,
+  LINK_X_COM_CHAT,
 } from '@/links';
 
 export default function CoverPage() {
-    return (
-        <main className={cx('prose-custom prose-style mx-auto prose-hr:mb-6')}>
-            <h3 className='mt-4'>Hi there, I'm Dima. I do Frontend.</h3>
-            <hr />
+  return (
+    <main className={cx('prose-custom prose-style mx-auto prose-hr:mb-6')}>
+      <h3 className='mt-4'>Hi there, I'm Dima. I do Frontend.</h3>
+      <hr />
 
-            <p>
-                I bring <b>{yearExperience} years</b> of <b>frontend development</b> experience, with deep expertise in{' '}
-                <b>React ({yearExperienceReact} years)</b>, <b>Next.js ({yearExperienceNextjs} years)</b>,{' '}
-                <b>TypeScript ({yearExperienceTypescript} years)</b> and{' '}
-                <b>Tailwind ({yearExperienceTailwind} years)</b>.{' '}
-                <Link href={`/#${LINK_ID_CV_TOOLS}`}>See more tools I use</Link>. I’ve delivered many successful
-                projects, focusing on high-quality functionality, clean UI/UX, and simplicity — challenges included.
-            </p>
+      <p>
+        I bring <b>{yearExperience} years</b> of <b>frontend development</b>{' '}
+        experience, with deep expertise in{' '}
+        <b>React ({yearExperienceReact} years)</b>,{' '}
+        <b>Next.js ({yearExperienceNextjs} years)</b>,{' '}
+        <b>TypeScript ({yearExperienceTypescript} years)</b> and{' '}
+        <b>Tailwind ({yearExperienceTailwind} years)</b>.{' '}
+        <Link href={`/#${LINK_ID_CV_TOOLS}`}>See more tools I use</Link>. I’ve
+        delivered many successful projects, focusing on high-quality
+        functionality, clean UI/UX, and simplicity — challenges included.
+      </p>
 
-            <p>
-                I’m looking for a cool new project, maybe a startup, where I can help build an awesome consumer-facing
-                product. I’m excited to join a great team where I can put my skills and collaborative spirit to work on
-                something impactful.
-            </p>
+      <p>
+        I’m looking for a cool new project, maybe a startup, where I can help
+        build an awesome consumer-facing product. I’m excited to join a great
+        team where I can put my skills and collaborative spirit to work on
+        something impactful.
+      </p>
 
-            <p>
-                👽 Check out my latest side project: an AI-driven{' '}
-                <ExternalLink href={LINK_X_COM_CHAT}>X-COM Chat</ExternalLink>, where each character has its own
-                personality. <br />
-            </p>
-            <blockquote>
-                💡 You can find more of my work on&nbsp;
-                <ExternalLink href={ADDRESS_GITHUB_PERSONAL}>GitHub</ExternalLink>.
-            </blockquote>
+      <p>
+        👽 Check out my latest side project: an AI-driven{' '}
+        <ExternalLink href={LINK_X_COM_CHAT}>X-COM Chat</ExternalLink>, where
+        each character has its own personality. <br />
+      </p>
+      <blockquote>
+        💡 You can find more of my work on&nbsp;
+        <ExternalLink href={ADDRESS_GITHUB_PERSONAL}>GitHub</ExternalLink>.
+      </blockquote>
 
-            <p>
-                💬 Reach me out via <ExternalLink href={ADDRESS_TELEGRAM_PERSONAL}>Telegram</ExternalLink>,{' '}
-                <ExternalLink href={EMAIL_TO}>Email</ExternalLink> or{' '}
-                <ExternalLink href={ADDRESS_LINKEDIN_PERSONAL}>LinkedIn</ExternalLink>.
-            </p>
-        </main>
-    );
+      <p>
+        💬 Reach me out via{' '}
+        <ExternalLink href={ADDRESS_TELEGRAM_PERSONAL}>Telegram</ExternalLink>,{' '}
+        <ExternalLink href={EMAIL_TO}>Email</ExternalLink> or{' '}
+        <ExternalLink href={ADDRESS_LINKEDIN_PERSONAL}>LinkedIn</ExternalLink>.
+      </p>
+    </main>
+  );
 }
 
 /* Helpers */
@@ -83,6 +85,7 @@ const yearExperienceTailwind = yearCurrent - YEAR_STARTED_TAILWIND;
 // ];
 
 export const metadata: Metadata = {
-    title: 'Dima Vakatsiienko Cover',
-    description: 'Dima Vakatsiienko Cover, Dima Vakatsiienko, Vakatsiienko Dmytro Viktorovytch',
+  description:
+    'Dima Vakatsiienko Cover, Dima Vakatsiienko, Vakatsiienko Dmytro Viktorovytch',
+  title: 'Dima Vakatsiienko Cover',
 };

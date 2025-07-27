@@ -1,13 +1,10 @@
-export * from './SVG';
-
-export { Layout } from './Layout';
-export { Header } from './Header';
+export { Button } from './Button';
+export { CartItem } from './CartItem';
 export { Footer } from './Footer';
+export { Header } from './Header';
+export { LaunchTile } from './LaunchTile';
+export { Layout } from './Layout';
 export { Loading } from './Loading';
 export { LoginForm } from './LoginForm';
-
-export { LaunchTile } from './LaunchTile';
-export { CartItem } from './CartItem';
-
-export { Button } from './Button';
 export { MenuItem } from './MenuItem';
+export * from './SVG';

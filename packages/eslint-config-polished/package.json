@@ -1,41 +1,38 @@
 {
-    "name": "eslint-config-polished",
-    "version": "0.0.13",
-    "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-    "scripts": {
-        "lint": "eslint",
-        "lint:inspect": "pnpx @eslint/config-inspector@latest"
-    },
-    "dependencies": {
-        "@eslint/js": "9.32.0",
-        "eslint-plugin-react": "7.37.5",
-        "eslint-plugin-react-hooks": "5.2.0",
-        "eslint-plugin-smells": "1.0.1",
-        "globals": "16.3.0",
-        "typescript-eslint": "8.38.0"
-    },
-    "peerDependencies": {
-        "eslint": ">=8.57.0",
-        "typescript": ">=5.0.0"
-    },
-    "main": "./typescript.js",
-    "exports": {
-        ".": "./index.mjs",
-        "./javascript": "./javascript.js",
-        "./typescript": "./typescript.js",
-        "./flat": "./index.mjs"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/dvakatsiienko/bytes.git",
-        "directory": "packages/eslint-config-polished"
-    },
-    "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/eslint-config-polished#readme",
-    "keywords": [
-        "eslint",
-        "eslintconfig"
-    ],
-    "bugs": {
-        "url": "https://github.com/dvakatsiienko/bytes/issues"
-    }
+  "name": "eslint-config-polished",
+  "version": "0.0.13",
+  "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
+  "scripts": {
+    "lint": "eslint",
+    "lint:inspect": "pnpx @eslint/config-inspector@latest"
+  },
+  "dependencies": {
+    "@eslint/js": "9.32.0",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "eslint-plugin-smells": "1.0.1",
+    "globals": "16.3.0",
+    "typescript-eslint": "8.38.0"
+  },
+  "peerDependencies": {
+    "eslint": ">=8.57.0",
+    "typescript": ">=5.0.0"
+  },
+  "main": "./typescript.js",
+  "exports": {
+    ".": "./index.mjs",
+    "./javascript": "./javascript.js",
+    "./typescript": "./typescript.js",
+    "./flat": "./index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dvakatsiienko/bytes.git",
+    "directory": "packages/eslint-config-polished"
+  },
+  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/eslint-config-polished#readme",
+  "keywords": ["eslint", "eslintconfig"],
+  "bugs": {
+    "url": "https://github.com/dvakatsiienko/bytes/issues"
+  }
 }

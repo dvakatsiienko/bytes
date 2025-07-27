@@ -2,9 +2,8 @@
  * ? This module is not used until @typescript-eslint v6 is released.
  */
 
-
-const stylisticRuleSet = require('@typescript-eslint/eslint-plugin').configs.stylistic;
-
+const stylisticRuleSet = require('@typescript-eslint/eslint-plugin').configs
+  .stylistic;
 
 const { rewireRuleSet } = require('./rewireRuleSet');
 

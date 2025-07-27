@@ -1,24 +1,24 @@
 {
-	/* File inclusion */
-	"include": ["**/*.ts", "**/*.tsx"],
-	"exclude": ["node_modules", "types"],
-	"compilerOptions": {
-		/* Module resolution */
-		"target": "ESNext",
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"strict": true,
-		"forceConsistentCasingInFileNames": true,
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"resolveJsonModule": true,
-		"isolatedModules": true,
-		"noFallthroughCasesInSwitch": true,
+  /* File inclusion */
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "types"],
+  "compilerOptions": {
+    /* Module resolution */
+    "target": "ESNext",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noFallthroughCasesInSwitch": true,
 
-		/* build */
-		"emitDeclarationOnly": true,
-		"declaration": true,
-		"outDir": "types"
-	}
+    /* build */
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "outDir": "types"
+  }
 }

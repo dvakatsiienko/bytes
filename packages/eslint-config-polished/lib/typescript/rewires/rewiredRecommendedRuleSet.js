@@ -1,6 +1,5 @@
-
-const recommendedRuleSet = require('@typescript-eslint/eslint-plugin').configs.recommended;
-
+const recommendedRuleSet = require('@typescript-eslint/eslint-plugin').configs
+  .recommended;
 
 const { rewireRuleSet } = require('./rewireRuleSet');
 

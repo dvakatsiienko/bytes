@@ -1,20 +1,20 @@
 {
-    "name": "fonts",
-    "version": "0.0.1",
-    "scripts": {
-        "lint": "eslint",
-        "typecheck": "tsc",
-        "build": "tsc"
-    },
-    "dependencies": {
-        "next": "15.4.4"
-    },
-    "types": "./types/next-fonts.d.ts",
-    "exports": {
-        ".": "./src/next-fonts.ts",
-        "./manrope-vrr-font-face": "./src/manrope-vrr.scss",
-        "./manrope-vrr-font": "./src/Manrope[wght].woff2",
-        "./roboto-flex-vrr-font-face": "./src/roboto-flex-vrr.scss",
-        "./roboto-flex-vrr-font": "./src/RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf"
-    }
+  "name": "fonts",
+  "version": "0.0.1",
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "next": "15.4.4"
+  },
+  "types": "./types/next-fonts.d.ts",
+  "exports": {
+    ".": "./src/next-fonts.ts",
+    "./manrope-vrr-font-face": "./src/manrope-vrr.scss",
+    "./manrope-vrr-font": "./src/Manrope[wght].woff2",
+    "./roboto-flex-vrr-font-face": "./src/roboto-flex-vrr.scss",
+    "./roboto-flex-vrr-font": "./src/RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf"
+  }
 }

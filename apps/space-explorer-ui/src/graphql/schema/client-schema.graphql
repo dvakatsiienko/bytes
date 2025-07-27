@@ -1,4 +1,4 @@
 extend type Query {
-    isLoggedIn: Boolean!
-    cartItems: [ID!]!
+  isLoggedIn: Boolean!
+  cartItems: [ID!]!
 }
