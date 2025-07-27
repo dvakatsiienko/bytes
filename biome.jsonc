@@ -73,6 +73,17 @@
         // TypeScript
         "**/*.d.ts"
       ]
+    },
+
+    // disable linter enitrely for generated files
+    {
+      "linter": {
+        "enabled": false
+      },
+      "includes": [
+        "apps/**/convex/_generated/**",
+        "apps/**/graphql/index.{ts,tsx}"
+      ]
     }
   ]
 }
