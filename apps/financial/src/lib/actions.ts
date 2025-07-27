@@ -120,10 +120,10 @@ const InvoiceSchema = z.object({
     .number()
     .gt(0, { message: 'Please enter an amount greater than $0.' }),
   createdAt: z.string(),
-  customerId: z.string({ invalid_type_error: 'Please select a customer.' }),
+  customerId: z.string({ message: 'Please select a customer.' }),
   id: z.string(),
   status: z.enum(['pending', 'paid'], {
-    invalid_type_error: 'Please select an invoice status.',
+    message: 'Please select an invoice status.',
   }),
 });
 

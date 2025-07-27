@@ -2,7 +2,7 @@
   "name": "fonts",
   "version": "0.0.1",
   "scripts": {
-    "lint": "eslint",
+    "lint": "biome lint",
     "typecheck": "tsc",
     "build": "tsc"
   },

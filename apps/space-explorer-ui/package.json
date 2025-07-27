@@ -10,7 +10,7 @@
     "build:clean": "rimraf dist",
     "serve": "run-s build:clean build:vite preview",
     "preview": "vite preview",
-    "lint": "eslint",
+    "lint": "biome lint",
     "typecheck": "tsc",
     "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\""
   },

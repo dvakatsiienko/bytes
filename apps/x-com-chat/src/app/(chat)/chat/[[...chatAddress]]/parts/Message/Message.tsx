@@ -187,8 +187,8 @@ const MessagePreview = ({
               i === message.parts.length - 1) ??
             false
           }
-          // @ts-expect-error part
           key={`message-${message.id}-${i}`}
+          // @ts-expect-error TODO fix this later
           part={part}
         />
       );

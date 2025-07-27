@@ -6,7 +6,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "tsx watch ./src/index.ts",
-    "lint": "eslint",
+    "lint": "biome lint",
     "typecheck": "tsc",
     "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
     "prisma:generate": "prisma generate",

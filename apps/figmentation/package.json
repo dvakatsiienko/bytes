@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "serve": "next start",
-    "lint": "eslint",
+    "lint": "biome lint",
     "typecheck": "tsc"
   },
   "dependencies": {

@@ -13,16 +13,6 @@
         "CONVEX_DEPLOY_KEY"
       ]
     },
-    "lint": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "!**/*.css",
-        "!**/*.scss",
-        "!**/*.yaml",
-        "!.vscode/**",
-        "!.cursor/**"
-      ]
-    },
     "typecheck": { "inputs": ["package.json", "**/*.{ts,tsx}"] },
     "db:generate": { "cache": false }
   }

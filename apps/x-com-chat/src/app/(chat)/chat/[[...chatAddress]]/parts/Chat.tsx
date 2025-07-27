@@ -113,8 +113,8 @@ export const Chat = (props: ChatProps) => {
     value: friend._id,
   }));
 
-  // @ts-expect-error todo fix it later
   const selectedFriend = props.friendList.find(
+    // @ts-expect-error todo fix it later
     (friend) => friend._id === props.friendId,
   );
 
@@ -185,11 +185,11 @@ export const Chat = (props: ChatProps) => {
             'brand:bg-primary brand:text-primary-foreground',
           )}
           isLoading={isLoading}
-          // @ts-expect-error todo fix it later
           label='Select Friend'
           name='select-friend'
           onValueChange={selectFriend}
           options={friendOptionList}
+          // @ts-expect-error todo fix it later
           value={selectedFriend?._id ?? ''}
         />
 

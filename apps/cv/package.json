@@ -8,9 +8,8 @@
     "build": "next build --turbopack",
     "build:clean": "rimraf .next",
     "serve": "next start",
-    "lint": "eslint",
-    "typecheck": "tsc",
-    "validate": "run-p lint typecheck"
+    "lint": "biome lint",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@styled-icons/ionicons-sharp": "10.46.0",
