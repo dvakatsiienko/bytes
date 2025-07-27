@@ -51,11 +51,11 @@
         "**/app/**/{layout,page,loading,error,not-found,default}.tsx",
         "apps/**/app/**/{layout,page,loading,error,not-found,default}.tsx",
 
-        "app/**/middleware.ts",
-        "apps/**/app/**/middleware.ts",
+        "src/**/middleware.ts",
+        "apps/**/src/**/middleware.ts",
 
-        "app/**/_middleware.ts",
-        "apps/**/app/**/_middleware.ts",
+        "src/**/_middleware.ts",
+        "apps/**/src/**/_middleware.ts",
 
         // Vite
         "vite.config.ts",
