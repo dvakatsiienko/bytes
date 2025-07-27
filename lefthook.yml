@@ -1,6 +1,8 @@
 pre-commit:
   jobs:
-    - run: npx ultracite format
+    - run:
+        npx @biomejs/biome check --write --no-errors-on-unmatched
+        --files-ignore-unknown=true {staged_files}
       glob:
         - '*.js'
         - '*.js'
