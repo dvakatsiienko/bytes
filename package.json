@@ -14,7 +14,7 @@
     "dev:financial": "turbo financial#dev",
     "dev:astro": "turbo astro#dev",
     "build": "turbo build",
-    "build:space-explorer/ui": "turbo space-explorer/ui#build",
+    "build:space-explorer/ui": "turbo @space-explorer/ui#build",
     "build:cv": "turbo cv#build",
     "build:x-com-chat": "turbo x-com-chat#build",
     "build:figmentation": "turbo figmentation#build",

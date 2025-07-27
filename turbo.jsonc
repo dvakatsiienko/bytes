@@ -30,6 +30,7 @@
       ]
     },
     "typecheck": {
+      // TODO optimize this pipeline works and align across codebase
       "dependsOn": ["^typecheck"],
       "inputs": [
         "$TURBO_DEFAULT$",
