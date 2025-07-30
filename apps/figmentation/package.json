@@ -12,16 +12,16 @@
   "dependencies": {
     "@ui/kit": "workspace:*",
     "cva": "1.0.0-beta.4",
-    "next": "15.4.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "next": "15.4.5",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.11",
     "@tailwindcss/typography": "0.5.16",
     "@types/node": "24.1.0",
-    "@types/react": "19.1.8",
-    "@types/react-dom": "19.1.6",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
     "tailwindcss": "4.1.11",

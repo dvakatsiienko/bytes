@@ -15,19 +15,19 @@
     "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\""
   },
   "dependencies": {
-    "@apollo/client": "3.13.8",
-    "@hookform/resolvers": "5.2.0",
+    "@apollo/client": "3.13.9",
+    "@hookform/resolvers": "5.2.1",
     "apollo-link-logger": "2.0.1",
     "debug": "4.4.1",
     "graphql": "16.11.0",
     "history": "5.3.0",
     "polished": "4.3.1",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "react-hook-form": "7.61.1",
     "react-router-dom": "7.7.1",
     "styled-components": "6.1.19",
-    "zod": "4.0.10"
+    "zod": "4.0.14"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.7",
@@ -37,8 +37,8 @@
     "@graphql-codegen/typescript-react-apollo": "4.3.3",
     "@types/debug": "4.1.12",
     "@types/node": "24.1.0",
-    "@types/react": "19.1.8",
-    "@types/react-dom": "19.1.6",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
     "@vitejs/plugin-react-swc": "3.11.0",
     "npm-run-all": "4.1.5",
     "prettier": "3.6.2",
