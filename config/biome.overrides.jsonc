@@ -64,6 +64,10 @@
         // Convex
         "**/convex/**",
 
+        // Prisma
+        "prisma.config.ts",
+        "**/prisma.config.ts",
+
         // TypeScript
         "*.d.ts",
         "**/*.d.ts",
