@@ -16,7 +16,7 @@ export const themeList = [
     value: 'dark',
   },
   {
-    icon: <Monitor className='h-[1.2rem] w-[1.2rem] transition-all ' />,
+    icon: <Monitor className='h-[1.2rem] w-[1.2rem] transition-all' />,
     label: 'System',
     value: 'system',
   },

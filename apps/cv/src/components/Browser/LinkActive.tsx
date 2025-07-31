@@ -23,7 +23,7 @@ export const LinkActive = (props: NavLinksProps) => {
 const linkActiveCn = cva({
   base: cx(
     // TODO put into theme
-    'grid h-full w-full items-center text-gray-500 dark:text-gray-400 ',
+    'grid h-full w-full items-center text-gray-500 dark:text-gray-400',
     'text-center font-semibold text-xs',
     'border-none',
 
@@ -31,7 +31,7 @@ const linkActiveCn = cva({
   ),
   variants: {
     intent: {
-      active: 'text-indigo-600 dark:text-link ',
+      active: 'text-indigo-600 dark:text-link',
     },
   },
 });
