@@ -52,8 +52,8 @@ function Textarea({ className, ...props }: TextareaProps) {
 /* Styles */
 const textareaCn = cva({
   base: [
-    'w-full resize-none pb-10 ',
-    'rounded-md ',
+    'w-full resize-none pb-10',
+    'rounded-md',
     'text-base placeholder:text-muted-foreground md:text-sm',
   ],
   defaultVariants: {
