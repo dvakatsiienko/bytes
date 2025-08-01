@@ -41,3 +41,6 @@ pscale.txt
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Crush agent directory
+.crush
