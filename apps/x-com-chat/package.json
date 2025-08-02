@@ -74,7 +74,7 @@
     "prettier": "3.6.2",
     "prisma": "6.13.0",
     "tailwindcss": "4.1.11",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "prisma": {
     "seed": "node -r @swc-node/register prisma/seed/init"
