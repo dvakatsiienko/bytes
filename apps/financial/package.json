@@ -31,13 +31,13 @@
     "react-dom": "19.1.1",
     "use-debounce": "10.0.5",
     "waait": "1.0.5",
-    "zod": "4.0.14"
+    "zod": "4.0.15"
   },
   "devDependencies": {
     "@tailwindcss/forms": "0.5.10",
     "@tailwindcss/postcss": "4.1.11",
     "@tanstack/react-query-devtools": "5.84.1",
-    "@types/node": "24.1.0",
+    "@types/node": "24.2.0",
     "@types/react": "19.1.9",
     "@types/react-dom": "19.1.7",
     "npm-run-all": "4.1.5",
