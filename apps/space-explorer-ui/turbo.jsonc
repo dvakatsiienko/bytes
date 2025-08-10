@@ -1,0 +1,33 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "lint": {
+      "env": [
+        "APOLLO_GRAPH_ID",
+        "APOLLO_GRAPH_VARIANT",
+        "APOLLO_KEY",
+        "APOLLO_SCHEMA_REPORTING",
+        "PORT"
+      ]
+    },
+    "typecheck": {
+      "env": [
+        "APOLLO_GRAPH_ID",
+        "APOLLO_GRAPH_VARIANT",
+        "APOLLO_KEY",
+        "APOLLO_SCHEMA_REPORTING",
+        "PORT"
+      ]
+    },
+    "build": {
+      "env": [
+        "APOLLO_GRAPH_ID",
+        "APOLLO_GRAPH_VARIANT",
+        "APOLLO_KEY",
+        "APOLLO_SCHEMA_REPORTING",
+        "PORT"
+      ]
+    }
+  }
+}
