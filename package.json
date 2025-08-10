@@ -44,8 +44,8 @@
   "packageManager": "pnpm@10.8.0",
   "dependencies": {
     "@ai-sdk/groq": "2.0.4",
-    "@ai-sdk/react": "2.0.8",
-    "ai": "5.0.8",
+    "@ai-sdk/react": "2.0.9",
+    "ai": "5.0.9",
     "zod": "^4.0.17"
   }
 }
