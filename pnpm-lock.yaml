@@ -510,7 +510,7 @@ importers:
         specifier: 1.0.5
         version: 1.0.5
       zod:
-        specifier: ^4.0.17
+        specifier: 4.0.17
         version: 4.0.17
     devDependencies:
       '@swc-node/register':
