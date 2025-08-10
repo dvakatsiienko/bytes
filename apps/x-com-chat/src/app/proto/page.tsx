@@ -17,8 +17,10 @@ export default function ProtoPage() {
     <section className='grid auto-rows-min justify-center gap-4 pt-8'>
       <h1 className='mb-12 font-bold text-4xl'>Proto</h1>
 
-      {chatHistoryQuery?.map(({ id, content }) => (
-        <div key={id}>{content}</div>
+      {chatHistoryQuery?.map((m) => (
+        <div key={m.id}>
+          {m.parts?.map((p) => (p.type === 'text' ? p.text : null))}
+        </div>
       ))}
 
       <section className='flex gap-2'>

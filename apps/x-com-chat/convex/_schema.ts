@@ -13,23 +13,13 @@ export const SchemaMessageList = v.array(
       v.literal('data'),
       v.literal('assistant'),
     ),
-
-    content: v.string(),
-    parts: v.array(
-      v.object({
-        type: v.string(),
-        text: v.optional(v.string()),
-      }),
-    ),
-    toolInvocations: v.optional(
-      v.array(
-        v.object({
-          name: v.string(),
-          id: v.string(),
-          result: v.string(),
-        }),
-      ),
-    ),
+    // v5 UIMessage can be `{ content: string }` or `{ parts: ContentPart[] }`.
+    // Accept both, optionally, to remain forward-compatible with SDK updates.
+    content: v.optional(v.string()),
+    // store UIMessage parts as-is (v5 UIMessage parts union). Keep permissive.
+    parts: v.optional(v.array(v.any())),
+    // Tool invocations may be present depending on the model/tool calling flow
+    toolInvocations: v.optional(v.array(v.any())),
   }),
 );
 
@@ -41,7 +31,7 @@ export default defineSchema({
   chats: defineTable({
     chatId: v.string(), // or whatever type your chatId is
     friendId: v.string(),
-    friendName: v.string(),
+    friendName: v.optional(v.string()),
     messageList: SchemaMessageList,
   }).index('by_chatId', ['chatId']),
 });

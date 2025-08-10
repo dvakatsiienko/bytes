@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import type { Message as TMessage } from 'ai';
+import type { UIMessage as TMessage } from 'ai';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@/components/ui/button';

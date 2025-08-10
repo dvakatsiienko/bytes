@@ -48,6 +48,8 @@ export const saveChatHistory = mutation({
   handler: async (ctx, args) => {
     const existingChat = await ctx.db.get(args.chatId as Id<'chat'>);
 
+    console.log('existingChat', args.messageList);
+
     if (existingChat) {
       await ctx.db.patch(existingChat._id, {
         messageList: args.messageList,
