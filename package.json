@@ -27,6 +27,12 @@
     "packages:reinstall": "rimraf pnpm-lock.yaml && rimraf **/{node_modules,.next} && pnpm i --force",
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
+  "dependencies": {
+    "@ai-sdk/groq": "2.0.4",
+    "@ai-sdk/react": "2.0.9",
+    "ai": "5.0.9",
+    "zod": "^4.0.17"
+  },
   "devDependencies": {
     "@biomejs/biome": "2.1.4",
     "lefthook": "1.12.2",
@@ -41,11 +47,5 @@
   "engines": {
     "node": ">=22.14.0"
   },
-  "packageManager": "pnpm@10.8.0",
-  "dependencies": {
-    "@ai-sdk/groq": "2.0.4",
-    "@ai-sdk/react": "2.0.9",
-    "ai": "5.0.9",
-    "zod": "^4.0.17"
-  }
+  "packageManager": "pnpm@10.14.0"
 }
