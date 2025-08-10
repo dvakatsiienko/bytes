@@ -79,32 +79,11 @@ export async function POST(req: Request) {
       originalMessages: uiMessages,
       generateMessageId: generateId,
       onFinish: async ({ messages }) => {
-        const normalizedMessages = messages.map((message) => {
-          const existingContent =
-            typeof (message as { content?: unknown }).content === 'string'
-              ? (message as { content?: string }).content
-              : undefined;
-
-          const fallbackContent = extractTextFromParts(
-            (message as { parts?: unknown }).parts,
-          );
-
-          return {
-            ...message,
-            // Prefer existing content; otherwise synthesize it from text parts
-            content: existingContent ?? fallbackContent,
-            // Back-compat: some Convex deployments still expect parts items to be
-            // exactly `{ type: string, text?: string }`. Strip extra fields.
-            parts: sanitizePartsToText(
-              (message as { parts?: unknown }).parts as UIMessage['parts'],
-            ),
-          } as typeof message & { content?: string };
-        });
-
         await fetchMutation(api.chat.saveChatHistory, {
           chatId,
           friendId: chatFriend._id,
-          messageList: normalizedMessages as unknown as UIMessage[],
+          // Store raw messages as-is for simplicity / forward-compatibility
+          messageList: messages as unknown as UIMessage[],
         });
       },
     });
@@ -114,66 +93,7 @@ export async function POST(req: Request) {
   }
 }
 
-/**
- * Extract a best-effort plain text from UIMessage parts.
- * Safely handles unknown structures and non-text parts.
- */
-function extractTextFromParts(parts: unknown): string | undefined {
-  if (!Array.isArray(parts)) return '';
-  const text = parts
-    .map((part) => {
-      if (
-        part &&
-        typeof part === 'object' &&
-        'text' in (part as Record<string, unknown>)
-      ) {
-        const value = (part as { text?: unknown }).text;
-        return typeof value === 'string' ? value : '';
-      }
-      return '';
-    })
-    .join('')
-    .trim();
-
-  return text.length > 0 ? text : '';
-}
-
-/**
- * Ensure parts are an array of objects with only `type` and optional `text`.
- * Drops unknown/extra fields to satisfy stricter validators.
- */
-function sanitizePartsToText(
-  parts: UIMessage['parts'],
-): Array<{ type: string; text?: string }> | undefined {
-  if (!Array.isArray(parts)) return;
-
-  const cleaned = parts
-    .map((part) => {
-      if (
-        part &&
-        typeof part === 'object' &&
-        'type' in (part as Record<string, unknown>)
-      ) {
-        const typeValue = (part as { type?: unknown }).type;
-        const textValue = (part as { text?: unknown }).text;
-        const type =
-          typeof typeValue === 'string'
-            ? typeValue
-            : String(typeValue ?? 'text');
-        const result: { type: string; text?: string } = { type };
-        if (typeof textValue === 'string') result.text = textValue;
-        return result;
-      }
-
-      // Fallback: turn primitive text into a text part
-      if (typeof part === 'string') return { type: 'text', text: part };
-
-      return null;
-    })
-    .filter(Boolean) as Array<{ type: string; text?: string }>;
-
-  return cleaned.length > 0 ? cleaned : undefined;
-}
+// No normalization helpers: we store raw messages as-is
 
 const modelProvider = customProvider({
   languageModels: {
