@@ -101,8 +101,6 @@ export async function POST(req: Request) {
           } as typeof message & { content?: string };
         });
 
-        /* biome-ignore lint/suspicious/noConsole: server-side debug log */
-        console.log('normalizedMessages logged', normalizedMessages);
         await fetchMutation(api.chat.saveChatHistory, {
           chatId,
           friendId: chatFriend._id,
