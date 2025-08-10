@@ -1,10 +1,10 @@
 'use client';
 
-import { type ChangeEvent, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import useEventListener from '@use-it/event-listener';
-import { createIdGenerator, type Message } from 'ai';
+import { createIdGenerator, DefaultChatTransport, type UIMessage } from 'ai';
 import { useMutation } from 'convex/react';
 import { useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
@@ -38,28 +38,17 @@ export const Chat = (props: ChatProps) => {
     props.chatId,
   );
 
-  const {
-    input,
-    handleInputChange,
-    status,
-    error,
-    handleSubmit: submitChatPrompt,
-  } = useChat({
-    experimental_prepareRequestBody({ id, messages }) {
-      // ? only send the last message to the server to save bandwith
-      return {
-        id,
-        message: messages.at(-1),
-      };
-    },
+  const [input, setInput] = useState('');
+
+  const { status, error, sendMessage, stop } = useChat({
     generateId: createIdGenerator({
       // ? ids format for user messages
       prefix: 'msgc',
       size: 16,
     }),
     id: props.chatId,
-    initialMessages: chatHistoryQuery,
-    sendExtraMessageFields: true, // send id and createdAt for each message TODO maybe not since convex rejects this field
+    messages: chatHistoryQuery,
+    transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -102,7 +91,7 @@ export const Chat = (props: ChatProps) => {
   };
 
   const sendPromptSuggestion = (value: string) => {
-    handleInputChange({ target: { value } } as ChangeEvent<HTMLInputElement>);
+    setInput(value);
     textareaRef.current?.focus();
     setTimeout(() => formRef.current?.requestSubmit(), 0);
   };
@@ -132,11 +121,20 @@ export const Chat = (props: ChatProps) => {
       {/* TODO extract to a component */}
       <form
         className='sticky bottom-(--layout-offset) mx-auto grid w-full [grid-area:textarea]'
-        onSubmit={submitChatPrompt}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (input.trim()) {
+            sendMessage({
+              parts: [{ text: input, type: 'text' }],
+              role: 'user',
+            });
+            setInput('');
+          }
+        }}
         ref={formRef}>
         <Textarea
           name='chat-textarea'
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
@@ -237,7 +235,7 @@ interface ChatProps {
   chatId: string;
   friendId: string;
   friendList: Friend[];
-  initialMessages: Message[];
+  initialMessages: UIMessage[];
 }
 
 function useInitJotai(chatId: string, friendId: string) {
