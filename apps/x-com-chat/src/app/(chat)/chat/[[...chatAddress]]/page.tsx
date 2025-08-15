@@ -56,6 +56,7 @@ export default async function ChatPage(props: ChatPageProps) {
     redirectToValidAddress = true;
   }
 
+  // biome-ignore lint/nursery/noUnnecessaryConditions: as for biome 2.1.4 this rule works incorrectly
   if (redirectToValidAddress) redirect(`/chat/${chat._id}/${friendId}`);
 
   const chatHistory = preloadedQueryResult(
