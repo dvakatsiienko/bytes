@@ -22,6 +22,7 @@ structured with apps in the `/apps` directory and shared libraries in
 ## Shared Packages
 
 - **prettier-config-polished** - Custom Prettier configuration
+- **biome-config-polished** - Comprehensive Biome linting and formatting configuration
 
 ## Common Commands
 
@@ -140,167 +141,28 @@ pnpm db:reinit           # Reset, generate, and seed database
 - **Database**: Prisma, SQLite, Convex
 - **Build Tools**: Turbo, SWC, Biome, Prettier
 
-## Biome Configuration System
+## Biome Configuration
 
-### Package Architecture
+### Package Setup
 
-The repository uses a custom `biome-config-polished` package located in `/packages/biome-config-polished/` to provide comprehensive linting and formatting configuration across all apps.
+The repository uses `biome-config-polished` package for consistent linting and formatting across all apps.
 
-**Key Files:**
-- `/packages/biome-config-polished/config.jsonc` - Main configuration with all rules and overrides
-- `/packages/biome-config-polished/package.json` - Package exports: `"exports": { ".": "./config.jsonc" }`
-- `/biome.jsonc` - Root config that extends both "ultracite" and "biome-config-polished"
-
-**Configuration Chain:**
+**Usage:**
 ```jsonc
-// Root biome.jsonc
+// biome.jsonc
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": ["ultracite", "biome-config-polished"]
 }
 ```
 
-### Rule Categories & Organization
-
-The configuration comprehensively covers all 7 Biome rule categories:
-
-1. **a11y** - Accessibility rules (useButtonType, noNoninteractiveElementInteractions)
-2. **complexity** - Code complexity detection (noExcessiveCognitiveComplexity disabled)
-3. **correctness** - Guaranteed incorrect code detection (strict React rules, useUniqueElementIds disabled)
-4. **nursery** - Experimental rules under development (useConsistentTypeDefinitions disabled)
-5. **performance** - Runtime efficiency rules (noNamespaceImport disabled for utility)
-6. **security** - Security vulnerability detection (noBlankTarget, noDangerouslySetInnerHtml)
-7. **style** - Code style consistency (noDefaultExport enabled, enforces named exports)
-8. **suspicious** - Likely incorrect code patterns (noConsole with allow list, React-specific rules)
-
-### Advanced Override System
-
-**CRITICAL**: Overrides must be at **root config level**, not nested inside `linter`:
-
-```jsonc
-{
-  "linter": { /* linter config */ },
-  "overrides": [  // ✅ Correct - root level
-    {
-      "linter": { "rules": { "style": { "noDefaultExport": "off" } } },
-      "includes": ["**/app/**/{layout,page}.tsx"]
-    }
-  ]
-}
-```
-
-**Three-Layer Override Strategy:**
-
-#### 1. Config File Protection Override
-```jsonc
-{
-  "assist": { "actions": { "source": { "useSortedKeys": "off" } } },
-  "includes": [
-    "biome.jsonc", "**/package.json", "**/tsconfig.json", 
-    "**/components.json", "**/.prettierrc.js"
-  ]
-}
-```
-**Purpose**: Prevents auto-sorting of configuration files that benefit from manual organization.
-
-#### 2. Framework Exception Override  
-```jsonc
-{
-  "linter": { "rules": { "style": { "noDefaultExport": "off" } } },
-  "includes": [
-    // Next.js App Router
-    "**/app/**/{layout,page,loading,error,not-found,default}.tsx",
-    // Build configs
-    "next.config.ts", "**/vite.config.ts",
-    // Function-based APIs
-    "**/convex/**", "*.d.ts"
-  ]
-}
-```
-**Purpose**: Allows default exports where frameworks require them (Next.js pages, config files, type definitions).
-
-#### 3. Generated Code Exclusion Override
-```jsonc
-{
-  "linter": { "enabled": false },
-  "includes": [
-    "apps/**/convex/_generated/**",
-    "apps/**/graphql/index.{ts,tsx}"
-  ]
-}
-```
-**Purpose**: Completely disables linting for generated code that shouldn't be manually modified.
-
-### Import Organization Strategy
-
-**Sophisticated Grouping System:**
-```jsonc
-"organizeImports": {
-  "groups": [
-    // Core Dependencies
-    { "type": false, "source": [":NODE:"] },  // Node built-ins
-    "react", "react-router",                   // UI framework
-    ["ramda", "use-debounce"],                // Utilities
-    ["motion"],                               // Animations  
-    ["cva", "classnames", "clsx"],            // Style utilities
-    ":PACKAGE:",                              // Other packages
-    
-    ":BLANK_LINE:",                           // Visual separator
-    
-    // Application Code
-    "@/app/**", "@/pages/**", "@/components/**",
-    
-    ":BLANK_LINE:",
-    
-    // Instruments & Utilities
-    ["@/lib", "@/lib/**"], "@/helpers/**", "@/utils/**", "@/hooks/**",
-    
-    ":BLANK_LINE:",
-    
-    // Local Imports
-    "./parts/**", ":PATH:"                    // Relative imports last
-  ]
-}
-```
-
-### Quick Reference Links
-
-- **Getting Started**: https://biomejs.dev/guides/getting-started/
-- **Configuration Guide**: https://biomejs.dev/guides/configure-biome/
-- **Monorepo Setup**: https://biomejs.dev/guides/big-projects/
-- **Rules Reference**: https://biomejs.dev/linter/javascript/rules/
-
-### Common Configuration Gotchas
-
-1. **Override Nesting**: Always place `overrides` at root config level, not inside `linter`
-2. **Package Resolution**: Ensure `exports` field in package.json points to correct config file
-3. **Extends Chain**: Order matters - later configs override earlier ones
-4. **Generated Files**: Use complete linter disabling, not rule-by-rule exclusion
-5. **Framework Files**: Use specific includes patterns for framework-required default exports
-
-### Package Usage in Other Projects
-
 **Installation:**
 ```bash
 pnpm add -D biome-config-polished@workspace:*
 ```
 
-**Basic Setup:**
-```jsonc
-// biome.jsonc
-{
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["biome-config-polished"]
-}
-```
-
-**With Additional Config:**
-```jsonc
-// biome.jsonc  
-{
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["biome-config-polished"],
-  "files": { "ignoreUnknown": false },
-  "vcs": { "enabled": true, "clientKind": "git" }
-}
-```
+**Key Features:**
+- Comprehensive rule coverage for all Biome categories
+- Framework-specific overrides (Next.js, Vite, Convex)
+- Smart import organization with blank line grouping
+- Generated code exclusions
