@@ -23,6 +23,7 @@
     "lint:errors": "biome lint --diagnostic-level=error",
     "lint:report": "biome lint --reporter=summary",
     "typecheck": "turbo typecheck",
+    "format": "biome format --write",
     "check": "turbo lint typecheck",
     "packages:reinstall": "rimraf pnpm-lock.yaml && rimraf **/{node_modules,.next} && pnpm i --force",
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
+    "biome-config-polished": "workspace:*",
     "lefthook": "1.12.3",
     "prettier": "3.6.2",
     "prettier-config-polished": "workspace:*",
