@@ -24,6 +24,9 @@ importers:
       '@biomejs/biome':
         specifier: 2.2.0
         version: 2.2.0
+      biome-config-polished:
+        specifier: workspace:*
+        version: link:packages/biome-config-polished
       lefthook:
         specifier: 1.12.3
         version: 1.12.3
@@ -552,6 +555,12 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
+
+  packages/biome-config-polished:
+    dependencies:
+      '@biomejs/biome':
+        specifier: '>=2.0.0'
+        version: 2.2.0
 
   packages/fonts:
     dependencies:

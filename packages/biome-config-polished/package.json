@@ -1,0 +1,28 @@
+{
+  "name": "biome-config-polished",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "lint": "biome lint",
+    "format": "biome format --write"
+  },
+  "exports": {
+    ".": "./config.jsonc"
+  },
+  "files": ["config.jsonc"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dvakatsiienko/bytes.git",
+    "directory": "packages/biome-config-polished"
+  },
+  "bugs": {
+    "url": "https://github.com/dvakatsiienko/bytes/issues"
+  },
+  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/biome-config-polished#readme",
+  "keywords": ["biome", "biomeconfig", "linter", "formatter"],
+  "peerDependencies": {
+    "@biomejs/biome": ">=2.2.0"
+  }
+}

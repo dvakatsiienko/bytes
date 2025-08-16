@@ -1,13 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 
-  "extends": [
-    // order matters
-    "ultracite",
-    "./config/biome.formatter.jsonc",
-    "./config/biome.linter.jsonc",
-    "./config/biome.overrides.jsonc"
-  ],
+  "extends": ["ultracite", "biome-config-polished"],
   "files": {
     "ignoreUnknown": false,
     "includes": ["**"]
