@@ -291,6 +291,8 @@
         "**/prettier.config.mjs",
         "prettier.mjs",
         "**/prettier.mjs",
+        ".prettierrc.mjs",
+        "**/prettierrc.mjs",
 
         "postcss.config.mjs",
         "**/postcss.config.mjs",
