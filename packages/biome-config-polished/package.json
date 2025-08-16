@@ -6,12 +6,22 @@
   "type": "module",
   "scripts": {
     "lint": "biome lint",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "publish": "npm publish --access public",
+    "patch": "npm version patch",
+    "release": "run-s patch publish"
+  },
+  "dependencies": {
+    "npm-run-all": "4.1.5"
+  },
+  "peerDependencies": {
+    "@biomejs/biome": ">=2.2.0"
   },
   "exports": {
     ".": "./config.jsonc"
   },
   "files": ["config.jsonc"],
+  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/biome-config-polished#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/dvakatsiienko/bytes.git",
@@ -20,9 +30,5 @@
   "bugs": {
     "url": "https://github.com/dvakatsiienko/bytes/issues"
   },
-  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/biome-config-polished#readme",
-  "keywords": ["biome", "biomeconfig", "linter", "formatter"],
-  "peerDependencies": {
-    "@biomejs/biome": ">=2.2.0"
-  }
+  "keywords": ["biome", "biomeconfig", "linter", "formatter"]
 }
