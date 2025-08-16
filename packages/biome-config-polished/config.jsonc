@@ -289,6 +289,8 @@
         // Other configs
         "prettier.config.mjs",
         "**/prettier.config.mjs",
+        "prettier.mjs",
+        "**/prettier.mjs",
 
         "postcss.config.mjs",
         "**/postcss.config.mjs",
