@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import useEventListener from '@use-it/event-listener';
-import { createIdGenerator, DefaultChatTransport, type UIMessage } from 'ai';
+import { DefaultChatTransport, type UIMessage, createIdGenerator } from 'ai';
 import { useMutation } from 'convex/react';
 import { useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';

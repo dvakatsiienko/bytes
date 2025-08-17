@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
-import { createInvoice, type State } from '@/lib';
+import { type State, createInvoice } from '@/lib';
 
 import { Button } from '@/ui/Button';
 import type { Customer } from '~/prisma/client/edge';

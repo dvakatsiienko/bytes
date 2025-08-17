@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { cva, type VariantProps } from 'cva';
+import { type VariantProps, cva } from 'cva';
 import NextImage, { type ImageProps as NextImageProps } from 'next/image';
 
 import { cn } from '@/utils/cn';

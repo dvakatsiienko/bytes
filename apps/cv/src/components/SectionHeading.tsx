@@ -1,4 +1,4 @@
-import { cva, cx, type VariantProps } from 'cva';
+import { type VariantProps, cva, cx } from 'cva';
 import { cn } from '@ui/kit/lib/utils';
 
 export function SectionHeading(props: SectionHeadingProps) {

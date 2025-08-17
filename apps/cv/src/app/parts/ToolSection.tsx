@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/correctness/noUnusedImports: wip */
 
-import { cva, cx, type VariantProps } from 'cva';
+import { type VariantProps, cva, cx } from 'cva';
 import { Masonry, type RenderComponentProps } from 'masonic';
 
 import { Tool } from './Tool';

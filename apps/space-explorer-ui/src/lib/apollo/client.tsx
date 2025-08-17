@@ -1,4 +1,4 @@
-import { ApolloClient, from, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, from } from '@apollo/client';
 import loggerLink from 'apollo-link-logger';
 
 import { authLink, errorLink, httpLink } from './links';
