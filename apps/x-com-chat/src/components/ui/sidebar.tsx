@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { cva, type VariantProps } from 'cva';
+import { type VariantProps, cva } from 'cva';
 import { Slot } from '@radix-ui/react-slot';
 import { PanelLeftIcon } from 'lucide-react';
 

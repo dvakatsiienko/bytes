@@ -1,8 +1,8 @@
 import {
   type FieldPolicy,
   type FieldReadFunction,
-  makeVar,
   type TypePolicy,
+  makeVar,
 } from '@apollo/client';
 
 import type * as gql from '@/graphql';

@@ -1,9 +1,9 @@
 'use client';
 
 import {
-  isServer,
   QueryClient,
   QueryClientProvider,
+  isServer,
 } from '@tanstack/react-query';
 
 // TODO probably remove react-query

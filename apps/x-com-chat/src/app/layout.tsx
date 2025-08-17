@@ -1,6 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { preloadedQueryResult, preloadQuery } from 'convex/nextjs';
+import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';

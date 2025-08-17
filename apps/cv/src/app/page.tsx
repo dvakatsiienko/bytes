@@ -30,7 +30,7 @@ import {
 import logoJpeg from '/public/logo.jpeg';
 import meJpeg from '/public/my-photo.jpeg';
 import { ExternalLink } from '@/elements';
-import { __DEV__, EMAIL_TO } from '@/frags';
+import { EMAIL_TO, __DEV__ } from '@/frags';
 import * as links from '@/links';
 
 export default function CVPage() {

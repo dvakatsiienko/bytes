@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import {
   fetchMutation,
-  preloadedQueryResult,
   preloadQuery,
+  preloadedQueryResult,
 } from 'convex/nextjs';
 import { redirect } from 'next/navigation';
 

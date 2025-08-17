@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import {
-  dehydrate,
   HydrationBoundary,
   QueryClient,
+  dehydrate,
 } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 

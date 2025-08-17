@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from 'cva';
+import { type VariantProps, cva } from 'cva';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 

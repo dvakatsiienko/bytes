@@ -36,6 +36,7 @@
         "organizeImports": {
           "level": "on",
           "options": {
+            "identifierOrder": "lexicographic",
             "groups": [
               /* Core */
               { "type": false, "source": [":NODE:"] }, // node built-ins
