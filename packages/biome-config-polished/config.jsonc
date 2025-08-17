@@ -30,8 +30,14 @@
     "enabled": true,
     "actions": {
       "source": {
-        "useSortedAttributes": "on",
-        "useSortedKeys": "on",
+        "useSortedAttributes": {
+          "level": "on",
+          "options": { "sortOrder": "lexicographic" }
+        },
+        "useSortedKeys": {
+          "level": "on",
+          "options": { "sortOrder": "lexicographic" }
+        },
         "useSortedProperties": "on",
         "organizeImports": {
           "level": "on",
