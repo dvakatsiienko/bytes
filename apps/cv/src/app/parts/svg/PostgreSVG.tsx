@@ -8,8 +8,8 @@ export const PostgreSVG = (props: TSvgProps) => {
       height={size}
       viewBox='0 0 432.071 445.383'
       width={size}
-      xmlns='http://www.w3.org/2000/svg'
       xmlSpace='preserve'
+      xmlns='http://www.w3.org/2000/svg'
       {...restProps}>
       <title>PostgreSQL</title>
       <g

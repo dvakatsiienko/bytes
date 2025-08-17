@@ -5,8 +5,8 @@ export const LogoSvg = (props: SVGProps<SVGSVGElement>) => (
     height={800}
     viewBox='0 0 15.741 15.741'
     width={800}
-    xmlns='http://www.w3.org/2000/svg'
     xmlSpace='preserve'
+    xmlns='http://www.w3.org/2000/svg'
     {...props}>
     <title>X-COM Chat Logo</title>
     <path
