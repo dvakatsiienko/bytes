@@ -11,7 +11,6 @@ export default {
 
     /* dev deps */
     'tailwindcss',
-    '@swc-node/register',
   ],
   /**
    * Files are reported as unused if they are in the set of project files,
