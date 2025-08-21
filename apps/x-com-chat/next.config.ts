@@ -25,6 +25,7 @@ const nextConfig = {
     },
   ],
   transpilePackages: ['jotai-devtools'],
+  typedRoutes: true, // todo test it out
   typescript: { ignoreBuildErrors: true },
   webpack: (config) => {
     config.plugins.push(ReactComponentName({}));

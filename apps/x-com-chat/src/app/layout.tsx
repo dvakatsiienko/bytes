@@ -20,7 +20,7 @@ import { cn } from '@/utils/cn';
 import { api } from '@/convex/_generated/api';
 import '@/theme/init.css';
 
-export default async function RootLayout(props: React.PropsWithChildren) {
+export default async function RootLayout(props: LayoutProps<'/'>) {
   const friendList = preloadedQueryResult(
     await preloadQuery(api.chat.getFriendList),
   );
