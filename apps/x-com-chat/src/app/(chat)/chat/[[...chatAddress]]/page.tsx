@@ -18,6 +18,7 @@ import { api } from '@/convex/_generated/api';
 export const dynamic = 'force-dynamic';
 // export const revalidate = 60;
 
+// TODO repalce with PageProps<'/??'>
 export default async function ChatPage(props: ChatPageProps) {
   const params = await props.params;
   const friendList = preloadedQueryResult(
