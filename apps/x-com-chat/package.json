@@ -10,7 +10,7 @@
     "build:clean": "rimraf .next",
     "serve": "next start",
     "lint": "biome lint",
-    "typecheck": "tsc",
+    "typecheck": "next typegen && tsc",
     "db:push": "prisma db push",
     "prisma:generate": "prisma generate --no-engine",
     "db:reset": "prisma db push --force-reset",
