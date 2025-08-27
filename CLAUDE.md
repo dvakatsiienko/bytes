@@ -22,7 +22,8 @@ structured with apps in the `/apps` directory and shared libraries in
 ## Shared Packages
 
 - **prettier-config-polished** - Custom Prettier configuration
-- **biome-config-polished** - Comprehensive Biome linting and formatting configuration
+- **biome-config-polished** - Comprehensive Biome linting and formatting
+  configuration
 
 ## Common Commands
 
@@ -145,23 +146,27 @@ pnpm db:reinit           # Reset, generate, and seed database
 
 ### Package Setup
 
-The repository uses `biome-config-polished` package for consistent linting and formatting across all apps.
+The repository uses `biome-config-polished` package for consistent linting and
+formatting across all apps.
 
 **Usage:**
+
 ```jsonc
 // biome.jsonc
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite", "biome-config-polished"]
+  "extends": ["ultracite", "biome-config-polished"],
 }
 ```
 
 **Installation:**
+
 ```bash
 pnpm add -D biome-config-polished@workspace:*
 ```
 
 **Key Features:**
+
 - Comprehensive rule coverage for all Biome categories
 - Framework-specific overrides (Next.js, Vite, Convex)
 - Smart import organization with blank line grouping

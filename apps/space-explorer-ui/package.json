@@ -25,9 +25,9 @@
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "react-hook-form": "7.62.0",
-    "react-router-dom": "7.8.1",
+    "react-router-dom": "7.8.2",
     "styled-components": "6.1.19",
-    "zod": "4.0.17"
+    "zod": "4.1.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.7",
@@ -37,7 +37,7 @@
     "@graphql-codegen/typescript-react-apollo": "4.3.3",
     "@types/debug": "4.1.12",
     "@types/node": "24.3.0",
-    "@types/react": "19.1.10",
+    "@types/react": "19.1.11",
     "@types/react-dom": "19.1.7",
     "@vitejs/plugin-react-swc": "4.0.1",
     "npm-run-all": "4.1.5",

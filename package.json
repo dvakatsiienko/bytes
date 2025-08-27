@@ -29,13 +29,13 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "dependencies": {
-    "@ai-sdk/groq": "2.0.12",
-    "@ai-sdk/react": "2.0.21",
-    "ai": "5.0.21",
-    "zod": "4.0.17"
+    "@ai-sdk/groq": "2.0.14",
+    "@ai-sdk/react": "2.0.23",
+    "ai": "5.0.23",
+    "zod": "4.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.0",
+    "@biomejs/biome": "2.2.2",
     "biome-config-polished": "workspace:*",
     "lefthook": "1.12.3",
     "prettier": "3.6.2",
