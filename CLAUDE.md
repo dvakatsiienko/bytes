@@ -1,31 +1,51 @@
-# CLAUDE.md
+# CLAUDE.md - Monorepo Coordination Layer
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
+This file provides structural coordination and navigation guidance for Claude
+Code when working across this Turborepo-powered monorepo.
 
-## Repository Overview
+## Repository Architecture
 
-This is a Turborepo-powered monorepo containing several web applications and
-shared packages. The repository uses pnpm as the package manager and is
-structured with apps in the `/apps` directory and shared libraries in
-`/packages`.
+A pnpm workspace monorepo orchestrated by Turborepo, containing multiple web
+applications and shared infrastructure packages. The architecture emphasizes
+code reuse, consistent tooling, and efficient task orchestration.
 
-## Applications
+## App Registry
 
-- **cv** - Personal CV/resume website built with Next.js and React
-- **x-com-chat** - AI chat application using Next.js, Convex, and Prisma
-- **space-explorer-ui** - Apollo GraphQL frontend built with Vite and React
-- **space-explorer-api** - GraphQL API server using Apollo Server and Prisma
-- **financial** - Financial dashboard app built with Next.js (WIP)
-- **figmentation** - CSS showcase with Clinique demo using Next.js
+Each app maintains its own CLAUDE.md with detailed implementation context.
 
-## Shared Packages
+| App                  | Purpose                                 | Stack                             | Status     |
+| -------------------- | --------------------------------------- | --------------------------------- | ---------- |
+| `cv`                 | Personal portfolio with tool showcase   | Next.js 15, React 19, Tailwind    | Production |
+| `x-com-chat`         | AI chat with customizable alien friends | Next.js, Convex, Jotai, Prisma    | Active Dev |
+| `space-explorer-ui`  | GraphQL client demo                     | Vite, Apollo Client, React        | Demo       |
+| `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
+| `financial`          | Financial dashboard with auth           | Next.js, Prisma, Auth.js          | WIP        |
+| `figmentation`       | CSS/design experiments                  | Next.js, CSS Modules              | Showcase   |
 
-- **prettier-config-polished** - Custom Prettier configuration
-- **biome-config-polished** - Comprehensive Biome linting and formatting
-  configuration
+## Shared Infrastructure
 
-## Common Commands
+### Core Packages
+
+| Package                    | Purpose                          | Usage                                |
+| -------------------------- | -------------------------------- | ------------------------------------ |
+| `biome-config-polished`    | Unified linting/formatting rules | `extends: ["biome-config-polished"]` |
+| `prettier-config-polished` | Prettier configuration           | Legacy, migrating to Biome           |
+| `kit`                      | Shared UI components             | Common buttons, drawers, icons       |
+| `fonts`                    | Variable font assets             | Manrope, Roboto Flex                 |
+| `typescript-config`        | Base TS configurations           | Extended by all apps                 |
+| `utils`                    | Shared utilities                 | Common calculations, helpers         |
+
+## Task Orchestration
+
+### Turborepo Pipeline
+
+```mermaid
+build → depends on → ^build, lint, typecheck, ^prisma:generate
+dev → depends on → ^prisma:generate
+typecheck → depends on → ^typecheck
+```
+
+### Common Commands
 
 ### Root Commands
 
@@ -104,70 +124,94 @@ pnpm db:reset            # Reset database (force)
 pnpm db:reinit           # Reset, generate, and seed database
 ```
 
-## Architecture
+## Cross-App Conventions
 
-### Common Patterns
+### File Structure Patterns
 
-1. **Next.js Apps Structure**
-   - `/src/app` - App router pages and layouts
-   - `/src/components` - Reusable UI components
-   - `/src/theme` - Theme configuration
-   - `/src/lib` - Utility functions and shared code
+```
+apps/{app}/
+├── src/
+│   ├── app/           # Next.js App Router
+│   ├── components/    # UI components
+│   ├── lib/          # Core logic
+│   ├── queries/      # Data fetching
+│   └── theme/        # Styling
+├── prisma/           # Database schema
+└── turbo.jsonc       # App-specific Turbo config
+```
 
-2. **Space Explorer Structure**
-   - UI: Vite-based React application using Apollo Client
-   - API: Apollo Server with Prisma and SpaceX API integration
+### State Management Strategies
 
-3. **Database Management**
-   - Prisma ORM for database access
-   - SQLite for development databases
-   - Convex for real-time backend in x-com-chat
+- **Client State**: Jotai atoms for UI state
+- **Server State**: React Query for caching
+- **Real-time**: Convex subscriptions
+- **GraphQL**: Apollo Client cache
 
-4. **State Management**
-   - Jotai in x-com-chat
-   - React Query for data fetching
-   - Apollo Client for GraphQL state
+### Database Patterns
 
-5. **Task Dependencies** The `turbo.jsonc` file defines task dependencies:
-   - `dev` depends on prisma:generate
-   - `build` depends on ^build, lint, typecheck, and ^prisma:generate
-   - Proper caching config is set up for all tasks
+- **Development**: SQLite via Prisma
+- **Real-time**: Convex for live updates
+- **Migrations**: Prisma migrate workflow
+- **Seeding**: `tsx prisma/seed/init`
 
 ## Technology Stack
 
-- **Core**: TypeScript, React 19, Next.js, Vite
-- **Styling**: Tailwind CSS, styled-components
-- **State**: Jotai, React Query, Apollo Client
-- **API**: GraphQL, REST
-- **Database**: Prisma, SQLite, Convex
-- **Build Tools**: Turbo, SWC, Biome, Prettier
+### Core Technologies
 
-## Biome Configuration
+- **Runtime**: Node.js ≥22.17.0, pnpm 10.14.0
+- **Framework**: Next.js 15 (Turbopack), Vite 6
+- **Language**: TypeScript 5.9.2, React 19.1.1
 
-### Package Setup
+### Data Layer
 
-The repository uses `biome-config-polished` package for consistent linting and
-formatting across all apps.
+- **ORM**: Prisma 6.14.0
+- **Real-time**: Convex 1.26.1
+- **GraphQL**: Apollo Server/Client
+- **AI Integration**: Vercel AI SDK, Groq, OpenRouter
 
-**Usage:**
+### Developer Experience
 
-```jsonc
-// biome.jsonc
-{
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite", "biome-config-polished"],
-}
-```
+- **Monorepo**: Turborepo 2.5.6
+- **Linting**: Biome 2.2.2, ultracite 5.2.5
+- **Git Hooks**: Lefthook 1.12.3
 
-**Installation:**
+## Coordination Protocols
+
+### Multi-App Development
 
 ```bash
-pnpm add -D biome-config-polished@workspace:*
+# Run multiple apps simultaneously
+pnpm dev:@space-explorer     # Both UI and API
+pnpm dev:x-com-chat          # Next.js + Convex backends
+
+# Targeted operations
+turbo cv#build               # Build specific app
+turbo --filter=x-com-chat... # Include dependencies
 ```
 
-**Key Features:**
+### Dependency Management
 
-- Comprehensive rule coverage for all Biome categories
-- Framework-specific overrides (Next.js, Vite, Convex)
-- Smart import organization with blank line grouping
-- Generated code exclusions
+```bash
+# Workspace-wide operations
+pnpm packages:reinstall      # Clean reinstall
+pnpm add -D pkg -w          # Add to root
+pnpm add pkg --filter=cv    # Add to specific app
+```
+
+### Quality Assurance
+
+```bash
+pnpm check                   # Lint + typecheck all
+pnpm lint:errors            # Show only errors
+pnpm format                 # Auto-fix formatting
+```
+
+## Environment Configuration
+
+Each app maintains its own `.env.local` with specific requirements documented in
+its CLAUDE.md file. Common patterns:
+
+- **Auth**: Clerk keys for user management
+- **AI**: API keys for LLM providers
+- **Database**: Connection strings and deploy keys
+- **Analytics**: Tracking and monitoring
