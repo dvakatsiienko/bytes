@@ -21,6 +21,7 @@
       ]
     },
     "build": {
+      "outputs": ["dist/**"],
       "env": [
         "APOLLO_GRAPH_ID",
         "APOLLO_GRAPH_VARIANT",
