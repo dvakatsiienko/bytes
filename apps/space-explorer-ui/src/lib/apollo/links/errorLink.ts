@@ -1,22 +1,20 @@
-import { onError } from '@apollo/client/link/error';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { ErrorLink } from '@apollo/client/link/error';
 import debug from 'debug';
 
 const logGql = debug('[GraphQL error]');
 
-export const errorLink = onError((net) => {
-  logGql('Operation:', net.operation);
-  logGql('Response:', net.response);
-  logGql(`Errors quantity: ${net.graphQLErrors?.length}`);
+export const errorLink = new ErrorLink(({ error, operation }) => {
+  logGql('Operation:', operation);
 
-  if (net.graphQLErrors) {
-    for (const error of net.graphQLErrors) {
+  if (CombinedGraphQLErrors.is(error)) {
+    logGql(`GraphQL errors: ${error.errors.length}`);
+    for (const gqlError of error.errors) {
       logGql(
-        `Message: ${error.message}, Location: ${error.locations}, Path: ${error.path}`,
+        `Message: ${gqlError.message}, Location: ${gqlError.locations}, Path: ${gqlError.path}`,
       );
     }
-  }
-
-  if (net.networkError) {
-    logGql(`Network error: ${net.networkError}`);
+  } else if (error) {
+    logGql(`Network error: ${error}`);
   }
 });

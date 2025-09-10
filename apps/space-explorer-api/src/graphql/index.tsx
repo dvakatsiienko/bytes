@@ -42,7 +42,7 @@ export type LaunchesPayload = {
   __typename?: 'LaunchesPayload';
   cursor: Scalars['Int']['output'];
   hasMore: Scalars['Boolean']['output'];
-  list: Launch[];
+  list: Array<Launch>;
 };
 
 export type Mission = {
@@ -57,14 +57,14 @@ export type MissionMissionPatchArgs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  bookTrips: Trip[];
+  bookTrips: Array<Trip>;
   cancelTrip: Scalars['Boolean']['output'];
   login: UserProfile;
   logout: Scalars['Boolean']['output'];
 };
 
 export type MutationBookTripsArgs = {
-  launchIds: Scalars['ID']['input'][];
+  launchIds: Array<Scalars['ID']['input']>;
 };
 
 export type MutationCancelTripArgs = {
@@ -75,7 +75,6 @@ export type MutationLoginArgs = {
   email?: InputMaybe<Scalars['String']['input']>;
 };
 
-// biome-ignore lint/style/noEnum: refactor later
 export enum PatchSize {
   Large = 'LARGE',
   Small = 'SMALL',
@@ -116,5 +115,5 @@ export type UserProfile = {
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   token?: Maybe<Scalars['String']['output']>;
-  trips: Trip[];
+  trips: Array<Trip>;
 };

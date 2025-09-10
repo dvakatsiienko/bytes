@@ -9,7 +9,16 @@ config:
 generates:
     src/graphql/index.tsx:
         plugins:
+            - add:
+                content: '// @ts-nocheck'
             - typescript
             - typescript-operations
             - typescript-react-apollo
-            - typescript-apollo-client-helpers
+        config:
+            apolloReactHooksImportFrom: '@apollo/client/react'
+            apolloReactCommonImportFrom: '@apollo/client/react'
+            apolloReactHocImportFrom: '@apollo/client/react'
+            apolloReactSsrImportFrom: '@apollo/client/react'
+            withHooks: true
+            withComponent: false
+            withHOC: false

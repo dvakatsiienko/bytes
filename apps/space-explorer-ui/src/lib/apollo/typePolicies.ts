@@ -1,13 +1,8 @@
-import {
-  type FieldPolicy,
-  type FieldReadFunction,
-  type TypePolicy,
-  makeVar,
-} from '@apollo/client';
+import { type TypePolicies, makeVar } from '@apollo/client';
 
 import type * as gql from '@/graphql';
 
-export const typePolicies: TTypePolicies = {
+export const typePolicies: TypePolicies = {
   Query: {
     fields: {
       cartItems: { read: () => cartItemsVar() },
@@ -39,16 +34,3 @@ export const isLoggedInVar = makeVar<boolean>(
   Boolean(localStorage.getItem('token')),
 );
 export const cartItemsVar = makeVar<string[]>([]);
-
-/* Types */
-type TQueryFieldPolicy = Omit<gql.QueryFieldPolicy, 'launches'> & {
-  launches:
-    | FieldPolicy<gql.LaunchesPayload>
-    | FieldReadFunction<gql.LaunchesPayload>;
-};
-type TTypePolicy = Omit<TypePolicy, 'fields'> & {
-  fields: TQueryFieldPolicy;
-};
-type TTypePolicies = Omit<gql.TypedTypePolicies, 'Query'> & {
-  Query: TTypePolicy;
-};

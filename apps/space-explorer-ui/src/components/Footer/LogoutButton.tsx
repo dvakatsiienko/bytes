@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client/react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 

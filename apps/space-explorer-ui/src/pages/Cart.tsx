@@ -11,7 +11,6 @@ export const Cart = () => {
   const [bookTripsMutation, bookTripsMeta] = gql.useBookTripsMutation({
     onCompleted: () => cartItemsVar([]),
     refetchQueries: [gql.UserProfileDocument],
-    variables: { launchIds: cartItemsQuery.data?.cartItems ?? [] },
   });
 
   if (cartItemsQuery.loading || !cartItemsQuery.data) {
@@ -46,7 +45,12 @@ export const Cart = () => {
 
       {Boolean(cartItems.length) && (
         <BookAllButtonContainer>
-          <Button onClick={() => bookTripsMutation()}>Book All</Button>
+          <Button
+            onClick={() =>
+              bookTripsMutation({ variables: { launchIds: cartItems } })
+            }>
+            Book All
+          </Button>
         </BookAllButtonContainer>
       )}
 

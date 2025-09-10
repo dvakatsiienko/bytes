@@ -1,11 +1,7 @@
-import * as Apollo from '@apollo/client';
+// @ts-nocheck
 import { gql } from '@apollo/client';
-import type {
-  FieldPolicy,
-  FieldReadFunction,
-  TypePolicies,
-  TypePolicy,
-} from '@apollo/client/cache';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -51,7 +47,7 @@ export type LaunchesPayload = {
   __typename?: 'LaunchesPayload';
   cursor: Scalars['Int']['output'];
   hasMore: Scalars['Boolean']['output'];
-  list: Launch[];
+  list: Array<Launch>;
 };
 
 export type Mission = {
@@ -66,14 +62,14 @@ export type MissionMissionPatchArgs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  bookTrips: Trip[];
+  bookTrips: Array<Trip>;
   cancelTrip: Scalars['Boolean']['output'];
   login: UserProfile;
   logout: Scalars['Boolean']['output'];
 };
 
 export type MutationBookTripsArgs = {
-  launchIds: Scalars['ID']['input'][];
+  launchIds: Array<Scalars['ID']['input']>;
 };
 
 export type MutationCancelTripArgs = {
@@ -84,7 +80,6 @@ export type MutationLoginArgs = {
   email?: InputMaybe<Scalars['String']['input']>;
 };
 
-// biome-ignore lint/style/noEnum: refactor later
 export enum PatchSize {
   Large = 'LARGE',
   Small = 'SMALL',
@@ -92,7 +87,7 @@ export enum PatchSize {
 
 export type Query = {
   __typename?: 'Query';
-  cartItems: Scalars['ID']['output'][];
+  cartItems: Array<Scalars['ID']['output']>;
   isLoggedIn: Scalars['Boolean']['output'];
   launch: Launch;
   launches: LaunchesPayload;
@@ -127,7 +122,7 @@ export type UserProfile = {
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   token?: Maybe<Scalars['String']['output']>;
-  trips: Trip[];
+  trips: Array<Trip>;
 };
 
 export type LaunchesQueryVariables = Exact<{
@@ -180,12 +175,12 @@ export type LaunchFragment = {
 };
 
 export type BookTripsMutationVariables = Exact<{
-  launchIds: (Scalars['ID']['input'] | Scalars['ID']['input'])[];
+  launchIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 export type BookTripsMutation = {
   __typename?: 'Mutation';
-  bookTrips: {
+  bookTrips: Array<{
     __typename?: 'Trip';
     id: string;
     createdAt?: any | null;
@@ -198,7 +193,7 @@ export type BookTripsMutation = {
       rocket: { __typename?: 'Rocket'; id: string; name: string; type: string };
       mission: { __typename?: 'Mission'; name: string; missionPatch: string };
     };
-  }[];
+  }>;
 };
 
 export type CancelTripMutationVariables = Exact<{
@@ -218,7 +213,7 @@ export type GetCartItemsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetCartItemsQuery = {
   __typename?: 'Query';
-  cartItems: string[];
+  cartItems: Array<string>;
 };
 
 export type UserProfileQueryVariables = Exact<{ [key: string]: never }>;
@@ -230,7 +225,7 @@ export type UserProfileQuery = {
     id: string;
     email: string;
     token?: string | null;
-    trips: {
+    trips: Array<{
       __typename?: 'Trip';
       id: string;
       createdAt?: any | null;
@@ -248,7 +243,7 @@ export type UserProfileQuery = {
         };
         mission: { __typename?: 'Mission'; name: string; missionPatch: string };
       };
-    }[];
+    }>;
   };
 };
 
@@ -311,39 +306,45 @@ export const LaunchesDocument = gql`
  * });
  */
 export function useLaunchesQuery(
-  baseOptions?: Apollo.QueryHookOptions<LaunchesQuery, LaunchesQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<LaunchesQuery, LaunchesQueryVariables>(
-    LaunchesDocument,
-    options,
-  );
-}
-export function useLaunchesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
     LaunchesQuery,
     LaunchesQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<LaunchesQuery, LaunchesQueryVariables>(
+  return ApolloReactHooks.useQuery<LaunchesQuery, LaunchesQueryVariables>(
+    LaunchesDocument,
+    options,
+  );
+}
+export function useLaunchesLazyQuery(
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    LaunchesQuery,
+    LaunchesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return ApolloReactHooks.useLazyQuery<LaunchesQuery, LaunchesQueryVariables>(
     LaunchesDocument,
     options,
   );
 }
 export function useLaunchesSuspenseQuery(
   baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<LaunchesQuery, LaunchesQueryVariables>,
+    | ApolloReactHooks.SkipToken
+    | ApolloReactHooks.SuspenseQueryHookOptions<
+        LaunchesQuery,
+        LaunchesQueryVariables
+      >,
 ) {
   const options =
-    baseOptions === Apollo.skipToken
+    baseOptions === ApolloReactHooks.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<LaunchesQuery, LaunchesQueryVariables>(
-    LaunchesDocument,
-    options,
-  );
+  return ApolloReactHooks.useSuspenseQuery<
+    LaunchesQuery,
+    LaunchesQueryVariables
+  >(LaunchesDocument, options);
 }
 export type LaunchesQueryHookResult = ReturnType<typeof useLaunchesQuery>;
 export type LaunchesLazyQueryHookResult = ReturnType<
@@ -352,7 +353,7 @@ export type LaunchesLazyQueryHookResult = ReturnType<
 export type LaunchesSuspenseQueryHookResult = ReturnType<
   typeof useLaunchesSuspenseQuery
 >;
-export type LaunchesQueryResult = Apollo.QueryResult<
+export type LaunchesQueryResult = ApolloReactCommon.QueryResult<
   LaunchesQuery,
   LaunchesQueryVariables
 >;
@@ -381,34 +382,43 @@ export const LaunchDocument = gql`
  * });
  */
 export function useLaunchQuery(
-  baseOptions: Apollo.QueryHookOptions<LaunchQuery, LaunchQueryVariables> &
+  baseOptions: ApolloReactHooks.QueryHookOptions<
+    LaunchQuery,
+    LaunchQueryVariables
+  > &
     ({ variables: LaunchQueryVariables; skip?: boolean } | { skip: boolean }),
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<LaunchQuery, LaunchQueryVariables>(
+  return ApolloReactHooks.useQuery<LaunchQuery, LaunchQueryVariables>(
     LaunchDocument,
     options,
   );
 }
 export function useLaunchLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<LaunchQuery, LaunchQueryVariables>,
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    LaunchQuery,
+    LaunchQueryVariables
+  >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<LaunchQuery, LaunchQueryVariables>(
+  return ApolloReactHooks.useLazyQuery<LaunchQuery, LaunchQueryVariables>(
     LaunchDocument,
     options,
   );
 }
 export function useLaunchSuspenseQuery(
   baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<LaunchQuery, LaunchQueryVariables>,
+    | ApolloReactHooks.SkipToken
+    | ApolloReactHooks.SuspenseQueryHookOptions<
+        LaunchQuery,
+        LaunchQueryVariables
+      >,
 ) {
   const options =
-    baseOptions === Apollo.skipToken
+    baseOptions === ApolloReactHooks.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<LaunchQuery, LaunchQueryVariables>(
+  return ApolloReactHooks.useSuspenseQuery<LaunchQuery, LaunchQueryVariables>(
     LaunchDocument,
     options,
   );
@@ -418,7 +428,7 @@ export type LaunchLazyQueryHookResult = ReturnType<typeof useLaunchLazyQuery>;
 export type LaunchSuspenseQueryHookResult = ReturnType<
   typeof useLaunchSuspenseQuery
 >;
-export type LaunchQueryResult = Apollo.QueryResult<
+export type LaunchQueryResult = ApolloReactCommon.QueryResult<
   LaunchQuery,
   LaunchQueryVariables
 >;
@@ -433,7 +443,7 @@ export const BookTripsDocument = gql`
   }
 }
     ${LaunchFragmentDoc}`;
-export type BookTripsMutationFn = Apollo.MutationFunction<
+export type BookTripsMutationFn = ApolloReactCommon.MutationFunction<
   BookTripsMutation,
   BookTripsMutationVariables
 >;
@@ -456,22 +466,23 @@ export type BookTripsMutationFn = Apollo.MutationFunction<
  * });
  */
 export function useBookTripsMutation(
-  baseOptions?: Apollo.MutationHookOptions<
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
     BookTripsMutation,
     BookTripsMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<BookTripsMutation, BookTripsMutationVariables>(
-    BookTripsDocument,
-    options,
-  );
+  return ApolloReactHooks.useMutation<
+    BookTripsMutation,
+    BookTripsMutationVariables
+  >(BookTripsDocument, options);
 }
 export type BookTripsMutationHookResult = ReturnType<
   typeof useBookTripsMutation
 >;
-export type BookTripsMutationResult = Apollo.MutationResult<BookTripsMutation>;
-export type BookTripsMutationOptions = Apollo.BaseMutationOptions<
+export type BookTripsMutationResult =
+  ApolloReactCommon.MutationResult<BookTripsMutation>;
+export type BookTripsMutationOptions = ApolloReactCommon.BaseMutationOptions<
   BookTripsMutation,
   BookTripsMutationVariables
 >;
@@ -480,7 +491,7 @@ export const CancelTripDocument = gql`
   cancelTrip(tripId: $tripId)
 }
     `;
-export type CancelTripMutationFn = Apollo.MutationFunction<
+export type CancelTripMutationFn = ApolloReactCommon.MutationFunction<
   CancelTripMutation,
   CancelTripMutationVariables
 >;
@@ -503,23 +514,23 @@ export type CancelTripMutationFn = Apollo.MutationFunction<
  * });
  */
 export function useCancelTripMutation(
-  baseOptions?: Apollo.MutationHookOptions<
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
     CancelTripMutation,
     CancelTripMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CancelTripMutation, CancelTripMutationVariables>(
-    CancelTripDocument,
-    options,
-  );
+  return ApolloReactHooks.useMutation<
+    CancelTripMutation,
+    CancelTripMutationVariables
+  >(CancelTripDocument, options);
 }
 export type CancelTripMutationHookResult = ReturnType<
   typeof useCancelTripMutation
 >;
 export type CancelTripMutationResult =
-  Apollo.MutationResult<CancelTripMutation>;
-export type CancelTripMutationOptions = Apollo.BaseMutationOptions<
+  ApolloReactCommon.MutationResult<CancelTripMutation>;
+export type CancelTripMutationOptions = ApolloReactCommon.BaseMutationOptions<
   CancelTripMutation,
   CancelTripMutationVariables
 >;
@@ -545,42 +556,42 @@ export const IsUserLoggedInDocument = gql`
  * });
  */
 export function useIsUserLoggedInQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
     IsUserLoggedInQuery,
     IsUserLoggedInQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>(
-    IsUserLoggedInDocument,
-    options,
-  );
+  return ApolloReactHooks.useQuery<
+    IsUserLoggedInQuery,
+    IsUserLoggedInQueryVariables
+  >(IsUserLoggedInDocument, options);
 }
 export function useIsUserLoggedInLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
     IsUserLoggedInQuery,
     IsUserLoggedInQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>(
-    IsUserLoggedInDocument,
-    options,
-  );
+  return ApolloReactHooks.useLazyQuery<
+    IsUserLoggedInQuery,
+    IsUserLoggedInQueryVariables
+  >(IsUserLoggedInDocument, options);
 }
 export function useIsUserLoggedInSuspenseQuery(
   baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
+    | ApolloReactHooks.SkipToken
+    | ApolloReactHooks.SuspenseQueryHookOptions<
         IsUserLoggedInQuery,
         IsUserLoggedInQueryVariables
       >,
 ) {
   const options =
-    baseOptions === Apollo.skipToken
+    baseOptions === ApolloReactHooks.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
+  return ApolloReactHooks.useSuspenseQuery<
     IsUserLoggedInQuery,
     IsUserLoggedInQueryVariables
   >(IsUserLoggedInDocument, options);
@@ -594,7 +605,7 @@ export type IsUserLoggedInLazyQueryHookResult = ReturnType<
 export type IsUserLoggedInSuspenseQueryHookResult = ReturnType<
   typeof useIsUserLoggedInSuspenseQuery
 >;
-export type IsUserLoggedInQueryResult = Apollo.QueryResult<
+export type IsUserLoggedInQueryResult = ApolloReactCommon.QueryResult<
   IsUserLoggedInQuery,
   IsUserLoggedInQueryVariables
 >;
@@ -620,45 +631,45 @@ export const GetCartItemsDocument = gql`
  * });
  */
 export function useGetCartItemsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
     GetCartItemsQuery,
     GetCartItemsQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetCartItemsQuery, GetCartItemsQueryVariables>(
-    GetCartItemsDocument,
-    options,
-  );
+  return ApolloReactHooks.useQuery<
+    GetCartItemsQuery,
+    GetCartItemsQueryVariables
+  >(GetCartItemsDocument, options);
 }
 export function useGetCartItemsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
     GetCartItemsQuery,
     GetCartItemsQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetCartItemsQuery, GetCartItemsQueryVariables>(
-    GetCartItemsDocument,
-    options,
-  );
+  return ApolloReactHooks.useLazyQuery<
+    GetCartItemsQuery,
+    GetCartItemsQueryVariables
+  >(GetCartItemsDocument, options);
 }
 export function useGetCartItemsSuspenseQuery(
   baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
+    | ApolloReactHooks.SkipToken
+    | ApolloReactHooks.SuspenseQueryHookOptions<
         GetCartItemsQuery,
         GetCartItemsQueryVariables
       >,
 ) {
   const options =
-    baseOptions === Apollo.skipToken
+    baseOptions === ApolloReactHooks.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GetCartItemsQuery, GetCartItemsQueryVariables>(
-    GetCartItemsDocument,
-    options,
-  );
+  return ApolloReactHooks.useSuspenseQuery<
+    GetCartItemsQuery,
+    GetCartItemsQueryVariables
+  >(GetCartItemsDocument, options);
 }
 export type GetCartItemsQueryHookResult = ReturnType<
   typeof useGetCartItemsQuery
@@ -669,7 +680,7 @@ export type GetCartItemsLazyQueryHookResult = ReturnType<
 export type GetCartItemsSuspenseQueryHookResult = ReturnType<
   typeof useGetCartItemsSuspenseQuery
 >;
-export type GetCartItemsQueryResult = Apollo.QueryResult<
+export type GetCartItemsQueryResult = ApolloReactCommon.QueryResult<
   GetCartItemsQuery,
   GetCartItemsQueryVariables
 >;
@@ -706,45 +717,45 @@ export const UserProfileDocument = gql`
  * });
  */
 export function useUserProfileQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
     UserProfileQuery,
     UserProfileQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UserProfileQuery, UserProfileQueryVariables>(
+  return ApolloReactHooks.useQuery<UserProfileQuery, UserProfileQueryVariables>(
     UserProfileDocument,
     options,
   );
 }
 export function useUserProfileLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
     UserProfileQuery,
     UserProfileQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UserProfileQuery, UserProfileQueryVariables>(
-    UserProfileDocument,
-    options,
-  );
+  return ApolloReactHooks.useLazyQuery<
+    UserProfileQuery,
+    UserProfileQueryVariables
+  >(UserProfileDocument, options);
 }
 export function useUserProfileSuspenseQuery(
   baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
+    | ApolloReactHooks.SkipToken
+    | ApolloReactHooks.SuspenseQueryHookOptions<
         UserProfileQuery,
         UserProfileQueryVariables
       >,
 ) {
   const options =
-    baseOptions === Apollo.skipToken
+    baseOptions === ApolloReactHooks.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<UserProfileQuery, UserProfileQueryVariables>(
-    UserProfileDocument,
-    options,
-  );
+  return ApolloReactHooks.useSuspenseQuery<
+    UserProfileQuery,
+    UserProfileQueryVariables
+  >(UserProfileDocument, options);
 }
 export type UserProfileQueryHookResult = ReturnType<typeof useUserProfileQuery>;
 export type UserProfileLazyQueryHookResult = ReturnType<
@@ -753,7 +764,7 @@ export type UserProfileLazyQueryHookResult = ReturnType<
 export type UserProfileSuspenseQueryHookResult = ReturnType<
   typeof useUserProfileSuspenseQuery
 >;
-export type UserProfileQueryResult = Apollo.QueryResult<
+export type UserProfileQueryResult = ApolloReactCommon.QueryResult<
   UserProfileQuery,
   UserProfileQueryVariables
 >;
@@ -765,7 +776,7 @@ export const LoginDocument = gql`
   }
 }
     `;
-export type LoginMutationFn = Apollo.MutationFunction<
+export type LoginMutationFn = ApolloReactCommon.MutationFunction<
   LoginMutation,
   LoginMutationVariables
 >;
@@ -788,20 +799,21 @@ export type LoginMutationFn = Apollo.MutationFunction<
  * });
  */
 export function useLoginMutation(
-  baseOptions?: Apollo.MutationHookOptions<
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
     LoginMutation,
     LoginMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
+  return ApolloReactHooks.useMutation<LoginMutation, LoginMutationVariables>(
     LoginDocument,
     options,
   );
 }
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
-export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<
+export type LoginMutationResult =
+  ApolloReactCommon.MutationResult<LoginMutation>;
+export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<
   LoginMutation,
   LoginMutationVariables
 >;
@@ -810,7 +822,7 @@ export const LogoutDocument = gql`
   logout
 }
     `;
-export type LogoutMutationFn = Apollo.MutationFunction<
+export type LogoutMutationFn = ApolloReactCommon.MutationFunction<
   LogoutMutation,
   LogoutMutationVariables
 >;
@@ -832,176 +844,21 @@ export type LogoutMutationFn = Apollo.MutationFunction<
  * });
  */
 export function useLogoutMutation(
-  baseOptions?: Apollo.MutationHookOptions<
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
     LogoutMutation,
     LogoutMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
+  return ApolloReactHooks.useMutation<LogoutMutation, LogoutMutationVariables>(
     LogoutDocument,
     options,
   );
 }
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
-export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<
+export type LogoutMutationResult =
+  ApolloReactCommon.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = ApolloReactCommon.BaseMutationOptions<
   LogoutMutation,
   LogoutMutationVariables
 >;
-export type LaunchKeySpecifier = (
-  | 'flightNumber'
-  | 'id'
-  | 'isBooked'
-  | 'mission'
-  | 'rocket'
-  | 'site'
-  | LaunchKeySpecifier
-)[];
-export type LaunchFieldPolicy = {
-  flightNumber?: FieldPolicy<any> | FieldReadFunction<any>;
-  id?: FieldPolicy<any> | FieldReadFunction<any>;
-  isBooked?: FieldPolicy<any> | FieldReadFunction<any>;
-  mission?: FieldPolicy<any> | FieldReadFunction<any>;
-  rocket?: FieldPolicy<any> | FieldReadFunction<any>;
-  site?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type LaunchesPayloadKeySpecifier = (
-  | 'cursor'
-  | 'hasMore'
-  | 'list'
-  | LaunchesPayloadKeySpecifier
-)[];
-export type LaunchesPayloadFieldPolicy = {
-  cursor?: FieldPolicy<any> | FieldReadFunction<any>;
-  hasMore?: FieldPolicy<any> | FieldReadFunction<any>;
-  list?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type MissionKeySpecifier = (
-  | 'missionPatch'
-  | 'name'
-  | MissionKeySpecifier
-)[];
-export type MissionFieldPolicy = {
-  missionPatch?: FieldPolicy<any> | FieldReadFunction<any>;
-  name?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type MutationKeySpecifier = (
-  | 'bookTrips'
-  | 'cancelTrip'
-  | 'login'
-  | 'logout'
-  | MutationKeySpecifier
-)[];
-export type MutationFieldPolicy = {
-  bookTrips?: FieldPolicy<any> | FieldReadFunction<any>;
-  cancelTrip?: FieldPolicy<any> | FieldReadFunction<any>;
-  login?: FieldPolicy<any> | FieldReadFunction<any>;
-  logout?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type QueryKeySpecifier = (
-  | 'cartItems'
-  | 'isLoggedIn'
-  | 'launch'
-  | 'launches'
-  | 'userProfile'
-  | QueryKeySpecifier
-)[];
-export type QueryFieldPolicy = {
-  cartItems?: FieldPolicy<any> | FieldReadFunction<any>;
-  isLoggedIn?: FieldPolicy<any> | FieldReadFunction<any>;
-  launch?: FieldPolicy<any> | FieldReadFunction<any>;
-  launches?: FieldPolicy<any> | FieldReadFunction<any>;
-  userProfile?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type RocketKeySpecifier = (
-  | 'id'
-  | 'name'
-  | 'type'
-  | RocketKeySpecifier
-)[];
-export type RocketFieldPolicy = {
-  id?: FieldPolicy<any> | FieldReadFunction<any>;
-  name?: FieldPolicy<any> | FieldReadFunction<any>;
-  type?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type TripKeySpecifier = (
-  | 'createdAt'
-  | 'id'
-  | 'launch'
-  | TripKeySpecifier
-)[];
-export type TripFieldPolicy = {
-  createdAt?: FieldPolicy<any> | FieldReadFunction<any>;
-  id?: FieldPolicy<any> | FieldReadFunction<any>;
-  launch?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type UserProfileKeySpecifier = (
-  | 'email'
-  | 'id'
-  | 'token'
-  | 'trips'
-  | UserProfileKeySpecifier
-)[];
-export type UserProfileFieldPolicy = {
-  email?: FieldPolicy<any> | FieldReadFunction<any>;
-  id?: FieldPolicy<any> | FieldReadFunction<any>;
-  token?: FieldPolicy<any> | FieldReadFunction<any>;
-  trips?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type StrictTypedTypePolicies = {
-  Launch?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?:
-      | false
-      | LaunchKeySpecifier
-      | (() => undefined | LaunchKeySpecifier);
-    fields?: LaunchFieldPolicy;
-  };
-  LaunchesPayload?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?:
-      | false
-      | LaunchesPayloadKeySpecifier
-      | (() => undefined | LaunchesPayloadKeySpecifier);
-    fields?: LaunchesPayloadFieldPolicy;
-  };
-  Mission?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?:
-      | false
-      | MissionKeySpecifier
-      | (() => undefined | MissionKeySpecifier);
-    fields?: MissionFieldPolicy;
-  };
-  Mutation?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?:
-      | false
-      | MutationKeySpecifier
-      | (() => undefined | MutationKeySpecifier);
-    fields?: MutationFieldPolicy;
-  };
-  Query?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?:
-      | false
-      | QueryKeySpecifier
-      | (() => undefined | QueryKeySpecifier);
-    fields?: QueryFieldPolicy;
-  };
-  Rocket?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?:
-      | false
-      | RocketKeySpecifier
-      | (() => undefined | RocketKeySpecifier);
-    fields?: RocketFieldPolicy;
-  };
-  Trip?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?: false | TripKeySpecifier | (() => undefined | TripKeySpecifier);
-    fields?: TripFieldPolicy;
-  };
-  UserProfile?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?:
-      | false
-      | UserProfileKeySpecifier
-      | (() => undefined | UserProfileKeySpecifier);
-    fields?: UserProfileFieldPolicy;
-  };
-};
-export type TypedTypePolicies = StrictTypedTypePolicies & TypePolicies;

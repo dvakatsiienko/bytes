@@ -24,7 +24,10 @@ export const Login = () => {
   });
 
   if (loading) return <Loading />;
-  if (error) return <p>An error occurred.</p>;
+  if (error) {
+    console.error('Login error:', error);
+    return <p>An error occurred: {error.message}</p>;
+  }
 
   return <LoginForm loginMutation={loginMutation} />;
 };
