@@ -1,4 +1,4 @@
-import { useReactiveVar } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -25,14 +25,13 @@ export const LaunchTile = (props: LaunchTileProps) => {
         variables: { after: 0 },
       },
     ],
-    variables: { tripId: props.trip?.id ?? '' },
   });
 
-  const submit = (event: React.SyntheticEvent) => {
+  const submit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
 
     if (props.trip) {
-      cancelTripMutation();
+      await cancelTripMutation({ variables: { tripId: props.trip.id } });
     } else {
       cartItemsVar(
         isInCart
