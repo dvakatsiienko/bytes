@@ -29,15 +29,15 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "dependencies": {
-    "@ai-sdk/groq": "2.0.18",
-    "@ai-sdk/react": "2.0.39",
-    "ai": "5.0.39",
-    "zod": "4.1.7"
+    "@ai-sdk/groq": "2.0.19",
+    "@ai-sdk/react": "2.0.44",
+    "ai": "5.0.44",
+    "zod": "4.1.8"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
     "biome-config-polished": "workspace:*",
-    "lefthook": "1.12.4",
+    "lefthook": "1.13.0",
     "prettier": "3.6.2",
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.6.14",
