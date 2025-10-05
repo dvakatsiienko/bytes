@@ -81,7 +81,6 @@ export default async function RootLayout(props: LayoutProps<'/'>) {
 
           {/** biome-ignore lint/complexity/useSimplifiedLogicExpression: for debugging */}
           {/** biome-ignore lint/suspicious/noConstantBinaryExpressions: for debugging */}
-          {/** biome-ignore lint/nursery/noUnnecessaryConditions: for debugging */}
           {false && <ReactQueryDevtools />}
         </ReactQueryProvider>
       </ClerkProvider>
