@@ -49,8 +49,8 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
       ultracite:
-        specifier: 5.3.8
-        version: 5.3.8(@inquirer/prompts@7.8.6(@types/node@24.6.2))(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1)
+        specifier: 5.5.0
+        version: 5.5.0(@types/debug@4.1.12)(@types/node@24.6.2)(effect@3.16.12)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1)
 
   apps/cv:
     dependencies:
@@ -3252,9 +3252,6 @@ packages:
   '@types/node@24.6.2':
     resolution: {integrity: sha512-d2L25Y4j+W3ZlNAeMKcy7yDsK425ibcAOO2t7aPTz6gNMH0z2GThtwENCDc0d/Pw9wgyRqE5Px1wkV7naz8ang==}
 
-  '@types/omelette@0.4.5':
-    resolution: {integrity: sha512-zUCJpVRwfMcZfkxSCGp73mgd3/xesvPz5tQJIORlfP/zkYEyp9KUfF7IP3RRjyZR3DwxkPs96/IFf70GmYZYHQ==}
-
   '@types/prismjs@1.26.5':
     resolution: {integrity: sha512-AUZTa7hQ2KY5L7AmtSiqxlhWxb4ina0yd8hNbl4TWuqnv/pFP0nDMb3YrfSBf4hJVGLh2YEIBfKaBW/9UEl6IQ==}
 
@@ -4636,7 +4633,6 @@ packages:
     resolution: {integrity: sha512-Quz3MvAwHxVYNXsOByL7xI5EB2WYOeFswqaHIA3qOK3isRWTxiplBEocmmru6XmxDB2L7jDNYtYA4FyimoAFEw==}
     engines: {node: '>=8.17.0'}
     hasBin: true
-    bundledDependencies: []
 
   jwt-decode@4.0.0:
     resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
@@ -6150,17 +6146,29 @@ packages:
   trough@2.2.0:
     resolution: {integrity: sha512-tmMpK00BjZiUyVyvrBK7knerNgmgvcV/KLVyuma/SC+TQN167GrMRciANTz09+k3zW8L8t60jWO1GpfkZdjTaw==}
 
-  trpc-cli@0.10.2:
-    resolution: {integrity: sha512-zBkL88AeX0vQLXwEAcX6WUoT4Sopr97nFDFeD1zmW33wHQwBKbszylplNVk6BO/cuhgm/iq8/cG27NokqKA1mw==}
+  trpc-cli@0.11.0:
+    resolution: {integrity: sha512-cFt5LVl1EzwmhZtWa6xPBWr6rgLXGgEOqmcTMIYcI6fLQE1REgu6tS55LmqUJs5kVSXrOd1z5/aufJS71xUUyA==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
-      '@inquirer/prompts': '*'
-      omelette: '*'
+      '@orpc/server': ^1.0.0
+      '@trpc/server': ^10.45.2 || ^11.0.1
+      '@valibot/to-json-schema': ^1.1.0
+      effect: ^3.14.2 || ^4.0.0
+      valibot: ^1.1.0
+      zod: ^3.24.0 || ^4.0.0
     peerDependenciesMeta:
-      '@inquirer/prompts':
+      '@orpc/server':
         optional: true
-      omelette:
+      '@trpc/server':
+        optional: true
+      '@valibot/to-json-schema':
+        optional: true
+      effect:
+        optional: true
+      valibot:
+        optional: true
+      zod:
         optional: true
 
   ts-log@2.2.7:
@@ -6263,8 +6271,8 @@ packages:
     resolution: {integrity: sha512-LbBDqdIC5s8iROCUjMbW1f5dJQTEFB1+KO9ogbvlb3nm9n4YHa5p4KTvFPWvh2Hs8gZMBuiB1/8+pdfe/tDPug==}
     hasBin: true
 
-  ultracite@5.3.8:
-    resolution: {integrity: sha512-WAziUkB6n/o4Pp98DpF2rdMz7S89mybl9klqTUWzytmr7uluPejRYh0Sw2gAAJ9vlpOJ4YBlvqMUWEmOqw20/Q==}
+  ultracite@5.5.0:
+    resolution: {integrity: sha512-mkfm9gpB3aVP5OfH3Wmy4QVwICJVGMa3MUNb9k2kmT6mJKQl9j662XjARQFVbJFQLkX4Lg1u2It3oY9PMuJc1A==}
     hasBin: true
 
   unbox-primitive@1.1.0:
@@ -6644,14 +6652,6 @@ packages:
   yoctocolors-cjs@2.1.3:
     resolution: {integrity: sha512-U/PBtDf35ff0D8X8D0jfdzHYEPFxAI7jJlxZXwCSez5M3190m+QobIfh+sWDWSHMCWWJN2AWamkegn6vr6YBTw==}
     engines: {node: '>=18'}
-
-  zod-to-json-schema@3.24.6:
-    resolution: {integrity: sha512-h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==}
-    peerDependencies:
-      zod: ^3.24.1
-
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
   zod@4.1.11:
     resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
@@ -9271,8 +9271,6 @@ snapshots:
   '@types/node@24.6.2':
     dependencies:
       undici-types: 7.13.0
-
-  '@types/omelette@0.4.5': {}
 
   '@types/prismjs@1.26.5': {}
 
@@ -12525,18 +12523,13 @@ snapshots:
 
   trough@2.2.0: {}
 
-  trpc-cli@0.10.2(@inquirer/prompts@7.8.6(@types/node@24.6.2))(typescript@5.9.3):
+  trpc-cli@0.11.0(@trpc/server@11.6.0(typescript@5.9.3))(effect@3.16.12)(zod@4.1.11):
     dependencies:
-      '@trpc/server': 11.6.0(typescript@5.9.3)
-      '@types/omelette': 0.4.5
       commander: 14.0.1
-      picocolors: 1.1.1
-      zod: 3.25.76
-      zod-to-json-schema: 3.24.6(zod@3.25.76)
     optionalDependencies:
-      '@inquirer/prompts': 7.8.6(@types/node@24.6.2)
-    transitivePeerDependencies:
-      - typescript
+      '@trpc/server': 11.6.0(typescript@5.9.3)
+      effect: 3.16.12
+      zod: 4.1.11
 
   ts-log@2.2.7: {}
 
@@ -12633,29 +12626,31 @@ snapshots:
 
   ua-parser-js@1.0.41: {}
 
-  ultracite@5.3.8(@inquirer/prompts@7.8.6(@types/node@24.6.2))(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1):
+  ultracite@5.5.0(@types/debug@4.1.12)(@types/node@24.6.2)(effect@3.16.12)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.8.1):
     dependencies:
       '@clack/prompts': 0.11.0
+      '@trpc/server': 11.6.0(typescript@5.9.3)
       deepmerge: 4.3.1
       jsonc-parser: 3.3.1
       nypm: 0.6.2
-      trpc-cli: 0.10.2(@inquirer/prompts@7.8.6(@types/node@24.6.2))(typescript@5.9.3)
+      trpc-cli: 0.11.0(@trpc/server@11.6.0(typescript@5.9.3))(effect@3.16.12)(zod@4.1.11)
       vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)(yaml@2.8.1)
       zod: 4.1.11
     transitivePeerDependencies:
       - '@edge-runtime/vm'
-      - '@inquirer/prompts'
+      - '@orpc/server'
       - '@types/debug'
       - '@types/node'
+      - '@valibot/to-json-schema'
       - '@vitest/browser'
       - '@vitest/ui'
+      - effect
       - happy-dom
       - jiti
       - jsdom
       - less
       - lightningcss
       - msw
-      - omelette
       - sass
       - sass-embedded
       - stylus
@@ -12664,6 +12659,7 @@ snapshots:
       - terser
       - tsx
       - typescript
+      - valibot
       - yaml
 
   unbox-primitive@1.1.0:
@@ -13076,12 +13072,6 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors-cjs@2.1.3: {}
-
-  zod-to-json-schema@3.24.6(zod@3.25.76):
-    dependencies:
-      zod: 3.25.76
-
-  zod@3.25.76: {}
 
   zod@4.1.11: {}
 
