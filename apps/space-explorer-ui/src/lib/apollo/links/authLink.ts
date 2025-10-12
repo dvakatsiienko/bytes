@@ -1,14 +1,12 @@
-import { setContext } from '@apollo/client/link/context';
+import { SetContextLink } from '@apollo/client/link/context';
 
-export const authLink = setContext((_, prevCtx) => {
+export const authLink = new SetContextLink((prevContext) => {
   const token = localStorage.getItem('token') || '';
 
-  const ctx = {
+  return {
     headers: {
-      ...prevCtx.headers,
+      ...prevContext.headers,
       Authorization: token,
     },
   };
-
-  return ctx;
 });
