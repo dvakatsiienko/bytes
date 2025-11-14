@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.1.15",
-    "@radix-ui/react-slot": "1.2.3",
+    "@radix-ui/react-slot": "1.2.4",
     "@radix-ui/react-tabs": "1.1.13",
     "@radix-ui/react-toggle": "1.1.10",
     "@radix-ui/react-toggle-group": "1.1.11",
@@ -24,8 +24,8 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.14",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.1",
+    "@types/react": "19.2.4",
+    "@types/react-dom": "19.2.3",
     "@workspace/typescript-config": "workspace:*",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
