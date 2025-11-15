@@ -15,15 +15,15 @@
     "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\""
   },
   "dependencies": {
-    "@apollo/client": "4.0.7",
+    "@apollo/client": "4.0.9",
     "@hookform/resolvers": "5.2.2",
     "debug": "4.4.3",
-    "graphql": "16.11.0",
+    "graphql": "16.12.0",
     "history": "5.3.0",
     "polished": "4.3.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-hook-form": "7.65.0",
+    "react-hook-form": "7.66.0",
     "react-router-dom": "7.9.6",
     "styled-components": "6.1.19",
     "zod": "4.1.12"
