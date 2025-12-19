@@ -7,6 +7,6 @@
     ".": "./calc.ts"
   },
   "dependencies": {
-    "next": "15.5.7"
+    "next": "15.5.9"
   }
 }
