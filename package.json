@@ -36,7 +36,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
     "biome-config-polished": "workspace:*",
-    "lefthook": "1.13.6",
+    "lefthook": "2.0.12",
     "prettier": "3.7.4",
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.7.2",
