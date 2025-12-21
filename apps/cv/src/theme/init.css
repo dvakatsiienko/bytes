@@ -2,11 +2,9 @@
 @import "./accent.css";
 @import "./gray.css";
 
-@plugin '@tailwindcss/typography';
-@plugin 'tailwind-scrollbar' {
-  /* biome-ignore lint/correctness/noUnknownProperty: tailwind-scrollbar unique */
+@plugin "@tailwindcss/typography";
+@plugin "tailwind-scrollbar" {
   nocompatible: true;
-  /* biome-ignore lint/correctness/noUnknownProperty: tailwind-scrollbar unique */
   preferredstrategy: "pseudoelements";
 }
 

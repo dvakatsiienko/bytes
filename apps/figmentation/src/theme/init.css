@@ -1,7 +1,7 @@
 @import "@ui/kit/globals.css";
 @import "./theme-tesla-landing.css";
 
-@plugin '@tailwindcss/typography';
+@plugin "@tailwindcss/typography";
 
 @layer base {
   @font-face {

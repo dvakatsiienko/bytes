@@ -164,12 +164,12 @@ const MessagePreview = ({
               </div>
               <div className='flex h-5 w-5 items-center justify-center'>
                 {state === 'call' ? (
+                  // biome-ignore lint/style/noNestedTernary: todo simplify this
                   isLatestMessage && status !== 'ready' ? (
                     <Loader2 className='h-4 w-4 animate-spin text-zinc-500' />
                   ) : (
                     <StopCircle className='h-4 w-4 text-red-500' />
                   )
-                  // biome-ignore lint/style/noNestedTernary: todo simplify this
                 ) : state === 'result' ? (
                   <CheckCircle className='text-green-600' size={14} />
                 ) : null}
