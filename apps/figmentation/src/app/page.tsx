@@ -51,18 +51,18 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
     <article
       className={cn(
         'group relative isolate grid grid-rows-[auto_1fr] overflow-hidden rounded-2xl',
-        'hover:-translate-y-0.5 bg-white shadow-lg transition-all duration-300 hover:shadow-2xl',
+        'bg-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl',
         'cursor-pointer',
       )}>
       <div className='relative overflow-hidden'>
         <NextImage
           alt={imageAlt}
-          className='aspect-16/9 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
+          className='aspect-video h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
           height={400}
           src={imageSrc}
           width={320}
         />
-        <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+        <div className='absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
       </div>
 
       <section className='grid grid-rows-[auto_1fr_auto] items-start gap-4 p-6'>

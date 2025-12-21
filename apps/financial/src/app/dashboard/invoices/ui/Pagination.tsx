@@ -58,7 +58,7 @@ export const Pagination = (props: PaginationProps) => {
         isDisabled={currentPage <= 1}
       />
 
-      <div className='-space-x-px flex'>{paginationNumberListJSX}</div>
+      <div className='flex -space-x-px'>{paginationNumberListJSX}</div>
 
       <PaginationArrow
         direction='right'

@@ -31,7 +31,7 @@ export const Image = (props: ImageProps) => {
           // todo change direction different from layout direction
           'bg-background',
           'brand:bg-gradient-to-tr brand:from-gradient-layout-primary-1 brand:to-gradient-layout-primary-2',
-          '-outline-offset-1 outline outline-gray-900/10 dark:outline-gray-100/10',
+          'outline outline-gray-900/10 -outline-offset-1 dark:outline-gray-100/10',
           containerClassName,
         ),
         intent,
@@ -75,7 +75,7 @@ const imageCn = cva({
   base: 'object-cover',
   variants: {
     intent: {
-      card: '-outline-offset-1 outline outline-gray-900/10 dark:outline-gray-100/10',
+      card: 'outline outline-gray-900/10 -outline-offset-1 dark:outline-gray-100/10',
     },
     mask: {
       true: ['dark:mask-l-from-0% dark:mask-l-to-100%'],

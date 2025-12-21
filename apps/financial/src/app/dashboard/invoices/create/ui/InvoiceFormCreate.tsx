@@ -50,7 +50,7 @@ export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
               {customerListJSX}
             </select>
 
-            <UserCircleIcon className='-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] text-gray-500' />
+            <UserCircleIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-500' />
 
             <div aria-atomic='true' aria-live='polite' id='customer-error'>
               {actionState.errors?.customerId?.map((error: string) => (
@@ -79,7 +79,7 @@ export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
                 type='number'
               />
 
-              <CurrencyDollarIcon className='-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] text-gray-500 peer-focus:text-gray-900' />
+              <CurrencyDollarIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
             </div>
           </div>
         </div>

@@ -48,7 +48,7 @@ export default async function RootLayout(props: LayoutProps<'/'>) {
                 <SidebarProvider>
                   <AppSidebar />
 
-                  <section className='page-layout min-h-[100dvh]'>
+                  <section className='page-layout min-h-dvh'>
                     <Header friendList={friendList}>
                       <SidebarTrigger
                         className={cn(

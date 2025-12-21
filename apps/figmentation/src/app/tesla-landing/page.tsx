@@ -30,7 +30,7 @@ const TeslaLandingPage = () => {
     <main className='sm:text-lg'>
       <Header />
 
-      <section className='hero -mt-14 relative max-h-[500px] min-h-[600px] pt-20'>
+      <section className='hero relative -mt-14 max-h-[500px] min-h-[600px] pt-20'>
         <NextImage
           alt='Tesla Model Y'
           className='z-0 max-h-[500px] w-full object-cover'

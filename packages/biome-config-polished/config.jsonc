@@ -167,8 +167,8 @@
 
       /* rules under development */
       "nursery": {
-        "useConsistentTypeDefinitions": "off", // ultracite rule — type and interface are useful in different situations.
-        "useConsistentArrowReturn": "off" // ultracite rule — no need for arrow functions shorthand.
+        "useConsistentArrowReturn": "off", // ultracite rule — no need for arrow functions shorthand.
+        "noLeakedRender": "off" // ultracite rule — && operator is useful
       },
 
       /* rules catching ways your code could be written to run faster, or generally be more efficient. */
@@ -191,6 +191,7 @@
         "useFilenamingConvention": "off", // ultracite rule — move to kebab-case later.
         "useBlockStatements": "off", // ultracite rule — sometimes if-one-liners are pretty.
         "noMagicNumbers": "off", // ultracite rule — sometimes magic numbers are useful.
+        "useConsistentTypeDefinitions": "off", // ultracite rule — type and interface are useful in different situations.
 
         /* React */
         "useComponentExportOnlyModules": "off", // TODO thus rule is probably useful — review it and enable
