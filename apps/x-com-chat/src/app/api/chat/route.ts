@@ -64,8 +64,8 @@ export async function POST(req: Request) {
       // model: openrouter('deepseek/deepseek-chat-v3-0324:free'),
       // model: openrouter('google/gemini-2.0-flash-001'),
       // model: openrouter('deepseek/deepseek-chat-v3-0324:free'),
-      // model: modelProvider.languageModel('llama-3.1-8b-instant'), // ? quick
-      model: modelProvider.languageModel('llama-3.3-70b-versatile'), // ? conversational // TODO deprecates on august 31, find another one
+      model: modelProvider.languageModel('llama-3.1-8b-instant'), // ? quick
+      // model: modelProvider.languageModel('llama-3.3-70b-versatile'), // ? conversational // TODO deprecates on august 31, find another one
       system: chatFriend?.system,
       messages: modelMessages,
       // all persistence moved to toUIMessageStreamResponse.onFinish
