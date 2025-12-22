@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { Friend } from '.prisma/client/client';
+import type { Friend } from '~/prisma/client';
 
 export const useFriendListQuery = () => {
   const query = useQuery<Friend[]>({

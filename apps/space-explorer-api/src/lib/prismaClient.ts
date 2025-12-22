@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
-import { PrismaClient } from './prisma-client/client';
+import { PrismaClient } from '~/prisma/client';
 
 const dbPath =
   // biome-ignore lint/nursery/noUndeclaredEnvVars: space-explorer-api does not use turborepo

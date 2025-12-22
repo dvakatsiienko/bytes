@@ -1,6 +1,6 @@
 import { prisma } from './prisma';
 import { formatCurrency } from './utils';
-import type { Invoice } from '~/.generated/prisma';
+import type { Invoice } from '~/prisma/client';
 
 export async function fetchRevenueList() {
   try {
