@@ -23,9 +23,9 @@ import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
 import { cn } from '@/utils/cn';
 
 import { MessageList } from './MessageList';
-import type { Friend } from '.prisma/client/client';
 import { api } from '@/convex/_generated/api';
 import { useChatHistoryQuery } from '@/queries/chat';
+import type { Friend } from '~/prisma/client';
 
 export const Chat = (props: ChatProps) => {
   const router = useRouter();

@@ -3,7 +3,10 @@
   "compilerOptions": {
     /* Module resolution */
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] },
+    "paths": {
+      "@/*": ["src/*"],
+      "~/*": ["./.generated/*"]
+    },
 
     "moduleResolution": "Node",
     "target": "ESNext",

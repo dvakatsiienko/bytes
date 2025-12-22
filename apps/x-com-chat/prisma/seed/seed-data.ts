@@ -1,4 +1,4 @@
-import type { Friend } from '.prisma/client/client';
+import type { Friend } from '~/prisma/client';
 
 export const friendList: Omit<Friend, 'id'>[] = [
   /**

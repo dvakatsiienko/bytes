@@ -1,5 +1,5 @@
 import type { LaunchModel } from '../datasources';
-import type { Trip } from '../lib/prisma-client/client';
+import type { Trip } from '~/prisma/client';
 
 export const injectLaunchesIntoTrips = (
   trips: Trip[],

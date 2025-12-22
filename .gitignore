@@ -11,6 +11,7 @@ out
 .vite
 .turbo
 .vercel
+.generated
 
 # testing
 coverage

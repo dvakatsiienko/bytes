@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
 import { cn } from '@/utils/cn';
 
-import type { Friend } from '.prisma/client/client';
+import type { Friend } from '~/prisma/client';
 
 // TODO make btns size-6 (24px)
 // https://youtu.be/soFSSkf4oVY?si=sEMeAooIz414Us4e&t=62
