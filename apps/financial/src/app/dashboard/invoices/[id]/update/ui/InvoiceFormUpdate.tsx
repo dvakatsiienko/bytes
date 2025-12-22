@@ -12,7 +12,7 @@ import NextLink from 'next/link';
 import { type State, updateInvoice } from '@/lib';
 
 import { Button } from '@/ui/Button';
-import type { Customer, Invoice } from '~/prisma/client';
+import type { Customer, Invoice } from '~/prisma/client/client';
 
 export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
   const initialState: State = { errors: {}, message: null };
