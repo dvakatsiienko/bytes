@@ -5,6 +5,7 @@ import Database from 'better-sqlite3';
 import { PrismaClient } from './prisma-client/client';
 
 const dbPath =
+  // biome-ignore lint/nursery/noUndeclaredEnvVars: space-explorer-api do not use turborepo
   process.env.DATABASE_URL?.replace('file:', '') || './prisma/db.sqlite';
 const db = new Database(dbPath);
 const adapter = new PrismaBetterSqlite3({ url: dbPath });
