@@ -8,7 +8,7 @@ import {
   KeyIcon,
 } from '@heroicons/react/24/outline';
 
-import { authenticate } from '@/lib';
+import { authenticate } from '@/lib/actions';
 
 import { lusitana } from '@/theme/fonts';
 import { Button } from '@/ui/Button';

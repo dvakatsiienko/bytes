@@ -1,4 +1,4 @@
-import { fetchCustomerList } from '@/lib';
+import { fetchCustomerList } from '@/lib/queries';
 
 import { CustomerTable } from './ui/CustomerTable';
 

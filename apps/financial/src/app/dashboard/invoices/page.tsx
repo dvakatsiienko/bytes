@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 
-import { fetchInvoicesPages } from '@/lib';
+import { fetchInvoicesPages } from '@/lib/queries';
 
 import { InvoiceTable, Pagination } from './ui';
 import { CreateInvoice } from './ui/Buttons';

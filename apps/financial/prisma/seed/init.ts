@@ -4,8 +4,8 @@ import pg from 'pg';
 
 import { hashPassword } from '@/lib/security';
 
-import { PrismaClient } from '../../.generated/prisma/client/client';
 import { customers, invoices, revenue, users } from './seed-data';
+import { PrismaClient } from '~/prisma/client';
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);

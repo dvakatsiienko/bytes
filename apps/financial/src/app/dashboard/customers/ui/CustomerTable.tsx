@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import { lusitana } from '@/theme/fonts';
 import { SearchField } from '@/ui/SearchField';
-import type { Customer } from '~/prisma/client/client';
+import type { Customer } from '~/.generated/prisma';
 
 export const CustomerTable = (props: CustomerTableProps) => {
   const customerListHeadJSX = props.customerList?.map((customer) => (
