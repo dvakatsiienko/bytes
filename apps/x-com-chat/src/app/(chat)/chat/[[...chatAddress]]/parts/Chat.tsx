@@ -23,7 +23,7 @@ import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
 import { cn } from '@/utils/cn';
 
 import { MessageList } from './MessageList';
-import type { Friend } from '.prisma/client/edge';
+import type { Friend } from '.prisma/client';
 import { api } from '@/convex/_generated/api';
 import { useChatHistoryQuery } from '@/queries/chat';
 

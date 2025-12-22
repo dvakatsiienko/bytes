@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { type State, createInvoice } from '@/lib';
 
 import { Button } from '@/ui/Button';
-import type { Customer } from '~/prisma/client/edge';
+import type { Customer } from '~/prisma/client';
 
 export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
   const initialState: State = { errors: {}, message: null };

@@ -1,9 +1,15 @@
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
+
 import { hashPassword } from '@/lib/security';
 
+import { PrismaClient } from '../../.generated/prisma/client';
 import { customers, invoices, revenue, users } from './seed-data';
-import { PrismaClient } from '~/prisma/client/edge';
 
-const prisma = new PrismaClient();
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function seed() {
   try {
