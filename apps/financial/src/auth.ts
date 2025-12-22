@@ -6,7 +6,7 @@ import { prisma } from '@/lib';
 import { verifyPassword } from '@/lib/security';
 
 import { authConfig } from './auth.config';
-import type { User } from '~/prisma/client/edge';
+import type { User } from '~/prisma/client';
 
 export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
