@@ -55,7 +55,6 @@ const { url } = await startStandaloneServer(apolloServer, {
       userEmail,
     };
   },
-  // biome-ignore lint/nursery/noUndeclaredEnvVars: space-explorer-api does not use turborepo
   listen: { port: Number(process.env.PORT ?? 4000) },
 });
 
