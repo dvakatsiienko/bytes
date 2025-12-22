@@ -9,10 +9,10 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
-import { type State, createInvoice } from '@/lib';
+import { type State, createInvoice } from '@/lib/actions';
 
 import { Button } from '@/ui/Button';
-import type { Customer } from '~/prisma/client/client';
+import type { Customer } from '~/prisma/client';
 
 export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
   const initialState: State = { errors: {}, message: null };

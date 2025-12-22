@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
 
-import { fetchCustomerList, fetchInvoiceById } from '@/lib';
+import { fetchCustomerList, fetchInvoiceById } from '@/lib/queries';
 
 import { InvoiceFormUpdate } from './ui';
 import type { NextPageProps } from '@/types';
