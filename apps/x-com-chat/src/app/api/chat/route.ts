@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     ...chatHistory,
     ...(newMessage ? [newMessage] : []),
   ] as UIMessage[];
-  const modelMessages = convertToModelMessages(uiMessages);
+  const modelMessages = await convertToModelMessages(uiMessages);
 
   try {
     const streamTextResponse = streamText({
