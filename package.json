@@ -28,9 +28,9 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "dependencies": {
-    "@ai-sdk/groq": "3.0.0",
-    "@ai-sdk/react": "3.0.2",
-    "ai": "6.0.2",
+    "@ai-sdk/groq": "3.0.1",
+    "@ai-sdk/react": "3.0.3",
+    "ai": "6.0.3",
     "zod": "4.2.1"
   },
   "devDependencies": {
