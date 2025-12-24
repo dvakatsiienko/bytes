@@ -275,6 +275,9 @@
         "**/app/**/{layout,page,loading,error,not-found,default}.tsx",
         "apps/**/app/**/{layout,page,loading,error,not-found,default}.tsx",
 
+        "src/**/proxy.ts",
+        "apps/**/src/**/proxy.ts",
+
         "src/**/middleware.ts",
         "apps/**/src/**/middleware.ts",
 

@@ -164,7 +164,6 @@ pnpm db:reinit         # Full reset + seed
 
 ```bash
 pnpm build            # Production build with Turbopack
-pnpm build:analyze    # Bundle analysis
 pnpm typecheck       # Type checking with Next.js typegen
 ```
 
@@ -258,7 +257,6 @@ stone.css     # Alternative neutrals
 ### Bundle Optimization
 
 - Tree shaking with Turbopack
-- Analyze with `pnpm build:analyze`
 - Selective Radix imports
 
 ## Testing Approach

@@ -22,8 +22,5 @@
   "keywords": ["prettier", "prettierconfig"],
   "peerDependencies": {
     "prettier": ">=3.0.0"
-  },
-  "dependencies": {
-    "next": "15.5.9"
   }
 }
