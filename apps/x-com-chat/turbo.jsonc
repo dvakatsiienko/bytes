@@ -8,8 +8,7 @@
         "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
         "DATABASE_URL",
         "GROQ_API_KEY",
-        "CONVEX_DEPLOY_KEY",
-        "ANALYZE"
+        "CONVEX_DEPLOY_KEY"
       ]
     }
   }

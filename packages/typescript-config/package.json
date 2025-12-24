@@ -5,8 +5,5 @@
   "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "next": "15.5.9"
   }
 }
