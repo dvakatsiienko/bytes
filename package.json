@@ -5,7 +5,6 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev:@space-explorer": "turbo @space-explorer/api#dev @space-explorer/ui#dev",
     "dev:@space-explorer/ui": "turbo @space-explorer/ui#dev",
     "dev:@space-explorer/api": "turbo @space-explorer/api#dev ",
     "dev:cv": "turbo cv#dev",
@@ -24,6 +23,7 @@
     "typecheck": "turbo typecheck",
     "format": "biome format --write",
     "check": "turbo lint typecheck",
+    "turbo:devtools": "turbo devtools",
     "packages:reinstall": "rimraf pnpm-lock.yaml && rimraf **/{node_modules,.next} && pnpm i --force",
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
@@ -41,7 +41,7 @@
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.7.2",
     "rimraf": "6.1.2",
-    "turbo": "2.5.8",
+    "turbo": "2.7.2",
     "typescript": "5.9.3",
     "ultracite": "6.5.0"
   },

@@ -168,7 +168,8 @@
       /* rules under development */
       "nursery": {
         "useConsistentArrowReturn": "off", // ultracite rule — no need for arrow functions shorthand.
-        "noLeakedRender": "off" // ultracite rule — && operator is useful
+        "noLeakedRender": "off", // ultracite rule — && operator is useful
+        "noUndeclaredEnvVars": "error"
       },
 
       /* rules catching ways your code could be written to run faster, or generally be more efficient. */
