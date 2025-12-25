@@ -13,5 +13,8 @@
     "./manrope-vrr-font": "./src/Manrope[wght].woff2",
     "./roboto-flex-vrr-font-face": "./src/roboto-flex-vrr.scss",
     "./roboto-flex-vrr-font": "./src/RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf"
+  },
+  "dependencies": {
+    "next": "16.1.1"
   }
 }

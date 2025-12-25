@@ -2,6 +2,12 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "with": ["@space-explorer/api#dev"],
+      "dependsOn": ["^prisma:generate"]
+    },
     "lint": {
       "env": [
         "APOLLO_GRAPH_ID",
