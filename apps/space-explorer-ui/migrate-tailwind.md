@@ -5,6 +5,31 @@
 
 ---
 
+## 🎯 Current Migration Status
+
+**Last Updated:** After initial Tailwind v4 setup and global styles migration
+
+### ✅ Completed
+- Tailwind CSS v4 installed (`tailwindcss@4.1.18`, `@tailwindcss/vite@4.1.18`)
+- Vite plugin configured
+- Global styles migrated to `src/theme/init.css`
+- Font changed to Geist Variable (`@fontsource-variable/geist@5.2.8`)
+- Root flexbox layout set up
+- Typography base styles (h1, h2, h3, h5)
+
+### ⏳ In Progress
+- Adding custom color tokens using `@theme` directive
+
+### 📋 TODO
+- Install `clsx` and `tailwind-merge`
+- Create `cn()` utility helper
+- Migrate 11 component files from styled-components to Tailwind
+- Remove `styled-components` and `polished` dependencies
+- Delete `src/styles.ts`
+- ✅ ~~**FIX VERCEL 404 ISSUE** - Add `vercel.json` for SPA routing~~ **DONE**
+
+---
+
 ## 📊 Current State Analysis
 
 ### Files Using styled-components: 11
@@ -48,92 +73,112 @@ COLORS = {
 }
 ```
 
-### Tailwind Config Strategy
-```js
-// tailwind.config.js
-export default {
-  theme: {
-    extend: {
-      colors: {
-        accent: '#e535ab',
-        background: '#f7f8fa',
-        grey: '#d8d9e0',
-        primary: '#220a82',
-        secondary: '#14cbc4',
-        text: '#343c5a',
-        'text-secondary': '#747790',
-      },
-      spacing: {
-        // Keep default Tailwind spacing (already has 8px = spacing-2)
-      },
-    },
-  },
+### Tailwind v4 CSS-First Config Strategy
+**Note:** Tailwind v4 uses CSS-first configuration via the `@theme` directive instead of `tailwind.config.js`.
+
+```css
+/* Add to src/theme/init.css */
+@theme {
+  /* Custom color tokens from src/styles.ts */
+  --color-accent: #e535ab;
+  --color-accent-light: #e85ebf;   /* Pre-calculated lighten(0.1) for Button hover */
+  --color-accent-lighter: #ec87d3; /* Pre-calculated lighten(0.2) for Button active */
+  --color-accent-dark: #b72a89;    /* Pre-calculated darken(0.2) for Button disabled */
+  --color-background: #f7f8fa;
+  --color-grey: #d8d9e0;
+  --color-primary: #220a82;
+  --color-secondary: #14cbc4;
+  --color-text: #343c5a;
+  --color-text-secondary: #747790;
+
+  /* Spacing: Tailwind v4 default spacing already includes 8px = spacing-2 */
 }
+```
+
+**Usage in components:**
+```tsx
+// Before: styled-components
+<Button className={cn("bg-accent hover:bg-accent-light")} />
+
+// After: Tailwind classes
+<button className="bg-accent hover:bg-accent-light" />
 ```
 
 ---
 
 ## 🔧 Migration Phases
 
-### Phase 1: Setup Tailwind CSS ✅
+### Phase 1: Setup Tailwind CSS ✅ COMPLETED
 
 **Tasks:**
-1. Install Tailwind dependencies
+1. ✅ **DONE** - Install Tailwind v4 dependencies
    ```bash
-   pnpm add -D tailwindcss postcss autoprefixer
-   pnpm dlx tailwindcss init -p
+   # Already installed: tailwindcss@4.1.18, @tailwindcss/vite@4.1.18
+   # Already installed: @fontsource-variable/geist@5.2.8
    ```
 
-2. Configure `tailwind.config.js`
-   - Add custom colors from COLORS token
-   - Configure content paths: `['./index.html', './src/**/*.{js,ts,jsx,tsx}']`
-   - Add keyframe animations for Loading spinner
+2. ✅ **DONE** - Configure Vite plugin
+   - Added `@tailwindcss/vite` to `vite.config.ts`
+   - Tailwind v4 uses CSS-first config (no tailwind.config.js needed)
 
-3. Create `src/index.css` with Tailwind directives
+3. ✅ **DONE** - Create `src/theme/init.css` with Tailwind directives
    ```css
-   @tailwind base;
-   @tailwind components;
-   @tailwind utilities;
+   @import "tailwindcss";
+   @import "@fontsource-variable/geist";
+
+   :root {
+     font-family: "Geist Variable", sans-serif;
+   }
+
+   :root, body, #root {
+     min-height: 100vh;
+   }
+
+   #root {
+     display: flex;
+     flex-direction: column;
+   }
 
    @layer base {
-     /* Global styles migration from createGlobalStyle */
-     *, *::before, *::after { box-sizing: border-box; }
-     html, body, #root { height: 100%; }
-     #root { display: flex; flex-direction: column; }
-     body {
-       font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-       color: #343c5a;
-       background-color: #f7f8fa;
+     h1, h2, h3, h4, h5, h6 {
        margin: 0;
-       -webkit-font-smoothing: antialiased;
+       font-weight: 600;
      }
-     /* Scrollbar hiding */
-     ::-webkit-scrollbar { display: none; }
-     * { -ms-overflow-style: none; scrollbar-width: none; }
-   }
-
-   @layer components {
-     /* Typography from createGlobalStyle */
-     h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.0625rem; }
-     h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.0313rem; }
-     h3 { font-size: 1.3125rem; font-weight: 500; }
-     h4 { font-size: 1.125rem; font-weight: 600; }
-     h5 { font-size: 1rem; font-weight: 500; }
-     h6 { font-size: 0.875rem; font-weight: 500; letter-spacing: 0.025rem; }
+     h1 { font-size: 48px; line-height: 1; }
+     h2 { font-size: 40px; }
+     h3 { font-size: 36px; }
+     h5 { font-size: 16px; text-transform: uppercase; letter-spacing: 4px; }
    }
    ```
 
-4. Import in `src/main.tsx`
+4. ✅ **DONE** - Import in `src/index.tsx`
    ```typescript
-   import './index.css'; // Add before App import
+   import './theme/init.css'; // ✅ Already imported
    ```
 
-5. Install `clsx` for conditional className logic
+5. ⏳ **NEXT** - Add custom color tokens to CSS
+   ```css
+   /* Add to src/theme/init.css */
+   @theme {
+     --color-accent: #e535ab;
+     --color-accent-light: #e85ebf;
+     --color-accent-lighter: #ec87d3;
+     --color-accent-dark: #b72a89;
+     --color-background: #f7f8fa;
+     --color-grey: #d8d9e0;
+     --color-primary: #220a82;
+     --color-secondary: #14cbc4;
+     --color-text: #343c5a;
+     --color-text-secondary: #747790;
+   }
+   ```
+
+6. ⏳ **TODO** - Install `clsx` for conditional className logic
    ```bash
    pnpm add clsx tailwind-merge
    ```
 
-6. Create utility helper `src/lib/utils.ts`
+7. ⏳ **TODO** - Create utility helper `src/lib/utils.ts`
    ```typescript
    import clsx, { ClassValue } from 'clsx';
    import { twMerge } from 'tailwind-merge';
@@ -145,20 +190,23 @@ export default {
 
 ---
 
-### Phase 2: Migrate Global Styles & Design Tokens
+### Phase 2: Migrate Global Styles & Design Tokens ⏳ IN PROGRESS
 
 **File:** `src/styles.ts`
 
 **Actions:**
-1. ✅ Design tokens → `tailwind.config.js` colors (done in Phase 1)
-2. ✅ Global styles → `src/index.css` @layer base (done in Phase 1)
-3. ❌ Delete `src/styles.ts` after all migrations complete
-4. ❌ Remove `createGlobalStyle` import from `src/main.tsx`
+1. ✅ **DONE** - Global styles migrated to `src/theme/init.css` @layer base
+   - Font changed from Source Sans Pro to Geist Variable ✅
+   - Root flexbox layout ✅
+   - Typography hierarchy (h1-h6) ✅
+2. ⏳ **NEXT** - Migrate design tokens from `src/styles.ts` to CSS using `@theme` directive (Tailwind v4)
+3. ⏳ **TODO** - Delete `src/styles.ts` after all component migrations complete
+4. ✅ **N/A** - No `createGlobalStyle` to remove (already using CSS)
 
 **Validation:**
-- Typography hierarchy renders identically
-- Scrollbar hiding works cross-browser
-- Root flexbox layout maintains structure
+- ✅ Typography hierarchy renders with Geist Variable font
+- ✅ Root flexbox layout maintains structure
+- ⏳ Need to test color tokens after adding `@theme` directive
 
 ---
 
@@ -334,14 +382,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 ```
 
-**Tailwind Config Addition:**
-```js
-// tailwind.config.js - Add accent color variants
-colors: {
-  accent: '#e535ab',
-  'accent-light': '#e85ebf',   // lighten(0.1, #e535ab)
-  'accent-lighter': '#ec87d3', // lighten(0.2, #e535ab)
-  'accent-dark': '#b72a89',    // darken(0.2, #e535ab)
+**Tailwind v4 @theme Addition:**
+```css
+/* src/theme/init.css - Add accent color variants */
+@theme {
+  --color-accent: #e535ab;
+  --color-accent-light: #e85ebf;   /* lighten(0.1, #e535ab) */
+  --color-accent-lighter: #ec87d3; /* lighten(0.2, #e535ab) */
+  --color-accent-dark: #b72a89;    /* darken(0.2, #e535ab) */
 }
 ```
 
@@ -511,17 +559,8 @@ export const Loading = () => {
 };
 ```
 
-**Tailwind Config Addition:**
-```js
-// tailwind.config.js
-theme: {
-  extend: {
-    animation: {
-      spin: 'spin 1s linear infinite', // Already built-in!
-    },
-  },
-}
-```
+**Note on Animation:**
+Tailwind v4 includes `animate-spin` by default, so no additional configuration needed! 🎉
 
 **Changes:**
 - Remove `polished` size utility
@@ -596,17 +635,22 @@ See Phase 3.3 for LoginForm component migrations.
 ## 📋 Migration Checklist
 
 ### Setup
-- [ ] Install Tailwind CSS dependencies
-- [ ] Configure `tailwind.config.js` with custom colors
-- [ ] Create `src/index.css` with base styles
-- [ ] Install `clsx` and create `cn()` helper
-- [ ] Import Tailwind CSS in `main.tsx`
+- [x] Install Tailwind CSS v4 dependencies
+- [x] Configure Vite plugin with `@tailwindcss/vite`
+- [x] Create `src/theme/init.css` with base styles
+- [x] Import Tailwind CSS in `src/index.tsx`
+- [ ] Add custom color tokens using `@theme` directive
+- [ ] Install `clsx` and `tailwind-merge`
+- [ ] Create `cn()` utility helper in `src/lib/utils.ts`
 
 ### Global Styles
-- [ ] Migrate design tokens to Tailwind config
-- [ ] Migrate createGlobalStyle to @layer base
-- [ ] Test typography hierarchy (h1-h6)
-- [ ] Verify scrollbar hiding works
+- [x] Migrate base styles to `@layer base` in `src/theme/init.css`
+- [x] Change font from Source Sans Pro to Geist Variable
+- [x] Set up root flexbox layout
+- [x] Configure typography hierarchy (h1-h6)
+- [ ] Migrate COLORS tokens from `src/styles.ts` to `@theme` directive
+- [ ] Test all color tokens work correctly
+- [ ] Add missing typography styles (h4, h6) if needed
 
 ### Simple Components (6 files)
 - [ ] Layout.tsx
@@ -669,12 +713,12 @@ See Phase 3.3 for LoginForm component migrations.
 ```
 
 ### 2. Color Calculations (lighten/darken)
-**Solution:** Pre-calculate variants in Tailwind config
-```js
-colors: {
-  accent: '#e535ab',
-  'accent-light': '#e85ebf',   // Pre-calculated lighten(0.1)
-  'accent-dark': '#b72a89',    // Pre-calculated darken(0.2)
+**Solution:** Pre-calculate variants in CSS using `@theme` directive (Tailwind v4)
+```css
+@theme {
+  --color-accent: #e535ab;
+  --color-accent-light: #e85ebf;   /* Pre-calculated lighten(0.1) */
+  --color-accent-dark: #b72a89;    /* Pre-calculated darken(0.2) */
 }
 ```
 
@@ -686,12 +730,18 @@ colors: {
 ```
 
 ### 4. Complex Animations
-**Solution:** Extend Tailwind theme with custom keyframes
-```js
-keyframes: {
-  spin: { to: { transform: 'rotate(360deg)' } },
+**Solution:** Use built-in Tailwind animations or extend via `@theme` (Tailwind v4)
+```css
+/* For custom animations, add to src/theme/init.css */
+@theme {
+  --animate-custom-spin: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 ```
+**Note:** For this project, `animate-spin` is already built-in! ✅
 
 ---
 
@@ -724,3 +774,129 @@ keyframes: {
 **Migration Time Estimate:** 2-3 hours for thorough implementation + testing
 **Risk Level:** Low (straightforward utility class conversion)
 **Visual Changes:** None (1-to-1 migration)
+
+---
+
+## 🚨 Vercel Deployment Fix: SPA Routing 404 Issue
+
+### Problem
+When deployed to Vercel, refreshing the page on `/launches` route returns a 404 error. This works fine locally but fails in production because Vercel tries to serve a static `/launches/index.html` file that doesn't exist.
+
+**Root Cause:** This is a Single Page Application (SPA) with client-side routing (React Router). Vercel needs to be configured to rewrite all routes to `index.html` so the client-side router can handle them.
+
+---
+
+### Solution: Create `vercel.json`
+
+Create a `vercel.json` file in the root of the project with the following configuration:
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+**What this does:**
+- Catches ALL routes (`(.*)` regex matches everything)
+- Rewrites them to serve `/index.html`
+- React Router takes over and handles the routing client-side
+- Preserves the URL in the browser (no redirect, just internal rewrite)
+
+---
+
+### Alternative: Vite Build Configuration
+
+If you prefer not to use `vercel.json`, you can configure Vite's build output to include a custom 404.html:
+
+**Option 1: Add to `public/` directory**
+```bash
+# Create public directory if it doesn't exist
+mkdir -p public
+
+# Copy index.html as 404.html
+cp dist/index.html public/404.html
+```
+
+**Option 2: Post-build script in `package.json`**
+```json
+{
+  "scripts": {
+    "build:vite": "vite build && cp dist/index.html dist/404.html"
+  }
+}
+```
+
+---
+
+### Recommended Approach
+
+**Use `vercel.json`** - This is the cleaner, more explicit solution:
+
+1. Create `vercel.json` at project root
+2. Add the rewrites configuration above
+3. Commit and redeploy
+
+**Why this is better:**
+- ✅ Explicit and self-documenting
+- ✅ Works for all routes automatically
+- ✅ No build script modifications needed
+- ✅ Standard Vercel configuration pattern
+- ✅ Works with Vercel preview deployments
+
+---
+
+### Testing After Deployment
+
+After adding `vercel.json` and redeploying:
+
+1. Visit your deployed URL
+2. Navigate to `/launches`
+3. Refresh the page (F5 or Cmd+R)
+4. ✅ Should load the app correctly (no 404)
+
+---
+
+### Additional Routes to Test
+
+Make sure to test all client-side routes after deploying:
+- `/` (homepage)
+- `/launches` (launches list)
+- `/launch/:id` (individual launch detail)
+- `/cart` (cart page)
+- `/login` (login page)
+
+All should work when:
+- Navigating via links
+- Refreshing the page
+- Direct URL access
+- Browser back/forward buttons
+
+---
+
+## 📝 Updated Implementation Checklist
+
+### Deployment Fix (HIGH PRIORITY)
+- [x] Create `vercel.json` with rewrites configuration ✅
+- [ ] Test locally with `pnpm build && pnpm preview`
+- [ ] Commit and push to trigger Vercel deployment
+- [ ] Test all routes on production URL after deployment
+- [ ] Verify refresh works on `/launches` route
+
+### Tailwind Migration (Original Plan)
+- [x] Install Tailwind CSS v4 dependencies
+- [x] Configure Vite plugin
+- [x] Create `src/theme/init.css` with base styles
+- [x] Change font to Geist Variable
+- [x] Import CSS in `src/index.tsx`
+- [ ] Add custom color tokens using `@theme` directive
+- [ ] Install `clsx` and `tailwind-merge`
+- [ ] Create `cn()` utility helper
+- [ ] Migrate 11 component files
+- [ ] Remove styled-components dependencies
+- [ ] Delete `src/styles.ts`
+- [ ] Update CLAUDE.md
