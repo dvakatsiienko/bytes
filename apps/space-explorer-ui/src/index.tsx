@@ -5,7 +5,6 @@ import { BrowserRouter as Router } from 'react-router-dom';
 
 import { client } from './lib/apollo';
 import { Pages } from './pages';
-import { GlobalStyle } from './styles';
 import './theme/init.css';
 
 const rootEl = document.getElementById('root') as HTMLElement;
@@ -17,8 +16,6 @@ const App = (
         <Pages />
       </ApolloProvider>
     </Router>
-
-    <GlobalStyle />
   </StrictMode>
 );
 
