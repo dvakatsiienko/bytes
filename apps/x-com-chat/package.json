@@ -37,7 +37,7 @@
     "@radix-ui/react-tooltip": "1.2.8",
     "@tailwindcss/forms": "0.5.11",
     "@tailwindcss/typography": "0.5.19",
-    "@tanstack/react-query": "5.90.13",
+    "@tanstack/react-query": "5.90.14",
     "@use-it/event-listener": "0.1.7",
     "ai": "6.0.3",
     "convex": "1.31.2",
@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.18",
-    "@tanstack/react-query-devtools": "5.91.1",
+    "@tanstack/react-query-devtools": "5.91.2",
     "@types/node": "25.0.3",
     "@types/pg": "8.16.0",
     "@types/react": "19.2.7",
