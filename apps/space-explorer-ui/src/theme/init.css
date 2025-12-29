@@ -1,1 +1,48 @@
 @import "tailwindcss";
+@import "@fontsource-variable/geist";
+
+:root {
+  font-family: "Geist Variable", sans-serif;
+}
+
+:root,
+body,
+#root {
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  h2 {
+    font-size: 40px;
+  }
+
+  h3 {
+    font-size: 36px;
+  }
+
+  h5 {
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+  }
+}
