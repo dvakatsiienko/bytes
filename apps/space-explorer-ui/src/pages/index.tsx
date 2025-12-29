@@ -10,7 +10,6 @@ import {
 import { Cart } from './Cart';
 import { Launch } from './Launch';
 import { Launches } from './Launches';
-/* Pages */
 import { Login } from './Login';
 import { Profile } from './Profile';
 import { Layout } from '@/components';

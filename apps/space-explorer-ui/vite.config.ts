@@ -1,3 +1,4 @@
+import vitePluginTailwindcss from '@tailwindcss/vite';
 import vitePluginReactSwc from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import vitePluginProgress from 'vite-plugin-progress';
@@ -8,5 +9,6 @@ export default defineConfig({
     vitePluginReactSwc(),
     vitePluginProgress(),
     vitePluginTsconfigPaths(),
+    vitePluginTailwindcss(),
   ],
 });
