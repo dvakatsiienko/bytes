@@ -24,7 +24,7 @@ export const Footer = () => {
         <MenuItem to='/cart'>
           <CartSvg />
           {Boolean(cartItemsCount) && (
-            <span className='count'>{cartItemsCount}</span>
+            <span className={tooltipCoutCn}>{cartItemsCount}</span>
           )}
           Cart
         </MenuItem>
@@ -32,7 +32,7 @@ export const Footer = () => {
         <MenuItem to='/profile'>
           <ProfileSvg />
           {Boolean(userTripsCount) && (
-            <span className='count'>{userTripsCount}</span>
+            <span className={tooltipCoutCn}>{userTripsCount}</span>
           )}
           Profile
         </MenuItem>
@@ -44,6 +44,8 @@ export const Footer = () => {
 };
 
 /* Styles */
+const tooltipCoutCn = 'count grid place-content-center text-sm';
+
 const Container = styled('footer')({
   backgroundColor: 'white',
   bottom: 0,

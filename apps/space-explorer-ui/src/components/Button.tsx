@@ -1,39 +1,42 @@
-import { darken, lighten } from 'polished';
-import styled from 'styled-components';
+import { type VariantProps, cva } from 'cva';
 
-import { COLORS, SPACING } from '@/styles';
+export const Button = (props: ButtonProps) => {
+  return (
+    <button
+      className={buttonCn({
+        className: props.className,
+        mini: props.mini,
+      })}
+      disabled={props.disabled}
+      onClick={props.onClick}
+      type={props.type ?? 'button'}>
+      {props.children}
+    </button>
+  );
+};
 
-const height = 50;
+/* Styles */
+const buttonCn = cva({
+  base: 'grid h-12 min-w-52 cursor-pointer place-content-center rounded-md bg-accent font-bold text-lg text-white uppercase disabled:cursor-not-allowed',
+  variants: {
+    mini: {
+      true: 'h-9 min-w-44',
+    },
+  },
+});
 
-interface ButtonProps {
-  $mini?: boolean;
+/* Types */
+interface ButtonProps extends React.PropsWithChildren, ButtonCnProps {
+  disabled?: boolean;
+  className?: string;
+  type?: React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  >['type'];
+  onClick?: React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  >['onClick'];
 }
-export const Button = styled.button<ButtonProps>`
-    display: block;
-    min-width: ${(props) => (props.$mini ? 175 : 200)}px;
-    height: ${(props) => (props.$mini ? height / 1.3 : height)}px;
-    margin: 0 ${(props) => (props.$mini ? '0 0 auto' : 'auto')};
-    padding: 0 ${(props) => (props.$mini ? SPACING : SPACING * 4)}px;
-    border: none;
-    border-radius: ${height / 2}px;
-    font-family: inherit;
-    font-size: 18px;
-    font-weight: 700;
-    color: white;
-    text-transform: uppercase;
-    background-color: ${COLORS.accent};
-    cursor: pointer;
-    outline: none;
-    transition: background-color 0.1s ease;
 
-    &:hover {
-        background-color: ${lighten(0.1, COLORS.accent)};
-    }
-    &:active {
-        background-color: ${lighten(0.2, COLORS.accent)};
-    }
-    &::disabled {
-        background-color: ${darken(0.2, COLORS.accent)};
-        cursor: not-allowed;
-    }
-`;
+type ButtonCnProps = VariantProps<typeof buttonCn>;

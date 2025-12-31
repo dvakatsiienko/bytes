@@ -46,3 +46,19 @@ body,
     letter-spacing: 4px;
   }
 }
+
+@theme {
+  /* Custom color tokens from src/styles.ts */
+  --color-accent: #e535ab;
+  --color-accent-light: #e85ebf; /* Pre-calculated lighten(0.1) for Button hover */
+  --color-accent-lighter: #ec87d3; /* Pre-calculated lighten(0.2) for Button active */
+  --color-accent-dark: #b72a89; /* Pre-calculated darken(0.2) for Button disabled */
+  --color-background: #f7f8fa;
+  --color-grey: #d8d9e0;
+  --color-primary: #220a82;
+  --color-secondary: #14cbc4;
+  --color-text: #343c5a;
+  --color-text-secondary: #747790;
+
+  /* Spacing: Tailwind v4 default spacing already includes 8px = spacing-2 */
+}
