@@ -1,10 +1,7 @@
-import styled from 'styled-components';
-
 import { MenuItem } from '../MenuItem';
 import { LogoutButton } from './LogoutButton';
 import { CartSvg, HomeSvg, ProfileSvg } from './SVG';
 import * as gql from '@/graphql';
-import { COLORS, SPACING } from '@/styles';
 
 export const Footer = () => {
   const cartItemsQuery = gql.useGetCartItemsQuery();
@@ -14,8 +11,8 @@ export const Footer = () => {
   const userTripsCount = userProfileQuery.data?.userProfile.trips.length;
 
   return (
-    <Container>
-      <InnerContainer>
+    <footer className='sticky bottom-0 bg-white text-text-secondary'>
+      <section className='mx-auto flex w-full max-w-115 items-center p-5'>
         <MenuItem to='/launches'>
           <HomeSvg />
           Home
@@ -38,28 +35,10 @@ export const Footer = () => {
         </MenuItem>
 
         <LogoutButton />
-      </InnerContainer>
-    </Container>
+      </section>
+    </footer>
   );
 };
 
 /* Styles */
 const tooltipCoutCn = 'count grid place-content-center text-sm';
-
-const Container = styled('footer')({
-  backgroundColor: 'white',
-  bottom: 0,
-  color: COLORS.textSecondary,
-  flexShrink: 0,
-  height: 130,
-  marginTop: 'auto',
-  position: 'sticky',
-});
-
-const InnerContainer = styled('div')({
-  alignItems: 'center',
-  display: 'flex',
-  margin: '0 auto',
-  maxWidth: 460,
-  padding: SPACING * 2.5,
-});
