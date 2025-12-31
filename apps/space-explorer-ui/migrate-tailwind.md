@@ -1,4 +1,5 @@
 # Tailwind CSS Migration Plan
+
 ## Space Explorer UI: styled-components → Tailwind CSS
 
 **Migration Strategy:** 1-to-1 style preservation with zero visual changes
@@ -10,6 +11,7 @@
 **Last Updated:** After initial Tailwind v4 setup and global styles migration
 
 ### ✅ Completed
+
 - Tailwind CSS v4 installed (`tailwindcss@4.1.18`, `@tailwindcss/vite@4.1.18`)
 - Vite plugin configured
 - Global styles migrated to `src/theme/init.css`
@@ -18,9 +20,11 @@
 - Typography base styles (h1, h2, h3, h5)
 
 ### ⏳ In Progress
+
 - Adding custom color tokens using `@theme` directive
 
 ### 📋 TODO
+
 - Install `clsx` and `tailwind-merge`
 - Create `cn()` utility helper
 - Migrate 11 component files from styled-components to Tailwind
@@ -33,6 +37,7 @@
 ## 📊 Current State Analysis
 
 ### Files Using styled-components: 11
+
 1. `src/styles.ts` - Global styles + design tokens
 2. `src/components/Button.tsx`
 3. `src/components/Layout.tsx`
@@ -46,13 +51,16 @@
 11. `src/pages/Login.tsx`
 
 ### Dependencies to Remove
+
 - `styled-components@6.1.19`
 - `polished@4.3.1` (color utilities)
 - `@types/styled-components`
 
 ### Complexity Breakdown
+
 - **Simple (static styles):** 6 files - Direct conversion to className
-- **Moderate (dynamic props):** 4 files - Use `clsx`/`cn` helper for conditional classes
+- **Moderate (dynamic props):** 4 files - Use `clsx`/`cn` helper for conditional
+  classes
 - **Advanced (animations):** 1 file - Convert to Tailwind animations
 
 ---
@@ -60,6 +68,7 @@
 ## 🎨 Design Token Migration
 
 ### Current Design Tokens (`src/styles.ts`)
+
 ```typescript
 SPACING = 8px              → Tailwind: spacing.2 (8px)
 COLORS = {
@@ -74,16 +83,18 @@ COLORS = {
 ```
 
 ### Tailwind v4 CSS-First Config Strategy
-**Note:** Tailwind v4 uses CSS-first configuration via the `@theme` directive instead of `tailwind.config.js`.
+
+**Note:** Tailwind v4 uses CSS-first configuration via the `@theme` directive
+instead of `tailwind.config.js`.
 
 ```css
 /* Add to src/theme/init.css */
 @theme {
   /* Custom color tokens from src/styles.ts */
   --color-accent: #e535ab;
-  --color-accent-light: #e85ebf;   /* Pre-calculated lighten(0.1) for Button hover */
+  --color-accent-light: #e85ebf; /* Pre-calculated lighten(0.1) for Button hover */
   --color-accent-lighter: #ec87d3; /* Pre-calculated lighten(0.2) for Button active */
-  --color-accent-dark: #b72a89;    /* Pre-calculated darken(0.2) for Button disabled */
+  --color-accent-dark: #b72a89; /* Pre-calculated darken(0.2) for Button disabled */
   --color-background: #f7f8fa;
   --color-grey: #d8d9e0;
   --color-primary: #220a82;
@@ -96,6 +107,7 @@ COLORS = {
 ```
 
 **Usage in components:**
+
 ```tsx
 // Before: styled-components
 <Button className={cn("bg-accent hover:bg-accent-light")} />
@@ -111,7 +123,9 @@ COLORS = {
 ### Phase 1: Setup Tailwind CSS ✅ COMPLETED
 
 **Tasks:**
+
 1. ✅ **DONE** - Install Tailwind v4 dependencies
+
    ```bash
    # Already installed: tailwindcss@4.1.18, @tailwindcss/vite@4.1.18
    # Already installed: @fontsource-variable/geist@5.2.8
@@ -122,15 +136,18 @@ COLORS = {
    - Tailwind v4 uses CSS-first config (no tailwind.config.js needed)
 
 3. ✅ **DONE** - Create `src/theme/init.css` with Tailwind directives
+
    ```css
-   @import "tailwindcss";
-   @import "@fontsource-variable/geist";
+   @import 'tailwindcss';
+   @import '@fontsource-variable/geist';
 
    :root {
-     font-family: "Geist Variable", sans-serif;
+     font-family: 'Geist Variable', sans-serif;
    }
 
-   :root, body, #root {
+   :root,
+   body,
+   #root {
      min-height: 100vh;
    }
 
@@ -140,23 +157,41 @@ COLORS = {
    }
 
    @layer base {
-     h1, h2, h3, h4, h5, h6 {
+     h1,
+     h2,
+     h3,
+     h4,
+     h5,
+     h6 {
        margin: 0;
        font-weight: 600;
      }
-     h1 { font-size: 48px; line-height: 1; }
-     h2 { font-size: 40px; }
-     h3 { font-size: 36px; }
-     h5 { font-size: 16px; text-transform: uppercase; letter-spacing: 4px; }
+     h1 {
+       font-size: 48px;
+       line-height: 1;
+     }
+     h2 {
+       font-size: 40px;
+     }
+     h3 {
+       font-size: 36px;
+     }
+     h5 {
+       font-size: 16px;
+       text-transform: uppercase;
+       letter-spacing: 4px;
+     }
    }
    ```
 
 4. ✅ **DONE** - Import in `src/index.tsx`
+
    ```typescript
    import './theme/init.css'; // ✅ Already imported
    ```
 
 5. ⏳ **NEXT** - Add custom color tokens to CSS
+
    ```css
    /* Add to src/theme/init.css */
    @theme {
@@ -174,11 +209,13 @@ COLORS = {
    ```
 
 6. ⏳ **TODO** - Install `clsx` for conditional className logic
+
    ```bash
    pnpm add clsx tailwind-merge
    ```
 
 7. ⏳ **TODO** - Create utility helper `src/lib/utils.ts`
+
    ```typescript
    import clsx, { ClassValue } from 'clsx';
    import { twMerge } from 'tailwind-merge';
@@ -195,15 +232,18 @@ COLORS = {
 **File:** `src/styles.ts`
 
 **Actions:**
+
 1. ✅ **DONE** - Global styles migrated to `src/theme/init.css` @layer base
    - Font changed from Source Sans Pro to Geist Variable ✅
    - Root flexbox layout ✅
    - Typography hierarchy (h1-h6) ✅
-2. ⏳ **NEXT** - Migrate design tokens from `src/styles.ts` to CSS using `@theme` directive (Tailwind v4)
+2. ⏳ **NEXT** - Migrate design tokens from `src/styles.ts` to CSS using
+   `@theme` directive (Tailwind v4)
 3. ⏳ **TODO** - Delete `src/styles.ts` after all component migrations complete
 4. ✅ **N/A** - No `createGlobalStyle` to remove (already using CSS)
 
 **Validation:**
+
 - ✅ Typography hierarchy renders with Geist Variable font
 - ✅ Root flexbox layout maintains structure
 - ⏳ Need to test color tokens after adding `@theme` directive
@@ -215,7 +255,9 @@ COLORS = {
 **Priority Order:** Layout → Footer → LoginForm helpers
 
 #### 3.1 Layout.tsx (Simple - Object API)
+
 **Current:**
+
 ```typescript
 const Bar = styled('div')({
   backgroundColor: COLORS.primary,
@@ -234,6 +276,7 @@ const Container = styled('div')({
 ```
 
 **Migrated:**
+
 ```typescript
 // Delete styled imports
 export const Layout = ({ children }: LayoutProps) => {
@@ -249,6 +292,7 @@ export const Layout = ({ children }: LayoutProps) => {
 ```
 
 **Changes:**
+
 - Remove `styled` imports
 - Replace styled components with `className` props
 - `height: 12` → `h-3` (12px)
@@ -259,7 +303,9 @@ export const Layout = ({ children }: LayoutProps) => {
 ---
 
 #### 3.2 Footer.tsx (Simple - Object API)
+
 **Current:**
+
 ```typescript
 const Container = styled('footer')({
   backgroundColor: 'white',
@@ -283,6 +329,7 @@ const InnerContainer = styled('div')({
 ```
 
 **Migrated:**
+
 ```typescript
 export const Footer = () => {
   return (
@@ -296,15 +343,18 @@ export const Footer = () => {
 ```
 
 **Changes:**
+
 - `height: 130` → `h-[130px]`
-- `paddingBottom: SPACING * 2` → `pb-4` (16px = SPACING * 2)
-- `padding: 0 ${SPACING * 3}px` → `px-6` (24px = SPACING * 3)
+- `paddingBottom: SPACING * 2` → `pb-4` (16px = SPACING \* 2)
+- `padding: 0 ${SPACING * 3}px` → `px-6` (24px = SPACING \* 3)
 - Sticky positioning maintained
 
 ---
 
 #### 3.3 LoginForm Helpers (Simple - Object API)
+
 **Current:**
+
 ```typescript
 const StyledInput = styled('input')({
   ':focus': { borderColor: COLORS.primary },
@@ -313,13 +363,11 @@ const StyledInput = styled('input')({
   padding: `${SPACING * 1.25}px ${SPACING * 2.5}px`,
 });
 
-const Header = styled('header')(
-  { marginBottom: SPACING * 5 },
-  svgClassName
-);
+const Header = styled('header')({ marginBottom: SPACING * 5 }, svgClassName);
 ```
 
 **Migrated:**
+
 ```typescript
 // Input
 <input className="border border-grey px-5 py-2.5 outline-none focus:border-primary" />
@@ -329,6 +377,7 @@ const Header = styled('header')(
 ```
 
 **Changes:**
+
 - `padding: ${SPACING * 1.25}px ${SPACING * 2.5}px` → `px-5 py-2.5` (10px/20px)
 - `:focus` → `focus:border-primary`
 - `marginBottom: SPACING * 5` → `mb-10` (40px)
@@ -340,7 +389,9 @@ const Header = styled('header')(
 **Priority Order:** Button → LaunchTile → Header → MenuItem
 
 #### 4.1 Button.tsx (Moderate - Transient Props + Polished)
+
 **Current:**
+
 ```typescript
 const height = 56;
 const StyledButton = styled.button<ButtonProps>`
@@ -348,13 +399,20 @@ const StyledButton = styled.button<ButtonProps>`
   height: ${(props) => (props.$mini ? height / 1.3 : height)}px;
   border-radius: ${height / 2}px;
   background-color: ${COLORS.accent};
-  &:hover { background-color: ${lighten(0.1, COLORS.accent)}; }
-  &:active { background-color: ${lighten(0.2, COLORS.accent)}; }
-  &:disabled { background-color: ${darken(0.2, COLORS.accent)}; }
+  &:hover {
+    background-color: ${lighten(0.1, COLORS.accent)};
+  }
+  &:active {
+    background-color: ${lighten(0.2, COLORS.accent)};
+  }
+  &:disabled {
+    background-color: ${darken(0.2, COLORS.accent)};
+  }
 `;
 ```
 
 **Migrated:**
+
 ```typescript
 import { cn } from '@/lib/utils';
 
@@ -383,17 +441,19 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 ```
 
 **Tailwind v4 @theme Addition:**
+
 ```css
 /* src/theme/init.css - Add accent color variants */
 @theme {
   --color-accent: #e535ab;
-  --color-accent-light: #e85ebf;   /* lighten(0.1, #e535ab) */
+  --color-accent-light: #e85ebf; /* lighten(0.1, #e535ab) */
   --color-accent-lighter: #ec87d3; /* lighten(0.2, #e535ab) */
-  --color-accent-dark: #b72a89;    /* darken(0.2, #e535ab) */
+  --color-accent-dark: #b72a89; /* darken(0.2, #e535ab) */
 }
 ```
 
 **Changes:**
+
 - Remove `polished` dependency (color variants in config)
 - `$mini` prop → `mini` prop (no transient props needed)
 - Conditional classes via `cn()` helper
@@ -403,18 +463,23 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 ---
 
 #### 4.2 LaunchTile.tsx (Moderate - Transient Props + Background Image)
+
 **Current:**
+
 ```typescript
 const StyledLink = styled(Link)<StyledLinkProps>`
   background-image: ${(props) => props.$bgImage};
   background-position: center;
   background-size: cover;
   height: ${(props) => (props.$isDetailed ? 365 : 193)}px;
-  &:not(:last-child) { margin-bottom: ${SPACING * 3}px; }
+  &:not(:last-child) {
+    margin-bottom: ${SPACING * 3}px;
+  }
 `;
 ```
 
 **Migrated:**
+
 ```typescript
 export const LaunchTile = ({ launch, isDetailed }: LaunchTileProps) => {
   const bgImage = launch.mission.missionPatch
@@ -438,6 +503,7 @@ export const LaunchTile = ({ launch, isDetailed }: LaunchTileProps) => {
 ```
 
 **Changes:**
+
 - Background image via `style` prop (dynamic URL)
 - `$isDetailed` → `isDetailed` prop
 - `&:not(:last-child)` → `[&:not(:last-child)]:mb-6` (arbitrary variant)
@@ -446,7 +512,9 @@ export const LaunchTile = ({ launch, isDetailed }: LaunchTileProps) => {
 ---
 
 #### 4.3 Header.tsx (Moderate - Transient Props)
+
 **Current:**
+
 ```typescript
 const StyledImage = styled.img<{ $round: boolean }>`
   border-radius: ${(props) => (props.$round ? '50%' : '0%')};
@@ -456,6 +524,7 @@ const StyledImage = styled.img<{ $round: boolean }>`
 ```
 
 **Migrated:**
+
 ```typescript
 export const Header = ({ image, round = false }: HeaderProps) => {
   return (
@@ -476,6 +545,7 @@ interface HeaderProps {
 ```
 
 **Changes:**
+
 - `$round` → `round` prop
 - `border-radius: 50%` → `rounded-full`
 - `border-radius: 0%` → `rounded-none`
@@ -483,13 +553,19 @@ interface HeaderProps {
 ---
 
 #### 4.4 MenuItem.tsx (Moderate - CSS Fragments)
+
 **Current:**
+
 ```typescript
 export const menuItemClassName = css`
   position: relative;
   cursor: pointer;
   flex-grow: 1;
-  & svg { display: block; width: 60px; fill: ${COLORS.secondary}; }
+  & svg {
+    display: block;
+    width: 60px;
+    fill: ${COLORS.secondary};
+  }
   & .count {
     position: absolute;
     top: -10px;
@@ -500,11 +576,12 @@ export const menuItemClassName = css`
 
 export const MenuItem = styled(Link)(
   { textDecoration: 'none' },
-  menuItemClassName
+  menuItemClassName,
 );
 ```
 
 **Migrated:**
+
 ```typescript
 // Create className string (no css`` needed)
 export const menuItemClassName =
@@ -522,6 +599,7 @@ export const MenuItem = ({ to, children }: MenuItemProps) => {
 ```
 
 **Changes:**
+
 - Remove `css` template literal
 - Nested selectors: `& svg` → `[&_svg]:block` (arbitrary variant)
 - `top: -10px` → `-top-2.5` (closest: -10px ≈ -0.625rem)
@@ -532,25 +610,27 @@ export const MenuItem = ({ to, children }: MenuItemProps) => {
 ### Phase 5: Migrate Advanced Components (Animations)
 
 #### 5.1 Loading.tsx (Advanced - Keyframe Animation)
+
 **Current:**
+
 ```typescript
 import { size } from 'polished';
 
 const spin = css`
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 `;
 
-export const Loading = styled(LogoSvg)(
-  size(64),
-  {
-    display: 'block',
-    fill: COLORS.grey,
-    path: { animation: `${spin} 1s linear infinite` },
-  }
-);
+export const Loading = styled(LogoSvg)(size(64), {
+  display: 'block',
+  fill: COLORS.grey,
+  path: { animation: `${spin} 1s linear infinite` },
+});
 ```
 
 **Migrated:**
+
 ```typescript
 export const Loading = () => {
   return (
@@ -559,10 +639,11 @@ export const Loading = () => {
 };
 ```
 
-**Note on Animation:**
-Tailwind v4 includes `animate-spin` by default, so no additional configuration needed! 🎉
+**Note on Animation:** Tailwind v4 includes `animate-spin` by default, so no
+additional configuration needed! 🎉
 
 **Changes:**
+
 - Remove `polished` size utility
 - `size(64)` → `h-16 w-16` (64px)
 - Animation: `animate-spin` (Tailwind built-in)
@@ -573,7 +654,9 @@ Tailwind v4 includes `animate-spin` by default, so no additional configuration n
 ### Phase 6: Migrate Remaining Pages
 
 #### 6.1 Cart.tsx (Simple - Sticky Positioning)
+
 **Current:**
+
 ```typescript
 const BookTrips = styled('div')({
   bottom: SPACING * 2.5,
@@ -582,16 +665,19 @@ const BookTrips = styled('div')({
 ```
 
 **Migrated:**
+
 ```typescript
 <div className="sticky bottom-5">{/* Book trips button */}</div>
 ```
 
 **Changes:**
+
 - `bottom: SPACING * 2.5` → `bottom-5` (20px)
 
 ---
 
 #### 6.2 Login.tsx (Already covered in 3.3)
+
 See Phase 3.3 for LoginForm component migrations.
 
 ---
@@ -599,7 +685,9 @@ See Phase 3.3 for LoginForm component migrations.
 ### Phase 7: Cleanup & Verification
 
 **Tasks:**
+
 1. ❌ Remove styled-components dependencies
+
    ```bash
    pnpm remove styled-components @types/styled-components polished
    ```
@@ -614,6 +702,7 @@ See Phase 3.3 for LoginForm component migrations.
    - Search: `from 'polished'` (Grep tool)
 
 5. ✅ Verify no runtime errors
+
    ```bash
    pnpm typecheck
    pnpm dev
@@ -635,6 +724,7 @@ See Phase 3.3 for LoginForm component migrations.
 ## 📋 Migration Checklist
 
 ### Setup
+
 - [x] Install Tailwind CSS v4 dependencies
 - [x] Configure Vite plugin with `@tailwindcss/vite`
 - [x] Create `src/theme/init.css` with base styles
@@ -644,6 +734,7 @@ See Phase 3.3 for LoginForm component migrations.
 - [ ] Create `cn()` utility helper in `src/lib/utils.ts`
 
 ### Global Styles
+
 - [x] Migrate base styles to `@layer base` in `src/theme/init.css`
 - [x] Change font from Source Sans Pro to Geist Variable
 - [x] Set up root flexbox layout
@@ -653,6 +744,7 @@ See Phase 3.3 for LoginForm component migrations.
 - [ ] Add missing typography styles (h4, h6) if needed
 
 ### Simple Components (6 files)
+
 - [ ] Layout.tsx
 - [ ] Footer/Footer.tsx
 - [ ] Footer/LogoutButton.tsx (reuse MenuItem pattern)
@@ -660,15 +752,18 @@ See Phase 3.3 for LoginForm component migrations.
 - [ ] Cart.tsx (sticky positioning)
 
 ### Dynamic Components (4 files)
+
 - [ ] Button.tsx (props-based sizing + hover states)
 - [ ] LaunchTile.tsx (props-based height + background image)
 - [ ] Header/Header.tsx (conditional border-radius)
 - [ ] MenuItem.tsx (CSS fragments + nested selectors)
 
 ### Advanced Components (1 file)
+
 - [ ] Loading.tsx (keyframe animation)
 
 ### Cleanup
+
 - [ ] Remove styled-components package
 - [ ] Remove polished package
 - [ ] Delete src/styles.ts
@@ -677,6 +772,7 @@ See Phase 3.3 for LoginForm component migrations.
 - [ ] Visual regression testing
 
 ### Documentation
+
 - [ ] Update CLAUDE.md tech stack section
 - [ ] Update component patterns documentation
 - [ ] Add Tailwind config documentation
@@ -686,17 +782,20 @@ See Phase 3.3 for LoginForm component migrations.
 ## 🎯 Expected Outcomes
 
 ### Bundle Size Reduction
+
 - **Before:** ~150KB (styled-components + polished runtime)
 - **After:** ~10KB (Tailwind CSS purged)
 - **Savings:** ~140KB (-93%)
 
 ### Developer Experience
+
 - ✅ Autocomplete for Tailwind classes
 - ✅ Faster HMR (no runtime CSS generation)
 - ✅ Easier responsive design with built-in breakpoints
 - ✅ Better integration with design systems
 
 ### Maintenance
+
 - ✅ Simpler component files (no styled wrappers)
 - ✅ Consistent utility-first approach
 - ✅ Easier refactoring (search/replace className)
@@ -707,30 +806,40 @@ See Phase 3.3 for LoginForm component migrations.
 ## ⚠️ Potential Challenges
 
 ### 1. Dynamic Background Images
+
 **Solution:** Use inline `style` prop for dynamic URLs
+
 ```typescript
 <div style={{ backgroundImage: `url(${imageUrl})` }} className="bg-cover" />
 ```
 
 ### 2. Color Calculations (lighten/darken)
-**Solution:** Pre-calculate variants in CSS using `@theme` directive (Tailwind v4)
+
+**Solution:** Pre-calculate variants in CSS using `@theme` directive (Tailwind
+v4)
+
 ```css
 @theme {
   --color-accent: #e535ab;
-  --color-accent-light: #e85ebf;   /* Pre-calculated lighten(0.1) */
-  --color-accent-dark: #b72a89;    /* Pre-calculated darken(0.2) */
+  --color-accent-light: #e85ebf; /* Pre-calculated lighten(0.1) */
+  --color-accent-dark: #b72a89; /* Pre-calculated darken(0.2) */
 }
 ```
 
 ### 3. Nested CSS Selectors
+
 **Solution:** Use arbitrary variants `[&_selector]:`
+
 ```typescript
 // Before: & svg { fill: blue; }
 // After: [&_svg]:fill-blue
 ```
 
 ### 4. Complex Animations
-**Solution:** Use built-in Tailwind animations or extend via `@theme` (Tailwind v4)
+
+**Solution:** Use built-in Tailwind animations or extend via `@theme` (Tailwind
+v4)
+
 ```css
 /* For custom animations, add to src/theme/init.css */
 @theme {
@@ -738,9 +847,12 @@ See Phase 3.3 for LoginForm component migrations.
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 ```
+
 **Note:** For this project, `animate-spin` is already built-in! ✅
 
 ---
@@ -772,23 +884,29 @@ See Phase 3.3 for LoginForm component migrations.
 ---
 
 **Migration Time Estimate:** 2-3 hours for thorough implementation + testing
-**Risk Level:** Low (straightforward utility class conversion)
-**Visual Changes:** None (1-to-1 migration)
+**Risk Level:** Low (straightforward utility class conversion) **Visual
+Changes:** None (1-to-1 migration)
 
 ---
 
 ## 🚨 Vercel Deployment Fix: SPA Routing 404 Issue
 
 ### Problem
-When deployed to Vercel, refreshing the page on `/launches` route returns a 404 error. This works fine locally but fails in production because Vercel tries to serve a static `/launches/index.html` file that doesn't exist.
 
-**Root Cause:** This is a Single Page Application (SPA) with client-side routing (React Router). Vercel needs to be configured to rewrite all routes to `index.html` so the client-side router can handle them.
+When deployed to Vercel, refreshing the page on `/launches` route returns a 404
+error. This works fine locally but fails in production because Vercel tries to
+serve a static `/launches/index.html` file that doesn't exist.
+
+**Root Cause:** This is a Single Page Application (SPA) with client-side routing
+(React Router). Vercel needs to be configured to rewrite all routes to
+`index.html` so the client-side router can handle them.
 
 ---
 
 ### Solution: Create `vercel.json`
 
-Create a `vercel.json` file in the root of the project with the following configuration:
+Create a `vercel.json` file in the root of the project with the following
+configuration:
 
 ```json
 {
@@ -802,6 +920,7 @@ Create a `vercel.json` file in the root of the project with the following config
 ```
 
 **What this does:**
+
 - Catches ALL routes (`(.*)` regex matches everything)
 - Rewrites them to serve `/index.html`
 - React Router takes over and handles the routing client-side
@@ -811,9 +930,11 @@ Create a `vercel.json` file in the root of the project with the following config
 
 ### Alternative: Vite Build Configuration
 
-If you prefer not to use `vercel.json`, you can configure Vite's build output to include a custom 404.html:
+If you prefer not to use `vercel.json`, you can configure Vite's build output to
+include a custom 404.html:
 
 **Option 1: Add to `public/` directory**
+
 ```bash
 # Create public directory if it doesn't exist
 mkdir -p public
@@ -823,6 +944,7 @@ cp dist/index.html public/404.html
 ```
 
 **Option 2: Post-build script in `package.json`**
+
 ```json
 {
   "scripts": {
@@ -842,6 +964,7 @@ cp dist/index.html public/404.html
 3. Commit and redeploy
 
 **Why this is better:**
+
 - ✅ Explicit and self-documenting
 - ✅ Works for all routes automatically
 - ✅ No build script modifications needed
@@ -864,6 +987,7 @@ After adding `vercel.json` and redeploying:
 ### Additional Routes to Test
 
 Make sure to test all client-side routes after deploying:
+
 - `/` (homepage)
 - `/launches` (launches list)
 - `/launch/:id` (individual launch detail)
@@ -871,6 +995,7 @@ Make sure to test all client-side routes after deploying:
 - `/login` (login page)
 
 All should work when:
+
 - Navigating via links
 - Refreshing the page
 - Direct URL access
@@ -881,6 +1006,7 @@ All should work when:
 ## 📝 Updated Implementation Checklist
 
 ### Deployment Fix (HIGH PRIORITY)
+
 - [x] Create `vercel.json` with rewrites configuration ✅
 - [ ] Test locally with `pnpm build && pnpm preview`
 - [ ] Commit and push to trigger Vercel deployment
@@ -888,6 +1014,7 @@ All should work when:
 - [ ] Verify refresh works on `/launches` route
 
 ### Tailwind Migration (Original Plan)
+
 - [x] Install Tailwind CSS v4 dependencies
 - [x] Configure Vite plugin
 - [x] Create `src/theme/init.css` with base styles

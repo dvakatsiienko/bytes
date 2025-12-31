@@ -28,10 +28,10 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "dependencies": {
-    "@ai-sdk/groq": "3.0.1",
-    "@ai-sdk/react": "3.0.3",
-    "ai": "6.0.3",
-    "zod": "4.2.1"
+    "@ai-sdk/groq": "3.0.2",
+    "@ai-sdk/react": "3.0.5",
+    "ai": "6.0.5",
+    "zod": "4.3.2"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.10",
@@ -43,7 +43,7 @@
     "rimraf": "6.1.2",
     "turbo": "2.7.2",
     "typescript": "5.9.3",
-    "ultracite": "6.5.0"
+    "ultracite": "6.5.1"
   },
   "engines": {
     "node": "24.12.0"
