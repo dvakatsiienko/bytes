@@ -36,7 +36,9 @@ export const LoginForm = (props: LoginFormProps) => {
         <ErrorMessage>
           {form.formState.errors.email?.message ?? <>&nbsp;</>}
         </ErrorMessage>
-        <Button type='submit'>Log in</Button>
+        <Button className='mx-auto' type='submit'>
+          Log in
+        </Button>
       </StyledForm>
     </Container>
   );

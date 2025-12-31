@@ -65,7 +65,11 @@ export const LaunchTile = (props: LaunchTileProps) => {
         ) : null}
       </div>
 
-      <Button $mini disabled={isDisabled} onClick={submit}>
+      <Button
+        className='mt-2 ml-auto'
+        disabled={isDisabled}
+        mini
+        onClick={submit}>
         {!props.trip && isBooked ? '✓ Trip Booked' : null}
         {props.trip && isBooked ? 'Cancel trip' : null}
         {!isBooked && isInCart ? 'Remove from Cart' : null}
