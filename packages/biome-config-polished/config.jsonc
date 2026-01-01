@@ -221,9 +221,9 @@
       }
     }
   },
-  // OVERRIDES
-
   // LINTER
+
+  // OVERRIDES
   "overrides": [
     // do not sort special files — they are better to organize manually
     {

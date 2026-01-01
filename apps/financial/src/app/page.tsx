@@ -31,6 +31,7 @@ const RootPage = () => {
             alt='Screenshots of the dashboard project showing desktop version'
             className='hidden md:block'
             height={760}
+            loading='eager'
             src='/hero-desktop.png'
             width={1000}
           />
