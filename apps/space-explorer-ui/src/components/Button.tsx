@@ -29,14 +29,8 @@ const buttonCn = cva({
 interface ButtonProps extends React.PropsWithChildren, ButtonCnProps {
   disabled?: boolean;
   className?: string;
-  type?: React.DetailedHTMLProps<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  >['type'];
-  onClick?: React.DetailedHTMLProps<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  >['onClick'];
+  type?: React.ComponentPropsWithoutRef<'button'>['type'];
+  onClick?: React.ComponentPropsWithoutRef<'button'>['onClick'];
 }
 
 type ButtonCnProps = VariantProps<typeof buttonCn>;

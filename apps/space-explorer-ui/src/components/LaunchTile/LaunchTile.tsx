@@ -1,6 +1,6 @@
+import { type VariantProps, cva } from 'cva';
 import { useReactiveVar } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { cartItemsVar } from '@/lib/apollo';
 
@@ -9,7 +9,6 @@ import galaxyJpg from './img/galaxy.jpg';
 import issJpg from './img/iss.jpg';
 import moonJpg from './img/moon.jpg';
 import * as gql from '@/graphql';
-import { SPACING } from '@/styles';
 
 export const LaunchTile = (props: LaunchTileProps) => {
   const { id, site, rocket, mission, isBooked, flightNumber } = props.launch;
@@ -44,9 +43,12 @@ export const LaunchTile = (props: LaunchTileProps) => {
   const isDisabled = cancelTripMeta.loading || (!props.trip && isBooked);
 
   return (
-    <StyledLink
-      $bgImage={getBgImage(flightNumber)}
-      $isDetailed={props.isDetailed}
+    <Link
+      className={launchTileCn({
+        className: props.className,
+        isDetailed: props.isDetailed,
+      })}
+      style={{ backgroundImage: getBgImage(flightNumber) }}
       to={`/launches/${id}`}>
       <div>
         <h3>Mission: {mission.name}</h3>
@@ -76,49 +78,35 @@ export const LaunchTile = (props: LaunchTileProps) => {
 
         {isBooked || isInCart ? null : 'Add to Cart'}
       </Button>
-    </StyledLink>
+    </Link>
   );
 };
 
 /* Styles */
-const padding = SPACING * 2;
-
-interface StyledLinkProps {
-  $isDetailed?: boolean;
-  $bgImage: string;
-}
-const StyledLink = styled(Link)<StyledLinkProps>`
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: ${(props) => (props.$isDetailed ? 365 : 193)}px;
-    margin-top: ${padding}px;
-    margin-bottom: ${padding}px;
-    padding: ${SPACING * 4}px ${SPACING * 5}px ${SPACING * 2}px;
-    text-decoration: none;
-    border-radius: 7px;
-    color: white;
-    background-image: ${(props) => props.$bgImage};
-    background-size: cover;
-    background-position: center;
-
-    &:not(:last-child) {
-        margin-bottom: ${padding * 2}px;
-    }
-`;
+const launchTileCn = cva({
+  base: 'my-4 not-last:mb-8 flex h-48 flex-col justify-between rounded-md bg-center bg-cover px-10 pt-8 pb-4 text-white',
+  variants: {
+    isDetailed: {
+      true: 'h-92',
+    },
+  },
+});
 
 /* Helpers */
 const backgrounds = [galaxyJpg, issJpg, moonJpg];
 
-export function getBgImage(flightNumber: number) {
+function getBgImage(flightNumber: number) {
   const bg = flightNumber % backgrounds.length;
 
   return `url(${backgrounds[bg]})`;
 }
 
 /* Types */
-interface LaunchTileProps {
+interface LaunchTileProps extends React.PropsWithChildren, LaunchTileCnProps {
   launch: gql.LaunchFragment;
+  className?: string;
   isDetailed?: boolean;
   trip?: gql.Trip;
 }
+
+type LaunchTileCnProps = VariantProps<typeof launchTileCn>;

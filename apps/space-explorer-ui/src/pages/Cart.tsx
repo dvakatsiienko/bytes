@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 import { cartItemsVar } from '@/lib/apollo';
 
 import { Button, CartItem, Header, Loading } from '@/components';
@@ -44,30 +42,17 @@ export const Cart = () => {
       {message ? <h4>{message}</h4> : null}
 
       {Boolean(cartItems.length) && (
-        <BookAllButtonContainer>
+        <section className='sticky top-2.5 z-1000 overflow-hidden'>
           <Button
+            className='mx-auto'
             onClick={() =>
               bookTripsMutation({ variables: { launchIds: cartItems } })
             }>
             Book All
           </Button>
-        </BookAllButtonContainer>
+        </section>
       )}
-
       {listJSX}
     </>
   );
 };
-
-/* Styles */
-const BookAllButtonContainer = styled.div`
-  /* background-color: red; */
-  position: sticky;
-  top: 10px;
-  z-index: 1000;
-  overflow: hidden;
-
-  button {
-    /* margin-bottom: 32px; */
-  }
-`;

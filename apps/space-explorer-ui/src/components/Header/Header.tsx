@@ -1,9 +1,8 @@
-import styled from 'styled-components';
+import { cx } from 'cva';
 
 import dog1Png from './img/dog-1.png';
 import dog2Png from './img/dog-2.png';
 import dog3Png from './img/dog-3.png';
-import { COLORS, SPACING } from '@/styles';
 
 export const Header = (props: HeaderProps) => {
   const { image, title } = props;
@@ -11,36 +10,22 @@ export const Header = (props: HeaderProps) => {
   const avatar = image || pickAvatarByEmail('test@email.com');
 
   return (
-    <Container>
-      <Image $round={!image} alt='Space dog' src={avatar} />
+    <section className='mb-9 flex items-center'>
+      {/** biome-ignore lint/performance/noImgElement: todo — make nextjs biome rules specific to each next app instaed of applying globally */}
+      <img
+        alt='Space dog'
+        className={cx('mr-5 size-33', { 'rounded-full': !image })}
+        height={135}
+        src={avatar}
+        width={135}
+      />
       <div>
         <h2>{title}</h2>
-        <Subheading>{email}</Subheading>
+        <h5 className='mt-1 text-text-secondary'>{email}</h5>
       </div>
-    </Container>
+    </section>
   );
 };
-
-/* Styles */
-const Container = styled('div')({
-  alignItems: 'center',
-  // position:     'sticky',
-  // top:          0,
-  display: 'flex',
-  marginBottom: SPACING * 4.5,
-});
-
-const Image = styled.img<{ $round: boolean }>`
-    width: 135px;
-    height: 135px;
-    margin-right: ${SPACING * 2.5}px;
-    border-radius: ${(props) => (props.$round ? '50%' : '0%')};
-`;
-
-const Subheading = styled('h5')({
-  color: COLORS.textSecondary,
-  marginTop: SPACING / 2,
-});
 
 /* Helpers */
 const max = 25; // 25 letters in the alphabet

@@ -10,7 +10,7 @@ export const Layout = () => {
     <>
       <div className='h-3 bg-primary' />
 
-      <section className='mx-auto flex w-full max-w-[600px] flex-col p-6 pb-10'>
+      <section className='mx-auto flex w-full max-w-[600px] grow flex-col p-6 pb-10'>
         <Outlet />
       </section>
 

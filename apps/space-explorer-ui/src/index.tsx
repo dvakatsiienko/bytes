@@ -5,7 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 
 import { client } from './lib/apollo';
 import { Pages } from './pages';
-import './theme/init.css';
+import './theme.css';
 
 const rootEl = document.getElementById('root') as HTMLElement;
 

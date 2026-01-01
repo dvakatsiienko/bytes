@@ -6,5 +6,4 @@ export { LaunchTile } from './LaunchTile';
 export { Layout } from './Layout';
 export { Loading } from './Loading';
 export { LoginForm } from './LoginForm';
-export { MenuItem } from './MenuItem';
 export * from './SVG';

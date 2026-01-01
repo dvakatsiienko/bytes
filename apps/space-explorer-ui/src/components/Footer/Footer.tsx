@@ -1,4 +1,5 @@
-import { MenuItem } from '../MenuItem';
+import { Link } from 'react-router-dom';
+
 import { LogoutButton } from './LogoutButton';
 import { CartSvg, HomeSvg, ProfileSvg } from './SVG';
 import * as gql from '@/graphql';
@@ -13,32 +14,36 @@ export const Footer = () => {
   return (
     <footer className='sticky bottom-0 bg-white text-text-secondary'>
       <section className='mx-auto flex w-full max-w-115 items-center p-5'>
-        <MenuItem to='/launches'>
-          <HomeSvg />
+        <Link className={menuItemCn} to='/launches'>
+          <HomeSvg className={svgCn} />
           Home
-        </MenuItem>
+        </Link>
 
-        <MenuItem to='/cart'>
-          <CartSvg />
+        <Link className={menuItemCn} to='/cart'>
+          <CartSvg className={svgCn} />
           {Boolean(cartItemsCount) && (
             <span className={tooltipCoutCn}>{cartItemsCount}</span>
           )}
           Cart
-        </MenuItem>
+        </Link>
 
-        <MenuItem to='/profile'>
-          <ProfileSvg />
+        <Link className={menuItemCn} to='/profile'>
+          <ProfileSvg className={svgCn} />
           {Boolean(userTripsCount) && (
             <span className={tooltipCoutCn}>{userTripsCount}</span>
           )}
           Profile
-        </MenuItem>
+        </Link>
 
-        <LogoutButton />
+        <LogoutButton className={menuItemCn} classNameSvg={svgCn} />
       </section>
     </footer>
   );
 };
 
 /* Styles */
-const tooltipCoutCn = 'count grid place-content-center text-sm';
+const menuItemCn =
+  'relative cursor-pointer flex-grow text-20 tracking-1.5 uppercase text-center';
+const svgCn = 'block size-15 mx-auto mb-2 fill-secondary';
+const tooltipCoutCn =
+  'absolute -top-2.5 right-5 grid place-content-center size-6.25 rounded-full bg-accent text-white text-sm';
