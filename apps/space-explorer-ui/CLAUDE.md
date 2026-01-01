@@ -30,7 +30,7 @@ This is a Vite-powered React application that serves as a GraphQL client for the
 - **Build Tool**: Vite with React SWC plugin for fast HMR
 - **UI Framework**: React 19 with React Router v7
 - **GraphQL Client**: Apollo Client with custom link chain
-- **Styling**: Styled Components v6
+- **Styling**: Tailwind CSS v4 with CVA (Class Variance Authority)
 - **Forms**: React Hook Form with Zod validation
 - **TypeScript**: Strict mode with path aliases
 
@@ -85,7 +85,7 @@ src/
 ├── pages/              # Route components
 ├── components/         # Reusable UI components
 │   └── SVG/           # SVG components organized by feature
-└── styles.ts          # Global styles with styled-components
+└── theme.css          # Tailwind theme with custom design tokens
 ```
 
 ## TypeScript Configuration
@@ -100,8 +100,32 @@ All strict TypeScript checks are enabled. Ensure new code maintains type safety.
 
 ## Component Patterns
 
-### Styled Components
-Global styles are defined in `src/styles.ts` using createGlobalStyle. Component-specific styles use styled-components directly.
+### Styling Approach
+Components use Tailwind CSS v4 utility classes for styling. The theme is configured in `src/theme.css` using the `@theme` directive for custom design tokens (colors, spacing).
+
+**Complex Components with Variants:**
+Use CVA (Class Variance Authority) for type-safe variant composition:
+```typescript
+import { cva } from 'cva';
+
+const buttonCn = cva({
+  base: 'rounded-full px-8 font-bold uppercase transition-colors',
+  variants: {
+    mini: {
+      true: 'h-9 min-w-44 text-sm',
+      false: 'h-14 min-w-52 text-base'
+    }
+  }
+});
+```
+
+**Simple Components:**
+Use direct className strings for straightforward styling. Use `cx()` from CVA for conditional classes when needed.
+
+**Custom Theme Tokens:**
+- Color palette: accent, primary, secondary, background, text, grey
+- All colors defined in `src/theme.css` using CSS variables
+- Access via Tailwind utilities: `bg-accent`, `text-primary`, etc.
 
 ### SVG Organization
 SVGs are React components organized by feature area (e.g., `components/Footer/SVG/`, `components/LoginForm/SVG/`)

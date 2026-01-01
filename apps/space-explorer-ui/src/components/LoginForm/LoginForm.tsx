@@ -1,13 +1,10 @@
-import { size } from 'polished';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import spaceJpg from './img/space.jpg';
 import { resolver } from './resolver';
 import { CurveSvg, RocketSvg } from './SVG';
 import { Button, LogoSvg } from '@/components';
 import type * as gql from '@/graphql';
-import { COLORS, SPACING } from '@/styles';
 
 export const LoginForm = (props: LoginFormProps) => {
   const form = useForm({
@@ -23,99 +20,35 @@ export const LoginForm = (props: LoginFormProps) => {
   });
 
   return (
-    <Container>
-      <Header>
-        <StyledCurve />
-        <StyledLogo />
-      </Header>
+    <section
+      className='flex grow flex-col items-center bg-center bg-cover bg-no-repeat pb-12 text-white'
+      style={{ backgroundImage: `url(${spaceJpg})` }}>
+      <header className='relative mb-10 w-full p-5'>
+        <LogoSvg className='relative z-2 mx-auto mb-2 size-14 fill-current' />
+        <CurveSvg className='absolute top-0 left-0 size-full fill-primary' />
+      </header>
 
-      <StyledRocket />
-      <Heading>Space Explorer</Heading>
-      <StyledForm onSubmit={onSubmit}>
-        <StyledInput placeholder='Email' {...form.register('email')} />
-        <ErrorMessage>
+      <RocketSvg className='size-60 fill-current' />
+      <h1 className='mt-6 mb-12'>Space Explorer</h1>
+
+      <form
+        className='w-full max-w-100 rounded-sm bg-white p-7 text-text'
+        onSubmit={onSubmit}>
+        <input
+          className='w-full rounded-md border border-gray px-5 py-2.5 outline-none focus:border-primary'
+          placeholder='Email'
+          {...form.register('email')}
+        />
+        <span className='mb-4 inline-block font-bold text-red-500'>
           {form.formState.errors.email?.message ?? <>&nbsp;</>}
-        </ErrorMessage>
+        </span>
         <Button className='mx-auto' type='submit'>
           Log in
         </Button>
-      </StyledForm>
-    </Container>
+      </form>
+    </section>
   );
 };
-
-/* Styles */
-const Container = styled('div')({
-  alignItems: 'center',
-  backgroundColor: COLORS.primary,
-  backgroundImage: `url(${spaceJpg})`,
-  backgroundPosition: 'center',
-  backgroundSize: 'cover',
-  color: 'white',
-  display: 'flex',
-  flexDirection: 'column',
-  flexGrow: 1,
-  paddingBottom: SPACING * 6,
-});
-
-const svgClassName = css({
-  display: 'block',
-  fill: 'currentColor',
-});
-
-const Header = styled('header')(
-  {
-    marginBottom: SPACING * 5,
-    padding: SPACING * 2.5,
-    position: 'relative',
-    width: '100%',
-  },
-  svgClassName,
-);
-
-const StyledLogo = styled(LogoSvg)(size(56), {
-  display: 'block',
-  margin: '0 auto',
-  position: 'relative',
-});
-
-const StyledCurve = styled(CurveSvg)(size('100%'), {
-  fill: COLORS.primary,
-  left: 0,
-  position: 'absolute',
-  top: 0,
-});
-
-const Heading = styled('h1')({ margin: `${SPACING * 3}px 0 ${SPACING * 6}px` });
-
-const StyledRocket = styled(RocketSvg)({ width: 250 }, svgClassName);
-
-const StyledForm = styled('form')({
-  backgroundColor: 'white',
-  borderRadius: 3,
-  boxShadow: '6px 6px 1px rgba(0, 0, 0, 0.25)',
-  color: COLORS.text,
-  maxWidth: 406,
-  padding: SPACING * 3.5,
-  width: '100%',
-});
-
-const StyledInput = styled('input')({
-  ':focus': { borderColor: COLORS.primary },
-  border: `1px solid ${COLORS.grey}`,
-  fontSize: 16,
-  marginBottom: SPACING,
-  outline: 'none',
-  padding: `${SPACING * 1.25}px ${SPACING * 2.5}px`,
-  width: '100%',
-});
-
-const ErrorMessage = styled.span`
-  display: inline-block;
-  font-weight: 600;
-  color: red;
-  margin-bottom: ${SPACING * 2}px;
-`;
 
 /* Types */
 interface LoginFormProps {

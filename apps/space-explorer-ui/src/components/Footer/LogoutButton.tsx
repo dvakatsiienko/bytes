@@ -1,15 +1,13 @@
 import { useApolloClient } from '@apollo/client/react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { isLoggedInVar } from '@/lib/apollo';
 
-import { menuItemClassName } from '../MenuItem';
 import { LogoutSvg } from './SVG';
 import * as gql from '@/graphql';
 import { clearLocalStorageAuthItems } from '@/utils';
 
-export const LogoutButton = () => {
+export const LogoutButton = (props: LogoutButtonProps) => {
   const client = useApolloClient();
   const navigate = useNavigate();
 
@@ -27,19 +25,15 @@ export const LogoutButton = () => {
   };
 
   return (
-    <StyledButton onClick={logout}>
-      <LogoutSvg />
+    <button className={props.className} onClick={logout} type='button'>
+      <LogoutSvg className={props.classNameSvg} />
       Logout
-    </StyledButton>
+    </button>
   );
 };
 
-/* Styles */
-const StyledButton = styled('button')(
-  {
-    background: 'none',
-    border: 'none',
-    padding: 0,
-  },
-  menuItemClassName,
-);
+/* Types */
+interface LogoutButtonProps {
+  className?: string;
+  classNameSvg?: string;
+}
