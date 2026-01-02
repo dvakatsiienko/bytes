@@ -43,7 +43,7 @@
     "rimraf": "6.1.2",
     "turbo": "2.7.2",
     "typescript": "5.9.3",
-    "ultracite": "7.0.3"
+    "ultracite": "7.0.5"
   },
   "engines": {
     "node": "24.12.0"
