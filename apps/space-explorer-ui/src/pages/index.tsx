@@ -16,6 +16,16 @@ import { Layout } from '@/components';
 import * as gql from '@/graphql';
 import { clearLocalStorageAuthItems } from '@/utils';
 
+const ProtectedRoute = (props: ProtectedRouteProps) => {
+  const { data } = gql.useIsUserLoggedInQuery();
+
+  if (!data?.isLoggedIn) {
+    return <Navigate replace to='/login' />;
+  }
+
+  return props.children;
+};
+
 export const Pages = () => {
   const { data } = gql.useIsUserLoggedInQuery();
   const navigate = useNavigate();
@@ -31,10 +41,38 @@ export const Pages = () => {
   return (
     <Routes>
       <Route element={<Layout />} path='/'>
-        <Route element={<Launches />} path='launches' />
-        <Route element={<Launch />} path='launches/:launchId' />
-        <Route element={<Cart />} path='cart' />
-        <Route element={<Profile />} path='profile' />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Launches />
+            </ProtectedRoute>
+          }
+          path='launches'
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Launch />
+            </ProtectedRoute>
+          }
+          path='launches/:launchId'
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+          path='cart'
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+          path='profile'
+        />
 
         <Route
           element={<Navigate to={data?.isLoggedIn ? '/launches' : '/login'} />}
@@ -46,3 +84,8 @@ export const Pages = () => {
     </Routes>
   );
 };
+
+/* Types */
+interface ProtectedRouteProps {
+  children: React.ReactElement;
+}
