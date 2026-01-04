@@ -1,1 +1,0 @@
-/Users/dima/.claude/commands/commit.md
