@@ -28,9 +28,9 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "dependencies": {
-    "@ai-sdk/groq": "3.0.3",
-    "@ai-sdk/react": "3.0.11",
-    "ai": "6.0.11",
+    "@ai-sdk/groq": "3.0.4",
+    "@ai-sdk/react": "3.0.21",
+    "ai": "6.0.21",
     "zod": "4.3.5"
   },
   "devDependencies": {
@@ -44,7 +44,7 @@
     "turbo": "2.7.3",
     "turbo-ignore": "2.7.3",
     "typescript": "5.9.3",
-    "ultracite": "7.0.8"
+    "ultracite": "7.0.10"
   },
   "engines": {
     "node": "24.12.0"
