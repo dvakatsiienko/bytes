@@ -7,19 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@ai-sdk/groq':
-        specifier: 3.0.4
-        version: 3.0.4(zod@4.3.5)
-      '@ai-sdk/react':
-        specifier: 3.0.29
-        version: 3.0.29(react@19.2.3)(zod@4.3.5)
-      ai:
-        specifier: 6.0.27
-        version: 6.0.27(zod@4.3.5)
-      zod:
-        specifier: 4.3.5
-        version: 4.3.5
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.11
@@ -5024,6 +5011,7 @@ packages:
     resolution: {integrity: sha512-Quz3MvAwHxVYNXsOByL7xI5EB2WYOeFswqaHIA3qOK3isRWTxiplBEocmmru6XmxDB2L7jDNYtYA4FyimoAFEw==}
     engines: {node: '>=8.17.0'}
     hasBin: true
+    bundledDependencies: []
 
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
