@@ -15,7 +15,7 @@
     "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\""
   },
   "dependencies": {
-    "@apollo/client": "4.0.12",
+    "@apollo/client": "4.0.13",
     "@fontsource-variable/geist": "5.2.8",
     "@hookform/resolvers": "5.2.2",
     "@tailwindcss/vite": "4.1.18",
@@ -24,7 +24,7 @@
     "graphql": "16.12.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-hook-form": "7.71.0",
+    "react-hook-form": "7.71.1",
     "react-router-dom": "7.12.0",
     "tailwind-merge": "3.4.0",
     "tailwindcss": "4.1.18",
@@ -37,7 +37,7 @@
     "@graphql-codegen/typescript-operations": "5.0.7",
     "@graphql-codegen/typescript-react-apollo": "4.4.0",
     "@types/debug": "4.1.12",
-    "@types/node": "25.0.7",
+    "@types/node": "25.0.8",
     "@types/react": "19.2.8",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react-swc": "4.2.2",
