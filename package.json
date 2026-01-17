@@ -35,8 +35,8 @@
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.7.2",
     "rimraf": "6.1.2",
-    "turbo": "2.7.4",
-    "turbo-ignore": "2.7.4",
+    "turbo": "2.7.5",
+    "turbo-ignore": "2.7.5",
     "typescript": "5.9.3",
     "ultracite": "7.0.11"
   },
