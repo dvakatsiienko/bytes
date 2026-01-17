@@ -15,6 +15,6 @@
     "./roboto-flex-vrr-font": "./src/RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf"
   },
   "dependencies": {
-    "next": "16.1.2"
+    "next": "16.1.3"
   }
 }
