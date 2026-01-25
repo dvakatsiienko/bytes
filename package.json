@@ -28,15 +28,15 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.11",
+    "@biomejs/biome": "2.3.12",
     "biome-config-polished": "workspace:*",
     "lefthook": "2.0.15",
     "prettier": "3.8.1",
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.7.2",
     "rimraf": "6.1.2",
-    "turbo": "2.7.5",
-    "turbo-ignore": "2.7.5",
+    "turbo": "2.7.6",
+    "turbo-ignore": "2.7.6",
     "typescript": "5.9.3",
     "ultracite": "7.0.12"
   },
