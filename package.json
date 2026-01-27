@@ -28,9 +28,9 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.12",
+    "@biomejs/biome": "2.3.13",
     "biome-config-polished": "workspace:*",
-    "lefthook": "2.0.15",
+    "lefthook": "2.0.16",
     "prettier": "3.8.1",
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.7.2",
@@ -38,7 +38,7 @@
     "turbo": "2.7.6",
     "turbo-ignore": "2.7.6",
     "typescript": "5.9.3",
-    "ultracite": "7.0.12"
+    "ultracite": "7.1.1"
   },
   "engines": {
     "node": "24.12.0"
