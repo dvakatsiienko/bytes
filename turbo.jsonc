@@ -32,6 +32,7 @@
     "lint": {},
     "typecheck": {
       "dependsOn": ["^typecheck"],
+      "description": "Checks TypeScript code for errors",
       "inputs": [
         "$TURBO_DEFAULT$",
         "package.json",
