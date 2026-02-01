@@ -19,8 +19,8 @@
     "knip": "knip"
   },
   "dependencies": {
-    "@ai-sdk/groq": "3.0.19",
-    "@ai-sdk/react": "3.0.64",
+    "@ai-sdk/groq": "3.0.21",
+    "@ai-sdk/react": "3.0.69",
     "@clerk/nextjs": "6.37.1",
     "@clerk/themes": "2.4.51",
     "@openrouter/ai-sdk-provider": "2.1.1",
@@ -39,7 +39,7 @@
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/react-query": "5.90.20",
     "@use-it/event-listener": "0.1.7",
-    "ai": "6.0.62",
+    "ai": "6.0.67",
     "convex": "1.31.7",
     "cva": "1.0.0-beta.3",
     "dotenv": "17.2.3",
@@ -49,7 +49,7 @@
     "motion": "12.29.2",
     "next": "16.1.6",
     "next-themes": "0.4.6",
-    "pg": "8.17.2",
+    "pg": "8.18.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-markdown": "10.1.0",
