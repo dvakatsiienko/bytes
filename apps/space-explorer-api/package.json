@@ -20,14 +20,14 @@
     "@prisma/adapter-better-sqlite3": "7.3.0",
     "@prisma/client": "7.3.0",
     "chalk": "5.6.2",
-    "dotenv": "17.2.3",
+    "dotenv": "17.2.4",
     "graphql": "16.12.0",
     "zod": "4.3.6"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "6.1.1",
     "@graphql-codegen/typescript": "5.0.7",
-    "@types/node": "25.2.0",
+    "@types/node": "25.2.1",
     "prisma": "7.3.0",
     "tsx": "4.21.0"
   }
