@@ -19,8 +19,8 @@
     "knip": "knip"
   },
   "dependencies": {
-    "@ai-sdk/groq": "3.0.21",
-    "@ai-sdk/react": "3.0.75",
+    "@ai-sdk/groq": "3.0.22",
+    "@ai-sdk/react": "3.0.79",
     "@clerk/nextjs": "6.37.3",
     "@clerk/themes": "2.4.51",
     "@openrouter/ai-sdk-provider": "2.1.1",
@@ -39,7 +39,7 @@
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/react-query": "5.90.20",
     "@use-it/event-listener": "0.1.7",
-    "ai": "6.0.73",
+    "ai": "6.0.77",
     "convex": "1.31.7",
     "cva": "1.0.0-beta.3",
     "dotenv": "17.2.4",
@@ -72,7 +72,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "baseline-browser-mapping": "2.9.19",
     "jotai-devtools": "0.13.0",
-    "knip": "5.83.0",
+    "knip": "5.83.1",
     "prisma": "7.3.0",
     "tailwindcss": "4.1.18",
     "tsx": "4.21.0"
