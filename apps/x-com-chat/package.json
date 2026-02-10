@@ -23,7 +23,7 @@
     "@ai-sdk/react": "3.0.80",
     "@clerk/nextjs": "6.37.3",
     "@clerk/themes": "2.4.51",
-    "@openrouter/ai-sdk-provider": "2.1.1",
+    "@openrouter/ai-sdk-provider": "2.2.1",
     "@prisma/adapter-pg": "7.3.0",
     "@prisma/client": "7.3.0",
     "@radix-ui/react-dialog": "1.1.15",
