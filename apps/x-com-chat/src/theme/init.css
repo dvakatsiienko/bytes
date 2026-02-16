@@ -119,11 +119,11 @@
   }
 
   .gradient-outline-container {
-    @apply relative overflow-hidden bg-gradient-to-b from-slate-700 to-slate-800;
+    @apply relative overflow-hidden bg-linear-to-b from-slate-700 to-slate-800;
   }
 
   /* Gradient */
-  .gradient-outline-container::before {
+  .gradient-outline-container:before {
     background: conic-gradient(
       rgba(244, 114, 182, 0.4) 0deg,
       rgba(192, 132, 252, 0.4) 0deg,
@@ -138,7 +138,7 @@
 
   .gradient-outline-content {
     /* stretch content absolutely to cover the most of conic gradient but keep offest (by inset) that reveal animated part of conic gradient */
-    @apply absolute inset-[1px] h-[calc(100%-2px)] w-[calc(100%-2px)] bg-gradient-to-b from-slate-800 to-slate-900;
+    @apply absolute inset-[1px] h-[calc(100%-2px)] w-[calc(100%-2px)] bg-linear-to-b from-slate-800 to-slate-900;
   }
   /* gradient outline */
 
