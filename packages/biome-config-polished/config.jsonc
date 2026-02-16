@@ -140,6 +140,7 @@
 
       /* rules that detect code that is guaranteed to be incorrect or useless. */
       "correctness": {
+        "noUnknownPseudoElement": "off", // it does not recoginze ::selection as a pseudo element
         "noUnusedVariables": {
           "level": "warn",
           "fix": "none" // do not let biome fix unused variables by prefixing with _ — review and handle these manually
@@ -167,7 +168,6 @@
 
       /* rules under development */
       "nursery": {
-        "useConsistentArrowReturn": "off", // ultracite rule — no need for arrow functions shorthand.
         "noLeakedRender": "off", // ultracite rule — && operator is useful
         "noUndeclaredEnvVars": "error"
       },
@@ -193,6 +193,7 @@
         "useBlockStatements": "off", // ultracite rule — sometimes if-one-liners are pretty.
         "noMagicNumbers": "off", // ultracite rule — sometimes magic numbers are useful.
         "useConsistentTypeDefinitions": "off", // ultracite rule — type and interface are useful in different situations.
+        "useConsistentArrowReturn": "off", // ultracite rule — no need for arrow functions shorthand.
 
         /* React */
         "useComponentExportOnlyModules": "off", // TODO thus rule is probably useful — review it and enable
