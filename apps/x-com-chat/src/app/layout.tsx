@@ -4,7 +4,6 @@ import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
-import { Monitoring } from 'react-scan/monitoring/next';
 
 import { AppSidebar } from '@/components/AppSidebar';
 import { Header } from '@/components/Header';
@@ -63,12 +62,6 @@ export default async function RootLayout(props: LayoutProps<'/'>) {
                     </Header>
 
                     <ReactScan />
-                    <Monitoring
-                      apiKey='tQpGsVtVhEjqxiH9U4P_TwEV0OrH3kRb'
-                      branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
-                      commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
-                      url='https://monitoring.react-scan.com/api/v1/ingest'
-                    />
 
                     {props.children}
                   </section>
