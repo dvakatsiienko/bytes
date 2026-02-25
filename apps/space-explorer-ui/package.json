@@ -15,19 +15,19 @@
     "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\""
   },
   "dependencies": {
-    "@apollo/client": "4.1.5",
+    "@apollo/client": "4.1.6",
     "@fontsource-variable/geist": "5.2.8",
     "@hookform/resolvers": "5.2.2",
-    "@tailwindcss/vite": "4.2.0",
+    "@tailwindcss/vite": "4.2.1",
     "cva": "1.0.0-beta.3",
     "debug": "4.4.3",
-    "graphql": "16.12.0",
+    "graphql": "16.13.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "7.71.2",
-    "react-router-dom": "7.13.0",
+    "react-router-dom": "7.13.1",
     "tailwind-merge": "3.5.0",
-    "tailwindcss": "4.2.0",
+    "tailwindcss": "4.2.1",
     "zod": "4.3.6"
   },
   "devDependencies": {
