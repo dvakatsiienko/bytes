@@ -28,7 +28,7 @@
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.4",
+    "@biomejs/biome": "2.4.5",
     "biome-config-polished": "workspace:*",
     "lefthook": "2.1.2",
     "prettier": "3.8.1",
