@@ -215,7 +215,7 @@
 
         /* React */
         "useBiomeIgnoreFolder": "error",
-        "noArrayIndexKey": "error",
+        "noArrayIndexKey": "info",
         "noDuplicateJsxProps": "error",
         "noSuspiciousSemicolonInJsx": "error",
         "noCommentText": "error"

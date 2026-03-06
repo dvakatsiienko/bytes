@@ -15,19 +15,19 @@
   "dependencies": {
     "@apollo/datasource-rest": "6.4.1",
     "@apollo/server": "5.4.0",
-    "@graphql-tools/graphql-file-loader": "8.1.9",
+    "@graphql-tools/graphql-file-loader": "8.1.11",
     "@graphql-tools/load": "8.1.8",
     "@prisma/adapter-better-sqlite3": "7.4.2",
     "@prisma/client": "7.4.2",
     "chalk": "5.6.2",
     "dotenv": "17.3.1",
-    "graphql": "16.13.0",
+    "graphql": "16.13.1",
     "zod": "4.3.6"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "6.1.2",
     "@graphql-codegen/typescript": "5.0.8",
-    "@types/node": "25.3.3",
+    "@types/node": "25.3.5",
     "prisma": "7.4.2",
     "tsx": "4.21.0"
   }
