@@ -42,6 +42,6 @@ function pickAvatarByEmail(email: string) {
 
 /* Types */
 interface HeaderProps {
-  title: string;
   image?: string;
+  title: string;
 }
