@@ -147,6 +147,9 @@
         },
         "noUndeclaredDependencies": "error",
 
+        "useImportExtensions": "off",
+        "noUnresolvedImports": "off",
+
         /* React */
         "noRenderReturnValue": "error",
         "useHookAtTopLevel": "error",
