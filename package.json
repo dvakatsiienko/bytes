@@ -38,7 +38,7 @@
     "turbo": "2.8.17",
     "turbo-ignore": "2.8.17",
     "typescript": "5.9.3",
-    "ultracite": "7.3.1"
+    "ultracite": "7.3.2"
   },
   "engines": {
     "node": "24.12.0"
