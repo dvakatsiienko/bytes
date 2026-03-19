@@ -42,3 +42,6 @@ pscale.txt
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Claude Code worktrees (embedded git repos)
+.claude/worktrees/
