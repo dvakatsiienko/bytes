@@ -3,14 +3,12 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import Script from 'next/script';
 
 import { AppSidebar } from '@/components/AppSidebar';
 import { Header } from '@/components/Header';
 import { ConvexClientProvider } from '@/components/service/ConvexClientProvider';
 import { JotaiDevtools } from '@/components/service/JotaiDevtools';
 import { ReactQueryProvider } from '@/components/service/ReactQueryProvider';
-import { ReactScan } from '@/components/service/ReactScan';
 import { ThemeProvider } from '@/components/service/ThemeProvider';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
@@ -35,12 +33,6 @@ export default async function RootLayout(props: LayoutProps<'/'>) {
             )}
             lang='en' // ? next-themes injects «style» prop on the client
             suppressHydrationWarning>
-            <head>
-              <Script
-                src='https://unpkg.com/react-scan/dist/install-hook.global.js'
-                strategy='beforeInteractive'
-              />
-            </head>
             {/* TODO migrate theme bg-gradient-layout */}
             <body className='overscroll-none antialiased'>
               <ThemeProvider>
@@ -60,8 +52,6 @@ export default async function RootLayout(props: LayoutProps<'/'>) {
                         )}
                       />
                     </Header>
-
-                    <ReactScan />
 
                     {props.children}
                   </section>

@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # CLAUDE.md - x-com-chat App Knowledge Base
 
 AI-powered chat application with customizable alien friends and real-time
