@@ -5,6 +5,8 @@ export const ADDRESS_TELEGRAM_PERSONAL = 'https://t.me/shining1488';
 export const ADDRESS_LINKEDIN_PERSONAL =
   'https://www.linkedin.com/in/dmytro-vakatsiienko-a20271100';
 export const ADDRESS_GITHUB_PERSONAL = 'https://github.com/dvakatsiienko';
+export const ADDRESS_CV_FULL =
+  'https://drive.google.com/open?id=1hlhqwEpXVNv_0f8y2R93nGn6bVNE1hmv&usp=drive_fs';
 
 /* turbo stars */
 export const LINK_TURBO_STARS = 'https://turbostars.io/';

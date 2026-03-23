@@ -61,6 +61,10 @@ export default function CVPage() {
           <BriefEntry
             content={
               <>
+                <ExternalLink href={links.ADDRESS_CV_FULL}>
+                  full cv
+                </ExternalLink>
+                ,{' '}
                 <ExternalLink href={links.ADDRESS_GITHUB_PERSONAL}>
                   github
                 </ExternalLink>
