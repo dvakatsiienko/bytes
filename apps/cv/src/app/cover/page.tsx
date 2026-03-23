@@ -6,6 +6,7 @@ import { ExternalLink } from '@/elements/ExternalLink';
 
 import { EMAIL_TO } from '@/frags';
 import {
+  ADDRESS_CV_FULL,
   ADDRESS_GITHUB_PERSONAL,
   ADDRESS_LINKEDIN_PERSONAL,
   ADDRESS_TELEGRAM_PERSONAL,
@@ -49,10 +50,12 @@ export default function CoverPage() {
       </blockquote>
 
       <p>
-        💬 Reach me out via{' '}
-        <ExternalLink href={ADDRESS_TELEGRAM_PERSONAL}>Telegram</ExternalLink>,{' '}
-        <ExternalLink href={EMAIL_TO}>Email</ExternalLink> or{' '}
-        <ExternalLink href={ADDRESS_LINKEDIN_PERSONAL}>LinkedIn</ExternalLink>.
+        💬 Reach me out via <ExternalLink href={EMAIL_TO}>Email</ExternalLink>,{' '}
+        <ExternalLink href={ADDRESS_LINKEDIN_PERSONAL}>LinkedIn</ExternalLink>{' '}
+        or{' '}
+        <ExternalLink href={ADDRESS_TELEGRAM_PERSONAL}>Telegram</ExternalLink>.
+        <br />🔖 Check out my{' '}
+        <ExternalLink href={ADDRESS_CV_FULL}>full CV</ExternalLink>.
       </p>
     </main>
   );
