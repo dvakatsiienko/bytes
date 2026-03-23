@@ -1,11 +1,8 @@
 /** biome-ignore-all lint/correctness/noUnusedImports: wip */
 'use client';
 
-import { Fragment } from 'react';
 import { cx } from 'cva';
 import { Button } from '@ui/kit/components/button';
-// import { Masonry } from 'masonic';
-// import { EasyMasonryComponent } from './EasyMasonryComponent';
 import { ExternalLinkSvg } from '@ui/kit/icons/ExternalLinkSvg';
 import Image from 'next/image';
 
@@ -27,10 +24,9 @@ import {
   toolListState,
   toolListStyles,
 } from './parts/toolConfig';
-import logoJpeg from '/public/logo.jpeg';
 import meJpeg from '/public/my-photo.jpeg';
 import { ExternalLink } from '@/elements';
-import { EMAIL_TO, __DEV__ } from '@/frags';
+import { EMAIL_TO } from '@/frags';
 import * as links from '@/links';
 
 export default function CVPage() {
@@ -177,305 +173,224 @@ export default function CVPage() {
           toolList={toolListLLM}
         />
       </article>
-      {__DEV__ && (
-        <>
-          {/* TODO extract and reuse article grid cn */}
-          <article className='grid grid-cols-2 place-items-start gap-x-2 gap-y-2'>
-            <SectionHeading
-              accentColor='emerald'
-              className='col-span-full'
-              text='projects'
-            />
+      <article className='grid gap-y-2'>
+        <SectionHeading
+          accentColor='emerald'
+          className='col-span-full'
+          text='portfolio'
+        />
 
-            {/* turbo stars */}
-            {/* Jan 2025 - Present */}
-            <Project
-              achievementList={[
-                'Upgraded the legacy Frontend build pipeline to a modern standards',
-                'Integrated Rust Frontend toolchain',
-                'Incorporated a project upscale plan',
+        <Project
+          dates='Jan 2025 – Oct 2025'
+          description={
+            <p>
+              Migrated a 5-year-old{' '}
+              <ExternalLink href={links.LINK_TURBO_STARS_SPORTSBOOK}>
+                Sportsbook
+              </ExternalLink>{' '}
+              codebase in severe tech debt state into a modern stack. JavaScript
+              → <b>TypeScript</b>, Webpack → <b>Vite</b>, Preact → <b>React</b>.
+              Reduced the project size and complexity from ~140k to ~100k LOC,
+              replaced SCSS with <b>Tailwind</b>. Coordinated a frontend team of
+              3 engineers and improved the team's DX by integrating{' '}
+              <b>CodeRabbitAI</b> into self-hosted GitLab.
+            </p>
+          }
+          employer={
+            <ExternalLink href={links.LINK_TURBO_STARS}>
+              Turbo Stars
+            </ExternalLink>
+          }
+          projectRole='Senior/Lead Frontend Engineer'
+        />
 
-                <Fragment key='code-rabbit-ai'>
-                  Streamlined code review company-wide by utilizing{' '}
-                  <ExternalLink href='http://coderabbit.ai/'>
-                    CodeRabbitAI
-                  </ExternalLink>
-                </Fragment>,
-                'Coordinated and mentored Frontend team',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_TURBO_STARS}>
-                  Turbo Stars
+        <p className='text-muted-foreground text-xs italic'>
+          Oct 2023 – Jan 2025 — health recovery, volunteering with Ukrainian
+          armed forces.
+        </p>
+
+        <Project
+          dates='Jun 2022 – Oct 2023'
+          description={
+            <>
+              <p>
+                <b>Keystone</b> (NDA) — drove the technical upgrade of a
+                Norway-based oil & gas platform out of a legacy PHP stack:
+                introduced <b>TypeScript</b>, built a shared component library
+                with <b>Storybook</b>, <b>Vite</b> and <b>React</b>, launched
+                cross-team knowledge-sharing sessions, and implemented the first{' '}
+                <b>Next.js</b> sub-project as a proof of concept for entire
+                platform migration.
+              </p>
+              <p>
+                <ExternalLink href={links.LINK_ANADAEA_ROCKY}>
+                  Rocky
+                </ExternalLink>{' '}
+                — led frontend team for a UGC advertising marketplace. Replaced
+                a broken styled-components + MUI setup with <b>Tailwind</b> +{' '}
+                <b>Radix/Headless UI</b>, resolved systematic <b>Next.js</b>{' '}
+                anti-patterns, and delivered the majority of the production
+                codebase. Trained team with architectural best practices.
+              </p>
+            </>
+          }
+          employer={
+            <ExternalLink href={links.LINK_ANADAEA}>Anadea</ExternalLink>
+          }
+          projectRole='Senior/Lead Frontend Engineer'
+        />
+
+        <Project
+          dates='2021 – 2022'
+          description={
+            <p>
+              Built the MVP of Corva's new{' '}
+              <ExternalLink href={links.LINK_CORVA_GEOSCIENCE}>
+                Geoscience
+              </ExternalLink>{' '}
+              branch — a geosteering visualization app embedded via iframe into
+              the main platform. Joined to resolve a heavy tech debt from a
+              previous contractor. Replaced JavaScript with <b>TypeScript</b>,
+              eliminated memory leaks degrading live chart performance,
+              improving rendering by 20%. Reduced architectural complexity and
+              streamlined delivery pace to align with MVP roadmap.
+            </p>
+          }
+          employer={
+            <ExternalLink href={links.LINK_CORVA}>Corva.ai</ExternalLink>
+          }
+          projectRole='Senior Frontend Engineer'
+        />
+
+        <Project
+          dates='Dec 2020 – May 2021'
+          description={
+            <p>
+              Led the content platform v2 frontend migration out of a legacy PHP
+              stack — 67 satellite landing pages funneling into a central
+              application, plus an admin panel. Designed the new architecture:{' '}
+              <b>Gatsby</b> for static landings, <b>Next.js</b> for the main app
+              and admin, <b>Strapi CMS</b> for content.
+            </p>
+          }
+          employer={
+            <ExternalLink href={links.LINK_BOOSTA}>Boosta</ExternalLink>
+          }
+          projectRole='Senior Frontend Engineer'
+        />
+
+        <Project
+          dates='Dec 2019 – Nov 2020'
+          description={
+            <p>
+              Designed and implemented the{' '}
+              <ExternalLink href={links.LINK_TEMY_CCT}>
+                Community Capital Technologies Marketplace
+              </ExternalLink>{' '}
+              (fintech) v2 from scratch with <b>Next.js</b>, <b>Redux</b>, and{' '}
+              <b>styled-components</b>, working directly with the client's CTO
+              and a UX designer. After four months, interviewed and onboarded a
+              frontend developer and two QA engineers joining under my
+              coordination, growing the team to 5.
+            </p>
+          }
+          employer={<ExternalLink href={links.LINK_TEMY}>Temy</ExternalLink>}
+          projectRole='Senior Frontend Engineer'
+        />
+
+        <Project
+          dates='Nov 2019 – Apr 2020'
+          description={
+            <p>
+              Alongside main roles, I took on consulting and tutoring
+              engagements: frontend course delivery at{' '}
+              <ExternalLink href={links.LINK_DAN_IT}>DAN.IT</ExternalLink>,
+              platform migration coordination for{' '}
+              <ExternalLink href={links.LINK_BUKI}>Buki</ExternalLink> (PHP to{' '}
+              <b>Next.js</b>), and a standalone <b>Next.js</b> course
+              development at{' '}
+              <ExternalLink href={links.LINK_LECTRUM}>Lectrum</ExternalLink>.
+            </p>
+          }
+          employer={
+            <>
+              <ExternalLink href={links.LINK_BUKI}>Buki</ExternalLink>,{' '}
+              <ExternalLink href={links.LINK_DAN_IT}>DAN.IT</ExternalLink>,{' '}
+              <ExternalLink href={links.LINK_QA_STARTUP}>
+                QA Startup
+              </ExternalLink>
+              , <ExternalLink href={links.LINK_LECTRUM}>Lectrum</ExternalLink>
+            </>
+          }
+          projectRole='Frontend Team Lead, tutor'
+        />
+
+        <Project
+          dates='Nov 2016 – Aug 2019'
+          description={
+            <>
+              <p>
+                Built an ed-tech startup from the ground up as part of a
+                four-person team. Designed and produced the entire frontend
+                curriculum — JavaScript, React, Redux, Webpack — and delivered
+                it live to student cohorts of 15–20 through online sessions and
+                weekend intensives. On the engineering side, built the company's
+                web presence with <b>Next.js</b> and LMS platform.
+              </p>
+              <p>
+                Created courses:{' '}
+                <ExternalLink href={links.LINK_LECTRUM_COURSE_NEXT_JS}>
+                  Next.js
                 </ExternalLink>
-              }
-              projectName={
-                <ExternalLink href={links.LINK_TURBO_STARS_SPORTSBOOK}>
-                  Sportsbook
-                </ExternalLink>
-              }
-              projectRole='Lead Frontend Engineer'
-            />
+                , React, JavaScript, Webpack, Redux, Redux Saga, Immutable.js.
+              </p>
+            </>
+          }
+          employer={
+            <ExternalLink href={links.LINK_LECTRUM}>Lectrum</ExternalLink>
+          }
+          projectRole='Frontend Engineer, tutor'
+        />
 
-            {/* Anadea */}
-            {/* Jun 2022 - Oct 2023 */}
-            <Project
-              achievementList={[
-                // 'Rocky',
-                'Developed a social media platform from scratch',
-                'Coordinated Frontend team dev flow',
-                'Mentored Frontend team',
-                'Refined product features with client',
+        <Project
+          dates='Dec 2016 – May 2017'
+          description={
+            <p>
+              Built <b>DBGlass</b> — an open-source Postgres database GUI with{' '}
+              <b>React</b>, <b>Redux</b>, and <b>Electron</b>. Transitioned to
+              supporting internal tools, then delivered a first production
+              client project — an e-commerce platform for a US-based client.
+            </p>
+          }
+          employer={
+            <ExternalLink href={links.LINK_WEB_PAL}>Web-pal</ExternalLink>
+          }
+          projectRole='Frontend Engineer'
+        />
 
-                // 'Keystone',
-                'Migrated a drilling platform from PHP to Next.js',
-                'Created a component library using Vite and Storybook',
-                'Implemented a cross-team Frontend training program',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_ANADAEA}>Anadea</ExternalLink>
-              }
-              projectName={
-                <>
-                  <ExternalLink href={links.LINK_ANADAEA_ROCKY}>
-                    Rocky
-                  </ExternalLink>
-                  , Keystone (NDA)
-                </>
-              }
-              projectRole='Lead Frontend Engineer'
-            />
-
-            {/* Corva */}
-            {/* 2020 - 2021 */}
-            {/* Sep 2020 - Feb 2021 */}
-            <Project
-              achievementList={[
-                'Re-architected project Frontend',
-                'Migrated codebase to TypeScript',
-                'Improved performance stats by 40%',
-                'Integrated rust-based tooling',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_CORVA}>Corva.ai</ExternalLink>
-              }
-              projectName={
-                <ExternalLink href={links.LINK_CORVA_GEODRILLING}>
-                  Geoscience Drilling
-                </ExternalLink>
-              }
-              projectRole='Senior Frontend Engineer'
-            />
-
-            {/* Boosta */}
-            {/* Feb 2021 - May 2021 */}
-            <Project
-              achievementList={[
-                'Prototyped Frontend v2 architecture',
-                'Implemented Frontend using Gatsby.js and Strapi CMS',
-                'Coordinated legacy PHP backend migration',
-                'Colocated frontend codebase into a monorepo',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_BOOSTA}>Boosta</ExternalLink>
-              }
-              projectName='Essay'
-              projectRole='Senior Frontend Engineer'
-            />
-
-            {/* Temy */}
-            {/* Dec 2019 − Nov 2020 */}
-            <Project
-              achievementList={[
-                'Prototyped and developed Frontend v2 architecture rebranding',
-                'Improved a product business model by polishing features with CTO',
-                'Guided and mentored team’s development process',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_TEMY}>Temy</ExternalLink>
-              }
-              projectName={
-                <ExternalLink href={links.LINK_TEMY_CCT}>
-                  CCT Marketplace
-                </ExternalLink>
-              }
-              projectRole='Senior Frontend Engineer'
-            />
-
-            {/* Buki */}
-            {/* Nov 2019 − Apr 2020, part time */}
-            <Project
-              achievementList={[
-                'Coordinated Frontend team dev flow',
-                'Tutored and mentored team',
-                //
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_BUKI}>Buki</ExternalLink>
-              }
-              projectName={
-                <ExternalLink href={links.LINK_BUKI_MARKETPLACE}>
-                  Tutor marketplace
-                </ExternalLink>
-              }
-              projectRole='Frontend Team Lead, Tutor'
-            />
-
-            {/* Lectrum */}
-            {/* Nov 2016 − Aug 2019 */}
-            <Project
-              achievementList={[
-                'Developed LMS platform',
-                'Managed team development process',
-                'Created and maintained a Frontend branch educational program',
-                'Tutored and mentored students',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              courses={
-                <>
-                  <ExternalLink href={links.LINK_LECTRUM_COURSE_NEXT_JS}>
-                    Next.js
-                  </ExternalLink>
-                  , React, JavaScript
-                </>
-              }
-              employer={
-                <ExternalLink href={links.LINK_LECTRUM}>
-                  Lectrum.io
-                </ExternalLink>
-              }
-              projectName='LMS platform'
-              projectRole='Frontend Engineer, Tutor'
-            />
-
-            {/* WebPal */}
-            {/* Dec 2016 − May 2017 */}
-            <Project
-              achievementList={[
-                'Developed internal company product with React, Redux and Electron',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_WEB_PAL}>WebPal</ExternalLink>
-              }
-              projectName='NDA'
-              projectRole='Junior Frontend Engineer'
-            />
-
-            {/* Ubisoft Lead */}
-            {/* Jul 2016 − Dec 2016 */}
-            <Project
-              achievementList={[
-                'Coordinated QC team workflow',
-                'Organised milestone validation',
-                'Created guidelines and test cases',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_UBISOFT}>Ubisoft</ExternalLink>
-              }
-              projectName={
-                <ExternalLink href={links.LINK_UBISOFT_CONNECT}>
-                  Ubisoft Connect
-                </ExternalLink>
-              }
-              projectRole='Associate Lead QC'
-            />
-
-            {/* Ubisoft Dev Tester */}
-            {/* Nov 2015 − Jul 2016 */}
-            <Project
-              achievementList={[
-                'Conducted a video game console-to-PC port QA verification',
-                'Created weekly QA report graphs',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              employer={
-                <ExternalLink href={links.LINK_UBISOFT}>Ubisoft</ExternalLink>
-              }
-              projectName={
-                <ExternalLink href={links.LINK_WATCH_DOGS_2}>
-                  Watch Dogs 2
-                </ExternalLink>
-              }
-              projectRole='Junior Dev Tester'
-            />
-          </article>
-
-          <article className='grid grid-cols-2 place-items-start gap-x-2 gap-y-1'>
-            <SectionHeading
-              accentColor='orange'
-              className='col-span-full'
-              text='tutoring'
-            />
-
-            {/* Lectrum */}
-            {/* Nov 2020 − May 2021, part time */}
-            <Project
-              achievementList={[
-                'Created Next.js and React course',
-                'Tutored students with React, Next.js and JavaScript',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              courses={
-                <>
-                  <ExternalLink href={links.LINK_LECTRUM_COURSE_NEXT_JS}>
-                    Next.js
-                  </ExternalLink>
-                  , React
-                </>
-              }
-              employer={
-                <ExternalLink href={links.LINK_LECTRUM}>
-                  Lectrum.io
-                </ExternalLink>
-              }
-              projectRole='Course developer, Tutor'
-            />
-
-            {/* DAN.IT */}
-            {/* Oct 2019 − Jan 2020, part time */}
-            <Project
-              achievementList={[
-                'Developed courses program',
-                'Tutored and mentored students',
-              ]}
-              comapnyLogoUrl={logoJpeg}
-              courses={
-                <>
-                  <ExternalLink href={links.LINK_DAN_IT_FRONTEND_COURSE}>
-                    Frontend
-                  </ExternalLink>
-                  , React
-                </>
-              }
-              employer={
-                <ExternalLink href={links.LINK_DAN_IT}>DAN.IT</ExternalLink>
-              }
-              projectRole='Tutor'
-            />
-
-            {/* QA Startup */}
-            {/* Dec 2019, part time */}
-            <Project
-              achievementList={['Tutored and mentored students']}
-              comapnyLogoUrl={logoJpeg}
-              courses='Web Services'
-              employer={
-                <ExternalLink href={links.LINK_QA_STARTUP}>
-                  QA Startup
-                </ExternalLink>
-              }
-              projectRole='Tutor'
-            />
-          </article>
-        </>
-      )}
+        <Project
+          dates='Nov 2015 – Dec 2016'
+          description={
+            <p>
+              Started as a dev tester on the{' '}
+              <ExternalLink href={links.LINK_WATCH_DOGS_2}>
+                Watch Dogs 2
+              </ExternalLink>{' '}
+              PC port, creating performance testing workflows with data
+              visualization dashboards. Promoted to lead a new 11-person QA team
+              on{' '}
+              <ExternalLink href={links.LINK_UBISOFT_CONNECT}>
+                Uplay
+              </ExternalLink>
+              , designing the entire testing process from scratch.
+            </p>
+          }
+          employer={
+            <ExternalLink href={links.LINK_UBISOFT}>Ubisoft</ExternalLink>
+          }
+          projectRole='Junior Dev Tester, Associate Lead QA'
+        />
+      </article>
     </main>
   );
 }

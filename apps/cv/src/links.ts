@@ -19,10 +19,6 @@ export const LINK_ANADAEA_ROCKY = 'https://wearerocky.com/';
 /* corva */
 export const LINK_CORVA = 'https://www.corva.ai/';
 export const LINK_CORVA_GEOSCIENCE = 'https://www.corva.ai/energy/geoscience';
-export const LINK_CORVA_GEODRILLING =
-  'https://www.corva.ai/energy/geoscience/geodrilling';
-export const LINK_CORVA_GEOCOMPLETIONS =
-  'https://www.corva.ai/energy/geoscience/geocompletions';
 
 /* boosta */
 export const LINK_BOOSTA = 'https://boosta.biz/';
@@ -34,12 +30,9 @@ export const LINK_TEMY_CCT =
 
 /* buki */
 export const LINK_BUKI = 'https://buki.com.ua/en/';
-export const LINK_BUKI_MARKETPLACE = 'https://buki.com.ua/tutors/';
 
 /* dan.it */
 export const LINK_DAN_IT = 'https://dan-it.com.ua/uk/';
-export const LINK_DAN_IT_FRONTEND_COURSE =
-  'https://dan-it.com.ua/uk/program/front-end/';
 
 /* QA Startup */
 export const LINK_QA_STARTUP = 'https://qastartup.net/';

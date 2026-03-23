@@ -122,12 +122,12 @@ export const toolListAnimations = [
 
 export const toolListAi = [
   {
-    icon: svg.PerplexityAiSVG,
-    name: 'Perplexity',
+    icon: svg.ClaudeAiSVG,
+    name: 'Claude',
   },
   {
-    icon: svg.CursorLightSVG,
-    name: 'Cursor',
+    icon: svg.PerplexityAiSVG,
+    name: 'Perplexity',
   },
   {
     icon: svg.CodeRabbitSVG,
@@ -156,16 +156,16 @@ export const toolListBundlers = [
 
 export const toolListLLM = [
   {
+    icon: svg.AnthropicSVG,
+    name: 'Anthropic',
+  },
+  {
     icon: svg.VercelSVG,
     name: 'Vercel AI',
   },
   {
     icon: svg.OpenAiSVG,
     name: 'OpenAI',
-  },
-  {
-    icon: svg.AnthropicSVG,
-    name: 'Anthropic',
   },
   {
     icon: svg.GroqAiSVG,
