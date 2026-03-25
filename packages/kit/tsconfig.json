@@ -4,9 +4,8 @@
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "noEmit": true,
-    "module": "ESNext",
+    "module": "esnext",
     "moduleResolution": "bundler",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@ui/kit/*": ["./src/*"]
