@@ -70,8 +70,8 @@
     "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "baseline-browser-mapping": "2.10.11",
-    "jotai-devtools": "0.13.0",
-    "knip": "6.0.6",
+    "jotai-devtools": "0.13.1",
+    "knip": "6.1.0",
     "prisma": "7.6.0",
     "tailwindcss": "4.2.2",
     "tsx": "4.21.0"
