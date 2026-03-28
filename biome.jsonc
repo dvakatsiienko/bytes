@@ -9,7 +9,12 @@
   ],
   "files": {
     "ignoreUnknown": false,
-    "includes": ["!**/.generated", "!**/prisma-client"]
+    "includes": [
+      "!**/.generated",
+      "!**/prisma-client",
+      "!**/next-env.d.ts",
+      "!**/next-fonts.d.ts"
+    ]
   },
   "vcs": {
     "clientKind": "git",
