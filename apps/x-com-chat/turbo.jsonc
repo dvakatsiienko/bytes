@@ -9,6 +9,20 @@
         "GROQ_API_KEY",
         "CONVEX_DEPLOY_KEY"
       ]
+    },
+    "lint": {
+      "passThroughEnv": [
+        "CLERK_SECRET_KEY",
+        "GROQ_API_KEY",
+        "CONVEX_DEPLOY_KEY"
+      ]
+    },
+    "typecheck": {
+      "passThroughEnv": [
+        "CLERK_SECRET_KEY",
+        "GROQ_API_KEY",
+        "CONVEX_DEPLOY_KEY"
+      ]
     }
   }
 }
