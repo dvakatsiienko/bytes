@@ -94,12 +94,6 @@ export default async function ChatPage(props: ChatPageProps) {
   );
 }
 
-// export async function generateStaticParams() {
-//     const friendList = await prisma.friend.findMany();
-
-//     return friendList.map((friend) => ({ friendId: friend.id }));
-// }
-
 type ChatPageParams = Promise<{
   chatAddress: ChatAddress;
 }>;

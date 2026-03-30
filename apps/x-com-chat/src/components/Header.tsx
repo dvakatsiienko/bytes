@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
 import { cn } from '@/utils/cn';
 
-import type { Friend } from '~/prisma/client';
+import type { TFriend } from '@/convex/seed-data';
 
 // TODO make btns size-6 (24px)
 // https://youtu.be/soFSSkf4oVY?si=sEMeAooIz414Us4e&t=62
@@ -25,7 +25,6 @@ export const Header = (props: HeaderProps) => {
   const { isLoaded, isSignedIn } = useAuth();
 
   const selectedFriend = props.friendList.find(
-    // @ts-expect-error TODO fix this later
     (friend) => friend._id === selectedFriendId,
   ) ?? {
     name: '',
@@ -118,5 +117,5 @@ const fadeAnimation = {
 
 /* Types */
 interface HeaderProps extends React.PropsWithChildren {
-  friendList: Friend[];
+  friendList: TFriend[];
 }

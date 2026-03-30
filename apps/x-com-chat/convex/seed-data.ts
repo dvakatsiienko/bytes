@@ -1,6 +1,4 @@
-import type { Friend } from '~/prisma/client';
-
-export const friendList: Omit<Friend, 'id'>[] = [
+export const friendList: Omit<TFriend, '_id' | '_creationTime'>[] = [
   /**
    * - Define the tone: formal friendly humorous
    * - Set behavioral guidelines: patient empathetic
@@ -92,3 +90,11 @@ export const friendList: Omit<Friend, 'id'>[] = [
         `,
   },
 ];
+
+/* Types */
+export interface TFriend {
+  _creationTime: number;
+  _id: string;
+  name: string;
+  system: string;
+}

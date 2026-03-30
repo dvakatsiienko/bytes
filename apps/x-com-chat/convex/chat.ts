@@ -1,9 +1,9 @@
 import { v } from 'convex/values';
 
-import { friendList } from '../prisma/seed/seed-data';
 import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { SchemaMessageList } from './_schema';
+import { friendList } from './seed-data';
 
 // TODO look how to seed convex
 export const seedFriends = mutation({

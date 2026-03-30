@@ -24,8 +24,8 @@ import { cn } from '@/utils/cn';
 
 import { MessageList } from './MessageList';
 import { api } from '@/convex/_generated/api';
+import type { TFriend } from '@/convex/seed-data';
 import { useChatHistoryQuery } from '@/queries/chat';
-import type { Friend } from '~/prisma/client';
 
 export const Chat = (props: ChatProps) => {
   const router = useRouter();
@@ -98,12 +98,10 @@ export const Chat = (props: ChatProps) => {
 
   const friendOptionList = props.friendList.map((friend) => ({
     label: friend.name,
-    // @ts-expect-error todo fix it later
     value: friend._id,
   }));
 
   const selectedFriend = props.friendList.find(
-    // @ts-expect-error todo fix it later
     (friend) => friend._id === props.friendId,
   );
 
@@ -187,7 +185,6 @@ export const Chat = (props: ChatProps) => {
           name='select-friend'
           onValueChange={selectFriend}
           options={friendOptionList}
-          // @ts-expect-error todo fix it later
           value={selectedFriend?._id ?? ''}
         />
 
@@ -216,8 +213,8 @@ const KeyboardShortcutItem = (props: KeyboardShortcutItemProps) => {
   );
 };
 interface KeyboardShortcutItemProps {
-  shortcut: string;
   description: string;
+  shortcut: string;
 }
 
 /* Helpers */
@@ -234,7 +231,7 @@ const keyboradChortcutList = [
 interface ChatProps {
   chatId: string;
   friendId: string;
-  friendList: Friend[];
+  friendList: TFriend[];
   initialMessages: UIMessage[];
 }
 
