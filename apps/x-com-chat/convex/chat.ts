@@ -78,7 +78,8 @@ export const initChat = mutation({
       }
     }
 
-    // todo make friendId somewhere here or make it relational
+    if (!args.friendId) return null;
+
     const friend = await ctx.db.get(args.friendId as Id<'friend'>);
 
     const newChatId = await ctx.db.insert('chats', {
