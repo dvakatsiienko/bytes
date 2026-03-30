@@ -9,14 +9,14 @@ import { friendList } from './seed-data';
 export const seedFriends = mutation({
   handler: async (ctx) => {
     await Promise.all(
-      friendList.map((friend) => ctx.db.insert('friends', friend)),
+      friendList.map((friend) => ctx.db.insert('friend', friend)),
     );
   },
 });
 
 export const getFriendList = query({
   handler: async (ctx) => {
-    const friendListQuery = await ctx.db.query('friends').collect();
+    const friendListQuery = await ctx.db.query('friend').collect();
 
     return friendListQuery;
   },
