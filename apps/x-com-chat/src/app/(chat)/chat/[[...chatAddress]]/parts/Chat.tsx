@@ -24,7 +24,7 @@ import { cn } from '@/utils/cn';
 
 import { MessageList } from './MessageList';
 import { api } from '@/convex/_generated/api';
-import type { TFriend } from '@/convex/seed-data';
+import type { TFriend } from '@/convex/seed_data';
 import { useChatHistoryQuery } from '@/queries/chat';
 
 export const Chat = (props: ChatProps) => {
