@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --inspect",
     "dev:convex": "convex dev",
+    "convex:seed": "convex run chat:seedFriends",
     "build": "next build",
     "build:clean": "rimraf .next",
     "serve": "next start",

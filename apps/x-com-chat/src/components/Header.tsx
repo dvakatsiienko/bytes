@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
 import { cn } from '@/utils/cn';
 
-import type { TFriend } from '@/convex/seed_data';
+import type { Doc } from '@/convex/_generated/dataModel';
 
 // TODO make btns size-6 (24px)
 // https://youtu.be/soFSSkf4oVY?si=sEMeAooIz414Us4e&t=62
@@ -117,5 +117,5 @@ const fadeAnimation = {
 
 /* Types */
 interface HeaderProps extends React.PropsWithChildren {
-  friendList: TFriend[];
+  friendList: Doc<'friend'>[];
 }

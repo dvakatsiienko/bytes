@@ -2,15 +2,15 @@ import { v } from 'convex/values';
 
 import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { SchemaMessageList } from './_schema';
+import { SchemaMessageList } from './schema';
 import { friendList } from './seed_data';
 
-// TODO look how to seed convex
 export const seedFriends = mutation({
   handler: async (ctx) => {
-    await Promise.all(
-      friendList.map((friend) => ctx.db.insert('friend', friend)),
-    );
+    const existing = await ctx.db.query('friend').collect();
+
+    await Promise.all(existing.map((f) => ctx.db.delete(f._id)));
+    await Promise.all(friendList.map((f) => ctx.db.insert('friend', f)));
   },
 });
 
@@ -33,7 +33,7 @@ export const getFriendById = query({
 export const getChatHistory = query({
   args: { chatId: v.string() },
   handler: async (ctx, args) => {
-    const chatHistory = await ctx.db.get(args.chatId as Id<'chat'>);
+    const chatHistory = await ctx.db.get(args.chatId as Id<'chats'>);
 
     return chatHistory;
   },
@@ -46,7 +46,7 @@ export const saveChatHistory = mutation({
     messageList: SchemaMessageList,
   },
   handler: async (ctx, args) => {
-    const existingChat = await ctx.db.get(args.chatId as Id<'chat'>);
+    const existingChat = await ctx.db.get(args.chatId as Id<'chats'>);
 
     if (existingChat) {
       await ctx.db.patch(existingChat._id, {
@@ -54,7 +54,6 @@ export const saveChatHistory = mutation({
       });
     } else {
       await ctx.db.insert('chats', {
-        chatId: args.chatId,
         friendId: args.friendId,
         messageList: args.messageList,
       });
@@ -70,7 +69,7 @@ export const initChat = mutation({
   handler: async (ctx, args) => {
     if (args.chatId) {
       try {
-        const existingChat = await ctx.db.get(args.chatId as Id<'chat'>);
+        const existingChat = await ctx.db.get(args.chatId as Id<'chats'>);
 
         if (existingChat) return existingChat;
       } catch (error) {
@@ -99,14 +98,13 @@ export const getChatByFriend = mutation({
     friendId: v.string(),
   },
   handler: async (ctx, args) => {
-    const chat = await ctx.db.get(args.chatId as Id<'chat'>);
+    const chat = await ctx.db.get(args.chatId as Id<'chats'>);
 
     if (chat?.friendId === args.friendId) return chat._id;
     if (chat?.friendId !== args.friendId) {
       const existingChat = await ctx.db
-
         .query('chats')
-        .filter((q) => q.eq(q.field('friendId'), args.friendId))
+        .withIndex('by_friendId', (q) => q.eq('friendId', args.friendId))
         .first();
 
       if (existingChat) return existingChat._id;

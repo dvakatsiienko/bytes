@@ -43,7 +43,7 @@ export async function POST(req: Request) {
   const chatHistory = (chatHistryQuery?.messageList ?? []) as UIMessage[];
 
   const friendPreloaded = await preloadQuery(api.chat.getFriendById, {
-    friendId: chatHistryQuery?.friendId,
+    friendId: chatHistryQuery?.friendId ?? '',
   });
 
   const chatFriend = preloadedQueryResult(friendPreloaded);
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
       onFinish: async ({ messages }) => {
         await fetchMutation(api.chat.saveChatHistory, {
           chatId,
-          friendId: chatFriend._id,
+          friendId: chatFriend?._id ?? '',
           // Store raw messages as-is for simplicity / forward-compatibility
           messageList: messages as unknown as UIMessage[],
         });

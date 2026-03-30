@@ -24,7 +24,7 @@ import { cn } from '@/utils/cn';
 
 import { MessageList } from './MessageList';
 import { api } from '@/convex/_generated/api';
-import type { TFriend } from '@/convex/seed_data';
+import type { Doc } from '@/convex/_generated/dataModel';
 import { useChatHistoryQuery } from '@/queries/chat';
 
 export const Chat = (props: ChatProps) => {
@@ -78,7 +78,7 @@ export const Chat = (props: ChatProps) => {
           friendId: selectedFriendId,
         });
 
-        chatId = chatByFriendId;
+        if (chatByFriendId) chatId = chatByFriendId;
       }
 
       const url = `/chat/${chatId}/${selectedFriendId}`;
@@ -231,7 +231,7 @@ const keyboradChortcutList = [
 interface ChatProps {
   chatId: string;
   friendId: string;
-  friendList: TFriend[];
+  friendList: Doc<'friend'>[];
   initialMessages: UIMessage[];
 }
 

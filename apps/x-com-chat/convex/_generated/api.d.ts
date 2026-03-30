@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Generated `api` utility.
  *
@@ -7,32 +8,44 @@
  * @module
  */
 
+import type * as chat from '../chat.js';
+import type * as seed_data from '../seed_data.js';
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from 'convex/server';
 
-import type * as _schema from '../_schema.js';
-import type * as chat from '../chat.js';
+declare const fullApi: ApiFromModules<{
+  chat: typeof chat;
+  seed_data: typeof seed_data;
+}>;
 
 /**
- * A utility for referencing Convex functions in your app's API.
+ * A utility for referencing Convex functions in your app's public API.
  *
  * Usage:
  * ```js
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-declare const fullApi: ApiFromModules<{
-  _schema: typeof _schema;
-  chat: typeof chat;
-}>;
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, 'public'>
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, 'internal'>
 >;
+
+export declare const components: {};

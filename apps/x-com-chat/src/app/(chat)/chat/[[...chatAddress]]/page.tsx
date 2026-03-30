@@ -34,9 +34,9 @@ export default async function ChatPage(props: ChatPageProps) {
 
   let redirectToValidAddress = false;
 
-  const isFriendValid = friendList
-    .map((friend) => friend._id)
-    .includes(friendIdParam ?? '');
+  const isFriendValid = friendList.some(
+    (friend) => friend._id === (friendIdParam ?? ''),
+  );
 
   if (!chatIdParam) redirectToValidAddress = true;
   if (!isFriendValid) {

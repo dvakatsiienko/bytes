@@ -1,4 +1,6 @@
-export const friendList: Omit<TFriend, '_id' | '_creationTime'>[] = [
+import type { Doc } from './_generated/dataModel';
+
+export const friendList: Omit<Doc<'friend'>, '_id' | '_creationTime'>[] = [
   /**
    * - Define the tone: formal friendly humorous
    * - Set behavioral guidelines: patient empathetic
@@ -90,11 +92,3 @@ export const friendList: Omit<TFriend, '_id' | '_creationTime'>[] = [
         `,
   },
 ];
-
-/* Types */
-export interface TFriend {
-  _creationTime: number;
-  _id: string;
-  name: string;
-  system: string;
-}
