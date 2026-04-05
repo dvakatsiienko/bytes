@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useState } from 'react';
 import {
   CheckIcon,
   ClockIcon,
@@ -9,18 +9,33 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
-import { type State, createInvoice } from '@/lib/actions';
+import { type TMutationError, useCreateInvoice } from '@/lib/mutations';
 
 import { Button } from '@/ui/Button';
 import type { Customer } from '~/prisma/client';
 
-export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
-  const initialState: State = { errors: {}, message: null };
+export const InvoiceFormCreate = (props: IInvoiceFormCreateProps) => {
+  const [errors, setErrors] = useState<TMutationError['errors']>({});
+  const createInvoice = useCreateInvoice();
 
-  const [actionState, createInvoiceAction] = useActionState(
-    createInvoice,
-    initialState,
-  );
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    setErrors({});
+    createInvoice.mutate(
+      {
+        amount: Number(formData.get('amount')),
+        customerId: formData.get('customerId') as string,
+        status: formData.get('status') as string,
+      },
+      {
+        onError: (error: TMutationError) => {
+          setErrors(error.errors);
+        },
+      },
+    );
+  };
 
   const customerListJSX = props.customerList.map((customer) => (
     <option key={customer.id} value={customer.id}>
@@ -29,7 +44,7 @@ export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
   ));
 
   return (
-    <form action={createInvoiceAction}>
+    <form onSubmit={handleSubmit}>
       <div className='rounded-md bg-gray-50 p-4 md:p-6'>
         {/* Customer Name */}
         <div className='mb-4'>
@@ -53,7 +68,7 @@ export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
             <UserCircleIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-500' />
 
             <div aria-atomic='true' aria-live='polite' id='customer-error'>
-              {actionState.errors?.customerId?.map((error: string) => (
+              {errors?.customerId?.map((error: string) => (
                 <p className='mt-2 text-red-500 text-sm' key={error}>
                   {error}
                 </p>
@@ -93,15 +108,15 @@ export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
             <div className='flex gap-4'>
               <div className='flex items-center'>
                 <input
-                  className='h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                  className='peer/pending h-4 w-4 cursor-pointer border-gray-300 text-gray-600 focus:ring-2'
                   defaultChecked
-                  defaultValue='pending'
                   id='pending'
                   name='status'
                   type='radio'
+                  value='pending'
                 />
                 <label
-                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 text-xs'
+                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 text-xs peer-checked/pending:bg-gray-600 peer-checked/pending:text-white'
                   htmlFor='pending'>
                   Pending <ClockIcon className='h-4 w-4' />
                 </label>
@@ -109,14 +124,14 @@ export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
 
               <div className='flex items-center'>
                 <input
-                  className='h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                  className='peer/paid h-4 w-4 cursor-pointer border-gray-300 text-gray-600 focus:ring-2'
                   id='paid'
                   name='status'
                   type='radio'
                   value='paid'
                 />
                 <label
-                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 font-medium text-white text-xs'
+                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 text-xs peer-checked/paid:bg-green-500 peer-checked/paid:text-white'
                   htmlFor='paid'>
                   Paid <CheckIcon className='h-4 w-4' />
                 </label>
@@ -139,6 +154,6 @@ export const InvoiceFormCreate = (props: InvoiceFormCreateProps) => {
 };
 
 /* Types */
-interface InvoiceFormCreateProps {
+interface IInvoiceFormCreateProps {
   customerList: Customer[];
 }

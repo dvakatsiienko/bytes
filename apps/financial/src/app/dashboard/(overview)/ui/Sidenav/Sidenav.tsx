@@ -1,16 +1,13 @@
+'use client';
+
 import { PowerIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 
 import { NavLinks } from './Navlinks';
-import { signOut } from '@/auth';
 import { AcmeLogo } from '@/ui/AcmeLogo';
 
 export const Sidenav = () => {
-  const signOutAction = async () => {
-    'use server';
-    await signOut();
-  };
-
   return (
     <nav className='flex h-full flex-col px-3 py-4 md:px-2'>
       <Link
@@ -26,14 +23,13 @@ export const Sidenav = () => {
 
         <div className='hidden h-auto w-full grow rounded-md bg-gray-50 md:block' />
 
-        <form action={signOutAction}>
-          <button
-            className='flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 font-medium text-sm hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3'
-            type='button'>
-            <PowerIcon className='w-6' />
-            <div className='hidden md:block'>Sign Out</div>
-          </button>
-        </form>
+        <button
+          className='flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 font-medium text-sm hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3'
+          onClick={() => signOut()}
+          type='button'>
+          <PowerIcon className='w-6' />
+          <div className='hidden md:block'>Sign Out</div>
+        </button>
       </div>
     </nav>
   );

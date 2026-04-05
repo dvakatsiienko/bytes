@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useState } from 'react';
 import {
   CheckIcon,
   ClockIcon,
@@ -9,18 +9,34 @@ import {
 } from '@heroicons/react/24/outline';
 import NextLink from 'next/link';
 
-import { type State, updateInvoice } from '@/lib/actions';
+import { type TMutationError, useUpdateInvoice } from '@/lib/mutations';
 
 import { Button } from '@/ui/Button';
 import type { Customer, Invoice } from '~/prisma/client';
 
-export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
-  const initialState: State = { errors: {}, message: null };
-  const updateInvoiceWithId = updateInvoice.bind(null, props.invoice.id);
-  const [actionState, formAction] = useActionState(
-    updateInvoiceWithId,
-    initialState,
-  );
+export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
+  const [errors, setErrors] = useState<TMutationError['errors']>({});
+  const updateInvoice = useUpdateInvoice();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    setErrors({});
+    updateInvoice.mutate(
+      {
+        amount: Number(formData.get('amount')),
+        customerId: formData.get('customerId') as string,
+        id: props.invoice.id,
+        status: formData.get('status') as string,
+      },
+      {
+        onError: (error: TMutationError) => {
+          setErrors(error.errors);
+        },
+      },
+    );
+  };
 
   const customerListJSX = props.customerList.map((customer) => (
     <option key={customer.id} value={customer.id}>
@@ -29,10 +45,8 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
   ));
 
   return (
-    <form action={formAction}>
+    <form onSubmit={handleSubmit}>
       <div className='rounded-md bg-gray-50 p-4 md:p-6'>
-        <input name='id' type='hidden' value={props.invoice.id} />
-
         {/* Customer Name */}
         <div className='mb-4'>
           <label className='mb-2 block font-medium text-sm' htmlFor='customer'>
@@ -73,7 +87,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
               <CurrencyDollarIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
 
               <div aria-atomic='true' aria-live='polite' id='amount-error'>
-                {actionState.errors?.amount?.map((error: string) => (
+                {errors?.amount?.map((error: string) => (
                   <p className='mt-2 text-red-500 text-sm' key={error}>
                     {error}
                   </p>
@@ -92,7 +106,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
             <div className='flex gap-4'>
               <div className='flex items-center'>
                 <input
-                  className='h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                  className='peer/pending h-4 w-4 cursor-pointer border-gray-300 text-gray-600 focus:ring-2'
                   defaultChecked={props.invoice.status === 'pending'}
                   id='pending'
                   name='status'
@@ -100,14 +114,14 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
                   value='pending'
                 />
                 <label
-                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 text-xs'
+                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 text-xs peer-checked/pending:bg-gray-600 peer-checked/pending:text-white'
                   htmlFor='pending'>
                   Pending <ClockIcon className='h-4 w-4' />
                 </label>
               </div>
               <div className='flex items-center'>
                 <input
-                  className='h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                  className='peer/paid h-4 w-4 cursor-pointer border-gray-300 text-gray-600 focus:ring-2'
                   defaultChecked={props.invoice.status === 'paid'}
                   id='paid'
                   name='status'
@@ -115,7 +129,7 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
                   value='paid'
                 />
                 <label
-                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 font-medium text-white text-xs'
+                  className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 text-xs peer-checked/paid:bg-green-500 peer-checked/paid:text-white'
                   htmlFor='paid'>
                   Paid <CheckIcon className='h-4 w-4' />
                 </label>
@@ -138,19 +152,8 @@ export const InvoiceFormUpdate = (props: InvoiceFormUpdateProps) => {
   );
 };
 
-/* Helpers */
-// const InvoiceSchema = z.object({
-//     id:         z.string(),
-//     customerId: z.string(),
-//     amount:     z.coerce.number(),
-//     status:     z.enum([ 'pending', 'paid' ]),
-//     createdAt:       z.string(),
-// });
-
-// const UpdateInvoice = InvoiceSchema.omit({ id: true, createdAt: true });
-
 /* Types */
-interface InvoiceFormUpdateProps {
-  invoice: Invoice;
+interface IInvoiceFormUpdateProps {
   customerList: Customer[];
+  invoice: Invoice;
 }

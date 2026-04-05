@@ -1,83 +1,54 @@
 import { prisma } from './prisma';
 import { formatCurrency } from './utils';
-import type { Invoice } from '~/prisma/client';
 
 export async function fetchRevenueList() {
-  try {
-    const revenueList = await prisma.revenue.findMany();
+  const revenueList = await prisma.revenue.findMany();
 
-    return revenueList;
-  } catch (error) {
-    console.error('Database Error:', error);
-
-    throw new Error('Failed to fetch revenue data.');
-  }
+  return revenueList;
 }
 
 export async function fetchLatestInvoiceList() {
-  try {
-    const invoiceList = await prisma.invoice.findMany({
-      include: {
-        customer: {
-          select: {
-            email: true,
-            imageUrl: true,
-            name: true,
-          },
+  const invoiceList = await prisma.invoice.findMany({
+    include: {
+      customer: {
+        select: {
+          email: true,
+          imageUrl: true,
+          name: true,
         },
       },
-    });
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+  });
 
-    // TODO sort by date
-    const latestInvoiceList = invoiceList.map((invoice) => {
-      return {
-        ...invoice,
-        amount: formatCurrency(invoice.amount),
-      };
-    });
-
-    return latestInvoiceList;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
-  }
+  return invoiceList.map((invoice) => ({
+    ...invoice,
+    amount: formatCurrency(invoice.amount),
+  }));
 }
 
 export async function fetchCardData() {
-  try {
-    const numberOfInvoices = await prisma.invoice.count();
-    const numberOfCustomers = await prisma.customer.count();
-    const invoiceList = await prisma.invoice.findMany();
+  const [numberOfInvoices, numberOfCustomers, invoiceList] = await Promise.all([
+    prisma.invoice.count(),
+    prisma.customer.count(),
+    prisma.invoice.findMany({ select: { amount: true, status: true } }),
+  ]);
 
-    const invoiceStatusMap = {
-      paid: invoiceList.reduce((acc, curr) => {
-        // biome-ignore lint/style/noParameterAssign: fix later
-        if (curr.status === 'paid') acc += curr.amount;
+  let paid = 0;
+  let pending = 0;
 
-        return acc;
-      }, 0),
-      pending: invoiceList.reduce((acc, curr) => {
-        // biome-ignore lint/style/noParameterAssign: fix later
-        if (curr.status === 'pending') acc += curr.amount;
-
-        return acc;
-      }, 0),
-    };
-
-    const totalPaidInvoices = formatCurrency(invoiceStatusMap.paid);
-    const totalPendingInvoices = formatCurrency(invoiceStatusMap.pending);
-
-    return {
-      numberOfCustomers,
-      numberOfInvoices,
-      totalPaidInvoices,
-      totalPendingInvoices,
-    };
-  } catch (error) {
-    console.error('Database Error:', error);
-
-    throw new Error('Failed to fetch card data.');
+  for (const invoice of invoiceList) {
+    if (invoice.status === 'paid') paid += invoice.amount;
+    else if (invoice.status === 'pending') pending += invoice.amount;
   }
+
+  return {
+    numberOfCustomers,
+    numberOfInvoices,
+    totalPaidInvoices: formatCurrency(paid),
+    totalPendingInvoices: formatCurrency(pending),
+  };
 }
 
 const ITEMS_PER_PAGE = 6;
@@ -88,102 +59,50 @@ export async function fetchInvoiceListFiltered(
 ) {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  try {
-    const invoiceList = await prisma.invoice.findMany({
-      include: {
-        customer: {
-          select: {
-            email: true,
-            imageUrl: true,
-            name: true,
-          },
+  const where = query
+    ? { customer: { name: { contains: query, mode: 'insensitive' as const } } }
+    : undefined;
+
+  const invoiceList = await prisma.invoice.findMany({
+    include: {
+      customer: {
+        select: {
+          email: true,
+          imageUrl: true,
+          name: true,
         },
       },
-    });
+    },
+    skip: offset,
+    take: ITEMS_PER_PAGE,
+    where,
+  });
 
-    // TODO filter by:
-    // - customer name
-    // - customer email
-    // - invoice amount
-    // - invoice date
-    // - invoice status
-    const invoiceListFiltered = invoiceList
-      .filter((invoice) =>
-        invoice.customer.name?.toLowerCase().includes(query.toLowerCase()),
-      )
-      .slice(offset, offset + ITEMS_PER_PAGE);
-
-    return invoiceListFiltered;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoices.');
-  }
+  return invoiceList;
 }
 
 export async function fetchInvoicesPages(query: string) {
-  try {
-    const invoiceList = await prisma.invoice.findMany({
-      include: {
-        customer: {
-          select: {
-            email: true,
-            imageUrl: true,
-            name: true,
-          },
-        },
-      },
-    });
+  const where = query
+    ? { customer: { name: { contains: query, mode: 'insensitive' as const } } }
+    : undefined;
 
-    // TODO filter by:
-    // - customer name
-    // - customer email
-    // - invoice amount
-    // - invoice date
-    // - invoice status
-    const invoiceListFiltered = invoiceList.filter((invoice) => {
-      if (query.length === 0) return true;
+  const count = await prisma.invoice.count({ where });
+  const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
 
-      return invoice.customer.name?.toLowerCase().includes(query.toLowerCase());
-    });
-
-    const totalPages = Math.ceil(
-      (invoiceListFiltered.length + 1) / ITEMS_PER_PAGE,
-    );
-
-    return totalPages;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
-  }
+  return totalPages;
 }
 
 export async function fetchInvoiceById(id: string) {
-  try {
-    const invoice = await prisma.invoice.findUnique({ where: { id } });
+  const invoice = await prisma.invoice.findUnique({ where: { id } });
 
-    const nextInvoice = {
-      ...invoice,
-      amount: (invoice?.amount ?? 0) / 100,
-    } as Invoice;
+  if (!invoice) return null;
 
-    return nextInvoice;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
-  }
+  return {
+    ...invoice,
+    amount: invoice.amount / 100,
+  };
 }
 
-export async function fetchCustomerList() {
-  try {
-    const customerList = await prisma.customer.findMany();
-
-    return customerList;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch all customers.');
-  }
-}
-
-export async function fetchCustomerListFiltered(/* query: string */) {
-  // TODO implement
+export function fetchCustomerList() {
+  return prisma.customer.findMany();
 }

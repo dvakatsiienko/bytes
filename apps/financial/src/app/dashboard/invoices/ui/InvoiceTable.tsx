@@ -15,7 +15,6 @@ export const InvoiceTable = async (props: InvoiceTableProps) => {
   const invoiceListMobileJSX = invoicesList?.map((invoice) => (
     <div className='mb-2 w-full rounded-md bg-white p-4' key={invoice.id}>
       <div className='flex items-center justify-between border-gray-200 border-b pb-4'>
-        xxx
         <div>
           <div className='mb-2 flex items-center'>
             <NextImage
@@ -121,6 +120,6 @@ export const InvoiceTable = async (props: InvoiceTableProps) => {
 
 /* Types */
 interface InvoiceTableProps {
-  query: string;
   currentPage: number;
+  query: string;
 }

@@ -1,26 +1,48 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useState } from 'react';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import {
   AtSymbolIcon,
   ExclamationCircleIcon,
   KeyIcon,
 } from '@heroicons/react/24/outline';
-
-import { authenticate } from '@/lib/actions';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 import { lusitana } from '@/theme/fonts';
 import { Button } from '@/ui/Button';
 
 export const LoginForm = () => {
-  const [errorMessage, authenticateAction, isPending] = useActionState(
-    authenticate,
-    '',
-  );
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setIsPending(true);
+
+    const formData = new FormData(e.currentTarget);
+
+    const result = await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirect: false,
+    });
+
+    setIsPending(false);
+
+    if (result?.error) {
+      setErrorMessage('Invalid credentials.');
+      return;
+    }
+
+    router.push('/dashboard');
+  };
 
   return (
-    <form action={authenticateAction} className='space-y-3'>
+    <form className='space-y-3' onSubmit={handleSubmit}>
       <div className='flex-1 rounded-lg bg-gray-50 px-6 pt-8 pb-4'>
         <h1 className={`${lusitana.className} mb-3 text-2xl`}>
           Please log in to continue.
