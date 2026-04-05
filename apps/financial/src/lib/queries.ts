@@ -106,3 +106,11 @@ export async function fetchInvoiceById(id: string) {
 export function fetchCustomerList() {
   return prisma.customer.findMany();
 }
+
+export function fetchCustomerListFiltered(query: string) {
+  const where = query
+    ? { name: { contains: query, mode: 'insensitive' as const } }
+    : undefined;
+
+  return prisma.customer.findMany({ where });
+}

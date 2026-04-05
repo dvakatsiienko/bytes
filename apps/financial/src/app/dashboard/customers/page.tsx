@@ -1,9 +1,13 @@
-import { fetchCustomerList } from '@/lib/queries';
+import { fetchCustomerListFiltered } from '@/lib/queries';
 
 import { CustomerTable } from './ui/CustomerTable';
+import type { NextPageProps } from '@/types';
 
-const CustomersPage = async () => {
-  const customers = await fetchCustomerList();
+const CustomersPage = async (props: NextPageProps) => {
+  const searchParams = await props.searchParams;
+  const query = searchParams?.query || '';
+
+  const customers = await fetchCustomerListFiltered(query);
 
   return (
     <section>
