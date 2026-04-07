@@ -29,19 +29,20 @@ export async function fetchLatestInvoiceList() {
 }
 
 export async function fetchCardData() {
-  const [numberOfInvoices, numberOfCustomers, invoiceList] = await Promise.all([
-    prisma.invoice.count(),
-    prisma.customer.count(),
-    prisma.invoice.findMany({ select: { amount: true, status: true } }),
-  ]);
+  const [numberOfInvoices, numberOfCustomers, amountsByStatus] =
+    await Promise.all([
+      prisma.invoice.count(),
+      prisma.customer.count(),
+      prisma.invoice.groupBy({
+        _sum: { amount: true },
+        by: ['status'],
+      }),
+    ]);
 
-  let paid = 0;
-  let pending = 0;
-
-  for (const invoice of invoiceList) {
-    if (invoice.status === 'paid') paid += invoice.amount;
-    else if (invoice.status === 'pending') pending += invoice.amount;
-  }
+  const paid =
+    amountsByStatus.find((g) => g.status === 'paid')?._sum.amount ?? 0;
+  const pending =
+    amountsByStatus.find((g) => g.status === 'pending')?._sum.amount ?? 0;
 
   return {
     numberOfCustomers,

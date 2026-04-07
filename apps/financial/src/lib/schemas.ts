@@ -23,8 +23,10 @@ export const UpdateInvoiceSchema = InvoiceSchema.omit({
 });
 
 /* Types */
+export type TInvoiceStatus = z.infer<typeof InvoiceSchema>['status'];
+
 export type TInvoiceFormErrors = {
-  customerId?: string[];
   amount?: string[];
+  customerId?: string[];
   status?: string[];
 };

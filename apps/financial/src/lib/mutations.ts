@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import type { TInvoiceFormErrors } from './schemas';
+import type { TInvoiceFormErrors, TInvoiceStatus } from './schemas';
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
@@ -81,7 +81,7 @@ export const useDeleteInvoice = () => {
 type TCreateInvoiceInput = {
   amount: number;
   customerId: string;
-  status: string;
+  status: TInvoiceStatus;
 };
 
 type TUpdateInvoiceInput = TCreateInvoiceInput & {

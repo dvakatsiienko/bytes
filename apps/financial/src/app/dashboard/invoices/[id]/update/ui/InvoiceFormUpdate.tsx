@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   CheckIcon,
   ClockIcon,
@@ -10,32 +9,23 @@ import {
 import NextLink from 'next/link';
 
 import { type TMutationError, useUpdateInvoice } from '@/lib/mutations';
+import { UpdateInvoiceSchema } from '@/lib/schemas';
 
 import { Button } from '@/ui/Button';
 import type { Customer, Invoice } from '~/prisma/client';
 
 export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
-  const [errors, setErrors] = useState<TMutationError['errors']>({});
   const updateInvoice = useUpdateInvoice();
+  const errors = (updateInvoice.error as TMutationError | null)?.errors;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const formData = Object.fromEntries(new FormData(e.currentTarget));
+    const parsed = UpdateInvoiceSchema.safeParse(formData);
 
-    setErrors({});
-    updateInvoice.mutate(
-      {
-        amount: Number(formData.get('amount')),
-        customerId: formData.get('customerId') as string,
-        id: props.invoice.id,
-        status: formData.get('status') as string,
-      },
-      {
-        onError: (error: TMutationError) => {
-          setErrors(error.errors);
-        },
-      },
-    );
+    if (!parsed.success) return; // todo show error message on the ui
+
+    updateInvoice.mutate({ ...parsed.data, id: props.invoice.id });
   };
 
   const customerListJSX = props.customerList.map((customer) => (

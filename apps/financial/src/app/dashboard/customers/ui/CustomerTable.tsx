@@ -5,7 +5,7 @@ import { lusitana } from '@/theme/fonts';
 import { SearchField } from '@/ui/SearchField';
 import type { Customer } from '~/prisma/client';
 
-export const CustomerTable = (props: CustomerTableProps) => {
+export const CustomerTable = (props: ICustomerTableProps) => {
   const customerListHeadJSX = props.customerList?.map((customer) => (
     <div className='mb-2 w-full rounded-md bg-white p-4' key={customer.id}>
       <div className='flex items-center justify-between border-b pb-4'>
@@ -128,6 +128,6 @@ export const CustomerTable = (props: CustomerTableProps) => {
 };
 
 /* Types */
-interface CustomerTableProps {
+interface ICustomerTableProps {
   customerList: Customer[];
 }

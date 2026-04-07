@@ -6,7 +6,7 @@ import { formatCurrency, formatDateToLocal } from '@/lib/utils';
 import { DeleteInvoice, UpdateInvoice } from './Buttons';
 import { InvoiceStatus } from './InvoiceStatus';
 
-export const InvoiceTable = async (props: InvoiceTableProps) => {
+export const InvoiceTable = async (props: IInvoiceTableProps) => {
   const invoicesList = await fetchInvoiceListFiltered(
     props.query,
     props.currentPage,
@@ -119,7 +119,7 @@ export const InvoiceTable = async (props: InvoiceTableProps) => {
 };
 
 /* Types */
-interface InvoiceTableProps {
+interface IInvoiceTableProps {
   currentPage: number;
   query: string;
 }
