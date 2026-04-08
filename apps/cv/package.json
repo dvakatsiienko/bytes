@@ -33,7 +33,7 @@
     "baseline-browser-mapping": "2.10.16",
     "masonic": "4.1.0",
     "mosaic": "1.1.0",
-    "postcss": "8.5.8",
+    "postcss": "8.5.9",
     "tailwind-scrollbar": "4.0.2",
     "tailwindcss": "4.2.2"
   }
