@@ -2,19 +2,19 @@ packages:
   - apps/*
   - packages/*
 
-onlyBuiltDependencies:
-  - '@apollo/protobufjs'
-  - '@clerk/shared'
-  - '@parcel/watcher'
-  - '@prisma/client'
-  - '@prisma/engines'
-  - '@swc/core'
-  - '@tailwindcss/oxide'
-  - better-sqlite3
-  - core-js-pure
-  - esbuild
-  - lefthook
-  - napi-postinstall
-  - oxc-resolver
-  - prisma
-  - sharp
+allowBuilds:
+  '@apollo/protobufjs': true
+  '@clerk/shared': true
+  '@parcel/watcher': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@swc/core': true
+  '@tailwindcss/oxide': true
+  better-sqlite3: true
+  core-js-pure: true
+  esbuild: true
+  lefthook: true
+  napi-postinstall: true
+  oxc-resolver: true
+  prisma: true
+  sharp: true
