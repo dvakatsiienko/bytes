@@ -26,7 +26,7 @@
     "format": "biome format --write",
     "check": "turbo lint typecheck",
     "turbo:devtools": "turbo devtools",
-    "packages:reinstall": "rimraf pnpm-lock.yaml && rimraf **/{node_modules,.next} && pnpm i --force",
+    "packages:reinstall": "pnpm dlx rimraf node_modules \"**/node_modules\" \"**/.next\" pnpm-lock.yaml && pnpm install",
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish"
   },
   "devDependencies": {
