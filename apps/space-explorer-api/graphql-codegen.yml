@@ -4,3 +4,6 @@ generates:
     src/graphql/index.tsx:
         plugins:
             - typescript
+        config:
+            scalars:
+                Date: string
