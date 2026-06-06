@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client/react';
+import { useApolloClient, useMutation } from '@apollo/client/react';
 import { useNavigate } from 'react-router-dom';
 
 import { isLoggedInVar } from '@/lib/apollo';
@@ -11,7 +11,7 @@ export const LogoutButton = (props: LogoutButtonProps) => {
   const client = useApolloClient();
   const navigate = useNavigate();
 
-  const [logoutMutation] = gql.useLogoutMutation();
+  const [logoutMutation] = useMutation(gql.LogoutDocument);
 
   const logout = () => {
     client.cache.evict({ fieldName: 'userProfile' });

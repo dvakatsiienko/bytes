@@ -1,5 +1,5 @@
 import { type VariantProps, cva } from 'cva';
-import { useReactiveVar } from '@apollo/client/react';
+import { useMutation, useReactiveVar } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
 
 import { cartItemsVar } from '@/lib/apollo';
@@ -16,15 +16,18 @@ export const LaunchTile = (props: LaunchTileProps) => {
   const cartItems = useReactiveVar(cartItemsVar);
   const isInCart = id ? cartItems.includes(id) : false;
 
-  const [cancelTripMutation, cancelTripMeta] = gql.useCancelTripMutation({
-    refetchQueries: [
-      'UserProfile',
-      {
-        query: gql.LaunchesDocument,
-        variables: { after: 0 },
-      },
-    ],
-  });
+  const [cancelTripMutation, cancelTripMeta] = useMutation(
+    gql.CancelTripDocument,
+    {
+      refetchQueries: [
+        'UserProfile',
+        {
+          query: gql.LaunchesDocument,
+          variables: { after: 0 },
+        },
+      ],
+    },
+  );
 
   const submit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -58,7 +61,7 @@ export const LaunchTile = (props: LaunchTileProps) => {
 
         {props.isDetailed ? <h5>Launch site: {site}</h5> : null}
 
-        {props.trip ? (
+        {props.trip?.createdAt ? (
           <h5>
             Booked at: {new Date(props.trip.createdAt).toLocaleDateString()}
             &nbsp;
@@ -103,10 +106,12 @@ function getBgImage(flightNumber: number) {
 
 /* Types */
 interface LaunchTileProps extends React.PropsWithChildren, LaunchTileCnProps {
-  launch: gql.LaunchFragment;
   className?: string;
   isDetailed?: boolean;
-  trip?: gql.Trip;
+  launch: gql.LaunchFragmentFragment;
+  trip?: TripData;
 }
+
+type TripData = gql.UserProfileQuery['userProfile']['trips'][number];
 
 type LaunchTileCnProps = VariantProps<typeof launchTileCn>;

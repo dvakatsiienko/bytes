@@ -1,8 +1,10 @@
+import { useQuery } from '@apollo/client/react';
+
 import { Header, LaunchTile, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Profile = () => {
-  const { data, loading } = gql.useUserProfileQuery({
+  const { data, loading } = useQuery(gql.UserProfileDocument, {
     fetchPolicy: 'cache-and-network',
   });
 

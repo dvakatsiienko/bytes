@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from '@apollo/client/react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 import { isLoggedInVar } from '@/lib/apollo';
@@ -7,8 +8,8 @@ import * as gql from '@/graphql';
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { data } = gql.useIsUserLoggedInQuery();
-  const [loginMutation, { loading, error }] = gql.useLoginMutation({
+  const { data } = useQuery(gql.IsUserLoggedInDocument);
+  const [loginMutation, { loading, error }] = useMutation(gql.LoginDocument, {
     onCompleted(response) {
       const { login } = response;
 

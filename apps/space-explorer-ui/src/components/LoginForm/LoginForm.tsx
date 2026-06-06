@@ -1,3 +1,4 @@
+import type { useMutation } from '@apollo/client/react';
 import { useForm } from 'react-hook-form';
 
 import spaceJpg from './img/space.jpg';
@@ -52,5 +53,8 @@ export const LoginForm = (props: LoginFormProps) => {
 
 /* Types */
 interface LoginFormProps {
-  loginMutation: gql.LoginMutationFn;
+  loginMutation: useMutation.MutationFunction<
+    gql.LoginMutation,
+    gql.LoginMutationVariables
+  >;
 }

@@ -1,10 +1,11 @@
+import { useQuery } from '@apollo/client/react';
 import { Outlet } from 'react-router-dom';
 
 import { Footer } from '@/components';
 import * as gql from '@/graphql';
 
 export const Layout = () => {
-  const { data } = gql.useIsUserLoggedInQuery();
+  const { data } = useQuery(gql.IsUserLoggedInDocument);
 
   return (
     <>

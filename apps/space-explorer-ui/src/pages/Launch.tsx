@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client/react';
 import { useParams } from 'react-router-dom';
 
 import { Header, LaunchTile, Loading } from '@/components';
@@ -5,7 +6,7 @@ import * as gql from '@/graphql';
 
 export const Launch = () => {
   const params = useParams();
-  const { data, loading, error } = gql.useLaunchQuery({
+  const { data, loading, error } = useQuery(gql.LaunchDocument, {
     variables: { id: params.launchId ?? '' },
   });
 

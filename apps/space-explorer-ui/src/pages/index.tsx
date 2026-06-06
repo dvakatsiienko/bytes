@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useQuery } from '@apollo/client/react';
 import {
   Navigate,
   Route,
@@ -17,7 +18,7 @@ import * as gql from '@/graphql';
 import { clearLocalStorageAuthItems } from '@/utils';
 
 const ProtectedRoute = (props: ProtectedRouteProps) => {
-  const { data } = gql.useIsUserLoggedInQuery();
+  const { data } = useQuery(gql.IsUserLoggedInDocument);
 
   if (!data?.isLoggedIn) {
     return <Navigate replace to='/login' />;
@@ -27,7 +28,7 @@ const ProtectedRoute = (props: ProtectedRouteProps) => {
 };
 
 export const Pages = () => {
-  const { data } = gql.useIsUserLoggedInQuery();
+  const { data } = useQuery(gql.IsUserLoggedInDocument);
   const navigate = useNavigate();
   const location = useLocation();
 

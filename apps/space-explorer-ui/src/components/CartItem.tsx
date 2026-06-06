@@ -1,8 +1,12 @@
+import { useQuery } from '@apollo/client/react';
+
 import { LaunchTile } from './LaunchTile';
 import * as gql from '@/graphql';
 
 export const CartItem = (props: CartItemProps) => {
-  const launchQuery = gql.useLaunchQuery({ variables: { id: props.launchId } });
+  const launchQuery = useQuery(gql.LaunchDocument, {
+    variables: { id: props.launchId },
+  });
   const { data, loading } = launchQuery;
 
   if (loading) return <h4>Loading...</h4>;

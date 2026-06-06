@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { useQuery } from '@apollo/client/react';
 
 import { Button, Header, LaunchTile, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Launches = () => {
-  const { data, loading, fetchMore } = gql.useLaunchesQuery({
+  const { data, loading, fetchMore } = useQuery(gql.LaunchesDocument, {
     fetchPolicy: 'cache-and-network',
   });
   const [isLoadingMore, setIsLoadingMore] = useState(false);

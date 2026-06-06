@@ -1,15 +1,20 @@
+import { useMutation, useQuery } from '@apollo/client/react';
+
 import { cartItemsVar } from '@/lib/apollo';
 
 import { Button, CartItem, Header, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Cart = () => {
-  const cartItemsQuery = gql.useGetCartItemsQuery();
+  const cartItemsQuery = useQuery(gql.GetCartItemsDocument);
 
-  const [bookTripsMutation, bookTripsMeta] = gql.useBookTripsMutation({
-    onCompleted: () => cartItemsVar([]),
-    refetchQueries: [gql.UserProfileDocument],
-  });
+  const [bookTripsMutation, bookTripsMeta] = useMutation(
+    gql.BookTripsDocument,
+    {
+      onCompleted: () => cartItemsVar([]),
+      refetchQueries: [gql.UserProfileDocument],
+    },
+  );
 
   if (cartItemsQuery.loading || !cartItemsQuery.data) {
     return <Loading />;

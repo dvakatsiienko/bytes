@@ -12,6 +12,7 @@
     "includes": [
       "!**/.generated",
       "!**/prisma-client",
+      "!**/graphql/generated",
       "!**/next-env.d.ts",
       "!**/next-fonts.d.ts"
     ]

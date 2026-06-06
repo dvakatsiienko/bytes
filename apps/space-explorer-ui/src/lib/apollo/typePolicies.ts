@@ -10,7 +10,7 @@ export const typePolicies: TypePolicies = {
       launches: {
         keyArgs: false,
         merge(existing, incoming) {
-          let list: gql.Launch[] = [];
+          let list: gql.LaunchesQuery['launches']['list'] = [];
 
           if (existing?.list) {
             list = list.concat(existing.list);

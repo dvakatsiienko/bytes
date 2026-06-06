@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
 
 import { LogoutButton } from './LogoutButton';
@@ -5,8 +6,8 @@ import { CartSvg, HomeSvg, ProfileSvg } from './SVG';
 import * as gql from '@/graphql';
 
 export const Footer = () => {
-  const cartItemsQuery = gql.useGetCartItemsQuery();
-  const userProfileQuery = gql.useUserProfileQuery();
+  const cartItemsQuery = useQuery(gql.GetCartItemsDocument);
+  const userProfileQuery = useQuery(gql.UserProfileDocument);
 
   const cartItemsCount = cartItemsQuery.data?.cartItems.length;
   const userTripsCount = userProfileQuery.data?.userProfile.trips.length;
