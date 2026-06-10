@@ -15,7 +15,7 @@
     "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\""
   },
   "dependencies": {
-    "@apollo/client": "4.2.2",
+    "@apollo/client": "4.2.3",
     "@fontsource-variable/geist": "5.2.9",
     "@graphql-typed-document-node/core": "3.2.0",
     "@hookform/resolvers": "5.4.0",

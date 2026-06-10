@@ -295,8 +295,8 @@ importers:
   apps/space-explorer-ui:
     dependencies:
       '@apollo/client':
-        specifier: 4.2.2
-        version: 4.2.2(graphql-ws@6.0.8(graphql@16.14.1)(ws@8.21.0))(graphql@16.14.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
+        specifier: 4.2.3
+        version: 4.2.3(graphql-ws@6.0.8(graphql@16.14.1)(ws@8.21.0))(graphql@16.14.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)
       '@fontsource-variable/geist':
         specifier: 5.2.9
         version: 5.2.9
@@ -380,8 +380,8 @@ importers:
         specifier: 3.0.39
         version: 3.0.39(zod@4.4.3)
       '@ai-sdk/react':
-        specifier: 3.0.199
-        version: 3.0.199(react@19.2.7)(zod@4.4.3)
+        specifier: 3.0.200
+        version: 3.0.200(react@19.2.7)(zod@4.4.3)
       '@clerk/nextjs':
         specifier: 7.4.3
         version: 7.4.3(next@16.2.7(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -390,7 +390,7 @@ importers:
         version: 2.4.57(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@openrouter/ai-sdk-provider':
         specifier: 2.9.0
-        version: 2.9.0(ai@6.0.197(zod@4.4.3))(zod@4.4.3)
+        version: 2.9.0(ai@6.0.198(zod@4.4.3))(zod@4.4.3)
       '@radix-ui/react-dialog':
         specifier: 1.1.16
         version: 1.1.16(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -428,8 +428,8 @@ importers:
         specifier: 0.1.7
         version: 0.1.7(react@19.2.7)
       ai:
-        specifier: 6.0.197
-        version: 6.0.197(zod@4.4.3)
+        specifier: 6.0.198
+        version: 6.0.198(zod@4.4.3)
       convex:
         specifier: 1.40.0
         version: 1.40.0(@clerk/react@6.7.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
@@ -607,8 +607,8 @@ importers:
 
 packages:
 
-  '@ai-sdk/gateway@3.0.125':
-    resolution: {integrity: sha512-tocl7cUDoTpmhZqeW8XVKMMznZQwwQAEunF0VyNKmf64qt8NbMIAEiet/vRMzh7Jr9WcFeb6EZjmhLTP4Qx2Og==}
+  '@ai-sdk/gateway@3.0.126':
+    resolution: {integrity: sha512-OHwcwdVkzLo7Rx4eeFyyH3e/vlsYg11HIgKPf5yH6jkptI1Kzq8BX9xZPIBq4BrLBTF2p6pgvWqRfy6AvARGkQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -629,8 +629,8 @@ packages:
     resolution: {integrity: sha512-Q3BZ27qfpYqnCYGvE3vt+Qi6LGOF9R5Nmzn+9JoM1lCRsD9mYaIhfJLkSunN48nfGXJ6n+XNV0J/XVpqGQl7Dw==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/react@3.0.199':
-    resolution: {integrity: sha512-0QmG6nd1iDTTWpWbQbE5qgSpEm0XkBvrOn1L1rSzBhG5+7BasckcjTF3CQMwUxdvozMMYRNOGXLQODs/1+a3NQ==}
+  '@ai-sdk/react@3.0.200':
+    resolution: {integrity: sha512-OzO/raYhgzQo5iVDRJYNCrlDj0gMmS8TBlOdGtZo5Elzl5unGEVQrtn0zjP3u4sFiKflr6D2En+qeeBMUzPZDA==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18 || ~19.0.1 || ~19.1.2 || ^19.2.1
@@ -644,10 +644,10 @@ packages:
     peerDependencies:
       graphql: 14.x || 15.x || 16.x
 
-  '@apollo/client@4.2.2':
-    resolution: {integrity: sha512-tiI91oRHFB43QBDy1Y9gaBYYcz+0YmU7qtziHZfVAdXYyaI+y5NIvfT7fYPUzeAYfT6gXU6/lndcdmsr4MsOBQ==}
+  '@apollo/client@4.2.3':
+    resolution: {integrity: sha512-+auRYBXow2v7cT+wKzvjyMyyEojq+G7Sf80vIR57rtEPcxRFuMXuU9IKjwxZ3muclUgdGKwZXNeuki+g0GabgQ==}
     peerDependencies:
-      graphql: ^16.0.0
+      graphql: ^16.0.0 || ^17.0.0
       graphql-ws: ^5.5.5 || ^6.0.3
       react: ^17.0.0 || ^18.0.0 || >=19.0.0-rc
       react-dom: ^17.0.0 || ^18.0.0 || >=19.0.0-rc
@@ -2849,8 +2849,8 @@ packages:
     peerDependencies:
       redux: ^3.1.0 || ^4.0.0 || ^5.0.0
 
-  '@repeaterjs/repeater@3.0.6':
-    resolution: {integrity: sha512-Javneu5lsuhwNCryN+pXH93VPQ8g0dBX7wItHFgYiwQmzE1sVdg5tWHiOgHywzL2W21XQopa7IwIEnNbmeUJYA==}
+  '@repeaterjs/repeater@3.1.0':
+    resolution: {integrity: sha512-TaoVksZRSx2KWYYpyLQtMQXXeS98VsgZImzW65xmiVgbYhXLk+aEsmzPLirqVuE4/XuUapH2iMtxUzaBNDzdSQ==}
 
   '@rolldown/binding-android-arm64@1.0.3':
     resolution: {integrity: sha512-454rs7jHngixp/NMxd5srYD57OnzSlZ/eFTETjORQHLwJG1lRtmNOJcBerZlfu4GjKqeq8aCCIQrMdHyhI51Hw==}
@@ -3250,8 +3250,8 @@ packages:
     resolution: {integrity: sha512-FNoYzHawTMk/6KMQoEG5O4PuioX19UbwdQKF44yw0nLfOypfQdjtfZzo/UIJWAJ23sNIFbD1Ug9lbaDGMwbqQA==}
     engines: {node: '>=8'}
 
-  ai@6.0.197:
-    resolution: {integrity: sha512-U3KsjkqwQXGHC0u0VeUDqUaNaBS/uQc7v4Vj92Cjv5lPx5DIyRBQYk4Hipy5vwD9AQKIG8uRvdaN9R+pAvrtcQ==}
+  ai@6.0.198:
+    resolution: {integrity: sha512-NEXlYGu3n7VTG6cn3SAeimfy60FLH/R5uRpl7zqDu0BLtIuoY1lALBGoJzltoVqd/iFQH1asIy/VqZqLPDWv0w==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -3736,8 +3736,8 @@ packages:
   effect@3.20.0:
     resolution: {integrity: sha512-qMLfDJscrNG8p/aw+IkT9W7fgj50Z4wG5bLBy0Txsxz8iUHjDIkOgO3SV0WZfnQbNG2VJYb0b+rDLMrhM4+Krw==}
 
-  electron-to-chromium@1.5.368:
-    resolution: {integrity: sha512-7RckJJK4uESJF9PxvfMWd3TGqIiieUTG4HxnKaKuIpGbcr+r2ZEB3g2gAhCP3Fqm42vJSzLfgab9eva/C4/XVw==}
+  electron-to-chromium@1.5.369:
+    resolution: {integrity: sha512-XM22K9FNaaCOvMMrBn1caIc8v0g6+pKt660ZbfQqUZvfil0hEzr8ZoiY7VcSLGM3L/x3rz5PqZrk+bKOOmVM9w==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -4103,8 +4103,8 @@ packages:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
 
-  hono@4.12.24:
-    resolution: {integrity: sha512-I36D1s+HgQc55KbhEr4iybfxv/9o1zdpw+XEM6dJa91LqQD0HCoSGdxpRJCZE+aavs87j4V3Ls2OJzq8C/U4iw==}
+  hono@4.12.25:
+    resolution: {integrity: sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@2.8.9:
@@ -5535,8 +5535,8 @@ packages:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
 
-  semver@7.8.2:
-    resolution: {integrity: sha512-c8jsqUZm3omBOI66G90z1Dyw5z622G8oLG+omfsHBJf3CWQTlOcwOjvOG6wtiNfW6anKm/eA39LMwMtMez2TiQ==}
+  semver@7.8.3:
+    resolution: {integrity: sha512-wnilbGyMxzbY7dNOl7jpKbLSjcfeweJWU5j4+u5qW+6/wuGD9KzIGOyZnQVSBM9E7DtWaaH3CyHkppYrKYoxwg==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -5605,8 +5605,8 @@ packages:
     resolution: {integrity: sha512-WPS/HvHQTYnHisLo9McqBHOJk2FkHO/tlpvldyrnem4aeQp4hai3gythswg6p01oSoTl58rcpiFAjF2br2Ak2A==}
     engines: {node: '>= 0.4'}
 
-  side-channel@1.1.0:
-    resolution: {integrity: sha512-ZX99e6tRweoUXqR+VBrslhda51Nh5MTQwou5tnUDgbtyM0dBgmhEDtWGP/xbKn6hqfPRHujUNwz5fy/wbbhnpw==}
+  side-channel@1.1.1:
+    resolution: {integrity: sha512-6x6dK6zJdpTzF4sQeNYxwtvBzf6Eg4GtlesS94HOvTudUeyK2WXAaIfmDgsyslYrRBeFIlsi54AYsFGUuhmvrQ==}
     engines: {node: '>= 0.4'}
 
   signal-exit@3.0.7:
@@ -6247,7 +6247,7 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/gateway@3.0.125(zod@4.4.3)':
+  '@ai-sdk/gateway@3.0.126(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
       '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
@@ -6271,10 +6271,10 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@3.0.199(react@19.2.7)(zod@4.4.3)':
+  '@ai-sdk/react@3.0.200(react@19.2.7)(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
-      ai: 6.0.197(zod@4.4.3)
+      ai: 6.0.198(zod@4.4.3)
       react: 19.2.7
       swr: 2.4.1(react@19.2.7)
       throttleit: 2.1.0
@@ -6287,7 +6287,7 @@ snapshots:
     dependencies:
       graphql: 16.14.1
 
-  '@apollo/client@4.2.2(graphql-ws@6.0.8(graphql@16.14.1)(ws@8.21.0))(graphql@16.14.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)':
+  '@apollo/client@4.2.3(graphql-ws@6.0.8(graphql@16.14.1)(ws@8.21.0))(graphql@16.14.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rxjs@7.8.2)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.1)
       '@wry/caches': 1.0.1
@@ -7085,7 +7085,7 @@ snapshots:
       '@graphql-tools/executor': 1.5.3(graphql@16.14.1)
       '@graphql-tools/schema': 10.0.33(graphql@16.14.1)
       '@graphql-tools/utils': 11.1.0(graphql@16.14.1)
-      '@repeaterjs/repeater': 3.0.6
+      '@repeaterjs/repeater': 3.1.0
       '@whatwg-node/promise-helpers': 1.3.2
       dataloader: 2.2.3
       graphql: 16.14.1
@@ -7124,7 +7124,7 @@ snapshots:
       '@graphql-hive/signal': 2.0.0
       '@graphql-tools/executor-common': 1.0.6(graphql@16.14.1)
       '@graphql-tools/utils': 11.1.0(graphql@16.14.1)
-      '@repeaterjs/repeater': 3.0.6
+      '@repeaterjs/repeater': 3.1.0
       '@whatwg-node/disposablestack': 0.0.6
       '@whatwg-node/fetch': 0.10.13
       '@whatwg-node/promise-helpers': 1.3.2
@@ -7150,7 +7150,7 @@ snapshots:
     dependencies:
       '@graphql-tools/utils': 11.1.0(graphql@16.14.1)
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.1)
-      '@repeaterjs/repeater': 3.0.6
+      '@repeaterjs/repeater': 3.1.0
       '@whatwg-node/disposablestack': 0.0.6
       '@whatwg-node/promise-helpers': 1.3.2
       graphql: 16.14.1
@@ -7299,9 +7299,9 @@ snapshots:
     dependencies:
       react: 19.2.7
 
-  '@hono/node-server@1.19.11(hono@4.12.24)':
+  '@hono/node-server@1.19.11(hono@4.12.25)':
     dependencies:
-      hono: 4.12.24
+      hono: 4.12.25
 
   '@hookform/resolvers@5.4.0(react-hook-form@7.78.0(react@19.2.7))':
     dependencies:
@@ -7617,9 +7617,9 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@openrouter/ai-sdk-provider@2.9.0(ai@6.0.197(zod@4.4.3))(zod@4.4.3)':
+  '@openrouter/ai-sdk-provider@2.9.0(ai@6.0.198(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      ai: 6.0.197(zod@4.4.3)
+      ai: 6.0.198(zod@4.4.3)
       zod: 4.4.3
 
   '@opentelemetry/api@1.9.1': {}
@@ -7794,13 +7794,13 @@ snapshots:
       '@electric-sql/pglite': 0.4.1
       '@electric-sql/pglite-socket': 0.1.1(@electric-sql/pglite@0.4.1)
       '@electric-sql/pglite-tools': 0.3.1(@electric-sql/pglite@0.4.1)
-      '@hono/node-server': 1.19.11(hono@4.12.24)
+      '@hono/node-server': 1.19.11(hono@4.12.25)
       '@prisma/get-platform': 7.2.0
       '@prisma/query-plan-executor': 7.2.0
       '@prisma/streams-local': 0.1.2
       foreground-child: 3.3.1
       get-port-please: 3.2.0
-      hono: 4.12.24
+      hono: 4.12.25
       http-status-codes: 2.3.0
       pathe: 2.0.3
       proper-lockfile: 4.1.2
@@ -8359,7 +8359,7 @@ snapshots:
       immutable: 4.3.8
       redux: 5.0.1
 
-  '@repeaterjs/repeater@3.0.6': {}
+  '@repeaterjs/repeater@3.1.0': {}
 
   '@rolldown/binding-android-arm64@1.0.3':
     optional: true
@@ -8671,9 +8671,9 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  ai@6.0.197(zod@4.4.3):
+  ai@6.0.198(zod@4.4.3):
     dependencies:
-      '@ai-sdk/gateway': 3.0.125(zod@4.4.3)
+      '@ai-sdk/gateway': 3.0.126(zod@4.4.3)
       '@ai-sdk/provider': 3.0.10
       '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
       '@opentelemetry/api': 1.9.1
@@ -8803,7 +8803,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.10.34
       caniuse-lite: 1.0.30001797
-      electron-to-chromium: 1.5.368
+      electron-to-chromium: 1.5.369
       node-releases: 2.0.47
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
 
@@ -9129,7 +9129,7 @@ snapshots:
       '@standard-schema/spec': 1.1.0
       fast-check: 3.23.2
 
-  electron-to-chromium@1.5.368: {}
+  electron-to-chromium@1.5.369: {}
 
   emoji-regex@10.6.0: {}
 
@@ -9586,7 +9586,7 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
-  hono@4.12.24: {}
+  hono@4.12.25: {}
 
   hosted-git-info@2.8.9: {}
 
@@ -9633,7 +9633,7 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
       hasown: 2.0.4
-      side-channel: 1.1.0
+      side-channel: 1.1.1
 
   invariant@2.2.4:
     dependencies:
@@ -10530,7 +10530,7 @@ snapshots:
 
   node-abi@3.92.0:
     dependencies:
-      semver: 7.8.2
+      semver: 7.8.3
 
   node-domexception@1.0.0: {}
 
@@ -10890,7 +10890,7 @@ snapshots:
 
   qs@6.15.2:
     dependencies:
-      side-channel: 1.1.0
+      side-channel: 1.1.1
 
   queue-microtask@1.2.3: {}
 
@@ -11200,7 +11200,7 @@ snapshots:
 
   semver@6.3.1: {}
 
-  semver@7.8.2: {}
+  semver@7.8.3: {}
 
   seq-queue@0.0.5: {}
 
@@ -11242,7 +11242,7 @@ snapshots:
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
-      semver: 7.8.2
+      semver: 7.8.3
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.5
       '@img/sharp-darwin-x64': 0.34.5
@@ -11304,7 +11304,7 @@ snapshots:
       object-inspect: 1.13.4
       side-channel-map: 1.0.1
 
-  side-channel@1.1.0:
+  side-channel@1.1.1:
     dependencies:
       es-errors: 1.3.0
       object-inspect: 1.13.4
