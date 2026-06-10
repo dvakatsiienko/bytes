@@ -14,11 +14,19 @@ export const seedFriends = mutation({
   },
 });
 
+const FRIEND_ORDER = ['Jacob', 'Sativa', 'Akira'];
+const friendRank = (name: string) => {
+  const index = FRIEND_ORDER.indexOf(name);
+  return index === -1 ? FRIEND_ORDER.length : index;
+};
+
 export const getFriendList = query({
   handler: async (ctx) => {
     const friendListQuery = await ctx.db.query('friend').collect();
 
-    return friendListQuery;
+    return friendListQuery.sort(
+      (a, b) => friendRank(a.name) - friendRank(b.name),
+    );
   },
 });
 export const getFriendById = query({
