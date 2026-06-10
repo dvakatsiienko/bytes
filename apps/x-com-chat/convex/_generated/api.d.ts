@@ -8,14 +8,14 @@
  * @module
  */
 
-import type * as chat from '../chat.js';
-import type * as seed_data from '../seed_data.js';
+import type * as chat from "../chat.js";
+import type * as seed_data from "../seed_data.js";
 
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
-} from 'convex/server';
+} from "convex/server";
 
 declare const fullApi: ApiFromModules<{
   chat: typeof chat;
@@ -32,7 +32,7 @@ declare const fullApi: ApiFromModules<{
  */
 export declare const api: FilterApi<
   typeof fullApi,
-  FunctionReference<any, 'public'>
+  FunctionReference<any, "public">
 >;
 
 /**
@@ -45,7 +45,7 @@ export declare const api: FilterApi<
  */
 export declare const internal: FilterApi<
   typeof fullApi,
-  FunctionReference<any, 'internal'>
+  FunctionReference<any, "internal">
 >;
 
 export declare const components: {};

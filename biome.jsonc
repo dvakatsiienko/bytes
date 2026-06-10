@@ -11,6 +11,7 @@
     "ignoreUnknown": false,
     "includes": [
       "!**/.generated",
+      "!**/_generated",
       "!**/prisma-client",
       "!**/graphql/generated",
       "!**/next-env.d.ts",
