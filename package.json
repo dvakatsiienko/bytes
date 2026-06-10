@@ -6,9 +6,9 @@
   "private": true,
   "scripts": {
     "dev:@space-explorer/ui": "turbo @space-explorer/ui#dev",
-    "dev:@space-explorer/api": "turbo @space-explorer/api#dev ",
+    "dev:@space-explorer/api": "turbo @space-explorer/api#dev",
     "dev:cv": "turbo cv#dev",
-    "dev:x-com-chat": "turbo x-com-chat#dev x-com-chat#convex",
+    "dev:x-com-chat": "turbo x-com-chat#dev x-com-chat#dev:convex",
     "dev:figmentation": "turbo figmentation#dev",
     "dev:financial": "turbo financial#dev",
     "dev:garment": "turbo garment#dev garment-api#dev",
