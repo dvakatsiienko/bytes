@@ -1,25 +1,18 @@
 import type { KnipConfig } from 'knip';
 
 export default {
-  ignore: ['convex/__generated/*.{js,jsx,ts,tsx,d.ts}'],
+  /* vendored shadcn/ui primitives — kept complete by design, don't report their
+   * unused re-exports (but still type-checked/linted as normal source) */
+  ignore: ['src/components/ui/**'],
+  /* provided by the workspace root, referenced only in package.json scripts */
+  ignoreBinaries: ['rimraf', 'biome', 'tsc'],
   ignoreDependencies: [
-    /* knip's tw plugin doesn't support tw v4 */
-    '@tailwindcss/forms',
-    '@tailwindcss/typography',
-    'tailwind-scrollbar',
-    'tw-animate-css',
-
-    /* dev deps */
-    'tailwindcss',
+    /* kept for ad-hoc execution of standalone TS files, not imported anywhere */
+    'tsx',
   ],
-  /**
-   * Files are reported as unused if they are in the set of project files,
-   * but not in the set of files resolved from the entry files.
-   */
-  // entry: ['src/**/*.{js,jsx,ts,tsx,css}', '!convex/__generated/*.{js,jsx,ts,tsx}'],
   project: [
     'src/**/*.{js,jsx,ts,tsx,css}',
     'convex/**/*.{js,jsx,ts,tsx}',
-    '!convex/__generated/*.{js,jsx,ts,tsx,d.ts}',
+    '!convex/_generated/**',
   ],
 } satisfies KnipConfig;

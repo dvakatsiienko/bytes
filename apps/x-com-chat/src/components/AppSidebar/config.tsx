@@ -32,5 +32,4 @@ export const colorPresetValueList = colorPresetList.map(
 );
 
 /* Types */
-export type AppTheme = (typeof themeList)[number]['value'];
 export type AppColorPreset = (typeof colorPresetList)[number]['value'];

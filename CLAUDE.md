@@ -16,7 +16,7 @@ Each app maintains its own CLAUDE.md with detailed implementation context.
 | App                  | Purpose                                 | Stack                             | Status     |
 | -------------------- | --------------------------------------- | --------------------------------- | ---------- |
 | `cv`                 | Personal portfolio with tool showcase   | Next.js 15, React 19, Tailwind    | Production |
-| `x-com-chat`         | AI chat with customizable alien friends | Next.js, Convex, Jotai, Prisma    | Active Dev |
+| `x-com-chat`         | AI chat with customizable alien friends | Next.js, Convex, Jotai, Clerk     | Active Dev |
 | `space-explorer-ui`  | GraphQL client demo                     | Vite, Apollo Client, React        | Demo       |
 | `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
 | `financial`          | Financial dashboard with auth           | Next.js, Prisma, Auth.js          | WIP        |

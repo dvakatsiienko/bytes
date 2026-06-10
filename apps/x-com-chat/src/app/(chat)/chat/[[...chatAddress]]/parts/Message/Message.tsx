@@ -36,7 +36,7 @@ const AnimatedBorder = (props: React.PropsWithChildren) => {
   );
 };
 
-export function MessageReasoningPart({
+function MessageReasoningPart({
   part,
   isReasoning,
 }: MessageReasoningPartProps) {
@@ -119,6 +119,7 @@ const MessagePreview = ({
             animate={{ opacity: 1, y: 0 }}
             className='flex w-full flex-row items-start gap-2 pb-4'
             initial={{ opacity: 0, y: 5 }}
+            // biome-ignore lint/suspicious/noArrayIndexKey: message parts render in stable order
             key={`message-${message.id}-part-${i}`}>
             <div
               className={cn('flex flex-col gap-4 px-3 py-2', {
@@ -149,6 +150,7 @@ const MessagePreview = ({
             animate={{ opacity: 1, y: 0 }}
             className='mb-3 flex flex-col gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-2 text-sm dark:border-zinc-800 dark:bg-zinc-900'
             initial={{ opacity: 0, y: 5 }}
+            // biome-ignore lint/suspicious/noArrayIndexKey: message parts render in stable order
             key={`message-${message.id}-part-${i}`}>
             <div className='flex flex-1 items-center justify-center'>
               <div className='flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 dark:bg-zinc-800'>
@@ -188,6 +190,7 @@ const MessagePreview = ({
                 i === message.parts.length - 1) ??
               false
             }
+            // biome-ignore lint/suspicious/noArrayIndexKey: message parts render in stable order
             key={`message-${message.id}-${i}`}
             part={part as ReasoningUIPart}
           />
@@ -244,15 +247,15 @@ export const Message = memo(MessagePreview, (prevProps, nextProps) => {
 
 /* Types */
 interface MessagePreviewProps {
-  message: TMessage;
-  isLoading: boolean;
-  status: 'error' | 'submitted' | 'streaming' | 'ready';
   isLatestMessage: boolean;
+  isLoading: boolean;
+  message: TMessage;
+  status: 'error' | 'submitted' | 'streaming' | 'ready';
 }
 type MessagePart = NonNullable<TMessage['parts']>[number];
 type ReasoningUIPart = Extract<MessagePart, { type: 'reasoning' }>;
 
 interface MessageReasoningPartProps {
-  part: ReasoningUIPart;
   isReasoning: boolean;
+  part: ReasoningUIPart;
 }
