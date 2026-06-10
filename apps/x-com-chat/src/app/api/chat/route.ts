@@ -19,11 +19,9 @@ import {
 
 import { api } from '@/convex/_generated/api';
 
-const keyOpenRouter =
-  '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';
+const keyOpenRouter = process.env.OPENROUTER_API_KEY;
 const keyGroq = process.env.GROQ_API_KEY;
 
-if (!keyOpenRouter) throw new Error('OPENROUTER_API_KEY is not set');
 if (!keyGroq) throw new Error('GROQ_API_KEY is not set');
 
 const _openrouter = createOpenRouter({ apiKey: keyOpenRouter });
