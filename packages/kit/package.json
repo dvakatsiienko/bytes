@@ -28,7 +28,7 @@
     "@types/react-dom": "19.2.3",
     "@workspace/typescript-config": "workspace:*",
     "postcss": "8.5.15",
-    "prettier": "3.8.3",
+    "prettier": "3.8.4",
     "tailwindcss": "4.3.0"
   },
   "exports": {
