@@ -170,10 +170,7 @@
       },
 
       /* rules under development */
-      "nursery": {
-        "noLeakedRender": "off", // ultracite rule — && operator is useful
-        "noUndeclaredEnvVars": "error"
-      },
+      "nursery": {},
 
       /* rules catching ways your code could be written to run faster, or generally be more efficient. */
       "performance": {
@@ -215,6 +212,8 @@
           }
         },
         "noUnknownAtRules": "off", // ultracite rule — there are too much custom at-rules from tailwind. review this rule when it will go out from nursery.
+        "noUndeclaredEnvVars": "error",
+        "noLeakedRender": "off", // ultracite rule — && operator is useful
 
         /* React */
         "useBiomeIgnoreFolder": "error",

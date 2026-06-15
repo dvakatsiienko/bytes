@@ -10,6 +10,7 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
+      "!**/*.svg",
       "!**/.generated",
       "!**/_generated",
       "!**/prisma-client",
