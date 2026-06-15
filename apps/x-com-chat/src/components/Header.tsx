@@ -70,7 +70,7 @@ export const Header = (props: HeaderProps) => {
               {isLoaded && !isSignedIn && (
                 <motion.div key='sign-in' {...fadeAnimation} className=''>
                   <SignInButton
-                    appearance={{ baseTheme }}
+                    appearance={{ theme: baseTheme }}
                     mode='modal'
                     oauthFlow='popup'>
                     <Button
@@ -91,9 +91,9 @@ export const Header = (props: HeaderProps) => {
                 <motion.div key='user-button' {...fadeAnimation}>
                   <Button size='icon' variant='ghost'>
                     <UserButton
-                      appearance={{ baseTheme }}
+                      appearance={{ theme: baseTheme }}
                       userProfileProps={{
-                        appearance: { baseTheme },
+                        appearance: { theme: baseTheme },
                       }}
                     />
                   </Button>
