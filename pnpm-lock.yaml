@@ -54,8 +54,8 @@ importers:
         specifier: 1.0.0-beta.3
         version: 1.0.0-beta.3(typescript@6.0.3)
       lucide-react:
-        specifier: 1.20.0
-        version: 1.20.0(react@19.2.7)
+        specifier: 1.21.0
+        version: 1.21.0(react@19.2.7)
       next:
         specifier: 16.2.9
         version: 16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -371,17 +371,17 @@ importers:
         specifier: 3.0.42
         version: 3.0.42(zod@4.4.3)
       '@ai-sdk/react':
-        specifier: 3.0.209
-        version: 3.0.209(react@19.2.7)(zod@4.4.3)
+        specifier: 3.0.210
+        version: 3.0.210(react@19.2.7)(zod@4.4.3)
       '@clerk/nextjs':
-        specifier: 7.5.3
-        version: 7.5.3(next@16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: 7.5.5
+        version: 7.5.5(next@16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@clerk/themes':
         specifier: 2.4.57
         version: 2.4.57(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@openrouter/ai-sdk-provider':
         specifier: 2.9.1
-        version: 2.9.1(ai@6.0.207(zod@4.4.3))(zod@4.4.3)
+        version: 2.9.1(ai@6.0.208(zod@4.4.3))(zod@4.4.3)
       '@radix-ui/react-dialog':
         specifier: 1.1.17
         version: 1.1.17(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -413,11 +413,11 @@ importers:
         specifier: 0.1.7
         version: 0.1.7(react@19.2.7)
       ai:
-        specifier: 6.0.207
-        version: 6.0.207(zod@4.4.3)
+        specifier: 6.0.208
+        version: 6.0.208(zod@4.4.3)
       convex:
         specifier: 1.41.0
-        version: 1.41.0(@clerk/react@6.10.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+        version: 1.41.0(@clerk/react@6.10.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
       cva:
         specifier: 1.0.0-beta.3
         version: 1.0.0-beta.3(typescript@6.0.3)
@@ -428,8 +428,8 @@ importers:
         specifier: 2.20.1
         version: 2.20.1(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.17)(react@19.2.7)
       lucide-react:
-        specifier: 1.20.0
-        version: 1.20.0(react@19.2.7)
+        specifier: 1.21.0
+        version: 1.21.0(react@19.2.7)
       motion:
         specifier: 12.40.0
         version: 12.40.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -602,8 +602,8 @@ packages:
     resolution: {integrity: sha512-Q3BZ27qfpYqnCYGvE3vt+Qi6LGOF9R5Nmzn+9JoM1lCRsD9mYaIhfJLkSunN48nfGXJ6n+XNV0J/XVpqGQl7Dw==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/react@3.0.209':
-    resolution: {integrity: sha512-0lZrb5St5EpRQAjAhrv9ZhAJNNl7NYtZYwyZRMp/nicx6EbL4NSeeVQBx6yGOYNGYj8Z2KsOV7qsZqBZZmlcig==}
+  '@ai-sdk/react@3.0.210':
+    resolution: {integrity: sha512-VprBlyc8yvwlpIdcIICL307vRncXrLlmcRTY/7JR5ND9+LvUcxJU16yW6prClFahqEWVza8Vr8P4Bgk5ZBtp4A==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18 || ~19.0.1 || ~19.1.2 || ^19.2.1
@@ -889,20 +889,20 @@ packages:
     resolution: {integrity: sha512-zccHj2z2oCCO4yrDiRSlFOxWerGqRiysP7a5jPK6uoI9URKAquwY42Dd/iUP8JWHxEzdRe4TlbvZCo8z1/mhrw==}
     engines: {node: '>= 20.12.0'}
 
-  '@clerk/backend@3.7.1':
-    resolution: {integrity: sha512-2CeOUZJQ0aKZ51fdaoCEh8ffOC7KD5w9Q8HZXw0AnEWuxFiplyyhwDo/ixFWYueQULWOehjzRNR89YEQTwuY0w==}
+  '@clerk/backend@3.8.0':
+    resolution: {integrity: sha512-uZLyJNsRYnc8Ccx7IK/ZpUajRmb69khgwab3c24THK/oIyFs78wFlZ3rAKuC5K+BroggDOSUBwceXYJPUTCLLQ==}
     engines: {node: '>=20.9.0'}
 
-  '@clerk/nextjs@7.5.3':
-    resolution: {integrity: sha512-/PuTjaEi0ks11bRPjKGnqi3OZXwjn+8xSCeLmcjHc04C5Ohe44V935XXYgT2bOWqFz0uzULSSVqnr6b6mA1jag==}
+  '@clerk/nextjs@7.5.5':
+    resolution: {integrity: sha512-fhFR2BUQ9hjRBZJ3RM75FteM7YQCUWH5bQpc0icMJysuK7CIPGNaMHrFpAjq4zIY6MvtAIyLzts+jC8wY3SF5Q==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
       next: ^15.2.8 || ^15.3.8 || ^15.4.10 || ^15.5.9 || ^15.6.0-0 || ^16.0.10 || ^16.1.0-0
       react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
       react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
 
-  '@clerk/react@6.10.0':
-    resolution: {integrity: sha512-ixEFt0mq0DL2uXcR/h71oqhUQAM3aAelbyO4WCO8aeeg18Urf+nnghed8FhHGDwSDMbfzyix4F7jHxSr0U7qpg==}
+  '@clerk/react@6.10.2':
+    resolution: {integrity: sha512-8f6F+GMhtyrVGxxpqXCdKP16l+EhoNTBI1QD4B6x3U0h2XW6qe7MK8X5X9PFJ27hrSgIjy+M64zhz8j9uXL6fA==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
       react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
@@ -920,8 +920,8 @@ packages:
       react-dom:
         optional: true
 
-  '@clerk/shared@4.18.0':
-    resolution: {integrity: sha512-WHqnq1dUUjBFrrnptQEpRpoP3H2Pag00E2MP6+aHfJICNjqSSZU3NecOpcKeizYr77hFG38jqV9jcIyB5UpmBQ==}
+  '@clerk/shared@4.19.0':
+    resolution: {integrity: sha512-27tZG3/PAuuOQAKFpKGzFlio2FC/t/0TcSRl6UNlYap85BJRPnnYdo3PaVunNbKYKOpaFwJlwgcD2cKB7l/qWw==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
       react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
@@ -3200,8 +3200,8 @@ packages:
     resolution: {integrity: sha512-FNoYzHawTMk/6KMQoEG5O4PuioX19UbwdQKF44yw0nLfOypfQdjtfZzo/UIJWAJ23sNIFbD1Ug9lbaDGMwbqQA==}
     engines: {node: '>=8'}
 
-  ai@6.0.207:
-    resolution: {integrity: sha512-9rAHnqU+AvxyqO6WgiWj7hQENX6AprHXZWZEdBWwgnA854D2Mje/PiTmbcFqO+2Cck1lII0NLRQJY9lmdSorMw==}
+  ai@6.0.208:
+    resolution: {integrity: sha512-STz+AaZqJ4ZjH7UkpXkbHx+bjgIDOsE8fIUoZjkZ2whoZcfVmG9K/TqEKouJZ03SuZuD7lagntlU3zBhAEkRpQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -4558,8 +4558,8 @@ packages:
     resolution: {integrity: sha512-DqC6n3QQ77zdFpCMASA1a3Jlb64Hv2N2DciFGkO/4L9+q/IpIAuRlKOvCXabtRW6cQf8usbmM6BE/TOPysCdIA==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
 
-  lucide-react@1.20.0:
-    resolution: {integrity: sha512-jhXLeC/7m0/tjL1nzMdKk6x256zWA6AtbhTVreHOiKPoeX2d6MK4FbyIQPpVq0E6iPWBisyy1TW+pEge/uMEuQ==}
+  lucide-react@1.21.0:
+    resolution: {integrity: sha512-reEZMXq8Qdd5jg5XYkQ5TR1fB/GiQ7ih4vcrthYDtgjSDwh0i6/YLiGjsWsIwgN49gpAnd4J2elSNzncMEEUUQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -6222,10 +6222,10 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@3.0.209(react@19.2.7)(zod@4.4.3)':
+  '@ai-sdk/react@3.0.210(react@19.2.7)(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider-utils': 4.0.30(zod@4.4.3)
-      ai: 6.0.207(zod@4.4.3)
+      ai: 6.0.208(zod@4.4.3)
       react: 19.2.7
       swr: 2.4.1(react@19.2.7)
       throttleit: 2.1.0
@@ -6549,29 +6549,29 @@ snapshots:
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
-  '@clerk/backend@3.7.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@clerk/backend@3.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@clerk/shared': 4.18.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@clerk/shared': 4.19.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       standardwebhooks: 1.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
       - react
       - react-dom
 
-  '@clerk/nextjs@7.5.3(next@16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@clerk/nextjs@7.5.5(next@16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@clerk/backend': 3.7.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@clerk/react': 6.10.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@clerk/shared': 4.18.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@clerk/backend': 3.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@clerk/react': 6.10.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@clerk/shared': 4.19.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next: 16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       server-only: 0.0.1
       tslib: 2.8.1
 
-  '@clerk/react@6.10.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@clerk/react@6.10.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@clerk/shared': 4.18.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@clerk/shared': 4.19.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       tslib: 2.8.1
@@ -6588,7 +6588,7 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@clerk/shared@4.18.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@clerk/shared@4.19.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@tanstack/query-core': 5.101.0
       dequal: 2.0.3
@@ -7568,9 +7568,9 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@openrouter/ai-sdk-provider@2.9.1(ai@6.0.207(zod@4.4.3))(zod@4.4.3)':
+  '@openrouter/ai-sdk-provider@2.9.1(ai@6.0.208(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      ai: 6.0.207(zod@4.4.3)
+      ai: 6.0.208(zod@4.4.3)
       zod: 4.4.3
 
   '@opentelemetry/api@1.9.1': {}
@@ -8583,7 +8583,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  ai@6.0.207(zod@4.4.3):
+  ai@6.0.208(zod@4.4.3):
     dependencies:
       '@ai-sdk/gateway': 3.0.133(zod@4.4.3)
       '@ai-sdk/provider': 3.0.10
@@ -8869,13 +8869,13 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  convex@1.41.0(@clerk/react@6.10.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7):
+  convex@1.41.0(@clerk/react@6.10.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7):
     dependencies:
       esbuild: 0.27.0
       prettier: 3.8.4
       ws: 8.20.1
     optionalDependencies:
-      '@clerk/react': 6.10.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@clerk/react': 6.10.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
     transitivePeerDependencies:
       - bufferutil
@@ -9951,7 +9951,7 @@ snapshots:
 
   lru.min@1.1.4: {}
 
-  lucide-react@1.20.0(react@19.2.7):
+  lucide-react@1.21.0(react@19.2.7):
     dependencies:
       react: 19.2.7
 
