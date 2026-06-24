@@ -55,7 +55,7 @@
     "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "jotai-devtools": "0.14.0",
-    "knip": "6.17.1",
+    "knip": "6.18.0",
     "tailwindcss": "4.3.1",
     "tsx": "4.22.4"
   }

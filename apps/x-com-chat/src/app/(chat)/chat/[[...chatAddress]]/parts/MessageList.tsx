@@ -108,11 +108,11 @@ const promptSuggestionList = [
 
 /* Types */
 interface MessageListProps {
-  messages: TMessage[];
+  className?: string;
   isLoading: boolean;
+  messages: TMessage[];
+  selectedFriendName: string;
+  sendPromptSuggestion: (text: string) => void;
   status: 'error' | 'submitted' | 'streaming' | 'ready';
   testMessages?: boolean;
-  className?: string;
-  sendPromptSuggestion: (text: string) => void;
-  selectedFriendName: string;
 }
