@@ -58,12 +58,7 @@ export async function POST(req: Request) {
 
   try {
     const streamTextResponse = streamText({
-      // model: openrouter('google/gemini-2.5-pro-exp-03-25:free'),
-      // model: openrouter('deepseek/deepseek-chat-v3-0324:free'),
-      // model: openrouter('google/gemini-2.0-flash-001'),
-      // model: openrouter('deepseek/deepseek-chat-v3-0324:free'),
-      model: modelProvider.languageModel('llama-3.1-8b-instant'), // ? quick
-      // model: modelProvider.languageModel('llama-3.3-70b-versatile'), // ? conversational // TODO deprecates on august 31, find another one
+      model: modelProvider.languageModel('gpt-oss-20b'),
       system: chatFriend?.system,
       messages: modelMessages,
       // all persistence moved to toUIMessageStreamResponse.onFinish
@@ -95,8 +90,7 @@ export async function POST(req: Request) {
 
 const modelProvider = customProvider({
   languageModels: {
-    'llama-3.3-70b-versatile': groq('llama-3.3-70b-versatile'),
-    'llama-3.1-8b-instant': groq('llama-3.1-8b-instant'),
+    'gpt-oss-20b': groq('openai/gpt-oss-20b'),
     'deepseek-r1-distill-llama-70b': wrapLanguageModel({
       middleware: extractReasoningMiddleware({ tagName: 'think' }),
       model: groq('deepseek-r1-distill-llama-70b'),
