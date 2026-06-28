@@ -33,7 +33,7 @@
     "@biomejs/biome": "2.5.1",
     "biome-config-polished": "workspace:*",
     "lefthook": "2.1.9",
-    "prettier": "3.8.4",
+    "prettier": "3.9.0",
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.8.0",
     "rimraf": "6.1.3",
