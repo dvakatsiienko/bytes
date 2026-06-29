@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   try {
     const streamTextResponse = streamText({
       model: modelProvider.languageModel('gpt-oss-20b'),
-      system: chatFriend?.system,
+      instructions: chatFriend?.system,
       messages: modelMessages,
       // all persistence moved to toUIMessageStreamResponse.onFinish
       onError: (error) => {
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       sendReasoning: true,
       originalMessages: uiMessages,
       generateMessageId: generateId,
-      onFinish: async ({ messages }) => {
+      onEnd: async ({ messages }) => {
         await fetchMutation(api.chat.saveChatHistory, {
           chatId,
           friendId: chatFriend?._id ?? '',
