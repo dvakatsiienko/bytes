@@ -23,13 +23,13 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "4.3.1",
+    "@tailwindcss/postcss": "4.3.2",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@workspace/typescript-config": "workspace:*",
-    "postcss": "8.5.15",
-    "prettier": "3.9.1",
-    "tailwindcss": "4.3.1"
+    "postcss": "8.5.16",
+    "prettier": "3.9.4",
+    "tailwindcss": "4.3.2"
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",
