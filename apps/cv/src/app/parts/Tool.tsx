@@ -3,7 +3,7 @@ import { cva, cx } from 'cva';
 import type { ITool } from './toolConfig';
 
 export const Tool = (props: ToolProps) => {
-  const Icon = props.Icon;
+  const { Icon } = props;
 
   return (
     <div className={toolCn()}>
@@ -27,6 +27,6 @@ const toolCn = cva({
 
 /* Types */
 interface ToolProps extends React.PropsWithChildren {
-  name: ITool['name'];
   Icon?: ITool['icon'];
+  name: ITool['name'];
 }

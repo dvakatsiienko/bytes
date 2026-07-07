@@ -16,7 +16,9 @@
       "!**/prisma-client",
       "!**/graphql/generated",
       "!**/next-env.d.ts",
-      "!**/next-fonts.d.ts"
+      "!**/next-fonts.d.ts",
+      "!**/*.graphql",
+      "!**/*.gql"
     ]
   },
   "vcs": {

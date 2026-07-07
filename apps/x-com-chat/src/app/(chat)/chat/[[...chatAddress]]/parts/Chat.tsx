@@ -70,7 +70,7 @@ export const Chat = (props: ChatProps) => {
 
   const selectFriend = async (selectedFriendId: string) => {
     if (selectedFriendId) {
-      let chatId = props.chatId;
+      let { chatId } = props;
 
       if (props.friendId !== selectedFriendId) {
         const chatByFriendId = await getChatByFriend({

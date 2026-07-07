@@ -24,7 +24,7 @@ export const Select = (props: SelectProps) => {
     }
   });
 
-  const selectOptionList = props.options?.map((option) => (
+  const selectOptionList = props.options.map((option) => (
     <SelectItem key={option.value} value={option.value}>
       {option.label}
     </SelectItem>
@@ -33,11 +33,11 @@ export const Select = (props: SelectProps) => {
   return (
     <SelectRoot
       defaultValue={props.defaultValue}
-      name={props.name ?? 'select'}
+      name={props.name}
       onOpenChange={(open: boolean) => setIsOpen(open)}
       onValueChange={props.onValueChange}
       open={isOpen}
-      value={props.value ?? undefined}>
+      value={props.value}>
       <Button asChild variant='secondary'>
         <SelectTrigger
           className={selectTriggerCva({
@@ -82,15 +82,15 @@ const selectContentCva = cva({
 
 /* Types */
 interface SelectProps {
-  name: string;
-  options: Option[];
-  value: string;
-  defaultValue?: string;
-  onValueChange: SelectRadix.SelectProps['onValueChange'];
   classNameContent?: string;
   classNameTrigger?: string;
+  defaultValue?: string;
   isLoading?: boolean;
   label?: string;
+  name: string;
+  onValueChange: SelectRadix.SelectProps['onValueChange'];
+  options: Option[];
+  value: string;
 }
 interface Option {
   label: string;

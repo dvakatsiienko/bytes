@@ -111,7 +111,7 @@ const MessagePreview = ({
   isLatestMessage,
   status,
 }: MessagePreviewProps) => {
-  const messegePartListJSX = message.parts?.map(
+  const messegePartListJSX = message.parts.map(
     (part: MessagePart, i: number) => {
       if (part.type === 'text') {
         return (
@@ -185,10 +185,7 @@ const MessagePreview = ({
         return (
           <MessageReasoningPart
             isReasoning={
-              (message.parts &&
-                status === 'streaming' &&
-                i === message.parts.length - 1) ??
-              false
+              !!(status === 'streaming' && i === message.parts.length - 1)
             }
             // biome-ignore lint/suspicious/noArrayIndexKey: message parts render in stable order
             key={`message-${message.id}-${i}`}
