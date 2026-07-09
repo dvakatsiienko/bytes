@@ -2,14 +2,14 @@
   "name": "cv",
   "version": "0.0.1",
   "scripts": {
+    "build": "next build",
+    "build:clean": "rimraf .next",
     "dev": "next dev --inspect",
     "dev:analyze": "next experimental-analyze",
     "dev:vc": "vercel dev",
-    "restart": "run-s build:clean start",
-    "build": "next build",
-    "build:clean": "rimraf .next",
-    "serve": "next start",
     "lint": "biome lint",
+    "restart": "run-s build:clean start",
+    "serve": "next start",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -26,7 +26,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.2",
     "@tailwindcss/typography": "0.5.20",
-    "@types/node": "26.1.0",
+    "@types/node": "26.1.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "1.0.0",

@@ -3,18 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --inspect",
     "build": "next build",
     "build:clean": "rimraf .next",
-    "serve": "next start",
-    "lint": "biome lint",
-    "typecheck": "tsc",
     "db:push": "prisma db push",
-    "prisma:generate": "prisma generate",
+    "db:reinit": "run-s db:reset prisma:generate db:seed",
     "db:reset": "prisma db push --force-reset",
     "db:seed": "prisma db seed",
-    "db:reinit": "run-s db:reset prisma:generate db:seed",
-    "postinstall": "prisma generate"
+    "dev": "next dev --inspect",
+    "postinstall": "prisma generate",
+    "lint": "biome lint",
+    "prisma:generate": "prisma generate",
+    "serve": "next start",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@heroicons/react": "2.2.0",
@@ -36,7 +36,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.2",
     "@tanstack/react-query-devtools": "5.101.2",
-    "@types/node": "26.1.0",
+    "@types/node": "26.1.1",
     "@types/pg": "8.20.0",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
