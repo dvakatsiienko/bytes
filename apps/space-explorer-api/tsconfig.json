@@ -8,12 +8,10 @@
 
     "moduleResolution": "bundler",
     "target": "esnext",
-    "module": "esnext",
     "lib": ["esnext"],
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "dist",
-    "strict": true,
     "jsx": "preserve",
     "noEmit": true
   }
