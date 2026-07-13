@@ -94,8 +94,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0
       postcss:
-        specifier: 8.5.16
-        version: 8.5.16
+        specifier: 8.5.17
+        version: 8.5.17
       tailwind-scrollbar:
         specifier: 4.0.2
         version: 4.0.2(react@19.2.7)(tailwindcss@4.3.2)
@@ -140,8 +140,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       postcss:
-        specifier: 8.5.16
-        version: 8.5.16
+        specifier: 8.5.17
+        version: 8.5.17
       tailwindcss:
         specifier: 4.3.2
         version: 4.3.2
@@ -219,8 +219,8 @@ importers:
         specifier: 4.1.5
         version: 4.1.5
       postcss:
-        specifier: 8.5.16
-        version: 8.5.16
+        specifier: 8.5.17
+        version: 8.5.17
       prisma:
         specifier: 7.8.0
         version: 7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(better-sqlite3@12.11.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@7.0.2)
@@ -368,8 +368,8 @@ importers:
   apps/x-com-chat:
     dependencies:
       '@ai-sdk/groq':
-        specifier: 4.0.7
-        version: 4.0.7(zod@4.4.3)
+        specifier: 4.0.8
+        version: 4.0.8(zod@4.4.3)
       '@ai-sdk/react':
         specifier: 4.0.23
         version: 4.0.23(react@19.2.7)(zod@4.4.3)
@@ -559,8 +559,8 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
       postcss:
-        specifier: 8.5.16
-        version: 8.5.16
+        specifier: 8.5.17
+        version: 8.5.17
       prettier:
         specifier: 3.9.5
         version: 3.9.5
@@ -586,8 +586,8 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/groq@4.0.7':
-    resolution: {integrity: sha512-7IiUo/qpiX4luJHlpaiNw/EqY0pWvWyIkTi4vyNwwTl7EuB1rk4mUUSKLc4eo3VAowKiCoz6Ry6y0utm1wcmTQ==}
+  '@ai-sdk/groq@4.0.8':
+    resolution: {integrity: sha512-M5eyvVoztr7WKSU7ZpdCgO0SiY2urek1Ll5+v2DHl/NfddfDOMwp4LhnnP83f3sNJNDPLKoAdqpdYejOsdL4eQ==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -5155,6 +5155,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@3.3.16:
+    resolution: {integrity: sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
   napi-build-utils@2.0.0:
     resolution: {integrity: sha512-GEbrYkbfF7MoNaoh2iGG84Mnf/WZfB0GdGEsM8wz7Expx/LlWf5U8t9nvJKXSp3qr5IsEbK04cBGhol/KwOsWA==}
 
@@ -5453,8 +5458,8 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.5.16:
-    resolution: {integrity: sha512-vuwillviilfKZsg0VGj5R/YwwcHx4SLsIOI/7K6mQkWx+l5cUHTjj5g0AasTBcyXsbfTgrwsUNmVUb5xVwyPwg==}
+  postcss@8.5.17:
+    resolution: {integrity: sha512-J7EF+8X+CzRPaJPOv9Ck2wNWJvGnnl3PcNPAdGg6GTLjyVpyQ0yATMSXRFRV01BviT/9Gwuc3rjEyJbDJG9a4w==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres-array@2.0.0:
@@ -6586,7 +6591,7 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
-  '@ai-sdk/groq@4.0.7(zod@4.4.3)':
+  '@ai-sdk/groq@4.0.8(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 4.0.3
       '@ai-sdk/provider-utils': 5.0.7(zod@4.4.3)
@@ -8872,7 +8877,7 @@ snapshots:
       '@alloc/quick-lru': 5.2.0
       '@tailwindcss/node': 4.3.2
       '@tailwindcss/oxide': 4.3.2
-      postcss: 8.5.16
+      postcss: 8.5.17
       tailwindcss: 4.3.2
 
   '@tailwindcss/typography@0.5.20(tailwindcss@4.3.2)':
@@ -11112,6 +11117,8 @@ snapshots:
 
   nanoid@3.3.15: {}
 
+  nanoid@3.3.16: {}
+
   napi-build-utils@2.0.0: {}
 
   natural-compare@1.4.0: {}
@@ -11442,9 +11449,9 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postcss@8.5.16:
+  postcss@8.5.17:
     dependencies:
-      nanoid: 3.3.15
+      nanoid: 3.3.16
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -12484,7 +12491,7 @@ snapshots:
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.5
-      postcss: 8.5.16
+      postcss: 8.5.17
       rolldown: 1.1.5
       tinyglobby: 0.2.17
     optionalDependencies:
