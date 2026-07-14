@@ -57,6 +57,6 @@
     "jotai-devtools": "0.14.0",
     "knip": "6.26.0",
     "tailwindcss": "4.3.2",
-    "tsx": "4.23.0"
+    "tsx": "4.23.1"
   }
 }
