@@ -30,7 +30,7 @@
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.3",
+    "@biomejs/biome": "2.5.4",
     "biome-config-polished": "workspace:*",
     "lefthook": "2.1.10",
     "prettier": "3.9.5",
