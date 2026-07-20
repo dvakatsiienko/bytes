@@ -32,7 +32,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "masonic": "4.1.0",
     "mosaic": "1.1.0",
-    "postcss": "8.5.19",
+    "postcss": "8.5.20",
     "tailwind-scrollbar": "4.0.2",
     "tailwindcss": "4.3.3"
   }
