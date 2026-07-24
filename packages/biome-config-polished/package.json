@@ -1,6 +1,6 @@
 {
   "name": "biome-config-polished",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "keywords": ["biome", "biomeconfig", "linter", "formatter"],
   "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/biome-config-polished#readme",
   "bugs": {
