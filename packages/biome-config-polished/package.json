@@ -1,34 +1,34 @@
 {
   "name": "biome-config-polished",
-  "version": "0.0.3",
+  "version": "0.0.5",
+  "keywords": ["biome", "biomeconfig", "linter", "formatter"],
+  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/biome-config-polished#readme",
+  "bugs": {
+    "url": "https://github.com/dvakatsiienko/bytes/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dvakatsiienko/bytes.git",
+    "directory": "packages/biome-config-polished"
+  },
   "license": "MIT",
   "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
   "type": "module",
+  "exports": {
+    ".": "./config.jsonc"
+  },
+  "files": ["config.jsonc"],
   "scripts": {
-    "lint": "biome lint",
     "format": "biome format --write",
-    "publish": "npm publish --access public",
+    "lint": "biome lint",
+    "npm-publish": "npm publish --access public",
     "patch": "npm version patch",
-    "release": "run-s patch publish"
+    "release": "run-s patch npm-publish"
   },
   "dependencies": {
     "npm-run-all": "4.1.5"
   },
   "peerDependencies": {
     "@biomejs/biome": ">=2.4.6"
-  },
-  "exports": {
-    ".": "./config.jsonc"
-  },
-  "files": ["config.jsonc"],
-  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/biome-config-polished#readme",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dvakatsiienko/bytes.git",
-    "directory": "packages/biome-config-polished"
-  },
-  "bugs": {
-    "url": "https://github.com/dvakatsiienko/bytes/issues"
-  },
-  "keywords": ["biome", "biomeconfig", "linter", "formatter"]
+  }
 }
