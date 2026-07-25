@@ -39,6 +39,7 @@
           "options": { "sortOrder": "lexicographic" }
         },
         "useSortedProperties": "on",
+        "useSortedPackageJson": "off",
         "organizeImports": {
           "level": "on",
           "options": {
@@ -255,7 +256,10 @@
         "**/components.json",
 
         ".prettierrc.js",
-        "**/.prettierrc.js"
+        "**/.prettierrc.js",
+
+        "settings.json",
+        "**/settings.json"
       ]
     },
 
