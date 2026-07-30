@@ -26,13 +26,13 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
     "@tailwindcss/typography": "0.5.20",
-    "@types/node": "26.1.1",
+    "@types/node": "26.1.2",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "masonic": "4.1.0",
     "mosaic": "1.1.0",
-    "postcss": "8.5.23",
+    "postcss": "8.5.24",
     "tailwind-scrollbar": "4.0.2",
     "tailwindcss": "4.3.3"
   }
