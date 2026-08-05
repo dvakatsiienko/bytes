@@ -26,6 +26,7 @@ export const MessageList = (props: MessageListProps) => {
     <Button
       key={msg.text + msg.emoji}
       onClick={() => {
+        // biome-ignore lint/suspicious/noUnnecessaryConditions: todo process it later
         if (isChatInitRef.current) return;
 
         isChatInitRef.current = true;

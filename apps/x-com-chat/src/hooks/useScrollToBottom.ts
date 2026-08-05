@@ -11,6 +11,7 @@ export function useScrollToBottom<
     const container = containerRef.current;
     const end = endRef.current;
 
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: todo process it later
     if (container && end) {
       const observer = new MutationObserver(() => {
         end.scrollIntoView({ behavior: 'instant', block: 'end' });
