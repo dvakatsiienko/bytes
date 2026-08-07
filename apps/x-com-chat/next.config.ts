@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig = {
-  experimental: { useTypeScriptCli: true },
+  experimental: { turbopackRustReactCompiler: true, useTypeScriptCli: true },
   images: {
     minimumCacheTTL: 60 * 60 * 24 * 7, // 1 week
   },

@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  experimental: { useTypeScriptCli: true },
+  experimental: { turbopackRustReactCompiler: true, useTypeScriptCli: true },
   reactCompiler: true,
   reactStrictMode: true,
   transpilePackages: ['ui', 'utils', '@ui/kit'],
