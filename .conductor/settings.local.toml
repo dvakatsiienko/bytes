@@ -2,4 +2,5 @@
 file_include_globs = ".env*\napps/*/.env*\napps/*/.vercel/.env*\n"
 
 [scripts]
+run_mode = "concurrent"
 setup = "git -C \"$CONDUCTOR_ROOT_PATH\" fetch --prune origin && git -C \"$CONDUCTOR_ROOT_PATH\" pull --ff-only || true && pnpm install"
