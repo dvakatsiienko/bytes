@@ -19,13 +19,14 @@ export const LaunchTile = (props: LaunchTileProps) => {
   const [cancelTripMutation, cancelTripMeta] = useMutation(
     gql.CancelTripDocument,
     {
-      refetchQueries: [
-        'UserProfile',
-        {
-          query: gql.LaunchesDocument,
-          variables: { after: 0 },
-        },
-      ],
+      refetchQueries: ['UserProfile'],
+      update(cache) {
+        // the mutation payload carries no Launch, so unbook it in the cache directly
+        cache.modify({
+          fields: { isBooked: () => false },
+          id: cache.identify({ __typename: 'Launch', id }),
+        });
+      },
     },
   );
 
@@ -33,7 +34,11 @@ export const LaunchTile = (props: LaunchTileProps) => {
     event.preventDefault();
 
     if (props.trip) {
-      await cancelTripMutation({ variables: { tripId: props.trip.id } });
+      try {
+        await cancelTripMutation({ variables: { tripId: props.trip.id } });
+      } catch (error) {
+        console.error('Failed to cancel trip:', error);
+      }
     } else {
       cartItemsVar(
         isInCart
@@ -43,7 +48,10 @@ export const LaunchTile = (props: LaunchTileProps) => {
     }
   };
 
-  const isDisabled = cancelTripMeta.loading || (!props.trip && isBooked);
+  // a successfully cancelled trip tile stays until the UserProfile refetch removes it
+  const isCancelled = Boolean(cancelTripMeta.data?.cancelTrip);
+  const isDisabled =
+    cancelTripMeta.loading || isCancelled || (!props.trip && isBooked);
 
   return (
     <Link
@@ -70,16 +78,20 @@ export const LaunchTile = (props: LaunchTileProps) => {
         ) : null}
       </div>
 
+      {cancelTripMeta.error ? (
+        <h5 className='ml-auto'>Cancel failed — try again.</h5>
+      ) : null}
+
       <Button
         className='mt-2 ml-auto'
         disabled={isDisabled}
         mini
         onClick={submit}>
         {!props.trip && isBooked ? '✓ Trip Booked' : null}
-        {props.trip && isBooked ? 'Cancel trip' : null}
-        {!isBooked && isInCart ? 'Remove from Cart' : null}
+        {props.trip ? 'Cancel trip' : null}
+        {!(props.trip || isBooked) && isInCart ? 'Remove from Cart' : null}
 
-        {isBooked || isInCart ? null : 'Add to Cart'}
+        {props.trip || isBooked || isInCart ? null : 'Add to Cart'}
       </Button>
     </Link>
   );

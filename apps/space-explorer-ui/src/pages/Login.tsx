@@ -13,14 +13,12 @@ export const Login = () => {
     onCompleted(response) {
       const { login } = response;
 
-      if (login) {
+      if (login?.token) {
+        localStorage.setItem('token', login.token);
+        localStorage.setItem('userId', login.id);
+
         isLoggedInVar(true);
         navigate('/launches');
-
-        if (login.token) {
-          localStorage.setItem('token', login.token);
-          localStorage.setItem('userId', login.id);
-        }
       }
     },
   });
@@ -29,12 +27,15 @@ export const Login = () => {
     return <Navigate replace to='/launches' />;
   }
 
-  if (loading) return <Loading />;
+  return (
+    <>
+      {loading ? <Loading /> : null}
+      {error && !loading ? <p>An error occurred: {error.message}</p> : null}
 
-  if (error) {
-    console.error('Login error:', error);
-    return <p>An error occurred: {error.message}</p>;
-  }
-
-  return <LoginForm loginMutation={loginMutation} />;
+      {/* keep the form mounted while the mutation is in flight so typed values survive a failure */}
+      <div className={loading ? 'hidden' : 'contents'}>
+        <LoginForm loginMutation={loginMutation} />
+      </div>
+    </>
+  );
 };

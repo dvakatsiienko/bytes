@@ -15,7 +15,6 @@ import { Login } from './Login';
 import { Profile } from './Profile';
 import { Layout } from '@/components';
 import * as gql from '@/graphql';
-import { clearLocalStorageAuthItems } from '@/utils';
 
 const ProtectedRoute = (props: ProtectedRouteProps) => {
   const { data } = useQuery(gql.IsUserLoggedInDocument);
@@ -34,7 +33,6 @@ export const Pages = () => {
 
   useEffect(() => {
     if (location.pathname === '/') {
-      if (!data?.isLoggedIn) clearLocalStorageAuthItems();
       navigate(data?.isLoggedIn ? '/launches' : '/login', { replace: true });
     }
   }, [data?.isLoggedIn, location.pathname, navigate]);
@@ -76,7 +74,9 @@ export const Pages = () => {
         />
 
         <Route
-          element={<Navigate to={data?.isLoggedIn ? '/launches' : '/login'} />}
+          element={
+            <Navigate replace to={data?.isLoggedIn ? '/launches' : '/login'} />
+          }
           path='*'
         />
       </Route>

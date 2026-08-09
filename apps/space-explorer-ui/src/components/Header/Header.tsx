@@ -6,8 +6,9 @@ import dog3Png from './img/dog-3.png';
 
 export const Header = (props: HeaderProps) => {
   const { image, title } = props;
-  const email = window.atob(localStorage.getItem('token') as string);
-  const avatar = image || pickAvatarByEmail('test@email.com');
+  const token = localStorage.getItem('token');
+  const email = token ? window.atob(token) : '';
+  const avatar = image || pickAvatarByEmail(email);
 
   return (
     <section className='mb-9 flex items-center'>
@@ -35,6 +36,9 @@ const maxIndex = avatars.length - 1;
 
 function pickAvatarByEmail(email: string) {
   const charCode = email.toLowerCase().charCodeAt(0) - offset;
+
+  if (Number.isNaN(charCode)) return avatars[0];
+
   const percentile = Math.max(0, Math.min(max, charCode)) / max;
 
   return avatars[Math.round(maxIndex * percentile)];

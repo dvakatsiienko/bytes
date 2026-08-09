@@ -1,6 +1,4 @@
-import { type TypePolicies, makeVar } from '@apollo/client';
-
-import type * as gql from '@/graphql';
+import { type Reference, type TypePolicies, makeVar } from '@apollo/client';
 
 export const typePolicies: TypePolicies = {
   Query: {
@@ -9,21 +7,33 @@ export const typePolicies: TypePolicies = {
       isLoggedIn: { read: () => isLoggedInVar() },
       launches: {
         keyArgs: false,
-        merge(existing, incoming) {
-          let list: gql.LaunchesQuery['launches']['list'] = [];
-
-          if (existing?.list) {
-            list = list.concat(existing.list);
+        merge(existing, incoming, { args, readField }) {
+          if (!(existing?.list && incoming?.list)) {
+            return incoming;
           }
 
-          if (incoming?.list) {
-            list = list.concat(incoming.list);
+          if (args?.after) {
+            // pagination: append only launches not already present
+            const ids = new Set(
+              existing.list.map((ref: Reference) => readField('id', ref)),
+            );
+            const fresh = incoming.list.filter(
+              (ref: Reference) => !ids.has(readField('id', ref)),
+            );
+
+            return { ...incoming, list: [...existing.list, ...fresh] };
           }
 
-          return {
-            ...incoming,
-            list,
-          };
+          // page-1 refresh (falsy `after`) over an accumulated list:
+          // refresh the head, keep the accumulated tail and its cursor
+          const ids = new Set(
+            incoming.list.map((ref: Reference) => readField('id', ref)),
+          );
+          const tail = existing.list.filter(
+            (ref: Reference) => !ids.has(readField('id', ref)),
+          );
+
+          return { ...existing, list: [...incoming.list, ...tail] };
         },
       },
     },

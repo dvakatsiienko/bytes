@@ -17,9 +17,13 @@ export const Launches = () => {
   const fetchMoreLaunches = async () => {
     setIsLoadingMore(true);
 
-    await fetchMore({ variables: { after: data?.launches.cursor } });
-
-    setIsLoadingMore(false);
+    try {
+      await fetchMore({ variables: { after: data?.launches.cursor } });
+    } catch (error) {
+      console.error('Failed to load more launches:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   return (
