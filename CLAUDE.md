@@ -12,15 +12,18 @@ code reuse, consistent tooling, and efficient task orchestration.
 ## App Registry
 
 Each app maintains its own CLAUDE.md with detailed implementation context.
+App CLAUDE.md files start with an `@AGENTS.md` import (framework directives live
+there); keep that line first when editing. When bumping framework versions,
+update the Stack column below — it drifts stale otherwise.
 
 | App                  | Purpose                                 | Stack                             | Status     |
 | -------------------- | --------------------------------------- | --------------------------------- | ---------- |
-| `cv`                 | Personal portfolio with tool showcase   | Next.js 15, React 19, Tailwind    | Production |
-| `x-com-chat`         | AI chat with customizable alien friends | Next.js, Convex, Jotai, Clerk     | Active Dev |
-| `space-explorer-ui`  | GraphQL client demo                     | Vite, Apollo Client, React        | Demo       |
+| `cv`                 | Personal portfolio with tool showcase   | Next.js 16, React 19, Tailwind v4 | Production |
+| `x-com-chat`         | AI chat with customizable alien friends | Next.js 16, Convex, Jotai, Clerk  | Active Dev |
+| `space-explorer-ui`  | GraphQL client demo                     | Vite 8, Apollo Client, React      | Demo       |
 | `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
-| `financial`          | Financial dashboard with auth           | Next.js, Prisma, Auth.js          | WIP        |
-| `figmentation`       | CSS/design experiments                  | Next.js, CSS Modules              | Showcase   |
+| `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, Auth.js       | WIP        |
+| `figmentation`       | CSS/design experiments                  | Next.js 16, CSS Modules           | Showcase   |
 
 ## Shared Infrastructure
 
