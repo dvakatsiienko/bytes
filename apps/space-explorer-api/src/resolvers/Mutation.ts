@@ -4,40 +4,29 @@ import { injectLaunchesIntoTrips } from '@/utils';
 
 export const Mutation: MutationResolvers = {
   bookTrips: async (_, args, { dataSources }) => {
-    const { launchIds } = args;
+    const launchIds = [...new Set(args.launchIds)];
 
-    const bookedTrips = await dataSources.userAPI.bookTrips(launchIds);
+    // validate every launch exists before writing anything — a bogus id throws
+    // here, so no trip row is ever created for a launch the SpaceX API rejects
     const launches = await dataSources.spaceXAPI.getLaunchesByIds(launchIds);
+    const bookedTrips = await dataSources.userAPI.bookTrips(launchIds);
 
-    const finalTrips = injectLaunchesIntoTrips(bookedTrips, launches);
-
-    return finalTrips;
+    return injectLaunchesIntoTrips(bookedTrips, launches);
   },
-  cancelTrip: async (_, args, { dataSources }) => {
-    const { tripId } = args;
-
-    await dataSources.userAPI.cancelTrip(tripId);
-
-    return true;
+  cancelTrip: (_, args, { dataSources }) => {
+    return dataSources.userAPI.cancelTrip(args.tripId);
   },
-  login: async (_, args, { dataSources }) => {
-    const userProfile = await dataSources.userAPI.findOrCreate(args.email);
-
-    dataSources.userAPI.login(userProfile?.email ?? '');
-
-    return userProfile;
+  login: (_, args, { dataSources }) => {
+    return dataSources.userAPI.findOrCreate(args.email);
   },
-  logout: (_, __, { dataSources }) => {
-    dataSources.userAPI.logout();
-
-    return true;
-  },
+  // auth is a stateless bearer token; logout is a client-side token discard
+  logout: () => true,
 };
 
 /* Types */
 interface MutationResolvers {
-  login: Resolver<gql.MutationLoginArgs>;
-  logout: Resolver;
   bookTrips: Resolver<gql.MutationBookTripsArgs>;
   cancelTrip: Resolver<gql.MutationCancelTripArgs>;
+  login: Resolver<gql.MutationLoginArgs>;
+  logout: Resolver;
 }

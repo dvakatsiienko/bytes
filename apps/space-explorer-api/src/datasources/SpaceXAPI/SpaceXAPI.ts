@@ -15,11 +15,20 @@ export class SpaceXAPI extends RESTDataSource {
 
     const { rockets, launchpads } = await this.collectLaunchData(launches);
 
-    const launchModels = launches.map(
-      (launch) => new LaunchModel(launch, rockets.flat(), launchpads.flat()),
-    );
+    // skip any launch that can't be fully resolved rather than throwing the
+    // whole page — one launch with a missing rocket/launchpad must not null the
+    // entire non-null `LaunchesPayload!` for every client
+    const models = launches.flatMap((launch) => {
+      try {
+        return [new LaunchModel(launch, rockets, launchpads)];
+      } catch {
+        return [];
+      }
+    });
 
-    return launchModels;
+    // sort ascending by flightNumber so value-based cursor pagination is exact
+    // and hasMore's "last element" is genuinely the highest flight number
+    return models.sort((a, b) => a.flightNumber - b.flightNumber);
   }
 
   async getLaunch(id: string) {
@@ -33,13 +42,16 @@ export class SpaceXAPI extends RESTDataSource {
   }
 
   async collectLaunchData(launches: Launch[]) {
+    // fetch resiliently: a single failed rocket/launchpad lookup must not reject
+    // the whole batch. A launch whose data is missing here simply won't match in
+    // LaunchModel — getLaunches skips it, getLaunch (single) still throws.
     const [rockets, launchpads] = await Promise.all([
-      Promise.all(
+      settled(
         launches.map((launch) =>
           this.get<Rocket>(`/v4/rockets/${launch.rocket}`),
         ),
       ),
-      Promise.all(
+      settled(
         launches.map((launch) =>
           this.get<Launchpad>(`/v4/launchpads/${launch.launchpad}`),
         ),
@@ -49,9 +61,23 @@ export class SpaceXAPI extends RESTDataSource {
     return { launchpads, rockets };
   }
 
-  async getLaunchesByIds(ids: string[]) {
-    const launches = await Promise.all(ids.map((id) => this.getLaunch(id)));
+  // strict by default (bookTrips relies on a bogus id throwing to block the write);
+  // allowMissing drops unresolvable ids so trip history survives one dead launch
+  getLaunchesByIds(ids: string[], allowMissing = false) {
+    if (!allowMissing) {
+      return Promise.all(ids.map((id) => this.getLaunch(id)));
+    }
 
-    return launches;
+    return settled(ids.map((id) => this.getLaunch(id)));
   }
+}
+
+async function settled<T>(promises: Promise<T>[]) {
+  const results = await Promise.allSettled(promises);
+
+  return results
+    .filter((result): result is PromiseFulfilledResult<Awaited<T>> => {
+      return result.status === 'fulfilled';
+    })
+    .map((result) => result.value);
 }

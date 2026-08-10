@@ -31,7 +31,7 @@ const { url } = await startStandaloneServer(apolloServer, {
 
     const auth = req.headers?.authorization ?? '';
 
-    const decodedUserEmail = Buffer.from(auth, 'base64').toString('ascii');
+    const decodedUserEmail = Buffer.from(auth, 'base64').toString('utf8');
     let userEmail = z.string().email().safeParse(decodedUserEmail).success
       ? decodedUserEmail
       : null;

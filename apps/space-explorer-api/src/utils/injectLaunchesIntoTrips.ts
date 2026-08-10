@@ -5,15 +5,12 @@ export const injectLaunchesIntoTrips = (
   trips: Trip[],
   launches: LaunchModel[],
 ) => {
-  const finalTrips = trips.map((trip) => {
+  // drop trips whose launch could not be resolved rather than throwing — a single
+  // dead launch must not null a whole trip list. bookTrips validates ids up front,
+  // so its trips are always kept; only stale history trips are skipped.
+  return trips.flatMap((trip) => {
     const launch = launches.find((_launch) => _launch.id === trip.launchId);
 
-    if (!launch) {
-      throw new Error('Launch for a trip not found.');
-    }
-
-    return { ...trip, launch };
+    return launch ? [{ ...trip, launch }] : [];
   });
-
-  return finalTrips;
 };

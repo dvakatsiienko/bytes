@@ -1,33 +1,19 @@
 import type { LaunchModel } from '../datasources';
 
-export const paginate = ({
-  after: cursor,
-  pageSize = 20,
-  results,
-  getCursor = () => null,
-}: Options) => {
+export const paginate = ({ after: cursor, pageSize, results }: Options) => {
   if (pageSize < 1) return [];
 
   if (!cursor) return results.slice(0, pageSize);
 
-  const cursorIndex = results.findIndex((item) => {
-    const itemCursor = item.flightNumber ? item.flightNumber : getCursor();
+  // value-based cursor: the first launch *after* the cursor's flightNumber.
+  // Robust to a cursor launch having been dropped from the list (getLaunches
+  // skips launches whose rocket/launchpad can't be resolved); relies on the
+  // ascending order guaranteed by getLaunches.
+  const startIndex = results.findIndex((item) => item.flightNumber > cursor);
 
-    return itemCursor ? cursor === itemCursor : false;
-  });
+  if (startIndex < 0) return [];
 
-  if (cursorIndex >= 0) {
-    if (cursorIndex === results.length - 1) {
-      return [];
-    }
-
-    return results.slice(
-      cursorIndex + 1,
-      Math.min(results.length, cursorIndex + 1 + pageSize),
-    );
-  }
-
-  return results.slice(0, pageSize);
+  return results.slice(startIndex, startIndex + pageSize);
 };
 
 /* Types */
@@ -35,5 +21,4 @@ interface Options {
   after: number;
   pageSize: number;
   results: LaunchModel[];
-  getCursor?: () => null;
 }

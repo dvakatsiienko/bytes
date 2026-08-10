@@ -14,9 +14,12 @@ export class LaunchModel implements TLaunchModel {
     }
 
     this.site = launchpad.name;
+    // patch images are frequently null in the SpaceX dataset; missionPatch is a
+    // non-null field, so coalesce between sizes and fall back to an empty string
+    const { patch } = launch.links;
     this.mission = {
-      missionPatchLarge: launch.links.patch.large,
-      missionPatchSmall: launch.links.patch.small,
+      missionPatchLarge: patch?.large ?? patch?.small ?? '',
+      missionPatchSmall: patch?.small ?? patch?.large ?? '',
       name: launch.name,
     };
 
@@ -50,18 +53,18 @@ export class LaunchModel implements TLaunchModel {
 
 /* Types */
 export interface TLaunchModel {
-  id: string;
   flightNumber: number;
-  site: string;
+  id: string;
 
   mission: TMission;
   rocket: TRocket;
+  site: string;
 }
 
 export interface TMission {
-  name: string;
-  missionPatchSmall: string;
   missionPatchLarge: string;
+  missionPatchSmall: string;
+  name: string;
 }
 
 export interface TRocket {

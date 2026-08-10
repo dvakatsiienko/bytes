@@ -17,10 +17,13 @@ export const Query: QueryResolvers = {
       results: launches,
     });
 
+    const last = list.at(-1);
+
     return {
-      cursor: list.length ? list.at(-1)?.flightNumber : null,
-      hasMore: list.length
-        ? list.at(-1)?.flightNumber !== launches.at(-1)?.flightNumber
+      // cursor is Int! — fall back to 0 for an empty page rather than null
+      cursor: last?.flightNumber ?? 0,
+      hasMore: last
+        ? last.flightNumber !== launches.at(-1)?.flightNumber
         : false,
       list,
     };
@@ -32,7 +35,7 @@ export const Query: QueryResolvers = {
 
 /* Types */
 interface QueryResolvers {
-  launches: Resolver<gql.QueryLaunchesArgs>;
   launch: Resolver<gql.QueryLaunchArgs>;
+  launches: Resolver<gql.QueryLaunchesArgs>;
   userProfile: Resolver;
 }

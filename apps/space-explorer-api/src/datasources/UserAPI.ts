@@ -1,6 +1,9 @@
 import { RESTDataSource } from '@apollo/datasource-rest';
+import { z } from 'zod';
 
 import { prismaClient } from '@/lib';
+
+const emailSchema = z.string().email();
 
 export class UserAPI extends RESTDataSource {
   constructor(userEmail: string | null) {
@@ -9,114 +12,92 @@ export class UserAPI extends RESTDataSource {
     this.userEmail = userEmail;
   }
 
-  private userEmail: string | null;
+  private readonly userEmail: string | null;
 
   async findOrCreate(email?: string | null) {
-    if (!email) {
-      throw new Error('Email is null!');
+    const parsed = emailSchema.safeParse(email);
+
+    if (!parsed.success) {
+      throw new Error('A valid email is required.');
     }
 
-    let user = await prismaClient.user.findUnique({
+    const validEmail = parsed.data;
+
+    const user = await prismaClient.user.upsert({
+      create: { email: validEmail },
+      include: { trips: true },
+      update: {},
+      where: { email: validEmail },
+    });
+
+    // token is derived from the email, not persisted — expose it as a computed field
+    return { ...user, token: Buffer.from(validEmail).toString('base64') };
+  }
+
+  async bookTrips(launchIds: string[]) {
+    const email = this.validateAuth();
+    const user = await this.getUser(email);
+
+    const uniqueIds = [...new Set(launchIds)];
+
+    // upsert on the (userId, launchId) unique is atomic and idempotent: a
+    // re-booked or concurrently double-clicked launch no-ops instead of racing
+    // a check-then-insert into a P2002 unique violation
+    await prismaClient.$transaction(
+      uniqueIds.map((launchId) =>
+        prismaClient.trip.upsert({
+          create: { launchId, userId: user.id },
+          update: {},
+          where: { userId_launchId: { launchId, userId: user.id } },
+        }),
+      ),
+    );
+
+    return prismaClient.trip.findMany({
+      where: { launchId: { in: uniqueIds }, userId: user.id },
+    });
+  }
+
+  async cancelTrip(id: string) {
+    const email = this.validateAuth();
+
+    // scope the delete to the owner; deleteMany returns a count instead of throwing
+    const { count } = await prismaClient.trip.deleteMany({
+      where: { id, user: { email } },
+    });
+
+    return count > 0;
+  }
+
+  async isBookedOnLaunch(launchId: string) {
+    if (!this.userEmail) return false;
+
+    const trip = await prismaClient.trip.findFirst({
+      select: { id: true },
+      where: { launchId, user: { email: this.userEmail } },
+    });
+
+    return trip !== null;
+  }
+
+  private async getUser(email: string) {
+    const user = await prismaClient.user.findUnique({
       include: { trips: true },
       where: { email },
     });
 
     if (user === null) {
-      user = await prismaClient.user.create({
-        data: {
-          email,
-          trips: { create: [] },
-        },
-        include: { trips: true },
-      });
+      throw new Error('User not found.');
     }
-
-    user.token = Buffer.from(email).toString('base64');
 
     return user;
   }
 
-  async bookTrips(launchIds: string[]) {
-    this.validateAuth();
-
-    const results = await Promise.all(
-      launchIds.map((launchId) => this.bookTrip(launchId)),
-    );
-
-    return results;
-  }
-
-  async bookTrip(launchId: string) {
-    const email = this.validateAuth();
-
-    const user = await prismaClient.user.findUnique({ where: { email } });
-
-    if (user === null) {
-      throw new Error('User not found.');
-    }
-
-    const trip = await prismaClient.trip.create({
-      data: { launchId, userId: user.id },
-    });
-
-    return trip;
-  }
-
-  async cancelTrip(id: string) {
-    this.validateAuth();
-
-    await prismaClient.trip.delete({ where: { id } });
-  }
-
-  async getTrips() {
-    const email = this.validateAuth();
-
-    const user = await prismaClient.user.findUnique({
-      include: { trips: true },
-      where: { email },
-    });
-
-    if (user === null) {
-      throw new Error('User not found.');
-    }
-
-    const { trips } = user;
-
-    return trips;
-  }
-
-  async isBookedOnLaunch(launchId: string) {
-    const email = this.validateAuth();
-
-    const user = await prismaClient.user.findUnique({
-      include: { trips: true },
-      where: { email },
-    });
-
-    if (user === null) {
-      throw new Error('User not found.');
-    }
-
-    const userTrips = await prismaClient.trip.findMany({
-      where: { launchId, userId: user.id },
-    });
-
-    return userTrips && userTrips.length > 0;
-  }
-
-  validateAuth() {
+  private validateAuth() {
     if (!this.userEmail) {
       throw new Error('Not authenticated.');
     }
 
     return this.userEmail;
-  }
-
-  login(email: string) {
-    this.userEmail = email;
-  }
-
-  logout() {
-    this.userEmail = null;
   }
 }
