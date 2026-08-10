@@ -27,8 +27,8 @@
   "devDependencies": {
     "@graphql-codegen/cli": "7.2.0",
     "@graphql-codegen/typescript": "6.1.0",
-    "@types/node": "26.1.2",
+    "@types/node": "26.2.0",
     "prisma": "7.9.1",
-    "tsx": "4.23.10"
+    "tsx": "4.23.11"
   }
 }
