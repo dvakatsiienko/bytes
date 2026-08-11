@@ -38,7 +38,13 @@ export async function POST(req: Request) {
   });
   const chatHistryQuery = preloadedQueryResult(chatHistoryPreloaded);
 
-  const chatHistory = (chatHistryQuery?.messageList ?? []) as UIMessage[];
+  // a missing chat doc would run the model without a persona and make
+  // saveChatHistory insert an orphan row — reject instead
+  if (!chatHistryQuery) {
+    return new Response('Chat not found', { status: 404 });
+  }
+
+  const chatHistory = (chatHistryQuery.messageList ?? []) as UIMessage[];
 
   const friendPreloaded = await preloadQuery(api.chat.getFriendById, {
     friendId: chatHistryQuery?.friendId ?? '',
@@ -72,11 +78,15 @@ export async function POST(req: Request) {
       originalMessages: uiMessages,
       generateMessageId: generateId,
       onEnd: async ({ messages }) => {
+        // an errored/aborted generation finishes with a contentless assistant
+        // message — persisting it would store a blank bubble forever
+        const messageList = messages.filter((m) => m.parts.length > 0);
+
         await fetchMutation(api.chat.saveChatHistory, {
           chatId,
           friendId: chatFriend?._id ?? '',
           // Store raw messages as-is for simplicity / forward-compatibility
-          messageList: messages as unknown as UIMessage[],
+          messageList: messageList as unknown as UIMessage[],
         });
       },
     });

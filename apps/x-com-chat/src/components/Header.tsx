@@ -30,12 +30,10 @@ export const Header = (props: HeaderProps) => {
     name: '',
   };
 
-  const friendName =
-    selectedFriend?.name.charAt(0).toUpperCase() +
-    selectedFriend?.name.slice(1);
-  const defaultFriendName = props.friendList[0]?.name ?? '';
-
-  const finalFriendName = friendName.length ? friendName : defaultFriendName;
+  // no fallback to friendList[0]: before the atoms init it would flash the
+  // default friend's name on another friend's chat page
+  const finalFriendName =
+    selectedFriend.name.charAt(0).toUpperCase() + selectedFriend.name.slice(1);
 
   const baseTheme = resolvedTheme === 'dark' ? dark : undefined;
 
@@ -59,7 +57,11 @@ export const Header = (props: HeaderProps) => {
         <div className='mx-auto hidden sm:block'>
           <NextLink
             className='text-center font-semibold text-shadow-2xs text-sm sm:text-lg'
-            href={`/chat/${selectedChatId}/${selectedFriendId}`}>
+            href={
+              selectedChatId && selectedFriendId
+                ? `/chat/${selectedChatId}/${selectedFriendId}`
+                : '/chat'
+            }>
             💬 Chat {finalFriendName ? `with ${finalFriendName}` : ''}
           </NextLink>
         </div>

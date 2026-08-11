@@ -19,7 +19,7 @@ export const Select = (props: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.metaKey && e.shiftKey && e.key === 'k') {
+    if (e.metaKey && e.shiftKey && e.key.toLowerCase() === 'k') {
       setIsOpen(!isOpen);
     }
   });

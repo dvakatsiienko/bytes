@@ -132,8 +132,6 @@ const MessagePreview = ({
         );
       }
 
-      const isReasoning = false;
-
       if (part.type.startsWith('tool-')) {
         const state = (part as { state?: string }).state as
           | 'call'
@@ -181,11 +179,15 @@ const MessagePreview = ({
         );
       }
 
-      if (part.type === 'reasoning' && isReasoning) {
+      if (part.type === 'reasoning') {
         return (
           <MessageReasoningPart
             isReasoning={
-              !!(status === 'streaming' && i === message.parts.length - 1)
+              !!(
+                status === 'streaming' &&
+                isLatestMessage &&
+                i === message.parts.length - 1
+              )
             }
             // biome-ignore lint/suspicious/noArrayIndexKey: message parts render in stable order
             key={`message-${message.id}-${i}`}

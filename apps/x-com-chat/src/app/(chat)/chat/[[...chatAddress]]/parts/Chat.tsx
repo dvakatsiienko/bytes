@@ -40,7 +40,7 @@ export const Chat = (props: ChatProps) => {
 
   const [input, setInput] = useState('');
 
-  const { status, error, sendMessage, stop } = useChat({
+  const { messages, setMessages, status, error, sendMessage, stop } = useChat({
     generateId: createIdGenerator({
       // ? ids format for user messages
       prefix: 'msgc',
@@ -50,6 +50,16 @@ export const Chat = (props: ChatProps) => {
     messages: chatHistoryQuery,
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
+
+  // useChat only reads its `messages` option at instance creation — adopt
+  // later Convex writes (other tab, post-stream persistence) when they extend
+  // the local transcript and nothing is in flight
+  useEffect(() => {
+    if (status === 'streaming' || status === 'submitted') return;
+    if (chatHistoryQuery.length > messages.length) {
+      setMessages(chatHistoryQuery);
+    }
+  }, [chatHistoryQuery, messages.length, setMessages, status]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -64,7 +74,6 @@ export const Chat = (props: ChatProps) => {
   });
 
   const getChatByFriend = useMutation(api.chat.getChatByFriend);
-  if (error) return <div>{error.message}</div>;
 
   const isLoading = status === 'streaming' || status === 'submitted';
 
@@ -110,11 +119,18 @@ export const Chat = (props: ChatProps) => {
       <MessageList
         // testMessages
         isLoading={isLoading}
-        messages={chatHistoryQuery}
+        key={props.chatId}
+        messages={messages}
         selectedFriendName={selectedFriend?.name ?? ''}
         sendPromptSuggestion={sendPromptSuggestion}
         status={status}
       />
+
+      {error && (
+        <div className='mx-auto w-full px-4 py-2 text-destructive text-sm'>
+          ⚠️ {error.message}
+        </div>
+      )}
 
       {/* TODO extract to a component */}
       <form

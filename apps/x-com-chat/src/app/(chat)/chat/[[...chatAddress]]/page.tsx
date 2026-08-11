@@ -44,12 +44,22 @@ export default async function ChatPage(props: ChatPageProps) {
     redirectToValidAddress = true;
   }
 
+  const chat = await fetchMutation(api.chat.initChat, { chatId, friendId });
+  if (!chat) redirect('/404');
+
+  // the chat's stored friendId drives the system prompt — keep the displayed
+  // persona in sync with it when the URL's friend segment was invalid
+  if (
+    chat.friendId !== friendId &&
+    friendList.some((friend) => friend._id === chat.friendId)
+  ) {
+    ({ friendId } = chat);
+    redirectToValidAddress = true;
+  }
+
   const friendName = friendList
     .find((friend) => friend._id === friendId)
     ?.name?.toLocaleLowerCase();
-
-  const chat = await fetchMutation(api.chat.initChat, { chatId, friendId });
-  if (!chat) redirect('/404');
 
   // ? if chatId different from chat._id means it's a new chat
   if (chat._id !== chatId) {

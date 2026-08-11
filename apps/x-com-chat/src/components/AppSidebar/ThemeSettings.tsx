@@ -50,7 +50,7 @@ export const ThemeSettings = () => {
       setTheme(nextTheme.value);
     }
 
-    if (e.metaKey && e.shiftKey && e.key === 'p') {
+    if (e.metaKey && e.shiftKey && e.key.toLowerCase() === 'p') {
       e?.preventDefault();
 
       const idx = colorPresetValueList.indexOf(colorPreset);

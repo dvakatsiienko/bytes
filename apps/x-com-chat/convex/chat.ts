@@ -1,16 +1,28 @@
 import { v } from 'convex/values';
 
-import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { SchemaMessageList } from './schema';
 import { friendList } from './seed_data';
 
 export const seedFriends = mutation({
   handler: async (ctx) => {
+    // upsert by name so existing friend ids (referenced by chats.friendId)
+    // survive re-seeding
     const existing = await ctx.db.query('friend').collect();
+    const existingByName = new Map(existing.map((f) => [f.name, f]));
+    const seedNames = new Set(friendList.map((f) => f.name));
 
-    await Promise.all(existing.map((f) => ctx.db.delete(f._id)));
-    await Promise.all(friendList.map((f) => ctx.db.insert('friend', f)));
+    await Promise.all([
+      ...existing
+        .filter((f) => !seedNames.has(f.name))
+        .map((f) => ctx.db.delete(f._id)),
+      ...friendList.map((f) => {
+        const current = existingByName.get(f.name);
+        return current
+          ? ctx.db.patch(current._id, f)
+          : ctx.db.insert('friend', f);
+      }),
+    ]);
   },
 });
 
@@ -32,18 +44,19 @@ export const getFriendList = query({
 export const getFriendById = query({
   args: { friendId: v.string() },
   handler: async (ctx, args) => {
-    const friend = await ctx.db.get(args.friendId as Id<'friend'>);
+    // normalizeId: client-supplied strings must not throw on malformed ids
+    const friendId = ctx.db.normalizeId('friend', args.friendId);
 
-    return friend;
+    return friendId ? await ctx.db.get(friendId) : null;
   },
 });
 
 export const getChatHistory = query({
   args: { chatId: v.string() },
   handler: async (ctx, args) => {
-    const chatHistory = await ctx.db.get(args.chatId as Id<'chats'>);
+    const chatId = ctx.db.normalizeId('chats', args.chatId);
 
-    return chatHistory;
+    return chatId ? await ctx.db.get(chatId) : null;
   },
 });
 
@@ -54,11 +67,17 @@ export const saveChatHistory = mutation({
     messageList: SchemaMessageList,
   },
   handler: async (ctx, args) => {
-    const existingChat = await ctx.db.get(args.chatId as Id<'chats'>);
+    const chatId = ctx.db.normalizeId('chats', args.chatId);
+    const existingChat = chatId ? await ctx.db.get(chatId) : null;
 
     if (existingChat) {
+      // union by message id: a concurrent turn committed after the caller's
+      // snapshot must survive, not be overwritten (lost-update race)
+      const existingIds = new Set(existingChat.messageList.map((m) => m?.id));
+      const appended = args.messageList.filter((m) => !existingIds.has(m?.id));
+
       await ctx.db.patch(existingChat._id, {
-        messageList: args.messageList,
+        messageList: [...existingChat.messageList, ...appended],
       });
     } else {
       await ctx.db.insert('chats', {
@@ -76,22 +95,32 @@ export const initChat = mutation({
   },
   handler: async (ctx, args) => {
     if (args.chatId) {
-      try {
-        const existingChat = await ctx.db.get(args.chatId as Id<'chats'>);
+      const chatId = ctx.db.normalizeId('chats', args.chatId);
+      const existingChat = chatId ? await ctx.db.get(chatId) : null;
 
-        if (existingChat) return existingChat;
-      } catch (error) {
-        console.error('Errro finding existing chat ', error);
-      }
+      if (existingChat) return existingChat;
     }
 
     if (!args.friendId) return null;
 
-    const friend = await ctx.db.get(args.friendId as Id<'friend'>);
+    const friendId = ctx.db.normalizeId('friend', args.friendId);
+    const friend = friendId ? await ctx.db.get(friendId) : null;
+
+    if (!friend) return null;
+
+    // reuse the latest chat for this friend — a bare /chat visit must not
+    // mint a fresh document and orphan the previous conversation
+    const latestChat = await ctx.db
+      .query('chats')
+      .withIndex('by_friendId', (q) => q.eq('friendId', friend._id))
+      .order('desc')
+      .first();
+
+    if (latestChat) return latestChat;
 
     const newChatId = await ctx.db.insert('chats', {
       // chatId: nextChatId,
-      friendId: friend?._id as Id<'friend'>,
+      friendId: friend._id,
       messageList: [],
     });
     const newChat = await ctx.db.get(newChatId);
@@ -106,26 +135,29 @@ export const getChatByFriend = mutation({
     friendId: v.string(),
   },
   handler: async (ctx, args) => {
-    const chat = await ctx.db.get(args.chatId as Id<'chats'>);
+    const chatId = ctx.db.normalizeId('chats', args.chatId);
+    const chat = chatId ? await ctx.db.get(chatId) : null;
 
     if (chat?.friendId === args.friendId) return chat._id;
-    if (chat?.friendId !== args.friendId) {
-      const existingChat = await ctx.db
-        .query('chats')
-        .withIndex('by_friendId', (q) => q.eq('friendId', args.friendId))
-        .first();
 
-      if (existingChat) return existingChat._id;
+    const friendId = ctx.db.normalizeId('friend', args.friendId);
 
-      const newChatId = await ctx.db.insert('chats', {
-        // todo reuse initChat here
-        friendId: args.friendId as Id<'friend'>,
-        messageList: [],
-      });
+    if (!friendId) return null;
 
-      return newChatId;
-    }
+    const existingChat = await ctx.db
+      .query('chats')
+      .withIndex('by_friendId', (q) => q.eq('friendId', friendId))
+      .order('desc')
+      .first();
 
-    return null;
+    if (existingChat) return existingChat._id;
+
+    const newChatId = await ctx.db.insert('chats', {
+      // todo reuse initChat here
+      friendId,
+      messageList: [],
+    });
+
+    return newChatId;
   },
 });
