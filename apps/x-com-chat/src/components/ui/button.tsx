@@ -46,11 +46,6 @@ export const buttonVariants = cva({
       destructive:
         'bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40',
 
-      // ? Custom
-      // ghost: 'hover:bg-accent-1',
-      // standard: 'bg-accent-1 hover:bg-accent-2',
-
-      // ? Chadcn version
       ghost:
         'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
       link: 'text-primary underline-offset-4 hover:underline',

@@ -2,14 +2,12 @@
 @import "tw-animate-css";
 @import "./accent.css";
 @import "./gray.css";
-@import "./stone.css";
 
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 @plugin "tailwind-scrollbar";
 
 @custom-variant brand (&:is(.brand, .brand *));
-@custom-variant stone (&:is(.stone, .stone *));
 @custom-variant dark (&:is(.dark, .dark *));
 
 /* TODO test :where version */
@@ -42,11 +40,12 @@
   }
 
   .brand::selection {
-    @apply bg-accent-1 text-white;
+    color: white;
+    background-color: var(--accent-6);
   }
 
   .brand.dark::selection {
-    @apply text-black;
+    color: black;
   }
 
   /* Undo @tailwindcss/forms styles */
@@ -264,12 +263,9 @@
   --color-gradient-input-primary-1: var(--gradient-input-primary-1);
   --color-gradient-input-primary-2: var(--gradient-input-primary-2);
 
-  /* todo delete */
   /* Links */
   --color-link-hover: var(--accent-10);
   --color-link-active: color-mix(in oklch, var(--accent-10), black 20%);
-  --color-accent-1: var(--accent-6);
-  /* todo delete */
 }
 
 /* chadcn theme */

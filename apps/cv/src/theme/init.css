@@ -52,19 +52,6 @@
 
   --color-background-header: var(--accent-2);
   --color-background-header-link: var(--color-background);
-
-  --color-surface-1: var(--gray-1);
-  --color-surface-2: var(--gray-2);
-  --color-surface-3: var(--gray-3);
-  --color-surface-4: var(--gray-4);
-  --color-surface-5: var(--gray-5);
-  --color-surface-6: var(--gray-6);
-  --color-surface-7: var(--gray-7);
-  --color-surface-8: var(--gray-8);
-  --color-surface-9: var(--gray-9);
-  --color-surface-10: var(--gray-10);
-  --color-surface-11: var(--gray-11);
-  --color-surface-12: var(--gray-12);
 }
 
 :root.dark,
@@ -80,19 +67,6 @@
   --color-link: var(--accent-10);
   --color-link-hover: var(--accent-9);
   --color-link-active: var(--accent-11);
-
-  --color-surface-1: var(--gray-1);
-  --color-surface-2: var(--gray-2);
-  --color-surface-3: var(--gray-3);
-  --color-surface-4: var(--gray-4);
-  --color-surface-5: var(--gray-5);
-  --color-surface-6: var(--gray-6);
-  --color-surface-7: var(--gray-7);
-  --color-surface-8: var(--gray-8);
-  --color-surface-9: var(--gray-9);
-  --color-surface-10: var(--gray-10);
-  --color-surface-11: var(--gray-11);
-  --color-surface-12: var(--gray-12);
 }
 
 @theme inline {
@@ -108,18 +82,18 @@
 
   --color-background-header: var(--color-background-header);
 
-  --color-surface-1: var(--color-surface-1);
-  --color-surface-2: var(--color-surface-2);
-  --color-surface-3: var(--color-surface-3);
-  --color-surface-4: var(--color-surface-4);
-  --color-surface-5: var(--color-surface-5);
-  --color-surface-6: var(--color-surface-6);
-  --color-surface-7: var(--color-surface-7);
-  --color-surface-8: var(--color-surface-8);
-  --color-surface-9: var(--color-surface-9);
-  --color-surface-10: var(--color-surface-10);
-  --color-surface-11: var(--color-surface-11);
-  --color-surface-12: var(--color-surface-12);
+  --color-gray-1: var(--gray-1);
+  --color-gray-2: var(--gray-2);
+  --color-gray-3: var(--gray-3);
+  --color-gray-4: var(--gray-4);
+  --color-gray-5: var(--gray-5);
+  --color-gray-6: var(--gray-6);
+  --color-gray-7: var(--gray-7);
+  --color-gray-8: var(--gray-8);
+  --color-gray-9: var(--gray-9);
+  --color-gray-10: var(--gray-10);
+  --color-gray-11: var(--gray-11);
+  --color-gray-12: var(--gray-12);
 
   /* Fonts */
   --font-manrope: var(--font-manrope);

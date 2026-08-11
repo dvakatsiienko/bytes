@@ -8,8 +8,6 @@ import {
   SidebarHeader,
 } from '@/components/ui/sidebar';
 
-import { cn } from '@/utils/cn';
-
 import { ThemeSettings } from './ThemeSettings';
 
 export function AppSidebar() {
@@ -26,10 +24,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup className='h-full gap-2 pl-4 font-semibold'>
           {linkList.map((link) => (
-            <Link
-              className={cn({ 'mt-auto': link.href === '/proto' })}
-              href={link.href}
-              key={link.href}>
+            <Link href={link.href} key={link.href}>
               {link.label}
             </Link>
           ))}
@@ -54,10 +49,3 @@ const linkList = [
     label: '⚙️ Settings',
   },
 ];
-
-if (process.env.NODE_ENV === 'development') {
-  linkList.push({
-    href: '/proto',
-    label: '🚧 Proto Dev 🚧',
-  });
-}

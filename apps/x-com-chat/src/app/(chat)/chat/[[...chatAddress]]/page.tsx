@@ -111,6 +111,5 @@ type ChatPageParams = Promise<{
 /* Types */
 interface ChatPageProps {
   params: ChatPageParams;
-  searchParams: Promise<{ _chatId_delete: string }>;
 }
 type ChatAddress = ['chatId' | undefined, 'friendId' | undefined];

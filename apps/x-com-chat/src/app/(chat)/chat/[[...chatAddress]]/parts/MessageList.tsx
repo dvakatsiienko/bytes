@@ -8,9 +8,6 @@ import { cn } from '@/utils/cn';
 import { useScrollToBottom } from '@/hooks/useScrollToBottom';
 
 import { Message } from './Message';
-import longTextStub from '@/../public/long-text-stub.json' with {
-  type: 'json',
-};
 
 // TODO review and simplify messages
 export const MessageList = (props: MessageListProps) => {
@@ -41,18 +38,10 @@ export const MessageList = (props: MessageListProps) => {
   const messageListJSX = props.messages.map((message, i) => (
     <Message
       isLatestMessage={i === props.messages.length - 1}
-      isLoading={props.isLoading}
       key={message.id}
       message={message}
       status={props.status}
     />
-  ));
-
-  const testMessageListJSX = [...new Array(10)].map((_, i) => (
-    // biome-ignore lint/suspicious/noArrayIndexKey: no id for this
-    <motion.p className='mb-4' key={i}>
-      {longTextStub.paragraph}
-    </motion.p>
   ));
 
   return (
@@ -60,7 +49,7 @@ export const MessageList = (props: MessageListProps) => {
       // TODO connect croll-area
       className={cn(
         'grid overflow-y-auto py-8',
-        'scrollbar-track-surface-1 scrollbar-thin scrollbar-thumb-accent-1 [grid-area:chat]',
+        'scrollbar-thin scrollbar-thumb-(--accent-6) [grid-area:chat]',
         props.className,
         {
           'auto-rows-max': props.messages.length,
@@ -69,11 +58,8 @@ export const MessageList = (props: MessageListProps) => {
       )}
       ref={containerRef}>
       <AnimatePresence mode='popLayout'>
-        {!(
-          props.testMessages ||
-          isChatInitRef.current ||
-          messageListJSX.length
-        ) && (
+        {/* biome-ignore lint/suspicious/noUnnecessaryConditions: ref mutates in event handlers */}
+        {!(isChatInitRef.current || messageListJSX.length) && (
           <motion.div
             className='mx-auto grid w-full max-w-sm place-content-center gap-4 self-center justify-self-center text-balance'
             exit={{ opacity: 0 }}
@@ -91,9 +77,7 @@ export const MessageList = (props: MessageListProps) => {
             {promptSuggestionListJSX}
           </motion.div>
         )}
-        {props.testMessages && testMessageListJSX}
-
-        {!props.testMessages && !!messageListJSX.length && messageListJSX}
+        {!!messageListJSX.length && messageListJSX}
       </AnimatePresence>
       <div className='h-0' ref={endRef} />
     </section>
@@ -110,10 +94,8 @@ const promptSuggestionList = [
 /* Types */
 interface MessageListProps {
   className?: string;
-  isLoading: boolean;
   messages: TMessage[];
   selectedFriendName: string;
   sendPromptSuggestion: (text: string) => void;
   status: 'error' | 'submitted' | 'streaming' | 'ready';
-  testMessages?: boolean;
 }

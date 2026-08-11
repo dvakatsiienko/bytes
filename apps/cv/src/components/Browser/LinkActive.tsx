@@ -26,8 +26,6 @@ const linkActiveCn = cva({
     'grid h-full w-full items-center text-gray-500 dark:text-gray-400',
     'text-center font-semibold text-xs',
     'border-none',
-
-    // 'border-surface-4 dark:border-surface-2',
   ),
   variants: {
     intent: {
@@ -38,6 +36,6 @@ const linkActiveCn = cva({
 
 /* Types */
 interface NavLinksProps extends React.PropsWithChildren {
-  href: string;
   className?: string;
+  href: string;
 }

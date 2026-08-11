@@ -13,7 +13,6 @@ export default defineSchema({
   }),
   chats: defineTable({
     friendId: v.string(),
-    friendName: v.optional(v.string()),
     messageList: SchemaMessageList,
   }).index('by_friendId', ['friendId']),
 });

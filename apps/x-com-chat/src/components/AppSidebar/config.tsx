@@ -21,15 +21,3 @@ export const themeList = [
     value: 'system',
   },
 ] as const;
-
-/* Helpers */
-export const colorPresetList = [
-  { color: 'bg-(--accent-7)', label: 'Brand', value: 'brand' },
-  { color: 'bg-stone-500', label: 'Stone', value: 'stone' },
-] as const;
-export const colorPresetValueList = colorPresetList.map(
-  (preset) => preset.value,
-);
-
-/* Types */
-export type AppColorPreset = (typeof colorPresetList)[number]['value'];

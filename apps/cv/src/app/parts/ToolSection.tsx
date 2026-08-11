@@ -11,7 +11,7 @@ export const ToolSection = (props: ToolSectionProps) => {
     <section
       className={cx(
         'w-full p-2 px-1.5',
-        'bg-surface-5 dark:bg-surface-1',
+        'bg-gray-5 dark:bg-gray-1',
         'rounded-md',
         props.className,
       )}>

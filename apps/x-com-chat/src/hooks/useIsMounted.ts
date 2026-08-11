@@ -7,5 +7,5 @@ export const useIsMounted = () => {
     setIsMounted(true);
   }, []);
 
-  return [isMounted, setIsMounted];
+  return [isMounted] as const;
 };

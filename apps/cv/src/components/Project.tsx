@@ -8,7 +8,7 @@ export const Project = (props: IProjectProps) => {
       className={cn(
         'gap-x-2',
         'grid grid-cols-[auto_1fr] rounded-md px-4 py-2',
-        'bg-surface-5 dark:bg-surface-1',
+        'bg-gray-5 dark:bg-gray-1',
         'shadow-md',
         'text-pretty',
       )}>

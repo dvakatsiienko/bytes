@@ -72,7 +72,13 @@ const components: Partial<Components> = {
       </ol>
     );
   },
-  pre: ({ children }) => <>{children}</>,
+  pre: ({ children, ...props }) => (
+    <pre
+      className='my-2 overflow-x-auto rounded-md bg-muted p-3 font-mono text-sm'
+      {...props}>
+      {children}
+    </pre>
+  ),
   strong: ({ children, ...props }) => {
     return (
       <span className='font-semibold' {...props}>

@@ -47,8 +47,8 @@ export const Browser = (props: BrowserProps) => {
           'overflow-y-scroll print:max-h-none print:overflow-y-visible',
           /* Scrollbar */
           'scrollbar scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-w-1',
-          'scrollbar-thumb-surface-7 scrollbar-track-transparent',
-          'scrollbar-hover:scrollbar-thumb-surface-11 scrollbar-active:scrollbar-thumb-surface-10',
+          'scrollbar-thumb-gray-7 scrollbar-track-transparent',
+          'scrollbar-hover:scrollbar-thumb-gray-11 scrollbar-active:scrollbar-thumb-gray-10',
           'scrollbar-active:cursor-grabbing scrollbar-hover:cursor-grab',
 
           // 'scrollbar-thumb-slate-700 scrollbar-track-slate-300'

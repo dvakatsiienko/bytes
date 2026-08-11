@@ -3,15 +3,7 @@
 import { memo, useState } from 'react';
 import type { UIMessage as TMessage } from 'ai';
 import equal from 'fast-deep-equal';
-import {
-  CheckCircle,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  Loader2,
-  PocketKnife,
-  SparklesIcon,
-  StopCircle,
-} from 'lucide-react';
+import { ChevronDownIcon, ChevronUpIcon, SparklesIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import dynamic from 'next/dynamic';
 
@@ -28,7 +20,7 @@ const AnimatedBorder = (props: React.PropsWithChildren) => {
   return (
     <div className='relative size-8'>
       <div className='absolute inset-0 rounded-full border-2 border-primary' />
-      <div className='absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-surface-1 dark:border-t-surface-2' />
+      <div className='absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-(--gray-1) dark:border-t-(--gray-2)' />
       <div className='absolute inset-0 flex items-center justify-center'>
         {props.children}
       </div>
@@ -132,53 +124,6 @@ const MessagePreview = ({
         );
       }
 
-      if (part.type.startsWith('tool-')) {
-        const state = (part as { state?: string }).state as
-          | 'call'
-          | 'result'
-          | 'input-streaming'
-          | 'input-available'
-          | 'output-available'
-          | 'output-error'
-          | undefined;
-        const toolName = part.type.replace('tool-', '');
-
-        return (
-          <motion.div
-            animate={{ opacity: 1, y: 0 }}
-            className='mb-3 flex flex-col gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-2 text-sm dark:border-zinc-800 dark:bg-zinc-900'
-            initial={{ opacity: 0, y: 5 }}
-            // biome-ignore lint/suspicious/noArrayIndexKey: message parts render in stable order
-            key={`message-${message.id}-part-${i}`}>
-            <div className='flex flex-1 items-center justify-center'>
-              <div className='flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 dark:bg-zinc-800'>
-                <PocketKnife className='h-4 w-4' />
-              </div>
-              <div className='flex-1'>
-                <div className='flex items-baseline gap-2 font-medium'>
-                  {state === 'call' ? 'Calling' : 'Called'}{' '}
-                  <span className='rounded-md bg-zinc-100 px-2 py-1 font-mono dark:bg-zinc-800'>
-                    {toolName}
-                  </span>
-                </div>
-              </div>
-              <div className='flex h-5 w-5 items-center justify-center'>
-                {state === 'call' ? (
-                  // biome-ignore lint/style/noNestedTernary: todo simplify this
-                  isLatestMessage && status !== 'ready' ? (
-                    <Loader2 className='h-4 w-4 animate-spin text-zinc-500' />
-                  ) : (
-                    <StopCircle className='h-4 w-4 text-red-500' />
-                  )
-                ) : state === 'result' ? (
-                  <CheckCircle className='text-green-600' size={14} />
-                ) : null}
-              </div>
-            </div>
-          </motion.div>
-        );
-      }
-
       if (part.type === 'reasoning') {
         return (
           <MessageReasoningPart
@@ -247,7 +192,6 @@ export const Message = memo(MessagePreview, (prevProps, nextProps) => {
 /* Types */
 interface MessagePreviewProps {
   isLatestMessage: boolean;
-  isLoading: boolean;
   message: TMessage;
   status: 'error' | 'submitted' | 'streaming' | 'ready';
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import useEventListener from '@use-it/event-listener';
 import { useTheme } from 'next-themes';
 
@@ -9,36 +8,18 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/utils/cn';
 import { useIsMounted } from '@/hooks/useIsMounted';
 
-import {
-  type AppColorPreset,
-  colorPresetList,
-  colorPresetValueList,
-  themeList,
-} from './config';
+import { themeList } from './config';
 
 export const ThemeSettings = () => {
   const { theme, setTheme } = useTheme();
 
   const [isMounted] = useIsMounted();
-  const [colorPreset, setColorPreset] = useState<AppColorPreset>('brand');
 
   const selectTheme = (value: string) => {
     if (value === theme || !value) return null;
 
     return setTheme(value);
   };
-
-  function selectPreset(selectedColorPreset: AppColorPreset) {
-    if (
-      selectedColorPreset === colorPreset ||
-      !colorPreset ||
-      !selectedColorPreset
-    )
-      return null;
-
-    setColorPreset(selectedColorPreset);
-    replacePresetCnOnRoot(colorPreset, selectedColorPreset);
-  }
 
   useEventListener('keydown', (e: KeyboardEvent) => {
     if (e.metaKey && !e.shiftKey && e.key === 'p') {
@@ -49,29 +30,7 @@ export const ThemeSettings = () => {
 
       setTheme(nextTheme.value);
     }
-
-    if (e.metaKey && e.shiftKey && e.key.toLowerCase() === 'p') {
-      e?.preventDefault();
-
-      const idx = colorPresetValueList.indexOf(colorPreset);
-      const nextPreset =
-        colorPresetValueList[(idx + 1) % colorPresetValueList.length];
-
-      setColorPreset(nextPreset);
-      replacePresetCnOnRoot(colorPreset, nextPreset);
-    }
   });
-
-  const replacePresetCnOnRoot = (
-    prevPreset: AppColorPreset,
-    nextPreset: AppColorPreset,
-  ) => {
-    if (!(prevPreset && nextPreset)) return null;
-
-    const root = document.documentElement;
-    root.classList.remove(prevPreset);
-    root.classList.add(nextPreset);
-  };
 
   // todo refactor
   const settingNameCn = cn(
@@ -100,26 +59,6 @@ export const ThemeSettings = () => {
                 value={themeItem.value}
                 variant='outline'>
                 {themeItem.icon}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-
-          <span className={settingNameCn}>{colorPreset} color</span>
-          <ToggleGroup
-            className={cn(settingGroupCn)}
-            defaultValue={colorPreset}
-            onValueChange={(value) => selectPreset(value as AppColorPreset)}
-            type='single'
-            value={colorPreset}
-            variant='outline'>
-            {colorPresetList.map((preset) => (
-              <ToggleGroupItem
-                className={settingItemCn}
-                key={preset.value}
-                size='sm'
-                value={preset.value}
-                variant='outline'>
-                <span className={cn('size-4 rounded-full', preset.color)} />
               </ToggleGroupItem>
             ))}
           </ToggleGroup>

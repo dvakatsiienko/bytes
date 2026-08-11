@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
-import { InfoCircledIcon } from '@radix-ui/react-icons';
 import useEventListener from '@use-it/event-listener';
 import { DefaultChatTransport, type UIMessage, createIdGenerator } from 'ai';
 import { useMutation } from 'convex/react';
 import { useSetAtom } from 'jotai';
+import { Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import { Select } from '@/components/Select';
@@ -32,7 +32,11 @@ export const Chat = (props: ChatProps) => {
 
   const setSelectedFriendId = useSetAtom(selectedFriendIdAtom);
   const setSelectedChatId = useSetAtom(selectedChatIdAtom);
-  useInitJotai(props.chatId, props.friendId);
+
+  useEffect(() => {
+    setSelectedFriendId(props.friendId);
+    setSelectedChatId(props.chatId);
+  }, [props.friendId, props.chatId, setSelectedFriendId, setSelectedChatId]);
 
   const { chatHistoryQuery = props.initialMessages } = useChatHistoryQuery(
     props.chatId,
@@ -117,8 +121,6 @@ export const Chat = (props: ChatProps) => {
   return (
     <>
       <MessageList
-        // testMessages
-        isLoading={isLoading}
         key={props.chatId}
         messages={messages}
         selectedFriendName={selectedFriend?.name ?? ''}
@@ -172,7 +174,7 @@ export const Chat = (props: ChatProps) => {
               'absolute top-0 right-0 hidden size-8 place-items-center md:grid',
               'rounded-tr-md rounded-bl-md bg-transparent',
             )}>
-            <InfoCircledIcon />
+            <Info size={15} />
           </TooltipTrigger>
 
           <TooltipContent
@@ -239,7 +241,6 @@ const keyboradChortcutList = [
   { description: 'Send', shortcut: '⌘ + ↵' },
   { description: 'Select Friend', shortcut: '⌘ + ⇧ + K' },
   { description: 'Swtich Theme 🌙 | 🌞 | system', shortcut: '⌘ + P' },
-  { description: 'Swtich Theme Preset', shortcut: '⌘ + ⇧ + P' },
   { description: 'Toggle Sidebar', shortcut: '⌘ + B' },
 ];
 
@@ -249,15 +250,4 @@ interface ChatProps {
   friendId: string;
   friendList: Doc<'friend'>[];
   initialMessages: UIMessage[];
-}
-
-function useInitJotai(chatId: string, friendId: string) {
-  const setSelectedFriendId = useSetAtom(selectedFriendIdAtom);
-  const setSelectedChatId = useSetAtom(selectedChatIdAtom);
-
-  useEffect(() => {
-    // init jotai
-    setSelectedFriendId(friendId);
-    setSelectedChatId(chatId);
-  }, [friendId, chatId, setSelectedFriendId, setSelectedChatId]);
 }
