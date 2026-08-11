@@ -66,3 +66,17 @@ its CLAUDE.md file. Common patterns:
 - **AI**: API keys for LLM providers
 - **Database**: Connection strings and deploy keys
 - **Analytics**: Tracking and monitoring
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues in `dvakatsiienko/bytes` via the `gh` CLI, one app label per issue (`x-com-chat`, `cv`, …). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Multi-context — root `CONTEXT-MAP.md` points at per-app `CONTEXT.md` files. See `docs/agents/domain.md`.
