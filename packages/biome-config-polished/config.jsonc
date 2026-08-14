@@ -206,13 +206,11 @@
 
       /* rules that detect code that is likely to be incorrect or useless. */
       "suspicious": {
-        "noConsole": {
-          // ultracite rule — lint for console.log only, allow everything else
-          "level": "warn",
-          "options": {
-            "allow": ["assert", "error", "info", "warn"]
-          }
-        },
+        // ultracite rule — off on purpose. Its fix is unsafe (it deletes the
+        // call), so a `biome check --write --unsafe` pass silently strips the
+        // output out of CLI scripts and leaves them running mute. Console noise
+        // is a review question, not a thing to autofix.
+        "noConsole": "off",
         "noUnknownAtRules": "off", // ultracite rule — there are too much custom at-rules from tailwind. review this rule when it will go out from nursery.
         "noUndeclaredEnvVars": "error",
         "noLeakedRender": "off", // ultracite rule — && operator is useful
