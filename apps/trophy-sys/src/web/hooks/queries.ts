@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type {
   Game,
@@ -34,11 +34,29 @@ export const useGame = (gameId: string | null) =>
     queryKey: ['game', gameId],
   });
 
-export const useNews = (enabled: boolean) =>
+export const useNews = () =>
   useQuery({
-    enabled,
     queryFn: () => apiGet<NewsFeed>('/news'),
     queryKey: ['news'],
     // A failed news scan costs 15 titles x 2 PSN calls; never replay it.
     retry: 0,
   });
+
+/**
+ * Commits the current earnings as the new baseline, which is what makes the
+ * next /api/news diff meaningful. Deliberately a button rather than a side
+ * effect of reading the feed.
+ */
+export const useSnapshot = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/snapshot', { method: 'POST' });
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload.error ?? res.statusText);
+      return payload;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['news'] }),
+  });
+};

@@ -2,27 +2,58 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  redirect,
 } from '@tanstack/react-router';
 
-import { App } from './App.tsx';
-import { searchValidate } from './search.ts';
+import { Layout } from './layout.tsx';
+import { Library, LibraryEmpty, LibraryGame } from './library.tsx';
+import { News } from './news.tsx';
 
-const rootRoute = createRootRoute();
+const rootRoute = createRootRoute({ component: Layout });
 
 /**
- * One screen, so the view state lives in search params rather than path
- * segments — `?tab=library&game=NPWR38256_00` survives a reload and is
- * shareable, which a useState pair never was.
+ * Paths, not search params: the tabs are navigation and a game is a resource,
+ * so /library/NPWR21924_00 is the honest URL. vercel.json rewrites every
+ * non-/api path to index.html, which is what makes those deep links load.
  */
 const indexRoute = createRoute({
-  component: App,
+  beforeLoad: () => {
+    throw redirect({ to: '/library' });
+  },
   getParentRoute: () => rootRoute,
   path: '/',
-  validateSearch: searchValidate,
+});
+
+const libraryRoute = createRoute({
+  component: Library,
+  getParentRoute: () => rootRoute,
+  path: '/library',
+});
+
+const libraryIndexRoute = createRoute({
+  component: LibraryEmpty,
+  getParentRoute: () => libraryRoute,
+  path: '/',
+});
+
+const libraryGameRoute = createRoute({
+  component: LibraryGame,
+  getParentRoute: () => libraryRoute,
+  path: '$gameId',
+});
+
+const newsRoute = createRoute({
+  component: News,
+  getParentRoute: () => rootRoute,
+  path: '/news',
 });
 
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute]),
+  routeTree: rootRoute.addChildren([
+    indexRoute,
+    libraryRoute.addChildren([libraryIndexRoute, libraryGameRoute]),
+    newsRoute,
+  ]),
 });
 
 declare module '@tanstack/react-router' {

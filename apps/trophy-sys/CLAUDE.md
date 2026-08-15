@@ -116,9 +116,11 @@ load into ~120 PSN round-trips.
 
 - Naming is subject-first: `gamesFetch`, `stateLoad`, `dateFormat`, `game-list.tsx`. Never
   `fetchGames`.
-- Server state is TanStack Query (`hooks/queries.ts`), URL state is TanStack Router search params
-  (`search.ts` holds the schema, `router.tsx` the route tree). `search.ts` deliberately imports no
-  router code so `App.tsx` can use it without an import cycle back through `router.tsx`.
+- Server state is TanStack Query (`hooks/queries.ts`); routing is TanStack Router with real
+  paths — `/library`, `/library/$gameId`, `/news` — not search params, because the tabs are
+  navigation and a game is a resource. `router.tsx` holds the tree; `layout.tsx`, `library.tsx`
+  and `news.tsx` are the route components. Deep links work because `vercel.json` rewrites every
+  non-`/api` path to `index.html`.
 - Server imports carry the `.ts` extension — node's native TS resolution requires it.
 - `biome.jsonc` is a nested (`root: false`) config extending the monorepo root. It turns off
   `noImgElement` (a Next.js rule, meaningless in a Vite app) and allows the default export the
