@@ -1,9 +1,35 @@
+.page {
+  --ink: #101014;
+  --paper: #f7f5f2;
+  --lab: #e8f0ee;
+  --accent: #b8d8cf;
+  color: var(--ink);
+
+  background: var(--paper);
+}
+
+.grain {
+  background-image:
+    linear-gradient(to right, rgb(16 16 20 / 4%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(16 16 20 / 4%) 1px, transparent 1px);
+  background-size: 88px 88px;
+}
+
+.halo {
+  background: radial-gradient(
+    circle at 50% 45%,
+    var(--lab) 0%,
+    var(--lab) 42%,
+    transparent 68%
+  );
+}
+
 .layout-hero {
   grid-template-areas:
     "breadcrumbs"
     "image"
     "description";
-  grid-template-rows: auto 500px auto;
+  grid-template-rows: auto 460px auto;
 
   & [class~="image"] {
     grid-area: image;
@@ -22,5 +48,38 @@
       "image breadcrumbs"
       "image description";
     grid-template-rows: max-content 1fr;
+  }
+}
+
+.card {
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  &:hover {
+    box-shadow: 0 24px 48px -24px rgb(16 16 20 / 25%);
+    transform: translateY(-6px);
+  }
+
+  & img {
+    transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  &:hover img {
+    transform: scale(1.06) rotate(-2deg);
+  }
+}
+
+.marquee {
+  animation: slide 32s linear infinite;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
   }
 }

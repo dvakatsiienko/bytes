@@ -5,127 +5,193 @@ import Image from 'next/image';
 import styles from './styles.module.css';
 import { SvgLogo } from './svg/SvgLogo';
 
-// TODO improve images resonpsivness
-// TODO improve page
 export default () => {
   return (
-    <main className='px-5 sm:px-16 sm:text-lg'>
-      <header className='sticky top-0 flex h-20 items-center justify-center bg-white py-4 sm:justify-between sm:py-6'>
-        <SvgLogo />
+    <main className={`${styles.page} min-h-screen`}>
+      <header className='sticky top-0 z-20 border-[#101014]/10 border-b bg-[#f7f5f2]/80 backdrop-blur-md'>
+        <div className='mx-auto flex h-20 max-w-[1400px] items-center justify-center px-5 sm:justify-between sm:px-10'>
+          <SvgLogo />
 
-        <nav className='hidden gap-4 font-bold sm:flex md:gap-8 lg:gap-12'>
-          <NavLink text='New' />
-          <NavLink text='clinique iD™' />
-          <NavLink text='Best Sellers' />
-          <NavLink text='Shop All' />
-        </nav>
+          <nav className='hidden gap-8 font-medium text-sm uppercase tracking-[0.18em] sm:flex lg:gap-12'>
+            <NavLink text='New' />
+            <NavLink text='clinique iD™' />
+            <NavLink text='Best Sellers' />
+            <NavLink text='Shop All' />
+          </nav>
+
+          <span className='hidden text-[#101014]/40 text-xs uppercase tracking-[0.2em] lg:block'>
+            Bag (0)
+          </span>
+        </div>
       </header>
 
-      <section
-        className={`${styles['layout-hero']} mb-5 grid min-h-[calc(100vh-80px)] gap-x-16 gap-y-3 border-gray-200 border-b sm:grid-cols-2`}>
-        <Image
-          alt='Product image'
-          className='image place-self-center md:h-[470px] md:w-64'
-          height={292}
-          src='/clinique/product-1.png'
-          width={105}
-        />
-        <section className='breadrumbs cursor-pointer font-extralight text-slate-500 underline-offset-4 hover:underline'>
-          Makeup / Foundations
-        </section>
+      <div className='overflow-hidden border-[#101014]/10 border-b bg-[#101014] py-2.5 text-[#f7f5f2]'>
+        <div
+          className={`${styles.marquee} flex w-max gap-10 whitespace-nowrap text-xs uppercase tracking-[0.3em]`}>
+          <span className='flex gap-10'>{ticker}</span>
+          <span aria-hidden className='flex gap-10'>
+            {ticker}
+          </span>
+        </div>
+      </div>
 
-        <section className='description'>
-          <section className='mb-4 border-gray-200 border-b'>
-            <h6 className='mb-2 font-bold text-xl sm:mb-1 sm:text-3xl'>
-              Even Better Glow™ Light Reflecting Makeup Broad Spectrum SPF 15
-            </h6>
-            <p className='mb-5 sm:mb-1'>
+      <div className='mx-auto max-w-[1400px] px-5 sm:px-10'>
+        <section
+          className={`${styles['layout-hero']} grid min-h-[calc(100vh-120px)] items-start gap-x-16 gap-y-6 py-10 sm:grid-cols-2`}>
+          <figure
+            className={`${styles.halo} image relative grid h-full w-full place-content-center self-stretch`}>
+            <span
+              className={`${styles.grain} pointer-events-none absolute inset-0`}
+            />
+            <span className='absolute top-1/2 left-0 origin-left -rotate-90 text-[#101014]/30 text-xs uppercase tracking-[0.35em]'>
+              Shade WN 04
+            </span>
+            <Image
+              alt='Even Better Glow foundation bottle'
+              className='relative drop-shadow-[0_40px_60px_rgba(16,16,20,0.25)]'
+              height={584}
+              priority
+              src='/clinique/product-1.png'
+              width={210}
+            />
+          </figure>
+
+          <nav className='breadrumbs flex items-center gap-2 text-[#101014]/50 text-xs uppercase tracking-[0.2em]'>
+            <span className='cursor-pointer hover:text-[#101014]'>Makeup</span>
+            <span>/</span>
+            <span className='cursor-pointer hover:text-[#101014]'>
+              Foundations
+            </span>
+          </nav>
+
+          <section className='description max-w-xl'>
+            <p className='mb-4 inline-block border border-[#101014]/15 px-3 py-1 text-[10px] uppercase tracking-[0.3em]'>
+              Best seller
+            </p>
+
+            <h1 className='mb-4 font-semibold text-4xl leading-[1.05] tracking-tight lg:text-6xl'>
+              Even Better Glow™
+              <span className='block font-light text-2xl text-[#101014]/55 tracking-normal lg:text-3xl'>
+                Light Reflecting Makeup SPF 15
+              </span>
+            </h1>
+
+            <p className='mb-5 text-[#101014]/70 text-lg leading-relaxed'>
               Moderate-coverage foundation instantly perfects, improves evenness
               of skin.
             </p>
-            <span className='mb-7 block'>★★★★★ (102)</span>
 
-            <section className='mb-9 grid gap-y-6 sm:grid-cols-2'>
+            <div className='mb-10 flex items-center gap-3 text-sm'>
+              <span className='tracking-[0.2em]'>★★★★★</span>
+              <span className='text-[#101014]/50'>102 reviews</span>
+            </div>
+
+            <dl className='mb-10 grid gap-px border border-[#101014]/10 bg-[#101014]/10 sm:grid-cols-2'>
               <Feature
                 description='Glow and natural radiance'
                 title='Benefits'
               />
-              <Feature description='Sheer to Moderate' title='Coverage ' />
+              <Feature description='Sheer to moderate' title='Coverage' />
               <Feature description='Radiant' title='Finish' />
               <Feature
-                description='Coriander Seed, Black Pepper, Patchouli'
-                title='Key Ingredients'
+                description='Coriander seed, black pepper, patchouli'
+                title='Key ingredients'
               />
-            </section>
+            </dl>
 
-            <section className='mb-5 flex h-14 max-w-72 items-center justify-between border-2 border-gray-200 px-5'>
-              <span className='font-bold'>WN 04</span>
-              <span className='h-4 w-4 bg-[#F6DFC8]' />
-            </section>
-          </section>
+            <div className='mb-8 flex flex-wrap items-center gap-4'>
+              <div className='flex h-14 flex-1 items-center justify-between border border-[#101014]/20 px-5'>
+                <span className='font-medium text-sm tracking-[0.15em]'>
+                  WN 04 BONE
+                </span>
+                <span className='h-5 w-5 rounded-full bg-[#f6dfc8] ring-1 ring-[#101014]/20 ring-offset-2 ring-offset-[#f7f5f2]' />
+              </div>
 
-          <section className='mb-14 grid grid-cols-2 items-center gap-y-7 font-bold'>
-            <span className='flex gap-4 sm:col-span-2 md:col-auto'>
-              Quantity
-              <span>
-                &#x2212; <span className='mr-2 ml-2'>1</span> +
+              <div className='flex h-14 items-center gap-5 border border-[#101014]/20 px-5 text-lg'>
+                <button
+                  className='cursor-pointer text-[#101014]/50 hover:text-[#101014]'
+                  type='button'>
+                  &minus;
+                </button>
+                <span className='w-4 text-center font-medium'>1</span>
+                <button
+                  className='cursor-pointer text-[#101014]/50 hover:text-[#101014]'
+                  type='button'>
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className='flex flex-wrap items-center gap-6'>
+              <span className='font-semibold text-3xl tabular-nums'>
+                $29.00
               </span>
-            </span>
+              <Button intent='buy' text='Add to Bag' />
+            </div>
 
-            <span className='sm:col-start-1 md:col-auto'>
-              One time purchase
-            </span>
-            <span className='text-xl'>$29.00</span>
-
-            <Button intent='buy' text='Add to Bag' />
+            <p className='mt-4 text-[#101014]/45 text-xs uppercase tracking-[0.2em]'>
+              One time purchase · Free shipping over $50
+            </p>
           </section>
         </section>
-      </section>
 
-      <section className='mb-12 text-2xl'>
-        <h1 className='mb-8 font-bold sm:text-3xl'>Works Well With</h1>
+        <section className='border-[#101014]/10 border-t py-16'>
+          <header className='mb-10 flex items-end justify-between gap-6'>
+            <h2 className='font-semibold text-3xl tracking-tight lg:text-4xl'>
+              Works well with
+            </h2>
+            <span className='hidden text-[#101014]/45 text-xs uppercase tracking-[0.2em] sm:block'>
+              04 products
+            </span>
+          </header>
 
-        <section className='grid justify-center gap-12 sm:gap-6 xl:grid-flow-col'>
-          <Product
-            imageHeight={178}
-            imageSrc='/clinique/product-2.png'
-            imageWidth={164}
-            price='$42.00'
-            title='Turnaround™ Overnight Revitalizing Moisturizer'
-          />
+          <div className='grid gap-8 sm:grid-cols-2 xl:grid-cols-4'>
+            <Product
+              imageHeight={178}
+              imageSrc='/clinique/product-2.png'
+              imageWidth={164}
+              price='$42.00'
+              title='Turnaround™ Overnight Revitalizing Moisturizer'
+            />
 
-          <Product
-            imageHeight={160}
-            imageSrc='/clinique/product-3.png'
-            imageWidth={164}
-            price='$48.00'
-            title='Superdefense™ Daily Defense Moisturizer Broad Spectrum SPF 20'
-          />
+            <Product
+              imageHeight={160}
+              imageSrc='/clinique/product-3.png'
+              imageWidth={164}
+              price='$48.00'
+              title='Superdefense™ Daily Defense Moisturizer SPF 20'
+            />
 
-          <Product
-            imageHeight={160}
-            imageSrc='/clinique/product-4.png'
-            imageWidth={152}
-            price='$50.00'
-            title='Even Better™ Skin Tone Correcting Moisturizer Broad Spectrum SPF 20'
-          />
+            <Product
+              imageHeight={160}
+              imageSrc='/clinique/product-4.png'
+              imageWidth={152}
+              price='$50.00'
+              title='Even Better™ Skin Tone Correcting Moisturizer SPF 20'
+            />
 
-          <Product
-            imageHeight={236}
-            imageSrc='/clinique/product-5.png'
-            imageWidth={50}
-            price='$39.00'
-            title='Moisture Surge™ Hydrating Supercharged Concentrate'
-          />
+            <Product
+              imageHeight={236}
+              imageSrc='/clinique/product-5.png'
+              imageWidth={50}
+              price='$39.00'
+              title='Moisture Surge™ Hydrating Supercharged Concentrate'
+            />
+          </div>
         </section>
-      </section>
+
+        <footer className='flex flex-wrap items-center justify-between gap-4 border-[#101014]/10 border-t py-10 text-[#101014]/45 text-xs uppercase tracking-[0.2em]'>
+          <SvgLogo />
+          <span>Figmentation study · not affiliated</span>
+        </footer>
+      </div>
     </main>
   );
 };
 
 const NavLink = (props: NavLinkProps) => {
   return (
-    <div className='cursor-pointer underline-offset-3 hover:underline'>
+    <div className='relative cursor-pointer after:absolute after:bottom-[-6px] after:left-0 after:h-px after:w-0 after:bg-[#101014] after:transition-[width] after:duration-300 hover:after:w-full'>
       {props.text}
     </div>
   );
@@ -133,31 +199,34 @@ const NavLink = (props: NavLinkProps) => {
 
 const Feature = (props: FeatureProps) => {
   return (
-    <div>
-      <p className='font-bold'>{props.title}</p>
-      <p>{props.description}</p>
+    <div className='bg-[#f7f5f2] p-4'>
+      <dt className='mb-1 text-[#101014]/45 text-[10px] uppercase tracking-[0.2em]'>
+        {props.title}
+      </dt>
+      <dd className='text-sm'>{props.description}</dd>
     </div>
   );
 };
 
 const Product = (props: ProductProps) => {
   return (
-    <div className='grid min-h-[440px] w-full max-w-85 flex-col gap-2 font-light text-lg sm:max-w-72'>
-      <picture className='grid aspect-square w-full place-content-center justify-self-center bg-gray-100'>
+    <article
+      className={`${styles.card} flex flex-col gap-4 border border-[#101014]/10 bg-white p-5`}>
+      <picture
+        className={`${styles.halo} grid aspect-square w-full place-content-center`}>
         <Image
-          alt='product image'
-          // className = 'h-40 w-40'
+          alt={props.title}
           height={props.imageHeight}
           src={props.imageSrc}
           width={props.imageWidth}
         />
       </picture>
 
-      <p>{props.title}</p>
-      <p className='text-gray-500'>{props.price}</p>
+      <p className='flex-1 text-base leading-snug'>{props.title}</p>
+      <p className='font-medium tabular-nums'>{props.price}</p>
 
       <Button intent='shop' text='Shop now' />
-    </div>
+    </article>
   );
 };
 
@@ -169,28 +238,17 @@ const Button = (props: ButtonProps) => {
   );
 };
 
+const ticker =
+  'Allergy tested · 100% fragrance free · Dermatologist developed · '.repeat(4);
+
 /* Styles */
 const button = cva({
+  base: 'h-14 cursor-pointer text-sm uppercase tracking-[0.2em] transition-colors duration-300',
   defaultVariants: { intent: 'buy' },
   variants: {
     intent: {
-      buy: [
-        'col-span-2 row-start-3 h-14 cursor-pointer bg-black text-white lg:col-auto lg:row-auto lg:max-w-64',
-      ],
-      shop: [
-        'bg-white',
-        'text-black',
-        'border',
-        'border-grey-100',
-        'lg:max-w-72',
-        'max-w-84',
-        'h-14',
-        'w-full',
-        'cursor-pointer',
-        'self-end',
-        'justify-self-center',
-        'font-bold',
-      ],
+      buy: 'flex-1 bg-[#101014] px-10 font-medium text-[#f7f5f2] hover:bg-[#101014]/80 sm:min-w-64 sm:flex-none',
+      shop: 'w-full border border-[#101014]/20 bg-transparent hover:bg-[#101014] hover:text-[#f7f5f2]',
     },
   },
 });
@@ -201,16 +259,16 @@ interface NavLinkProps {
 }
 
 interface FeatureProps {
-  title: string;
   description: string;
+  title: string;
 }
 
 interface ProductProps {
+  imageHeight: number;
+  imageSrc: string;
+  imageWidth: number;
   price: string;
   title: string;
-  imageSrc: string;
-  imageHeight: number;
-  imageWidth: number;
 }
 
 type ButtonPropsCva = VariantProps<typeof button>;
