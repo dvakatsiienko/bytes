@@ -8,14 +8,17 @@
     "build:api": "esbuild src/server/handler.ts --bundle --platform=node --format=esm --target=node24 --outfile=api/handler.js",
     "build:web": "vite build",
     "dev": "node --run dev:api & node --run dev:web",
-    "dev:api": "node --watch --env-file=.env src/server/main.ts",
+    "dev:api": "node --watch --env-file=.env --env-file-if-exists=.env.local src/server/main.ts",
     "dev:web": "vite",
     "lint": "biome lint",
     "preview": "vite preview",
-    "trophies": "node --env-file=.env src/server/cli.ts",
+    "trophies": "node --env-file=.env --env-file-if-exists=.env.local src/server/cli.ts",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json"
   },
   "dependencies": {
+    "@tanstack/react-query": "5.101.4",
+    "@tanstack/react-router": "1.170.29",
+    "@upstash/redis": "1.38.2",
     "psn-api": "2.18.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"

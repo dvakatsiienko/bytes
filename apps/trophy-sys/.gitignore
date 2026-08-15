@@ -3,3 +3,4 @@
 api/
 dist/
 .vercel/
+.env*.local

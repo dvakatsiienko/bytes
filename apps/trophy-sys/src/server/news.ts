@@ -9,7 +9,7 @@ export const newsFetch = async ({
 }: {
   commit: boolean;
 }): Promise<NewsFeed> => {
-  const state = stateLoad();
+  const state = await stateLoad();
   const isBaseline = Object.keys(state).length === 0;
   const games = await gamesFetch(SCAN_LIMIT);
   const fresh: NewTrophy[] = [];
@@ -37,7 +37,7 @@ export const newsFetch = async ({
     state[game.id] = earned.map((trophy) => trophy.id);
   }
 
-  if (commit) stateSave(state);
+  if (commit) await stateSave(state);
 
   fresh.sort((a, b) => (b.earnedAt ?? '').localeCompare(a.earnedAt ?? ''));
   return { isBaseline, trophies: fresh };

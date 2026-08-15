@@ -1,13 +1,30 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { Redis } from '@upstash/redis';
 
 const STATE_FILE = new URL('../../.trophy-state.json', import.meta.url);
-
-/** Serverless filesystems are read-only — the baseline only persists locally. */
-export const isStateWritable = !process.env.VERCEL;
+const STATE_KEY = 'trophy-sys:baseline';
 
 export type TrophyState = Record<string, number[]>;
 
-export const stateLoad = (): TrophyState => {
+/**
+ * The baseline lives in Upstash when the KV credentials are present, and in a
+ * local JSON file otherwise. Serverless filesystems are read-only, so the file
+ * alone cannot work in production; the fallback keeps `pnpm dev` and the CLI
+ * usable with no network store attached.
+ */
+const redis =
+  process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+    ? new Redis({
+        token: process.env.KV_REST_API_TOKEN,
+        url: process.env.KV_REST_API_URL,
+      })
+    : null;
+
+export const stateBackend = redis ? 'kv' : 'file';
+
+export const stateLoad = async (): Promise<TrophyState> => {
+  if (redis) return (await redis.get<TrophyState>(STATE_KEY)) ?? {};
+
   try {
     return JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
   } catch {
@@ -15,6 +32,11 @@ export const stateLoad = (): TrophyState => {
   }
 };
 
-export const stateSave = (state: TrophyState) => {
+export const stateSave = async (state: TrophyState) => {
+  if (redis) {
+    await redis.set(STATE_KEY, state);
+    return;
+  }
+
   writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 };

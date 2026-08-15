@@ -22,3 +22,5 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/provider-utils@5.0.1'
   - '@ai-sdk/react@4.0.5'
   - ai@7.0.4
+  - '@tanstack/react-router@1.170.29'
+  - '@tanstack/router-core@1.171.24'

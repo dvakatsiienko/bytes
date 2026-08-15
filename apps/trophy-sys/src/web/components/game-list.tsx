@@ -17,19 +17,26 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => (
 
         return (
           <button
-            className={`flex w-full items-center gap-3 border-line/60 border-b px-3 py-2.5 text-left transition-colors last:border-b-0 ${
-              isSelected ? 'bg-bg-lift' : 'hover:bg-bg-soft'
+            className={`group flex w-full cursor-pointer items-center gap-3 border-line/60 border-b border-l-2 px-3 py-2.5 text-left transition-colors duration-150 last:border-b-0 ${
+              isSelected
+                ? 'border-l-orange bg-bg-lift'
+                : 'border-l-transparent hover:border-l-dim hover:bg-bg-soft'
             }`}
             key={game.id}
             onClick={() => onSelect(game.id)}
             type='button'>
-            <span className={isSelected ? 'text-orange' : 'text-dim'}>
-              {isSelected ? '▶' : ' '}
+            <span
+              className={`transition-colors ${isSelected ? 'text-orange' : 'text-dim group-hover:text-fg-soft'}`}>
+              {isSelected ? '▶' : '·'}
             </span>
 
             <img
               alt=''
-              className='size-9 shrink-0 border border-line object-cover grayscale-[35%]'
+              className={`size-9 shrink-0 border border-line object-cover transition-all duration-150 ${
+                isSelected
+                  ? 'grayscale-0'
+                  : 'grayscale-[60%] group-hover:grayscale-0'
+              }`}
               height={36}
               loading='lazy'
               src={game.iconUrl}
@@ -38,7 +45,7 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => (
 
             <span className='min-w-0 flex-1'>
               <span
-                className={`block truncate ${isSelected ? 'text-fg' : 'text-fg-soft'}`}>
+                className={`block truncate transition-colors ${isSelected ? 'text-fg' : 'text-fg-soft group-hover:text-fg'}`}>
                 {game.name}
               </span>
               <span className='block text-[10px] text-dim'>

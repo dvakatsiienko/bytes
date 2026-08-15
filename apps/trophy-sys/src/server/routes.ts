@@ -1,7 +1,7 @@
 import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, gamesFetch, profileFetch } from './psn.ts';
-import { isStateWritable } from './state.ts';
+import { stateBackend } from './state.ts';
 
 const GAME_PATH = /^\/api\/games\/([\w-]+)$/;
 
@@ -17,8 +17,7 @@ export const routeResolve = async (
   const path = url.pathname;
   const ok = (body: unknown) => ({ body, status: 200 });
 
-  if (path === '/api/health')
-    return ok({ ok: true, stateWritable: isStateWritable });
+  if (path === '/api/health') return ok({ ok: true, stateBackend });
   if (path === '/api/profile') return ok(await cached('profile', profileFetch));
   if (path === '/api/news')
     return ok(await cached('news', () => newsFetch({ commit: false })));
@@ -29,14 +28,6 @@ export const routeResolve = async (
   }
 
   if (path === '/api/snapshot' && method === 'POST') {
-    if (!isStateWritable) {
-      return {
-        body: {
-          error: 'snapshot needs a writable filesystem — run it locally',
-        },
-        status: 501,
-      };
-    }
     cacheClear();
     return ok(await newsFetch({ commit: true }));
   }
