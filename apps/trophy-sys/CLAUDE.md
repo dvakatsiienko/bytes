@@ -61,18 +61,29 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
   `/api/snapshot` answers 501 there. Persisting the baseline in production needs a KV store — not
   built.
 
-## Deployment — two constraints that will bite
+## Deployment — three constraints that will bite
 
 The Vercel project is linked from this directory (`.vercel/`), root directory `.`, framework Vite.
+Vite plays no part in the API: the `api/` directory is a Vercel convention, scanned at the
+deployment root of any project regardless of framework.
 
 1. **The function is pre-bundled, deliberately.** `pnpm build:api` esbuilds
-   `src/server/handler.ts` into `api/[...path].js` (gitignored). Letting Vercel compile
+   `src/server/handler.ts` into `api/handler.js` (gitignored). Letting Vercel compile
    `api/**.ts` itself fails: pnpm's symlinked `psn-api` is not traced into the lambda and the
    function dies with `ERR_MODULE_NOT_FOUND`. Bundling sidesteps workspace resolution entirely.
 2. **The handler must use Node's `(req, res)` signature.** Vercel's launcher
    (`launcherType: "Nodejs"`) invokes it that way; a web-standard handler returning a `Response`
    is silently dropped and the request hangs until timeout. `main.ts` mounts the same function
    locally.
+3. **Routing is explicit in `vercel.json`, never filename-derived.** A catch-all named
+   `api/[...path].js` looks right and is not: Vercel generated `^/api/([^/]+)$` for it, so
+   one-segment routes worked while `/api/games/:id` fell through to a 404 HTML page. The rewrite
+   `/api/(.*) → /api/handler` matches any depth. `req.url` keeps the original path across the
+   rewrite, which is what `routeResolve` matches on.
+
+After changing anything about deployment, test a **two-segment** route
+(`/api/games/NPWR24415_00`), not just `/api/health` — the single-segment routes stayed green
+through the whole bug.
 
 TypeScript comes from the monorepo root (7.x) — the app pins no version of its own. Vercel's
 builder does crash on TS 7, but only when it compiles `api/**.ts` itself; pre-bundling means it
