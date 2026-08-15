@@ -61,7 +61,7 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
   `/api/snapshot` answers 501 there. Persisting the baseline in production needs a KV store — not
   built.
 
-## Deployment — three constraints that will bite
+## Deployment — two constraints that will bite
 
 The Vercel project is linked from this directory (`.vercel/`), root directory `.`, framework Vite.
 
@@ -73,9 +73,10 @@ The Vercel project is linked from this directory (`.vercel/`), root directory `.
    (`launcherType: "Nodejs"`) invokes it that way; a web-standard handler returning a `Response`
    is silently dropped and the request hangs until timeout. `main.ts` mounts the same function
    locally.
-3. **TypeScript is pinned to 6.x in this app**, not the root's 7.x. Vercel's Node builder crashes
-   on TS 7 with `Cannot read properties of undefined (reading 'readFile')`. Revisit when the
-   builder catches up.
+
+TypeScript comes from the monorepo root (7.x) — the app pins no version of its own. Vercel's
+builder does crash on TS 7, but only when it compiles `api/**.ts` itself; pre-bundling means it
+never sees TypeScript. If you ever drop the bundling step, that crash comes back.
 
 ## Costs to respect
 

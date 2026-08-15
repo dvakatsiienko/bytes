@@ -1,20 +1,22 @@
 {
   "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+
+  // NOT redundant — do not delete. The root config extends
+  // `ultracite/biome/next`, whose Next.js-only rules fire on this Vite app.
+  // Without this file `pnpm lint` reports 4 errors here. Both entries below
+  // are workarounds, not preferences; drop them if the root ever stops
+  // extending the Next preset.
   "root": false,
   "extends": "//",
-  "files": {
-    // api/ holds the esbuild-bundled Vercel function, not source.
-    "includes": ["**", "!api"]
-  },
   "linter": {
     "rules": {
-      // Vite app, not Next.js — there is no next/image to prefer.
+      // There is no next/image in a Vite app to prefer over <img>.
       "performance": { "noImgElement": "off" }
     }
   },
   "overrides": [
     {
-      // Vercel functions are discovered by their default export.
+      // Vercel discovers the serverless function by its default export.
       "includes": ["src/server/handler.ts"],
       "linter": { "rules": { "style": { "noDefaultExport": "off" } } }
     }

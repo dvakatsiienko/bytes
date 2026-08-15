@@ -1,7 +1,10 @@
 {
   "$schema": "https://v2-10-0.turborepo.dev/schema.json",
   "ui": "tui",
-  "globalPassThroughEnv": ["ENABLE_EXPERIMENTAL_COREPACK"],
+  // Declaring this list makes turbo strip every OTHER env var from task
+  // environments. DATABASE_URL must be named here or prisma:generate cannot
+  // see the value CI sets, and the typecheck task fails.
+  "globalPassThroughEnv": ["ENABLE_EXPERIMENTAL_COREPACK", "DATABASE_URL"],
   "tasks": {
     "dev": {
       "cache": false,
