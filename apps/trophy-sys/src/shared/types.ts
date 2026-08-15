@@ -48,11 +48,22 @@ export interface Trophy {
   rarity: number;
 }
 
+/** One trophy set within a title — the base game, then each DLC. */
+export interface TrophyGroup {
+  defined: TrophyCounts;
+  earned: TrophyCounts;
+  id: string;
+  name: string;
+  progress: number;
+}
+
 export interface GameDetail extends Game {
+  groups: TrophyGroup[];
   trophies: Trophy[];
 }
 
-export interface NewTrophy extends Trophy {
+/** A trophy lifted out of its title, for the cross-library feeds. */
+export interface GameTrophy extends Trophy {
   gameIconUrl: string;
   gameId: string;
   gameName: string;
@@ -60,5 +71,10 @@ export interface NewTrophy extends Trophy {
 
 export interface NewsFeed {
   isBaseline: boolean;
-  trophies: NewTrophy[];
+  trophies: GameTrophy[];
+}
+
+export interface AlmostFeed {
+  scanned: number;
+  trophies: GameTrophy[];
 }

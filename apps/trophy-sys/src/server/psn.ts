@@ -8,6 +8,7 @@ import {
   exchangeNpssoForAccessCode,
   exchangeRefreshTokenForAuthTokens,
   getTitleTrophies,
+  getTitleTrophyGroups,
   getUserTitles,
   getUserTrophiesEarnedForTitle,
   getUserTrophyProfileSummary,
@@ -18,7 +19,9 @@ import type {
   GameDetail,
   Profile,
   Trophy,
+  TrophyCounts,
   TrophyGrade,
+  TrophyGroup,
   TrophyProgress,
 } from '../shared/types.ts';
 import { cached } from './cache.ts';
@@ -105,8 +108,55 @@ export const gameDetailFetch = async (gameId: string): Promise<GameDetail> => {
   const game = games.find((candidate) => candidate.id === gameId);
   if (!game) throw new Error(`unknown game ${gameId}`);
 
-  return { ...game, trophies: await trophiesFetch(game) };
+  const [trophies, groups] = await Promise.all([
+    trophiesFetch(game),
+    groupsFetch(game),
+  ]);
+
+  return { ...game, groups: groupsBuild(groups, trophies), trophies };
 };
+
+const serviceName = (game: Game) =>
+  game.platform.includes('PS5') ? 'trophy2' : 'trophy';
+
+const groupsFetch = async (game: Game) =>
+  (
+    await getTitleTrophyGroups(await authGet(), game.id, {
+      npServiceName: serviceName(game),
+    })
+  ).trophyGroups;
+
+const countsBuild = (trophies: Trophy[]): TrophyCounts => ({
+  bronze: trophies.filter((trophy) => trophy.grade === 'bronze').length,
+  gold: trophies.filter((trophy) => trophy.grade === 'gold').length,
+  platinum: trophies.filter((trophy) => trophy.grade === 'platinum').length,
+  silver: trophies.filter((trophy) => trophy.grade === 'silver').length,
+});
+
+/**
+ * Earned counts are derived from the trophies already fetched rather than from
+ * getUserTrophyGroupEarningsForTitle — same numbers, one fewer PSN round-trip.
+ */
+const groupsBuild = (
+  groups: { trophyGroupId: string; trophyGroupName?: string }[],
+  trophies: Trophy[],
+): TrophyGroup[] =>
+  groups.map((group) => {
+    const mine = trophies.filter(
+      (trophy) => trophy.group === group.trophyGroupId,
+    );
+    const earned = mine.filter((trophy) => trophy.earned);
+
+    return {
+      defined: countsBuild(mine),
+      earned: countsBuild(earned),
+      id: group.trophyGroupId,
+      name: group.trophyGroupName ?? group.trophyGroupId,
+      progress: mine.length
+        ? Math.round((earned.length / mine.length) * 100)
+        : 0,
+    };
+  });
 
 const progressBuild = (
   definition: TitleThinTrophy & ProgressFields,
@@ -128,7 +178,7 @@ const progressBuild = (
 
 export const trophiesFetch = async (game: Game): Promise<Trophy[]> => {
   const auth = await authGet();
-  const npServiceName = game.platform.includes('PS5') ? 'trophy2' : 'trophy';
+  const npServiceName = serviceName(game);
 
   const [definitions, earnings] = await Promise.all([
     getTitleTrophies(auth, game.id, 'all', { npServiceName }),

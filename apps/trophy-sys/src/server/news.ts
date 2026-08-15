@@ -1,4 +1,4 @@
-import type { NewTrophy, NewsFeed } from '../shared/types.ts';
+import type { GameTrophy, NewsFeed } from '../shared/types.ts';
 import { gamesFetch, trophiesFetch } from './psn.ts';
 import { stateLoad, stateSave } from './state.ts';
 
@@ -12,7 +12,7 @@ export const newsFetch = async ({
   const state = await stateLoad();
   const isBaseline = Object.keys(state).length === 0;
   const games = await gamesFetch(SCAN_LIMIT);
-  const fresh: NewTrophy[] = [];
+  const fresh: GameTrophy[] = [];
 
   for (const game of games) {
     // Sequential on purpose: PSN rate-limits, and each title costs two calls.

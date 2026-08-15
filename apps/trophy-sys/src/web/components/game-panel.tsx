@@ -50,6 +50,25 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
         </div>
       </div>
 
+      {game.groups.length > 1 && (
+        <ul className='flex flex-wrap gap-x-5 gap-y-1 border-line border-b px-4 py-2 text-[10px]'>
+          {game.groups.map((group) => (
+            <li className='flex items-center gap-2' key={group.id}>
+              <span className='text-dim'>
+                {group.id === 'default' ? 'base game' : group.name}
+              </span>
+              <span
+                className={
+                  group.progress === 100 ? 'text-green' : 'text-yellow'
+                }>
+                {barRender(group.progress, 8)}
+              </span>
+              <span className='text-mute'>{group.progress}%</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <ul className='min-h-0 flex-1 overflow-y-auto'>
         {game.trophies.map((trophy) => (
           <TrophyRow key={trophy.id} trophy={trophy} />
