@@ -15,8 +15,8 @@
   "dependencies": {
     "@apollo/datasource-rest": "6.4.1",
     "@apollo/server": "5.5.1",
-    "@graphql-tools/graphql-file-loader": "8.1.18",
-    "@graphql-tools/load": "8.1.15",
+    "@graphql-tools/graphql-file-loader": "8.1.19",
+    "@graphql-tools/load": "8.1.16",
     "@prisma/adapter-better-sqlite3": "7.9.1",
     "@prisma/client": "7.9.1",
     "chalk": "6.0.0",
