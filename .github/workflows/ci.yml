@@ -12,10 +12,6 @@ concurrency:
 env:
   TURBO_TELEMETRY_DISABLED: 1
   DO_NOT_TRACK: 1
-  # prisma.config.ts resolves env('DATABASE_URL') at load time, so `prisma
-  # generate` in postinstall dies without it. Generation never connects to a
-  # database — any syntactically valid URL is enough.
-  DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
 
 jobs:
   check:
