@@ -25,7 +25,11 @@ export const routeResolve = async (
     return ok(await cached('news', () => newsFetch({ commit: false })));
 
   if (path === '/api/games') {
-    const limit = Number(url.searchParams.get('limit') ?? 100);
+    // 800 is PSN's page size for this endpoint, and it defaults to the whole
+    // library rather than a slice — a lower default silently truncated it.
+    // It also matches the key gameDetailFetch caches under, so the library
+    // list and any deep link share one fetch.
+    const limit = Number(url.searchParams.get('limit') ?? 800);
     return ok(await cached(`games:${limit}`, () => gamesFetch(limit)));
   }
 

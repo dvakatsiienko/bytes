@@ -1,4 +1,4 @@
-import type { GameDetail } from '../../shared/types.ts';
+import type { GameDetail, Trophy, TrophyGroup } from '../../shared/types.ts';
 import { barRender } from '../helpers/format.ts';
 import { TrophyRow } from './trophy-row.tsx';
 
@@ -50,31 +50,67 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
         </div>
       </div>
 
-      {game.groups.length > 1 && (
-        <ul className='flex flex-wrap gap-x-5 gap-y-1 border-line border-b px-4 py-2 text-[10px]'>
-          {game.groups.map((group) => (
-            <li className='flex items-center gap-2' key={group.id}>
-              <span className='text-dim'>
-                {group.id === 'default' ? 'base game' : group.name}
-              </span>
-              <span
-                className={
-                  group.progress === 100 ? 'text-green' : 'text-yellow'
-                }>
-                {barRender(group.progress, 8)}
-              </span>
-              <span className='text-mute'>{group.progress}%</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className='min-h-0 flex-1 overflow-y-auto'>
+        {game.groups.length > 1 ? (
+          game.groups.map((group) => (
+            <GroupSection
+              group={group}
+              key={group.id}
+              trophies={game.trophies.filter(
+                (trophy) => trophy.group === group.id,
+              )}
+            />
+          ))
+        ) : (
+          <ul>
+            {game.trophies.map((trophy) => (
+              <TrophyRow key={trophy.id} trophy={trophy} />
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+};
 
-      <ul className='min-h-0 flex-1 overflow-y-auto'>
-        {game.trophies.map((trophy) => (
+const GroupSection = ({
+  group,
+  trophies,
+}: {
+  group: TrophyGroup;
+  trophies: Trophy[];
+}) => {
+  const earned =
+    group.earned.bronze +
+    group.earned.silver +
+    group.earned.gold +
+    group.earned.platinum;
+
+  return (
+    <>
+      <header className='sticky top-0 z-10 flex items-center gap-3 border-line border-y bg-bg-lift px-4 py-1.5 text-[10px]'>
+        <span className='truncate text-orange uppercase tracking-[0.15em]'>
+          {group.id === 'default' ? 'base game' : group.name}
+        </span>
+        <span className='shrink-0 text-mute'>
+          {earned} of {trophies.length}
+        </span>
+
+        <span className='ml-auto flex shrink-0 items-center gap-2'>
+          <span
+            className={group.progress === 100 ? 'text-green' : 'text-yellow'}>
+            {barRender(group.progress, 10)}
+          </span>
+          <span className='w-8 text-right text-dim'>{group.progress}%</span>
+        </span>
+      </header>
+
+      <ul>
+        {trophies.map((trophy) => (
           <TrophyRow key={trophy.id} trophy={trophy} />
         ))}
       </ul>
-    </section>
+    </>
   );
 };
 
