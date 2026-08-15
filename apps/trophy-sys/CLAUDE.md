@@ -22,7 +22,7 @@ Deployed: <https://trophy-sys.vercel.app>
 pnpm dev          # both processes
 pnpm dev:api      # api alone, node --watch, TS run natively (no build step)
 pnpm dev:web      # vite alone
-pnpm build        # vite build + esbuild bundle of the Vercel function
+pnpm build        # vite build (Vercel compiles api/handler.ts itself)
 pnpm typecheck    # both tsconfigs — app (DOM/bundler) and server (node/nodenext)
 pnpm lint         # biome
 pnpm trophies <cmd>   # same data as the API, straight to stdout as JSON
@@ -72,21 +72,27 @@ they come from `.env` plus the Vercel-generated `.env.local` (loaded via `node -
 it concurrently today, but a cron or a UI button would need a lock — two overlapping snapshots
 would let the loser's trophies resurface as "new".
 
-## Deployment — three constraints that will bite
+## Deployment — four constraints that will bite
 
-The Vercel project is linked from this directory (`.vercel/`), root directory `.`, framework Vite.
-Vite plays no part in the API: the `api/` directory is a Vercel convention, scanned at the
-deployment root of any project regardless of framework.
+Deploys are **Git-triggered**: the GitHub repo is connected, Root Directory is `apps/trophy-sys`,
+"include files outside the root directory" is on so the pnpm workspace install works, and "skip
+deployments when there are no changes to the root directory" keeps pushes to other apps from
+redeploying this one. Vite plays no part in the API: the `api/` directory is a Vercel convention,
+scanned at the deployment root of any project regardless of framework.
 
-1. **The function is pre-bundled, deliberately.** `pnpm build:api` esbuilds
-   `src/server/handler.ts` into `api/handler.js` (gitignored). Letting Vercel compile
-   `api/**.ts` itself fails: pnpm's symlinked `psn-api` is not traced into the lambda and the
-   function dies with `ERR_MODULE_NOT_FOUND`. Bundling sidesteps workspace resolution entirely.
-2. **The handler must use Node's `(req, res)` signature.** Vercel's launcher
+1. **The function must exist in git as source.** Vercel decides which functions exist by scanning
+   the source tree at clone time. `api/handler.ts` therefore has to be committed — a build step
+   that *generates* `api/handler.js` runs far too late, and the deploy goes green while every
+   `/api` route 404s with Vercel's HTML error page.
+2. **TypeScript is pinned to 6.x here**, against the root's 7.x. Vercel's builder compiles
+   `api/**.ts` and crashes on TS 7 with `Cannot read properties of undefined (reading 'readFile')`.
+   The two constraints are linked: pre-bundling with esbuild avoids the TS crash but breaks
+   constraint 1, so the pin is the price of git deploys. Revisit when the builder supports TS 7.
+3. **The handler must use Node's `(req, res)` signature.** Vercel's launcher
    (`launcherType: "Nodejs"`) invokes it that way; a web-standard handler returning a `Response`
    is silently dropped and the request hangs until timeout. `main.ts` mounts the same function
    locally.
-3. **Routing is explicit in `vercel.json`, never filename-derived.** A catch-all named
+4. **Routing is explicit in `vercel.json`, never filename-derived.** A catch-all named
    `api/[...path].js` looks right and is not: Vercel generated `^/api/([^/]+)$` for it, so
    one-segment routes worked while `/api/games/:id` fell through to a 404 HTML page. The rewrite
    `/api/(.*) → /api/handler` matches any depth. `req.url` keeps the original path across the
@@ -95,10 +101,6 @@ deployment root of any project regardless of framework.
 After changing anything about deployment, test a **two-segment** route
 (`/api/games/NPWR24415_00`), not just `/api/health` — the single-segment routes stayed green
 through the whole bug.
-
-TypeScript comes from the monorepo root (7.x) — the app pins no version of its own. Vercel's
-builder does crash on TS 7, but only when it compiles `api/**.ts` itself; pre-bundling means it
-never sees TypeScript. If you ever drop the bundling step, that crash comes back.
 
 ## Costs to respect
 
@@ -119,7 +121,8 @@ load into ~120 PSN round-trips.
   router code so `App.tsx` can use it without an import cycle back through `router.tsx`.
 - Server imports carry the `.ts` extension — node's native TS resolution requires it.
 - `biome.jsonc` is a nested (`root: false`) config extending the monorepo root. It turns off
-  `noImgElement` (a Next.js rule, meaningless here) and excludes generated `api/**`.
+  `noImgElement` (a Next.js rule, meaningless in a Vite app) and allows the default export the
+  Vercel function needs. Do not delete it as redundant — without it `pnpm lint` reports 4 errors.
 - Retro look = gruvbox-material, matching the `sline` statusline palette. Colors are Tailwind
   theme tokens in `src/web/theme.css` (`text-orange`, `bg-bg-lift`, `text-gold`…) — no hex in
   components. Progress bars are `█`/`░` runs from `barRender`, not DOM elements.
