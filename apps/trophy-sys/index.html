@@ -5,6 +5,19 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
     <title>TROPHY.SYS</title>
+    <!--
+      Runs before the bundle, so the palette is settled before first paint.
+      A Vite SPA renders only after its JS loads, so without this the page
+      flashes the wrong theme. No stored value means follow the OS.
+    -->
+    <script>
+      "use strict";
+      {
+        const stored = localStorage.getItem("theme");
+        if (stored === "light" || stored === "dark")
+          document.documentElement.dataset.theme = stored;
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

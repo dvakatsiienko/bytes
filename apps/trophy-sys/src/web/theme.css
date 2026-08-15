@@ -1,28 +1,109 @@
 @import "tailwindcss";
 @import "@fontsource-variable/jetbrains-mono";
 
-@theme {
+/*
+ * Two palettes, both gruvbox-material — same family, same author, so the light
+ * one complements the dark rather than competing with it.
+ *
+ * Tailwind v4 bakes `@theme` values in at build time, so tokens cannot be
+ * swapped at runtime directly. `@theme inline` maps every --color-* onto a raw
+ * --p-* variable instead, and only those raw variables are redefined per
+ * theme. Light is the base; dark arrives either by explicit attribute or by
+ * system preference when no attribute is set.
+ */
+:root {
+  --p-bg: #fbf1c7;
+  --p-bg-soft: #f2e5bc;
+  --p-bg-lift: #ebdbb2;
+  --p-line: #d5c4a1;
+  --p-dim: #a89984;
+  --p-mute: #928374;
+  --p-fg: #654735;
+  --p-fg-soft: #4f3829;
+  --p-red: #c14a4a;
+  --p-green: #6c782e;
+  --p-yellow: #b47109;
+  --p-orange: #c35e0a;
+  --p-purple: #945e80;
+  --p-blue: #45707a;
+  --p-bronze: #a86a32;
+  --p-silver: #7c6f64;
+  --p-gold: #b47109;
+  --p-platinum: #45707a;
+  /* The CRT overlay is scanlines on dark, and grime on light. */
+  --p-scanline: 0;
+}
+
+/* Explicit dark. */
+:root[data-theme="dark"] {
+  --p-bg: #1d2021;
+  --p-bg-soft: #282828;
+  --p-bg-lift: #32302f;
+  --p-line: #504945;
+  --p-dim: #7c6f64;
+  --p-mute: #928374;
+  --p-fg: #d4be98;
+  --p-fg-soft: #bdae93;
+  --p-red: #ea6962;
+  --p-green: #a9b665;
+  --p-yellow: #d8a657;
+  --p-orange: #e78a4e;
+  --p-purple: #d3869b;
+  --p-blue: #7daea3;
+  --p-bronze: #c07f4a;
+  --p-silver: #bdae93;
+  --p-gold: #d8a657;
+  --p-platinum: #7daea3;
+  --p-scanline: 0.16;
+}
+
+/* System dark — only when the user has not pinned light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --p-bg: #1d2021;
+    --p-bg-soft: #282828;
+    --p-bg-lift: #32302f;
+    --p-line: #504945;
+    --p-dim: #7c6f64;
+    --p-mute: #928374;
+    --p-fg: #d4be98;
+    --p-fg-soft: #bdae93;
+    --p-red: #ea6962;
+    --p-green: #a9b665;
+    --p-yellow: #d8a657;
+    --p-orange: #e78a4e;
+    --p-purple: #d3869b;
+    --p-blue: #7daea3;
+    --p-bronze: #c07f4a;
+    --p-silver: #bdae93;
+    --p-gold: #d8a657;
+    --p-platinum: #7daea3;
+    --p-scanline: 0.16;
+  }
+}
+
+@theme inline {
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
-  --color-bg: #1d2021;
-  --color-bg-soft: #282828;
-  --color-bg-lift: #32302f;
-  --color-line: #504945;
-  --color-dim: #7c6f64;
-  --color-mute: #928374;
-  --color-fg: #d4be98;
-  --color-fg-soft: #bdae93;
-  --color-red: #ea6962;
-  --color-green: #a9b665;
-  --color-yellow: #d8a657;
-  --color-orange: #e78a4e;
-  --color-purple: #d3869b;
-  --color-blue: #7daea3;
+  --color-bg: var(--p-bg);
+  --color-bg-soft: var(--p-bg-soft);
+  --color-bg-lift: var(--p-bg-lift);
+  --color-line: var(--p-line);
+  --color-dim: var(--p-dim);
+  --color-mute: var(--p-mute);
+  --color-fg: var(--p-fg);
+  --color-fg-soft: var(--p-fg-soft);
+  --color-red: var(--p-red);
+  --color-green: var(--p-green);
+  --color-yellow: var(--p-yellow);
+  --color-orange: var(--p-orange);
+  --color-purple: var(--p-purple);
+  --color-blue: var(--p-blue);
 
-  --color-bronze: #c07f4a;
-  --color-silver: #bdae93;
-  --color-gold: #d8a657;
-  --color-platinum: #7daea3;
+  --color-bronze: var(--p-bronze);
+  --color-silver: var(--p-silver);
+  --color-gold: var(--p-gold);
+  --color-platinum: var(--p-platinum);
 }
 
 @layer base {
@@ -50,8 +131,8 @@
     content: "";
     background: repeating-linear-gradient(
       to bottom,
-      rgb(0 0 0 / 0.16) 0px,
-      rgb(0 0 0 / 0.16) 1px,
+      rgb(0 0 0 / var(--p-scanline)) 0px,
+      rgb(0 0 0 / var(--p-scanline)) 1px,
       transparent 1px,
       transparent 3px
     );
@@ -92,5 +173,46 @@
 
   .glow {
     text-shadow: 0 0 12px currentColor;
+  }
+
+  /*
+   * Explanatory tooltip, driven by a data-hint attribute. CSS only — the
+   * native `title` attribute cannot be styled at all, and the Popover API
+   * still needs script or an invoker attribute to open on hover.
+   */
+  .hint {
+    position: relative;
+  }
+
+  .hint::after {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    z-index: 60;
+    width: max-content;
+    max-width: 15rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--color-fg);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    content: attr(data-hint);
+    background: var(--color-bg-lift);
+    border: 1px solid var(--color-line);
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .hint:hover::after,
+  .hint:focus-visible::after {
+    opacity: 1;
+  }
+
+  /* Flip to the right edge where a left-anchored tip would overflow. */
+  .hint-right::after {
+    right: 0;
+    left: auto;
   }
 }
