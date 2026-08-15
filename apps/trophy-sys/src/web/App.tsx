@@ -1,15 +1,18 @@
+import { useNavigate, useSearch } from '@tanstack/react-router';
+
 import { GameList } from './components/game-list.tsx';
 import { GamePanel } from './components/game-panel.tsx';
 import { NewsPanel } from './components/news-panel.tsx';
 import { ProfileBar } from './components/profile-bar.tsx';
 import { useGame, useGames, useNews, useProfile } from './hooks/queries.ts';
-import { useAppNavigate, useAppSearch } from './router.tsx';
-
-const TABS = ['library', 'news'] as const;
+import { TABS, type Tab } from './search.ts';
 
 export const App = () => {
-  const { tab, game: selectedId } = useAppSearch();
-  const { gameSelect, tabSelect } = useAppNavigate();
+  const { tab, game: selectedId } = useSearch({ from: '/' });
+  const navigate = useNavigate({ from: '/' });
+
+  const searchSet = (next: Partial<{ game: string; tab: Tab }>) =>
+    navigate({ replace: true, search: (prev) => ({ ...prev, ...next }) });
 
   const profile = useProfile();
   const games = useGames();
@@ -39,7 +42,7 @@ export const App = () => {
                   : 'border-line text-dim hover:border-dim hover:text-fg-soft'
               }`}
               key={name}
-              onClick={() => tabSelect(name)}
+              onClick={() => searchSet({ tab: name })}
               type='button'>
               {name}
             </button>
@@ -55,7 +58,7 @@ export const App = () => {
         <main className='grid min-h-0 flex-1 grid-cols-[minmax(280px,1fr)_1.4fr] gap-5'>
           <GameList
             games={games.data ?? []}
-            onSelect={gameSelect}
+            onSelect={(gameId) => searchSet({ game: gameId })}
             selectedId={activeId}
           />
           <GamePanel

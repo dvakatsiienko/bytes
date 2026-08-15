@@ -6,11 +6,12 @@ import { createRoot } from 'react-dom/client';
 import { router } from './router.tsx';
 import './theme.css';
 
-// The API already memoizes PSN calls for 60s, so matching that here keeps tab
-// switches instant without a second layer of staleness to reason about.
+// staleTime matches the API's own 60s memo, so tab switches stay instant.
+// retry is deliberately low: the server cache stores successes only, so every
+// retry replays the full PSN scan against a rate-limited API.
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { refetchOnWindowFocus: false, staleTime: 60_000 },
+    queries: { refetchOnWindowFocus: false, retry: 1, staleTime: 60_000 },
   },
 });
 

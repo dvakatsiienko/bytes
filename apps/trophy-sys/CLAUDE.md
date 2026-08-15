@@ -47,19 +47,30 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
 
 ## Auth and state
 
-- `NPSSO` lives in `.env` locally (loaded via `node --env-file`, never `dotenv`) and as a Vercel
-  env var in production. Both entrypoints — `src/server/main.ts` and `src/server/cli.ts` — need
-  the flag.
+Three env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`. Locally
+they come from `.env` plus the Vercel-generated `.env.local` (loaded via `node --env-file`, never
+`dotenv`); in production Vercel injects them. Both entrypoints — `src/server/main.ts` and
+`src/server/cli.ts` — need the flags. Every key the app reads must also be listed in
+`turbo.jsonc`'s `env` array, because Biome's `noUndeclaredEnvVars` reads that list.
+
 - `authGet()` in `psn.ts` holds one in-memory session and refreshes it with the refresh token, so
   the NPSSO→access-code exchange runs once per process.
-- `.trophy-state.json` is the "seen trophies" baseline: `npCommunicationId → trophyId[]`.
-  `newsFetch({ commit })` diffs live earnings against it; **only `POST /api/snapshot` and
+- The baseline is `npCommunicationId → trophyId[]`, stored in **Upstash Redis** under
+  `trophy-sys:baseline` when KV credentials exist, and in `.trophy-state.json` otherwise. The file
+  fallback keeps `pnpm dev` and the CLI working with no store attached; `/api/health` reports
+  which backend is live as `stateBackend`.
+- `newsFetch({ commit })` diffs live earnings against the baseline. **Only `POST /api/snapshot` and
   `pnpm trophies snapshot` write it** — `/api/news` is read-only on purpose, so reading the feed
   never destroys the diff you were about to look at.
-- Empty state file = baseline mode: no "new" trophies are reported, the snapshot just seeds.
-- Serverless filesystems are read-only, so `isStateWritable` is false on Vercel and
-  `/api/snapshot` answers 501 there. Persisting the baseline in production needs a KV store — not
-  built.
+- Empty baseline = seed mode: no "new" trophies are reported, the snapshot just records what
+  exists.
+- `isStateWritable` is false only in the broken case — the file backend on a serverless host. The
+  snapshot route checks it *before* scanning, so a deploy missing its KV vars answers 501
+  immediately instead of spending 30 PSN calls and dying on `EROFS`.
+
+📌 `newsFetch({ commit: true })` is a read-modify-write over a now-shared store. Nothing triggers
+it concurrently today, but a cron or a UI button would need a lock — two overlapping snapshots
+would let the loser's trophies resurface as "new".
 
 ## Deployment — three constraints that will bite
 
@@ -95,10 +106,17 @@ PSN is slow and rate-limited. `cache.ts` is a 60s TTL memo in front of every rou
 routes behind it. `newsFetch` scans only `SCAN_LIMIT` (15) recent titles because each title costs
 two PSN round-trips; the library list itself is one call regardless of limit.
 
+📌 `cache.ts` memoizes **successes only**, so a client retry replays the entire scan. That is why
+`retry` is 1 globally and 0 for the news query — react-query's default of 3 turns one failed news
+load into ~120 PSN round-trips.
+
 ## Conventions
 
 - Naming is subject-first: `gamesFetch`, `stateLoad`, `dateFormat`, `game-list.tsx`. Never
   `fetchGames`.
+- Server state is TanStack Query (`hooks/queries.ts`), URL state is TanStack Router search params
+  (`search.ts` holds the schema, `router.tsx` the route tree). `search.ts` deliberately imports no
+  router code so `App.tsx` can use it without an import cycle back through `router.tsx`.
 - Server imports carry the `.ts` extension — node's native TS resolution requires it.
 - `biome.jsonc` is a nested (`root: false`) config extending the monorepo root. It turns off
   `noImgElement` (a Next.js rule, meaningless here) and excludes generated `api/**`.

@@ -29,7 +29,8 @@ export const useGames = () =>
 export const useGame = (gameId: string | null) =>
   useQuery({
     enabled: Boolean(gameId),
-    queryFn: () => apiGet<GameDetail>(`/games/${gameId}`),
+    queryFn: () =>
+      apiGet<GameDetail>(`/games/${encodeURIComponent(gameId ?? '')}`),
     queryKey: ['game', gameId],
   });
 
@@ -38,4 +39,6 @@ export const useNews = (enabled: boolean) =>
     enabled,
     queryFn: () => apiGet<NewsFeed>('/news'),
     queryKey: ['news'],
+    // A failed news scan costs 15 titles x 2 PSN calls; never replay it.
+    retry: 0,
   });

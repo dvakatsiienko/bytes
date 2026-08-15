@@ -1,7 +1,7 @@
 import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, gamesFetch, profileFetch } from './psn.ts';
-import { stateBackend } from './state.ts';
+import { isStateWritable, stateBackend } from './state.ts';
 
 const GAME_PATH = /^\/api\/games\/([\w-]+)$/;
 
@@ -28,6 +28,15 @@ export const routeResolve = async (
   }
 
   if (path === '/api/snapshot' && method === 'POST') {
+    if (!isStateWritable) {
+      return {
+        body: {
+          error: 'no KV store linked — the baseline cannot persist here',
+        },
+        status: 501,
+      };
+    }
+
     cacheClear();
     return ok(await newsFetch({ commit: true }));
   }

@@ -7,7 +7,13 @@
       "outputs": ["dist/**"],
       // Biome's noUndeclaredEnvVars reads this list, so every process.env
       // key the app touches must appear here.
-      "env": ["NPSSO", "API_PORT", "KV_REST_API_URL", "KV_REST_API_TOKEN"]
+      "env": [
+        "NPSSO",
+        "API_PORT",
+        "KV_REST_API_URL",
+        "KV_REST_API_TOKEN",
+        "VERCEL"
+      ]
     },
     "lint": {},
     "typecheck": {}

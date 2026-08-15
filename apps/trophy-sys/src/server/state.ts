@@ -22,6 +22,13 @@ const redis =
 
 export const stateBackend = redis ? 'kv' : 'file';
 
+/**
+ * The file backend cannot write on a serverless host. Callers check this before
+ * starting work, so a misconfigured deploy fails immediately instead of running
+ * the whole PSN scan and then dying on EROFS.
+ */
+export const isStateWritable = stateBackend === 'kv' || !process.env.VERCEL;
+
 export const stateLoad = async (): Promise<TrophyState> => {
   if (redis) return (await redis.get<TrophyState>(STATE_KEY)) ?? {};
 
