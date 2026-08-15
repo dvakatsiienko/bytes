@@ -32,6 +32,13 @@ Apps R&D-ed or vibe coded.
 [Website](https://financical.vercel.app/) |
 [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/financial)
 
+#### 🏆 Trophy Sys
+
+Retro-terminal dashboard over the PlayStation Network trophy API.
+
+[Website](https://trophy-sys.vercel.app) |
+[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/trophy-sys)
+
 ## 🎨 Engineering and Design
 
 Apps made during my Figma UI prototyping exploration.
