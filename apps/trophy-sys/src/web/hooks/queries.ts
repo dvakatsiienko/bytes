@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type {
+  AlmostFeed,
   Game,
   GameDetail,
   NewsFeed,
@@ -39,6 +40,14 @@ export const useNews = () =>
     queryFn: () => apiGet<NewsFeed>('/news'),
     queryKey: ['news'],
     // A failed news scan costs 15 titles x 2 PSN calls; never replay it.
+    retry: 0,
+  });
+
+export const useAlmost = () =>
+  useQuery({
+    queryFn: () => apiGet<AlmostFeed>('/almost'),
+    queryKey: ['almost'],
+    // Same cost shape as the news scan: two PSN calls per title. Never replay.
     retry: 0,
   });
 

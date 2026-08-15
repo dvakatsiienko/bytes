@@ -1,3 +1,4 @@
+import { almostFetch } from './almost.ts';
 import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, gamesFetch, profileFetch } from './psn.ts';
@@ -18,6 +19,7 @@ export const routeResolve = async (
   const ok = (body: unknown) => ({ body, status: 200 });
 
   if (path === '/api/health') return ok({ ok: true, stateBackend });
+  if (path === '/api/almost') return ok(await cached('almost', almostFetch));
   if (path === '/api/profile') return ok(await cached('profile', profileFetch));
   if (path === '/api/news')
     return ok(await cached('news', () => newsFetch({ commit: false })));
