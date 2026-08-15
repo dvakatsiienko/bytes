@@ -24,7 +24,7 @@ update the Stack column below — it drifts stale otherwise.
 | `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
 | `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, Auth.js       | WIP        |
 | `figmentation`       | CSS/design experiments                  | Next.js 16, CSS Modules           | Showcase   |
-| `trophy-sys`         | PSN trophy tracker, retro terminal UI   | Vite 8, React 19, Tailwind v4     | Active Dev |
+| `trophy-sys`         | PSN trophy tracker, retro terminal UI   | Vite 8, React 19, TanStack, Upstash | Active Dev |
 
 ## Shared Infrastructure
 
@@ -50,13 +50,22 @@ See root `package.json` "scripts" and each app's `package.json` for the exact co
 ### State Management Strategies
 
 - **Client State**: Jotai atoms for UI state
-- **Server State**: React Query for caching
+- **Server State**: React Query for caching — used by `financial` and `trophy-sys`; prefer it over
+  hand-rolled `useEffect` fetching in any new app
+- **URL State**: TanStack Router search params in `trophy-sys`, React Router elsewhere
 - **Real-time**: Convex subscriptions
 - **GraphQL**: Apollo Client cache
 
 ### Database Patterns
 
 - **Seeding**: `tsx prisma/seed/init`
+
+### Deployment Settings
+
+Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only settings are invisible
+to agents and to code review, and they silently override the repo — a dashboard edit to
+`trophy-sys`'s Root Directory once broke a deploy that no diff could explain. `trophy-sys` and
+`space-explorer-ui` have one; the Next.js apps do not yet.
 
 ## Environment Configuration
 
