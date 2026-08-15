@@ -22,7 +22,7 @@ Deployed: <https://trophy-sys.vercel.app>
 pnpm dev          # both processes
 pnpm dev:api      # api alone, node --watch, TS run natively (no build step)
 pnpm dev:web      # vite alone
-pnpm build        # vite build (Vercel compiles api/handler.ts itself)
+pnpm build        # vite build, then esbuild the api bundle over api/handler.js
 pnpm typecheck    # both tsconfigs — app (DOM/bundler) and server (node/nodenext)
 pnpm lint         # biome
 pnpm trophies <cmd>   # same data as the API, straight to stdout as JSON
@@ -80,14 +80,20 @@ deployments when there are no changes to the root directory" keeps pushes to oth
 redeploying this one. Vite plays no part in the API: the `api/` directory is a Vercel convention,
 scanned at the deployment root of any project regardless of framework.
 
-1. **The function must exist in git as source.** Vercel decides which functions exist by scanning
-   the source tree at clone time. `api/handler.ts` therefore has to be committed — a build step
-   that *generates* `api/handler.js` runs far too late, and the deploy goes green while every
-   `/api` route 404s with Vercel's HTML error page.
-2. **TypeScript is pinned to 6.x here**, against the root's 7.x. Vercel's builder compiles
-   `api/**.ts` and crashes on TS 7 with `Cannot read properties of undefined (reading 'readFile')`.
-   The two constraints are linked: pre-bundling with esbuild avoids the TS crash but breaks
-   constraint 1, so the pin is the price of git deploys. Revisit when the builder supports TS 7.
+1. **The function path must exist in git.** Vercel decides which functions exist by scanning the
+   source tree at clone time. `api/handler.js` is therefore a committed 430-byte stub returning
+   501; `pnpm build:api` overwrites it with the real esbuild bundle. A purely generated file
+   arrives far too late — the deploy goes green while every `/api` route 404s with Vercel's HTML
+   error page. 📌 A local `pnpm build` leaves the fat bundle in your working tree; restore the stub
+   (`git checkout -- api/handler.js`) before committing.
+2. **The API is esbuild-bundled, and that is mandatory.** `psn-api` cannot be imported from ESM in
+   any direction: its `import` condition points at real ESM named `.js` while the package declares
+   no `"type": "module"`, and its `require` entry branches on `NODE_ENV`, which defeats named-export
+   detection. Bundling inlines it and the problem stops existing. Three prod outages came from
+   trying to import it "correctly" instead. Because the shipped function is `.js`, Vercel's builder
+   no longer compiles any TypeScript here, so this app uses the root's TypeScript with no local
+   pin. (It was pinned to 6.x while `api/handler.ts` was committed as source — the builder crashed
+   on TS 7 with `Cannot read properties of undefined (reading 'readFile')`.)
 3. **The handler must use Node's `(req, res)` signature.** Vercel's launcher
    (`launcherType: "Nodejs"`) invokes it that way; a web-standard handler returning a `Response`
    is silently dropped and the request hangs until timeout. `main.ts` mounts the same function
