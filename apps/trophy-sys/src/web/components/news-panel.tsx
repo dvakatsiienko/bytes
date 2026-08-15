@@ -23,6 +23,13 @@ export const NewsPanel = ({ news, error }: NewsPanelProps) => (
       <p className='p-4 text-dim'>nothing new. go play something.</p>
     )}
 
+    {news?.drifted.map((drift) => (
+      <p className='px-4 py-2 text-[11px] text-yellow' key={drift.gameId}>
+        {drift.gameName} changed its trophy set
+        {drift.added > 0 ? ` · ${drift.added} trophies added` : ''}
+      </p>
+    ))}
+
     <ul className='min-h-0 flex-1 overflow-y-auto'>
       {news?.trophies.map((trophy) => (
         <TrophyRow

@@ -19,7 +19,7 @@ export const almostFetch = async (): Promise<AlmostFeed> => {
   for (const game of games) {
     // Sequential on purpose: PSN rate-limits, and each title costs two calls.
     // biome-ignore lint/performance/noAwaitInLoops: throttling is the point
-    const set = await trophiesFetch(game);
+    const { trophies: set } = await trophiesFetch(game);
 
     for (const trophy of set) {
       if (trophy.earned || !trophy.progress || trophy.progress.current === 0)

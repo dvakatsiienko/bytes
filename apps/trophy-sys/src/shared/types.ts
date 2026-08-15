@@ -69,7 +69,16 @@ export interface GameTrophy extends Trophy {
   gameName: string;
 }
 
+/** A title whose trophy set changed since the baseline — usually new DLC. */
+export interface GameDrift {
+  added: number;
+  gameIconUrl: string;
+  gameId: string;
+  gameName: string;
+}
+
 export interface NewsFeed {
+  drifted: GameDrift[];
   isBaseline: boolean;
   trophies: GameTrophy[];
 }

@@ -4,7 +4,13 @@ import { Redis } from '@upstash/redis';
 const STATE_FILE = new URL('../../.trophy-state.json', import.meta.url);
 const STATE_KEY = 'trophy-sys:baseline';
 
-export type TrophyState = Record<string, number[]>;
+export interface GameBaseline {
+  defined: number;
+  trophies: number[];
+  version: string;
+}
+
+export type TrophyState = Record<string, GameBaseline>;
 
 /**
  * The baseline lives in Upstash when the KV credentials are present, and in a
@@ -29,11 +35,32 @@ export const stateBackend = redis ? 'kv' : 'file';
  */
 export const isStateWritable = stateBackend === 'kv' || !process.env.VERCEL;
 
+/**
+ * The baseline used to be a bare array of earned trophy ids per game. Entries
+ * in that shape are widened here, with an empty version so the first read after
+ * the upgrade reports no drift rather than flagging every game at once.
+ */
+const stateMigrate = (
+  raw: Record<string, GameBaseline | number[]>,
+): TrophyState =>
+  Object.fromEntries(
+    Object.entries(raw).map(([gameId, entry]) => [
+      gameId,
+      Array.isArray(entry)
+        ? { defined: 0, trophies: entry, version: '' }
+        : entry,
+    ]),
+  );
+
 export const stateLoad = async (): Promise<TrophyState> => {
-  if (redis) return (await redis.get<TrophyState>(STATE_KEY)) ?? {};
+  if (redis)
+    return stateMigrate(
+      (await redis.get<Record<string, GameBaseline | number[]>>(STATE_KEY)) ??
+        {},
+    );
 
   try {
-    return JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
+    return stateMigrate(JSON.parse(readFileSync(STATE_FILE, 'utf-8')));
   } catch {
     return {};
   }

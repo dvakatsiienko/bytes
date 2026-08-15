@@ -108,12 +108,16 @@ export const gameDetailFetch = async (gameId: string): Promise<GameDetail> => {
   const game = games.find((candidate) => candidate.id === gameId);
   if (!game) throw new Error(`unknown game ${gameId}`);
 
-  const [trophies, groups] = await Promise.all([
+  const [set, groups] = await Promise.all([
     trophiesFetch(game),
     groupsFetch(game),
   ]);
 
-  return { ...game, groups: groupsBuild(groups, trophies), trophies };
+  return {
+    ...game,
+    groups: groupsBuild(groups, set.trophies),
+    trophies: set.trophies,
+  };
 };
 
 const serviceName = (game: Game) =>
@@ -176,7 +180,13 @@ const progressBuild = (
   };
 };
 
-export const trophiesFetch = async (game: Game): Promise<Trophy[]> => {
+export interface TrophySet {
+  trophies: Trophy[];
+  /** Bumped by the developer when a title gains or changes trophies. */
+  version: string;
+}
+
+export const trophiesFetch = async (game: Game): Promise<TrophySet> => {
   const auth = await authGet();
   const npServiceName = serviceName(game);
 
@@ -191,7 +201,7 @@ export const trophiesFetch = async (game: Game): Promise<Trophy[]> => {
     earnings.trophies.map((trophy) => [trophy.trophyId, trophy]),
   );
 
-  return definitions.trophies.map((definition) => {
+  const trophies = definitions.trophies.map((definition) => {
     const earning = earnedById.get(definition.trophyId);
     const earned = earning?.earned ?? false;
 
@@ -209,4 +219,6 @@ export const trophiesFetch = async (game: Game): Promise<Trophy[]> => {
       rarity: Number(earning?.trophyEarnedRate ?? 0),
     };
   });
+
+  return { trophies, version: definitions.trophySetVersion };
 };
