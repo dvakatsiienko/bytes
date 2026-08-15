@@ -27,6 +27,12 @@ export interface Game {
   progress: number;
 }
 
+export interface TrophyProgress {
+  current: number;
+  rate: number;
+  target: number;
+}
+
 export interface Trophy {
   detail: string;
   earned: boolean;
@@ -37,6 +43,8 @@ export interface Trophy {
   iconUrl: string;
   id: number;
   name: string;
+  /** PS5 only, and only for trophies that count towards a target. */
+  progress: TrophyProgress | null;
   rarity: number;
 }
 

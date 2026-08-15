@@ -1,5 +1,10 @@
 import type { Trophy } from '../../shared/types.ts';
-import { GRADE_COLOR, GRADE_MARK, dateFormat } from '../helpers/format.ts';
+import {
+  GRADE_COLOR,
+  GRADE_MARK,
+  barRender,
+  dateFormat,
+} from '../helpers/format.ts';
 
 interface TrophyRowProps {
   note?: string;
@@ -30,6 +35,14 @@ export const TrophyRow = ({ trophy, note }: TrophyRowProps) => (
       <span className='block truncate text-[10px] text-dim'>
         {note ?? trophy.detail}
       </span>
+      {trophy.progress && !trophy.earned ? (
+        <span className='block text-[10px] text-orange'>
+          {barRender(trophy.progress.rate, 12)}
+          <span className='ml-2 text-dim'>
+            {trophy.progress.current}/{trophy.progress.target}
+          </span>
+        </span>
+      ) : null}
     </span>
 
     <span className='shrink-0 text-right text-[10px] text-dim'>

@@ -1,4 +1,8 @@
-import type { AuthorizationPayload } from 'psn-api';
+import type {
+  AuthorizationPayload,
+  TitleThinTrophy,
+  UserThinTrophy,
+} from 'psn-api';
 import {
   exchangeAccessCodeForAuthTokens,
   exchangeNpssoForAccessCode,
@@ -15,8 +19,21 @@ import type {
   Profile,
   Trophy,
   TrophyGrade,
+  TrophyProgress,
 } from '../shared/types.ts';
 import { cached } from './cache.ts';
+
+/**
+ * PSN sends these for PS5 titles that count towards a target, but psn-api's
+ * thin trophy types drop them — `trophyProgressTargetValue` is absent from
+ * TitleThinTrophy, and the earned side declares no progress fields at all.
+ * Verified live against NPWR23485_00 (Sifu).
+ */
+interface ProgressFields {
+  progress?: string;
+  progressRate?: number;
+  trophyProgressTargetValue?: string;
+}
 
 interface Session {
   auth: AuthorizationPayload;
@@ -91,6 +108,24 @@ export const gameDetailFetch = async (gameId: string): Promise<GameDetail> => {
   return { ...game, trophies: await trophiesFetch(game) };
 };
 
+const progressBuild = (
+  definition: TitleThinTrophy & ProgressFields,
+  earned: boolean,
+  earning: (ProgressFields & UserThinTrophy) | undefined,
+): TrophyProgress | null => {
+  const total = Number(definition.trophyProgressTargetValue);
+  if (!total) return null;
+
+  // PSN stops reporting progress once the trophy pops.
+  if (earned) return { current: total, rate: 100, target: total };
+
+  return {
+    current: Number(earning?.progress ?? 0),
+    rate: earning?.progressRate ?? 0,
+    target: total,
+  };
+};
+
 export const trophiesFetch = async (game: Game): Promise<Trophy[]> => {
   const auth = await authGet();
   const npServiceName = game.platform.includes('PS5') ? 'trophy2' : 'trophy';
@@ -108,10 +143,11 @@ export const trophiesFetch = async (game: Game): Promise<Trophy[]> => {
 
   return definitions.trophies.map((definition) => {
     const earning = earnedById.get(definition.trophyId);
+    const earned = earning?.earned ?? false;
 
     return {
       detail: definition.trophyDetail ?? '',
-      earned: earning?.earned ?? false,
+      earned,
       earnedAt: earning?.earnedDateTime ?? null,
       grade: definition.trophyType as TrophyGrade,
       group: definition.trophyGroupId ?? 'default',
@@ -119,6 +155,7 @@ export const trophiesFetch = async (game: Game): Promise<Trophy[]> => {
       iconUrl: definition.trophyIconUrl ?? '',
       id: definition.trophyId,
       name: definition.trophyName ?? '(hidden)',
+      progress: progressBuild(definition, earned, earning),
       rarity: Number(earning?.trophyEarnedRate ?? 0),
     };
   });
