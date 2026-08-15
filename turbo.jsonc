@@ -32,7 +32,7 @@
     },
     "lint": {},
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": ["^typecheck", "prisma:generate"],
       "description": "Checks TypeScript code for errors",
       "inputs": [
         "$TURBO_DEFAULT$",
