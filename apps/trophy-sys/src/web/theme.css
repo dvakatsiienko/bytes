@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@import "@fontsource-variable/jetbrains-mono";
+
+@theme {
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-bg: #1d2021;
+  --color-bg-soft: #282828;
+  --color-bg-lift: #32302f;
+  --color-line: #504945;
+  --color-dim: #7c6f64;
+  --color-mute: #928374;
+  --color-fg: #d4be98;
+  --color-fg-soft: #bdae93;
+  --color-red: #ea6962;
+  --color-green: #a9b665;
+  --color-yellow: #d8a657;
+  --color-orange: #e78a4e;
+  --color-purple: #d3869b;
+  --color-blue: #7daea3;
+
+  --color-bronze: #c07f4a;
+  --color-silver: #bdae93;
+  --color-gold: #d8a657;
+  --color-platinum: #7daea3;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+    color: var(--color-fg);
+    letter-spacing: 0.01em;
+    background: var(--color-bg);
+  }
+
+  /* CRT scanlines — the one deliberate piece of retro theatre. */
+  body::after {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    content: "";
+    background: repeating-linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.16) 0px,
+      rgb(0 0 0 / 0.16) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .panel {
+    position: relative;
+    background: color-mix(in srgb, var(--color-bg-soft) 70%, transparent);
+    border: 1px solid var(--color-line);
+  }
+
+  .panel-title {
+    position: absolute;
+    top: -0.65rem;
+    left: 0.75rem;
+    padding-inline: 0.4rem;
+    font-size: 10px;
+    color: var(--color-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    background: var(--color-bg);
+  }
+
+  .glow {
+    text-shadow: 0 0 12px currentColor;
+  }
+}

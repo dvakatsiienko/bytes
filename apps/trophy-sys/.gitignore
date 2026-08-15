@@ -1,0 +1,5 @@
+.env
+.trophy-state.json
+api/
+dist/
+.vercel/

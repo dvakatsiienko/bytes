@@ -1,0 +1,13 @@
+{
+  "$schema": "https://v2-10-0.turborepo.dev/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "dev": { "cache": false, "persistent": true },
+    "build": {
+      "outputs": ["dist/**"],
+      "env": ["NPSSO", "API_PORT", "VERCEL"]
+    },
+    "lint": {},
+    "typecheck": {}
+  }
+}

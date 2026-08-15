@@ -1,0 +1,22 @@
+{
+  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+  "root": false,
+  "extends": "//",
+  "files": {
+    // api/ holds the esbuild-bundled Vercel function, not source.
+    "includes": ["**", "!api"]
+  },
+  "linter": {
+    "rules": {
+      // Vite app, not Next.js — there is no next/image to prefer.
+      "performance": { "noImgElement": "off" }
+    }
+  },
+  "overrides": [
+    {
+      // Vercel functions are discovered by their default export.
+      "includes": ["src/server/handler.ts"],
+      "linter": { "rules": { "style": { "noDefaultExport": "off" } } }
+    }
+  ]
+}
