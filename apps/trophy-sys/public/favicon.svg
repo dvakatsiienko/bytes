@@ -1,25 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-  <rect width="16" height="16" rx="3" fill="#1d2021" />
+<svg
+  shape-rendering="crispEdges"
+  viewBox="0 0 16 16"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <title>Trophy</title>
+
+  <rect fill="#1d2021" height="16" rx="3" width="16" />
 
   <g fill="#d8a657">
-    <rect x="3" y="2" width="10" height="1" />
-    <rect x="2" y="3" width="12" height="1" />
-    <rect x="3" y="4" width="10" height="2" />
-    <rect x="4" y="6" width="8" height="1" />
-    <rect x="5" y="7" width="6" height="1" />
-    <rect x="6" y="8" width="4" height="1" />
+    <rect height="1" width="10" x="3" y="2" />
+    <rect height="1" width="12" x="2" y="3" />
+    <rect height="2" width="10" x="3" y="4" />
+    <rect height="1" width="8" x="4" y="6" />
+    <rect height="1" width="6" x="5" y="7" />
+    <rect height="1" width="4" x="6" y="8" />
   </g>
 
   <g fill="#d8a657">
-    <rect x="1" y="4" width="1" height="4" />
-    <rect x="2" y="7" width="1" height="1" />
-    <rect x="14" y="4" width="1" height="4" />
-    <rect x="13" y="7" width="1" height="1" />
+    <rect height="4" width="1" x="1" y="4" />
+    <rect height="1" width="1" x="2" y="7" />
+    <rect height="4" width="1" x="14" y="4" />
+    <rect height="1" width="1" x="13" y="7" />
   </g>
 
   <g fill="#e78a4e">
-    <rect x="7" y="9" width="2" height="2" />
-    <rect x="5" y="11" width="6" height="1" />
-    <rect x="4" y="12" width="8" height="2" />
+    <rect height="2" width="2" x="7" y="9" />
+    <rect height="1" width="6" x="5" y="11" />
+    <rect height="2" width="8" x="4" y="12" />
   </g>
 </svg>

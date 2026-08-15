@@ -14,5 +14,5 @@
     "target": "ES2023",
     "types": ["node"]
   },
-  "include": ["api", "src/server", "src/shared"]
+  "include": ["src/server", "src/shared"]
 }

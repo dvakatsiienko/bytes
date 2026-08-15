@@ -1,6 +1,13 @@
-import { createRequire } from 'node:module';
-import type * as PsnApi from 'psn-api';
 import type { AuthorizationPayload } from 'psn-api';
+import {
+  exchangeAccessCodeForAuthTokens,
+  exchangeNpssoForAccessCode,
+  exchangeRefreshTokenForAuthTokens,
+  getTitleTrophies,
+  getUserTitles,
+  getUserTrophiesEarnedForTitle,
+  getUserTrophyProfileSummary,
+} from 'psn-api';
 
 import type {
   Game,
@@ -10,26 +17,6 @@ import type {
   TrophyGrade,
 } from '../shared/types.ts';
 import { cached } from './cache.ts';
-
-/**
- * psn-api is mispackaged for ESM consumers: its `import` condition points at
- * psn-api.esm.js, but the package has no `"type": "module"`, so Node loads that
- * file as CommonJS and refuses it. Its `require` entry meanwhile re-exports
- * conditionally on NODE_ENV, which defeats Node's static export detection, so
- * plain named imports fail too. Going through createRequire takes the CJS path
- * deliberately, which resolves at runtime in every environment.
- */
-const psnApi: typeof PsnApi = createRequire(import.meta.url)('psn-api');
-
-const {
-  exchangeAccessCodeForAuthTokens,
-  exchangeNpssoForAccessCode,
-  exchangeRefreshTokenForAuthTokens,
-  getTitleTrophies,
-  getUserTitles,
-  getUserTrophiesEarnedForTitle,
-  getUserTrophyProfileSummary,
-} = psnApi;
 
 interface Session {
   auth: AuthorizationPayload;

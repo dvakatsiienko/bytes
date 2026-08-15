@@ -7,6 +7,11 @@
   // are workarounds, not preferences; drop them if the root ever stops
   // extending the Next preset.
   "root": false,
+  "files": {
+    // api/handler.js is a committed stub that the build overwrites with a
+    // 582kb bundle — never lint whatever happens to be there.
+    "includes": ["**", "!api"]
+  },
   "extends": "//",
   "linter": {
     "rules": {
@@ -17,7 +22,7 @@
   "overrides": [
     {
       // Vercel discovers the serverless function by its default export.
-      "includes": ["src/server/handler.ts", "api/handler.ts"],
+      "includes": ["src/server/handler.ts"],
       "linter": { "rules": { "style": { "noDefaultExport": "off" } } }
     }
   ]
