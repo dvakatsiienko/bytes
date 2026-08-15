@@ -25,6 +25,7 @@ import type {
   TrophyProgress,
 } from '../shared/types.ts';
 import { cached } from './cache.ts';
+import { playtimeFetch, playtimeMatch } from './playtime.ts';
 
 /**
  * PSN sends these for PS5 titles that count towards a target, but psn-api's
@@ -87,20 +88,27 @@ export const profileFetch = async (): Promise<Profile> => {
 };
 
 export const gamesFetch = async (limit = 100): Promise<Game[]> => {
-  const { trophyTitles } = await getUserTitles(await authGet(), 'me', {
-    limit,
-  });
+  const [{ trophyTitles }, played] = await Promise.all([
+    getUserTitles(await authGet(), 'me', { limit }),
+    playtimeFetch(),
+  ]);
 
-  return trophyTitles.map((title) => ({
-    defined: { ...title.definedTrophies },
-    earned: { ...title.earnedTrophies },
-    iconUrl: title.trophyTitleIconUrl,
-    id: title.npCommunicationId,
-    lastPlayedAt: title.lastUpdatedDateTime,
-    name: title.trophyTitleName,
-    platform: title.trophyTitlePlatform,
-    progress: title.progress,
-  }));
+  return trophyTitles.map((title) => {
+    const play = playtimeMatch(played, title.trophyTitleName);
+
+    return {
+      defined: { ...title.definedTrophies },
+      earned: { ...title.earnedTrophies },
+      iconUrl: title.trophyTitleIconUrl,
+      id: title.npCommunicationId,
+      lastPlayedAt: title.lastUpdatedDateTime,
+      name: title.trophyTitleName,
+      platform: title.trophyTitlePlatform,
+      playSeconds: play?.seconds ?? null,
+      playedAt: play?.playedAt ?? null,
+      progress: title.progress,
+    };
+  });
 };
 
 export const gameDetailFetch = async (gameId: string): Promise<GameDetail> => {

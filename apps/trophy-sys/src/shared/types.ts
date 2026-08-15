@@ -21,9 +21,14 @@ export interface Game {
   earned: TrophyCounts;
   iconUrl: string;
   id: string;
+  /** When trophy data last changed — not when the game was last played. */
   lastPlayedAt: string;
   name: string;
   platform: string;
+  /** True last-played time, or null when the playtime join missed. */
+  playedAt: string | null;
+  /** Total seconds played, or null when the playtime join missed. */
+  playSeconds: number | null;
   progress: number;
 }
 
@@ -80,10 +85,5 @@ export interface GameDrift {
 export interface NewsFeed {
   drifted: GameDrift[];
   isBaseline: boolean;
-  trophies: GameTrophy[];
-}
-
-export interface AlmostFeed {
-  scanned: number;
   trophies: GameTrophy[];
 }

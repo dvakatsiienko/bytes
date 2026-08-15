@@ -19,6 +19,14 @@ export const dateFormat = (iso: string | null) => {
   return new Date(iso).toISOString().slice(0, 10).replace(/-/g, '.');
 };
 
+/** `—` when the playtime name-join found no match for this title. */
+export const playtimeFormat = (seconds: number | null) => {
+  if (seconds === null) return '—';
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.round((seconds % 3600) / 60);
+  return hours ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
+
 export const barRender = (percent: number, width = 20) => {
   const filled = Math.round(
     (Math.min(100, Math.max(0, percent)) / 100) * width,
