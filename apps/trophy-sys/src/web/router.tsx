@@ -5,7 +5,6 @@ import {
   redirect,
 } from '@tanstack/react-router';
 
-import { Almost } from './almost.tsx';
 import { Layout } from './layout.tsx';
 import { Library, LibraryEmpty, LibraryGame } from './library.tsx';
 import { News } from './news.tsx';
@@ -43,12 +42,6 @@ const libraryGameRoute = createRoute({
   path: '$gameId',
 });
 
-const almostRoute = createRoute({
-  component: Almost,
-  getParentRoute: () => rootRoute,
-  path: '/almost',
-});
-
 const newsRoute = createRoute({
   component: News,
   getParentRoute: () => rootRoute,
@@ -59,7 +52,6 @@ export const router = createRouter({
   routeTree: rootRoute.addChildren([
     indexRoute,
     libraryRoute.addChildren([libraryIndexRoute, libraryGameRoute]),
-    almostRoute,
     newsRoute,
   ]),
 });

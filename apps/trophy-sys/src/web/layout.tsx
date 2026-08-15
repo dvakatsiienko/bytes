@@ -1,11 +1,11 @@
 import { Link, Outlet } from '@tanstack/react-router';
 
 import { ProfileBar } from './components/profile-bar.tsx';
+import { ThemeToggle } from './components/theme-toggle.tsx';
 import { useGames, useProfile } from './hooks/queries.ts';
 
 const TABS = [
   { label: 'library', to: '/library' },
-  { label: 'almost', to: '/almost' },
   { label: 'news', to: '/news' },
 ] as const;
 
@@ -36,6 +36,8 @@ export const Layout = () => {
             </Link>
           ))}
         </nav>
+
+        <ThemeToggle />
 
         <span className='ml-auto text-[10px] text-dim'>{status}</span>
       </div>
