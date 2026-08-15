@@ -1,13 +1,5 @@
 import type { AuthorizationPayload } from 'psn-api';
-import {
-  exchangeAccessCodeForAuthTokens,
-  exchangeNpssoForAccessCode,
-  exchangeRefreshTokenForAuthTokens,
-  getTitleTrophies,
-  getUserTitles,
-  getUserTrophiesEarnedForTitle,
-  getUserTrophyProfileSummary,
-} from 'psn-api';
+import * as psnApi from 'psn-api';
 
 import type {
   Game,
@@ -17,6 +9,22 @@ import type {
   TrophyGrade,
 } from '../shared/types.ts';
 import { cached } from './cache.ts';
+
+/**
+ * Namespace import, not named imports. psn-api's CJS entry re-exports
+ * conditionally on NODE_ENV, which Node's static export detection cannot see
+ * through — named imports resolve locally (where the ESM build is chosen) and
+ * blow up at runtime on Vercel with "does not provide an export named".
+ */
+const {
+  exchangeAccessCodeForAuthTokens,
+  exchangeNpssoForAccessCode,
+  exchangeRefreshTokenForAuthTokens,
+  getTitleTrophies,
+  getUserTitles,
+  getUserTrophiesEarnedForTitle,
+  getUserTrophyProfileSummary,
+} = psnApi;
 
 interface Session {
   auth: AuthorizationPayload;
