@@ -32,7 +32,7 @@ Apps R&D-ed or vibe coded.
 [Website](https://financical.vercel.app/) |
 [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/financial)
 
-#### 🏆 Trophy Sys
+#### 🎮 Trophy Sys
 
 Retro-terminal dashboard over the PlayStation Network trophy API.
 
