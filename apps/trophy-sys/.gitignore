@@ -1,6 +1,5 @@
 .env
+.env*.local
 .trophy-state.json
-api/
 dist/
 .vercel/
-.env*.local

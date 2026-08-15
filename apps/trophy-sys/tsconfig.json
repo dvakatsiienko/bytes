@@ -1,4 +1,19 @@
 {
+  // Vercel's function builder reads this file when it compiles api/**.ts.
+  // rewriteRelativeImportExtensions turns `./routes.ts` into `./routes.js`;
+  // without it the emitted function imports paths that do not exist.
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "lib": ["DOM", "ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "rewriteRelativeImportExtensions": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2023",
+    "types": ["node"]
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

@@ -17,7 +17,7 @@
   "overrides": [
     {
       // Vercel discovers the serverless function by its default export.
-      "includes": ["src/server/handler.ts"],
+      "includes": ["src/server/handler.ts", "api/handler.ts"],
       "linter": { "rules": { "style": { "noDefaultExport": "off" } } }
     }
   ]
