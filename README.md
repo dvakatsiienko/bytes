@@ -34,7 +34,7 @@ Apps R&D-ed or vibe coded.
 
 #### 🎮 Trophy Sys
 
-Retro-terminal dashboard over the PlayStation Network trophy API.
+You may discover the games I play on PS5. Steam too, but less.
 
 [Website](https://trophy-sys.vercel.app) |
 [Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/trophy-sys)
