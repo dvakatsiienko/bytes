@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 
 import { AppProviders } from './AppProviders';
-import { inter } from '@/theme/fonts';
+import { body } from '@/theme/fonts';
 import '@/theme/global.css';
 
 export default (props: { children: React.ReactNode }) => {
   return (
     <html lang='en'>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${body.className} antialiased`}>
         <AppProviders>{props.children}</AppProviders>
       </body>
     </html>

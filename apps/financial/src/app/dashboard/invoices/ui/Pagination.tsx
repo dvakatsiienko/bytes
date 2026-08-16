@@ -73,13 +73,13 @@ const PaginationNumber = (props: PaginationNumberProps) => {
   const { page, href, position, isActive } = props;
 
   const className = cx(
-    'flex h-10 w-10 items-center justify-center text-sm border border-gray-400',
+    'flex h-10 w-10 items-center justify-center text-sm border border-rule',
     {
-      'hover:bg-gray-100': !isActive && position !== 'middle',
+      'hover:bg-bar': !isActive && position !== 'middle',
       'rounded-l-md': position === 'first' || position === 'single',
       'rounded-r-md': position === 'last' || position === 'single',
-      'text-gray-300': position === 'middle',
-      'z-10 bg-blue-600 border-blue-600 text-white': isActive,
+      'text-rule': position === 'middle',
+      'z-10 bg-seal border-seal text-paper': isActive,
     },
   );
 
@@ -96,12 +96,12 @@ const PaginationArrow = (props: PaginationArrowProps) => {
   const { href, direction, isDisabled } = props;
 
   const className = cx(
-    'flex h-10 w-10 items-center justify-center rounded-md border border-gray-400',
+    'flex h-10 w-10 items-center justify-center border border-rule',
     {
-      'hover:bg-gray-100': !isDisabled,
+      'hover:bg-bar': !isDisabled,
       'ml-2 md:ml-4': direction === 'right',
       'mr-2 md:mr-4': direction === 'left',
-      'pointer-events-none text-gray-300': isDisabled,
+      'pointer-events-none text-rule': isDisabled,
     },
   );
 
@@ -123,20 +123,20 @@ const PaginationArrow = (props: PaginationArrowProps) => {
 
 /* Types */
 interface PaginationProps {
-  totalPages: number;
   query: string;
+  totalPages: number;
 }
 
 interface PaginationNumberProps {
-  page: number | string;
   href: string;
-  position?: UPosition;
   isActive: boolean;
+  page: number | string;
+  position?: UPosition;
 }
 
 interface PaginationArrowProps {
-  href: string;
   direction: 'left' | 'right';
+  href: string;
   isDisabled?: boolean;
 }
 

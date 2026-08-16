@@ -1,21 +1,17 @@
-import clsx from 'clsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 
 import { fetchLatestInvoiceList } from '@/lib/queries';
 
-import { lusitana } from '@/theme/fonts';
+import { display, figures } from '@/theme/fonts';
 
 export const LatestInvoices = async () => {
   const latestInvoicesList = await fetchLatestInvoiceList();
 
-  const latestInvoicesListJSX = latestInvoicesList.map((invoice, i) => {
+  const latestInvoicesListJSX = latestInvoicesList.map((invoice) => {
     return (
       <div
-        className={clsx(
-          'flex flex-row items-center justify-between border-gray-200 py-4',
-          { 'border-t': i !== 0 },
-        )}
+        className='flex flex-row items-center justify-between px-4 py-3'
         key={invoice.id}>
         <div className='flex items-center'>
           <Image
@@ -26,16 +22,16 @@ export const LatestInvoices = async () => {
             width={32}
           />
           <div className='min-w-0'>
-            <p className='truncate font-semibold text-sm md:text-base'>
+            <p className='truncate font-medium text-sm'>
               {invoice.customer.name}
             </p>
-            <p className='hidden text-gray-500 text-sm sm:block'>
+            <p className='hidden truncate text-ink-soft text-xs sm:block'>
               {invoice.customer.email}
             </p>
           </div>
         </div>
         <p
-          className={`${lusitana.className} truncate font-medium text-sm md:text-base`}>
+          className={`${figures.className} shrink-0 pl-4 text-sm tabular-nums`}>
           {invoice.amount}
         </p>
       </div>
@@ -44,16 +40,16 @@ export const LatestInvoices = async () => {
 
   return (
     <div className='flex w-full flex-col md:col-span-4'>
-      <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Latest Invoices
+      <h2 className={`${display.className} mb-3 text-xl tracking-tight`}>
+        Latest invoices
       </h2>
 
-      <div className='flex grow flex-col justify-between rounded-xl bg-gray-50 p-4'>
-        <div className='bg-white px-6'>{latestInvoicesListJSX}</div>
+      <div className='flex grow flex-col justify-between border border-rule bg-white'>
+        <div className='greenbar'>{latestInvoicesListJSX}</div>
 
-        <div className='flex items-center pt-6 pb-2'>
-          <ArrowPathIcon className='h-5 w-5 text-gray-500' />
-          <h3 className='ml-2 text-gray-500 text-sm'>Updated just now</h3>
+        <div className='flex items-center gap-2 border-rule border-t bg-bar/50 px-4 py-2.5'>
+          <ArrowPathIcon className='h-4 w-4 text-ink-soft' />
+          <h3 className='caption text-ink-soft'>Updated just now</h3>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
 import { CardList, LatestInvoices, RevenueChart } from './ui';
-import { lusitana } from '@/theme/fonts';
+import { display } from '@/theme/fonts';
 import {
   CardsSkeleton,
   LatestInvoicesSkeleton,
@@ -11,9 +11,13 @@ import {
 const DashboardPage = () => {
   return (
     <main>
-      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Dashboard
-      </h1>
+      <header className='mb-8 border-rule border-b pb-4'>
+        <p className='caption text-ink-soft'>Statement</p>
+        <h1
+          className={`${display.className} mt-2 text-3xl tracking-tight md:text-4xl`}>
+          Dashboard
+        </h1>
+      </header>
 
       <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
         <Suspense fallback={<CardsSkeleton />}>

@@ -5,30 +5,33 @@ import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 
 import { NavLinks } from './Navlinks';
+import { display } from '@/theme/fonts';
 import { AcmeLogo } from '@/ui/AcmeLogo';
 
 export const Sidenav = () => {
   return (
-    <nav className='flex h-full flex-col px-3 py-4 md:px-2'>
+    <nav className='perforation flex h-full flex-col bg-bar/40 pl-4'>
       <Link
-        className='mb-2 flex h-20 items-end justify-start rounded-md bg-blue-600 p-4 md:h-40'
+        className='flex h-20 items-end border-rule border-b px-4 pb-4 md:h-32'
         href='/'>
-        <div className='w-32 text-white md:w-40'>
-          <AcmeLogo />
-        </div>
+        <span className={`${display.className} text-ink`}>
+          <span className='w-32 md:w-40'>
+            <AcmeLogo />
+          </span>
+        </span>
       </Link>
 
-      <div className='flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2'>
+      <div className='flex grow flex-row justify-between gap-1 p-3 md:flex-col md:gap-0.5'>
         <NavLinks />
 
-        <div className='hidden h-auto w-full grow rounded-md bg-gray-50 md:block' />
+        <div className='hidden grow md:block' />
 
         <button
-          className='flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 font-medium text-sm hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3'
+          className='flex h-11 w-full grow items-center justify-center gap-3 px-3 text-ink-soft text-sm transition-colors hover:bg-bar hover:text-ink md:flex-none md:justify-start'
           onClick={() => signOut()}
           type='button'>
-          <PowerIcon className='w-6' />
-          <div className='hidden md:block'>Sign Out</div>
+          <PowerIcon className='w-5' />
+          <span className='hidden md:block'>Sign out</span>
         </button>
       </div>
     </nav>

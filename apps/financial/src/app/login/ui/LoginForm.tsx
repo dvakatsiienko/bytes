@@ -10,7 +10,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 
-import { lusitana } from '@/theme/fonts';
+import { display } from '@/theme/fonts';
 import { Button } from '@/ui/Button';
 
 export const LoginForm = () => {
@@ -43,20 +43,22 @@ export const LoginForm = () => {
 
   return (
     <form className='space-y-3' onSubmit={handleSubmit}>
-      <div className='flex-1 rounded-lg bg-gray-50 px-6 pt-8 pb-4'>
-        <h1 className={`${lusitana.className} mb-3 text-2xl`}>
-          Please log in to continue.
+      <div className='flex-1 border border-rule bg-white px-6 pt-8 pb-4'>
+        <p className='caption text-ink-soft'>Account</p>
+        <h1
+          className={`${display.className} mt-2 mb-3 text-2xl tracking-tight`}>
+          Log in to continue.
         </h1>
 
         <fieldset className='w-full'>
           <label
-            className='mt-5 mb-3 block font-medium text-gray-900 text-xs'
+            className='caption mt-5 mb-2 block text-ink-soft'
             htmlFor='email'>
             Email
           </label>
           <div className='relative'>
             <input
-              className='peer mb-4 block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500'
+              className='peer mb-4 block w-full border border-rule bg-white py-[9px] pl-10 text-sm outline-seal placeholder:text-ink-soft focus:border-seal'
               defaultValue='user@nextmail.com'
               id='email'
               name='email'
@@ -64,17 +66,17 @@ export const LoginForm = () => {
               required
               type='email'
             />
-            <AtSymbolIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
+            <AtSymbolIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft peer-focus:text-seal' />
           </div>
 
           <label
-            className='mt-5 mb-3 block font-medium text-gray-900 text-xs'
+            className='caption mt-5 mb-2 block text-ink-soft'
             htmlFor='password'>
             Password
           </label>
           <div className='relative'>
             <input
-              className='peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500'
+              className='peer block w-full border border-rule bg-white py-[9px] pl-10 text-sm outline-seal placeholder:text-ink-soft focus:border-seal'
               defaultValue='123456'
               id='password'
               minLength={6}
@@ -83,12 +85,12 @@ export const LoginForm = () => {
               required
               type='password'
             />
-            <KeyIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900' />
+            <KeyIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft peer-focus:text-seal' />
           </div>
         </fieldset>
 
         <Button aria-disabled={isPending} className='mt-4 w-full'>
-          Log in <ArrowRightIcon className='ml-auto h-5 w-5 text-gray-50' />
+          Log in <ArrowRightIcon className='ml-auto h-5 w-5' />
         </Button>
 
         <div
@@ -97,8 +99,8 @@ export const LoginForm = () => {
           className='flex h-8 items-end space-x-1'>
           {errorMessage ? (
             <>
-              <ExclamationCircleIcon className='h-5 w-5 text-red-500' />
-              <p className='text-red-500 text-sm'>{errorMessage}</p>
+              <ExclamationCircleIcon className='h-5 w-5 text-flag' />
+              <p className='text-flag text-sm'>{errorMessage}</p>
             </>
           ) : null}
         </div>

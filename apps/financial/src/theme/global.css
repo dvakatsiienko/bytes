@@ -1,24 +1,64 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
-@layer base {
-  input,
-  select {
-    outline-color: var(--color-gray-200);
-    border-color: var(--color-gray-200);
-  }
-}
-
+/*
+ * Greenbar: the pale-banded continuous-feed paper that line printers used for
+ * ledgers and statements. The bands are the point — they exist so the eye can
+ * carry a figure across a wide row without losing the line.
+ */
 @theme {
-  --animate-shimmer: shimmer 2s ease-in-out infinite;
+  --color-paper: #f5f6f1;
+  --color-bar: #e2eadd;
+  --color-ink: #171c18;
+  --color-ink-soft: #5c665e;
+  --color-rule: #c9d2c6;
+  --color-seal: #0b5d3b;
+  --color-flag: #b4441f;
 
-  --color-blue-400: #2589fe;
-  --color-blue-500: #0070f3;
-  --color-blue-600: #2f6feb;
+  --animate-shimmer: shimmer 2s ease-in-out infinite;
 
   @keyframes shimmer {
     100% {
       transform: translateX(100%);
     }
+  }
+}
+
+@layer base {
+  body {
+    color: var(--color-ink);
+    background-color: var(--color-paper);
+  }
+
+  input,
+  select,
+  textarea {
+    outline-color: var(--color-seal);
+    border-color: var(--color-rule);
+  }
+}
+
+@layer components {
+  .greenbar > *:nth-child(even) {
+    background-color: var(--color-bar);
+  }
+
+  /* Tractor-feed holes down the sheet's edge. */
+  .perforation {
+    background-image: radial-gradient(
+      circle at center,
+      var(--color-rule) 0 2.5px,
+      transparent 2.5px
+    );
+    background-repeat: repeat-y;
+    background-size: 16px 30px;
+  }
+
+  /* Micro-label: the printed column heading on a statement. */
+  .caption {
+    font-size: 10px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
   }
 }

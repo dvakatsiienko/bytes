@@ -1,29 +1,26 @@
 import cx from 'clsx';
 import { CheckIcon, ClockIcon } from '@heroicons/react/24/outline';
 
+/**
+ * A rubber stamp, not a pill. Paid sits slightly off-square because a stamp
+ * pressed by hand never lands straight — it is the one place this interface
+ * admits a person was involved.
+ */
 export const InvoiceStatus = (props: { status: string }) => {
-  const pendingInvoiceJSX = props.status === 'pending' && (
-    <>
-      Pending
-      <ClockIcon className='ml-1 w-4 text-gray-500' />
-    </>
-  );
-
-  const paidInvoiceJSX = props.status === 'paid' && (
-    <>
-      Paid
-      <CheckIcon className='ml-1 w-4 text-white' />
-    </>
-  );
+  const isPaid = props.status === 'paid';
 
   return (
     <span
-      className={cx('inline-flex items-center rounded-full px-2 py-1 text-xs', {
-        'bg-gray-100 text-gray-500': props.status === 'pending',
-        'bg-green-500 text-white': props.status === 'paid',
-      })}>
-      {pendingInvoiceJSX}
-      {paidInvoiceJSX}
+      className={cx(
+        'caption inline-flex items-center gap-1 border-2 px-2 py-1 font-semibold',
+        isPaid ? '-rotate-3 border-seal text-seal' : 'border-flag/70 text-flag',
+      )}>
+      {isPaid ? 'Paid' : 'Pending'}
+      {isPaid ? (
+        <CheckIcon className='w-3.5' />
+      ) : (
+        <ClockIcon className='w-3.5' />
+      )}
     </span>
   );
 };

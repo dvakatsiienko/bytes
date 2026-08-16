@@ -1,13 +1,13 @@
 import { clsx } from 'clsx';
 import NextLink from 'next/link';
 
-import { lusitana } from '@/theme/fonts';
+import { display } from '@/theme/fonts';
 
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
   const breadcrumbListJSX = props.breadcrumbList.map((breadcrumb, index) => (
     <li
       aria-current={breadcrumb.active}
-      className={clsx(breadcrumb.active ? 'text-gray-900' : 'text-gray-500')}
+      className={clsx(breadcrumb.active ? 'text-ink' : 'text-ink-soft')}
       key={breadcrumb.href}>
       <NextLink href={breadcrumb.href}>{breadcrumb.label}</NextLink>
       {index < props.breadcrumbList.length - 1 && (
@@ -17,8 +17,14 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
   ));
 
   return (
-    <nav aria-label='Breadcrumb' className='mb-6 block'>
-      <ol className={clsx(lusitana.className, 'flex text-xl md:text-2xl')}>
+    <nav
+      aria-label='Breadcrumb'
+      className='mb-8 block border-rule border-b pb-4'>
+      <ol
+        className={clsx(
+          display.className,
+          'flex text-2xl tracking-tight md:text-3xl',
+        )}>
         {breadcrumbListJSX}
       </ol>
     </nav>
@@ -31,7 +37,7 @@ interface BreadcrumbsProps {
 }
 
 interface Breadcrumb {
-  label: string;
-  href: string;
   active?: boolean;
+  href: string;
+  label: string;
 }
