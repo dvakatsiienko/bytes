@@ -121,6 +121,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
           value={query}
         />
         <SelectControl
+          className='shrink-0'
           hint={TROPHY_SORT_HINT[sort]}
           labels={TROPHY_SORT_LABEL}
           onChange={setSort}
@@ -129,6 +130,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
         />
 
         <SelectControl
+          className='shrink-0'
           hint={EARNED_MODE_HINT[earnedMode]}
           labels={EARNED_MODE_LABEL}
           onChange={setEarnedMode}

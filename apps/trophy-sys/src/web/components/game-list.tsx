@@ -8,6 +8,17 @@ import {
   playtimeFormat,
   progressTone,
 } from '../helpers/format.ts';
+import {
+  GAME_SORT_HINT,
+  GAME_SORT_LABEL,
+  GAME_SORT_ORDER,
+  type GameSort,
+  PLATINUM_MODE_HINT,
+  PLATINUM_MODE_LABEL,
+  PLATINUM_MODE_ORDER,
+  type PlatinumMode,
+  gamesArrange,
+} from '../helpers/game-sort.ts';
 import { useStored } from '../hooks/use-stored.ts';
 import { PlatformBadge } from './platform-badge.tsx';
 import { SelectControl } from './select-control.tsx';
@@ -18,47 +29,18 @@ interface GameListProps {
   selectedId: string | null;
 }
 
-type Sort = 'name' | 'played' | 'playtime';
-
-const SORT_ORDER = [
-  'played',
-  'playtime',
-  'name',
-] as const satisfies readonly Sort[];
-
-const SORT_LABEL: Record<Sort, string> = {
-  name: 'name',
-  played: 'last played',
-  playtime: 'playtime',
-};
-
-const SORT_HINT: Record<Sort, string> = {
-  name: 'Alphabetical by title.',
-  played: 'Most recently played first — real play time, not last trophy.',
-  playtime: 'Longest total playtime first. Unmatched titles sink to the end.',
-};
-
-/**
- * Sorting and filtering are local state, not URL state: a search is a scratch
- * gesture, not a place you would link someone to.
- */
-const sortApply = (games: Game[], sort: Sort) => {
-  const sorted = [...games];
-
-  if (sort === 'name')
-    return sorted.sort((a, b) => a.name.localeCompare(b.name));
-
-  if (sort === 'playtime')
-    return sorted.sort((a, b) => (b.playSeconds ?? -1) - (a.playSeconds ?? -1));
-
-  return sorted.sort((a, b) =>
-    (b.playedAt ?? b.lastPlayedAt).localeCompare(a.playedAt ?? a.lastPlayedAt),
-  );
-};
-
 export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
   const [query, setQuery] = useState('');
-  const [sort, setSort] = useStored<Sort>('library-sort', 'played', SORT_ORDER);
+  const [sort, setSort] = useStored<GameSort>(
+    'library-sort',
+    'played',
+    GAME_SORT_ORDER,
+  );
+  const [platinum, setPlatinum] = useStored<PlatinumMode>(
+    'library-platinum',
+    'mixed',
+    PLATINUM_MODE_ORDER,
+  );
 
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -66,8 +48,8 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
       ? games.filter((game) => game.name.toLowerCase().includes(needle))
       : games;
 
-    return sortApply(matched, sort);
-  }, [games, query, sort]);
+    return gamesArrange(matched, sort, platinum);
+  }, [games, query, sort, platinum]);
 
   return (
     <nav className='panel flex min-h-0 flex-col'>
@@ -78,9 +60,9 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
           : `${shown.length} / ${games.length}`}
       </span>
 
-      <div className='flex items-center gap-2 border-line border-b px-3 py-2'>
+      <div className='flex flex-col gap-2 border-line border-b px-3 py-2'>
         <input
-          className='hint min-w-0 flex-1 border border-line bg-bg-soft px-2 py-1 text-[11px] text-fg placeholder:text-dim focus:border-orange focus:outline-none'
+          className='hint min-w-0 border border-line bg-bg-soft px-2 py-1 text-[11px] text-fg placeholder:text-dim focus:border-orange focus:outline-none'
           data-hint='Filters the list by title as you type.'
           onChange={(event) => setQuery(event.target.value)}
           placeholder='search titles…'
@@ -88,13 +70,25 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
           value={query}
         />
 
-        <SelectControl
-          hint={SORT_HINT[sort]}
-          labels={SORT_LABEL}
-          onChange={setSort}
-          options={SORT_ORDER}
-          value={sort}
-        />
+        <div className='grid grid-cols-2 gap-2'>
+          <SelectControl
+            className='w-full'
+            hint={GAME_SORT_HINT[sort]}
+            labels={GAME_SORT_LABEL}
+            onChange={setSort}
+            options={GAME_SORT_ORDER}
+            value={sort}
+          />
+
+          <SelectControl
+            className='w-full'
+            hint={PLATINUM_MODE_HINT[platinum]}
+            labels={PLATINUM_MODE_LABEL}
+            onChange={setPlatinum}
+            options={PLATINUM_MODE_ORDER}
+            value={platinum}
+          />
+        </div>
       </div>
 
       <div className='min-h-0 flex-1 overflow-y-auto'>
