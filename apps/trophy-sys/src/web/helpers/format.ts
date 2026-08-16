@@ -28,13 +28,12 @@ export const playtimeFormat = (seconds: number | null) => {
 };
 
 /**
- * Platinum is its own finish line. A title with dlc can hold the platinum and
- * still sit at 80%, so completion alone would file it with the abandoned ones.
+ * Two colours only. Platinum is carried by the ◆ beside the title — a metre
+ * cannot answer "how far along" and "did you platinum" at once, and the
+ * three-colour version had to be explained to be read.
  */
-export const progressTone = (progress: number, hasPlatinum: boolean) => {
-  if (progress === 100) return 'text-green';
-  return hasPlatinum ? 'text-platinum' : 'text-yellow';
-};
+export const progressTone = (progress: number) =>
+  progress === 100 ? 'text-green' : 'text-yellow';
 
 export const barRender = (percent: number, width = 20) => {
   const filled = Math.round(

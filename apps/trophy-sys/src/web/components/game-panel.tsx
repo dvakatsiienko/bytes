@@ -104,7 +104,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
         </div>
 
         <div className='ml-auto shrink-0 text-right text-[11px]'>
-          <span className={progressTone(game.progress, hasPlatinum)}>
+          <span className={progressTone(game.progress)}>
             {barRender(game.progress, 18)}
           </span>
           <span className='block text-dim'>{game.progress}%</span>

@@ -146,7 +146,7 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
               </span>
 
               <span className='shrink-0 text-right text-[10px]'>
-                <span className={progressTone(game.progress, hasPlatinum)}>
+                <span className={progressTone(game.progress)}>
                   {barRender(game.progress, 10)}
                 </span>
                 <span className='block text-dim'>{game.progress}%</span>
