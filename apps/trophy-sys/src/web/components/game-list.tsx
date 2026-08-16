@@ -1,7 +1,14 @@
 import { useMemo, useState } from 'react';
 
 import type { Game } from '../../shared/types.ts';
-import { barRender, dateFormat, playtimeFormat } from '../helpers/format.ts';
+import {
+  GRADE_MARK,
+  barRender,
+  dateFormat,
+  playtimeFormat,
+  progressTone,
+} from '../helpers/format.ts';
+import { useStored } from '../hooks/use-stored.ts';
 import { PlatformBadge } from './platform-badge.tsx';
 import { SelectControl } from './select-control.tsx';
 
@@ -51,7 +58,7 @@ const sortApply = (games: Game[], sort: Sort) => {
 
 export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
   const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<Sort>('played');
+  const [sort, setSort] = useStored<Sort>('library-sort', 'played', SORT_ORDER);
 
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -93,6 +100,7 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
       <div className='min-h-0 flex-1 overflow-y-auto'>
         {shown.map((game) => {
           const isSelected = game.id === selectedId;
+          const hasPlatinum = game.earned.platinum > 0;
 
           return (
             <button
@@ -123,9 +131,16 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
               />
 
               <span className='min-w-0 flex-1'>
-                <span
-                  className={`block truncate transition-colors ${isSelected ? 'text-fg' : 'text-fg-soft group-hover:text-fg'}`}>
-                  {game.name}
+                <span className='flex items-baseline gap-1.5'>
+                  <span
+                    className={`truncate transition-colors ${isSelected ? 'text-fg' : 'text-fg-soft group-hover:text-fg'}`}>
+                    {game.name}
+                  </span>
+                  {hasPlatinum && (
+                    <span className='glow shrink-0 text-platinum'>
+                      {GRADE_MARK.platinum}
+                    </span>
+                  )}
                 </span>
                 <span className='mt-0.5 flex items-center gap-1.5 text-[10px] text-dim'>
                   <PlatformBadge platform={game.platform} />
@@ -137,10 +152,7 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
               </span>
 
               <span className='shrink-0 text-right text-[10px]'>
-                <span
-                  className={
-                    game.progress === 100 ? 'text-green' : 'text-yellow'
-                  }>
+                <span className={progressTone(game.progress, hasPlatinum)}>
                   {barRender(game.progress, 10)}
                 </span>
                 <span className='block text-dim'>{game.progress}%</span>

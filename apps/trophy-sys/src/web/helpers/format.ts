@@ -27,6 +27,15 @@ export const playtimeFormat = (seconds: number | null) => {
   return hours ? `${hours}h ${minutes}m` : `${minutes}m`;
 };
 
+/**
+ * Platinum is its own finish line. A title with dlc can hold the platinum and
+ * still sit at 80%, so completion alone would file it with the abandoned ones.
+ */
+export const progressTone = (progress: number, hasPlatinum: boolean) => {
+  if (progress === 100) return 'text-green';
+  return hasPlatinum ? 'text-platinum' : 'text-yellow';
+};
+
 export const barRender = (percent: number, width = 20) => {
   const filled = Math.round(
     (Math.min(100, Math.max(0, percent)) / 100) * width,

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import type { GameDetail, Trophy, TrophyGroup } from '../../shared/types.ts';
-import { barRender } from '../helpers/format.ts';
+import { GRADE_MARK, barRender, progressTone } from '../helpers/format.ts';
 import {
   EARNED_MODE_HINT,
   EARNED_MODE_LABEL,
@@ -13,6 +13,7 @@ import {
   type TrophySort,
   trophiesArrange,
 } from '../helpers/trophy-sort.ts';
+import { useStored } from '../hooks/use-stored.ts';
 import { PlatformBadge } from './platform-badge.tsx';
 import { SelectControl } from './select-control.tsx';
 import { TrophyRow } from './trophy-row.tsx';
@@ -24,8 +25,16 @@ interface GamePanelProps {
 
 export const GamePanel = ({ game, error }: GamePanelProps) => {
   const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<TrophySort>('easiest');
-  const [earnedMode, setEarnedMode] = useState<EarnedMode>('mixed');
+  const [sort, setSort] = useStored<TrophySort>(
+    'trophy-sort',
+    'easiest',
+    TROPHY_SORT_ORDER,
+  );
+  const [earnedMode, setEarnedMode] = useStored<EarnedMode>(
+    'trophy-earned-mode',
+    'mixed',
+    EARNED_MODE_ORDER,
+  );
 
   const needle = query.trim().toLowerCase();
 
@@ -46,6 +55,8 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
   if (error) return <Shell>error · {error}</Shell>;
   if (!game) return <Shell>loading trophy set…</Shell>;
 
+  const hasPlatinum = game.earned.platinum > 0;
+
   return (
     <section className='panel flex min-h-0 flex-col'>
       <span className='panel-title'>{game.name}</span>
@@ -60,9 +71,23 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
         />
 
         <div className='min-w-0'>
-          <p className='glow truncate text-base text-orange'>{game.name}</p>
+          <p className='flex items-baseline gap-2'>
+            <span className='glow truncate text-base text-orange'>
+              {game.name}
+            </span>
+            {hasPlatinum && (
+              <span className='glow shrink-0 text-platinum text-sm'>
+                {GRADE_MARK.platinum}
+              </span>
+            )}
+          </p>
           <p className='mt-1 flex items-center gap-1.5 text-[11px] text-dim'>
             <PlatformBadge platform={game.platform} />
+            {hasPlatinum && (
+              <span className='shrink-0 border border-platinum/50 bg-platinum/10 px-1 py-px text-[9px] text-platinum leading-none tracking-[0.12em]'>
+                PLATINUM
+              </span>
+            )}
             <span>
               {game.earned.bronze +
                 game.earned.silver +
@@ -79,8 +104,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
         </div>
 
         <div className='ml-auto shrink-0 text-right text-[11px]'>
-          <span
-            className={game.progress === 100 ? 'text-green' : 'text-yellow'}>
+          <span className={progressTone(game.progress, hasPlatinum)}>
             {barRender(game.progress, 18)}
           </span>
           <span className='block text-dim'>{game.progress}%</span>
