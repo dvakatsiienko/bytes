@@ -94,7 +94,11 @@ export const gamesFetch = async (limit = 100): Promise<Game[]> => {
   ]);
 
   return trophyTitles.map((title) => {
-    const play = playtimeMatch(played, title.trophyTitleName);
+    const play = playtimeMatch(
+      played,
+      title.trophyTitleName,
+      title.trophyTitlePlatform,
+    );
 
     return {
       defined: { ...title.definedTrophies },
