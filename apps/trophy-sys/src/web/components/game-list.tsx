@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 
 import type { Game } from '../../shared/types.ts';
 import { barRender, dateFormat, playtimeFormat } from '../helpers/format.ts';
+import { PlatformBadge } from './platform-badge.tsx';
+import { SelectControl } from './select-control.tsx';
 
 interface GameListProps {
   games: Game[];
@@ -10,6 +12,12 @@ interface GameListProps {
 }
 
 type Sort = 'name' | 'played' | 'playtime';
+
+const SORT_ORDER = [
+  'played',
+  'playtime',
+  'name',
+] as const satisfies readonly Sort[];
 
 const SORT_LABEL: Record<Sort, string> = {
   name: 'name',
@@ -73,17 +81,13 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
           value={query}
         />
 
-        <select
-          className='hint hint-right cursor-pointer border border-line bg-bg-soft px-2 py-1 text-[11px] text-dim uppercase tracking-[0.1em] focus:border-orange focus:outline-none'
-          data-hint={SORT_HINT[sort]}
-          onChange={(event) => setSort(event.target.value as Sort)}
-          value={sort}>
-          {(Object.keys(SORT_LABEL) as Sort[]).map((option) => (
-            <option key={option} value={option}>
-              {SORT_LABEL[option]}
-            </option>
-          ))}
-        </select>
+        <SelectControl
+          hint={SORT_HINT[sort]}
+          labels={SORT_LABEL}
+          onChange={setSort}
+          options={SORT_ORDER}
+          value={sort}
+        />
       </div>
 
       <div className='min-h-0 flex-1 overflow-y-auto'>
@@ -123,10 +127,12 @@ export const GameList = ({ games, selectedId, onSelect }: GameListProps) => {
                   className={`block truncate transition-colors ${isSelected ? 'text-fg' : 'text-fg-soft group-hover:text-fg'}`}>
                   {game.name}
                 </span>
-                <span className='block text-[10px] text-dim'>
-                  {game.platform} ·{' '}
-                  {dateFormat(game.playedAt ?? game.lastPlayedAt)} ·{' '}
-                  {playtimeFormat(game.playSeconds)}
+                <span className='mt-0.5 flex items-center gap-1.5 text-[10px] text-dim'>
+                  <PlatformBadge platform={game.platform} />
+                  <span className='truncate'>
+                    {dateFormat(game.playedAt ?? game.lastPlayedAt)} ·{' '}
+                    {playtimeFormat(game.playSeconds)}
+                  </span>
                 </span>
               </span>
 

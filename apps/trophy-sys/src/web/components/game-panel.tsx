@@ -1,7 +1,20 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { GameDetail, Trophy, TrophyGroup } from '../../shared/types.ts';
 import { barRender } from '../helpers/format.ts';
+import {
+  EARNED_MODE_HINT,
+  EARNED_MODE_LABEL,
+  EARNED_MODE_ORDER,
+  type EarnedMode,
+  TROPHY_SORT_HINT,
+  TROPHY_SORT_LABEL,
+  TROPHY_SORT_ORDER,
+  type TrophySort,
+  trophiesArrange,
+} from '../helpers/trophy-sort.ts';
+import { PlatformBadge } from './platform-badge.tsx';
+import { SelectControl } from './select-control.tsx';
 import { TrophyRow } from './trophy-row.tsx';
 
 interface GamePanelProps {
@@ -11,18 +24,27 @@ interface GamePanelProps {
 
 export const GamePanel = ({ game, error }: GamePanelProps) => {
   const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<TrophySort>('easiest');
+  const [earnedMode, setEarnedMode] = useState<EarnedMode>('mixed');
 
   const needle = query.trim().toLowerCase();
-  // Description too, not just name — "collect" should find the collectathons.
-  const matches = (trophy: Trophy) =>
-    !needle ||
-    trophy.name.toLowerCase().includes(needle) ||
-    trophy.detail.toLowerCase().includes(needle);
+
+  const shown = useMemo(() => {
+    // Description too, not just name — "collect" finds the collectathons.
+    const matches = (trophy: Trophy) =>
+      !needle ||
+      trophy.name.toLowerCase().includes(needle) ||
+      trophy.detail.toLowerCase().includes(needle);
+
+    return trophiesArrange(
+      (game?.trophies ?? []).filter(matches),
+      sort,
+      earnedMode,
+    );
+  }, [game, needle, sort, earnedMode]);
 
   if (error) return <Shell>error · {error}</Shell>;
   if (!game) return <Shell>loading trophy set…</Shell>;
-
-  const shown = game.trophies.filter(matches);
 
   return (
     <section className='panel flex min-h-0 flex-col'>
@@ -39,18 +61,20 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
 
         <div className='min-w-0'>
           <p className='glow truncate text-base text-orange'>{game.name}</p>
-          <p className='text-[11px] text-dim'>
-            {game.platform} ·{' '}
-            {game.earned.bronze +
-              game.earned.silver +
-              game.earned.gold +
-              game.earned.platinum}
-            /
-            {game.defined.bronze +
-              game.defined.silver +
-              game.defined.gold +
-              game.defined.platinum}{' '}
-            trophies
+          <p className='mt-1 flex items-center gap-1.5 text-[11px] text-dim'>
+            <PlatformBadge platform={game.platform} />
+            <span>
+              {game.earned.bronze +
+                game.earned.silver +
+                game.earned.gold +
+                game.earned.platinum}
+              /
+              {game.defined.bronze +
+                game.defined.silver +
+                game.defined.gold +
+                game.defined.platinum}{' '}
+              trophies
+            </span>
           </p>
         </div>
 
@@ -72,12 +96,28 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
           type='search'
           value={query}
         />
-        {needle && (
-          <span className='shrink-0 text-[10px] text-dim'>
-            {shown.length} / {game.trophies.length}
-          </span>
-        )}
+        <SelectControl
+          hint={TROPHY_SORT_HINT[sort]}
+          labels={TROPHY_SORT_LABEL}
+          onChange={setSort}
+          options={TROPHY_SORT_ORDER}
+          value={sort}
+        />
+
+        <SelectControl
+          hint={EARNED_MODE_HINT[earnedMode]}
+          labels={EARNED_MODE_LABEL}
+          onChange={setEarnedMode}
+          options={EARNED_MODE_ORDER}
+          value={earnedMode}
+        />
       </div>
+
+      {shown.length !== game.trophies.length && (
+        <div className='border-line border-b px-4 py-1 text-[10px] text-dim'>
+          showing {shown.length} of {game.trophies.length}
+        </div>
+      )}
 
       <div className='min-h-0 flex-1 overflow-y-auto'>
         {game.groups.length > 1 ? (
