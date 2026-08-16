@@ -1,9 +1,9 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import NextImage from 'next/image';
 import Link from 'next/link';
 
 import { display } from '@/theme/fonts';
 import { AcmeLogo } from '@/ui/AcmeLogo';
+import { LedgerSheet } from '@/ui/LedgerSheet';
 
 const RootPage = () => {
   return (
@@ -33,22 +33,8 @@ const RootPage = () => {
           </Link>
         </div>
 
-        <div className='flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12'>
-          <NextImage
-            alt='Screenshots of the dashboard project showing desktop version'
-            className='hidden md:block'
-            height={760}
-            loading='eager'
-            src='/hero-desktop.png'
-            width={1000}
-          />
-          <NextImage
-            alt='Screenshots of the dashboard project showing mobile version'
-            className='md:hidden'
-            height={620}
-            src='/hero-mobile.png'
-            width={560}
-          />
+        <div className='flex items-center justify-center p-6 md:w-3/5 md:py-12'>
+          <LedgerSheet />
         </div>
       </div>
     </main>
