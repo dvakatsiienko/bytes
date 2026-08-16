@@ -32,8 +32,9 @@ A PlayStation trophy tracker that looks like a DOS terminal. Live at
 #### 📡 API
 
 - 🎮 [psn-api](https://github.com/achievements-app/psn-api) — the PSN client.
-  Its published build can't be imported from ESM, so it gets bundled in
-  ([#163](https://github.com/achievements-app/psn-api/issues/163))
+  Its ESM entry was unloadable until 2.18.1
+  ([#244](https://github.com/achievements-app/psn-api/issues/244)); it is still
+  bundled in, now for Vercel's dependency tracing rather than for the package
 - 🟢 plain `node:http` locally, the exact same handler shipped as a Vercel
   function in production
 - 🗃️ [Upstash Redis](https://upstash.com/) — holds the trophy baseline, with a

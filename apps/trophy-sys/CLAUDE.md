@@ -86,14 +86,26 @@ scanned at the deployment root of any project regardless of framework.
    arrives far too late — the deploy goes green while every `/api` route 404s with Vercel's HTML
    error page. 📌 A local `pnpm build` leaves the fat bundle in your working tree; restore the stub
    (`git checkout -- api/handler.js`) before committing.
-2. **The API is esbuild-bundled, and that is mandatory.** `psn-api` cannot be imported from ESM in
-   any direction: its `import` condition points at real ESM named `.js` while the package declares
-   no `"type": "module"`, and its `require` entry branches on `NODE_ENV`, which defeats named-export
-   detection. Bundling inlines it and the problem stops existing. Three prod outages came from
-   trying to import it "correctly" instead. Because the shipped function is `.js`, Vercel's builder
-   no longer compiles any TypeScript here, so this app uses the root's TypeScript with no local
-   pin. (It was pinned to 6.x while `api/handler.ts` was committed as source — the builder crashed
-   on TS 7 with `Cannot read properties of undefined (reading 'readFile')`.)
+2. **The API is esbuild-bundled, and that is mandatory** — but no longer because of `psn-api`.
+   Up to 2.18.0 that package was unimportable from ESM in either direction; **2.18.1 fixed it**
+   ([#244](https://github.com/achievements-app/psn-api/issues/244)) and a plain
+   `import { getUserTitles } from 'psn-api'` now works under Node. The bundle stays because of
+   Vercel: dropping it was tried and measured on 2026-08-16, and it fails twice over.
+   - Vercel's dependency tracing ships **no `node_modules`** into the function. The compiled
+     output keeps `import … from 'psn-api'` as a bare specifier, so the function dies at runtime
+     with `ERR_MODULE_NOT_FOUND` — a green build and dead routes, the worst failure shape here.
+     (Verified by copying `.vercel/output/functions/api/handler.func` out of the workspace and
+     importing it; a pnpm workspace with deps symlinked from the repo root is the likely cause.)
+   - Committing `api/handler.ts` as source makes the builder compile TypeScript again, and it
+     still crashes on **TS 7** with `Cannot read properties of undefined (reading 'readFile')`.
+     Pinning `typescript` to 6.0.3 clears that, but constraint one above remains fatal.
+
+   So: three prod outages came from trying to import `psn-api` "correctly", and one measured
+   experiment from trying to drop the bundle. 📌 Before retrying, run `vercel build` locally — it
+   costs no deploy quota — and load the built `.func` from outside the repo. If a `node_modules`
+   appears inside it, the first blocker is gone and this is worth revisiting. Because the shipped
+   function is `.js`, the builder compiles no TypeScript, so this app uses the root's TypeScript
+   with no local pin.
 3. **The handler must use Node's `(req, res)` signature.** Vercel's launcher
    (`launcherType: "Nodejs"`) invokes it that way; a web-standard handler returning a `Response`
    is silently dropped and the request hangs until timeout. `main.ts` mounts the same function

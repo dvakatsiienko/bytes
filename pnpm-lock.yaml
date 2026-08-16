@@ -377,8 +377,8 @@ importers:
         specifier: 1.38.2
         version: 1.38.2
       psn-api:
-        specifier: 2.18.0
-        version: 2.18.0
+        specifier: 2.18.1
+        version: 2.18.1
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -4545,9 +4545,6 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  isomorphic-unfetch@3.1.0:
-    resolution: {integrity: sha512-geDJjpoZ8N0kWexiwkX8F9NkTsXhetLPVbZFQ+JTW239QNOwvB0gniuR1Wc6f0AMTn7/mFGyXvHTifrCp/GH8Q==}
-
   isomorphic-ws@5.0.0:
     resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
     peerDependencies:
@@ -5606,8 +5603,8 @@ packages:
   property-information@7.2.0:
     resolution: {integrity: sha512-IAtzIB6sUiWaJYrX9smp3V46pBGbBeLFRGdh25kg1334VcBlD8HzhPeNIWQH9zhGmo2itIe25EHt9dQP7G5hmg==}
 
-  psn-api@2.18.0:
-    resolution: {integrity: sha512-SiSa7IWaEHjI4ub687xFd6wauzD65dvNdaUyoUMPJvjjvZKzhLqnXNZqVoC7Dn300RoZAWuMtoSYRMBNX9f5qg==}
+  psn-api@2.18.1:
+    resolution: {integrity: sha512-D0oVrJK+hVwJFARp2Io/auqJwjRx2t7x4Cke7mYNFbrOUQxSBONl0fHr4eVK5Bai89RNyaAsLPLFmgIw9pxzmQ==}
     engines: {node: '>=20', pnpm: '>=10'}
 
   pump@3.0.4:
@@ -6319,9 +6316,6 @@ packages:
   undici@7.29.0:
     resolution: {integrity: sha512-IDxfleLmmbSskfWSUATiN1nfn2rDuvnMOqb5CWR92iIfojA0Ud+ulOAAEQ57LPr9rWmsreUyf5lwyao+7GNNVw==}
     engines: {node: '>=20.18.1'}
-
-  unfetch@4.2.0:
-    resolution: {integrity: sha512-F9p7yYCn6cIW9El1zi0HI6vqpeIvBsr3dSuRO6Xuppb1u5rXpCPmMvLSyECLhybr9isec8Ohl0hPekMVrEinDA==}
 
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
@@ -10414,13 +10408,6 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  isomorphic-unfetch@3.1.0:
-    dependencies:
-      node-fetch: 2.7.0
-      unfetch: 4.2.0
-    transitivePeerDependencies:
-      - encoding
-
   isomorphic-ws@5.0.0(ws@8.21.1):
     dependencies:
       ws: 8.21.1
@@ -11546,11 +11533,7 @@ snapshots:
 
   property-information@7.2.0: {}
 
-  psn-api@2.18.0:
-    dependencies:
-      isomorphic-unfetch: 3.1.0
-    transitivePeerDependencies:
-      - encoding
+  psn-api@2.18.1: {}
 
   pump@3.0.4:
     dependencies:
@@ -12380,8 +12363,6 @@ snapshots:
   undici-types@8.3.0: {}
 
   undici@7.29.0: {}
-
-  unfetch@4.2.0: {}
 
   unicorn-magic@0.3.0: {}
 
