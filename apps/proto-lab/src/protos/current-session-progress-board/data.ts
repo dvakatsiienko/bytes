@@ -90,6 +90,7 @@ export const ticketsToday = [
   { id: 'DOT-55', state: 'touched' },
   { id: 'DOT-129', state: 'touched' },
   { id: 'DOT-117', state: 'touched' },
+  { id: 'BYT-52', note: 'to lab', state: 'touched' },
 ] as const satisfies readonly Ticket[];
 
 export const residencyLayers = [
