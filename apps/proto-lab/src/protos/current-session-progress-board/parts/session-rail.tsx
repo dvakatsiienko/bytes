@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 import { motion } from 'motion/react';
 
-import type { TaskState } from '@/protos/current/data';
+import type { TaskState } from '../data';
 
 export const SessionRail = (props: SessionRailProps) => {
   const doneCount = props.ticks.filter((tick) => {

@@ -1,6 +1,12 @@
-import { Proto, protoMeta } from '@/protos/current';
-
 export const Frame = () => {
+  if (!proto) {
+    return (
+      <p className='p-10 font-mono text-muted-foreground text-sm'>
+        no live proto — run pnpm proto-new &lt;topic&gt;
+      </p>
+    );
+  }
+
   return (
     <div className='min-h-screen'>
       <header className='border-b bg-card/60 backdrop-blur'>
@@ -19,22 +25,43 @@ export const Frame = () => {
               current
             </p>
             <p className='font-display font-medium text-lg leading-tight'>
-              {protoMeta.title}
+              {proto.protoMeta.title}
             </p>
-            <p className='text-muted-foreground text-sm'>{protoMeta.blurb}</p>
+            <p className='text-muted-foreground text-sm'>
+              {proto.protoMeta.blurb}
+            </p>
           </div>
         </div>
       </header>
 
       <main className='mx-auto max-w-5xl px-6 py-10'>
-        <Proto />
+        <proto.Proto />
       </main>
 
       <footer className='mx-auto max-w-5xl px-6 pb-10'>
         <p className='font-mono text-[0.65rem] text-muted-foreground'>
-          swap the proto in src/protos/current — `node --run reset` clears it
+          {protoDir} · pnpm proto-shift &lt;topic&gt; archives it, pnpm
+          proto-clear wipes all
         </p>
       </footer>
     </div>
   );
 };
+
+/* Helpers */
+// Resolved by glob, not by a fixed path: the live proto's directory carries its
+// topic (current-ledger-view), so renaming it on a shift must not touch imports.
+const protoModules = import.meta.glob<ProtoModule>(
+  '/src/protos/current-*/index.tsx',
+  {
+    eager: true,
+  },
+);
+const [protoPath, proto] = Object.entries(protoModules)[0] ?? [];
+const protoDir = protoPath?.split('/').at(-2);
+
+/* Types */
+interface ProtoModule {
+  Proto: () => React.ReactNode;
+  protoMeta: { blurb: string; title: string };
+}

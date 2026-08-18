@@ -1,13 +1,9 @@
 import { Separator } from '@/components/ui/separator';
 
-import {
-  type TaskState,
-  completionCurve,
-  session,
-} from '@/protos/current/data';
-import { CompletionCurve } from '@/protos/current/parts/completion-curve';
-import { SessionRail } from '@/protos/current/parts/session-rail';
-import { TaskGroup } from '@/protos/current/parts/task-group';
+import { CompletionCurve } from './parts/completion-curve';
+import { SessionRail } from './parts/session-rail';
+import { TaskGroup } from './parts/task-group';
+import { type TaskState, completionCurve, session } from './data';
 
 export const protoMeta = {
   blurb: 'what is done, what is moving, what is waiting',

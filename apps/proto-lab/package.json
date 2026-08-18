@@ -8,7 +8,10 @@
     "dev": "vite",
     "lint": "biome lint",
     "preview": "vite preview",
-    "reset": "node scripts/proto-reset.ts",
+    "proto-clear": "node scripts/proto.ts clear",
+    "proto-list": "node scripts/proto.ts list",
+    "proto-new": "node scripts/proto.ts new",
+    "proto-shift": "node scripts/proto.ts shift",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

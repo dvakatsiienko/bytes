@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-import type { Group } from '@/protos/current/data';
+import type { Group } from '../data';
 
 export const TaskGroup = (props: TaskGroupProps) => {
   const totalMinutes = props.group.tasks.reduce((sum, task) => {
