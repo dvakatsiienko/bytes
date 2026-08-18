@@ -6,7 +6,7 @@ import { TaskGroup } from './parts/task-group';
 import { type TaskState, completionCurve, session } from './data';
 
 export const protoMeta = {
-  blurb: 'what is done, what is moving, what is waiting',
+  question: 'how should a session show what is done, moving and queued?',
   title: 'session progress board',
 };
 

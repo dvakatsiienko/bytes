@@ -1,4 +1,10 @@
+import { useState } from 'react';
+
+import { VariantBar } from '@/frame/variant-bar';
+
 export const Frame = () => {
+  const [variantKey, setVariantKey] = useState(readVariantKey);
+
   if (!proto) {
     return (
       <p className='p-10 font-mono text-muted-foreground text-sm'>
@@ -6,6 +12,12 @@ export const Frame = () => {
       </p>
     );
   }
+
+  const variantKeyList = Object.keys(proto.variants ?? {});
+  const Live =
+    proto.variants?.[variantKey] ??
+    proto.variants?.[variantKeyList[0] ?? ''] ??
+    proto.Proto;
 
   return (
     <div className='min-h-screen'>
@@ -20,30 +32,38 @@ export const Frame = () => {
             </h1>
           </div>
 
-          <div className='text-right'>
+          <div className='max-w-md text-right'>
             <p className='font-mono text-[0.65rem] text-muted-foreground uppercase tracking-[0.2em]'>
-              current
+              answering
             </p>
             <p className='font-display font-medium text-lg leading-tight'>
-              {proto.protoMeta.title}
+              {proto.protoMeta.question}
             </p>
-            <p className='text-muted-foreground text-sm'>
-              {proto.protoMeta.blurb}
-            </p>
+            {proto.protoMeta.verdict ? (
+              <p className='mt-1 text-cobalt text-sm'>
+                settled: {proto.protoMeta.verdict}
+              </p>
+            ) : null}
           </div>
         </div>
       </header>
 
       <main className='mx-auto max-w-5xl px-6 py-10'>
-        <proto.Proto />
+        {Live ? <Live /> : null}
       </main>
 
-      <footer className='mx-auto max-w-5xl px-6 pb-10'>
+      <footer className='mx-auto max-w-5xl px-6 pb-24'>
         <p className='font-mono text-[0.65rem] text-muted-foreground'>
-          {protoDir} · pnpm proto-shift &lt;topic&gt; archives it, pnpm
-          proto-clear wipes all
+          {protoDir} · throwaway on purpose — no tests, no persistence, no
+          abstractions
         </p>
       </footer>
+
+      <VariantBar
+        active={variantKey}
+        keyList={variantKeyList}
+        onSelect={setVariantKey}
+      />
     </div>
   );
 };
@@ -60,8 +80,13 @@ const protoModules = import.meta.glob<ProtoModule>(
 const [protoPath, proto] = Object.entries(protoModules)[0] ?? [];
 const protoDir = protoPath?.split('/').at(-2);
 
+const readVariantKey = () => {
+  return new URLSearchParams(window.location.search).get('v') ?? '';
+};
+
 /* Types */
 interface ProtoModule {
-  Proto: () => React.ReactNode;
-  protoMeta: { blurb: string; title: string };
+  Proto?: () => React.ReactNode;
+  protoMeta: { question: string; title: string; verdict?: string };
+  variants?: Record<string, () => React.ReactNode>;
 }

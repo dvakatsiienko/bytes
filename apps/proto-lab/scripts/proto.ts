@@ -1,4 +1,11 @@
-import { mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import {
+  mkdir,
+  readFile,
+  readdir,
+  rename,
+  rm,
+  writeFile,
+} from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,6 +14,7 @@ const PROTOS_DIR = join(
   '../src/protos',
 );
 const ARCHIVE_PATTERN = /^(\d{3})-(.+)$/;
+const QUESTION_PATTERN = /question:\s*'([^']*)'/;
 
 const [command, ...topicWords] = process.argv.slice(2);
 
@@ -45,6 +53,19 @@ const toSlug = (words: string[]) => {
   return slug;
 };
 
+// A prototype exists to answer one question. proto-list reads it back out of
+// each folder, so an archive says what it settled without being opened.
+const readQuestion = async (name: string) => {
+  const source = await readFile(
+    join(PROTOS_DIR, name, 'index.tsx'),
+    'utf8',
+  ).catch(() => {
+    return '';
+  });
+
+  return QUESTION_PATTERN.exec(source)?.[1] ?? '';
+};
+
 const writeBlank = async (slug: string) => {
   const dir = join(PROTOS_DIR, `current-${slug}`);
   const title = slug.replaceAll('-', ' ');
@@ -53,7 +74,7 @@ const writeBlank = async (slug: string) => {
   await writeFile(
     join(dir, 'index.tsx'),
     `export const protoMeta = {
-  blurb: 'not built yet',
+  question: 'TODO — what does this proto settle?',
   title: '${title}',
 };
 
@@ -88,10 +109,16 @@ const say = (line: string) => {
 const { archives, current: liveProto } = await readProtos();
 
 if (command === 'list') {
-  for (const name of archives) {
-    say(`  ${name}`);
-  }
-  say(liveProto ? `→ ${liveProto}` : '→ nothing live');
+  const questions = await Promise.all(archives.map(readQuestion));
+
+  archives.forEach((name, index) => {
+    say(`  ${name} — ${questions[index]}`);
+  });
+  say(
+    liveProto
+      ? `→ ${liveProto} — ${await readQuestion(liveProto)}`
+      : '→ nothing live',
+  );
 } else if (command === 'new') {
   if (liveProto) {
     throw new Error(

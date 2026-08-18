@@ -13,8 +13,9 @@ The split is the whole point:
 - **`src/protos/`** — the swappable half: one live `current-<topic>` plus numbered archives.
 - **`src/components/ui/`** — shadcn primitives, owned not sacred (convert-on-touch to house style).
 
-The contract between the two halves is two exports from the live proto's `index.tsx`:
-`protoMeta` (title + blurb, rendered in the header) and `Proto` (the component). The frame
+The contract between the two halves is what the live proto's `index.tsx` exports:
+`protoMeta` (`question` required, `title`, optional `verdict`) plus either `Proto` or a
+`variants` record. The frame
 resolves it with `import.meta.glob('/src/protos/current-*/index.tsx')`, so the folder name
 can carry the topic and a rename never touches an import.
 
@@ -22,6 +23,14 @@ Two rules keep that true:
 
 - **Inside a proto, imports are relative** (`./data`, `../data`). An `@/protos/...` path
   breaks the moment the proto is shifted. Frame imports (`@/components/ui/...`) are fine.
+- **Every proto answers one question**, declared in `protoMeta.question` and rendered in
+  the header. `proto-list` greps it back out of each archive, so the folder stays readable
+  after the proto is cold. `verdict` records what it settled.
+- **A proto is throwaway.** No tests, no error handling, no abstractions, no persistence —
+  memory only. `@/frame/state-inspector` renders live state so a wrong state model is
+  visible instead of inferred.
+- **Two or more `variants`** put a switcher on screen and sync `?v=`. One take exports
+  `Proto`.
 - **Archive numbers only count up.** A shifted proto is never renamed again, so a-z order
   in an editor equals shift order, and one shift is one renamed directory in the diff.
 
