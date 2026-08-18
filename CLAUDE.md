@@ -98,11 +98,11 @@ its CLAUDE.md file. Common patterns:
 
 ### Issue tracker
 
-GitHub Issues in `dvakatsiienko/bytes` via the `gh` CLI, one app label per issue (`x-com-chat`, `cv`, …). See `docs/agents/issue-tracker.md`.
+Linear, workspace `x-com`, teams `BYT` / `DOT`, via the `linear` CLI. GitHub issues retired 2026-08 — closed history only, never operated (`docs/agents/issue-tracker.md` kept for that history).
 
 ### Triage labels
 
-GitHub: default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). Linear (`x-com`, teams `BYT`/`DOT`): workspace-level families — role, kind, special, model routing; project-meaning labels are banned. See `docs/agents/triage-labels.md`.
+Workspace-level families — role, kind, special, model routing. Project-meaning labels are banned. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 

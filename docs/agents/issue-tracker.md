@@ -1,6 +1,10 @@
-# Issue tracker: GitHub
+# Issue tracker: GitHub — RETIRED
 
-Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+> Retired 2026-08. Closed history only, never operated. The authoritative tracker is Linear
+> (workspace `x-com`, teams `BYT` / `DOT`) — see `docs/agents/triage-labels.md`. Everything
+> below describes how this repo used GitHub issues, kept so old issues stay readable.
+
+Issues and specs for this repo lived as GitHub issues, operated with the `gh` CLI.
 
 ## Monorepo scoping
 
