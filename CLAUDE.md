@@ -102,7 +102,7 @@ GitHub Issues in `dvakatsiienko/bytes` via the `gh` CLI, one app label per issue
 
 ### Triage labels
 
-Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+GitHub: default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). Linear (`x-com`, teams `BYT`/`DOT`): workspace-level families — role, kind, special, model routing; project-meaning labels are banned. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
