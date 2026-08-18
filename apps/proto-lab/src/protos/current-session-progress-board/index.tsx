@@ -1,12 +1,21 @@
 import { Separator } from '@/components/ui/separator';
 
-import { CompletionCurve } from './parts/completion-curve';
+import { ContextResidency } from './parts/context-residency';
+import { Flair } from './parts/flair';
+import { RoadmapList } from './parts/roadmap-list';
 import { SessionRail } from './parts/session-rail';
 import { TaskGroup } from './parts/task-group';
-import { type TaskState, completionCurve, session } from './data';
+import { TicketsToday } from './parts/tickets-today';
+import {
+  type TaskState,
+  residencyLayers,
+  roadmap,
+  session,
+  ticketsToday,
+} from './data';
 
 export const protoMeta = {
-  question: 'how should a session show what is done, moving and queued?',
+  question: 'session pulse — roadmap · tickets · context',
   title: 'session progress board',
 };
 
@@ -23,6 +32,16 @@ export const Proto = () => {
 
   return (
     <div className='grid gap-10'>
+      <Flair />
+
+      <RoadmapList items={roadmap} />
+
+      <Separator />
+
+      <TicketsToday tickets={ticketsToday} />
+
+      <Separator />
+
       <SessionRail
         label={session.label}
         startedAt={session.startedAt}
@@ -31,13 +50,13 @@ export const Proto = () => {
 
       <Separator />
 
-      <div className='grid gap-5 sm:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid gap-5 sm:grid-cols-2 lg:grid-cols-3'>
         {groupListJSX}
       </div>
 
       <Separator />
 
-      <CompletionCurve points={completionCurve} />
+      <ContextResidency layers={residencyLayers} />
     </div>
   );
 };
