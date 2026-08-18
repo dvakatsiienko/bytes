@@ -23,6 +23,7 @@ update the Stack column below — it drifts stale otherwise.
 | `space-explorer-ui`  | GraphQL client demo                     | Vite 8, Apollo Client, React      | Demo       |
 | `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
 | `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, Auth.js       | WIP        |
+| `proto-lab`          | Prototype platform, swappable proto slot | Vite 8, React 19, Tailwind v4, shadcn | Active Dev |
 | `figmentation`       | CSS/design experiments                  | Next.js 16, CSS Modules           | Showcase   |
 | `trophy-sys`         | PSN trophy tracker, retro terminal UI   | Vite 8, React 19, TanStack, Upstash | Active Dev |
 
