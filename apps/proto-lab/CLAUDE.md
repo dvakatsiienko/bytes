@@ -61,3 +61,47 @@ Three faces: Bricolage Grotesque (display), Inter (body), JetBrains Mono (data a
 - Dependencies stay installed across every lifecycle command on purpose. Pruning is manual.
 - Archived protos are committed, not ignored — they are the record of what was tried.
 - Not deployed. There is no `vercel.json` — add one if that ever changes.
+
+## Implementation flavours
+
+Default choices applied unless told otherwise in the moment.
+
+- **Motion** — use `motion` (motion.dev, `import { motion } from 'motion/react'`) for slight
+  animations here and there, for pretty sakeness. Entrances, rail ticks, card stagger. Small
+  and quick — under ~400ms, low travel, never a whole choreography. `theme.css` already honours
+  `prefers-reduced-motion`; keep it that way.
+- **shadcn first** — compose the new-york primitives in `src/components/ui` before writing raw
+  markup; add a missing one with the shadcn cli rather than hand-rolling it. Restyle through the
+  tokens above, not per-component overrides.
+- **Frame vs content** — a new shared primitive goes to the frame, anything answering this
+  proto's question stays in the proto. The frame never reaches into a proto.
+- **Recognition before change** — on any resume or respawn, run `pnpm proto-list` and read the
+  live proto first. Never wipe or shift what is there by default; `proto-shift` is only for a
+  genuinely new question, and editing the live proto's content is an edit, not a shift.
+- **Data** — mock data in the proto's own `data.ts`, typed with `satisfies`, no fetching.
+  Charts use `recharts`.
+
+## Use case — a board watched while dispatch works
+
+This app is not only a prototype surface. Its live proto doubles as a **status board Dima
+periodically glances at while dispatch grinds through its side of the work**. Dispatch streams
+updates here; Dima reads them. That drives three standing rules.
+
+**Board defaults — every live board carries these sections.**
+
+- **Roadmap checklist** at the top: compact, one item per line, checkbox per item. Three states,
+  not two — done (struck through), in-flight, queued.
+- **Tickets today**: processed / done / touched, live-updated as dispatch and `cc` stream in.
+  Columns carry counts. Ticket chips are **links**, and they must open the Linear desktop app:
+  `linear://x-com/issue/DOT-N`, never an https workspace url.
+- Both are live data — update them on every stream, in the same turn the update arrives.
+
+**A flair per update.** With each progress update, add a small piece of ui flavour for fun — a
+floating character in a corner, a bit of ornament. Rules:
+
+- **One at a time.** The new flair replaces the old one, it never joins it.
+- **Never touch the layout.** `fixed` + `pointer-events-none` + `aria-hidden`. It floats over
+  the board and changes nothing underneath.
+- **Decoration first**, free to react to the data when a moment obviously calls for it — a batch
+  closing, a run going green.
+- It lives in the proto, never the frame, so it stays throwaway.
