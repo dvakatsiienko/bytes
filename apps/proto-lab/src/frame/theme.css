@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+/*
+  Palette, named: bone (ground) · ink (text) · cobalt (done) ·
+  amber (in-flight) · mist (queued) · rule (hairlines).
+  Light only — this platform has one look on purpose.
+*/
+:root {
+  --bone: #f4f5f2;
+  --ink: #16181c;
+  --cobalt: #2743e0;
+  --amber: #e8a317;
+  --mist: #98a0b0;
+  --rule: #e3e4df;
+
+  --radius: 0.5rem;
+
+  --background: var(--bone);
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink);
+  --primary: var(--cobalt);
+  --primary-foreground: #ffffff;
+  --secondary: #eceef0;
+  --secondary-foreground: var(--ink);
+  --muted: #eceef0;
+  --muted-foreground: #6b7280;
+  --accent: #e8ebfd;
+  --accent-foreground: var(--cobalt);
+  --destructive: #c8372d;
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--cobalt);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-cobalt: var(--cobalt);
+  --color-amber: var(--amber);
+  --color-mist: var(--mist);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Inter Variable", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  ::selection {
+    background: var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
