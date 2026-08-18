@@ -95,13 +95,3 @@ updates here; Dima reads them. That drives three standing rules.
   Columns carry counts. Ticket chips are **links**, and they must open the Linear desktop app:
   `linear://x-com/issue/DOT-N`, never an https workspace url.
 - Both are live data — update them on every stream, in the same turn the update arrives.
-
-**A flair per update.** With each progress update, add a small piece of ui flavour for fun — a
-floating character in a corner, a bit of ornament. Rules:
-
-- **One at a time.** The new flair replaces the old one, it never joins it.
-- **Never touch the layout.** `fixed` + `pointer-events-none` + `aria-hidden`. It floats over
-  the board and changes nothing underneath.
-- **Decoration first**, free to react to the data when a moment obviously calls for it — a batch
-  closing, a run going green.
-- It lives in the proto, never the frame, so it stays throwaway.

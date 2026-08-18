@@ -1,7 +1,6 @@
 import { Separator } from '@/components/ui/separator';
 
 import { ContextResidency } from './parts/context-residency';
-import { Flair } from './parts/flair';
 import { RoadmapList } from './parts/roadmap-list';
 import { SessionRail } from './parts/session-rail';
 import { TaskGroup } from './parts/task-group';
@@ -32,8 +31,6 @@ export const Proto = () => {
 
   return (
     <div className='grid gap-10'>
-      <Flair />
-
       <RoadmapList items={roadmap} />
 
       <Separator />
