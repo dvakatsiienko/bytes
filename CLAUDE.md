@@ -53,9 +53,25 @@ See root `package.json` "scripts" and each app's `package.json` for the exact co
 - **Client State**: Jotai atoms for UI state
 - **Server State**: React Query for caching — used by `financial` and `trophy-sys`; prefer it over
   hand-rolled `useEffect` fetching in any new app
-- **URL State**: TanStack Router search params in `trophy-sys`, React Router elsewhere
+- **URL State**: TanStack Router in `trophy-sys`, React Router elsewhere — routing state goes in
+  the path (see below), never in search params
 - **Real-time**: Convex subscriptions
 - **GraphQL**: Apollo Client cache
+
+### URL Shape — routing state belongs in the path
+
+**If a thing is a resource or a place, it gets a path segment. Search params are only for genuine
+view state nobody would link to.**
+
+- ✅ `/library/NPWR21924_00`
+- 🚫 `/library?game=NPWR21924_00`
+
+A tab is navigation. A selected game is a resource. Both are paths. Sorting, a filter toggle, an
+open panel — those are view state and belong in search params.
+
+Why it is written down: `trophy-sys` was first built with search-param routing and rebuilt on paths
+after review. That cost the router, every component reading the params, and the rewrite rule that
+makes deep links load. The rule is cheap; the correction is not.
 
 ### Database Patterns
 
