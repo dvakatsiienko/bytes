@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "proto-lab",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev:proto-lab"],
+      "port": 5179
+    }
+  ]
+}

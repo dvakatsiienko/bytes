@@ -11,6 +11,7 @@
     "dev:figmentation": "turbo figmentation#dev",
     "dev:financial": "turbo financial#dev",
     "dev:garment": "turbo garment#dev garment-api#dev",
+    "dev:proto-lab": "turbo proto-lab#dev",
     "dev:trophy-sys": "turbo trophy-sys#dev",
     "dev:x-com-chat": "turbo x-com-chat#dev x-com-chat#dev:convex",
     "build": "turbo build",

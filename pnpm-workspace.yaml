@@ -25,3 +25,4 @@ minimumReleaseAgeExclude:
   - '@tanstack/react-router@1.170.29'
   - '@tanstack/router-core@1.171.24'
   - psn-api@2.18.1
+  - lucide-react@1.32.0
