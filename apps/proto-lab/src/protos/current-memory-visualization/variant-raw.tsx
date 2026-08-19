@@ -14,7 +14,7 @@ export const VariantRaw = () => {
   const [focus, setFocus] = useState<string | null>(null);
 
   return (
-    <ThemeScope>
+    <ThemeScope initialMode='light'>
       <div className='grid gap-8'>
         <StatStrip />
         <Spectrum />

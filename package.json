@@ -33,16 +33,16 @@
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.8",
+    "@biomejs/biome": "2.5.9",
     "biome-config-polished": "workspace:*",
     "lefthook": "2.1.10",
     "prettier": "3.9.6",
     "prettier-config-polished": "workspace:*",
     "prettier-plugin-tailwindcss": "0.8.1",
     "rimraf": "6.1.3",
-    "turbo": "2.10.10",
+    "turbo": "2.10.11",
     "typescript": "7.0.2",
-    "ultracite": "7.10.4"
+    "ultracite": "7.10.5"
   },
   "packageManager": "pnpm@11.5.2",
   "engines": {

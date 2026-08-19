@@ -3,9 +3,9 @@
   "configurations": [
     {
       "name": "proto-lab",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "proto-lab", "dev"],
-      "port": 5179
+      "port": 5179,
+      "url": "http://localhost:5179",
+      "autoPort": false
     }
   ]
 }
