@@ -1,0 +1,53 @@
+/*
+  Proto-scoped theme — memory-visualization.
+  Overrides the frame's shadcn tokens inside [data-proto-theme] only, so the
+  frame chrome keeps its own look and the proto carries its own. Dark is the
+  primary face; light is the derived one. Toggled via data-mode.
+
+  Palette, named: void (ground) · glow (text) · pulse (accent, links) ·
+  ember (feedback) · lichen (project) · tide (reference) · seam (hairlines).
+*/
+
+[data-proto-theme="memory-viz"] {
+  --void: #f6f4ee;
+  --glow: #1c1a24;
+  --pulse: #7048e8;
+  --ember: #d6584a;
+  --lichen: #3f9142;
+  --tide: #2f7fbf;
+  --seam: #e2ddd1;
+  --panel: #fdfcf9;
+  --dim: #8a8577;
+
+  --background: var(--void);
+  --foreground: var(--glow);
+  --card: var(--panel);
+  --card-foreground: var(--glow);
+  --primary: var(--pulse);
+  --primary-foreground: #ffffff;
+  --muted: #edeae0;
+  --muted-foreground: var(--dim);
+  --accent: #ece6fb;
+  --accent-foreground: var(--pulse);
+  --border: var(--seam);
+  --ring: var(--pulse);
+  color: var(--glow);
+
+  background: var(--void);
+}
+
+[data-proto-theme="memory-viz"][data-mode="dark"] {
+  --void: #0e0c14;
+  --glow: #e8e5f2;
+  --pulse: #9d7bff;
+  --ember: #ff7a68;
+  --lichen: #6fd873;
+  --tide: #5db3f0;
+  --seam: #26222f;
+  --panel: #16131f;
+  --dim: #6f6a80;
+
+  --muted: #1d1927;
+  --accent: #241d3a;
+  --accent-foreground: var(--pulse);
+}

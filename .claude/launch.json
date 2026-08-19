@@ -4,7 +4,7 @@
     {
       "name": "proto-lab",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev:proto-lab"],
+      "runtimeArgs": ["--filter", "proto-lab", "dev"],
       "port": 5179
     }
   ]
