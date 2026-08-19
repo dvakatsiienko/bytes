@@ -46,8 +46,9 @@ A prototype exists to answer one **question**. It is required, shown in the head
 `pnpm proto-list` reads it back out of every archive — so an old proto says what it was
 for without being opened. Write the `verdict` in when you know it.
 
-Exporting `variants` (two or more) puts a switcher at the bottom of the screen and syncs
-the choice to `?v=`. Export `Proto` instead when there is only one take.
+Exporting `variants` (two or more) puts a switcher at the bottom of the screen and routes
+the choice as a path (`/no-skill`, `/with-skill` — tanstack router). Export `Proto` instead
+when there is only one take.
 
 The frame finds it by glob, not by a fixed path — so renaming the folder never touches
 an import. Inside a proto, **import relatively** (`./data`, `../data`). An `@/protos/...`
@@ -64,6 +65,14 @@ pnpm proto-list                # show what is there, in order
 
 Shifted protos are kept so you can go back and look. Nothing else is touched — frame,
 tokens and installed packages survive all four commands. Prune dependencies by hand.
+## Ticket strip — standing feature
+
+Every proto page carries a ticket strip at the top: **in progress / done / touched**.
+It renders `src/frame/tickets.ts`; chips open the Linear app (`linear://x-com/issue/<id>`).
+
+Always keep and maintain it: whenever a ticket update arrives (from Dima or dispatch),
+edit `tickets.ts` in the same turn — the strip must never lag behind reality.
+
 ## House rules for a proto
 
 Throwaway from the first line. No tests, no error handling beyond what makes it run, no
