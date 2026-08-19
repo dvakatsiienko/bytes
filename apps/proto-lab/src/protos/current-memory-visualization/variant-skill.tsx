@@ -18,6 +18,9 @@ export const VariantSkill = () => {
   const [pinned, setPinned] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const focus = hovered ?? pinned;
+  const focusType = memoryList.find((memory) => {
+    return memory.name === focus;
+  })?.type;
 
   const isLinked = (name: string) => {
     if (!focus || name === focus) return false;
@@ -44,6 +47,7 @@ export const VariantSkill = () => {
               return (
                 <Bay
                   focus={focus}
+                  focusType={focusType}
                   isLinked={isLinked}
                   key={type}
                   list={bayList}
@@ -139,7 +143,7 @@ const Bay = (props: BayProps) => {
                 props.onHover(null);
               }}
               style={{
-                opacity: faded ? 0.45 : 1,
+                opacity: faded ? 0.3 : 1,
                 transform: isFocus ? 'translateX(10px)' : undefined,
               }}
               type='button'>
@@ -151,15 +155,23 @@ const Bay = (props: BayProps) => {
                 className='flex min-w-0 flex-1 items-center gap-3 border border-l-0 bg-card px-3 py-1.5'
                 style={{
                   borderColor: isFocus ? 'var(--marking)' : undefined,
-                  boxShadow: linked
-                    ? `inset 0 0 0 1px ${holderVar[memory.type]}`
-                    : undefined,
+                  boxShadow:
+                    linked && props.focusType
+                      ? `inset 0 0 0 2px ${holderVar[props.focusType]}`
+                      : undefined,
                 }}>
                 <span
                   className='truncate font-semibold text-sm uppercase tracking-wide'
                   style={{ fontStretch: '80%' }}>
                   {memory.name.replaceAll('-', ' ')}
                 </span>
+                {linked && props.focusType ? (
+                  <span
+                    className='shrink-0 font-mono text-[0.6rem] uppercase'
+                    style={{ color: holderVar[props.focusType] }}>
+                    ↔ linked
+                  </span>
+                ) : null}
                 {hasDangling ? (
                   <span
                     className='shrink-0 font-mono text-[0.6rem] uppercase'
@@ -264,6 +276,7 @@ const DetailPanel = (props: { focusName: string | null }) => {
 /* Types */
 interface BayProps {
   focus: string | null;
+  focusType: Memory['type'] | undefined;
   isLinked: (name: string) => boolean;
   list: Memory[];
   onHover: (name: string | null) => void;
