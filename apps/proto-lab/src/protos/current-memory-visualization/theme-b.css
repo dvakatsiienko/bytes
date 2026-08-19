@@ -1,0 +1,55 @@
+/*
+  Variant B theme — "strip rack". Control-tower daylight by default,
+  night ops on data-mode=dark. Scoped like theme.css, own token set.
+
+  Palette, named: console (ground) · strip (paper) · marking (text) ·
+  holder-* (type tabs, real ATC strip-holder colors) · alarm (dangling).
+*/
+
+@import "@fontsource-variable/archivo";
+
+[data-proto-theme="memory-viz-b"] {
+  --console: #b8bfc4;
+  --strip: #f2efe6;
+  --marking: #23282c;
+  --holder-feedback: #e5a33d;
+  --holder-project: #5aa25c;
+  --holder-reference: #5b8fc7;
+  --holder-user: #9a7bc9;
+  --alarm: #cc4433;
+  --etch: #9aa1a7;
+  --panel: #dfe2e2;
+
+  --background: var(--console);
+  --foreground: var(--marking);
+  --card: var(--strip);
+  --card-foreground: var(--marking);
+  --primary: var(--marking);
+  --primary-foreground: var(--strip);
+  --muted: var(--panel);
+  --muted-foreground: #5a6167;
+  --accent: var(--panel);
+  --accent-foreground: var(--marking);
+  --border: var(--etch);
+  --ring: var(--marking);
+
+  --font-strip: "Archivo Variable", "Inter Variable", sans-serif;
+  color: var(--marking);
+
+  background: var(--console);
+}
+
+[data-proto-theme="memory-viz-b"][data-mode="dark"] {
+  --console: #14181b;
+  --strip: #20262a;
+  --marking: #e6e2d4;
+  --holder-feedback: #ffb84d;
+  --holder-project: #72c274;
+  --holder-reference: #74a8e0;
+  --holder-user: #b294e0;
+  --alarm: #ff6a52;
+  --etch: #39424a;
+  --panel: #1a2023;
+
+  --muted-foreground: #8b948c;
+}
