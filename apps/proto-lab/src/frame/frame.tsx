@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import {
+  Outlet,
+  RouterProvider,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  useNavigate,
+  useParams,
+} from '@tanstack/react-router';
 
 import { VariantBar } from '@/frame/variant-bar';
 
-export const Frame = () => {
-  const [variantKey, setVariantKey] = useState(readVariantKey);
-
+const Shell = () => {
   if (!proto) {
     return (
       <p className='p-10 font-mono text-muted-foreground text-sm'>
@@ -12,12 +18,6 @@ export const Frame = () => {
       </p>
     );
   }
-
-  const variantKeyList = Object.keys(proto.variants ?? {});
-  const Live =
-    proto.variants?.[variantKey] ??
-    proto.variants?.[variantKeyList[0] ?? ''] ??
-    proto.Proto;
 
   return (
     <div className='min-h-screen'>
@@ -49,7 +49,7 @@ export const Frame = () => {
       </header>
 
       <main className='mx-auto max-w-5xl px-6 py-10'>
-        {Live ? <Live /> : null}
+        <Outlet />
       </main>
 
       <footer className='mx-auto max-w-5xl px-6 pb-24'>
@@ -58,14 +58,54 @@ export const Frame = () => {
           abstractions
         </p>
       </footer>
+    </div>
+  );
+};
 
+const VariantView = () => {
+  const params = useParams({ strict: false });
+  const navigate = useNavigate();
+
+  const variantKeyList = Object.keys(proto?.variants ?? {});
+  const variantKey = params.variantKey ?? '';
+  const Live =
+    proto?.variants?.[variantKey] ??
+    proto?.variants?.[variantKeyList[0] ?? ''] ??
+    proto?.Proto;
+
+  return (
+    <>
+      {Live ? <Live /> : null}
       <VariantBar
         active={variantKey}
         keyList={variantKeyList}
-        onSelect={setVariantKey}
+        onSelect={(key) => {
+          navigate({ params: { variantKey: key }, to: '/$variantKey' });
+        }}
       />
-    </div>
+    </>
   );
+};
+
+/* Router — a variant is a place, so it lives in the path. */
+const rootRoute = createRootRoute({ component: Shell });
+const indexRoute = createRoute({
+  component: VariantView,
+  getParentRoute: () => rootRoute,
+  path: '/',
+});
+const variantRoute = createRoute({
+  component: VariantView,
+  getParentRoute: () => rootRoute,
+  path: '/$variantKey',
+});
+
+const router = createRouter({
+  routeTree: rootRoute.addChildren([indexRoute, variantRoute]),
+});
+
+export const Frame = () => {
+  return <RouterProvider router={router} />;
 };
 
 /* Helpers */
@@ -80,13 +120,15 @@ const protoModules = import.meta.glob<ProtoModule>(
 const [protoPath, proto] = Object.entries(protoModules)[0] ?? [];
 const protoDir = protoPath?.split('/').at(-2);
 
-const readVariantKey = () => {
-  return new URLSearchParams(window.location.search).get('v') ?? '';
-};
-
 /* Types */
 interface ProtoModule {
   Proto?: () => React.ReactNode;
   protoMeta: { question: string; title: string; verdict?: string };
   variants?: Record<string, () => React.ReactNode>;
+}
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
 }
