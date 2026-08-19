@@ -88,8 +88,9 @@ periodically glances at while dispatch grinds through its side of the work**. Di
 updates here; Dima reads them. That drives three standing rules.
 
 **Ticket strip — a standing frame feature on every proto page.** `src/frame/ticket-strip.tsx`
-renders `src/frame/tickets.ts` at the top of the page: in progress / done / touched. Dispatch
-feeds ticket updates; edit `tickets.ts` in the same turn an update arrives. Chips are
+renders `src/frame/tickets.ts` at the top of the page: in progress / done / touched. Always
+keep and maintain this section: whenever a ticket update arrives (from Dima or dispatch),
+edit `tickets.ts` in the same turn — the strip must never lag behind reality. Chips are
 `linear://x-com/issue/<id>` links.
 
 **Board defaults — every live board carries these sections.**

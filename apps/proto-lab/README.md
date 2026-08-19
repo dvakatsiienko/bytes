@@ -65,14 +65,6 @@ pnpm proto-list                # show what is there, in order
 
 Shifted protos are kept so you can go back and look. Nothing else is touched — frame,
 tokens and installed packages survive all four commands. Prune dependencies by hand.
-## Ticket strip — standing feature
-
-Every proto page carries a ticket strip at the top: **in progress / done / touched**.
-It renders `src/frame/tickets.ts`; chips open the Linear app (`linear://x-com/issue/<id>`).
-
-Always keep and maintain it: whenever a ticket update arrives (from Dima or dispatch),
-edit `tickets.ts` in the same turn — the strip must never lag behind reality.
-
 ## House rules for a proto
 
 Throwaway from the first line. No tests, no error handling beyond what makes it run, no
