@@ -87,6 +87,11 @@ This app is not only a prototype surface. Its live proto doubles as a **status b
 periodically glances at while dispatch grinds through its side of the work**. Dispatch streams
 updates here; Dima reads them. That drives three standing rules.
 
+**Ticket strip — a standing frame feature on every proto page.** `src/frame/ticket-strip.tsx`
+renders `src/frame/tickets.ts` at the top of the page: in progress / done / touched. Dispatch
+feeds ticket updates; edit `tickets.ts` in the same turn an update arrives. Chips are
+`linear://x-com/issue/<id>` links.
+
 **Board defaults — every live board carries these sections.**
 
 - **Roadmap checklist** at the top: compact, one item per line, checkbox per item. Three states,

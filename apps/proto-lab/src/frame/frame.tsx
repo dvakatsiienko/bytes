@@ -8,6 +8,7 @@ import {
   useParams,
 } from '@tanstack/react-router';
 
+import { TicketStrip } from '@/frame/ticket-strip';
 import { VariantBar } from '@/frame/variant-bar';
 
 const Shell = () => {
@@ -47,6 +48,8 @@ const Shell = () => {
           </div>
         </div>
       </header>
+
+      <TicketStrip />
 
       <main className='mx-auto max-w-5xl px-6 py-10'>
         <Outlet />
