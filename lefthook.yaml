@@ -13,3 +13,22 @@ pre-commit:
         - '*.jsonc'
         - '*.css'
       stage_fixed: true
+
+pre-push:
+  jobs:
+    # Copied from dotfiles, deliberately. Linear's github integration answers a
+    # pushed magic word with TWO writes: the state move the keyword asked for,
+    # and an assignee nobody asked for. There is no setting for it, so this
+    # undoes it afterwards, detached.
+    #
+    # The script lives in dotfiles and is shared, not forked — one copy, many
+    # callers. A global git dispatcher would remove these per-repo copies, but
+    # `core.hooksPath` REPLACES hook lookup rather than adding to it, so a wrong
+    # dispatcher silently kills the pre-commit gate above. That build is DOT-210.
+    #
+    # {1} and {2} are git's own pre-push argv — remote name and remote url — and
+    # the url is the guard that keeps this off repos we do not own. It must never
+    # fail a push: the script swallows everything and exits 0.
+    - name: linear-revert
+      use_stdin: true
+      run: node /Users/dima/projects/dotfiles/script/linear-push-revert.ts hook {1} {2}
