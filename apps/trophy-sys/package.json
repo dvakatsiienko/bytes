@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "5.101.4",
-    "@tanstack/react-router": "1.170.30",
+    "@tanstack/react-router": "1.170.31",
     "@upstash/redis": "1.38.2",
     "psn-api": "2.18.1",
     "react": "19.2.8",
@@ -29,9 +29,10 @@
     "@types/node": "26.2.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
-    "@vitejs/plugin-react": "6.0.5",
+    "@vitejs/plugin-react": "6.1.0",
     "esbuild": "0.28.2",
+    "oxc-transform-react": "0.145.0",
     "tailwindcss": "4.3.3",
-    "vite": "8.2.1"
+    "vite": "8.2.2"
   }
 }
