@@ -4,6 +4,10 @@ import { defineConfig } from 'vite';
 import vitePluginProgress from 'vite-plugin-progress';
 
 export default defineConfig({
-  plugins: [vitePluginReact(), vitePluginProgress(), vitePluginTailwindcss()],
+  plugins: [
+    vitePluginReact({ compiler: true }),
+    vitePluginProgress(),
+    vitePluginTailwindcss(),
+  ],
   resolve: { tsconfigPaths: true },
 });
