@@ -99,7 +99,9 @@ its own memory file. Common patterns:
 
 ### Issue tracker
 
-Linear, workspace `x-com`, teams `BYT` / `DOT`, via the `linear` CLI. GitHub issues retired 2026-08 — closed history only, never operated (`docs/agents/issue-tracker.md` kept for that history).
+Linear per the always-loaded `rules/linear-flow.md` — this repo's work lives on team `BYT`.
+GitHub issues retired 2026-08 — closed history only, never operated (`docs/agents/issue-tracker.md`
+kept for that history).
 
 ### Triage labels
 
