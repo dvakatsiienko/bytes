@@ -31,4 +31,4 @@ pre-push:
     # fail a push: the script swallows everything and exits 0.
     - name: linear-revert
       use_stdin: true
-      run: node /Users/dima/projects/dotfiles/script/linear-push-revert.ts hook {1} {2}
+      run: node /Users/dima/dotfiles/script/linear-push-revert.ts hook {1} {2}
