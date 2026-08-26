@@ -1,8 +1,4 @@
-# AGENTS.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## trophy-sys — PSN Trophy Tracker
+# AGENTS.md — trophy-sys, PSN trophy tracker
 
 A retro-terminal trophy dashboard over the PlayStation Network API. Two runtimes from one codebase:
 

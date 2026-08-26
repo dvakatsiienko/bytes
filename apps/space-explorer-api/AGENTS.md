@@ -1,102 +1,22 @@
-# AGENTS.md
+# AGENTS.md — space-explorer-api
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+graphql server demo — apollo server over the spacex public api plus sqlite trip bookings.
+paired with `space-explorer-ui`, which needs this server on `:4000` for its codegen.
 
-## Project Overview
+## shape
 
-GraphQL API server for Space Explorer, a demo application showcasing Apollo Server integration with external APIs and database persistence.
+- **schema-first**: `src/graphql/schema.graphql` is the source of truth — after editing it, run
+  `pnpm codegen:graphql` to regenerate the types
+- resolvers in `src/resolvers/`, one file per type, exported from `index.ts`. resolvers stay
+  thin — data fetching belongs in `src/datasources/` (spacex rest source + prisma-backed
+  `UserAPI`), never in a resolver
+- sqlite via prisma; client generated to `src/lib/prisma-client`, db file `prisma/db.sqlite`
+- auth is deliberately demo-grade: base64 email in the authorization header, zod-validated,
+  injected into context; `UserAPI` checks it before any write
 
-## Development Commands
+## gotchas
 
-```bash
-# Development
-pnpm dev                 # Start server with hot reload (tsx watch on port 4000)
+- esm with `.ts` extension imports; `@/` → `src/`
+- port comes from `PORT`, default 4000 — the ui's `graphql-codegen.yml` points at it
 
-# Code Quality
-pnpm lint                # Run Biome linter
-pnpm typecheck           # TypeScript type checking
-
-# Code Generation
-pnpm codegen:graphql     # Generate TypeScript types from GraphQL schema
-pnpm prisma:generate     # Generate Prisma client (runs automatically on postinstall)
-```
-
-## Architecture
-
-### GraphQL Layer
-
-- **Schema-first approach**: Schema defined in `src/graphql/schema.graphql`
-- **Resolver structure**: Modular resolvers by type in `src/resolvers/`
-  - Each GraphQL type has its own resolver file (Query, Mutation, Launch, Mission, etc.)
-  - Resolvers access data sources via context
-
-### Data Sources Pattern
-
-Two RESTDataSource implementations handle external data:
-
-1. **SpaceXAPI** (`src/datasources/SpaceXAPI/`): 
-   - Fetches launch data from SpaceX public API
-   - Uses LaunchModel for data transformation
-   - Handles rocket and launchpad data aggregation
-
-2. **UserAPI** (`src/datasources/UserAPI.ts`):
-   - Manages user authentication and trip bookings
-   - Direct Prisma client access for database operations
-   - Validates authentication state via context
-
-### Database Configuration
-
-- **SQLite** with Prisma ORM
-- Custom Prisma client output: `src/lib/prisma-client`
-- Schema: Users and Trips with UUID primary keys
-- Database file: `prisma/db.sqlite`
-
-### Authentication Flow
-
-1. Client sends Base64-encoded email in Authorization header
-2. Server decodes and validates email format using Zod
-3. Verifies user exists in database
-4. Injects authenticated email into context for resolvers
-5. UserAPI methods validate auth state before operations
-
-## Key Implementation Details
-
-### Context Structure
-```typescript
-{
-  dataSources: {
-    spaceXAPI: SpaceXAPI instance,
-    userAPI: UserAPI instance (initialized with userEmail)
-  },
-  userEmail: string | null
-}
-```
-
-### Pagination Implementation
-- Cursor-based pagination for launches query
-- Returns `LaunchesPayload` with cursor, hasMore flag, and list
-- Implemented in `src/utils/paginate.ts`
-
-### Path Configuration
-- TypeScript path alias: `@/` → `src/`
-- ESM modules with `.ts` extension imports
-- Custom dirname utility for ESM compatibility
-
-### Environment Variables
-- `DATABASE_URL`: SQLite connection string (default: `file:./db.sqlite`)
-- `PORT`: Server port (default: 4000)
-
-## Working with This Codebase
-
-When modifying resolvers, maintain the separation of concerns pattern - each resolver should only handle its specific type's field resolution. Data fetching logic belongs in data sources, not resolvers.
-
-When adding new GraphQL types:
-1. Define schema in `src/graphql/schema.graphql`
-2. Run `pnpm codegen:graphql` to generate TypeScript types
-3. Create resolver file in `src/resolvers/`
-4. Export from `src/resolvers/index.ts`
-
-For database schema changes:
-1. Modify `prisma/schema.prisma`
-2. Run `pnpm prisma:generate` to update client
-3. Create migration if needed for production
+scripts live in `package.json` — read them there.

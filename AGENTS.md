@@ -5,9 +5,8 @@ Code when working across this Turborepo-powered monorepo.
 
 ## Repository Architecture
 
-A pnpm workspace monorepo orchestrated by Turborepo, containing multiple web
-applications and shared infrastructure packages. The architecture emphasizes
-code reuse, consistent tooling, and efficient task orchestration.
+A pnpm workspace monorepo orchestrated by Turborepo — multiple web applications plus shared
+infrastructure packages.
 
 ## App Registry
 
@@ -77,6 +76,8 @@ makes deep links load. The rule is cheap; the correction is not.
 ### Database Patterns
 
 - **Seeding**: `tsx prisma/seed/init`
+- **Test data is copied real data.** Seed a sandbox by copying real rows into it — never symlink
+  a live store, never point a seed, fixture, or test at live state.
 
 ### Deployment Settings
 

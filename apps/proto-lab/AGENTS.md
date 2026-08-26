@@ -1,8 +1,4 @@
-# AGENTS.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## proto-lab — prototype platform
+# AGENTS.md — proto-lab, prototype platform
 
 A permanent Vite app that replaces throwaway HTML prototypes. Everything is preinstalled so a
 new prototype starts at zero setup cost.
