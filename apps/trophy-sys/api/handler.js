@@ -425,7 +425,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import nodeCrypto from "node:crypto";
 var subtle = nodeCrypto.webcrypto?.subtle || {};
 
-// ../../node_modules/.pnpm/@upstash+redis@1.38.2/node_modules/@upstash/redis/chunk-K7RP6Y36.mjs
+// ../../node_modules/.pnpm/@upstash+redis@1.38.3/node_modules/@upstash/redis/chunk-YQDELQHC.mjs
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -588,6 +588,9 @@ var HttpClient = class {
     let res = null;
     let error = null;
     for (let i = 0; i <= this.retry.attempts; i++) {
+      if (i > 0 && requestHeaders["Upstash-Telemetry-Sdk"]) {
+        requestHeaders["Upstash-Telemetry-Retry"] = String(i);
+      }
       try {
         res = await fetch(requestUrl, requestOptions);
         break;
@@ -741,10 +744,9 @@ function merge(obj, key, value) {
     obj[key] = value;
     return obj;
   }
-  const values = obj[key].split(",");
-  if (!values.includes(value)) {
-    values.push(value);
-    obj[key] = values.join(",");
+  const values = obj[key].split(",").map((v) => v.trim());
+  if (!values.includes(value.trim())) {
+    obj[key] = [obj[key], value].join(",");
   }
   return obj;
 }
@@ -5429,9 +5431,9 @@ var Redis = class {
    */
   zunionstore = (...args) => new ZUnionStoreCommand(args, this.opts).exec(this.client);
 };
-var VERSION = "v1.38.2";
+var VERSION = "v1.38.3";
 
-// ../../node_modules/.pnpm/@upstash+redis@1.38.2/node_modules/@upstash/redis/nodejs.mjs
+// ../../node_modules/.pnpm/@upstash+redis@1.38.3/node_modules/@upstash/redis/nodejs.mjs
 var BUILD = /* @__PURE__ */ Symbol("build");
 var TextFieldBuilder = class _TextFieldBuilder {
   _noTokenize;
