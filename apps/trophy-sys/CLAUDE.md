@@ -82,10 +82,11 @@ deployments when there are no changes to the root directory" keeps pushes to oth
 redeploying this one. Vite plays no part in the API: the `api/` directory is a Vercel convention,
 scanned at the deployment root of any project regardless of framework.
 
-1. **The function path must exist in git.** `api/handler.js` is a committed 501 stub that
-   `pnpm build:api` overwrites — Vercel decides which functions exist at clone time, so a purely
-   generated file arrives too late. 📌 A local `pnpm build` leaves the fat bundle in your working
-   tree; restore the stub with `git checkout -- api/handler.js` before committing.
+1. **The function path must exist in git.** Vercel decides which functions exist by scanning the
+   source tree at clone time, so `api/handler.js` is committed — today as the built bundle, which
+   `pnpm build:api` regenerates. A file that only appears during the build arrives too late: the
+   deploy goes green and every `/api` route 404s. 📌 A local `pnpm build` rewrites it, so check the
+   diff is real server work before committing it.
 2. **The API is esbuild-bundled, and that is mandatory.** Vercel's dependency tracing ships no
    `node_modules` into the function, so any bare specifier surviving the build dies at runtime.
 3. **The handler must use Node's `(req, res)` signature.** A web-standard handler returning a

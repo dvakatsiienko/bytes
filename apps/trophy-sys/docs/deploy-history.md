@@ -8,9 +8,13 @@ constraint has expired.
 
 Vercel decides which functions exist by scanning the source tree at clone time, before any build
 runs. A purely generated `api/handler.js` therefore arrives far too late: the deploy goes green
-while every `/api` route answers Vercel's HTML 404 page. The committed 430-byte stub returning 501
-is what makes the path exist; `pnpm build:api` overwrites it with the real esbuild bundle during
-the build.
+while every `/api` route answers Vercel's HTML 404 page.
+
+📌 `CLAUDE.md` described the committed file as a 430-byte stub returning 501 until 2026-09-02. It
+is not one: `api/handler.js` entered the repo in `e4d288ef` as the full esbuild bundle, 178571
+bytes, and `main` has carried that ever since. Either shape satisfies the constraint — the path
+just has to be in git — but the tree holds the bundle, so a local `pnpm build` produces a real
+diff rather than something to throw away.
 
 ## Constraint 2 — the bundle, and why it is no longer about `psn-api`
 
