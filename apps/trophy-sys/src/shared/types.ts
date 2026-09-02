@@ -87,3 +87,29 @@ export interface NewsFeed {
   isBaseline: boolean;
   trophies: GameTrophy[];
 }
+
+/** One earned trophy, stripped to the fields the /stats charts read. */
+export interface ArchivedTrophy {
+  /** ISO instant the trophy popped. */
+  at: string;
+  gameId: string;
+  grade: TrophyGrade;
+  /** Global PSN earn rate, as a percent. */
+  rarity: number;
+}
+
+/**
+ * The trophy fan-out's output. Trophy-level data costs two PSN round-trips per
+ * title, so the ~108-title scan runs on demand and everything downstream reads
+ * this instead.
+ */
+export interface TrophyArchive {
+  /** Titles the scan could not read. A partial archive still draws.  */
+  failed: string[];
+  /** Titles successfully read. */
+  games: number;
+  /** null until the first sync has run. */
+  syncedAt: string | null;
+  /** Sorted oldest first. */
+  trophies: ArchivedTrophy[];
+}

@@ -2,6 +2,7 @@ import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, gamesFetch, profileFetch } from './psn.ts';
 import { isStateWritable, stateBackend } from './state.ts';
+import { statsFetch, statsSync } from './stats.ts';
 
 const GAME_PATH = /^\/api\/games\/([\w-]+)$/;
 
@@ -29,6 +30,22 @@ export const routeResolve = async (
     // list and any deep link share one fetch.
     const limit = Number(url.searchParams.get('limit') ?? 800);
     return ok(await cached(`games:${limit}`, () => gamesFetch(limit)));
+  }
+
+  if (path === '/api/stats') return ok(await cached('stats', statsFetch));
+
+  if (path === '/api/stats/sync' && method === 'POST') {
+    if (!isStateWritable) {
+      return {
+        body: {
+          error: 'no KV store linked — the trophy archive cannot persist here',
+        },
+        status: 501,
+      };
+    }
+
+    cacheClear();
+    return ok(await statsSync());
   }
 
   if (path === '/api/snapshot' && method === 'POST') {

@@ -1,8 +1,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Redis } from '@upstash/redis';
 
+import type { TrophyArchive } from '../shared/types.ts';
+
 const STATE_FILE = new URL('../../.trophy-state.json', import.meta.url);
 const STATE_KEY = 'trophy-sys:baseline';
+
+const STATS_FILE = new URL('../../.trophy-stats.json', import.meta.url);
+const STATS_KEY = 'trophy-sys:stats';
 
 export interface GameBaseline {
   defined: number;
@@ -52,25 +57,42 @@ const stateMigrate = (
     ]),
   );
 
-export const stateLoad = async (): Promise<TrophyState> => {
-  if (redis)
-    return stateMigrate(
-      (await redis.get<Record<string, GameBaseline | number[]>>(STATE_KEY)) ??
-        {},
-    );
+const storeRead = async <T>(key: string, file: URL): Promise<T | null> => {
+  if (redis) return (await redis.get<T>(key)) ?? null;
 
   try {
-    return stateMigrate(JSON.parse(readFileSync(STATE_FILE, 'utf-8')));
+    return JSON.parse(readFileSync(file, 'utf-8')) as T;
   } catch {
-    return {};
+    return null;
   }
 };
 
-export const stateSave = async (state: TrophyState) => {
+const storeWrite = async (key: string, file: URL, value: unknown) => {
   if (redis) {
-    await redis.set(STATE_KEY, state);
+    await redis.set(key, value);
     return;
   }
 
-  writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  writeFileSync(file, JSON.stringify(value, null, 2));
 };
+
+export const stateLoad = async (): Promise<TrophyState> =>
+  stateMigrate(
+    (await storeRead<Record<string, GameBaseline | number[]>>(
+      STATE_KEY,
+      STATE_FILE,
+    )) ?? {},
+  );
+
+export const stateSave = (state: TrophyState) =>
+  storeWrite(STATE_KEY, STATE_FILE, state);
+
+/**
+ * The trophy fan-out's output, written only by an explicit sync. Separate key
+ * from the baseline: the baseline answers "what is new", this answers "what has
+ * ever been earned, and when", and a snapshot must never disturb the second.
+ */
+export const statsLoad = () => storeRead<TrophyArchive>(STATS_KEY, STATS_FILE);
+
+export const statsSave = (archive: TrophyArchive) =>
+  storeWrite(STATS_KEY, STATS_FILE, archive);

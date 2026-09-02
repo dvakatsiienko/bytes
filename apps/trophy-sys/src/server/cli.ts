@@ -1,5 +1,6 @@
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, gamesFetch, profileFetch } from './psn.ts';
+import { statsFetch, statsSync } from './stats.ts';
 
 const [command = 'games', arg] = process.argv.slice(2);
 
@@ -9,6 +10,12 @@ const commands: Record<string, () => Promise<unknown>> = {
   news: () => newsFetch({ commit: false }),
   profile: profileFetch,
   snapshot: () => newsFetch({ commit: true }),
+  stats: statsFetch,
+  // The scan's result is the operation, not the payload — `stats` prints rows.
+  'stats-sync': async () => {
+    const archive = await statsSync();
+    return { ...archive, trophies: archive.trophies.length };
+  },
 };
 
 const run = commands[command];
