@@ -50,5 +50,5 @@ it, so one-segment routes worked while `/api/games/:id` fell through to a 404 HT
 `vercel.json` rewrite `/api/(.*) → /api/handler` matches any depth. `req.url` keeps the original
 path across the rewrite, which is what `routeResolve` matches on.
 
-This is why the post-deploy check is a **two-segment** route (`/api/games/NPWR24415_00`) and not
-`/api/health` — every single-segment route stayed green through the entire bug.
+Every single-segment route stayed green through the entire bug, which is what made it expensive to
+find.

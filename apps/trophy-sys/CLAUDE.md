@@ -11,11 +11,10 @@ A retro-terminal trophy dashboard over the PlayStation Network API. Two runtimes
 `psn.ts` — nothing downstream ever sees a `psn-api` type.
 
 `src/server/playtime.ts` is the other half of that boundary. PSN reports playtime on a separate
-endpoint keyed by `titleId` (`PPSA16033_00`) while trophies are keyed by `npCommunicationId`
-(`NPWR21904_00`), and nothing in either response bridges the two. The join is on name — an exact
-pass, then a loosened one, both qualified by platform, with any key two titles could claim dropped
-rather than guessed. It is lossy by design: 94 of 108 when measured. A `—` in the playtime column
-means the join missed, not that the title was never played.
+endpoint keyed by `titleId`, while trophies are keyed by `npCommunicationId`, and nothing in either
+response bridges the two. The join is on name and it is lossy by design — 94 of 108 when measured —
+so a `—` in the playtime column means the join missed, not that the title was never played. The
+file's own header carries the matching rules and what each one was measured to cost.
 
 Deployed: <https://trophy-sys.vercel.app>
 
