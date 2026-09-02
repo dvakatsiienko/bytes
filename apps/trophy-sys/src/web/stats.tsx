@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
-import { useNavigate, useSearch } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { MotionConfig } from 'motion/react';
 
 import { EffortLegend } from './charts/chart-legend.tsx';
-import { CircadianRingRecharts } from './charts/circadian-ring-recharts.tsx';
 import { CircadianRingVisx } from './charts/circadian-ring-visx.tsx';
 import { circadianTitle } from './charts/circadian-shared.ts';
-import { EffortScatterRecharts } from './charts/effort-scatter-recharts.tsx';
 import { EffortScatterVisx } from './charts/effort-scatter-visx.tsx';
 import { hoursLabel } from './charts/effort-shared.ts';
 import {
@@ -14,7 +12,6 @@ import {
   ChartFrame,
   ChartTable,
 } from './components/chart-frame.tsx';
-import { SegmentedControl } from './components/segmented-control.tsx';
 import {
   type CircadianHour,
   type EffortPoint,
@@ -23,14 +20,8 @@ import {
 } from './helpers/stats.ts';
 import { useGames, useStats, useStatsSync } from './hooks/queries.ts';
 
-const LIBS = [
-  { label: 'visx', value: 'visx' },
-  { label: 'recharts', value: 'recharts' },
-] as const satisfies readonly { label: string; value: ChartLib }[];
-
 export const Stats = () => {
   const navigate = useNavigate();
-  const { lib } = useSearch({ from: '/stats' });
   const games = useGames();
   const stats = useStats();
   const sync = useStatsSync();
@@ -41,12 +32,6 @@ export const Stats = () => {
     [stats.data, games.data],
   );
 
-  // Picking the component beats branching inside the JSX: both libraries
-  // implement the same two props, which is the whole point of the bake-off.
-  const isVisx = lib === 'visx';
-  const EffortChart = isVisx ? EffortScatterVisx : EffortScatterRecharts;
-  const CircadianChart = isVisx ? CircadianRingVisx : CircadianRingRecharts;
-
   const gameOpen = (gameId: string) =>
     navigate({ params: { gameId }, to: '/library/$gameId' });
 
@@ -54,7 +39,7 @@ export const Stats = () => {
   const hasArchive = Boolean(archive?.syncedAt);
 
   const ringJSX = hasArchive ? (
-    <CircadianChart hours={hours} />
+    <CircadianRingVisx hours={hours} />
   ) : (
     <p className='grid h-80 place-items-center px-6 text-center text-[11px] text-dim'>
       {stats.isPending
@@ -67,16 +52,6 @@ export const Stats = () => {
     <MotionConfig reducedMotion='user'>
       <main className='grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-4'>
         <div className='flex flex-wrap items-center gap-3'>
-          <SegmentedControl
-            label='Charting library'
-            name='chart-lib'
-            onChange={(next) =>
-              navigate({ search: { lib: next }, to: '/stats' })
-            }
-            options={LIBS}
-            value={lib}
-          />
-
           <button
             className='cursor-pointer border border-line px-3 py-1 text-[11px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-orange hover:text-orange disabled:cursor-wait disabled:opacity-50'
             disabled={sync.isPending}
@@ -101,9 +76,9 @@ export const Stats = () => {
                 rows={points}
               />
             }
-            title={`effort · ${lib}`}>
+            title='effort'>
             <EffortLegend />
-            <EffortChart onSelect={gameOpen} points={points} />
+            <EffortScatterVisx onSelect={gameOpen} points={points} />
           </ChartFrame>
 
           <ChartFrame
@@ -116,7 +91,7 @@ export const Stats = () => {
                 rows={hours}
               />
             }
-            title={`circadian · ${lib}`}>
+            title='circadian'>
             {ringJSX}
           </ChartFrame>
         </div>
@@ -165,6 +140,3 @@ const CIRCADIAN_COLUMNS: ChartColumn<CircadianHour>[] = [
   },
   { cell: (hour) => hour.topGame ?? '—', head: 'top title' },
 ];
-
-/* Types */
-export type ChartLib = 'recharts' | 'visx';
