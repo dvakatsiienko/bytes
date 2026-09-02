@@ -136,6 +136,18 @@
     user-select: text;
   }
 
+  /*
+   * The accent is orange, so a highlight drawn from the palette's blue reads
+   * as a selection rather than a second accent. Mixed with transparent, so it
+   * tints the panel it sits on and both themes are served by one rule. Raw
+   * `--p-*` and not `--color-*`: Tailwind drops any theme variable no utility
+   * asked for, and nothing uses blue.
+   */
+  ::selection {
+    color: var(--p-fg);
+    background: color-mix(in srgb, var(--p-blue) 40%, transparent);
+  }
+
   /* CRT scanlines — the one deliberate piece of retro theatre. */
   body::after {
     position: fixed;
