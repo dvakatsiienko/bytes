@@ -73,12 +73,17 @@ const Plot = (props: PlotProps) => {
   });
 
   /**
-   * Nearest data point, not the DOM element under the cursor. Forty-five of the
-   * ninety-six marks have their centre painted over by a later one, and a mark
-   * underneath can never receive a hover of its own — which is exactly why some
-   * titles had no tooltip while recharts, which hit-tests this way, had one.
+   * The nearest mark *under the pointer* — not the DOM element beneath it, and
+   * not simply the nearest mark on the chart.
+   *
+   * Element hit-testing fails because the points are drawn biggest-first, so a
+   * large mark sits under every smaller one that overlaps it and can never
+   * receive its own hover. Unqualified nearest fails the other way: with no
+   * cutoff some mark is always the closest, so the chart lights one up wherever
+   * the pointer sits. Candidates are therefore marks whose own radius covers
+   * the pointer, and the closest of those wins.
    */
-  const nearest = (event: ReactMouseEvent<SVGRectElement>) => {
+  const markAt = (event: ReactMouseEvent<SVGRectElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
     const pointerX = event.clientX - box.left;
     const pointerY = event.clientY - box.top;
@@ -89,9 +94,10 @@ const Plot = (props: PlotProps) => {
     for (const point of props.points) {
       const dx = xScale(point.hours) - pointerX;
       const dy = yScale(point.progress) - pointerY;
-      const distance = dx * dx + dy * dy;
+      const distance = Math.hypot(dx, dy);
+      const reach = markRadius(point.trophies, peak) + TOLERANCE;
 
-      if (distance < bestDistance) {
+      if (distance <= reach && distance < bestDistance) {
         bestDistance = distance;
         best = point;
       }
@@ -102,8 +108,14 @@ const Plot = (props: PlotProps) => {
 
   return (
     <>
-      <svg height={props.height} ref={containerRef} width={props.width}>
-        <title>Hours played against completion, one mark per title</title>
+      {/* aria-label rather than <title>: a <title> child is what browsers
+          render as their own native tooltip on hover. */}
+      <svg
+        aria-label='Hours played against completion, one mark per title'
+        height={props.height}
+        ref={containerRef}
+        role='img'
+        width={props.width}>
         <Group left={MARGIN.left} top={MARGIN.top}>
           <GridRows
             height={innerHeight}
@@ -153,13 +165,17 @@ const Plot = (props: PlotProps) => {
             fill='transparent'
             height={innerHeight}
             onClick={(event) => {
-              const point = nearest(event);
+              const point = markAt(event);
               if (point) props.onSelect(point.gameId);
             }}
             onMouseLeave={tooltip.hideTooltip}
             onMouseMove={(event) => {
-              const point = nearest(event);
-              if (!point) return;
+              const point = markAt(event);
+
+              if (!point) {
+                tooltip.hideTooltip();
+                return;
+              }
 
               tooltip.showTooltip({
                 tooltipData: point,
@@ -190,6 +206,10 @@ const Plot = (props: PlotProps) => {
     </>
   );
 };
+
+/* Helpers */
+/** How far outside a mark still counts as pointing at it. */
+const TOLERANCE = 4;
 
 /* Styles */
 const AXIS_LABEL = {

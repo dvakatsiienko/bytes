@@ -110,8 +110,12 @@ const Ring = (props: RingProps) => {
 
   return (
     <>
-      <svg height={props.height} ref={containerRef} width={props.width}>
-        <title>Trophies earned by hour of day, one spoke per hour</title>
+      <svg
+        aria-label='Trophies earned by hour of day, one spoke per hour'
+        height={props.height}
+        ref={containerRef}
+        role='img'
+        width={props.width}>
         <motion.g
           animate={{ opacity: 1, scale: 1 }}
           initial={{ opacity: 0, scale: 0.92 }}
