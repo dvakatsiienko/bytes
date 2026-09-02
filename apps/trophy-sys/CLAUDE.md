@@ -10,6 +10,13 @@ A retro-terminal trophy dashboard over the PlayStation Network API. Two runtimes
 `trophyTitleName`, `definedTrophies`…) are mapped to these flat types once, at the boundary in
 `psn.ts` — nothing downstream ever sees a `psn-api` type.
 
+`src/server/playtime.ts` is the other half of that boundary. PSN reports playtime on a separate
+endpoint keyed by `titleId` (`PPSA16033_00`) while trophies are keyed by `npCommunicationId`
+(`NPWR21904_00`), and nothing in either response bridges the two. The join is on name — an exact
+pass, then a loosened one, both qualified by platform, with any key two titles could claim dropped
+rather than guessed. It is lossy by design: 94 of 108 when measured. A `—` in the playtime column
+means the join missed, not that the title was never played.
+
 Deployed: <https://trophy-sys.vercel.app>
 
 ## Commands
@@ -76,45 +83,23 @@ deployments when there are no changes to the root directory" keeps pushes to oth
 redeploying this one. Vite plays no part in the API: the `api/` directory is a Vercel convention,
 scanned at the deployment root of any project regardless of framework.
 
-1. **The function path must exist in git.** Vercel decides which functions exist by scanning the
-   source tree at clone time. `api/handler.js` is therefore a committed 430-byte stub returning
-   501; `pnpm build:api` overwrites it with the real esbuild bundle. A purely generated file
-   arrives far too late — the deploy goes green while every `/api` route 404s with Vercel's HTML
-   error page. 📌 A local `pnpm build` leaves the fat bundle in your working tree; restore the stub
-   (`git checkout -- api/handler.js`) before committing.
-2. **The API is esbuild-bundled, and that is mandatory** — but no longer because of `psn-api`.
-   Up to 2.18.0 that package was unimportable from ESM in either direction; **2.18.1 fixed it**
-   ([#244](https://github.com/achievements-app/psn-api/issues/244)) and a plain
-   `import { getUserTitles } from 'psn-api'` now works under Node. The bundle stays because of
-   Vercel: dropping it was tried and measured on 2026-08-16, and it fails twice over.
-   - Vercel's dependency tracing ships **no `node_modules`** into the function. The compiled
-     output keeps `import … from 'psn-api'` as a bare specifier, so the function dies at runtime
-     with `ERR_MODULE_NOT_FOUND` — a green build and dead routes, the worst failure shape here.
-     (Verified by copying `.vercel/output/functions/api/handler.func` out of the workspace and
-     importing it; a pnpm workspace with deps symlinked from the repo root is the likely cause.)
-   - Committing `api/handler.ts` as source makes the builder compile TypeScript again, and it
-     still crashes on **TS 7** with `Cannot read properties of undefined (reading 'readFile')`.
-     Pinning `typescript` to 6.0.3 clears that, but constraint one above remains fatal.
-
-   So: three prod outages came from trying to import `psn-api` "correctly", and one measured
-   experiment from trying to drop the bundle. 📌 Before retrying, run `vercel build` locally — it
-   costs no deploy quota — and load the built `.func` from outside the repo. If a `node_modules`
-   appears inside it, the first blocker is gone and this is worth revisiting. Because the shipped
-   function is `.js`, the builder compiles no TypeScript, so this app uses the root's TypeScript
-   with no local pin.
-3. **The handler must use Node's `(req, res)` signature.** Vercel's launcher
-   (`launcherType: "Nodejs"`) invokes it that way; a web-standard handler returning a `Response`
-   is silently dropped and the request hangs until timeout. `main.ts` mounts the same function
-   locally.
-4. **Routing is explicit in `vercel.json`, never filename-derived.** A catch-all named
-   `api/[...path].js` looks right and is not: Vercel generated `^/api/([^/]+)$` for it, so
-   one-segment routes worked while `/api/games/:id` fell through to a 404 HTML page. The rewrite
-   `/api/(.*) → /api/handler` matches any depth. `req.url` keeps the original path across the
-   rewrite, which is what `routeResolve` matches on.
+1. **The function path must exist in git.** `api/handler.js` is a committed 501 stub that
+   `pnpm build:api` overwrites — Vercel decides which functions exist at clone time, so a purely
+   generated file arrives too late. 📌 A local `pnpm build` leaves the fat bundle in your working
+   tree; restore the stub with `git checkout -- api/handler.js` before committing.
+2. **The API is esbuild-bundled, and that is mandatory.** Vercel's dependency tracing ships no
+   `node_modules` into the function, so any bare specifier surviving the build dies at runtime.
+3. **The handler must use Node's `(req, res)` signature.** A web-standard handler returning a
+   `Response` is silently dropped and the request hangs until timeout.
+4. **Routing is explicit in `vercel.json`, never filename-derived.** The rewrite
+   `/api/(.*) → /api/handler` matches any depth; a filename catch-all matches one segment only.
 
 After changing anything about deployment, test a **two-segment** route
 (`/api/games/NPWR24415_00`), not just `/api/health` — the single-segment routes stayed green
 through the whole bug.
+
+📌 Each of those four lines cost an outage or a measurement. What was tried, what it broke, and how
+to tell when constraint 2 is safe to retry: [`docs/deploy-history.md`](docs/deploy-history.md).
 
 ## Costs to respect
 
@@ -142,6 +127,10 @@ load into ~120 PSN round-trips.
 - Retro look = gruvbox-material, matching the `sline` statusline palette. Colors are Tailwind
   theme tokens in `src/web/theme.css` (`text-orange`, `bg-bg-lift`, `text-gold`…) — no hex in
   components. Progress bars are `█`/`░` runs from `barRender`, not DOM elements.
+- Chrome is unselectable: the `body` rule in `theme.css` sets `user-select: none`, and strings
+  carrying a real name (game titles, trophy names and descriptions, group names) opt back in with
+  Tailwind's `select-text`. Inputs are exempted in the same base layer. `::selection` is derived
+  from the palette's blue, so both themes are served by one rule.
 - `.panel` + `.panel-title` is the boxed-with-a-label frame used by every region; the title is
   absolutely positioned outside the border, so a panel must not be the scroll container itself —
   put `overflow-y-auto` on a child.
