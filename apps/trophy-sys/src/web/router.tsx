@@ -18,7 +18,7 @@ const rootRoute = createRootRoute({ component: Layout });
  */
 const indexRoute = createRoute({
   beforeLoad: () => {
-    throw redirect({ to: '/library' });
+    throw redirect({ replace: true, to: '/library' });
   },
   getParentRoute: () => rootRoute,
   path: '/',
