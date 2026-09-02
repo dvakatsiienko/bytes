@@ -31,8 +31,10 @@ export const TrophyRow = ({ trophy, note }: TrophyRowProps) => (
     />
 
     <span className='min-w-0 flex-1'>
-      <span className='block truncate text-fg-soft'>{trophy.name}</span>
-      <span className='block truncate text-[10px] text-dim'>
+      <span className='block select-text truncate text-fg-soft'>
+        {trophy.name}
+      </span>
+      <span className='block select-text truncate text-[10px] text-dim'>
         {note ?? trophy.detail}
       </span>
       {trophy.progress && !trophy.earned ? (

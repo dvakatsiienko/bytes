@@ -119,7 +119,21 @@
     -webkit-font-smoothing: antialiased;
     color: var(--color-fg);
     letter-spacing: 0.01em;
+
+    /*
+     * Chrome — counters, bars, badges, labels — is nothing anyone wants to
+     * copy, and cmd+A lighting all of it up looks broken. Strings that carry
+     * a real name opt back in with Tailwind's `select-text`.
+     */
+    -webkit-user-select: none;
+    user-select: none;
     background: var(--color-bg);
+  }
+
+  input,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   /* CRT scanlines — the one deliberate piece of retro theatre. */

@@ -25,7 +25,8 @@ export const NewsPanel = ({ news, error }: NewsPanelProps) => (
 
     {news?.drifted.map((drift) => (
       <p className='px-4 py-2 text-[11px] text-yellow' key={drift.gameId}>
-        {drift.gameName} changed its trophy set
+        <span className='select-text'>{drift.gameName}</span> changed its trophy
+        set
         {drift.added > 0 ? ` · ${drift.added} trophies added` : ''}
       </p>
     ))}

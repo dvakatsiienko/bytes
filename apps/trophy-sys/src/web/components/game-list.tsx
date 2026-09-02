@@ -68,7 +68,7 @@ export const GameList = (props: GameListProps) => {
         <span className='min-w-0 flex-1'>
           <span className='flex items-baseline gap-1.5'>
             <span
-              className={`truncate transition-colors ${isSelected ? 'text-fg' : 'text-fg-soft group-hover:text-fg'}`}>
+              className={`select-text truncate transition-colors ${isSelected ? 'text-fg' : 'text-fg-soft group-hover:text-fg'}`}>
               {game.name}
             </span>
             {hasPlatinum && (

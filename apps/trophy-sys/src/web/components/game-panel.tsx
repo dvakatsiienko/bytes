@@ -59,7 +59,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
 
   return (
     <section className='panel flex min-h-0 flex-col'>
-      <span className='panel-title'>{game.name}</span>
+      <span className='panel-title select-text'>{game.name}</span>
 
       <div className='flex items-center gap-4 border-line border-b px-4 py-3'>
         <img
@@ -72,7 +72,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
 
         <div className='min-w-0'>
           <p className='flex items-baseline gap-2'>
-            <span className='glow truncate text-base text-orange'>
+            <span className='glow select-text truncate text-base text-orange'>
               {game.name}
             </span>
             {hasPlatinum && (
@@ -186,7 +186,7 @@ const GroupSection = ({
   return (
     <>
       <header className='sticky top-0 z-10 flex items-center gap-3 border-line border-y bg-bg-lift px-4 py-1.5 text-[10px]'>
-        <span className='truncate text-orange uppercase tracking-[0.15em]'>
+        <span className='select-text truncate text-orange uppercase tracking-[0.15em]'>
           {group.id === 'default' ? 'base game' : group.name}
         </span>
         <span className='shrink-0 text-mute'>
