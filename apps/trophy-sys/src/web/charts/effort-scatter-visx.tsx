@@ -4,7 +4,7 @@ import { GridColumns, GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import { ParentSize } from '@visx/responsive';
 import { scaleLinear, scaleLog } from '@visx/scale';
-import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
+import { useTooltip } from '@visx/tooltip';
 
 import { ChartTooltip } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
@@ -19,7 +19,7 @@ import {
 } from './effort-shared.ts';
 
 export const EffortScatterVisx = (props: EffortScatterVisxProps) => (
-  <div className='h-80 w-full'>
+  <div className='relative h-80 w-full'>
     <ParentSize>
       {(size) =>
         size.width > 0 ? (
@@ -51,10 +51,6 @@ const Plot = (props: PlotProps) => {
   const peak = markPeak(props.points);
 
   const tooltip = useTooltip<EffortPoint>();
-  const { TooltipInPortal, containerRef } = useTooltipInPortal({
-    detectBounds: true,
-    scroll: true,
-  });
 
   const activeId = tooltip.tooltipData?.gameId ?? null;
 
@@ -113,7 +109,6 @@ const Plot = (props: PlotProps) => {
       <svg
         aria-label='Hours played against completion, one mark per title'
         height={props.height}
-        ref={containerRef}
         role='img'
         width={props.width}>
         <Group left={MARGIN.left} top={MARGIN.top}>
@@ -189,19 +184,24 @@ const Plot = (props: PlotProps) => {
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
-        <TooltipInPortal
-          // `unstyled` drops the `style` prop outright — visx spreads it as
-          // `...(!unstyled && style)` — so position has to come from this flag.
-          applyPositionStyle
-          left={tooltip.tooltipLeft}
-          top={tooltip.tooltipTop}
-          unstyled>
+        <div
+          className='pointer-events-none absolute z-50'
+          style={{
+            left: tooltip.tooltipLeft,
+            top: tooltip.tooltipTop,
+            transform: tipTransform(
+              tooltip.tooltipLeft ?? 0,
+              tooltip.tooltipTop ?? 0,
+              props.width,
+              props.height,
+            ),
+          }}>
           <ChartTooltip
             iconUrl={tooltip.tooltipData.iconUrl}
             rows={effortRows(tooltip.tooltipData)}
             title={tooltip.tooltipData.name}
           />
-        </TooltipInPortal>
+        </div>
       )}
     </>
   );
@@ -210,6 +210,24 @@ const Plot = (props: PlotProps) => {
 /* Helpers */
 /** How far outside a mark still counts as pointing at it. */
 const TOLERANCE = 4;
+
+/**
+ * Flips the box back over the anchor near the right or bottom edge, so it never
+ * leaves the panel. Deterministic, and deliberately not measured: visx's own
+ * bounds-detecting tooltip measures itself inside a portal it creates during
+ * render and destroys on unmount, and that portal disappears from the document
+ * whenever the measured container bounds change.
+ */
+const tipTransform = (
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+) => {
+  const x = left > width * 0.6 ? 'calc(-100% - 12px)' : '12px';
+  const y = top > height * 0.6 ? 'calc(-100% - 12px)' : '12px';
+  return `translate(${x}, ${y})`;
+};
 
 /* Styles */
 const AXIS_LABEL = {

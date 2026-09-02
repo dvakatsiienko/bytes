@@ -2,7 +2,7 @@ import { Group } from '@visx/group';
 import { ParentSize } from '@visx/responsive';
 import { scaleLinear } from '@visx/scale';
 import { Arc } from '@visx/shape';
-import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
+import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
 import { ChartTooltip } from '../components/chart-tooltip.tsx';
@@ -18,7 +18,7 @@ import {
 } from './circadian-shared.ts';
 
 export const CircadianRingVisx = (props: CircadianRingProps) => (
-  <div className='h-80 w-full'>
+  <div className='relative h-80 w-full'>
     <ParentSize>
       {(size) =>
         size.width > 0 ? (
@@ -40,10 +40,6 @@ const Ring = (props: RingProps) => {
   });
 
   const tooltip = useTooltip<CircadianHour>();
-  const { TooltipInPortal, containerRef } = useTooltipInPortal({
-    detectBounds: true,
-    scroll: true,
-  });
 
   const centerX = props.width / 2;
   const centerY = props.height / 2;
@@ -71,13 +67,13 @@ const Ring = (props: RingProps) => {
             fill={CHART_INK.ring}
             fillOpacity={0.7}
             initial={{ opacity: 0 }}
-            onMouseEnter={() =>
+            onMouseEnter={() => {
               tooltip.showTooltip({
                 tooltipData: hour,
                 tooltipLeft: centerX + Math.sin(mid) * radius,
                 tooltipTop: centerY - Math.cos(mid) * radius,
-              })
-            }
+              });
+            }}
             onMouseLeave={tooltip.hideTooltip}
             stroke={CHART_INK.surface}
             strokeWidth={1}
@@ -113,7 +109,6 @@ const Ring = (props: RingProps) => {
       <svg
         aria-label='Trophies earned by hour of day, one spoke per hour'
         height={props.height}
-        ref={containerRef}
         role='img'
         width={props.width}>
         <motion.g
@@ -135,16 +130,18 @@ const Ring = (props: RingProps) => {
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
-        <TooltipInPortal
-          applyPositionStyle
-          left={tooltip.tooltipLeft}
-          top={tooltip.tooltipTop}
-          unstyled>
+        <div
+          className='pointer-events-none absolute z-50'
+          style={{
+            left: tooltip.tooltipLeft,
+            top: tooltip.tooltipTop,
+            transform: `translate(${(tooltip.tooltipLeft ?? 0) > props.width * 0.6 ? 'calc(-100% - 12px)' : '12px'}, ${(tooltip.tooltipTop ?? 0) > props.height * 0.6 ? 'calc(-100% - 12px)' : '12px'})`,
+          }}>
           <ChartTooltip
             rows={circadianRows(tooltip.tooltipData)}
             title={circadianTitle(tooltip.tooltipData)}
           />
-        </TooltipInPortal>
+        </div>
       )}
     </>
   );
