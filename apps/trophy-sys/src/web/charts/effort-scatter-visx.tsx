@@ -2,16 +2,20 @@ import { AxisBottom, AxisLeft } from '@visx/axis';
 import { GridColumns, GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
 import { ParentSize } from '@visx/responsive';
-import { scaleLinear, scaleLog, scaleSqrt } from '@visx/scale';
+import { scaleLinear, scaleLog } from '@visx/scale';
 import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 
 import { ChartTooltip } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 import type { EffortPoint } from '../helpers/stats.ts';
-import { effortRows, hoursLabel } from './effort-shared.ts';
-
-const MARGIN = { bottom: 36, left: 42, right: 14, top: 12 };
+import {
+  SCATTER_MARGIN as MARGIN,
+  effortRows,
+  hoursLabel,
+  markPeak,
+  markRadius,
+} from './effort-shared.ts';
 
 export const EffortScatterVisx = (props: EffortScatterVisxProps) => (
   <div className='h-80 w-full'>
@@ -43,10 +47,7 @@ const Plot = (props: PlotProps) => {
     domain: [0, 100],
     range: [innerHeight, 0],
   });
-  const rScale = scaleSqrt<number>({
-    domain: [1, Math.max(...props.points.map((point) => point.trophies), 1)],
-    range: [4, 15],
-  });
+  const peak = markPeak(props.points);
 
   const tooltip = useTooltip<EffortPoint>();
   const { TooltipInPortal, containerRef } = useTooltipInPortal({
@@ -72,7 +73,7 @@ const Plot = (props: PlotProps) => {
         }
         onLeave={tooltip.hideTooltip}
         onSelect={() => props.onSelect(point.gameId)}
-        radius={rScale(point.trophies)}
+        radius={markRadius(point.trophies, peak)}
       />
     );
   });
@@ -126,8 +127,10 @@ const Plot = (props: PlotProps) => {
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
         <TooltipInPortal
+          // `unstyled` drops the `style` prop outright — visx spreads it as
+          // `...(!unstyled && style)` — so position has to come from this flag.
+          applyPositionStyle
           left={tooltip.tooltipLeft}
-          style={{ position: 'absolute' }}
           top={tooltip.tooltipTop}
           unstyled>
           <ChartTooltip

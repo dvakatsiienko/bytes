@@ -5,7 +5,14 @@ import { Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChartTooltip } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 import type { CircadianHour } from '../helpers/stats.ts';
-import { circadianRows, circadianTitle } from './circadian-shared.ts';
+import { useElementSize } from '../hooks/use-element-size.ts';
+import {
+  RING_INNER,
+  RING_OUTER,
+  SPOKE_PAD,
+  circadianRows,
+  circadianTitle,
+} from './circadian-shared.ts';
 
 /**
  * Recharts has no spoke chart. RadialBarChart draws concentric rings and Pie
@@ -32,6 +39,8 @@ const arcPath = (inner: number, outer: number, from: number, to: number) => {
 };
 
 export const CircadianRingRecharts = (props: CircadianRingRechartsProps) => {
+  const [boxRef, box] = useElementSize();
+  const half = Math.min(box.width, box.height) / 2;
   const peak = Math.max(...props.hours.map((hour) => hour.count), 1);
   const slices = props.hours.map((hour) => ({ ...hour, slice: 1 }));
 
@@ -41,23 +50,37 @@ export const CircadianRingRecharts = (props: CircadianRingRechartsProps) => {
       inner +
       2 +
       (sector.outerRadius - inner - 2) * (sector.payload.count / peak);
-    const from = toRadians(sector.startAngle) + 0.012;
-    const to = toRadians(sector.endAngle) - 0.012;
+    const from = toRadians(sector.startAngle) + SPOKE_PAD;
+    const to = toRadians(sector.endAngle) - SPOKE_PAD;
+    const mid = (from + to) / 2;
+    const [labelX, labelY] = polar(sector.outerRadius + 12, mid);
 
     return (
-      <motion.path
-        animate={{ opacity: 1 }}
-        className='cursor-pointer'
-        d={arcPath(inner, outer, from, to)}
-        fill={CHART_INK.ring}
-        fillOpacity={0.7}
-        initial={{ opacity: 0 }}
-        stroke={CHART_INK.surface}
-        strokeWidth={1}
-        transform={`translate(${sector.cx} ${sector.cy})`}
-        transition={{ delay: sector.payload.hour * 0.02, duration: 0.35 }}
-        whileHover={{ fillOpacity: 1 }}
-      />
+      <g transform={`translate(${sector.cx} ${sector.cy})`}>
+        <motion.path
+          animate={{ opacity: 1 }}
+          className='cursor-pointer'
+          d={arcPath(inner, outer, from, to)}
+          fill={CHART_INK.ring}
+          fillOpacity={0.7}
+          initial={{ opacity: 0 }}
+          stroke={CHART_INK.surface}
+          strokeWidth={1}
+          transition={{ delay: sector.payload.hour * 0.02, duration: 0.35 }}
+          whileHover={{ fillOpacity: 1 }}
+        />
+        {sector.payload.hour % 3 === 0 && (
+          <text
+            dominantBaseline='middle'
+            fill={CHART_INK.axis}
+            fontSize={9}
+            textAnchor='middle'
+            x={labelX}
+            y={labelY}>
+            {String(sector.payload.hour).padStart(2, '0')}
+          </text>
+        )}
+      </g>
     );
   };
 
@@ -71,17 +94,21 @@ export const CircadianRingRecharts = (props: CircadianRingRechartsProps) => {
   };
 
   return (
-    <div className='h-80 w-full'>
+    <div className='h-80 w-full' ref={boxRef}>
       <ResponsiveContainer height='100%' width='100%'>
-        <PieChart>
-          <Tooltip content={tooltipRender as TooltipContent} />
+        <PieChart margin={{ bottom: 0, left: 0, right: 0, top: 0 }}>
+          <Tooltip
+            content={tooltipRender as TooltipContent}
+            isAnimationActive={false}
+          />
           <Pie
             data={slices}
             dataKey='slice'
             endAngle={-270}
-            innerRadius='30%'
+            innerRadius={half * RING_INNER}
             isAnimationActive={false}
-            outerRadius='88%'
+            maxRadius={half}
+            outerRadius={half * RING_OUTER}
             shape={spokeRender as PieShape}
             startAngle={90}
           />

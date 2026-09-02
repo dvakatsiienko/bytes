@@ -9,6 +9,8 @@ import { ChartTooltip } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 import type { CircadianHour } from '../helpers/stats.ts';
 import {
+  RING_INNER,
+  RING_OUTER,
   SPOKE_ANGLE,
   SPOKE_PAD,
   circadianRows,
@@ -28,9 +30,9 @@ export const CircadianRingVisx = (props: CircadianRingProps) => (
 );
 
 const Ring = (props: RingProps) => {
-  const size = Math.min(props.width, props.height);
-  const outer = size / 2 - 22;
-  const inner = outer * 0.3;
+  const half = Math.min(props.width, props.height) / 2;
+  const outer = half * RING_OUTER;
+  const inner = half * RING_INNER;
 
   const rScale = scaleLinear<number>({
     domain: [0, Math.max(...props.hours.map((hour) => hour.count), 1)],
@@ -130,8 +132,8 @@ const Ring = (props: RingProps) => {
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
         <TooltipInPortal
+          applyPositionStyle
           left={tooltip.tooltipLeft}
-          style={{ position: 'absolute' }}
           top={tooltip.tooltipTop}
           unstyled>
           <ChartTooltip

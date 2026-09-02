@@ -13,9 +13,13 @@ import { ChartTooltip } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 import type { EffortPoint } from '../helpers/stats.ts';
-import { effortRows, hoursLabel } from './effort-shared.ts';
-
-const MARGIN = { bottom: 8, left: 0, right: 14, top: 12 };
+import {
+  SCATTER_MARGIN,
+  effortRows,
+  hoursLabel,
+  markPeak,
+  markRadius,
+} from './effort-shared.ts';
 
 /**
  * Recharts draws its own dots and animates them itself, so both had to be
@@ -24,13 +28,7 @@ const MARGIN = { bottom: 8, left: 0, right: 14, top: 12 };
  * the size ZAxis computed.
  */
 export const EffortScatterRecharts = (props: EffortScatterRechartsProps) => {
-  const maxTrophies = Math.max(
-    ...props.points.map((point) => point.trophies),
-    1,
-  );
-  const radiusOf = (trophies: number) =>
-    4 +
-    11 * Math.sqrt(Math.max(trophies - 1, 0) / Math.max(maxTrophies - 1, 1));
+  const peak = markPeak(props.points);
 
   const markRender = (mark: MarkProps) => (
     <ScatterMark
@@ -42,7 +40,7 @@ export const EffortScatterRecharts = (props: EffortScatterRechartsProps) => {
       onEnter={() => undefined}
       onLeave={() => undefined}
       onSelect={() => props.onSelect(mark.payload.gameId)}
-      radius={radiusOf(mark.payload.trophies)}
+      radius={markRadius(mark.payload.trophies, peak)}
     />
   );
 
@@ -70,13 +68,20 @@ export const EffortScatterRecharts = (props: EffortScatterRechartsProps) => {
   return (
     <div className='h-80 w-full'>
       <ResponsiveContainer height='100%' width='100%'>
-        <ScatterChart margin={MARGIN}>
+        <ScatterChart
+          margin={{
+            bottom: 0,
+            left: 0,
+            right: SCATTER_MARGIN.right,
+            top: SCATTER_MARGIN.top,
+          }}>
           <CartesianGrid stroke={CHART_INK.grid} strokeOpacity={0.35} />
 
           <XAxis
             axisLine={{ stroke: CHART_INK.axis }}
             dataKey='hours'
             domain={['dataMin', 'dataMax']}
+            height={SCATTER_MARGIN.bottom}
             scale='log'
             tick={{ fill: CHART_INK.axis, fontSize: 9 }}
             tickFormatter={hoursLabel}
@@ -91,10 +96,16 @@ export const EffortScatterRecharts = (props: EffortScatterRechartsProps) => {
             tickFormatter={(value: number) => `${value}%`}
             tickLine={{ stroke: CHART_INK.axis }}
             type='number'
-            width={42}
+            width={SCATTER_MARGIN.left}
           />
 
-          <Tooltip content={tooltipRender as TooltipContent} cursor={false} />
+          {/* Recharts eases the tooltip wrapper from its last position over
+              400ms, which reads as the box flying in from the left. */}
+          <Tooltip
+            content={tooltipRender as TooltipContent}
+            cursor={false}
+            isAnimationActive={false}
+          />
 
           <Scatter
             data={seriesOf(true)}
