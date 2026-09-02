@@ -9,6 +9,10 @@ import { CHART_INK, seriesColor } from '../helpers/chart-theme.ts';
  *
  * Shape carries the same split as colour — ◆ for a platinumed title, ● for the
  * rest — so the chart still reads with the colour removed.
+ *
+ * The mark listens for nothing. Both charts hit-test by nearest data point at
+ * the chart level, because half these marks overlap and a mark buried under a
+ * later one can never receive a hover of its own.
  */
 export const ScatterMark = (props: ScatterMarkProps) => {
   const fill = seriesColor(props.hasPlatinum);
@@ -16,16 +20,16 @@ export const ScatterMark = (props: ScatterMarkProps) => {
     <path
       d={`M 0 ${-props.radius} L ${props.radius} 0 L 0 ${props.radius} L ${-props.radius} 0 Z`}
       fill={fill}
-      fillOpacity={0.8}
-      stroke={CHART_INK.surface}
+      fillOpacity={props.isActive ? 1 : 0.8}
+      stroke={props.isActive ? fill : CHART_INK.surface}
       strokeWidth={1.5}
     />
   ) : (
     <circle
       fill={fill}
-      fillOpacity={0.7}
+      fillOpacity={props.isActive ? 1 : 0.7}
       r={props.radius}
-      stroke={CHART_INK.surface}
+      stroke={props.isActive ? fill : CHART_INK.surface}
       strokeWidth={1.5}
     />
   );
@@ -33,26 +37,16 @@ export const ScatterMark = (props: ScatterMarkProps) => {
   return (
     <g transform={`translate(${props.cx} ${props.cy})`}>
       <motion.g
-        animate={{ opacity: 1 }}
-        aria-label={props.label}
-        className='cursor-pointer'
-        initial={{ opacity: 0 }}
-        onClick={props.onSelect}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') props.onSelect();
-        }}
-        onMouseEnter={props.onEnter}
-        onMouseLeave={props.onLeave}
-        role='button'
+        animate={{ opacity: 1, scale: props.isActive ? 1.45 : 1 }}
+        initial={{ opacity: 0, scale: 1 }}
         style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-        // The table view is the keyboard path — 79 tab stops before the next
-        // control would be worse than none. Focusable, just not in the order.
-        tabIndex={-1}
-        transition={{ delay: props.delay, duration: 0.35, ease: 'easeOut' }}
-        whileHover={{ scale: 1.45 }}>
+        // Split so the hover response is immediate — sharing the enter
+        // transition would make it wait out this mark's stagger delay.
+        transition={{
+          opacity: { delay: props.delay, duration: 0.35, ease: 'easeOut' },
+          scale: { duration: 0.15, ease: 'easeOut' },
+        }}>
         {shapeJSX}
-        {/* A 4px dot is not a hit target; this is the one you actually hover. */}
-        <circle fill='transparent' r={Math.max(props.radius, 9)} />
       </motion.g>
     </g>
   );
@@ -64,9 +58,6 @@ interface ScatterMarkProps {
   cy: number;
   delay: number;
   hasPlatinum: boolean;
-  label: string;
-  onEnter: () => void;
-  onLeave: () => void;
-  onSelect: () => void;
+  isActive: boolean;
   radius: number;
 }

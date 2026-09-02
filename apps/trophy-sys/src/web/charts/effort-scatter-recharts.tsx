@@ -30,19 +30,22 @@ import {
 export const EffortScatterRecharts = (props: EffortScatterRechartsProps) => {
   const peak = markPeak(props.points);
 
-  const markRender = (mark: MarkProps) => (
+  const markOf = (mark: MarkProps, isActive: boolean) => (
     <ScatterMark
       cx={mark.cx}
       cy={mark.cy}
       delay={0}
       hasPlatinum={mark.payload.hasPlatinum}
-      label={`${mark.payload.name}, ${mark.payload.progress}%`}
-      onEnter={() => undefined}
-      onLeave={() => undefined}
-      onSelect={() => props.onSelect(mark.payload.gameId)}
+      isActive={isActive}
       radius={markRadius(mark.payload.trophies, peak)}
     />
   );
+
+  // Recharts picks the active point the same way the visx overlay does — by
+  // proximity, not by which element the pointer is over — so `activeShape` is
+  // what keeps the two highlights behaving identically.
+  const markRender = (mark: MarkProps) => markOf(mark, false);
+  const activeMarkRender = (mark: MarkProps) => markOf(mark, true);
 
   const tooltipRender = (tip: TipProps) => {
     const point = tip.payload?.[0]?.payload as EffortPoint | undefined;
@@ -108,6 +111,7 @@ export const EffortScatterRecharts = (props: EffortScatterRechartsProps) => {
           />
 
           <Scatter
+            activeShape={activeMarkRender as ScatterShape}
             data={seriesOf(true)}
             isAnimationActive={false}
             name='platinum earned'
@@ -115,6 +119,7 @@ export const EffortScatterRecharts = (props: EffortScatterRechartsProps) => {
             shape={markRender as ScatterShape}
           />
           <Scatter
+            activeShape={activeMarkRender as ScatterShape}
             data={seriesOf(false)}
             isAnimationActive={false}
             name='no platinum yet'

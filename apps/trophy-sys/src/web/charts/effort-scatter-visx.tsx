@@ -1,3 +1,4 @@
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { GridColumns, GridRows } from '@visx/grid';
 import { Group } from '@visx/group';
@@ -55,6 +56,8 @@ const Plot = (props: PlotProps) => {
     scroll: true,
   });
 
+  const activeId = tooltip.tooltipData?.gameId ?? null;
+
   const markListJSX = props.points.map((point, index) => {
     return (
       <ScatterMark
@@ -62,21 +65,40 @@ const Plot = (props: PlotProps) => {
         cy={yScale(point.progress)}
         delay={index * 0.008}
         hasPlatinum={point.hasPlatinum}
+        isActive={point.gameId === activeId}
         key={point.gameId}
-        label={`${point.name}, ${point.progress}%`}
-        onEnter={() =>
-          tooltip.showTooltip({
-            tooltipData: point,
-            tooltipLeft: MARGIN.left + xScale(point.hours),
-            tooltipTop: MARGIN.top + yScale(point.progress),
-          })
-        }
-        onLeave={tooltip.hideTooltip}
-        onSelect={() => props.onSelect(point.gameId)}
         radius={markRadius(point.trophies, peak)}
       />
     );
   });
+
+  /**
+   * Nearest data point, not the DOM element under the cursor. Forty-five of the
+   * ninety-six marks have their centre painted over by a later one, and a mark
+   * underneath can never receive a hover of its own — which is exactly why some
+   * titles had no tooltip while recharts, which hit-tests this way, had one.
+   */
+  const nearest = (event: ReactMouseEvent<SVGRectElement>) => {
+    const box = event.currentTarget.getBoundingClientRect();
+    const pointerX = event.clientX - box.left;
+    const pointerY = event.clientY - box.top;
+
+    let best: EffortPoint | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    for (const point of props.points) {
+      const dx = xScale(point.hours) - pointerX;
+      const dy = yScale(point.progress) - pointerY;
+      const distance = dx * dx + dy * dy;
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = point;
+      }
+    }
+
+    return best;
+  };
 
   return (
     <>
@@ -122,6 +144,31 @@ const Plot = (props: PlotProps) => {
           />
 
           {markListJSX}
+
+          {/* Pointer-only enhancement: everything it offers — the readings and
+              the navigation — is reachable from this chart's table view, which
+              is why it carries no role and no tab stop. */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: duplicated in the table view */}
+          <rect
+            fill='transparent'
+            height={innerHeight}
+            onClick={(event) => {
+              const point = nearest(event);
+              if (point) props.onSelect(point.gameId);
+            }}
+            onMouseLeave={tooltip.hideTooltip}
+            onMouseMove={(event) => {
+              const point = nearest(event);
+              if (!point) return;
+
+              tooltip.showTooltip({
+                tooltipData: point,
+                tooltipLeft: MARGIN.left + xScale(point.hours),
+                tooltipTop: MARGIN.top + yScale(point.progress),
+              });
+            }}
+            width={innerWidth}
+          />
         </Group>
       </svg>
 
