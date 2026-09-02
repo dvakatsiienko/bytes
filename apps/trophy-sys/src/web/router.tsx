@@ -8,6 +8,7 @@ import {
 import { Layout } from './layout.tsx';
 import { Library, LibraryEmpty, LibraryGame } from './library.tsx';
 import { News } from './news.tsx';
+import { type ChartLib, Stats } from './stats.tsx';
 
 const rootRoute = createRootRoute({ component: Layout });
 
@@ -48,13 +49,33 @@ const newsRoute = createRoute({
   path: '/news',
 });
 
+/**
+ * `lib` is the one search param in the app, and deliberately so: it is a
+ * temporary A/B switch over the same data, which is view state. Anything that
+ * names a place or a resource still gets a path segment.
+ */
+const statsRoute = createRoute({
+  component: Stats,
+  getParentRoute: () => rootRoute,
+  path: '/stats',
+  validateSearch: (search: Record<string, unknown>): StatsSearch => ({
+    lib: search.lib === 'recharts' ? 'recharts' : 'visx',
+  }),
+});
+
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
     indexRoute,
     libraryRoute.addChildren([libraryIndexRoute, libraryGameRoute]),
     newsRoute,
+    statsRoute,
   ]),
 });
+
+/* Types */
+interface StatsSearch {
+  lib: ChartLib;
+}
 
 declare module '@tanstack/react-router' {
   interface Register {

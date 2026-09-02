@@ -5,14 +5,17 @@ import type {
   GameDetail,
   NewsFeed,
   Profile,
+  TrophyArchive,
 } from '../../shared/types.ts';
 
-const apiGet = async <T>(path: string): Promise<T> => {
-  const res = await fetch(`/api${path}`);
+const apiCall = async <T>(path: string, method = 'GET'): Promise<T> => {
+  const res = await fetch(`/api${path}`, { method });
   const payload = await res.json();
   if (!res.ok) throw new Error(payload.error ?? res.statusText);
   return payload as T;
 };
+
+const apiGet = <T>(path: string) => apiCall<T>(path);
 
 export const useProfile = () =>
   useQuery({
@@ -51,12 +54,26 @@ export const useSnapshot = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
-      const res = await fetch('/api/snapshot', { method: 'POST' });
-      const payload = await res.json();
-      if (!res.ok) throw new Error(payload.error ?? res.statusText);
-      return payload;
-    },
+    mutationFn: () => apiCall<NewsFeed>('/snapshot', 'POST'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['news'] }),
+  });
+};
+
+export const useStats = () =>
+  useQuery({
+    queryFn: () => apiGet<TrophyArchive>('/stats'),
+    queryKey: ['stats'],
+  });
+
+/**
+ * Runs the ~79-title fan-out. A button and never a side effect of reading the
+ * charts, for the same reason the snapshot is: it costs two PSN calls a title.
+ */
+export const useStatsSync = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => apiCall<TrophyArchive>('/stats/sync', 'POST'),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stats'] }),
   });
 };

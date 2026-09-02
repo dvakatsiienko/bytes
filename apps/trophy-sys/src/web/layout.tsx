@@ -7,6 +7,7 @@ import { useGames, useProfile } from './hooks/queries.ts';
 const TABS = [
   { label: 'library', to: '/library' },
   { label: 'news', to: '/news' },
+  { label: 'stats', to: '/stats' },
 ] as const;
 
 export const Layout = () => {
