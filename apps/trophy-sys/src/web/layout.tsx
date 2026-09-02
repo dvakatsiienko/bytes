@@ -21,8 +21,12 @@ export const Layout = () => {
   return (
     <div className='flex h-full flex-col gap-5 p-6'>
       <div className='flex items-center gap-4'>
-        <h1 className='glow text-lg text-orange tracking-[0.3em]'>
-          TROPHY.SYS
+        <h1 className='text-lg'>
+          <Link
+            className='glow cursor-pointer text-orange tracking-[0.3em] transition-colors hover:text-yellow focus-visible:outline focus-visible:outline-orange'
+            to='/'>
+            TROPHY.SYS
+          </Link>
         </h1>
 
         <nav className='flex gap-1'>
