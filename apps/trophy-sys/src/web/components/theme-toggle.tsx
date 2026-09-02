@@ -1,58 +1,84 @@
-import { useState } from 'react';
-
-type Theme = 'dark' | 'light' | 'system';
-
-const LABEL: Record<Theme, string> = {
-  dark: 'drk',
-  light: 'lgt',
-  system: 'sys',
-};
-
-const HINT: Record<Theme, string> = {
-  dark: 'Dark palette, pinned. Click for system.',
-  light: 'Light palette, pinned. Click for dark.',
-  system: 'Following your OS appearance. Click to pin light.',
-};
+import { Fragment, useState } from 'react';
 
 /**
- * Three states, not two: a plain light/dark switch strands you with no way to
- * hand control back to the OS once you have clicked it.
+ * One bordered unit with three cells, deliberately unlike the nav buttons —
+ * those are three separate boxes, this is one instrument. Three states, not
+ * two: a plain light/dark switch strands you with no way to hand control back
+ * to the OS once you have clicked it. Real radios, so arrow keys work.
  */
-const NEXT: Record<Theme, Theme> = {
-  dark: 'system',
-  light: 'dark',
-  system: 'light',
+export const ThemeToggle = () => {
+  const [theme, setTheme] = useState(themeRead);
+
+  const optionListJSX = THEME_OPTIONS.map((option, index) => {
+    const isActive = option.value === theme;
+
+    return (
+      <Fragment key={option.value}>
+        {index > 0 && (
+          <span aria-hidden='true' className='text-line'>
+            •
+          </span>
+        )}
+        <label
+          className={`hint cursor-pointer px-1 text-[11px] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-orange ${
+            isActive ? 'glow text-orange' : 'text-dim hover:text-fg-soft'
+          }`}
+          data-hint={option.hint}>
+          <input
+            checked={isActive}
+            className='sr-only'
+            name='theme'
+            onChange={() => {
+              themeApply(option.value);
+              setTheme(option.value);
+            }}
+            type='radio'
+            value={option.value}
+          />
+          {option.label}
+        </label>
+      </Fragment>
+    );
+  });
+
+  return (
+    <div
+      aria-label='Colour theme'
+      className='flex items-center border border-line px-2 py-1'
+      role='radiogroup'>
+      {optionListJSX}
+    </div>
+  );
 };
+
+/* Helpers */
+const THEME_OPTIONS = [
+  { hint: 'Light palette, pinned.', label: 'L', value: 'light' },
+  { hint: 'Dark palette, pinned.', label: 'D', value: 'dark' },
+  { hint: 'Follows your OS appearance.', label: 'S', value: 'system' },
+] as const satisfies readonly ThemeOption[];
 
 const themeRead = (): Theme => {
   const stored = localStorage.getItem('theme');
   return stored === 'light' || stored === 'dark' ? stored : 'system';
 };
 
-export const ThemeToggle = () => {
-  const [theme, setTheme] = useState(themeRead);
+const themeApply = (theme: Theme) => {
+  if (theme === 'system') {
+    localStorage.removeItem('theme');
+    delete document.documentElement.dataset.theme;
+    return;
+  }
 
-  const cycle = () => {
-    const next = NEXT[theme];
-
-    if (next === 'system') {
-      localStorage.removeItem('theme');
-      delete document.documentElement.dataset.theme;
-    } else {
-      localStorage.setItem('theme', next);
-      document.documentElement.dataset.theme = next;
-    }
-
-    setTheme(next);
-  };
-
-  return (
-    <button
-      className='hint cursor-pointer border border-line px-2 py-1 text-[11px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-orange hover:text-orange'
-      data-hint={HINT[theme]}
-      onClick={cycle}
-      type='button'>
-      {LABEL[theme]}
-    </button>
-  );
+  localStorage.setItem('theme', theme);
+  document.documentElement.dataset.theme = theme;
 };
+
+/* Types */
+interface ThemeOption {
+  hint: string;
+  label: string;
+  value: Theme;
+}
+
+type Theme = 'dark' | 'light' | 'system';
