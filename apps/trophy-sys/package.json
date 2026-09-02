@@ -31,7 +31,7 @@
     "@types/react-dom": "19.2.5",
     "@vitejs/plugin-react": "6.1.1",
     "esbuild": "0.28.2",
-    "oxc-transform-react": "0.147.0",
+    "oxc-transform-react": "0.148.0",
     "tailwindcss": "4.3.3",
     "vite": "8.2.2"
   }
