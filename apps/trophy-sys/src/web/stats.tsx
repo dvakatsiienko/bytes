@@ -2,21 +2,22 @@ import { useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { MotionConfig } from 'motion/react';
 
+import type { TrophyArchive } from '../shared/types.ts';
 import { EffortLegend } from './charts/chart-legend.tsx';
-import { CircadianRingVisx } from './charts/circadian-ring-visx.tsx';
-import { circadianTitle } from './charts/circadian-shared.ts';
-import { EffortScatterVisx } from './charts/effort-scatter-visx.tsx';
-import { hoursLabel } from './charts/effort-shared.ts';
+import { CircadianRing } from './charts/circadian-ring.tsx';
+import { EffortScatter } from './charts/effort-scatter.tsx';
 import {
   type ChartColumn,
   ChartFrame,
   ChartTable,
 } from './components/chart-frame.tsx';
+import { hoursFormat } from './helpers/format.ts';
 import {
   type CircadianHour,
   type EffortPoint,
   circadianHours,
   effortPoints,
+  hourRangeFormat,
 } from './helpers/stats.ts';
 import { useGames, useStats, useStatsSync } from './hooks/queries.ts';
 
@@ -39,7 +40,7 @@ export const Stats = () => {
   const hasArchive = Boolean(archive?.syncedAt);
 
   const ringJSX = hasArchive ? (
-    <CircadianRingVisx hours={hours} />
+    <CircadianRing hours={hours} />
   ) : (
     <p className='grid h-80 place-items-center px-6 text-center text-[11px] text-dim'>
       {stats.isPending
@@ -61,7 +62,7 @@ export const Stats = () => {
           </button>
 
           <span className='text-[10px] text-dim'>
-            {statusOf(sync, archive)}
+            {archiveStatus(archive, sync.error)}
           </span>
         </div>
 
@@ -78,7 +79,7 @@ export const Stats = () => {
             }
             title='effort'>
             <EffortLegend />
-            <EffortScatterVisx onSelect={gameOpen} points={points} />
+            <EffortScatter onSelect={gameOpen} points={points} />
           </ChartFrame>
 
           <ChartFrame
@@ -101,13 +102,11 @@ export const Stats = () => {
 };
 
 /* Helpers */
-const statusOf = (
-  sync: { error: Error | null; isPending: boolean },
-  archive:
-    | { games: number; syncedAt: string | null; trophies: unknown[] }
-    | undefined,
+const archiveStatus = (
+  archive: TrophyArchive | undefined,
+  error: Error | null,
 ) => {
-  if (sync.error) return `scan failed · ${sync.error.message}`;
+  if (error) return `scan failed · ${error.message}`;
   if (!archive?.syncedAt) return 'archive empty — the ring needs a scan';
 
   return `${archive.trophies.length} trophies from ${archive.games} titles · scanned ${archive.syncedAt.slice(0, 10)}`;
@@ -115,7 +114,11 @@ const statusOf = (
 
 const EFFORT_COLUMNS: ChartColumn<EffortPoint>[] = [
   { cell: (point) => point.name, head: 'title' },
-  { cell: (point) => hoursLabel(point.hours), head: 'played', isNumeric: true },
+  {
+    cell: (point) => hoursFormat(point.hours),
+    head: 'played',
+    isNumeric: true,
+  },
   {
     cell: (point) => `${point.earned}/${point.trophies}`,
     head: 'trophies',
@@ -123,7 +126,7 @@ const EFFORT_COLUMNS: ChartColumn<EffortPoint>[] = [
   },
   { cell: (point) => `${point.progress}%`, head: 'progress', isNumeric: true },
   {
-    cell: (point) => (point.perTrophy ? hoursLabel(point.perTrophy) : '—'),
+    cell: (point) => (point.perTrophy ? hoursFormat(point.perTrophy) : '—'),
     head: 'per trophy',
     isNumeric: true,
   },
@@ -131,7 +134,7 @@ const EFFORT_COLUMNS: ChartColumn<EffortPoint>[] = [
 ];
 
 const CIRCADIAN_COLUMNS: ChartColumn<CircadianHour>[] = [
-  { cell: (hour) => circadianTitle(hour), head: 'hour' },
+  { cell: (hour) => hourRangeFormat(hour), head: 'hour' },
   { cell: (hour) => String(hour.count), head: 'trophies', isNumeric: true },
   {
     cell: (hour) => `${hour.share.toFixed(1)}%`,

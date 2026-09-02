@@ -27,6 +27,10 @@ export const playtimeFormat = (seconds: number | null) => {
   return hours ? `${hours}h ${minutes}m` : `${minutes}m`;
 };
 
+/** Coarser than playtimeFormat, and in hours — what an axis and a dot want. */
+export const hoursFormat = (hours: number) =>
+  hours < 1 ? `${Math.round(hours * 60)}m` : `${Math.round(hours)}h`;
+
 /**
  * Two colours only. Platinum is carried by the ◆ beside the title — a metre
  * cannot answer "how far along" and "did you platinum" at once, and the

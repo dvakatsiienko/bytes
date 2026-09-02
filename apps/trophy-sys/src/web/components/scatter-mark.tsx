@@ -3,16 +3,12 @@ import { motion } from 'motion/react';
 import { CHART_INK, seriesColor } from '../helpers/chart-theme.ts';
 
 /**
- * Shared by both charting libraries on purpose: the bake-off is about scales,
- * axes, tooltips and layout, so the mark itself is held identical and the
- * comparison measures the framework rather than one circle's SVG.
- *
  * Shape carries the same split as colour — ◆ for a platinumed title, ● for the
  * rest — so the chart still reads with the colour removed.
  *
- * The mark listens for nothing. Both charts hit-test by nearest data point at
- * the chart level, because half these marks overlap and a mark buried under a
- * later one can never receive a hover of its own.
+ * The mark listens for nothing. The chart hit-tests by nearest mark under the
+ * pointer, because half of these overlap and one buried under a later mark can
+ * never receive a hover of its own.
  */
 export const ScatterMark = (props: ScatterMarkProps) => {
   const fill = seriesColor(props.hasPlatinum);

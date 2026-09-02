@@ -6,19 +6,14 @@ import { ParentSize } from '@visx/responsive';
 import { scaleLinear, scaleLog } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
 
+import type { TooltipRow } from '../components/chart-tooltip.tsx';
 import { ChartTooltip } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
+import { hoursFormat } from '../helpers/format.ts';
 import type { EffortPoint } from '../helpers/stats.ts';
-import {
-  SCATTER_MARGIN as MARGIN,
-  effortRows,
-  hoursLabel,
-  markPeak,
-  markRadius,
-} from './effort-shared.ts';
 
-export const EffortScatterVisx = (props: EffortScatterVisxProps) => (
+export const EffortScatter = (props: EffortScatterProps) => (
   <div className='relative h-80 w-full'>
     <ParentSize>
       {(size) =>
@@ -132,7 +127,7 @@ const Plot = (props: PlotProps) => {
             numTicks={4}
             scale={xScale}
             stroke={CHART_INK.axis}
-            tickFormat={(value) => hoursLabel(Number(value))}
+            tickFormat={(value) => hoursFormat(Number(value))}
             tickLabelProps={() => AXIS_LABEL}
             tickStroke={CHART_INK.axis}
             top={innerHeight}
@@ -189,7 +184,7 @@ const Plot = (props: PlotProps) => {
           style={{
             left: tooltip.tooltipLeft,
             top: tooltip.tooltipTop,
-            transform: tipTransform(
+            transform: tooltipTransform(
               tooltip.tooltipLeft ?? 0,
               tooltip.tooltipTop ?? 0,
               props.width,
@@ -208,8 +203,35 @@ const Plot = (props: PlotProps) => {
 };
 
 /* Helpers */
+const MARGIN = { bottom: 36, left: 42, right: 14, top: 12 };
+
 /** How far outside a mark still counts as pointing at it. */
 const TOLERANCE = 4;
+
+const MARK_MIN = 4;
+const MARK_MAX = 15;
+
+const markPeak = (points: EffortPoint[]) =>
+  Math.max(...points.map((point) => point.trophies), 2);
+
+/**
+ * d3's sqrt scale over [1, peak] → [4, 15], written out longhand. Area, not
+ * radius, tracks the trophy count — a radius-linear dot lies about magnitude.
+ */
+const markRadius = (trophies: number, peak: number) =>
+  MARK_MIN +
+  ((MARK_MAX - MARK_MIN) * (Math.sqrt(Math.max(trophies, 1)) - 1)) /
+    (Math.sqrt(Math.max(peak, 2)) - 1);
+
+const effortRows = (point: EffortPoint): TooltipRow[] => [
+  { label: 'played', value: hoursFormat(point.hours) },
+  { label: 'trophies', value: `${point.earned}/${point.trophies}` },
+  { label: 'progress', value: `${point.progress}%` },
+  {
+    label: 'per trophy',
+    value: point.perTrophy ? hoursFormat(point.perTrophy) : '—',
+  },
+];
 
 /**
  * Flips the box back over the anchor near the right or bottom edge, so it never
@@ -218,7 +240,7 @@ const TOLERANCE = 4;
  * render and destroys on unmount, and that portal disappears from the document
  * whenever the measured container bounds change.
  */
-const tipTransform = (
+const tooltipTransform = (
   left: number,
   top: number,
   width: number,
@@ -237,12 +259,12 @@ const AXIS_LABEL = {
 };
 
 /* Types */
-interface EffortScatterVisxProps {
+interface EffortScatterProps {
   onSelect: (gameId: string) => void;
   points: EffortPoint[];
 }
 
-interface PlotProps extends EffortScatterVisxProps {
+interface PlotProps extends EffortScatterProps {
   height: number;
   width: number;
 }

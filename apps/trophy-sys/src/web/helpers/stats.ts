@@ -74,8 +74,11 @@ export const circadianHours = (
   });
 };
 
-export const hourLabel = (hour: number) =>
-  `${String(hour).padStart(2, '0')}:00`;
+const hourFormat = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
+
+/** The span a spoke covers, which is what its tooltip and table row name. */
+export const hourRangeFormat = (hour: CircadianHour) =>
+  `${hourFormat(hour.hour)}–${hourFormat((hour.hour + 1) % 24)}`;
 
 /* Types */
 export interface EffortPoint {

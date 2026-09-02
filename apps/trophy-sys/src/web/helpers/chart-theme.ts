@@ -1,6 +1,5 @@
 /**
- * Charts pass colours to libraries as strings, so they cannot use Tailwind
- * classes. These are the raw `--p-*` palette variables and not the `--color-*`
+ * visx takes colours as prop strings, so charts cannot use Tailwind classes. These are the raw `--p-*` palette variables and not the `--color-*`
  * theme tokens, because Tailwind drops any theme variable no utility asked for
  * — `--color-blue` is absent from the built stylesheet, `--p-blue` is not.
  */

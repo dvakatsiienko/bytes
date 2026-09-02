@@ -5,19 +5,12 @@ import { Arc } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
+import type { TooltipRow } from '../components/chart-tooltip.tsx';
 import { ChartTooltip } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
-import type { CircadianHour } from '../helpers/stats.ts';
-import {
-  RING_INNER,
-  RING_OUTER,
-  SPOKE_ANGLE,
-  SPOKE_PAD,
-  circadianRows,
-  circadianTitle,
-} from './circadian-shared.ts';
+import { type CircadianHour, hourRangeFormat } from '../helpers/stats.ts';
 
-export const CircadianRingVisx = (props: CircadianRingProps) => (
+export const CircadianRing = (props: CircadianRingProps) => (
   <div className='relative h-80 w-full'>
     <ParentSize>
       {(size) =>
@@ -139,13 +132,29 @@ const Ring = (props: RingProps) => {
           }}>
           <ChartTooltip
             rows={circadianRows(tooltip.tooltipData)}
-            title={circadianTitle(tooltip.tooltipData)}
+            title={hourRangeFormat(tooltip.tooltipData)}
           />
         </div>
       )}
     </>
   );
 };
+
+/* Helpers */
+const SPOKES = 24;
+const SPOKE_ANGLE = (Math.PI * 2) / SPOKES;
+/** A hair of padding so neighbouring spokes read as separate marks. */
+const SPOKE_PAD = 0.012;
+
+/** Fractions of half the plot square. */
+const RING_OUTER = 0.86;
+const RING_INNER = 0.28;
+
+const circadianRows = (hour: CircadianHour): TooltipRow[] => [
+  { label: 'trophies', value: String(hour.count) },
+  { label: 'share', value: `${hour.share.toFixed(1)}%` },
+  { label: 'top title', value: hour.topGame ?? '—' },
+];
 
 /* Types */
 interface CircadianRingProps {
