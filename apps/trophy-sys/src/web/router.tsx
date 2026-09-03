@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import {
   createRootRoute,
   createRoute,
@@ -8,7 +9,15 @@ import {
 import { Layout } from './layout.tsx';
 import { Library, LibraryEmpty, LibraryGame } from './library.tsx';
 import { News } from './news.tsx';
-import { Stats } from './stats.tsx';
+
+/**
+ * Split out, because /stats is the only route that needs visx and motion and
+ * `/` redirects to /library. Loading a charting library to look at a game list
+ * is most of the bundle spent on a page the visitor may never open.
+ */
+const Stats = lazy(() =>
+  import('./stats.tsx').then((module) => ({ default: module.Stats })),
+);
 
 const rootRoute = createRootRoute({ component: Layout });
 
@@ -50,7 +59,16 @@ const newsRoute = createRoute({
 });
 
 const statsRoute = createRoute({
-  component: Stats,
+  component: () => (
+    <Suspense
+      fallback={
+        <p className='grid flex-1 place-items-center text-[11px] text-dim'>
+          loading the charts…
+        </p>
+      }>
+      <Stats />
+    </Suspense>
+  ),
   getParentRoute: () => rootRoute,
   path: '/stats',
 });
