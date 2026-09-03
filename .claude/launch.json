@@ -8,15 +8,39 @@
       "port": 3000
     },
     {
+      "name": "cv",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "cv", "dev", "-p", "3001"],
+      "port": 3001
+    },
+    {
+      "name": "x-com-chat",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "x-com-chat", "dev", "-p", "3002"],
+      "port": 3002
+    },
+    {
+      "name": "figmentation",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "figmentation", "dev", "-p", "3003"],
+      "port": 3003
+    },
+    {
       "name": "proto-lab",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "proto-lab", "dev"],
       "port": 5179,
       "url": "http://localhost:5179",
       "autoPort": false
     },
     {
-      "name": "trophy-sys",
+      "name": "space-explorer-ui",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "trophy-sys", "dev"],
+      "runtimeArgs": ["--filter", "space-explorer-ui", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "trophy-sys",
       "port": 5177,
       "url": "http://localhost:5177",
       "autoPort": false
