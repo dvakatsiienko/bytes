@@ -4,15 +4,15 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "node --run build:web && node --run build:api",
-    "build:api": "esbuild src/server/handler.ts --bundle --platform=node --format=esm --target=node24 --outfile=api/handler.js --allow-overwrite",
-    "build:web": "vite build",
     "dev": "node --run dev:api & node --run dev:web",
     "dev:api": "node --watch --env-file=.env --env-file-if-exists=.env.local src/server/main.ts",
     "dev:web": "vite",
-    "lint": "biome lint",
+    "build": "node --run build:web && node --run build:api",
+    "build:api": "esbuild src/server/handler.ts --bundle --platform=node --format=esm --target=node24 --outfile=api/handler.js --allow-overwrite",
+    "build:web": "vite build",
     "preview": "vite preview",
     "trophies": "node --env-file=.env --env-file-if-exists=.env.local src/server/cli.ts",
+    "lint": "biome lint",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json"
   },
   "dependencies": {
