@@ -94,6 +94,27 @@ export interface ArchivedTrophy {
   at: string;
   gameId: string;
   grade: TrophyGrade;
+  name: string;
+  /** Global PSN earn rate, as a percent. */
+  rarity: number;
+}
+
+/** Where an incremental trophy's counter stands — "47 of 100 flags". */
+export interface TrophyCounter {
+  current: number;
+  target: number;
+}
+
+/** A trophy still missing from a title that is under way. */
+export interface RemainingTrophy {
+  /**
+   * The counter's standing, or null when the trophy has none — which is every
+   * PS4 trophy and most PS5 ones.
+   */
+  counter: TrophyCounter | null;
+  gameId: string;
+  grade: TrophyGrade;
+  name: string;
   /** Global PSN earn rate, as a percent. */
   rarity: number;
 }
@@ -108,8 +129,12 @@ export interface TrophyArchive {
   failed: string[];
   /** Titles successfully read. */
   games: number;
+  /** Unearned trophies, kept only for titles under way. */
+  remaining: RemainingTrophy[];
   /** null until the first sync has run. */
   syncedAt: string | null;
   /** Sorted oldest first. */
   trophies: ArchivedTrophy[];
+  /** Bumped when the stored shape changes; an older archive reads as empty. */
+  version: number;
 }
