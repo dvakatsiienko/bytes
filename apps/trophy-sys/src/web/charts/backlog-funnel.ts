@@ -1,7 +1,7 @@
 import type { Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { hoursFormat } from '../helpers/format.ts';
-import type { BarDatum } from './bar-rows.tsx';
+import type { BarChart } from './bar-rows.tsx';
 
 /**
  * The buckets, coarse to fine. "Finished" is deliberately not called
@@ -36,10 +36,10 @@ export const backlogBuckets = (games: Game[]): BacklogBucket[] =>
     };
   });
 
-export const backlogBars = (buckets: BacklogBucket[]): BarDatum[] => {
+export const backlogChart = (buckets: BacklogBucket[]): BarChart => {
   const peak = Math.max(...buckets.map((bucket) => bucket.games.length), 1);
 
-  return buckets.map((bucket) => {
+  const bars = buckets.map((bucket) => {
     const named = bucket.games
       .slice(0, 3)
       .map((game) => game.name)
@@ -61,6 +61,11 @@ export const backlogBars = (buckets: BacklogBucket[]): BarDatum[] => {
       value: String(bucket.games.length),
     };
   });
+
+  return {
+    axis: { format: (value) => String(Math.round(value)), max: peak },
+    bars,
+  };
 };
 
 export const BACKLOG_COLUMNS: ChartColumn<BacklogBucket>[] = [

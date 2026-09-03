@@ -2,7 +2,7 @@ import type { Game, RemainingTrophy } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { hoursFormat } from '../helpers/format.ts';
 import { gameLookup } from '../helpers/stats.ts';
-import type { BarDatum } from './bar-rows.tsx';
+import type { BarChart } from './bar-rows.tsx';
 
 /** Titles shown before the list stops being a weekly-open view. */
 const LIMIT = 15;
@@ -62,8 +62,9 @@ export const closestRows = (
   return rows.sort((a, b) => a.distance - b.distance).slice(0, LIMIT);
 };
 
-export const closestBars = (rows: ClosestRow[]): BarDatum[] =>
-  rows.map((row) => {
+export const closestChart = (rows: ClosestRow[]): BarChart => ({
+  axis: { format: (value) => `${Math.round(value)}%`, max: 100 },
+  bars: rows.map((row) => {
     const namedLeft = row.left
       .slice(0, 3)
       .map((trophy) => trophy.name)
@@ -91,7 +92,8 @@ export const closestBars = (rows: ClosestRow[]): BarDatum[] =>
       tone: 'var(--p-yellow)',
       value: `${row.distance.toFixed(1)} left`,
     };
-  });
+  }),
+});
 
 const counterFormat = (counters: ClosestRow['counters']) => {
   const [first] = counters;

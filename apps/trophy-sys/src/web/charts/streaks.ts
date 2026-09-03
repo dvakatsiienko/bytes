@@ -1,7 +1,7 @@
 import type { ArchivedTrophy } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { dayKey } from '../helpers/stats.ts';
-import type { BarDatum } from './bar-rows.tsx';
+import type { BarChart } from './bar-rows.tsx';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** Runs shown before the list stops being a highlight reel. */
@@ -70,10 +70,10 @@ export const trophyStreaks = (trophies: ArchivedTrophy[]): StreakModel => {
   };
 };
 
-export const streakBars = (model: StreakModel): BarDatum[] => {
+export const streakChart = (model: StreakModel): BarChart => {
   const peak = Math.max(...model.runs.map((run) => run.days), 1);
 
-  return model.runs.map((run) => ({
+  const bars = model.runs.map((run) => ({
     fraction: run.days / peak,
     id: `${run.start}-${run.end}`,
     label: `${run.start} → ${run.end}`,
@@ -89,6 +89,11 @@ export const streakBars = (model: StreakModel): BarDatum[] => {
     tone: run === model.current ? 'var(--p-green)' : 'var(--p-orange)',
     value: `${run.days}d`,
   }));
+
+  return {
+    axis: { format: (value) => `${Math.round(value)}d`, max: peak },
+    bars,
+  };
 };
 
 export const STREAK_COLUMNS: ChartColumn<Streak>[] = [

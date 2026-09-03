@@ -96,25 +96,35 @@ export const progressionMonths = (
   return points;
 };
 
-export const TrophyProgression = (props: TrophyProgressionProps) => (
-  <div className='flex flex-col'>
-    <SeriesLegend items={GRADE_LEGEND} />
+export const TrophyProgression = (props: TrophyProgressionProps) => {
+  if (props.months.length === 0)
+    return (
+      <p className='grid h-40 place-items-center px-6 text-center text-[11px] text-dim'>
+        nothing earned yet, so there is no arc to draw.
+      </p>
+    );
 
-    <div className='relative h-80 w-full'>
-      <ParentSize>
-        {(size) =>
-          size.width > 0 ? (
-            <Plot
-              height={size.height}
-              months={props.months}
-              width={size.width}
-            />
-          ) : null
-        }
-      </ParentSize>
+  return (
+    <div className='flex flex-col'>
+      <SeriesLegend items={GRADE_LEGEND} />
+
+      <div className='relative h-80 w-full'>
+        <ParentSize>
+          {(size) =>
+            size.width > 0 ? (
+              <Plot
+                focusMonth={props.focusMonth}
+                height={size.height}
+                months={props.months}
+                width={size.width}
+              />
+            ) : null
+          }
+        </ParentSize>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Plot = (props: PlotProps) => {
   const tooltip = useTooltip<MonthPoint>();
@@ -143,6 +153,16 @@ const Plot = (props: PlotProps) => {
   });
 
   const step = innerWidth / Math.max(props.months.length, 1);
+  const barWidth = Math.max(step - 1, 1);
+
+  // The first and last bars are centred on the axis ends, so half of each would
+  // hang outside the plot. Both are pushed back in rather than clipped.
+  const bandX = (index: number) =>
+    Math.min(Math.max(xScale(index) - step / 2, 0), innerWidth - barWidth);
+
+  const focusIndex =
+    props.months.find((month) => month.label === props.focusMonth)?.index ??
+    null;
 
   const monthAt = (event: ReactMouseEvent<SVGRectElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
@@ -164,8 +184,8 @@ const Plot = (props: PlotProps) => {
       key={month.label}
       style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
       transition={{ delay: month.index * 0.004, duration: 0.3 }}
-      width={Math.max(step - 1, 1)}
-      x={xScale(month.index) - step / 2}
+      width={barWidth}
+      x={bandX(month.index)}
       y={BAND_HEIGHT - 4 - bandScale(month.count)}
     />
   ));
@@ -231,6 +251,35 @@ const Plot = (props: PlotProps) => {
               y1={0}
               y2={areaHeight}
             />
+          )}
+
+          {/* Where a clicked day in the activity heatmap lands on this
+              timeline — a solid marker, so it reads as a place rather than as
+              wherever the pointer happens to be. */}
+          {focusIndex !== null && (
+            <g>
+              <line
+                stroke={CHART_INK.ring}
+                strokeWidth={1.5}
+                x1={xScale(focusIndex)}
+                x2={xScale(focusIndex)}
+                y1={0}
+                y2={areaHeight}
+              />
+              <text
+                fill={CHART_INK.ring}
+                fontSize={9}
+                textAnchor={
+                  focusIndex > props.months.length / 2 ? 'end' : 'start'
+                }
+                x={
+                  xScale(focusIndex) +
+                  (focusIndex > props.months.length / 2 ? -4 : 4)
+                }
+                y={10}>
+                {props.focusMonth}
+              </text>
+            </g>
           )}
         </Group>
 
@@ -358,6 +407,8 @@ export interface MonthPoint {
 }
 
 interface TrophyProgressionProps {
+  /** `YYYY-MM` to mark, set by clicking a day in the activity heatmap. */
+  focusMonth: string | null;
   months: MonthPoint[];
 }
 

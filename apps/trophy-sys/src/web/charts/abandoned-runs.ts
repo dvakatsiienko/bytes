@@ -1,10 +1,7 @@
 import type { Game, RemainingTrophy } from '../../shared/types.ts';
-import type { ChartColumn } from '../components/chart-frame.tsx';
-import { dateFormat, hoursFormat } from '../helpers/format.ts';
 import { GRADE_ORDER, gameLookup } from '../helpers/stats.ts';
-import type { BarDatum } from './bar-rows.tsx';
 
-/** The band this chart is about: one step from the platinum, and stopped. */
+/** The band this list is about: one step from the platinum, and stopped. */
 const FLOOR = 80;
 const CEILING = 100;
 
@@ -40,7 +37,7 @@ export const abandonedRuns = (
 };
 
 /** "2 bronze, 1 gold" — what is actually left, by grade. */
-const gradeBreakdown = (left: RemainingTrophy[]) => {
+export const gradeBreakdown = (left: RemainingTrophy[]) => {
   const parts = GRADE_ORDER.map((grade) => {
     const count = left.filter((trophy) => trophy.grade === grade).length;
     return count ? `${count} ${grade}` : null;
@@ -48,40 +45,6 @@ const gradeBreakdown = (left: RemainingTrophy[]) => {
 
   return parts.length ? parts.join(', ') : '—';
 };
-
-export const abandonedBars = (runs: AbandonedRun[]): BarDatum[] =>
-  runs.map((run) => ({
-    // The band is 80-100, so the bar shows position inside the band rather than
-    // from zero — every bar would otherwise be nearly full and nearly equal.
-    fraction: (run.progress - FLOOR) / (CEILING - FLOOR),
-    iconUrl: run.iconUrl,
-    id: run.gameId,
-    label: run.name,
-    note: run.left
-      .slice(0, 3)
-      .map((trophy) => trophy.name)
-      .join(', '),
-    rows: [
-      { label: 'progress', value: `${run.progress}%` },
-      { label: 'left', value: gradeBreakdown(run.left) },
-      { label: 'hours sunk', value: hoursFormat(run.hours) },
-      { label: 'last played', value: dateFormat(run.playedAt) },
-    ],
-    tone: 'var(--p-red)',
-    value: `${run.progress}%`,
-  }));
-
-export const ABANDONED_COLUMNS: ChartColumn<AbandonedRun>[] = [
-  { cell: (run) => run.name, head: 'title' },
-  { cell: (run) => `${run.progress}%`, head: 'progress', isNumeric: true },
-  { cell: (run) => gradeBreakdown(run.left), head: 'left' },
-  {
-    cell: (run) => hoursFormat(run.hours),
-    head: 'hours sunk',
-    isNumeric: true,
-  },
-  { cell: (run) => dateFormat(run.playedAt), head: 'last played' },
-];
 
 /* Types */
 export interface AbandonedRun {

@@ -62,6 +62,11 @@ export const nightOwlGrid = (
 
   const peak = Math.max(...rows.flatMap((row) => row.hours), 1);
 
+  // Ordered by the hour each title peaked in, so the grid reads down the clock
+  // instead of restating the library's top-six list, which the ring and the
+  // effort scatter already carry between them.
+  rows.sort((a, b) => peakHour(a) - peakHour(b));
+
   return { hourTotals, peak, rows };
 };
 
@@ -172,6 +177,10 @@ export const NightOwl = (props: NightOwlProps) => {
 
 /* Helpers */
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
+
+/** The hour a title popped the most trophies in — the row's sort key. */
+const peakHour = (row: NightOwlRow) =>
+  row.hours.indexOf(Math.max(...row.hours));
 
 const CELL = 11;
 const STEP = 13;

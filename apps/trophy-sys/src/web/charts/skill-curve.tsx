@@ -14,10 +14,20 @@ import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 import { median, monthKey } from '../helpers/stats.ts';
 
+/** Months pooled into one rolling reading — the current month and the two before it. */
+const WINDOW = 3;
+
 /**
  * The median global earn rate of everything popped in a month. Median rather
  * than mean because one 0.5% platinum in a month of commons would drag a mean
  * far below what the month actually felt like.
+ *
+ * The line draws a three-month rolling median, and the dots the single months
+ * behind it. A single month swings between 2% and 60% with no trend in it —
+ * that is sample size, not skill, and a line through it reads as noise. The
+ * window pools the three months' trophies and takes one median of the pool,
+ * rather than averaging three medians, so a busy month counts for more than a
+ * month with four trophies in it.
  *
  * Quiet months are dropped: the median of nothing is not zero, it is nothing,
  * and drawing it as zero would invent the rarest month on record.
@@ -32,15 +42,24 @@ export const skillMonths = (trophies: ArchivedTrophy[]): SkillMonth[] => {
     else perMonth.set(key, [trophy.rarity]);
   }
 
-  return [...perMonth.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([label, rarities], index) => ({
+  const ordered = [...perMonth.entries()].sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
+
+  return ordered.map(([label, rarities], index) => {
+    const pooled = ordered
+      .slice(Math.max(index - WINDOW + 1, 0), index + 1)
+      .flatMap(([, values]) => values);
+
+    return {
       count: rarities.length,
       index,
       label,
       median: median(rarities),
       rarest: Math.min(...rarities),
-    }));
+      rolling: median(pooled),
+    };
+  });
 };
 
 export const SkillCurve = (props: SkillCurveProps) => (
@@ -83,7 +102,9 @@ const Plot = (props: PlotProps) => {
       cx={xScale(month.index)}
       cy={yScale(month.median)}
       fill={CHART_INK.ring}
-      fillOpacity={month.index === activeIndex ? 1 : 0.5}
+      // The single months sit behind the line as faint marks: they are the
+      // evidence, the rolling line is the reading.
+      fillOpacity={month.index === activeIndex ? 1 : 0.35}
       key={month.label}
       r={month.index === activeIndex ? 4 : 2}
     />
@@ -111,7 +132,7 @@ const Plot = (props: PlotProps) => {
           <LinePath<SkillMonth>
             data={props.months}
             x={(month) => xScale(month.index)}
-            y={(month) => yScale(month.median)}>
+            y={(month) => yScale(month.rolling)}>
             {({ path }) => (
               <motion.path
                 animate={{ pathLength: 1 }}
@@ -182,7 +203,11 @@ const Plot = (props: PlotProps) => {
           <ChartTooltip
             rows={[
               {
-                label: 'median rarity',
+                label: '3-month median',
+                value: `${tooltip.tooltipData.rolling.toFixed(1)}%`,
+              },
+              {
+                label: 'this month',
                 value: `${tooltip.tooltipData.median.toFixed(1)}%`,
               },
               {
@@ -205,8 +230,13 @@ const MARGIN = { bottom: 26, left: 38, right: 10, top: 10 };
 export const SKILL_COLUMNS: ChartColumn<SkillMonth>[] = [
   { cell: (month) => month.label, head: 'month' },
   {
+    cell: (month) => `${month.rolling.toFixed(1)}%`,
+    head: '3-month median',
+    isNumeric: true,
+  },
+  {
     cell: (month) => `${month.median.toFixed(1)}%`,
-    head: 'median rarity',
+    head: 'this month',
     isNumeric: true,
   },
   { cell: (month) => `${month.rarest}%`, head: 'rarest', isNumeric: true },
@@ -226,9 +256,11 @@ export interface SkillMonth {
   index: number;
   /** `YYYY-MM`. */
   label: string;
-  /** Median global earn rate this month — lower means rarer. */
+  /** Median global earn rate this month alone — lower means rarer. */
   median: number;
   rarest: number;
+  /** Median over this month and the two before it, pooled. The line's value. */
+  rolling: number;
 }
 
 interface SkillCurveProps {

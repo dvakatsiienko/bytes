@@ -1,3 +1,4 @@
+import { AxisBottom } from '@visx/axis';
 import { ParentSize } from '@visx/responsive';
 import { scaleLinear } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
@@ -13,7 +14,15 @@ import { CHART_INK } from '../helpers/chart-theme.ts';
  * measure, so the measure is the prop and the picture is written once.
  */
 export const BarRows = (props: BarRowsProps) => {
-  const height = props.rows.length * ROW_HEIGHT + PAD * 2;
+  if (props.rows.length === 0)
+    return (
+      <p className='grid h-24 place-items-center px-6 text-center text-[11px] text-dim'>
+        {props.empty ?? 'nothing to show here'}
+      </p>
+    );
+
+  const height =
+    props.rows.length * ROW_HEIGHT + PAD * 2 + (props.axis ? AXIS_HEIGHT : 0);
 
   return (
     <div className='relative w-full' style={{ height }}>
@@ -21,6 +30,7 @@ export const BarRows = (props: BarRowsProps) => {
         {(size) =>
           size.width > 0 ? (
             <Bars
+              axis={props.axis}
               height={height}
               label={props.label}
               onSelect={props.onSelect}
@@ -42,6 +52,12 @@ const Bars = (props: BarsProps) => {
 
   const xScale = scaleLinear<number>({
     domain: [0, 1],
+    range: [0, trackWidth],
+  });
+  // The axis reads in the measure's own units, so the ticks come from a second
+  // scale over the real domain rather than over the 0-1 bar fraction.
+  const axisScale = scaleLinear<number>({
+    domain: [0, props.axis?.max ?? 1],
     range: [0, trackWidth],
   });
 
@@ -109,7 +125,10 @@ const Bars = (props: BarsProps) => {
             duration: 0.4,
             ease: 'easeOut',
           }}
-          width={Math.max(xScale(row.fraction), 1)}
+          // A floor of two pixels: the shortest bars in a wide-spread set are
+          // the whole point of a "quickest first" ranking, and a sub-pixel bar
+          // reads as no bar at all.
+          width={Math.max(xScale(row.fraction), MIN_BAR)}
           x={gutter}
           y={y + (ROW_HEIGHT - BAR_HEIGHT) / 2}
         />
@@ -137,6 +156,23 @@ const Bars = (props: BarsProps) => {
         role='img'
         width={props.width}>
         {rowListJSX}
+
+        {props.axis && (
+          <AxisBottom
+            left={gutter}
+            numTicks={4}
+            scale={axisScale}
+            stroke={CHART_INK.axis}
+            tickFormat={(value) => props.axis?.format(Number(value)) ?? ''}
+            tickLabelProps={() => ({
+              fill: CHART_INK.axis,
+              fontSize: 9,
+              textAnchor: 'middle' as const,
+            })}
+            tickStroke={CHART_INK.axis}
+            top={props.rows.length * ROW_HEIGHT + PAD * 2}
+          />
+        )}
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
@@ -161,6 +197,8 @@ const Bars = (props: BarsProps) => {
 const ROW_HEIGHT = 20;
 const BAR_HEIGHT = 9;
 const PAD = 6;
+const MIN_BAR = 2;
+const AXIS_HEIGHT = 22;
 /** Room kept at the right edge for the readout, plus a gap before the track. */
 const VALUE_WIDTH = 76;
 
@@ -185,7 +223,27 @@ export interface BarDatum {
   value: string;
 }
 
+/** What the full track is worth, so the axis can print real units. */
+export interface BarAxis {
+  format: (value: number) => string;
+  max: number;
+}
+
+/**
+ * What a chart module hands over: the bars and the scale they were measured
+ * against. One return rather than two exports, because only the module that
+ * built the fractions knows what a full track means.
+ */
+export interface BarChart {
+  axis: BarAxis;
+  bars: BarDatum[];
+}
+
 interface BarRowsProps {
+  /** Given only when the bars run from zero — an offset scale has no axis. */
+  axis?: BarAxis;
+  /** Shown instead of the chart when there are no rows. */
+  empty?: string;
   /** What the whole chart says, for a screen reader. */
   label: string;
   onSelect?: (id: string) => void;

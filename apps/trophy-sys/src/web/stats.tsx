@@ -1,24 +1,21 @@
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode, useMemo, useRef, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { MotionConfig } from 'motion/react';
 
 import type { TrophyArchive } from '../shared/types.ts';
-import {
-  ABANDONED_COLUMNS,
-  abandonedBars,
-  abandonedRuns,
-} from './charts/abandoned-runs.ts';
+import { abandonedRuns } from './charts/abandoned-runs.ts';
 import {
   BACKLOG_COLUMNS,
-  backlogBars,
   backlogBuckets,
+  backlogChart,
 } from './charts/backlog-funnel.ts';
+import { BacklogPanel } from './charts/backlog-panel.tsx';
 import { BarRows } from './charts/bar-rows.tsx';
 import { EffortLegend } from './charts/chart-legend.tsx';
 import { CircadianRing } from './charts/circadian-ring.tsx';
 import {
   CLOSEST_COLUMNS,
-  closestBars,
+  closestChart,
   closestRows,
 } from './charts/closest-to-done.ts';
 import {
@@ -34,7 +31,7 @@ import {
 } from './charts/night-owl.tsx';
 import {
   RARITY_COLUMNS,
-  rarityBars,
+  rarityChart,
   rarityTiers,
 } from './charts/rarity-distribution.ts';
 import {
@@ -42,10 +39,14 @@ import {
   SkillCurve,
   skillMonths,
 } from './charts/skill-curve.tsx';
-import { STREAK_COLUMNS, streakBars, trophyStreaks } from './charts/streaks.ts';
+import {
+  STREAK_COLUMNS,
+  streakChart,
+  trophyStreaks,
+} from './charts/streaks.ts';
 import {
   PLATINUM_COLUMNS,
-  platinumBars,
+  platinumChart,
   platinumRuns,
 } from './charts/time-to-platinum.ts';
 import {
@@ -74,6 +75,9 @@ export const Stats = () => {
   const games = useGames();
   const stats = useStats();
   const sync = useStatsSync();
+
+  const [focusMonth, setFocusMonth] = useState<string | null>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   const gameList = useMemo(() => games.data ?? [], [games.data]);
   const archive = stats.data;
@@ -117,20 +121,55 @@ export const Stats = () => {
   );
   const streaks = useMemo(() => trophyStreaks(trophies), [trophies]);
 
+  // Each builder walks its rows once and returns the bars with the scale they
+  // were measured against, so it must not be called twice per render.
+  const rarityBars = useMemo(() => rarityChart(tiers), [tiers]);
+  const backlogBars = useMemo(() => backlogChart(buckets), [buckets]);
+  const closestBars = useMemo(() => closestChart(closest), [closest]);
+  const platinumBars = useMemo(() => platinumChart(platinums), [platinums]);
+  const streakBars = useMemo(() => streakChart(streaks), [streaks]);
+
   const gameOpen = (gameId: string) =>
     navigate({ params: { gameId }, to: '/library/$gameId' });
 
-  /** Charts drawn from the fan-out say so plainly until it has been run. */
-  const gate = (chart: ReactNode) =>
-    archive?.syncedAt ? (
-      chart
-    ) : (
-      <p className='grid h-40 place-items-center px-6 text-center text-[11px] text-dim'>
-        {stats.isPending
-          ? 'reading the archive…'
-          : 'no trophy archive yet. run the scan above — it reads every title you have earned in, once, and stores the result.'}
-      </p>
-    );
+  /**
+   * A day in the activity heatmap points at a month on the progression
+   * timeline. The timeline draws every month it has at once, so "scroll to that
+   * date" means bring the panel into view and mark the month — the two charts
+   * share nothing but this one string.
+   */
+  const dayFocus = (date: string) => {
+    setFocusMonth(date.slice(0, 7));
+    timelineRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+  };
+
+  /**
+   * Every chart says which of the four states it is in rather than drawing an
+   * empty plot: still loading, failed, waiting on a scan, or ready.
+   */
+  const gate = (chart: ReactNode, needsArchive = true) => {
+    if (games.isPending || (needsArchive && stats.isPending))
+      return <Note>reading…</Note>;
+
+    if (games.isError)
+      return <Note>could not read the library · {games.error.message}</Note>;
+
+    if (needsArchive && stats.isError)
+      return <Note>could not read the archive · {stats.error.message}</Note>;
+
+    if (needsArchive && !archive?.syncedAt)
+      return (
+        <Note>
+          no trophy archive yet. run the scan above — it reads every title you
+          have earned in, once, and stores the result.
+        </Note>
+      );
+
+    return chart;
+  };
 
   return (
     <MotionConfig reducedMotion='user'>
@@ -147,6 +186,15 @@ export const Stats = () => {
           <span className='text-[10px] text-dim'>
             {archiveStatus(archive, sync.error)}
           </span>
+
+          {focusMonth && (
+            <button
+              className='cursor-pointer border border-orange px-2 py-0.5 text-[10px] text-orange'
+              onClick={() => setFocusMonth(null)}
+              type='button'>
+              clear {focusMonth} marker ✕
+            </button>
+          )}
         </div>
 
         <KpiStrip games={gameList} trophies={trophies} />
@@ -164,7 +212,7 @@ export const Stats = () => {
             }
             title='effort'>
             <EffortLegend />
-            <EffortScatter onSelect={gameOpen} points={points} />
+            {gate(<EffortScatter onSelect={gameOpen} points={points} />, false)}
           </ChartFrame>
 
           <ChartFrame
@@ -194,8 +242,10 @@ export const Stats = () => {
             title='rarity'>
             {gate(
               <BarRows
+                axis={rarityBars.axis}
+                empty='no trophies in the archive yet'
                 label='Earned trophies bucketed by global rarity'
-                rows={rarityBars(tiers)}
+                rows={rarityBars.bars}
               />,
             )}
           </ChartFrame>
@@ -211,48 +261,13 @@ export const Stats = () => {
               />
             }
             title='backlog'>
-            <BarRows
-              label='Titles bucketed by completion'
-              rows={backlogBars(buckets)}
-            />
-          </ChartFrame>
-
-          <ChartFrame
-            name='abandoned'
-            note='dropped between 80% and the platinum · the bar shows where in that band it stopped'
-            table={
-              <ChartTable
-                columns={ABANDONED_COLUMNS}
-                rowKey={(run) => run.gameId}
-                rows={abandoned}
-              />
-            }
-            title='abandoned runs'>
             {gate(
-              <BarRows
-                label='Titles dropped one step from the platinum'
+              <BacklogPanel
+                abandoned={abandoned}
+                chart={backlogBars}
                 onSelect={gameOpen}
-                rows={abandonedBars(abandoned)}
               />,
-            )}
-          </ChartFrame>
-
-          <ChartFrame
-            name='streaks'
-            note={streakNote(streaks.current?.days ?? 0)}
-            table={
-              <ChartTable
-                columns={STREAK_COLUMNS}
-                rowKey={(run) => `${run.start}-${run.end}`}
-                rows={streaks.runs}
-              />
-            }
-            title='streaks'>
-            {gate(
-              <BarRows
-                label='Longest runs of consecutive days with a trophy'
-                rows={streakBars(streaks)}
-              />,
+              false,
             )}
           </ChartFrame>
 
@@ -269,9 +284,11 @@ export const Stats = () => {
             title='closest to done'>
             {gate(
               <BarRows
+                axis={closestBars.axis}
+                empty='nothing under way — every title is finished or untouched'
                 label='Titles under way, ranked by how little is left'
                 onSelect={gameOpen}
-                rows={closestBars(closest)}
+                rows={closestBars.bars}
               />,
             )}
           </ChartFrame>
@@ -289,17 +306,54 @@ export const Stats = () => {
             title='time to platinum'>
             {gate(
               <BarRows
+                axis={platinumBars.axis}
+                empty='no platinum has a matched playtime yet'
                 label='Hours played to reach each platinum'
                 onSelect={gameOpen}
-                rows={platinumBars(platinums)}
+                rows={platinumBars.bars}
               />,
             )}
           </ChartFrame>
 
-          <div className='lg:col-span-2'>
+          <ChartFrame
+            name='streaks'
+            note={streakNote(streaks.current?.days ?? 0)}
+            table={
+              <ChartTable
+                columns={STREAK_COLUMNS}
+                rowKey={(run) => `${run.start}-${run.end}`}
+                rows={streaks.runs}
+              />
+            }
+            title='streaks'>
+            {gate(
+              <BarRows
+                axis={streakBars.axis}
+                empty='no run of consecutive days yet'
+                label='Longest runs of consecutive days with a trophy'
+                rows={streakBars.bars}
+              />,
+            )}
+          </ChartFrame>
+
+          <ChartFrame
+            name='skill'
+            note='median global earn rate of the trophies popped each month · the line is a three-month rolling median, the dots are the single months · lower means rarer'
+            table={
+              <ChartTable
+                columns={SKILL_COLUMNS}
+                rowKey={(month) => month.label}
+                rows={skill}
+              />
+            }
+            title='skill curve'>
+            {gate(<SkillCurve months={skill} />)}
+          </ChartFrame>
+
+          <div className='min-w-0 lg:col-span-2'>
             <ChartFrame
               name='heatmap'
-              note='the last year, one cell per day · the bars on the right total each weekday over the same window'
+              note='the last year, one cell per day · the bars on the right total each weekday over the same window · click a day to mark its month on the timeline below'
               table={
                 <ChartTable
                   columns={WEEKDAY_COLUMNS}
@@ -308,11 +362,13 @@ export const Stats = () => {
                 />
               }
               title='activity'>
-              {gate(<ContributionHeatmap model={heatmap} />)}
+              {gate(
+                <ContributionHeatmap model={heatmap} onSelect={dayFocus} />,
+              )}
             </ChartFrame>
           </div>
 
-          <div className='lg:col-span-2'>
+          <div className='min-w-0 lg:col-span-2' ref={timelineRef}>
             <ChartFrame
               name='progression'
               note='trophies collected, stacked by grade · the band underneath is what each month alone brought'
@@ -324,37 +380,27 @@ export const Stats = () => {
                 />
               }
               title='progression'>
-              {gate(<TrophyProgression months={months} />)}
+              {gate(
+                <TrophyProgression focusMonth={focusMonth} months={months} />,
+              )}
             </ChartFrame>
           </div>
 
-          <ChartFrame
-            name='night-owl'
-            note='the same hours as the ring, one row per busiest title · the darker the cell, the more it popped in that hour'
-            table={
-              <ChartTable
-                columns={NIGHT_OWL_COLUMNS}
-                rowKey={(row) => row.name}
-                rows={nightOwl.rows}
-              />
-            }
-            title='night owl'>
-            {gate(<NightOwl grid={nightOwl} />)}
-          </ChartFrame>
-
-          <ChartFrame
-            name='skill'
-            note='median global earn rate of the trophies popped each month · lower means rarer'
-            table={
-              <ChartTable
-                columns={SKILL_COLUMNS}
-                rowKey={(month) => month.label}
-                rows={skill}
-              />
-            }
-            title='skill curve'>
-            {gate(<SkillCurve months={skill} />)}
-          </ChartFrame>
+          <div className='min-w-0 lg:col-span-2'>
+            <ChartFrame
+              name='night-owl'
+              note='the same hours as the ring, one row per busiest title, ordered by the hour each one peaked in · the darker the cell, the more it popped then'
+              table={
+                <ChartTable
+                  columns={NIGHT_OWL_COLUMNS}
+                  rowKey={(row) => row.name}
+                  rows={nightOwl.rows}
+                />
+              }
+              title='night owl'>
+              {gate(<NightOwl grid={nightOwl} />)}
+            </ChartFrame>
+          </div>
         </div>
       </main>
     </MotionConfig>
@@ -362,6 +408,12 @@ export const Stats = () => {
 };
 
 /* Helpers */
+const Note = (props: { children: ReactNode }) => (
+  <p className='grid h-40 place-items-center px-6 text-center text-[11px] text-dim'>
+    {props.children}
+  </p>
+);
+
 const archiveStatus = (
   archive: TrophyArchive | undefined,
   error: Error | null,

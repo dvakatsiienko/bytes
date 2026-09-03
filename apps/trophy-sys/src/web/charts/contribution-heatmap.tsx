@@ -94,13 +94,17 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
 
   const cellListJSX = props.model.columns.flatMap((column, weekIndex) =>
     column.map((cell) => (
+      // Pointer-only enhancement: the same numbers are in this chart's table
+      // view, and the click only moves a marker on another chart.
       <motion.rect
         animate={{ opacity: 1 }}
+        className={cell.count ? 'cursor-pointer' : undefined}
         fill={cell.count ? CHART_INK.ring : CHART_INK.grid}
         fillOpacity={cell.count ? shadeOf(cell.count) : 0.25}
         height={CELL}
         initial={{ opacity: 0 }}
         key={cell.date}
+        onClick={() => cell.count && props.onSelect(cell.date)}
         onMouseEnter={() =>
           tooltip.showTooltip({
             tooltipData: cell,
@@ -281,4 +285,6 @@ export interface HeatmapModel {
 
 interface ContributionHeatmapProps {
   model: HeatmapModel;
+  /** Called with a `YYYY-MM-DD` when a day with trophies in it is clicked. */
+  onSelect: (date: string) => void;
 }

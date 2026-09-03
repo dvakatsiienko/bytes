@@ -1,7 +1,7 @@
 import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { gameLookup } from '../helpers/stats.ts';
-import type { BarDatum } from './bar-rows.tsx';
+import type { BarChart } from './bar-rows.tsx';
 
 /**
  * PSNProfiles' own tier names and cut points, kept so the chart reads familiar.
@@ -47,10 +47,10 @@ export const rarityTiers = (
   });
 };
 
-export const rarityBars = (tiers: RarityTier[]): BarDatum[] => {
+export const rarityChart = (tiers: RarityTier[]): BarChart => {
   const peak = Math.max(...tiers.map((tier) => tier.count), 1);
 
-  return tiers.map((tier) => ({
+  const bars = tiers.map((tier) => ({
     fraction: tier.count / peak,
     iconUrl: tier.rarest[0]?.iconUrl,
     id: tier.label,
@@ -67,6 +67,11 @@ export const rarityBars = (tiers: RarityTier[]): BarDatum[] => {
     tone: tier.tone,
     value: String(tier.count),
   }));
+
+  return {
+    axis: { format: (value) => String(Math.round(value)), max: peak },
+    bars,
+  };
 };
 
 export const RARITY_COLUMNS: ChartColumn<RarityTier>[] = [

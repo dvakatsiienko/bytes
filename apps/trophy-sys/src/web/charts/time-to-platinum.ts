@@ -2,7 +2,7 @@ import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { dateFormat, hoursFormat } from '../helpers/format.ts';
 import { gameLookup } from '../helpers/stats.ts';
-import type { BarDatum } from './bar-rows.tsx';
+import type { BarChart } from './bar-rows.tsx';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -53,10 +53,10 @@ export const platinumRuns = (
   return runs.filter((run) => run.hours > 0).sort((a, b) => a.hours - b.hours);
 };
 
-export const platinumBars = (runs: PlatinumRun[]): BarDatum[] => {
+export const platinumChart = (runs: PlatinumRun[]): BarChart => {
   const peak = Math.max(...runs.map((run) => run.hours), 1);
 
-  return runs.map((run) => ({
+  const bars = runs.map((run) => ({
     fraction: run.hours / peak,
     iconUrl: run.iconUrl,
     id: run.gameId,
@@ -72,6 +72,8 @@ export const platinumBars = (runs: PlatinumRun[]): BarDatum[] => {
     tone: 'var(--p-platinum)',
     value: hoursFormat(run.hours),
   }));
+
+  return { axis: { format: hoursFormat, max: peak }, bars };
 };
 
 export const PLATINUM_COLUMNS: ChartColumn<PlatinumRun>[] = [
