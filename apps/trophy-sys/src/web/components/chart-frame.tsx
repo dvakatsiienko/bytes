@@ -16,7 +16,10 @@ export const ChartFrame = (props: ChartFrameProps) => {
   const [view, setView] = useState<ChartView>('chart');
 
   return (
-    <section className='panel flex min-h-0 flex-col'>
+    // min-w-0: a grid item defaults to min-width:auto, so a chart wider than the
+    // column (the heatmap, the night-owl grid) would stretch the track and push
+    // the whole page sideways instead of scrolling inside its own box.
+    <section className='panel flex min-h-0 min-w-0 flex-col'>
       <span className='panel-title'>{props.title}</span>
 
       <div className='flex items-center gap-3 border-line border-b px-4 py-2'>

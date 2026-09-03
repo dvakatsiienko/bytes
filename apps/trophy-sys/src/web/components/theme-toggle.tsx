@@ -20,7 +20,11 @@ export const ThemeToggle = () => {
           </span>
         )}
         <label
-          className={`hint cursor-pointer px-1 text-[11px] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-orange ${
+          // hint-right: this control sits at the end of the header row, and a
+          // left-anchored 15rem hint hangs 108px past a 390px viewport — which
+          // the page then scrolls to, because an absolutely positioned
+          // pseudo-element still counts toward the document's scroll width.
+          className={`hint hint-right cursor-pointer px-1 text-[11px] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-orange ${
             isActive ? 'glow text-orange' : 'text-dim hover:text-fg-soft'
           }`}
           data-hint={option.hint}>

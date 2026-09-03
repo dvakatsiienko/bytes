@@ -21,7 +21,10 @@ export const Layout = () => {
 
   return (
     <div className='flex h-full flex-col gap-5 p-6'>
-      <div className='flex items-center gap-4'>
+      {/* Wrapping, because the row is a fixed set of controls plus a status
+          string and there is no width at which truncating "news" is better than
+          a second line. */}
+      <div className='flex flex-wrap items-center gap-x-4 gap-y-2'>
         <h1 className='text-lg'>
           <Link
             className='glow cursor-pointer text-orange tracking-[0.3em] transition-colors hover:text-yellow focus-visible:outline focus-visible:outline-orange'
