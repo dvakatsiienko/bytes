@@ -7,7 +7,7 @@ import { scaleLinear, scaleLog } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
 
 import type { TooltipRow } from '../components/chart-tooltip.tsx';
-import { ChartTooltip } from '../components/chart-tooltip.tsx';
+import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
@@ -179,24 +179,17 @@ const Plot = (props: PlotProps) => {
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
-        <div
-          className='pointer-events-none absolute z-50'
-          style={{
-            left: tooltip.tooltipLeft,
-            top: tooltip.tooltipTop,
-            transform: tooltipTransform(
-              tooltip.tooltipLeft ?? 0,
-              tooltip.tooltipTop ?? 0,
-              props.width,
-              props.height,
-            ),
-          }}>
+        <TooltipLayer
+          height={props.height}
+          left={tooltip.tooltipLeft}
+          top={tooltip.tooltipTop}
+          width={props.width}>
           <ChartTooltip
             iconUrl={tooltip.tooltipData.iconUrl}
             rows={effortRows(tooltip.tooltipData)}
             title={tooltip.tooltipData.name}
           />
-        </div>
+        </TooltipLayer>
       )}
     </>
   );
@@ -232,24 +225,6 @@ const effortRows = (point: EffortPoint): TooltipRow[] => [
     value: point.perTrophy ? hoursFormat(point.perTrophy) : '—',
   },
 ];
-
-/**
- * Flips the box back over the anchor near the right or bottom edge, so it never
- * leaves the panel. Deterministic, and deliberately not measured: visx's own
- * bounds-detecting tooltip measures itself inside a portal it creates during
- * render and destroys on unmount, and that portal disappears from the document
- * whenever the measured container bounds change.
- */
-const tooltipTransform = (
-  left: number,
-  top: number,
-  width: number,
-  height: number,
-) => {
-  const x = left > width * 0.6 ? 'calc(-100% - 12px)' : '12px';
-  const y = top > height * 0.6 ? 'calc(-100% - 12px)' : '12px';
-  return `translate(${x}, ${y})`;
-};
 
 /* Styles */
 const AXIS_LABEL = {

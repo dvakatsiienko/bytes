@@ -6,7 +6,7 @@ import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
 import type { TooltipRow } from '../components/chart-tooltip.tsx';
-import { ChartTooltip } from '../components/chart-tooltip.tsx';
+import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 import { type CircadianHour, hourRangeFormat } from '../helpers/stats.ts';
 
@@ -123,18 +123,16 @@ const Ring = (props: RingProps) => {
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
-        <div
-          className='pointer-events-none absolute z-50'
-          style={{
-            left: tooltip.tooltipLeft,
-            top: tooltip.tooltipTop,
-            transform: `translate(${(tooltip.tooltipLeft ?? 0) > props.width * 0.6 ? 'calc(-100% - 12px)' : '12px'}, ${(tooltip.tooltipTop ?? 0) > props.height * 0.6 ? 'calc(-100% - 12px)' : '12px'})`,
-          }}>
+        <TooltipLayer
+          height={props.height}
+          left={tooltip.tooltipLeft}
+          top={tooltip.tooltipTop}
+          width={props.width}>
           <ChartTooltip
             rows={circadianRows(tooltip.tooltipData)}
             title={hourRangeFormat(tooltip.tooltipData)}
           />
-        </div>
+        </TooltipLayer>
       )}
     </>
   );

@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 /** The one tooltip every chart uses, with the game icon slot. */
 export const ChartTooltip = (props: ChartTooltipProps) => {
   const rowListJSX = props.rows.map((row) => {
@@ -26,7 +28,34 @@ export const ChartTooltip = (props: ChartTooltipProps) => {
         </span>
       </div>
 
+      {props.note && (
+        <p className='mt-1 max-w-44 text-[9px] text-mute'>{props.note}</p>
+      )}
+
       <dl className='mt-1 grid grid-cols-[auto_auto] gap-x-3'>{rowListJSX}</dl>
+    </div>
+  );
+};
+
+/**
+ * Parks a tooltip at a point inside the chart and flips it back over that point
+ * near the right or bottom edge, so it never leaves the panel.
+ *
+ * Deterministic, and deliberately not measured: visx's own bounds-detecting
+ * tooltip builds a portal during render and destroys it on unmount, and that
+ * portal leaves the document whenever the measured container bounds change.
+ */
+export const TooltipLayer = (props: TooltipLayerProps) => {
+  const left = props.left ?? 0;
+  const top = props.top ?? 0;
+  const x = left > props.width * 0.6 ? 'calc(-100% - 12px)' : '12px';
+  const y = top > props.height * 0.6 ? 'calc(-100% - 12px)' : '12px';
+
+  return (
+    <div
+      className='pointer-events-none absolute z-50'
+      style={{ left, top, transform: `translate(${x}, ${y})` }}>
+      {props.children}
     </div>
   );
 };
@@ -39,6 +68,16 @@ export interface TooltipRow {
 
 interface ChartTooltipProps {
   iconUrl?: string;
+  /** A line of prose above the readings — what a bucket means, say. */
+  note?: string;
   rows: TooltipRow[];
   title: string;
+}
+
+interface TooltipLayerProps {
+  children: ReactNode;
+  height: number;
+  left: number | undefined;
+  top: number | undefined;
+  width: number;
 }
