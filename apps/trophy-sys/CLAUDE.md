@@ -134,7 +134,20 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
   `*_COLUMNS`, so `stats.tsx` only wires.
 
-### Three things measured the hard way
+### Charts talking to each other
+
+Clicking a day in the activity heatmap marks that month on the progression
+timeline. **The two charts share one `YYYY-MM` string and nothing else** — the
+route holds `focusMonth` state and a `ref` on the progression wrapper, the
+heatmap emits a date, the progression takes a `focusMonth` prop and draws a
+marker. Keep any future cross-chart link this shape: a value in the route, never
+an import between chart modules.
+
+The timeline draws every month it has at once, so "scroll to that date" is
+`scrollIntoView` on the panel plus the marker. There is no horizontal scrolling
+to drive.
+
+### Five things measured the hard way
 
 - 🚫 **Never put motion's `animate` transform and an SVG `transform` attribute on one node.**
   Motion writes its scale into the `transform` style, which replaces the attribute outright — the
@@ -147,6 +160,13 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   also carries a shape, so colour is never alone.
 - 🚫 **No chart has two y axes.** The velocity band under the progression area is a second plot
   sharing the x axis, not a second scale on the same one.
+- 🚫 **A grid item needs `min-w-0`, or a wide chart stretches the page.** A grid item's
+  `min-width` defaults to `auto`, so the heatmap's 783px SVG widened its own column instead of
+  scrolling inside it. `ChartFrame` carries the class; so must any new wrapper around a panel.
+- 📌 **A hidden pseudo-element still counts toward the page's scroll width.** `.hint::after` is
+  `position: absolute` and up to 15rem wide, so the theme toggle at the end of the header pushed a
+  390px viewport out to 498px — invisibly, because `querySelectorAll('*')` never sees a
+  pseudo-element. Anything `.hint` near a right edge takes `hint-right` as well.
 
 ## Conventions
 
