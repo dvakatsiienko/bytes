@@ -1,0 +1,234 @@
+import { useTooltip } from '@visx/tooltip';
+import { motion } from 'motion/react';
+
+import type { ArchivedTrophy, Game } from '../../shared/types.ts';
+import type { ChartColumn } from '../components/chart-frame.tsx';
+import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
+import { CHART_INK } from '../helpers/chart-theme.ts';
+import { gameLookup } from '../helpers/stats.ts';
+
+/** Rows in the grid — the busiest titles, and nothing else. */
+const NAMED = 6;
+
+/**
+ * A grid, not a stack of coloured series. Six titles need six hues to stack,
+ * and this palette cannot separate six — measured with the dataviz validator,
+ * its purple and blue sit ΔE 1.5 apart under deuteranopia, which is no
+ * separation at all. One hue at four strengths carries the same reading with
+ * no colour coding to decode.
+ *
+ * Only the named titles get a row. A "everything else" row would set the shade
+ * scale by itself and leave the six subjects uniformly pale, and the circadian
+ * ring already draws the whole-library shape.
+ */
+export const nightOwlGrid = (
+  trophies: ArchivedTrophy[],
+  games: Game[],
+): NightOwlGrid => {
+  const byId = gameLookup(games);
+  const totals = new Map<string, number>();
+
+  for (const trophy of trophies) {
+    const name = byId.get(trophy.gameId)?.name ?? trophy.gameId;
+    totals.set(name, (totals.get(name) ?? 0) + 1);
+  }
+
+  const top = [...totals.entries()]
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, NAMED)
+    .map(([name]) => name);
+  const rows: NightOwlRow[] = top.map((name) => ({
+    hours: Array.from({ length: 24 }, () => 0),
+    name,
+    total: 0,
+  }));
+  const rowByName = new Map(rows.map((row) => [row.name, row]));
+  const hourTotals = Array.from({ length: 24 }, () => 0);
+
+  for (const trophy of trophies) {
+    const name = byId.get(trophy.gameId)?.name ?? trophy.gameId;
+    const hour = new Date(trophy.at).getHours();
+
+    // Every title feeds the hour total, so a cell's share is its slice of the
+    // whole library's hour, not just of these six.
+    hourTotals[hour] = (hourTotals[hour] ?? 0) + 1;
+
+    const row = rowByName.get(name);
+    if (!row) continue;
+
+    row.hours[hour] = (row.hours[hour] ?? 0) + 1;
+    row.total += 1;
+  }
+
+  const peak = Math.max(...rows.flatMap((row) => row.hours), 1);
+
+  return { hourTotals, peak, rows };
+};
+
+export const NightOwl = (props: NightOwlProps) => {
+  const tooltip = useTooltip<NightOwlCell>();
+
+  const width = GUTTER + 24 * STEP + 40;
+  const height = props.grid.rows.length * STEP + LABEL_HEIGHT + 4;
+
+  const cellListJSX = props.grid.rows.flatMap((row, rowIndex) =>
+    HOURS.map((hour) => {
+      const count = row.hours[hour] ?? 0;
+
+      return (
+        <motion.rect
+          animate={{ opacity: 1 }}
+          fill={count ? CHART_INK.ring : CHART_INK.grid}
+          fillOpacity={count ? shadeOf(count, props.grid.peak) : 0.2}
+          height={CELL}
+          initial={{ opacity: 0 }}
+          key={`${row.name}-${hour}`}
+          onMouseEnter={() =>
+            tooltip.showTooltip({
+              tooltipData: {
+                count,
+                hour,
+                name: row.name,
+                share: props.grid.hourTotals[hour]
+                  ? (count / (props.grid.hourTotals[hour] ?? 1)) * 100
+                  : 0,
+              },
+              tooltipLeft: GUTTER + hour * STEP + CELL,
+              tooltipTop: rowIndex * STEP + LABEL_HEIGHT,
+            })
+          }
+          onMouseLeave={tooltip.hideTooltip}
+          transition={{ delay: hour * 0.006, duration: 0.25 }}
+          width={CELL}
+          x={GUTTER + hour * STEP}
+          y={rowIndex * STEP + LABEL_HEIGHT}
+        />
+      );
+    }),
+  );
+
+  const rowLabelListJSX = props.grid.rows.map((row, rowIndex) => (
+    <text
+      dominantBaseline='middle'
+      fill={CHART_INK.axis}
+      fontSize={8}
+      key={row.name}
+      x={0}
+      y={rowIndex * STEP + LABEL_HEIGHT + CELL / 2}>
+      {row.name.length > 24 ? `${row.name.slice(0, 23)}…` : row.name}
+    </text>
+  ));
+
+  const hourLabelListJSX = HOURS.filter((hour) => hour % 3 === 0).map(
+    (hour) => (
+      <text
+        fill={CHART_INK.axis}
+        fontSize={8}
+        key={hour}
+        textAnchor='middle'
+        x={GUTTER + hour * STEP + CELL / 2}
+        y={8}>
+        {String(hour).padStart(2, '0')}
+      </text>
+    ),
+  );
+
+  return (
+    <div className='relative w-full overflow-x-auto px-4 py-2'>
+      {/* aria-label rather than <title>: a <title> child is what browsers
+          render as their own native tooltip on hover. */}
+      <svg
+        aria-label='Trophies per hour of day for each of the busiest titles'
+        height={height}
+        role='img'
+        width={width}>
+        {hourLabelListJSX}
+        {rowLabelListJSX}
+        {cellListJSX}
+      </svg>
+
+      {tooltip.tooltipOpen && tooltip.tooltipData && (
+        <TooltipLayer
+          height={height}
+          left={tooltip.tooltipLeft}
+          top={tooltip.tooltipTop}
+          width={width}>
+          <ChartTooltip
+            note={`${String(tooltip.tooltipData.hour).padStart(2, '0')}:00`}
+            rows={[
+              { label: 'trophies', value: String(tooltip.tooltipData.count) },
+              {
+                label: 'of that hour',
+                value: `${tooltip.tooltipData.share.toFixed(0)}%`,
+              },
+            ]}
+            title={tooltip.tooltipData.name}
+          />
+        </TooltipLayer>
+      )}
+    </div>
+  );
+};
+
+/* Helpers */
+const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
+
+const CELL = 11;
+const STEP = 13;
+const GUTTER = 130;
+const LABEL_HEIGHT = 12;
+
+/** Four strengths of one hue — a magnitude scale, never a second palette. */
+const shadeOf = (count: number, peak: number) => {
+  const share = count / peak;
+  if (share > 0.66) return 1;
+  if (share > 0.33) return 0.72;
+  if (share > 0.12) return 0.48;
+  return 0.28;
+};
+
+export const NIGHT_OWL_COLUMNS: ChartColumn<NightOwlRow>[] = [
+  { cell: (row) => row.name, head: 'title' },
+  { cell: (row) => String(row.total), head: 'trophies', isNumeric: true },
+  {
+    cell: (row) => {
+      const peak = Math.max(...row.hours);
+      const hour = row.hours.indexOf(peak);
+      return peak ? `${String(hour).padStart(2, '0')}:00` : '—';
+    },
+    head: 'busiest hour',
+  },
+  {
+    cell: (row) => String(Math.max(...row.hours)),
+    head: 'in that hour',
+    isNumeric: true,
+  },
+];
+
+/* Types */
+export interface NightOwlRow {
+  /** Trophies earned in each hour of the day, index 0-23. */
+  hours: number[];
+  name: string;
+  total: number;
+}
+
+interface NightOwlCell {
+  count: number;
+  hour: number;
+  name: string;
+  /** This title's slice of everything earned in that hour. */
+  share: number;
+}
+
+export interface NightOwlGrid {
+  /** Every title's trophies per hour, for the share reading. */
+  hourTotals: number[];
+  /** The busiest single cell, which sets the shade scale. */
+  peak: number;
+  rows: NightOwlRow[];
+}
+
+interface NightOwlProps {
+  grid: NightOwlGrid;
+}
