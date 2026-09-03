@@ -153,11 +153,7 @@ export const NightOwl = (props: NightOwlProps) => {
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
-        <TooltipLayer
-          height={height}
-          left={tooltip.tooltipLeft}
-          top={tooltip.tooltipTop}
-          width={width}>
+        <TooltipLayer left={tooltip.tooltipLeft} top={tooltip.tooltipTop}>
           <ChartTooltip
             note={`${String(tooltip.tooltipData.hour).padStart(2, '0')}:00`}
             rows={[

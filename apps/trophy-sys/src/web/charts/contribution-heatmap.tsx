@@ -181,11 +181,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
-        <TooltipLayer
-          height={height}
-          left={tooltip.tooltipLeft}
-          top={tooltip.tooltipTop}
-          width={width}>
+        <TooltipLayer left={tooltip.tooltipLeft} top={tooltip.tooltipTop}>
           <ChartTooltip
             note={gameNames(tooltip.tooltipData)}
             rows={[

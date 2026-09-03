@@ -195,11 +195,7 @@ const Plot = (props: PlotProps) => {
       </svg>
 
       {tooltip.tooltipOpen && tooltip.tooltipData && (
-        <TooltipLayer
-          height={props.height}
-          left={tooltip.tooltipLeft}
-          top={tooltip.tooltipTop}
-          width={props.width}>
+        <TooltipLayer left={tooltip.tooltipLeft} top={tooltip.tooltipTop}>
           <ChartTooltip
             rows={[
               {
