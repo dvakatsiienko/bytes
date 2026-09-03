@@ -129,8 +129,8 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   (`remaining`) with their live counters. "Closest to done" is the only chart needing the second
   list, and it is why the payload roughly doubled.
 - **Reach for the furniture before writing SVG.** `ChartFrame` gives the panel, the chart/table
-  toggle and the accessibility floor; `ChartTooltip` + `TooltipLayer` give the one tooltip and its
-  edge-flipping; `BarRows` draws any ranked horizontal-bar chart, and four of the twelve are one
+  toggle and the accessibility floor; `ChartTooltip` + `TooltipLayer` give the one tooltip, which
+  renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the twelve are one
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
   `*_COLUMNS`, so `stats.tsx` only wires.
 
@@ -147,7 +147,7 @@ The timeline draws every month it has at once, so "scroll to that date" is
 `scrollIntoView` on the panel plus the marker. There is no horizontal scrolling
 to drive.
 
-### Five things measured the hard way
+### Six things measured the hard way
 
 - 🚫 **Never put motion's `animate` transform and an SVG `transform` attribute on one node.**
   Motion writes its scale into the `transform` style, which replaces the attribute outright — the
@@ -160,6 +160,11 @@ to drive.
   also carries a shape, so colour is never alone.
 - 🚫 **No chart has two y axes.** The velocity band under the progression area is a second plot
   sharing the x axis, not a second scale on the same one.
+- 🚫 **An overlay positioned inside a chart is clipped three times over.** visx's `ParentSize`
+  wraps children in an `inset: 0; overflow: hidden` box — that one is invisible until you walk the
+  computed styles — and the panel body and `<main>` both scroll. The tooltip is 177px tall inside a
+  134px chart, so no flip can fit it; `TooltipLayer` portals to the body and positions against the
+  viewport instead. Any future overlay (a popover, a menu) needs the same escape.
 - 🚫 **A grid item needs `min-w-0`, or a wide chart stretches the page.** A grid item's
   `min-width` defaults to `auto`, so the heatmap's 783px SVG widened its own column instead of
   scrolling inside it. `ChartFrame` carries the class; so must any new wrapper around a panel.
@@ -167,6 +172,17 @@ to drive.
   `position: absolute` and up to 15rem wide, so the theme toggle at the end of the header pushed a
   390px viewport out to 498px — invisibly, because `querySelectorAll('*')` never sees a
   pseudo-element. Anything `.hint` near a right edge takes `hint-right` as well.
+
+### Driving the page
+
+`agent-browser` is the driver; it documents itself with `agent-browser skills get core`. Two
+things about **this** page waste a run otherwise:
+
+- A full-page screenshot comes out empty, because the page scrolls inside `<main>` rather than the
+  document. Capture the viewport, or one panel by selector.
+- A hover below the fold silently does nothing. Scroll the panel into view first, then move the
+  mouse to a mark's centre — marks are bare SVG, so they carry no accessibility refs and their
+  geometry has to come from `eval`.
 
 ## Conventions
 
