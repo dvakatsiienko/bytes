@@ -5682,6 +5682,8 @@ var Redis2 = class _Redis extends Redis {
 // src/server/state.ts
 var STATE_FILE = new URL("../../.trophy-state.json", import.meta.url);
 var STATE_KEY = "trophy-sys:baseline";
+var STATS_FILE = new URL("../../.trophy-stats.json", import.meta.url);
+var STATS_KEY = "trophy-sys:stats";
 var redis = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN ? new Redis2({
   token: process.env.KV_REST_API_TOKEN,
   url: process.env.KV_REST_API_URL
@@ -5694,24 +5696,30 @@ var stateMigrate = (raw) => Object.fromEntries(
     Array.isArray(entry) ? { defined: 0, trophies: entry, version: "" } : entry
   ])
 );
-var stateLoad = async () => {
-  if (redis)
-    return stateMigrate(
-      await redis.get(STATE_KEY) ?? {}
-    );
+var storeRead = async (key, file) => {
+  if (redis) return await redis.get(key) ?? null;
   try {
-    return stateMigrate(JSON.parse(readFileSync(STATE_FILE, "utf-8")));
+    return JSON.parse(readFileSync(file, "utf-8"));
   } catch {
-    return {};
+    return null;
   }
 };
-var stateSave = async (state) => {
+var storeWrite = async (key, file, value) => {
   if (redis) {
-    await redis.set(STATE_KEY, state);
+    await redis.set(key, value);
     return;
   }
-  writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  writeFileSync(file, JSON.stringify(value, null, 2));
 };
+var stateLoad = async () => stateMigrate(
+  await storeRead(
+    STATE_KEY,
+    STATE_FILE
+  ) ?? {}
+);
+var stateSave = (state) => storeWrite(STATE_KEY, STATE_FILE, state);
+var statsLoad = () => storeRead(STATS_KEY, STATS_FILE);
+var statsSave = (archive) => storeWrite(STATS_KEY, STATS_FILE, archive);
 
 // src/server/news.ts
 var SCAN_LIMIT = 15;
@@ -5759,6 +5767,82 @@ var newsFetch = async ({
   return { drifted, isBaseline, trophies: fresh };
 };
 
+// src/server/stats.ts
+var LANES = 5;
+var ARCHIVE_VERSION = 2;
+var EMPTY = {
+  failed: [],
+  games: 0,
+  remaining: [],
+  syncedAt: null,
+  trophies: [],
+  version: ARCHIVE_VERSION
+};
+var earnedCount = (game) => game.earned.bronze + game.earned.silver + game.earned.gold + game.earned.platinum;
+var statsFetch = async () => {
+  const stored = await statsLoad();
+  return stored?.version === ARCHIVE_VERSION ? stored : EMPTY;
+};
+var statsSync = async () => {
+  const library = await cached("games:800", () => gamesFetch(800));
+  const games = library.filter((game) => earnedCount(game) > 0);
+  const trophies = [];
+  const remaining = [];
+  const failed = [];
+  let cursor = 0;
+  const lane = async () => {
+    while (cursor < games.length) {
+      const game = games[cursor];
+      cursor += 1;
+      if (!game) return;
+      try {
+        const set = await trophiesFetch(game);
+        for (const trophy of set.trophies) {
+          if (trophy.earned && trophy.earnedAt) {
+            trophies.push({
+              at: trophy.earnedAt,
+              gameId: game.id,
+              grade: trophy.grade,
+              name: trophy.name,
+              rarity: trophy.rarity
+            });
+            continue;
+          }
+          if (trophy.earned || game.progress === 100) continue;
+          remaining.push({
+            counter: trophy.progress ? {
+              current: trophy.progress.current,
+              target: trophy.progress.target
+            } : null,
+            gameId: game.id,
+            grade: trophy.grade,
+            name: trophy.name,
+            rarity: trophy.rarity
+          });
+        }
+      } catch {
+        failed.push(game.id);
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: LANES }, lane));
+  if (games.length && trophies.length === 0)
+    throw new Error(
+      `read no trophies from ${games.length} titles \u2014 the archive is left alone`
+    );
+  trophies.sort((a2, b2) => a2.at.localeCompare(b2.at));
+  const archive = {
+    failed,
+    games: games.length - failed.length,
+    remaining,
+    syncedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    trophies,
+    version: ARCHIVE_VERSION
+  };
+  await statsSave(archive);
+  return archive;
+};
+
 // src/server/routes.ts
 var GAME_PATH = /^\/api\/games\/([\w-]+)$/;
 var routeResolve = async (url, method) => {
@@ -5771,6 +5855,19 @@ var routeResolve = async (url, method) => {
   if (path === "/api/games") {
     const limit = Number(url.searchParams.get("limit") ?? 800);
     return ok(await cached(`games:${limit}`, () => gamesFetch(limit)));
+  }
+  if (path === "/api/stats") return ok(await cached("stats", statsFetch));
+  if (path === "/api/stats/sync" && method === "POST") {
+    if (!isStateWritable) {
+      return {
+        body: {
+          error: "no KV store linked \u2014 the trophy archive cannot persist here"
+        },
+        status: 501
+      };
+    }
+    cacheClear();
+    return ok(await statsSync());
   }
   if (path === "/api/snapshot" && method === "POST") {
     if (!isStateWritable) {
