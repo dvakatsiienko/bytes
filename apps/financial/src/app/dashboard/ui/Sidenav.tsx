@@ -2,13 +2,22 @@
 
 import { PowerIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+
+import { authClient } from '@/lib/auth-client';
 
 import { NavLinks } from './Navlinks';
 import { display } from '@/theme/fonts';
 import { AcmeLogo } from '@/ui/AcmeLogo';
 
 export const Sidenav = () => {
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    router.push('/login');
+  };
+
   return (
     <nav className='perforation flex h-full flex-col bg-bar/40 pl-4'>
       <Link
@@ -28,7 +37,7 @@ export const Sidenav = () => {
 
         <button
           className='flex h-11 w-full grow items-center justify-center gap-3 px-3 text-ink-soft text-sm transition-colors hover:bg-bar hover:text-ink md:flex-none md:justify-start'
-          onClick={() => signOut()}
+          onClick={handleSignOut}
           type='button'>
           <PowerIcon className='w-5' />
           <span className='hidden md:block'>Sign out</span>

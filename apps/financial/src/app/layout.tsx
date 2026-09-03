@@ -16,7 +16,7 @@ export default (props: { children: React.ReactNode }) => {
 
 export const metadata: Metadata = {
   description:
-    'A Next.js App Router app, buil with TypeScript, Prisma, and NextAuth.js',
+    'A Next.js App Router app, built with TypeScript, Prisma, and better-auth.',
   title: {
     default: 'Financial',
     template: 'Financial | %s',

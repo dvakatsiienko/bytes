@@ -7,39 +7,37 @@ import {
   AtSymbolIcon,
   ExclamationCircleIcon,
   KeyIcon,
+  UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
-import { authClient } from '@/lib/auth-client';
-import { LoginSchema, type LoginValues } from '@/lib/schemas';
-
 /* Instruments */
-import { users } from '../../../../prisma/seed/seed-data';
+import { authClient } from '@/lib/auth-client';
+import { SignupSchema, type SignupValues } from '@/lib/schemas';
+
 import { display } from '@/theme/fonts';
 /* Components */
 import { Button } from '@/ui/Button';
 
-const [seededUser] = users;
-
-export const LoginForm = () => {
+export const SignupForm = () => {
   const [serverError, setServerError] = useState('');
   const router = useRouter();
 
-  const form = useForm<LoginValues>({
-    defaultValues: { email: seededUser.email, password: seededUser.password },
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<SignupValues>({
+    defaultValues: { email: '', name: '', password: '' },
+    resolver: zodResolver(SignupSchema),
   });
 
   const handleSubmit = form.handleSubmit(async (values) => {
     setServerError('');
 
-    const result = await authClient.signIn.email(values);
+    const result = await authClient.signUp.email(values);
 
     if (result.error) {
-      setServerError('Invalid credentials.');
+      setServerError(result.error.message ?? 'Signup failed.');
       return;
     }
 
@@ -47,6 +45,7 @@ export const LoginForm = () => {
   });
 
   const errorMessage =
+    form.formState.errors.name?.message ??
     form.formState.errors.email?.message ??
     form.formState.errors.password?.message ??
     serverError;
@@ -57,10 +56,26 @@ export const LoginForm = () => {
         <p className='caption text-ink-soft'>Account</p>
         <h1
           className={`${display.className} mt-2 mb-3 text-2xl tracking-tight`}>
-          Log in to continue.
+          Create an account.
         </h1>
 
         <fieldset className='w-full'>
+          <label
+            className='caption mt-5 mb-2 block text-ink-soft'
+            htmlFor='name'>
+            Name
+          </label>
+          <div className='relative'>
+            <input
+              className='peer mb-4 block w-full border border-rule bg-white py-[9px] pl-10 text-sm outline-seal placeholder:text-ink-soft focus:border-seal'
+              id='name'
+              placeholder='Enter your name'
+              type='text'
+              {...form.register('name')}
+            />
+            <UserCircleIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft peer-focus:text-seal' />
+          </div>
+
           <label
             className='caption mt-5 mb-2 block text-ink-soft'
             htmlFor='email'>
@@ -86,7 +101,7 @@ export const LoginForm = () => {
             <input
               className='peer block w-full border border-rule bg-white py-[9px] pl-10 text-sm outline-seal placeholder:text-ink-soft focus:border-seal'
               id='password'
-              placeholder='Enter password'
+              placeholder='Choose a password'
               type='password'
               {...form.register('password')}
             />
@@ -97,7 +112,7 @@ export const LoginForm = () => {
         <Button
           aria-disabled={form.formState.isSubmitting}
           className='mt-4 w-full'>
-          Log in <ArrowRightIcon className='ml-auto h-5 w-5' />
+          Sign up <ArrowRightIcon className='ml-auto h-5 w-5' />
         </Button>
 
         <div
@@ -113,11 +128,11 @@ export const LoginForm = () => {
         </div>
 
         <p className='mt-3 border-rule border-t pt-4 pb-2 text-center text-ink-soft text-sm'>
-          No account?{' '}
+          Have an account?{' '}
           <NextLink
             className='font-medium text-seal underline underline-offset-4 transition-colors hover:text-ink'
-            href='/signup'>
-            Create one
+            href='/login'>
+            Log in
           </NextLink>
         </p>
       </div>

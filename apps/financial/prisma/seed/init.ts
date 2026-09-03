@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
-import { hashPassword } from '@/lib/security';
+import { auth } from '@/lib/auth';
 
 import { customers, invoices, revenue, users } from './seed-data';
 import { PrismaClient } from '~/prisma/client';
@@ -36,14 +36,6 @@ seed()
   });
 
 /* Helpers */
-async function seedUsers() {
-  const userList = await Promise.all(
-    users.map((user) => {
-      return {
-        ...user,
-        password: hashPassword(user.password),
-      };
-    }),
-  );
-  await prisma.user.createMany({ data: userList });
+function seedUsers() {
+  return Promise.all(users.map((user) => auth.api.signUpEmail({ body: user })));
 }

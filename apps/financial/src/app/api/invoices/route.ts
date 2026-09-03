@@ -2,11 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
-import { InvoiceInputSchema } from '@/lib/schemas';
+import { InvoiceRecordSchema } from '@/lib/schemas';
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const validated = InvoiceInputSchema.safeParse(body);
+  const validated = InvoiceRecordSchema.safeParse(body);
 
   if (!validated.success) {
     return NextResponse.json(
@@ -36,7 +36,7 @@ export async function PUT(request: Request) {
     );
   }
 
-  const validated = InvoiceInputSchema.safeParse(fields);
+  const validated = InvoiceRecordSchema.safeParse(fields);
 
   if (!validated.success) {
     return NextResponse.json(

@@ -4,7 +4,7 @@ const users = [
   {
     email: 'user@x.com',
     name: 'User',
-    password: '1488',
+    password: '12345',
   },
 ];
 

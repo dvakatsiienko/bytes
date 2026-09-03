@@ -3,14 +3,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import type { InvoiceFormErrors, InvoiceInput } from './schemas';
+import type { InvoiceFormErrors, InvoiceRecord } from './schemas';
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async (data: InvoiceInput) => {
+    mutationFn: async (data: InvoiceRecord) => {
       const response = await fetch('/api/invoices', {
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
@@ -35,7 +35,7 @@ export const useUpdateInvoice = () => {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async (data: InvoiceInput & { id: string }) => {
+    mutationFn: async (data: InvoiceRecord & { id: string }) => {
       const response = await fetch('/api/invoices', {
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },

@@ -9,17 +9,21 @@ modeled after the Next.js App Router dashboard course app.
 
 - **Next.js 16** — App Router, **React 19**, TypeScript (strict)
 - **Prisma 7** — PostgreSQL via `@prisma/adapter-pg`; client generated to `.generated/prisma`
-- **Auth.js (next-auth v5 beta)** — Credentials provider, `src/auth.ts` + `src/auth.config.ts`;
-  passwords verified via `src/lib/security.ts`, input parsed with Zod
+- **better-auth** — email+password, `src/lib/auth.ts` (server) + `src/lib/auth-client.ts` (client);
+  route guard in `src/proxy.ts`, catch-all handler at `api/auth/[...all]`; seed creates the user
+  through `auth.api.signUpEmail`
+- **react-hook-form + zod** — all forms (`login`, `signup`, `InvoiceForm`) use `zodResolver`
+  against schemas in `src/lib/schemas.ts`; money input via rifm (`AmountInput`), canonical
+  amounts are integer cents (`src/lib/money.ts`)
 - **React Query** (`@tanstack/react-query`) — client-side server state
 - Tailwind (+ `@tailwindcss/forms`), heroicons, cva-free (clsx)
 
 ## Architecture
 
-- Routes: `/` , `/login`, `/dashboard` (`(overview)`, `customers`, `invoices` with
+- Routes: `/` , `/login`, `/signup`, `/dashboard` (`(overview)`, `customers`, `invoices` with
   `create` / `[id]/update`), `api/invoices/[id]`
 - `src/lib/` — `queries.ts` / `mutations.ts` (data access), `prisma.ts` (client),
-  `schemas.ts` (Zod), `security.ts` (password hashing)
+  `schemas.ts` (Zod), `money.ts` (cents↔usd), `auth.ts` / `auth-client.ts` (better-auth)
 - DB models: `User`, `Customer`, `Invoice` (belongs to Customer), `Revenue`
 - Seed data: `prisma/seed/init.ts` + `seed-data.ts`
 
@@ -41,5 +45,5 @@ pnpm prisma:generate  # regenerate client (also runs on postinstall)
 
 ```env
 DATABASE_URL=...   # PostgreSQL connection string
-AUTH_SECRET=...    # Auth.js session secret
+AUTH_SECRET=...    # better-auth session secret
 ```
