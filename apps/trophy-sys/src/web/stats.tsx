@@ -15,6 +15,8 @@ import { EffortLegend } from './charts/chart-legend.tsx';
 import { CircadianRing } from './charts/circadian-ring.tsx';
 import {
   CLOSEST_COLUMNS,
+  CLOSEST_SORTS,
+  type ClosestSort,
   closestChart,
   closestRows,
 } from './charts/closest-to-done.ts';
@@ -46,6 +48,8 @@ import {
 } from './charts/streaks.ts';
 import {
   PLATINUM_COLUMNS,
+  PLATINUM_SORTS,
+  type PlatinumSort,
   platinumChart,
   platinumRuns,
 } from './charts/time-to-platinum.ts';
@@ -60,6 +64,7 @@ import {
   ChartTable,
 } from './components/chart-frame.tsx';
 import { KpiStrip } from './components/kpi-strip.tsx';
+import { SegmentedControl } from './components/segmented-control.tsx';
 import { hoursFormat } from './helpers/format.ts';
 import {
   type CircadianHour,
@@ -77,6 +82,8 @@ export const Stats = () => {
   const sync = useStatsSync();
 
   const [focusMonth, setFocusMonth] = useState<string | null>(null);
+  const [closestSort, setClosestSort] = useState<ClosestSort>('left');
+  const [platinumSort, setPlatinumSort] = useState<PlatinumSort>('hours');
   const timelineRef = useRef<HTMLDivElement>(null);
 
   const gameList = useMemo(() => games.data ?? [], [games.data]);
@@ -90,16 +97,16 @@ export const Stats = () => {
     [trophies, gameList],
   );
   const closest = useMemo(
-    () => closestRows(remaining, gameList),
-    [remaining, gameList],
+    () => closestRows(remaining, gameList, closestSort),
+    [remaining, gameList, closestSort],
   );
   const tiers = useMemo(
     () => rarityTiers(trophies, gameList),
     [trophies, gameList],
   );
   const platinums = useMemo(
-    () => platinumRuns(trophies, gameList),
-    [trophies, gameList],
+    () => platinumRuns(trophies, gameList, platinumSort),
+    [trophies, gameList, platinumSort],
   );
   const buckets = useMemo(() => backlogBuckets(gameList), [gameList]);
   const abandoned = useMemo(
@@ -272,6 +279,15 @@ export const Stats = () => {
           </ChartFrame>
 
           <ChartFrame
+            controls={
+              <SegmentedControl
+                label='closest to done, sort order'
+                name='closest-sort'
+                onChange={setClosestSort}
+                options={CLOSEST_SORTS}
+                value={closestSort}
+              />
+            }
             name='closest'
             note='titles under way, nearest the platinum first · a part-done counter counts as its finished slice'
             table={
@@ -294,6 +310,15 @@ export const Stats = () => {
           </ChartFrame>
 
           <ChartFrame
+            controls={
+              <SegmentedControl
+                label='time to platinum, sort order'
+                name='platinum-sort'
+                onChange={setPlatinumSort}
+                options={PLATINUM_SORTS}
+                value={platinumSort}
+              />
+            }
             name='platinum'
             note='hours played per platinum, quickest first · the hover carries the calendar span · titles whose playtime never matched are left out'
             table={

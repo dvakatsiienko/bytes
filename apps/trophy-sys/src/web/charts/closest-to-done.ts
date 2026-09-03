@@ -1,5 +1,6 @@
 import type { Game, RemainingTrophy } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
+import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
 import { gameLookup } from '../helpers/stats.ts';
 import type { BarChart } from './bar-rows.tsx';
@@ -22,9 +23,30 @@ const distanceOf = (left: RemainingTrophy[]) =>
     0,
   );
 
+/**
+ * The orders worth offering. "left" is the default because the question the
+ * chart exists to answer is what to open next; the other two are for when the
+ * answer is "whichever I have already sunk the most into".
+ */
+export const CLOSEST_SORTS = [
+  { label: 'left', value: 'left' },
+  { label: 'progress', value: 'progress' },
+  { label: 'hours', value: 'hours' },
+] as const satisfies readonly { label: string; value: ClosestSort }[];
+
+const CLOSEST_ORDER: Record<
+  ClosestSort,
+  (a: ClosestRow, b: ClosestRow) => number
+> = {
+  hours: (a, b) => b.hours - a.hours,
+  left: (a, b) => a.distance - b.distance,
+  progress: (a, b) => b.progress - a.progress,
+};
+
 export const closestRows = (
   remaining: RemainingTrophy[],
   games: Game[],
+  sort: ClosestSort,
 ): ClosestRow[] => {
   const byId = gameLookup(games);
   const grouped = new Map<string, RemainingTrophy[]>();
@@ -59,7 +81,9 @@ export const closestRows = (
     });
   }
 
-  return rows.sort((a, b) => a.distance - b.distance).slice(0, LIMIT);
+  // Sorted before the cut, so changing the order changes which titles make the
+  // list — not just how the same fifteen are arranged.
+  return rows.sort(CLOSEST_ORDER[sort]).slice(0, LIMIT);
 };
 
 export const closestChart = (rows: ClosestRow[]): BarChart => ({
@@ -89,7 +113,7 @@ export const closestChart = (rows: ClosestRow[]): BarChart => ({
         { label: 'counters', value: counterFormat(row.counters) },
         { label: 'hours sunk', value: hoursFormat(row.hours) },
       ],
-      tone: 'var(--p-yellow)',
+      tone: BAR_TONE.open,
       value: `${row.distance.toFixed(1)} left`,
     };
   }),
@@ -126,6 +150,8 @@ export const CLOSEST_COLUMNS: ChartColumn<ClosestRow>[] = [
 ];
 
 /* Types */
+export type ClosestSort = 'hours' | 'left' | 'progress';
+
 export interface ClosestRow {
   /** The unearned trophies that carry a live counter. */
   counters: RemainingTrophy[];

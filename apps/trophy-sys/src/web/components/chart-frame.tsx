@@ -22,8 +22,10 @@ export const ChartFrame = (props: ChartFrameProps) => {
     <section className='panel flex min-h-0 min-w-0 flex-col'>
       <span className='panel-title'>{props.title}</span>
 
-      <div className='flex items-center gap-3 border-line border-b px-4 py-2'>
+      <div className='flex flex-wrap items-center gap-x-3 gap-y-2 border-line border-b px-4 py-2'>
         <p className='min-w-0 flex-1 text-[10px] text-dim'>{props.note}</p>
+
+        {props.controls}
 
         <SegmentedControl
           label={`${props.title} view`}
@@ -89,6 +91,8 @@ type ChartView = 'chart' | 'table';
 
 interface ChartFrameProps {
   children: ReactNode;
+  /** An extra control beside the view toggle — a sort order, typically. */
+  controls?: ReactNode;
   /** Unique per frame — two radio groups on one page must not share a name. */
   name: string;
   note: string;
