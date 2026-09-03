@@ -28,7 +28,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: package.json
+          # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so pin explicitly
+          node-version: 24
           cache: pnpm
 
       - name: Install
