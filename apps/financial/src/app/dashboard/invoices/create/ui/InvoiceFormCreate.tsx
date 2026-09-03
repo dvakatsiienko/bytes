@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   CheckIcon,
   ClockIcon,
@@ -7,6 +8,8 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { useRifm } from 'rifm';
+import { createNumberFormatter } from 'rifm/number';
 
 import { type TMutationError, useCreateInvoice } from '@/lib/mutations';
 import { CreateInvoiceSchema } from '@/lib/schemas';
@@ -17,11 +20,20 @@ import type { Customer } from '~/prisma/client';
 export const InvoiceFormCreate = (props: IInvoiceFormCreateProps) => {
   const createInvoice = useCreateInvoice();
   const errors = (createInvoice.error as TMutationError | null)?.errors;
+  const [amount, setAmount] = useState('');
+  const amountField = useRifm({
+    ...usdFormatter,
+    onChange: setAmount,
+    value: amount,
+  });
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(e.currentTarget));
-    const parsed = CreateInvoiceSchema.safeParse(formData);
+    const parsed = CreateInvoiceSchema.safeParse({
+      ...formData,
+      amount: amount.replaceAll(',', ''),
+    });
 
     if (!parsed.success) return; // todo show error message on the ui
 
@@ -78,11 +90,11 @@ export const InvoiceFormCreate = (props: IInvoiceFormCreateProps) => {
               <input
                 className='peer block w-full border border-rule py-2 pl-10 text-sm outline-2 placeholder:text-ink-soft'
                 id='amount'
-                name='amount'
+                inputMode='decimal'
                 placeholder='Enter USD amount'
                 required
-                step='0.01'
-                type='number'
+                type='text'
+                {...amountField}
               />
 
               <CurrencyDollarIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft peer-focus:text-ink' />
@@ -143,6 +155,12 @@ export const InvoiceFormCreate = (props: IInvoiceFormCreateProps) => {
     </form>
   );
 };
+
+/* Helpers */
+const usdFormatter = createNumberFormatter({
+  locales: 'en-US',
+  maximumFractionDigits: 2,
+});
 
 /* Types */
 interface IInvoiceFormCreateProps {

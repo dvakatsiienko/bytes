@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "financial",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "financial", "dev"],
+      "port": 3000
+    },
+    {
       "name": "proto-lab",
       "port": 5179,
       "url": "http://localhost:5179",
