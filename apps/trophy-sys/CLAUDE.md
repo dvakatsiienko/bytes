@@ -33,7 +33,12 @@ pnpm trophies <cmd>   # same data as the API, straight to stdout as JSON
 From the monorepo root: `pnpm dev:trophy-sys`, `pnpm build:trophy-sys`.
 
 `pnpm trophies` commands: `profile`, `games [limit]`, `game <npCommunicationId>`, `news`,
-`snapshot`.
+`snapshot`, `stats`, `stats-sync`.
+
+📌 `pnpm trophies` loads `.env.local`, so it reads **and writes the production Upstash store**.
+Drop that flag — `node --env-file=.env src/server/cli.ts <cmd>` — to work against the local
+`.trophy-*.json` files instead. That is the way to fill an archive for local chart work without
+touching prod.
 
 ## Querying trophies without the UI (this is how `cw` asks)
 
@@ -110,6 +115,38 @@ two PSN round-trips; the library list itself is one call regardless of limit.
 📌 `cache.ts` memoizes **successes only**, so a client retry replays the entire scan. That is why
 `retry` is 1 globally and 0 for the news query — react-query's default of 3 turns one failed news
 load into ~120 PSN round-trips.
+
+## The /stats charts
+
+Twelve charts and a KPI strip, all visx, all reading one payload — `GET /api/stats`, the trophy
+fan-out cached in Upstash under `trophy-sys:stats`.
+
+- **The archive is versioned.** `ARCHIVE_VERSION` in `stats.ts` gates it: a stored archive whose
+  version does not match reads as empty, and the route's own "rescan trophies" button refills it.
+  Bump it whenever the stored shape changes — cheaper and safer than migrating, because the scan
+  is one button and eight seconds.
+- It carries earned trophies (`trophies`) and, for titles still under way, the unearned ones
+  (`remaining`) with their live counters. "Closest to done" is the only chart needing the second
+  list, and it is why the payload roughly doubled.
+- **Reach for the furniture before writing SVG.** `ChartFrame` gives the panel, the chart/table
+  toggle and the accessibility floor; `ChartTooltip` + `TooltipLayer` give the one tooltip and its
+  edge-flipping; `BarRows` draws any ranked horizontal-bar chart, and four of the twelve are one
+  call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
+  `*_COLUMNS`, so `stats.tsx` only wires.
+
+### Three things measured the hard way
+
+- 🚫 **Never put motion's `animate` transform and an SVG `transform` attribute on one node.**
+  Motion writes its scale into the `transform` style, which replaces the attribute outright — the
+  night-owl columns all drew at hour zero. Place with a plain `<g transform>`, animate with a
+  `<motion.g>` inside it. `scatter-mark.tsx` is the reference shape.
+- 🚫 **This palette carries two categorical series, not six.** gruvbox-material is desaturated by
+  design; its purple and blue sit ΔE 1.5 apart under deuteranopia, measured with the `dataviz`
+  validator. To separate many things use one hue at several strengths (the activity and night-owl
+  grids) or position, never a hue per item. The one two-colour split — platinum against the rest —
+  also carries a shape, so colour is never alone.
+- 🚫 **No chart has two y axes.** The velocity band under the progression area is a second plot
+  sharing the x axis, not a second scale on the same one.
 
 ## Conventions
 
