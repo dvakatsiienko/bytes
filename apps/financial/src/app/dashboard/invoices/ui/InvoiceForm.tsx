@@ -1,5 +1,7 @@
 'use client';
 
+/* Core */
+import { useState } from 'react';
 import {
   CheckIcon,
   ClockIcon,
@@ -7,32 +9,61 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import NextLink from 'next/link';
+import { useRifm } from 'rifm';
+import { createNumberFormatter } from 'rifm/number';
 
-import { type TMutationError, useUpdateInvoice } from '@/lib/mutations';
-import { UpdateInvoiceSchema } from '@/lib/schemas';
+/* Instruments */
+import { centsToUsd } from '@/lib/money';
+import {
+  type MutationError,
+  useCreateInvoice,
+  useUpdateInvoice,
+} from '@/lib/mutations';
+import type { InvoiceStatus } from '@/lib/schemas';
 
+/* Components */
 import { Button } from '@/ui/Button';
 import type { Customer, Invoice } from '~/prisma/client';
 
-export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
+export const InvoiceForm = (props: InvoiceFormProps) => {
+  const createInvoice = useCreateInvoice();
   const updateInvoice = useUpdateInvoice();
-  const errors = (updateInvoice.error as TMutationError | null)?.errors;
+  const mutation = props.invoice ? updateInvoice : createInvoice;
+  const errors = (mutation.error as MutationError | null)?.errors;
+
+  const [amount, setAmount] = useState(
+    props.invoice ? centsToUsd(props.invoice.amount) : '',
+  );
+  const amountField = useRifm({
+    ...usdFormatter,
+    onChange: setAmount,
+    value: amount,
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.currentTarget));
-    const parsed = UpdateInvoiceSchema.safeParse(formData);
 
-    if (!parsed.success) return; // todo show error message on the ui
+    const formData = new FormData(e.currentTarget);
+    const input = {
+      amount,
+      customerId: String(formData.get('customerId')),
+      status: String(formData.get('status')) as InvoiceStatus,
+    };
 
-    updateInvoice.mutate({ ...parsed.data, id: props.invoice.id });
+    if (props.invoice) {
+      updateInvoice.mutate({ ...input, id: props.invoice.id });
+    } else {
+      createInvoice.mutate(input);
+    }
   };
 
-  const customerListJSX = props.customerList.map((customer) => (
-    <option key={customer.id} value={customer.id}>
-      {customer.name}
-    </option>
-  ));
+  const customerListJSX = props.customerList.map((customer) => {
+    return (
+      <option key={customer.id} value={customer.id}>
+        {customer.name}
+      </option>
+    );
+  });
 
   return (
     <form onSubmit={handleSubmit}>
@@ -42,10 +73,12 @@ export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
           <label className='mb-2 block font-medium text-sm' htmlFor='customer'>
             Choose customer
           </label>
+
           <div className='relative'>
             <select
+              aria-describedby='customer-error'
               className='peer block w-full cursor-pointer border border-rule py-2 pl-10 text-sm outline-2 placeholder:text-ink-soft'
-              defaultValue={props.invoice.customerId}
+              defaultValue={props.invoice?.customerId ?? ''}
               id='customer'
               name='customerId'>
               <option disabled value=''>
@@ -53,7 +86,18 @@ export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
               </option>
               {customerListJSX}
             </select>
+
             <UserCircleIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft' />
+
+            <div aria-atomic='true' aria-live='polite' id='customer-error'>
+              {errors?.customerId?.map((error) => {
+                return (
+                  <p className='mt-2 text-flag text-sm' key={error}>
+                    {error}
+                  </p>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -67,21 +111,24 @@ export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
               <input
                 aria-describedby='amount-error'
                 className='peer block w-full border border-rule py-2 pl-10 text-sm outline-2 placeholder:text-ink-soft'
-                defaultValue={props.invoice.amount}
                 id='amount'
-                name='amount'
+                inputMode='decimal'
                 placeholder='Enter USD amount'
-                step='0.01'
-                type='number'
+                required
+                type='text'
+                {...amountField}
               />
+
               <CurrencyDollarIcon className='pointer-events-none absolute top-1/2 left-3 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft peer-focus:text-ink' />
 
               <div aria-atomic='true' aria-live='polite' id='amount-error'>
-                {errors?.amount?.map((error: string) => (
-                  <p className='mt-2 text-flag text-sm' key={error}>
-                    {error}
-                  </p>
-                ))}
+                {errors?.amount?.map((error) => {
+                  return (
+                    <p className='mt-2 text-flag text-sm' key={error}>
+                      {error}
+                    </p>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -97,7 +144,9 @@ export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
               <div className='flex items-center'>
                 <input
                   className='peer/pending h-4 w-4 cursor-pointer border-rule text-ink-soft focus:ring-2'
-                  defaultChecked={props.invoice.status === 'pending'}
+                  defaultChecked={
+                    (props.invoice?.status ?? 'pending') === 'pending'
+                  }
                   id='pending'
                   name='status'
                   type='radio'
@@ -109,10 +158,11 @@ export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
                   Pending <ClockIcon className='h-4 w-4' />
                 </label>
               </div>
+
               <div className='flex items-center'>
                 <input
                   className='peer/paid h-4 w-4 cursor-pointer border-rule text-ink-soft focus:ring-2'
-                  defaultChecked={props.invoice.status === 'paid'}
+                  defaultChecked={props.invoice?.status === 'paid'}
                   id='paid'
                   name='status'
                   type='radio'
@@ -136,14 +186,22 @@ export const InvoiceFormUpdate = (props: IInvoiceFormUpdateProps) => {
           Cancel
         </NextLink>
 
-        <Button type='submit'>Edit Invoice</Button>
+        <Button type='submit'>
+          {props.invoice ? 'Edit Invoice' : 'Create Invoice'}
+        </Button>
       </div>
     </form>
   );
 };
 
+/* Helpers */
+const usdFormatter = createNumberFormatter({
+  locales: 'en-US',
+  maximumFractionDigits: 2,
+});
+
 /* Types */
-interface IInvoiceFormUpdateProps {
+interface InvoiceFormProps {
   customerList: Customer[];
-  invoice: Invoice;
+  invoice?: Invoice;
 }

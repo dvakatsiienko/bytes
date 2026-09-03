@@ -2,9 +2,9 @@
 // https://nextjs.org/learn/dashboard-app/fetching-data
 const users = [
   {
-    email: 'user@nextmail.com',
+    email: 'user@x.com',
     name: 'User',
-    password: '123456',
+    password: '1488',
   },
 ];
 
@@ -145,4 +145,4 @@ const revenue = [
   { month: 'Dec', revenue: 4800 },
 ];
 
-export { users, customers, invoices, revenue };
+export { customers, invoices, revenue, users };

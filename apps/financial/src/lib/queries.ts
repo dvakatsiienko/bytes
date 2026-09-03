@@ -1,5 +1,5 @@
+import { formatCurrency } from './money';
 import { prisma } from './prisma';
-import { formatCurrency } from './utils';
 
 export async function fetchRevenueList() {
   const revenueList = await prisma.revenue.findMany();
@@ -93,15 +93,8 @@ export async function fetchInvoicesPages(query: string) {
   return totalPages;
 }
 
-export async function fetchInvoiceById(id: string) {
-  const invoice = await prisma.invoice.findUnique({ where: { id } });
-
-  if (!invoice) return null;
-
-  return {
-    ...invoice,
-    amount: invoice.amount / 100,
-  };
+export function fetchInvoiceById(id: string) {
+  return prisma.invoice.findUnique({ where: { id } });
 }
 
 export function fetchCustomerList() {

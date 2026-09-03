@@ -14,6 +14,7 @@
     "lint": "biome lint",
     "prisma:generate": "prisma generate",
     "serve": "next start",
+    "test": "node --test src/lib/*.test.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -26,7 +27,7 @@
     "consola": "3.4.2",
     "dotenv": "17.4.2",
     "next": "16.3.4",
-    "next-auth": "5.0.0-beta.19",
+    "next-auth": "5.0.0-beta.32",
     "pg": "8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",

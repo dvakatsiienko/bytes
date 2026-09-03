@@ -1,7 +1,8 @@
 import NextImage from 'next/image';
 
+import { formatCurrency } from '@/lib/money';
 import { fetchInvoiceListFiltered } from '@/lib/queries';
-import { formatCurrency, formatDateToLocal } from '@/lib/utils';
+import { formatDateToLocal } from '@/lib/utils';
 
 import { DeleteInvoice, UpdateInvoice } from './Buttons';
 import { InvoiceStatus } from './InvoiceStatus';

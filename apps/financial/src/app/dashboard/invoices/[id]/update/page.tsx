@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/app/dashboard/invoices/ui/Breadcrumbs';
 
 import { fetchCustomerList, fetchInvoiceById } from '@/lib/queries';
 
-import { InvoiceFormUpdate } from './ui';
+import { InvoiceForm } from '../../ui';
 import type { NextPageProps } from '@/types';
 
 const UpdateInvoicePage = async (props: NextPageProps) => {
@@ -30,7 +30,7 @@ const UpdateInvoicePage = async (props: NextPageProps) => {
         ]}
       />
 
-      <InvoiceFormUpdate customerList={customerList} invoice={invoice} />
+      <InvoiceForm customerList={customerList} invoice={invoice} />
     </main>
   );
 };

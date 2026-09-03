@@ -1,12 +1,5 @@
 import type { Revenue } from '~/prisma/client';
 
-export const formatCurrency = (amount: number) => {
-  return (amount / 100).toLocaleString('en-US', {
-    currency: 'USD',
-    style: 'currency',
-  });
-};
-
 export const formatDateToLocal = (dateStr: Date, locale = 'en-US') => {
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = {

@@ -3,14 +3,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import type { TInvoiceFormErrors, TInvoiceStatus } from './schemas';
+import type { InvoiceFormErrors, InvoiceInput } from './schemas';
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async (data: TCreateInvoiceInput) => {
+    mutationFn: async (data: InvoiceInput) => {
       const response = await fetch('/api/invoices', {
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
@@ -35,7 +35,7 @@ export const useUpdateInvoice = () => {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async (data: TUpdateInvoiceInput) => {
+    mutationFn: async (data: InvoiceInput & { id: string }) => {
       const response = await fetch('/api/invoices', {
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
@@ -78,17 +78,7 @@ export const useDeleteInvoice = () => {
 };
 
 /* Types */
-type TCreateInvoiceInput = {
-  amount: number;
-  customerId: string;
-  status: TInvoiceStatus;
-};
-
-type TUpdateInvoiceInput = TCreateInvoiceInput & {
-  id: string;
-};
-
-export type TMutationError = {
-  errors?: TInvoiceFormErrors;
+export type MutationError = {
+  errors?: InvoiceFormErrors;
   message?: string;
 };

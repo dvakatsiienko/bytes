@@ -13,7 +13,7 @@ export const Sidenav = () => {
     <nav className='perforation flex h-full flex-col bg-bar/40 pl-4'>
       <Link
         className='flex h-20 items-end border-rule border-b px-4 pb-4 md:h-32'
-        href='/'>
+        href='/dashboard'>
         <span className={`${display.className} text-ink`}>
           <span className='w-32 md:w-40'>
             <AcmeLogo />

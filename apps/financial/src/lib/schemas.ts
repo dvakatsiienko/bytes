@@ -1,31 +1,34 @@
 import { z } from 'zod';
 
-export const InvoiceSchema = z.object({
-  amount: z.coerce
-    .number()
-    .gt(0, { message: 'Please enter an amount greater than $0.' }),
-  createdAt: z.string(),
-  customerId: z.string({ message: 'Please select a customer.' }),
-  id: z.string(),
+import { usdToCents } from './money';
+
+export const InvoiceInputSchema = z.object({
+  amount: z.string().transform((value, ctx) => {
+    const cents = usdToCents(value);
+
+    if (cents === null || cents <= 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Please enter an amount greater than $0.',
+      });
+
+      return z.NEVER;
+    }
+
+    return cents;
+  }),
+  customerId: z.string().min(1, { message: 'Please select a customer.' }),
   status: z.enum(['pending', 'paid'], {
     message: 'Please select an invoice status.',
   }),
 });
 
-export const CreateInvoiceSchema = InvoiceSchema.omit({
-  createdAt: true,
-  id: true,
-});
-
-export const UpdateInvoiceSchema = InvoiceSchema.omit({
-  createdAt: true,
-  id: true,
-});
-
 /* Types */
-export type TInvoiceStatus = z.infer<typeof InvoiceSchema>['status'];
+export type InvoiceInput = z.input<typeof InvoiceInputSchema>;
 
-export type TInvoiceFormErrors = {
+export type InvoiceStatus = z.infer<typeof InvoiceInputSchema>['status'];
+
+export type InvoiceFormErrors = {
   amount?: string[];
   customerId?: string[];
   status?: string[];
