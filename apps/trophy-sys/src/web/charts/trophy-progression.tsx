@@ -11,13 +11,8 @@ import { motion } from 'motion/react';
 import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
-import { CHART_INK } from '../helpers/chart-theme.ts';
-import {
-  GRADE_ORDER,
-  GRADE_TONE,
-  gameLookup,
-  monthKey,
-} from '../helpers/stats.ts';
+import { AXIS_LABEL, CHART_INK, GRADE_TONE } from '../helpers/chart-theme.ts';
+import { GRADE_ORDER, gameLookup, monthKey } from '../helpers/stats.ts';
 import { SeriesLegend } from './chart-legend.tsx';
 
 export const progressionMonths = (
@@ -381,13 +376,6 @@ export const PROGRESSION_COLUMNS: ChartColumn<MonthPoint>[] = [
   },
   { cell: (month) => month.topGame ?? '—', head: 'driven by' },
 ];
-
-/* Styles */
-const AXIS_LABEL = {
-  fill: CHART_INK.axis,
-  fontSize: 9,
-  textAnchor: 'middle' as const,
-};
 
 /* Types */
 type GradeKey = (typeof GRADE_ORDER)[number];

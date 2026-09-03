@@ -1,5 +1,6 @@
 import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
+import { CHART_INK, TIER_TONE } from '../helpers/chart-theme.ts';
 import { gameLookup } from '../helpers/stats.ts';
 import type { BarChart } from './bar-rows.tsx';
 
@@ -9,11 +10,11 @@ import type { BarChart } from './bar-rows.tsx';
  * rates, not the rate among PSNProfiles members, and the route says so.
  */
 const TIERS = [
-  { label: 'ultra rare', max: 5, min: 0, tone: 'var(--p-purple)' },
-  { label: 'very rare', max: 10, min: 5, tone: 'var(--p-red)' },
-  { label: 'rare', max: 25, min: 10, tone: 'var(--p-orange)' },
-  { label: 'uncommon', max: 50, min: 25, tone: 'var(--p-yellow)' },
-  { label: 'common', max: 100, min: 50, tone: 'var(--p-green)' },
+  { label: 'ultra rare', max: 5, min: 0 },
+  { label: 'very rare', max: 10, min: 5 },
+  { label: 'rare', max: 25, min: 10 },
+  { label: 'uncommon', max: 50, min: 25 },
+  { label: 'common', max: 100, min: 50 },
 ] as const;
 
 export const rarityTiers = (
@@ -22,7 +23,7 @@ export const rarityTiers = (
 ): RarityTier[] => {
   const byId = gameLookup(games);
 
-  return TIERS.map((tier) => {
+  return TIERS.map((tier, index) => {
     const members = trophies.filter(
       (trophy) => trophy.rarity > tier.min && trophy.rarity <= tier.max,
     );
@@ -42,7 +43,7 @@ export const rarityTiers = (
       range: `${tier.min}-${tier.max}%`,
       rarest,
       share: trophies.length ? (members.length / trophies.length) * 100 : 0,
-      tone: tier.tone,
+      tone: TIER_TONE[index] ?? CHART_INK.ring,
     };
   });
 };

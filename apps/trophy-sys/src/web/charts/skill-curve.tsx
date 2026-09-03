@@ -11,7 +11,7 @@ import { motion } from 'motion/react';
 import type { ArchivedTrophy } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
-import { CHART_INK } from '../helpers/chart-theme.ts';
+import { AXIS_LABEL, CHART_INK } from '../helpers/chart-theme.ts';
 import { median, monthKey } from '../helpers/stats.ts';
 
 /** Months pooled into one rolling reading — the current month and the two before it. */
@@ -242,13 +242,6 @@ export const SKILL_COLUMNS: ChartColumn<SkillMonth>[] = [
   { cell: (month) => `${month.rarest}%`, head: 'rarest', isNumeric: true },
   { cell: (month) => String(month.count), head: 'trophies', isNumeric: true },
 ];
-
-/* Styles */
-const AXIS_LABEL = {
-  fill: CHART_INK.axis,
-  fontSize: 9,
-  textAnchor: 'middle' as const,
-};
 
 /* Types */
 export interface SkillMonth {

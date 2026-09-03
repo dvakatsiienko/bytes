@@ -97,7 +97,7 @@ const Bars = (props: BarsProps) => {
 
         <text
           dominantBaseline='middle'
-          fill={isActive ? 'var(--p-fg)' : CHART_INK.axis}
+          fill={isActive ? CHART_INK.text : CHART_INK.axis}
           fontSize={9}
           x={0}
           y={y + ROW_HEIGHT / 2}>
@@ -135,7 +135,7 @@ const Bars = (props: BarsProps) => {
 
         <text
           dominantBaseline='middle'
-          fill={isActive ? 'var(--p-fg)' : CHART_INK.axis}
+          fill={isActive ? CHART_INK.text : CHART_INK.axis}
           fontSize={9}
           textAnchor='end'
           x={props.width}

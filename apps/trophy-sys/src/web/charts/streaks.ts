@@ -1,5 +1,6 @@
 import type { ArchivedTrophy } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
+import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { dayKey } from '../helpers/stats.ts';
 import type { BarChart } from './bar-rows.tsx';
 
@@ -86,7 +87,7 @@ export const streakChart = (model: StreakModel): BarChart => {
       { label: 'trophies', value: String(run.trophies) },
       { label: 'per day', value: (run.trophies / run.days).toFixed(1) },
     ],
-    tone: run === model.current ? 'var(--p-green)' : 'var(--p-orange)',
+    tone: run === model.current ? BAR_TONE.done : BAR_TONE.past,
     value: `${run.days}d`,
   }));
 

@@ -1,5 +1,6 @@
 import type { ArchivedTrophy, Game, TrophyGrade } from '../../shared/types.ts';
-import { GRADE_TONE, countTotal } from '../helpers/stats.ts';
+import { GRADE_TONE } from '../helpers/chart-theme.ts';
+import { countTotal } from '../helpers/stats.ts';
 
 /** PSN's own flat points per grade — the number every trophy site shows. */
 const FLAT_POINTS: Record<TrophyGrade, number> = {

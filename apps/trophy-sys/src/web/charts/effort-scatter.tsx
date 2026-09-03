@@ -9,7 +9,7 @@ import { useTooltip } from '@visx/tooltip';
 import type { TooltipRow } from '../components/chart-tooltip.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
-import { CHART_INK } from '../helpers/chart-theme.ts';
+import { AXIS_LABEL, CHART_INK } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
 import type { EffortPoint } from '../helpers/stats.ts';
 
@@ -225,13 +225,6 @@ const effortRows = (point: EffortPoint): TooltipRow[] => [
     value: point.perTrophy ? hoursFormat(point.perTrophy) : '—',
   },
 ];
-
-/* Styles */
-const AXIS_LABEL = {
-  fill: CHART_INK.axis,
-  fontSize: 9,
-  textAnchor: 'middle' as const,
-};
 
 /* Types */
 interface EffortScatterProps {

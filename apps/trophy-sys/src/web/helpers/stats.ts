@@ -16,14 +16,6 @@ export const GRADE_ORDER = [
   'platinum',
 ] as const satisfies readonly TrophyGrade[];
 
-/** visx takes colours as prop strings, so grades need the raw variables. */
-export const GRADE_TONE: Record<TrophyGrade, string> = {
-  bronze: 'var(--p-bronze)',
-  gold: 'var(--p-gold)',
-  platinum: 'var(--p-platinum)',
-  silver: 'var(--p-silver)',
-};
-
 export const gameLookup = (games: Game[]) =>
   new Map(games.map((game) => [game.id, game]));
 

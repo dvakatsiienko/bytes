@@ -1,5 +1,6 @@
 import type { Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
+import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
 import type { BarChart } from './bar-rows.tsx';
 
@@ -56,8 +57,8 @@ export const backlogChart = (buckets: BacklogBucket[]): BarChart => {
         { label: 'hours', value: hoursFormat(bucket.hours) },
       ],
       tone: bucket.label.startsWith('finished')
-        ? 'var(--p-green)'
-        : 'var(--p-blue)',
+        ? BAR_TONE.done
+        : BAR_TONE.plain,
       value: String(bucket.games.length),
     };
   });
