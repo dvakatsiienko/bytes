@@ -30,6 +30,25 @@ const NON_ALNUM = /[^a-z0-9]/g;
 const ARABIC = /\b(10|[1-9])\b/g;
 const TRAILING_TROPHIES = /trophies$/;
 const TRAILING_REMASTERED = /remastered$/;
+
+/**
+ * Edition suffixes the two endpoints disagree about: the trophy list carries
+ * them, the playtime feed usually names the base game. Only re-releases of one
+ * title belong here — a subtitle that names a *different* game (Ground Zeroes
+ * against The Phantom Pain) must never be stripped, or two games merge into one
+ * key. Deterministic strips, not scoring: the collision rules below still evict
+ * any key two titles could claim.
+ */
+const EDITIONS = [
+  'ultimateedition',
+  'definitiveedition',
+  'completeedition',
+  'deluxeedition',
+  'gameoftheyearedition',
+  'gotyedition',
+  'directorscut',
+];
+const TRAILING_EDITION = new RegExp(`(?:${EDITIONS.join('|')})$`);
 const DURATION = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
 
 /** Second pass, applied only to names the exact match missed. */
@@ -41,7 +60,8 @@ const nameKeyLoose = (name: string) => {
 
   return nameKey(arabic)
     .replace(TRAILING_TROPHIES, '')
-    .replace(TRAILING_REMASTERED, '');
+    .replace(TRAILING_REMASTERED, '')
+    .replace(TRAILING_EDITION, '');
 };
 
 const secondsParse = (duration: string) => {

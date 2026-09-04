@@ -98,7 +98,7 @@ const Bars = (props: BarsProps) => {
         <text
           dominantBaseline='middle'
           fill={isActive ? CHART_INK.text : CHART_INK.axis}
-          fontSize={11}
+          fontSize={LABEL_FONT}
           x={0}
           y={y + ROW_HEIGHT / 2}>
           {clip(row.label, gutter)}
@@ -136,7 +136,7 @@ const Bars = (props: BarsProps) => {
         <text
           dominantBaseline='middle'
           fill={isActive ? CHART_INK.text : CHART_INK.axis}
-          fontSize={11}
+          fontSize={LABEL_FONT}
           textAnchor='end'
           x={props.width}
           y={y + ROW_HEIGHT / 2}>
@@ -198,9 +198,18 @@ const AXIS_HEIGHT = 22;
 /** Room kept at the right edge for the readout, plus a gap before the track. */
 const VALUE_WIDTH = 76;
 
+const LABEL_FONT = 11;
+/**
+ * JetBrains Mono advances at 0.6em, so the font size *is* the character width.
+ * Derived rather than a constant: a hard-coded 5px-per-character was sized for
+ * 9px type and let ~30% too many characters through the moment the text grew,
+ * which is how the titles ended up running under the bars.
+ */
+const CHAR_WIDTH = LABEL_FONT * 0.6;
+
 /** SVG text has no ellipsis, so the label is cut to what the gutter can hold. */
 const clip = (label: string, gutter: number) => {
-  const fits = Math.max(Math.floor((gutter - 8) / 5), 6);
+  const fits = Math.max(Math.floor((gutter - 8) / CHAR_WIDTH), 6);
   return label.length > fits ? `${label.slice(0, fits - 1)}…` : label;
 };
 
