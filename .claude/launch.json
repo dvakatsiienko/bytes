@@ -41,6 +41,8 @@
     },
     {
       "name": "trophy-sys",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "trophy-sys", "dev"],
       "port": 5177,
       "url": "http://localhost:5177",
       "autoPort": false

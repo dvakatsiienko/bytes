@@ -9,5 +9,8 @@ export default defineConfig({
   server: {
     port: 5177,
     proxy: { '/api': `http://localhost:${API_PORT}` },
+    // Fail rather than auto-bump: a silent sibling on 5178+ collides with the
+    // api port and leaves the preview pointing at a stale server.
+    strictPort: true,
   },
 });
