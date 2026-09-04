@@ -1,3 +1,4 @@
+import { type MouseEvent as ReactMouseEvent, useRef } from 'react';
 import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
@@ -82,10 +83,23 @@ export const heatmapWeeks = (
 
 export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
   const tooltip = useTooltip<HeatmapCell>();
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The grid scales to fill its row, so an SVG coordinate is no longer a screen
+   * pixel — the tooltip has to be anchored off the cell's real rect instead of
+   * off `weekIndex * STEP`, or it drifts further with every column.
+   */
+  const anchorAt = (event: ReactMouseEvent<SVGRectElement>) => {
+    const wrap = wrapRef.current?.getBoundingClientRect();
+    const cell = event.currentTarget.getBoundingClientRect();
+    if (!wrap) return { left: 0, top: 0 };
+    return { left: cell.right - wrap.left, top: cell.top - wrap.top };
+  };
 
   const gridWidth = props.model.columns.length * STEP;
-  const marginX = gridWidth + 18;
-  const width = marginX + MARGIN_WIDTH + 30;
+  const marginX = LABEL_INSET + gridWidth + 18;
+  const width = marginX + MARGIN_WIDTH + 30 + LABEL_INSET;
   const height = 7 * STEP + 26;
   const peak = Math.max(
     ...props.model.weekdays.map((weekday) => weekday.count),
@@ -111,13 +125,14 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
           initial={{ opacity: 0 }}
           key={cell.date}
           onClick={() => props.onSelect(cell.date)}
-          onMouseEnter={() =>
+          onMouseEnter={(event) => {
+            const at = anchorAt(event);
             tooltip.showTooltip({
               tooltipData: cell,
-              tooltipLeft: weekIndex * STEP + CELL,
-              tooltipTop: cell.weekday * STEP + LABEL_HEIGHT,
-            })
-          }
+              tooltipLeft: at.left,
+              tooltipTop: at.top,
+            });
+          }}
           onMouseLeave={tooltip.hideTooltip}
           // The pick reads as an outline, never as a shade: the fill already
           // encodes the count, so recolouring it would collide with the scale.
@@ -125,7 +140,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
           strokeWidth={isPicked ? 1.5 : undefined}
           transition={{ delay: weekIndex * 0.004, duration: 0.25 }}
           width={CELL}
-          x={weekIndex * STEP}
+          x={LABEL_INSET + weekIndex * STEP}
           y={cell.weekday * STEP + LABEL_HEIGHT}
         />
       );
@@ -145,47 +160,53 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
         fill={CHART_INK.axis}
         fontSize={11}
         key={first.date}
-        x={weekIndex * STEP}
+        x={weekIndex * STEP + LABEL_INSET}
         y={8}>
         {MONTHS[date.getMonth()]}
       </text>,
     ];
   });
 
-  const marginListJSX = props.model.weekdays.map((weekday, index) => (
-    <g key={weekday.label}>
-      <motion.rect
-        animate={{ scaleX: 1 }}
-        fill={CHART_INK.ring}
-        fillOpacity={0.6}
-        height={CELL}
-        initial={{ scaleX: 0 }}
-        style={{ transformBox: 'fill-box', transformOrigin: 'left' }}
-        transition={{ delay: 0.25 + index * 0.03, duration: 0.35 }}
-        width={Math.max((weekday.count / peak) * MARGIN_WIDTH, 1)}
-        x={marginX}
-        y={index * STEP + LABEL_HEIGHT}
-      />
-      <text
-        dominantBaseline='middle'
-        fill={CHART_INK.axis}
-        fontSize={11}
-        x={marginX + MARGIN_WIDTH + 4}
-        y={index * STEP + LABEL_HEIGHT + CELL / 2}>
-        {weekday.label}
-      </text>
-    </g>
-  ));
+  const marginListJSX = props.model.weekdays.map((weekday, index) => {
+    return (
+      <g key={weekday.label}>
+        <motion.rect
+          animate={{ scaleX: 1 }}
+          fill={CHART_INK.ring}
+          fillOpacity={0.6}
+          height={CELL}
+          initial={{ scaleX: 0 }}
+          style={{ transformBox: 'fill-box', transformOrigin: 'left' }}
+          transition={{ delay: 0.25 + index * 0.03, duration: 0.35 }}
+          width={Math.max((weekday.count / peak) * MARGIN_WIDTH, 1)}
+          x={marginX}
+          y={index * STEP + LABEL_HEIGHT}
+        />
+        <text
+          dominantBaseline='middle'
+          fill={CHART_INK.axis}
+          fontSize={11}
+          x={marginX + MARGIN_WIDTH + 4}
+          y={index * STEP + LABEL_HEIGHT + CELL / 2}>
+          {weekday.label}
+        </text>
+      </g>
+    );
+  });
 
   return (
-    <div className='relative w-full overflow-x-auto px-4 py-2'>
+    <div className='relative w-full py-2' ref={wrapRef}>
       {/* aria-label rather than <title>: a <title> child is what browsers
           render as their own native tooltip on hover. */}
+      {/* viewBox rather than a pixel width: the panel spans the full row now,
+          and a fixed 725px grid left half of it empty. */}
       <svg
         aria-label='Trophies earned per day over the last year, plus a weekday total for each row'
-        height={height}
+        className='block w-full'
+        preserveAspectRatio='xMidYMid meet'
         role='img'
-        width={width}>
+        style={{ aspectRatio: `${width} / ${height}` }}
+        viewBox={`0 0 ${width} ${height}`}>
         {monthListJSX}
         {cellListJSX}
         {marginListJSX}
@@ -212,6 +233,8 @@ const CELL = 11;
 const STEP = 13;
 const LABEL_HEIGHT = 12;
 const MARGIN_WIDTH = 46;
+/** Matches bar-rows and night owl: one inset for every label column. */
+const LABEL_INSET = 8;
 
 const MONTHS = [
   'jan',

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 
 import type { GameDetail, Trophy, TrophyGroup } from '../../shared/types.ts';
 import { GRADE_MARK, barRender, progressTone } from '../helpers/format.ts';
@@ -18,12 +18,7 @@ import { PlatformBadge } from './platform-badge.tsx';
 import { SelectControl } from './select-control.tsx';
 import { TrophyRow } from './trophy-row.tsx';
 
-interface GamePanelProps {
-  error: string | null;
-  game: GameDetail | null;
-}
-
-export const GamePanel = ({ game, error }: GamePanelProps) => {
+export const GamePanel = (props: GamePanelProps) => {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useStored<TrophySort>(
     'trophy-sort',
@@ -46,34 +41,34 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
       trophy.detail.toLowerCase().includes(needle);
 
     return trophiesArrange(
-      (game?.trophies ?? []).filter(matches),
+      (props.game?.trophies ?? []).filter(matches),
       sort,
       earnedMode,
     );
-  }, [game, needle, sort, earnedMode]);
+  }, [props.game, needle, sort, earnedMode]);
 
-  if (error) return <Shell>error · {error}</Shell>;
-  if (!game) return <Shell>loading trophy set…</Shell>;
+  if (props.error) return <Shell>error · {props.error}</Shell>;
+  if (!props.game) return <Shell>loading trophy set…</Shell>;
 
-  const hasPlatinum = game.earned.platinum > 0;
+  const hasPlatinum = props.game.earned.platinum > 0;
 
   return (
     <section className='panel flex min-h-0 min-w-0 flex-col'>
-      <span className='panel-title select-text'>{game.name}</span>
+      <span className='panel-title select-text'>{props.game.name}</span>
 
       <div className='flex items-center gap-4 border-line border-b px-4 py-3'>
         <img
           alt=''
           className='size-14 border border-line bg-bg-soft object-contain'
           height={56}
-          src={game.iconUrl}
+          src={props.game.iconUrl}
           width={56}
         />
 
         <div className='min-w-0'>
           <p className='flex items-baseline gap-2'>
             <span className='glow select-text truncate text-base text-orange'>
-              {game.name}
+              {props.game.name}
             </span>
             {hasPlatinum && (
               <span className='glow shrink-0 text-platinum text-sm'>
@@ -82,32 +77,32 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
             )}
           </p>
           <p className='mt-1 flex items-center gap-1.5 text-[12px] text-dim'>
-            <PlatformBadge platform={game.platform} />
+            <PlatformBadge platform={props.game.platform} />
             {hasPlatinum && (
               <span className='shrink-0 border border-platinum/50 bg-platinum/10 px-1 py-px text-[12px] text-platinum leading-none tracking-[0.12em]'>
                 PLATINUM
               </span>
             )}
             <span>
-              {game.earned.bronze +
-                game.earned.silver +
-                game.earned.gold +
-                game.earned.platinum}
+              {props.game.earned.bronze +
+                props.game.earned.silver +
+                props.game.earned.gold +
+                props.game.earned.platinum}
               /
-              {game.defined.bronze +
-                game.defined.silver +
-                game.defined.gold +
-                game.defined.platinum}{' '}
+              {props.game.defined.bronze +
+                props.game.defined.silver +
+                props.game.defined.gold +
+                props.game.defined.platinum}{' '}
               trophies
             </span>
           </p>
         </div>
 
         <div className='ml-auto shrink-0 text-right text-[12px]'>
-          <span className={progressTone(game.progress)}>
-            {barRender(game.progress, 18)}
+          <span className={progressTone(props.game.progress)}>
+            {barRender(props.game.progress, 18)}
           </span>
-          <span className='block text-dim'>{game.progress}%</span>
+          <span className='block text-dim'>{props.game.progress}%</span>
         </div>
       </div>
 
@@ -139,15 +134,15 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
         />
       </div>
 
-      {shown.length !== game.trophies.length && (
+      {shown.length !== props.game.trophies.length && (
         <div className='border-line border-b px-4 py-1 text-[12px] text-dim'>
-          showing {shown.length} of {game.trophies.length}
+          showing {shown.length} of {props.game.trophies.length}
         </div>
       )}
 
       <div className='min-h-0 flex-1 overflow-y-auto'>
-        {game.groups.length > 1 ? (
-          game.groups.map((group) => {
+        {props.game.groups.length > 1 ? (
+          props.game.groups.map((group) => {
             const inGroup = shown.filter((trophy) => trophy.group === group.id);
             // A section with nothing left would leave a stranded header.
             if (inGroup.length === 0) return null;
@@ -158,9 +153,9 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
           })
         ) : (
           <ul>
-            {shown.map((trophy) => (
-              <TrophyRow key={trophy.id} trophy={trophy} />
-            ))}
+            {shown.map((trophy) => {
+              return <TrophyRow key={trophy.id} trophy={trophy} />;
+            })}
           </ul>
         )}
       </div>
@@ -203,16 +198,22 @@ const GroupSection = ({
       </header>
 
       <ul>
-        {trophies.map((trophy) => (
-          <TrophyRow key={trophy.id} trophy={trophy} />
-        ))}
+        {trophies.map((trophy) => {
+          return <TrophyRow key={trophy.id} trophy={trophy} />;
+        })}
       </ul>
     </>
   );
 };
 
-const Shell = ({ children }: { children: React.ReactNode }) => (
+const Shell = ({ children }: { children: ReactNode }) => (
   <section className='panel grid place-items-center text-dim'>
     {children}
   </section>
 );
+
+/* Types */
+interface GamePanelProps {
+  error: string | null;
+  game: GameDetail | null;
+}

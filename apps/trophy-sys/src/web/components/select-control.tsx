@@ -1,13 +1,3 @@
-interface SelectControlProps<Value extends string> {
-  className?: string;
-  hint: string;
-  labels: Record<Value, string>;
-  onChange: (value: Value) => void;
-  /** Explicit — record key order is alphabetised by the linter. */
-  options: readonly Value[];
-  value: Value;
-}
-
 /** The one dropdown look shared by the library and trophy control bars. */
 export const SelectControl = <Value extends string>({
   className = '',
@@ -22,10 +12,23 @@ export const SelectControl = <Value extends string>({
     data-hint={hint}
     onChange={(event) => onChange(event.target.value as Value)}
     value={value}>
-    {options.map((option) => (
-      <option key={option} value={option}>
-        {labels[option]}
-      </option>
-    ))}
+    {options.map((option) => {
+      return (
+        <option key={option} value={option}>
+          {labels[option]}
+        </option>
+      );
+    })}
   </select>
 );
+
+/* Types */
+interface SelectControlProps<Value extends string> {
+  className?: string;
+  hint: string;
+  labels: Record<Value, string>;
+  onChange: (value: Value) => void;
+  /** Explicit — record key order is alphabetised by the linter. */
+  options: readonly Value[];
+  value: Value;
+}

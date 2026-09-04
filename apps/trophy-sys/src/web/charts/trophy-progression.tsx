@@ -100,10 +100,10 @@ export const TrophyProgression = (props: TrophyProgressionProps) => {
     );
 
   return (
-    <div className='flex flex-col'>
+    <div className='flex h-full min-h-0 flex-col'>
       <SeriesLegend items={GRADE_LEGEND} />
 
-      <div className='relative h-80 w-full'>
+      <div className='relative min-h-64 w-full flex-1'>
         <ParentSize>
           {(size) =>
             size.width > 0 ? (
@@ -169,21 +169,23 @@ const Plot = (props: PlotProps) => {
 
   const activeIndex = tooltip.tooltipData?.index ?? null;
 
-  const bandListJSX = props.months.map((month) => (
-    <motion.rect
-      animate={{ scaleY: 1 }}
-      fill={CHART_INK.ring}
-      fillOpacity={month.index === activeIndex ? 1 : 0.55}
-      height={Math.max(bandScale(month.count), month.count ? 1 : 0)}
-      initial={{ scaleY: 0 }}
-      key={month.label}
-      style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
-      transition={{ delay: month.index * 0.004, duration: 0.3 }}
-      width={barWidth}
-      x={bandX(month.index)}
-      y={BAND_HEIGHT - 4 - bandScale(month.count)}
-    />
-  ));
+  const bandListJSX = props.months.map((month) => {
+    return (
+      <motion.rect
+        animate={{ scaleY: 1 }}
+        fill={CHART_INK.ring}
+        fillOpacity={month.index === activeIndex ? 1 : 0.55}
+        height={Math.max(bandScale(month.count), month.count ? 1 : 0)}
+        initial={{ scaleY: 0 }}
+        key={month.label}
+        style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
+        transition={{ delay: month.index * 0.004, duration: 0.3 }}
+        width={barWidth}
+        x={bandX(month.index)}
+        y={BAND_HEIGHT - 4 - bandScale(month.count)}
+      />
+    );
+  });
 
   return (
     <>
@@ -211,17 +213,19 @@ const Plot = (props: PlotProps) => {
             y0={(point) => yScale(point[0])}
             y1={(point) => yScale(point[1])}>
             {({ path, stacks }) =>
-              stacks.map((stack) => (
-                <motion.path
-                  animate={{ opacity: 1 }}
-                  d={path(stack) ?? ''}
-                  fill={GRADE_TONE[stack.key]}
-                  fillOpacity={0.85}
-                  initial={{ opacity: 0 }}
-                  key={stack.key}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                />
-              ))
+              stacks.map((stack) => {
+                return (
+                  <motion.path
+                    animate={{ opacity: 1 }}
+                    d={path(stack) ?? ''}
+                    fill={GRADE_TONE[stack.key]}
+                    fillOpacity={0.85}
+                    initial={{ opacity: 0 }}
+                    key={stack.key}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                  />
+                );
+              })
             }
           </AreaStack>
 

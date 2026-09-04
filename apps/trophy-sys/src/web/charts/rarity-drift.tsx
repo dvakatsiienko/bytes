@@ -32,7 +32,7 @@ const WINDOW = 3;
  * Quiet months are dropped: the median of nothing is not zero, it is nothing,
  * and drawing it as zero would invent the rarest month on record.
  */
-export const skillMonths = (trophies: ArchivedTrophy[]): SkillMonth[] => {
+export const driftMonths = (trophies: ArchivedTrophy[]): DriftMonth[] => {
   const perMonth = new Map<string, number[]>();
 
   for (const trophy of trophies) {
@@ -62,8 +62,8 @@ export const skillMonths = (trophies: ArchivedTrophy[]): SkillMonth[] => {
   });
 };
 
-export const SkillCurve = (props: SkillCurveProps) => (
-  <div className='relative h-64 w-full'>
+export const RarityDrift = (props: RarityDriftProps) => (
+  <div className='relative h-full min-h-64 w-full'>
     <ParentSize>
       {(size) =>
         size.width > 0 ? (
@@ -75,7 +75,7 @@ export const SkillCurve = (props: SkillCurveProps) => (
 );
 
 const Plot = (props: PlotProps) => {
-  const tooltip = useTooltip<SkillMonth>();
+  const tooltip = useTooltip<DriftMonth>();
 
   const innerWidth = Math.max(props.width - MARGIN.left - MARGIN.right, 1);
   const innerHeight = Math.max(props.height - MARGIN.top - MARGIN.bottom, 1);
@@ -97,18 +97,20 @@ const Plot = (props: PlotProps) => {
     return props.months[Math.min(Math.max(index, 0), props.months.length - 1)];
   };
 
-  const dotListJSX = props.months.map((month) => (
-    <circle
-      cx={xScale(month.index)}
-      cy={yScale(month.median)}
-      fill={CHART_INK.ring}
-      // The single months sit behind the line as faint marks: they are the
-      // evidence, the rolling line is the reading.
-      fillOpacity={month.index === activeIndex ? 1 : 0.35}
-      key={month.label}
-      r={month.index === activeIndex ? 4 : 2}
-    />
-  ));
+  const dotListJSX = props.months.map((month) => {
+    return (
+      <circle
+        cx={xScale(month.index)}
+        cy={yScale(month.median)}
+        fill={CHART_INK.ring}
+        // The single months sit behind the line as faint marks: they are the
+        // evidence, the rolling line is the reading.
+        fillOpacity={month.index === activeIndex ? 1 : 0.35}
+        key={month.label}
+        r={month.index === activeIndex ? 4 : 2}
+      />
+    );
+  });
 
   return (
     <>
@@ -129,7 +131,7 @@ const Plot = (props: PlotProps) => {
             width={innerWidth}
           />
 
-          <LinePath<SkillMonth>
+          <LinePath<DriftMonth>
             data={props.months}
             x={(month) => xScale(month.index)}
             y={(month) => yScale(month.rolling)}>
@@ -224,7 +226,7 @@ const Plot = (props: PlotProps) => {
 /* Helpers */
 const MARGIN = { bottom: 26, left: 38, right: 10, top: 10 };
 
-export const SKILL_COLUMNS: ChartColumn<SkillMonth>[] = [
+export const RARITY_DRIFT_COLUMNS: ChartColumn<DriftMonth>[] = [
   { cell: (month) => month.label, head: 'month' },
   {
     cell: (month) => `${month.rolling.toFixed(1)}%`,
@@ -241,7 +243,7 @@ export const SKILL_COLUMNS: ChartColumn<SkillMonth>[] = [
 ];
 
 /* Types */
-export interface SkillMonth {
+export interface DriftMonth {
   count: number;
   index: number;
   /** `YYYY-MM`. */
@@ -253,11 +255,11 @@ export interface SkillMonth {
   rolling: number;
 }
 
-interface SkillCurveProps {
-  months: SkillMonth[];
+interface RarityDriftProps {
+  months: DriftMonth[];
 }
 
-interface PlotProps extends SkillCurveProps {
+interface PlotProps extends RarityDriftProps {
   height: number;
   width: number;
 }

@@ -15,7 +15,7 @@ import { hoursFormat } from '../helpers/format.ts';
 import { countTotal } from '../helpers/stats.ts';
 
 export const EffortScatter = (props: EffortScatterProps) => (
-  <div className='relative h-80 w-full'>
+  <div className='relative h-full min-h-64 w-full'>
     <ParentSize>
       {(size) =>
         size.width > 0 ? (
@@ -40,9 +40,13 @@ const Plot = (props: PlotProps) => {
     domain: [Math.min(...hours, 0.5), Math.max(...hours, 1)],
     range: [0, innerWidth],
   });
+  // Inset by the largest mark's radius at both ends: a 0% title used to sit its
+  // centre exactly on the axis, so the bottom half of the dot crossed the line
+  // and read as clipped. The axis itself does not move — only the value range
+  // inside it, which keeps the picture the same shape.
   const yScale = scaleLinear<number>({
     domain: [0, 100],
-    range: [innerHeight, 0],
+    range: [innerHeight - MARK_MAX, MARK_MAX],
   });
   const peak = markPeak(props.points);
 

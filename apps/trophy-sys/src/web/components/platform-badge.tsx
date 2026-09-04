@@ -13,23 +13,26 @@ const CHIP: Record<string, string> = {
 
 const CHIP_UNKNOWN = 'border-line/60 text-mute';
 
+export const PlatformBadge = (props: PlatformBadgeProps) => (
+  <span className='inline-flex shrink-0 items-center gap-1'>
+    {props.platform
+      .split(',')
+      .map((name) => name.trim())
+      .filter(Boolean)
+      .map((name) => {
+        return (
+          <span
+            className={`border px-1 py-px text-[12px] leading-none tracking-[0.12em] ${CHIP[name] ?? CHIP_UNKNOWN}`}
+            key={name}>
+            {name}
+          </span>
+        );
+      })}
+  </span>
+);
+
+/* Types */
 interface PlatformBadgeProps {
   /** Comma-joined, straight from `trophyTitlePlatform` — `PS5,PSPC`. */
   platform: string;
 }
-
-export const PlatformBadge = ({ platform }: PlatformBadgeProps) => (
-  <span className='inline-flex shrink-0 items-center gap-1'>
-    {platform
-      .split(',')
-      .map((name) => name.trim())
-      .filter(Boolean)
-      .map((name) => (
-        <span
-          className={`border px-1 py-px text-[12px] leading-none tracking-[0.12em] ${CHIP[name] ?? CHIP_UNKNOWN}`}
-          key={name}>
-          {name}
-        </span>
-      ))}
-  </span>
-);

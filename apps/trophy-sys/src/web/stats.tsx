@@ -3,21 +3,12 @@ import { useNavigate } from '@tanstack/react-router';
 import { MotionConfig } from 'motion/react';
 
 import type { TrophyArchive } from '../shared/types.ts';
-import { AbandonedPanel } from './charts/abandoned-panel.tsx';
-import { ABANDONED_COLUMNS, abandonedRuns } from './charts/abandoned-runs.ts';
 import {
   type CircadianHour,
   CircadianRing,
   circadianHours,
   hourRangeFormat,
 } from './charts/circadian-ring.tsx';
-import {
-  CLOSEST_COLUMNS,
-  CLOSEST_SORTS,
-  type ClosestSort,
-  closestChart,
-  closestRows,
-} from './charts/closest-to-done.ts';
 import {
   ContributionHeatmap,
   WEEKDAY_COLUMNS,
@@ -39,10 +30,10 @@ import {
   rarityTiers,
 } from './charts/rarity-distribution.ts';
 import {
-  SKILL_COLUMNS,
-  SkillCurve,
-  skillMonths,
-} from './charts/skill-curve.tsx';
+  RARITY_DRIFT_COLUMNS,
+  RarityDrift,
+  driftMonths,
+} from './charts/rarity-drift.tsx';
 import {
   STREAK_COLUMNS,
   streakChart,
@@ -60,6 +51,13 @@ import {
   TrophyProgression,
   progressionMonths,
 } from './charts/trophy-progression.tsx';
+import {
+  UNFINISHED_COLUMNS,
+  UNFINISHED_SORTS,
+  type UnfinishedSort,
+  unfinishedChart,
+  unfinishedRows,
+} from './charts/unfinished.ts';
 import { BarRows } from './components/bar-rows.tsx';
 import {
   type ChartColumn,
@@ -80,7 +78,7 @@ export const Stats = () => {
 
   const [focusMonth, setFocusMonth] = useState<string | null>(null);
   const [focusDay, setFocusDay] = useState<string | null>(null);
-  const [closestSort, setClosestSort] = useState<ClosestSort>('left');
+  const [unfinishedSort, setUnfinishedSort] = useState<UnfinishedSort>('left');
   const [platinumSort, setPlatinumSort] = useState<PlatinumSort>('hours');
   const timelineRef = useRef<HTMLDivElement>(null);
 
@@ -94,9 +92,9 @@ export const Stats = () => {
     () => circadianHours(trophies, gameList),
     [trophies, gameList],
   );
-  const closest = useMemo(
-    () => closestRows(remaining, gameList, closestSort),
-    [remaining, gameList, closestSort],
+  const unfinished = useMemo(
+    () => unfinishedRows(remaining, gameList, unfinishedSort),
+    [remaining, gameList, unfinishedSort],
   );
   const tiers = useMemo(
     () => rarityTiers(trophies, gameList),
@@ -106,10 +104,6 @@ export const Stats = () => {
     () => platinumRuns(trophies, gameList, platinumSort),
     [trophies, gameList, platinumSort],
   );
-  const abandoned = useMemo(
-    () => abandonedRuns(gameList, remaining),
-    [gameList, remaining],
-  );
   const heatmap = useMemo(
     () => heatmapWeeks(trophies, gameList),
     [trophies, gameList],
@@ -118,7 +112,7 @@ export const Stats = () => {
     () => progressionMonths(trophies, gameList),
     [trophies, gameList],
   );
-  const skill = useMemo(() => skillMonths(trophies), [trophies]);
+  const drift = useMemo(() => driftMonths(trophies), [trophies]);
   const nightOwl = useMemo(
     () => nightOwlGrid(trophies, gameList),
     [trophies, gameList],
@@ -128,7 +122,10 @@ export const Stats = () => {
   // Each builder walks its rows once and returns the bars with the scale they
   // were measured against, so it must not be called twice per render.
   const rarityBars = useMemo(() => rarityChart(tiers), [tiers]);
-  const closestBars = useMemo(() => closestChart(closest), [closest]);
+  const unfinishedBars = useMemo(
+    () => unfinishedChart(unfinished),
+    [unfinished],
+  );
   const platinumBars = useMemo(() => platinumChart(platinums), [platinums]);
   const streakBars = useMemo(() => streakChart(streaks), [streaks]);
 
@@ -175,6 +172,268 @@ export const Stats = () => {
     return chart;
   };
 
+  /**
+   * Every panel by name. The table below decides where each one goes, so a
+   * reorder is one line there and never surgery on this markup.
+   */
+  const panel: Record<PanelName, ReactNode> = {
+    activity: (
+      <ChartFrame
+        name='heatmap'
+        note='a year of days · the right margin totals each weekday · click a day to mark its month below'
+        table={
+          <ChartTable
+            columns={WEEKDAY_COLUMNS}
+            rowKey={(weekday) => weekday.label}
+            rows={heatmap.weekdays}
+          />
+        }
+        title='activity'>
+        {gate(
+          <ContributionHeatmap
+            model={heatmap}
+            onSelect={dayFocus}
+            selected={focusDay}
+          />,
+        )}
+      </ChartFrame>
+    ),
+    circadian: (
+      <ChartFrame
+        name='circadian'
+        note='trophies by hour of day, in your local time · one spoke per hour'
+        table={
+          <ChartTable
+            columns={CIRCADIAN_COLUMNS}
+            rowKey={(hour) => String(hour.hour)}
+            rows={hours}
+          />
+        }
+        title='circadian'>
+        {gate(<CircadianRing hours={hours} />)}
+      </ChartFrame>
+    ),
+    effort: (
+      <ChartFrame
+        name='effort'
+        note='hours played against completion · log scale · mark size is the trophy count'
+        table={
+          <ChartTable
+            columns={EFFORT_COLUMNS}
+            rowKey={(point) => point.gameId}
+            rows={points}
+          />
+        }
+        title='effort'>
+        <EffortLegend />
+        {gate(<EffortScatter onSelect={gameOpen} points={points} />, false)}
+      </ChartFrame>
+    ),
+    nightOwl: (
+      <ChartFrame
+        name='night-owl'
+        note='the ring split by title, ordered by the hour each one peaked in'
+        table={
+          <ChartTable
+            columns={NIGHT_OWL_COLUMNS}
+            rowKey={(row) => row.name}
+            rows={nightOwl.rows}
+          />
+        }
+        title='night owl'>
+        {gate(<NightOwl grid={nightOwl} />)}
+      </ChartFrame>
+    ),
+    platinum: (
+      <ChartFrame
+        controls={
+          <SegmentedControl
+            label='time to platinum, sort order'
+            name='platinum-sort'
+            onChange={setPlatinumSort}
+            options={PLATINUM_SORTS}
+            value={platinumSort}
+          />
+        }
+        name='platinum'
+        note='hours played per platinum, quickest first · the hover carries the calendar span · titles whose playtime never matched are left out'
+        table={
+          <ChartTable
+            columns={PLATINUM_COLUMNS}
+            rowKey={(run) => run.gameId}
+            rows={platinums}
+          />
+        }
+        title='time to platinum'>
+        {gate(
+          <BarRows
+            axis={platinumBars.axis}
+            empty='no platinum has a matched playtime yet'
+            label='Hours played to reach each platinum'
+            onSelect={gameOpen}
+            rows={platinumBars.bars}
+          />,
+        )}
+      </ChartFrame>
+    ),
+    progression: (
+      <ChartFrame
+        name='progression'
+        note='trophies collected, stacked by grade · the band underneath is what each month alone brought'
+        table={
+          <ChartTable
+            columns={PROGRESSION_COLUMNS}
+            rowKey={(month) => month.label}
+            rows={months}
+          />
+        }
+        title='progression'>
+        {gate(<TrophyProgression focusMonth={focusMonth} months={months} />)}
+      </ChartFrame>
+    ),
+    rarity: (
+      <ChartFrame
+        name='rarity'
+        note="earned trophies by PSN's global earn rate — not PSNProfiles' member rate, so the tiers hold different numbers than that site shows"
+        table={
+          <ChartTable
+            columns={RARITY_COLUMNS}
+            rowKey={(tier) => tier.label}
+            rows={tiers}
+          />
+        }
+        title='rarity'>
+        {gate(
+          <BarRows
+            axis={rarityBars.axis}
+            empty='no trophies in the archive yet'
+            label='Earned trophies bucketed by global rarity'
+            rows={rarityBars.bars}
+          />,
+        )}
+      </ChartFrame>
+    ),
+    rarityDrift: (
+      <ChartFrame
+        name='rarity-drift'
+        note='are your trophies getting rarer? · the median global earn rate of what you popped each month · the line pools three months, the dots are the single ones · a falling line means rarer'
+        table={
+          <ChartTable
+            columns={RARITY_DRIFT_COLUMNS}
+            rowKey={(month) => month.label}
+            rows={drift}
+          />
+        }
+        title='rarity drift'>
+        {gate(<RarityDrift months={drift} />)}
+      </ChartFrame>
+    ),
+    streaks: (
+      <ChartFrame
+        name='streaks'
+        note={streakNote(streaks.current?.days ?? 0)}
+        table={
+          <ChartTable
+            columns={STREAK_COLUMNS}
+            rowKey={(run) => `${run.start}-${run.end}`}
+            rows={streaks.runs}
+          />
+        }
+        title='streaks'>
+        {gate(
+          <BarRows
+            axis={streakBars.axis}
+            empty='no run of consecutive days yet'
+            label='Longest runs of consecutive days with a trophy'
+            rows={streakBars.bars}
+          />,
+        )}
+      </ChartFrame>
+    ),
+    unfinished: (
+      <ChartFrame
+        controls={
+          <SegmentedControl
+            label='unfinished, sort order'
+            name='unfinished-sort'
+            onChange={setUnfinishedSort}
+            options={UNFINISHED_SORTS}
+            value={unfinishedSort}
+          />
+        }
+        name='unfinished'
+        note='what is left to finish, nearest the platinum first · dormant means untouched for six months'
+        table={
+          <ChartTable
+            columns={UNFINISHED_COLUMNS}
+            rowKey={(row) => row.gameId}
+            rows={unfinished}
+          />
+        }
+        title='unfinished'>
+        {gate(
+          <BarRows
+            axis={unfinishedBars.axis}
+            empty='nothing left over — every title is finished'
+            label='Titles with work left, ranked by how little is left'
+            onSelect={gameOpen}
+            rows={unfinishedBars.bars}
+          />,
+        )}
+      </ChartFrame>
+    ),
+  };
+
+  /**
+   * One entry per row, read top to bottom. A bare name is a whole row; a pair is
+   * two columns; a nested pair stacks inside its own column. Reordering the
+   * charts is a move inside LAYOUT — the markup above never shifts for it.
+   */
+  /** Only progression is scrolled to, so only it claims the ref. */
+  const refFor = (name: string) =>
+    name === 'progression' ? timelineRef : undefined;
+
+  const rowListJSX = LAYOUT.map((row) => {
+    const key = row.flat().join('-');
+
+    if (row.length === 1) {
+      const [only] = row;
+      return (
+        <div className='flex min-w-0' key={key} ref={refFor(only)}>
+          {panel[only as PanelName]}
+        </div>
+      );
+    }
+
+    const cellListJSX = row.map((cell) => {
+      const names = (Array.isArray(cell) ? cell : [cell]) as PanelName[];
+
+      return (
+        <div className='flex min-w-0 flex-col gap-4' key={names.join('-')}>
+          {names.map((name) => {
+            // flex-1 on every panel in the column: that is what makes a stack of
+            // two end level with the single tall panel beside it, and what lets
+            // a five-bar chart grow into the height a ten-bar neighbour sets.
+            return (
+              <div
+                className='flex min-h-0 flex-1'
+                key={name}
+                ref={refFor(name)}>
+                {panel[name]}
+              </div>
+            );
+          })}
+        </div>
+      );
+    });
+
+    return (
+      <div className='grid gap-4 lg:grid-cols-2' key={key}>
+        {cellListJSX}
+      </div>
+    );
+  });
+
   return (
     <MotionConfig reducedMotion='user'>
       <main className='flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto'>
@@ -206,233 +465,28 @@ export const Stats = () => {
 
         <KpiStrip games={gameList} trophies={trophies} />
 
-        <div className='grid items-start gap-4 lg:grid-cols-2'>
-          <ChartFrame
-            name='effort'
-            note='hours played against completion · log scale · mark size is the trophy count'
-            table={
-              <ChartTable
-                columns={EFFORT_COLUMNS}
-                rowKey={(point) => point.gameId}
-                rows={points}
-              />
-            }
-            title='effort'>
-            <EffortLegend />
-            {gate(<EffortScatter onSelect={gameOpen} points={points} />, false)}
-          </ChartFrame>
-
-          <ChartFrame
-            name='circadian'
-            note='trophies by hour of day, in your local time · one spoke per hour'
-            table={
-              <ChartTable
-                columns={CIRCADIAN_COLUMNS}
-                rowKey={(hour) => String(hour.hour)}
-                rows={hours}
-              />
-            }
-            title='circadian'>
-            {gate(<CircadianRing hours={hours} />)}
-          </ChartFrame>
-
-          <ChartFrame
-            name='rarity'
-            note="earned trophies by PSN's global earn rate — not PSNProfiles' member rate, so the tiers hold different numbers than that site shows"
-            table={
-              <ChartTable
-                columns={RARITY_COLUMNS}
-                rowKey={(tier) => tier.label}
-                rows={tiers}
-              />
-            }
-            title='rarity'>
-            {gate(
-              <BarRows
-                axis={rarityBars.axis}
-                empty='no trophies in the archive yet'
-                label='Earned trophies bucketed by global rarity'
-                rows={rarityBars.bars}
-              />,
-            )}
-          </ChartFrame>
-
-          <ChartFrame
-            name='abandoned'
-            note='titles dropped one step from the platinum — 80% or more, and stopped'
-            table={
-              <ChartTable
-                columns={ABANDONED_COLUMNS}
-                rowKey={(run) => run.gameId}
-                rows={abandoned}
-              />
-            }
-            title='abandoned'>
-            {gate(
-              <AbandonedPanel onSelect={gameOpen} runs={abandoned} />,
-              false,
-            )}
-          </ChartFrame>
-
-          <ChartFrame
-            controls={
-              <SegmentedControl
-                label='closest to done, sort order'
-                name='closest-sort'
-                onChange={setClosestSort}
-                options={CLOSEST_SORTS}
-                value={closestSort}
-              />
-            }
-            name='closest'
-            note='titles under way, nearest the platinum first · a part-done counter counts as its finished slice'
-            table={
-              <ChartTable
-                columns={CLOSEST_COLUMNS}
-                rowKey={(row) => row.gameId}
-                rows={closest}
-              />
-            }
-            title='closest to done'>
-            {gate(
-              <BarRows
-                axis={closestBars.axis}
-                empty='nothing under way — every title is finished or untouched'
-                label='Titles under way, ranked by how little is left'
-                onSelect={gameOpen}
-                rows={closestBars.bars}
-              />,
-            )}
-          </ChartFrame>
-
-          <ChartFrame
-            controls={
-              <SegmentedControl
-                label='time to platinum, sort order'
-                name='platinum-sort'
-                onChange={setPlatinumSort}
-                options={PLATINUM_SORTS}
-                value={platinumSort}
-              />
-            }
-            name='platinum'
-            note='hours played per platinum, quickest first · the hover carries the calendar span · titles whose playtime never matched are left out'
-            table={
-              <ChartTable
-                columns={PLATINUM_COLUMNS}
-                rowKey={(run) => run.gameId}
-                rows={platinums}
-              />
-            }
-            title='time to platinum'>
-            {gate(
-              <BarRows
-                axis={platinumBars.axis}
-                empty='no platinum has a matched playtime yet'
-                label='Hours played to reach each platinum'
-                onSelect={gameOpen}
-                rows={platinumBars.bars}
-              />,
-            )}
-          </ChartFrame>
-
-          <ChartFrame
-            name='streaks'
-            note={streakNote(streaks.current?.days ?? 0)}
-            table={
-              <ChartTable
-                columns={STREAK_COLUMNS}
-                rowKey={(run) => `${run.start}-${run.end}`}
-                rows={streaks.runs}
-              />
-            }
-            title='streaks'>
-            {gate(
-              <BarRows
-                axis={streakBars.axis}
-                empty='no run of consecutive days yet'
-                label='Longest runs of consecutive days with a trophy'
-                rows={streakBars.bars}
-              />,
-            )}
-          </ChartFrame>
-
-          <ChartFrame
-            name='skill'
-            note='median global earn rate of the trophies popped each month · the line is a three-month rolling median, the dots are the single months · lower means rarer'
-            table={
-              <ChartTable
-                columns={SKILL_COLUMNS}
-                rowKey={(month) => month.label}
-                rows={skill}
-              />
-            }
-            title='skill curve'>
-            {gate(<SkillCurve months={skill} />)}
-          </ChartFrame>
-
-          <div className='min-w-0 lg:col-span-2'>
-            <ChartFrame
-              name='heatmap'
-              note='the last year, one cell per day · the bars on the right total each weekday over the same window · click a day to mark its month on the timeline below'
-              table={
-                <ChartTable
-                  columns={WEEKDAY_COLUMNS}
-                  rowKey={(weekday) => weekday.label}
-                  rows={heatmap.weekdays}
-                />
-              }
-              title='activity'>
-              {gate(
-                <ContributionHeatmap
-                  model={heatmap}
-                  onSelect={dayFocus}
-                  selected={focusDay}
-                />,
-              )}
-            </ChartFrame>
-          </div>
-
-          <div className='min-w-0 lg:col-span-2' ref={timelineRef}>
-            <ChartFrame
-              name='progression'
-              note='trophies collected, stacked by grade · the band underneath is what each month alone brought'
-              table={
-                <ChartTable
-                  columns={PROGRESSION_COLUMNS}
-                  rowKey={(month) => month.label}
-                  rows={months}
-                />
-              }
-              title='progression'>
-              {gate(
-                <TrophyProgression focusMonth={focusMonth} months={months} />,
-              )}
-            </ChartFrame>
-          </div>
-
-          <div className='min-w-0 lg:col-span-2'>
-            <ChartFrame
-              name='night-owl'
-              note='the same hours as the ring, one row per busiest title, ordered by the hour each one peaked in · the darker the cell, the more it popped then'
-              table={
-                <ChartTable
-                  columns={NIGHT_OWL_COLUMNS}
-                  rowKey={(row) => row.name}
-                  rows={nightOwl.rows}
-                />
-              }
-              title='night owl'>
-              {gate(<NightOwl grid={nightOwl} />)}
-            </ChartFrame>
-          </div>
-        </div>
+        <div className='flex flex-col gap-4'>{rowListJSX}</div>
       </main>
     </MotionConfig>
   );
 };
 
 /* Helpers */
+/**
+ * The chart order, and the only place it lives.
+ *
+ * A bare name is a full-width row · a pair is two columns · a nested pair
+ * stacks inside its column, which is how the tall circadian ring sits beside
+ * night owl and activity together.
+ */
+const LAYOUT = [
+  ['effort', 'rarityDrift'],
+  ['circadian', ['nightOwl', 'activity']],
+  ['progression'],
+  ['rarity', 'streaks'],
+  ['unfinished', 'platinum'],
+] as const satisfies readonly (readonly (PanelName | readonly PanelName[])[])[];
+
 const Note = (props: { children: ReactNode }) => (
   <p className='grid h-40 place-items-center px-6 text-center text-[12px] text-dim'>
     {props.children}
@@ -485,3 +539,21 @@ const CIRCADIAN_COLUMNS: ChartColumn<CircadianHour>[] = [
   },
   { cell: (hour) => hour.topGame ?? '—', head: 'top title' },
 ];
+
+/* Types */
+/**
+ * The panel vocabulary, and the one source for it: `Record<PanelName, …>` makes
+ * the map prove it builds every panel, and LAYOUT's `satisfies` makes the table
+ * prove it only names real ones.
+ */
+type PanelName =
+  | 'activity'
+  | 'circadian'
+  | 'effort'
+  | 'nightOwl'
+  | 'platinum'
+  | 'progression'
+  | 'rarity'
+  | 'rarityDrift'
+  | 'streaks'
+  | 'unfinished';

@@ -21,17 +21,21 @@ export const BarRows = (props: BarRowsProps) => {
       </p>
     );
 
-  const height =
-    props.rows.length * ROW_HEIGHT + PAD * 2 + (props.axis ? AXIS_HEIGHT : 0);
+  // The floor the rows need; the panel is free to hand over more, and rows grow
+  // into it rather than leaving a hole beside a taller neighbour.
+  const minHeight =
+    props.rows.length * ROW_MIN +
+    PAD * 2 +
+    (props.axis ? AXIS_HEIGHT + AXIS_PAD : 0);
 
   return (
-    <div className='relative w-full' style={{ height }}>
+    <div className='relative h-full w-full' style={{ minHeight }}>
       <ParentSize>
         {(size) =>
-          size.width > 0 ? (
+          size.width > 0 && size.height > 0 ? (
             <Bars
               axis={props.axis}
-              height={height}
+              height={size.height}
               label={props.label}
               onSelect={props.onSelect}
               rows={props.rows}
@@ -48,7 +52,16 @@ const Bars = (props: BarsProps) => {
   const tooltip = useTooltip<BarDatum>();
 
   const gutter = Math.min(Math.max(props.width * 0.34, 90), 190);
-  const trackWidth = Math.max(props.width - gutter - VALUE_WIDTH - PAD, 1);
+  const trackWidth = Math.max(
+    props.width - gutter - VALUE_WIDTH - PAD - LABEL_INSET,
+    1,
+  );
+
+  // Rows share out whatever height the panel gave, so a five-bar chart beside a
+  // ten-bar one fills its half of the row instead of stopping halfway.
+  const usable = props.height - PAD * 2 - (props.axis ? AXIS_HEIGHT : 0);
+  const rowHeight = Math.max(usable / props.rows.length, ROW_MIN);
+  const barHeight = Math.min(Math.round(rowHeight * 0.45), BAR_MAX);
 
   const xScale = scaleLinear<number>({
     domain: [0, 1],
@@ -64,7 +77,7 @@ const Bars = (props: BarsProps) => {
   const activeId = tooltip.tooltipData?.id ?? null;
 
   const rowListJSX = props.rows.map((row, index) => {
-    const y = PAD + index * ROW_HEIGHT;
+    const y = PAD + index * rowHeight;
     const isActive = row.id === activeId;
 
     return (
@@ -80,44 +93,39 @@ const Bars = (props: BarsProps) => {
         onMouseEnter={() =>
           tooltip.showTooltip({
             tooltipData: row,
-            tooltipLeft: gutter + xScale(row.fraction),
-            tooltipTop: y + ROW_HEIGHT / 2,
+            tooltipLeft: gutter + LABEL_INSET + xScale(row.fraction),
+            tooltipTop: y + rowHeight / 2,
           })
         }
         onMouseLeave={tooltip.hideTooltip}
         {...(props.onSelect && { onClick: () => props.onSelect?.(row.id) })}>
         {/* The full-width catcher, so the gutter and the empty track answer a
             hover too — a 3%-long bar is otherwise almost unpointable. */}
-        <rect
-          fill='transparent'
-          height={ROW_HEIGHT}
-          width={props.width}
-          y={y}
-        />
+        <rect fill='transparent' height={rowHeight} width={props.width} y={y} />
 
         <text
           dominantBaseline='middle'
           fill={isActive ? CHART_INK.text : CHART_INK.axis}
           fontSize={LABEL_FONT}
-          x={0}
-          y={y + ROW_HEIGHT / 2}>
+          x={LABEL_INSET}
+          y={y + rowHeight / 2}>
           {clip(row.label, gutter)}
         </text>
 
         <rect
           fill={CHART_INK.grid}
           fillOpacity={0.25}
-          height={BAR_HEIGHT}
+          height={barHeight}
           width={trackWidth}
-          x={gutter}
-          y={y + (ROW_HEIGHT - BAR_HEIGHT) / 2}
+          x={gutter + LABEL_INSET}
+          y={y + (rowHeight - barHeight) / 2}
         />
 
         <motion.rect
           animate={{ scaleX: 1 }}
           fill={row.tone}
           fillOpacity={isActive ? 1 : 0.75}
-          height={BAR_HEIGHT}
+          height={barHeight}
           initial={{ scaleX: 0 }}
           style={{ transformBox: 'fill-box', transformOrigin: 'left' }}
           transition={{
@@ -129,8 +137,8 @@ const Bars = (props: BarsProps) => {
           // the whole point of a "quickest first" ranking, and a sub-pixel bar
           // reads as no bar at all.
           width={Math.max(xScale(row.fraction), MIN_BAR)}
-          x={gutter}
-          y={y + (ROW_HEIGHT - BAR_HEIGHT) / 2}
+          x={gutter + LABEL_INSET}
+          y={y + (rowHeight - barHeight) / 2}
         />
 
         <text
@@ -138,8 +146,8 @@ const Bars = (props: BarsProps) => {
           fill={isActive ? CHART_INK.text : CHART_INK.axis}
           fontSize={LABEL_FONT}
           textAnchor='end'
-          x={props.width}
-          y={y + ROW_HEIGHT / 2}>
+          x={props.width - LABEL_INSET}
+          y={y + rowHeight / 2}>
           {row.value}
         </text>
       </g>
@@ -159,7 +167,7 @@ const Bars = (props: BarsProps) => {
 
         {props.axis && (
           <AxisBottom
-            left={gutter}
+            left={gutter + LABEL_INSET}
             numTicks={4}
             scale={axisScale}
             stroke={CHART_INK.axis}
@@ -170,7 +178,7 @@ const Bars = (props: BarsProps) => {
               textAnchor: 'middle' as const,
             })}
             tickStroke={CHART_INK.axis}
-            top={props.rows.length * ROW_HEIGHT + PAD * 2}
+            top={props.rows.length * rowHeight + PAD * 2}
           />
         )}
       </svg>
@@ -190,11 +198,22 @@ const Bars = (props: BarsProps) => {
 };
 
 /* Helpers */
-const ROW_HEIGHT = 20;
-const BAR_HEIGHT = 9;
+/** Shortest a row may get; it grows past this to fill the panel. */
+const ROW_MIN = 20;
+/** A bar stays a bar — past this it reads as a block. */
+const BAR_MAX = 18;
+
+/**
+ * Breathing room at both edges — the label on the left, the readout on the
+ * right. Shared by every label column on the route, and the clip below is
+ * derived from it so widening the inset never pushes a title under its own bar.
+ */
+const LABEL_INSET = 8;
 const PAD = 6;
 const MIN_BAR = 2;
+/** Axis line, its labels, and a gap so the scale never touches the panel edge. */
 const AXIS_HEIGHT = 22;
+const AXIS_PAD = 8;
 /** Room kept at the right edge for the readout, plus a gap before the track. */
 const VALUE_WIDTH = 76;
 
@@ -209,7 +228,7 @@ const CHAR_WIDTH = LABEL_FONT * 0.6;
 
 /** SVG text has no ellipsis, so the label is cut to what the gutter can hold. */
 const clip = (label: string, gutter: number) => {
-  const fits = Math.max(Math.floor((gutter - 8) / CHAR_WIDTH), 6);
+  const fits = Math.max(Math.floor((gutter - LABEL_INSET * 2) / CHAR_WIDTH), 6);
   return label.length > fits ? `${label.slice(0, fits - 1)}…` : label;
 };
 

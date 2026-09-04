@@ -24,6 +24,8 @@
   --p-green: #6c782e;
   --p-yellow: #b47109;
   --p-orange: #c35e0a;
+  /*
+   */
   --p-purple: #945e80;
   --p-blue: #45707a;
   --p-bronze: #a86a32;
@@ -240,5 +242,55 @@
   .hint-right::after {
     right: 0;
     left: auto;
+  }
+
+  /*
+   * A sitting's trophies hang off a spine, file-tree style — real borders, not
+   * box-drawing characters, so the rules sit on the pixel grid and take the
+   * palette's line colour in both themes. The last child's spine stops at its
+   * own tick, which is what turns ├ into └.
+   */
+  .tree > li {
+    position: relative;
+    padding-left: 1.15rem;
+  }
+
+  .tree > li::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    content: "";
+    border-left: 1px solid var(--color-line);
+  }
+
+  .tree > li:last-child::before {
+    bottom: auto;
+    height: 1.15rem;
+  }
+
+  .tree > li::after {
+    position: absolute;
+    top: 1.15rem;
+    left: 0;
+    width: 0.7rem;
+    content: "";
+    border-top: 1px solid var(--color-line);
+  }
+}
+
+/*
+ * MotionConfig covers the charts, but every CSS transition on the route — row
+ * hovers, control focus, icon grayscale — answered to nothing. The floor asks
+ * for the preference to be honoured everywhere a human looks, not per library.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }

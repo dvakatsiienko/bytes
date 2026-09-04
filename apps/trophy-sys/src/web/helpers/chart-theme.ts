@@ -44,6 +44,10 @@ export const BAR_TONE = {
  * The five rarity tiers, rarest first. Ordinal data, so the order carries the
  * meaning and the labels carry the rest — the tier names are printed on every
  * bar and repeated in the table.
+ *
+ * 📌 A single-hue ordinal ramp was tried here and dima rejected it on sight
+ * (2026-09-04): it validated cleanly on contrast but read worse than the hues.
+ * Five bands is few enough that identity beats magnitude.
  */
 export const TIER_TONE = [
   'var(--p-purple)',

@@ -3,10 +3,35 @@ import type { BarChart } from '../components/bar-rows.tsx';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
-import { gameLookup } from '../helpers/stats.ts';
+import { GRADE_ORDER, gameLookup } from '../helpers/stats.ts';
 
 /** Titles shown before the list stops being a weekly-open view. */
 const LIMIT = 15;
+
+/**
+ * Untouched for this long and the title is dormant rather than in progress.
+ * Six months is the point where "I will get back to it" stops being true — the
+ * old abandoned panel drew the same distinction from progress alone, which
+ * missed a title stalled at 40%.
+ */
+const DORMANT_MONTHS = 6;
+
+const isDormant = (playedAt: string | null) => {
+  if (!playedAt) return true;
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - DORMANT_MONTHS);
+  return new Date(playedAt) < cutoff;
+};
+
+/** "2 bronze, 1 gold" — what is actually left, by grade. */
+export const gradeBreakdown = (left: RemainingTrophy[]) => {
+  const parts = GRADE_ORDER.map((grade) => {
+    const count = left.filter((trophy) => trophy.grade === grade).length;
+    return count ? `${count} ${grade}` : null;
+  }).filter((part) => part !== null);
+
+  return parts.length ? parts.join(', ') : '—';
+};
 
 /**
  * How much work a title still holds, in trophies. An incremental trophy counts
@@ -28,26 +53,26 @@ const distanceOf = (left: RemainingTrophy[]) =>
  * chart exists to answer is what to open next; the other two are for when the
  * answer is "whichever I have already sunk the most into".
  */
-export const CLOSEST_SORTS = [
+export const UNFINISHED_SORTS = [
   { label: 'left', value: 'left' },
   { label: 'progress', value: 'progress' },
   { label: 'hours', value: 'hours' },
-] as const satisfies readonly { label: string; value: ClosestSort }[];
+] as const satisfies readonly { label: string; value: UnfinishedSort }[];
 
-const CLOSEST_ORDER: Record<
-  ClosestSort,
-  (a: ClosestRow, b: ClosestRow) => number
+const UNFINISHED_ORDER: Record<
+  UnfinishedSort,
+  (a: UnfinishedRow, b: UnfinishedRow) => number
 > = {
   hours: (a, b) => b.hours - a.hours,
   left: (a, b) => a.distance - b.distance,
   progress: (a, b) => b.progress - a.progress,
 };
 
-export const closestRows = (
+export const unfinishedRows = (
   remaining: RemainingTrophy[],
   games: Game[],
-  sort: ClosestSort,
-): ClosestRow[] => {
+  sort: UnfinishedSort,
+): UnfinishedRow[] => {
   const byId = gameLookup(games);
   const grouped = new Map<string, RemainingTrophy[]>();
 
@@ -57,7 +82,7 @@ export const closestRows = (
     else grouped.set(trophy.gameId, [trophy]);
   }
 
-  const rows: ClosestRow[] = [];
+  const rows: UnfinishedRow[] = [];
 
   for (const [gameId, left] of grouped) {
     const game = byId.get(gameId);
@@ -68,14 +93,18 @@ export const closestRows = (
     const sorted = [...left].sort((a, b) => a.rarity - b.rarity);
     const counters = sorted.filter((trophy) => trophy.counter);
 
+    const playedAt = game.playedAt ?? game.lastPlayedAt;
+
     rows.push({
       counters,
       distance: distanceOf(left),
+      dormant: isDormant(playedAt),
       gameId,
       hours: (game.playSeconds ?? 0) / 3600,
       iconUrl: game.iconUrl,
       left: sorted,
       name: game.name,
+      playedAt,
       progress: game.progress,
       rarest: sorted[0] ?? null,
     });
@@ -83,10 +112,10 @@ export const closestRows = (
 
   // Sorted before the cut, so changing the order changes which titles make the
   // list — not just how the same fifteen are arranged.
-  return rows.sort(CLOSEST_ORDER[sort]).slice(0, LIMIT);
+  return rows.sort(UNFINISHED_ORDER[sort]).slice(0, LIMIT);
 };
 
-export const closestChart = (rows: ClosestRow[]): BarChart => ({
+export const unfinishedChart = (rows: UnfinishedRow[]): BarChart => ({
   axis: { format: (value) => `${Math.round(value)}%`, max: 100 },
   bars: rows.map((row) => {
     const namedLeft = row.left
@@ -102,6 +131,7 @@ export const closestChart = (rows: ClosestRow[]): BarChart => ({
       note: `still open: ${namedLeft}${row.left.length > 3 ? ` +${row.left.length - 3} more` : ''}`,
       rows: [
         { label: 'progress', value: `${row.progress}%` },
+        { label: 'left by grade', value: gradeBreakdown(row.left) },
         {
           label: 'left',
           value: `${row.distance.toFixed(1)} of ${row.left.length}`,
@@ -113,13 +143,15 @@ export const closestChart = (rows: ClosestRow[]): BarChart => ({
         { label: 'counters', value: counterFormat(row.counters) },
         { label: 'hours sunk', value: hoursFormat(row.hours) },
       ],
-      tone: BAR_TONE.open,
-      value: `${row.distance.toFixed(1)} left`,
+      tone: row.dormant ? BAR_TONE.past : BAR_TONE.open,
+      value: row.dormant
+        ? `${row.distance.toFixed(1)} left · dormant`
+        : `${row.distance.toFixed(1)} left`,
     };
   }),
 });
 
-const counterFormat = (counters: ClosestRow['counters']) => {
+const counterFormat = (counters: UnfinishedRow['counters']) => {
   const [first] = counters;
   if (!first?.counter) return '—';
 
@@ -127,8 +159,9 @@ const counterFormat = (counters: ClosestRow['counters']) => {
   return counters.length > 1 ? `${head} +${counters.length - 1}` : head;
 };
 
-export const CLOSEST_COLUMNS: ChartColumn<ClosestRow>[] = [
+export const UNFINISHED_COLUMNS: ChartColumn<UnfinishedRow>[] = [
   { cell: (row) => row.name, head: 'title' },
+  { cell: (row) => (row.dormant ? 'dormant' : 'active'), head: 'state' },
   { cell: (row) => `${row.progress}%`, head: 'progress', isNumeric: true },
   {
     cell: (row) => row.distance.toFixed(1),
@@ -150,19 +183,22 @@ export const CLOSEST_COLUMNS: ChartColumn<ClosestRow>[] = [
 ];
 
 /* Types */
-export type ClosestSort = 'hours' | 'left' | 'progress';
+export type UnfinishedSort = 'hours' | 'left' | 'progress';
 
-export interface ClosestRow {
+export interface UnfinishedRow {
   /** The unearned trophies that carry a live counter. */
   counters: RemainingTrophy[];
   /** Trophies still owed, counting a part-done one as its remaining slice. */
   distance: number;
+  /** Untouched for DORMANT_MONTHS — the old "abandoned" panel, as a marker. */
+  dormant: boolean;
   gameId: string;
   hours: number;
   iconUrl: string;
   /** Everything unearned in this title, rarest first. */
   left: RemainingTrophy[];
   name: string;
+  playedAt: string | null;
   progress: number;
   rarest: RemainingTrophy | null;
 }

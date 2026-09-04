@@ -11,7 +11,7 @@ import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
 
 export const CircadianRing = (props: CircadianRingProps) => (
-  <div className='relative h-80 w-full'>
+  <div className='relative h-full min-h-64 w-full'>
     <ParentSize>
       {(size) =>
         size.width > 0 ? (

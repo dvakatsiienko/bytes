@@ -1,3 +1,5 @@
+import { type MouseEvent as ReactMouseEvent, useRef } from 'react';
+import { ParentSize } from '@visx/responsive';
 import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
@@ -70,11 +72,50 @@ export const nightOwlGrid = (
   return { hourTotals, peak, rows };
 };
 
-export const NightOwl = (props: NightOwlProps) => {
-  const tooltip = useTooltip<NightOwlCell>();
+export const NightOwl = (props: NightOwlProps) => (
+  <div className='relative h-full min-h-24 w-full py-2'>
+    <ParentSize>
+      {(size) =>
+        size.width > 0 && size.height > 0 ? (
+          <Grid grid={props.grid} height={size.height} width={size.width} />
+        ) : null
+      }
+    </ParentSize>
+  </div>
+);
 
-  const width = GUTTER + 24 * STEP + 40;
-  const height = props.grid.rows.length * STEP + LABEL_HEIGHT + 4;
+const Grid = (props: GridProps) => {
+  const tooltip = useTooltip<NightOwlCell>();
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The grid scales to the row now, so an SVG coordinate is no longer a screen
+   * pixel — the tooltip anchors off the cell's real rect instead, the same way
+   * the activity grid does.
+   */
+  const anchorAt = (event: ReactMouseEvent<SVGRectElement>) => {
+    const wrap = wrapRef.current?.getBoundingClientRect();
+    const cell = event.currentTarget.getBoundingClientRect();
+    if (!wrap) return { left: 0, top: 0 };
+    return { left: cell.right - wrap.left, top: cell.top - wrap.top };
+  };
+
+  // The row step comes from the height the panel actually gave, the same way
+  // the bar charts do it — a fixed 13px was taller than this column's share, so
+  // the grid was being clipped away by the panel's own overflow.
+  const step = Math.min(
+    Math.max((props.height - LABEL_HEIGHT - 4) / props.grid.rows.length, 9),
+    STEP_MAX,
+  );
+  const cell = Math.max(step - 2, 6);
+  const gridWidth = 24 * step;
+  // Everything the grid does not need belongs to the names.
+  const gutter = Math.max(props.width - gridWidth - EDGE_PAD, GUTTER_MIN);
+  const labelChars = Math.max(
+    Math.floor((gutter - LABEL_INSET * 2) / (LABEL_FONT * 0.6)),
+    8,
+  );
+  const height = props.grid.rows.length * step + LABEL_HEIGHT + 4;
 
   const cellListJSX = props.grid.rows.flatMap((row, rowIndex) =>
     HOURS.map((hour) => {
@@ -86,10 +127,11 @@ export const NightOwl = (props: NightOwlProps) => {
           className='cursor-pointer'
           fill={count ? CHART_INK.ring : CHART_INK.grid}
           fillOpacity={count ? shadeOf(count, props.grid.peak) : 0.2}
-          height={CELL}
+          height={cell}
           initial={{ opacity: 0 }}
           key={`${row.name}-${hour}`}
-          onMouseEnter={() =>
+          onMouseEnter={(event) => {
+            const at = anchorAt(event);
             tooltip.showTooltip({
               tooltipData: {
                 count,
@@ -99,33 +141,35 @@ export const NightOwl = (props: NightOwlProps) => {
                   ? (count / (props.grid.hourTotals[hour] ?? 1)) * 100
                   : 0,
               },
-              tooltipLeft: GUTTER + hour * STEP + CELL,
-              tooltipTop: rowIndex * STEP + LABEL_HEIGHT,
-            })
-          }
+              tooltipLeft: at.left,
+              tooltipTop: at.top,
+            });
+          }}
           onMouseLeave={tooltip.hideTooltip}
           transition={{ delay: hour * 0.006, duration: 0.25 }}
-          width={CELL}
-          x={GUTTER + hour * STEP}
-          y={rowIndex * STEP + LABEL_HEIGHT}
+          width={cell}
+          x={gutter + hour * step}
+          y={rowIndex * step + LABEL_HEIGHT}
         />
       );
     }),
   );
 
-  const rowLabelListJSX = props.grid.rows.map((row, rowIndex) => (
-    <text
-      dominantBaseline='middle'
-      fill={CHART_INK.axis}
-      fontSize={LABEL_FONT}
-      key={row.name}
-      x={0}
-      y={rowIndex * STEP + LABEL_HEIGHT + CELL / 2}>
-      {row.name.length > LABEL_CHARS
-        ? `${row.name.slice(0, LABEL_CHARS - 1)}…`
-        : row.name}
-    </text>
-  ));
+  const rowLabelListJSX = props.grid.rows.map((row, rowIndex) => {
+    return (
+      <text
+        dominantBaseline='middle'
+        fill={CHART_INK.axis}
+        fontSize={LABEL_FONT}
+        key={row.name}
+        x={LABEL_INSET}
+        y={rowIndex * step + LABEL_HEIGHT + cell / 2}>
+        {row.name.length > labelChars
+          ? `${row.name.slice(0, labelChars - 1)}…`
+          : row.name}
+      </text>
+    );
+  });
 
   const hourLabelListJSX = HOURS.filter((hour) => hour % 3 === 0).map(
     (hour) => (
@@ -134,7 +178,7 @@ export const NightOwl = (props: NightOwlProps) => {
         fontSize={11}
         key={hour}
         textAnchor='middle'
-        x={GUTTER + hour * STEP + CELL / 2}
+        x={gutter + hour * step + cell / 2}
         y={8}>
         {String(hour).padStart(2, '0')}
       </text>
@@ -142,14 +186,17 @@ export const NightOwl = (props: NightOwlProps) => {
   );
 
   return (
-    <div className='relative w-full overflow-x-auto px-4 py-2'>
+    <div className='relative w-full py-2' ref={wrapRef}>
       {/* aria-label rather than <title>: a <title> child is what browsers
           render as their own native tooltip on hover. */}
+      {/* The cells keep their size; the slack goes to the label column instead,
+          which is the one place extra width buys something — full game names
+          rather than bigger squares. */}
       <svg
         aria-label='Trophies per hour of day for each of the busiest titles'
         height={height}
         role='img'
-        width={width}>
+        width={props.width}>
         {hourLabelListJSX}
         {rowLabelListJSX}
         {cellListJSX}
@@ -181,20 +228,23 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 const peakHour = (row: NightOwlRow) =>
   row.hours.indexOf(Math.max(...row.hours));
 
-const CELL = 11;
-const STEP = 13;
+/** The grid never grows past this per row, however tall the panel gets. */
+const STEP_MAX = 16;
 const LABEL_HEIGHT = 12;
 
 const LABEL_FONT = 11;
-/** How many characters of a title survive before the ellipsis. */
-const LABEL_CHARS = 22;
+/** Matches bar-rows and the activity grid: one inset for every label column. */
+const LABEL_INSET = 8;
+/** The names never squeeze below this, however narrow the panel gets. */
+const GUTTER_MIN = 130;
+/** Kept clear at the right so the last hour column is not flush to the edge. */
+const EDGE_PAD = 16;
 /**
  * The gutter is derived, never a magic number: JetBrains Mono advances at
  * 0.6em, so the character budget above *is* the width it needs. A hard-coded
  * 130 was sized for a 9px label and the titles ran into the grid the moment the
  * type got bigger.
  */
-const GUTTER = Math.ceil(LABEL_CHARS * LABEL_FONT * 0.6) + 8;
 
 /** Four strengths of one hue — a magnitude scale, never a second palette. */
 const shadeOf = (count: number, peak: number) => {
@@ -245,6 +295,11 @@ export interface NightOwlGrid {
   /** The busiest single cell, which sets the shade scale. */
   peak: number;
   rows: NightOwlRow[];
+}
+
+interface GridProps extends NightOwlProps {
+  height: number;
+  width: number;
 }
 
 interface NightOwlProps {

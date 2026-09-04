@@ -6,50 +6,51 @@ import {
   dateFormat,
 } from '../helpers/format.ts';
 
-interface TrophyRowProps {
-  note?: string;
-  trophy: Trophy;
-}
-
-export const TrophyRow = ({ trophy, note }: TrophyRowProps) => (
+export const TrophyRow = (props: TrophyRowProps) => (
   <li
     className={`flex items-center gap-3 border-line/60 border-b px-3 py-2 last:border-b-0 ${
-      trophy.earned ? '' : 'opacity-45'
+      props.trophy.earned ? '' : 'opacity-45'
     }`}>
     <span
-      className={`${GRADE_COLOR[trophy.grade]} ${trophy.earned ? 'glow' : ''} w-3 text-center`}>
-      {GRADE_MARK[trophy.grade]}
+      className={`${GRADE_COLOR[props.trophy.grade]} ${props.trophy.earned ? 'glow' : ''} w-3 text-center`}>
+      {GRADE_MARK[props.trophy.grade]}
     </span>
 
     <img
       alt=''
-      className={`size-8 shrink-0 border border-line object-cover ${trophy.earned ? '' : 'grayscale'}`}
+      className={`size-8 shrink-0 border border-line object-cover ${props.trophy.earned ? '' : 'grayscale'}`}
       height={32}
       loading='lazy'
-      src={trophy.iconUrl}
+      src={props.trophy.iconUrl}
       width={32}
     />
 
     <span className='min-w-0 flex-1'>
       <span className='block select-text truncate text-fg-soft'>
-        {trophy.name}
+        {props.trophy.name}
       </span>
       <span className='block select-text truncate text-[12px] text-dim'>
-        {note ?? trophy.detail}
+        {props.note ?? props.trophy.detail}
       </span>
-      {trophy.progress && !trophy.earned ? (
+      {props.trophy.progress && !props.trophy.earned ? (
         <span className='block text-[12px] text-orange'>
-          {barRender(trophy.progress.rate, 12)}
+          {barRender(props.trophy.progress.rate, 12)}
           <span className='ml-2 text-dim'>
-            {trophy.progress.current}/{trophy.progress.target}
+            {props.trophy.progress.current}/{props.trophy.progress.target}
           </span>
         </span>
       ) : null}
     </span>
 
     <span className='shrink-0 text-right text-[12px] text-dim'>
-      <span className='block'>{dateFormat(trophy.earnedAt)}</span>
-      <span className='block text-mute'>{trophy.rarity}%</span>
+      <span className='block'>{dateFormat(props.trophy.earnedAt)}</span>
+      <span className='block text-mute'>{props.trophy.rarity}%</span>
     </span>
   </li>
 );
+
+/* Types */
+interface TrophyRowProps {
+  note?: string;
+  trophy: Trophy;
+}

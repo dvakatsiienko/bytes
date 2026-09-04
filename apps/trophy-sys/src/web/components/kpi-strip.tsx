@@ -52,17 +52,19 @@ export const KpiStrip = (props: KpiStripProps) => {
       label: 'rarity score',
       value: numberFormat(weighted),
     },
-  ].map((tile) => (
-    <div className='flex flex-col gap-0.5 px-4 py-2' key={tile.label}>
-      <span className='text-[12px] text-mute uppercase tracking-[0.14em]'>
-        {tile.label}
-      </span>
-      <span className='text-fg text-lg tabular-nums leading-none'>
-        {tile.value}
-      </span>
-      {tile.hint && <span className='text-[12px] text-dim'>{tile.hint}</span>}
-    </div>
-  ));
+  ].map((tile) => {
+    return (
+      <div className='flex flex-col gap-0.5 px-4 py-2' key={tile.label}>
+        <span className='text-[12px] text-mute uppercase tracking-[0.14em]'>
+          {tile.label}
+        </span>
+        <span className='select-text text-fg text-lg tabular-nums leading-none'>
+          {tile.value}
+        </span>
+        {tile.hint && <span className='text-[12px] text-dim'>{tile.hint}</span>}
+      </div>
+    );
+  });
 
   const gradeListJSX = (['platinum', 'gold', 'silver', 'bronze'] as const).map(
     (grade) => (
@@ -70,7 +72,7 @@ export const KpiStrip = (props: KpiStripProps) => {
         <span style={{ color: GRADE_TONE[grade] }}>
           {grade === 'platinum' ? '◆' : '●'}
         </span>
-        <span className='tabular-nums'>{grades[grade]}</span>
+        <span className='select-text tabular-nums'>{grades[grade]}</span>
       </span>
     ),
   );
