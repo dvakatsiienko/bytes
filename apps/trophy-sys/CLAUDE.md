@@ -24,7 +24,7 @@ Deployed: <https://trophy-sys.vercel.app>
 pnpm dev          # both processes
 pnpm dev:api      # api alone, node --watch, TS run natively (no build step)
 pnpm dev:web      # vite alone
-pnpm build        # vite build, then esbuild the api bundle over api/handler.js
+pnpm build        # vite build, esbuild the api bundle, then assemble .vercel/output
 pnpm typecheck    # both tsconfigs — app (DOM/bundler) and server (node/nodenext)
 pnpm lint         # biome
 pnpm trophies <cmd>   # same data as the API, straight to stdout as JSON
@@ -87,17 +87,21 @@ deployments when there are no changes to the root directory" keeps pushes to oth
 redeploying this one. Vite plays no part in the API: the `api/` directory is a Vercel convention,
 scanned at the deployment root of any project regardless of framework.
 
-1. **The function path must exist in git.** Vercel decides which functions exist by scanning the
-   source tree at clone time, so `api/handler.js` is committed — today as the built bundle, which
-   `pnpm build:api` regenerates. A file that only appears during the build arrives too late: the
-   deploy goes green and every `/api` route 404s. 📌 A local `pnpm build` rewrites it, so check the
-   diff is real server work before committing it.
+1. **The function is declared by the build, never by the `api/` folder.** Vercel decides which
+   functions exist by scanning the cloned tree *before* the build runs, so the `api/` convention
+   can only ever see a committed file — a bundle the build writes arrives too late, and the deploy
+   goes green with every `/api` route 404ing. This app therefore uses the **Build Output API v3**:
+   `script/vercel-output.ts` writes `.vercel/output/` (static site, `functions/api/handler.func/`,
+   and `config.json`), Vercel consumes that directly, and nothing built is committed. 📌 `api/` is
+   gitignored and must stay that way — putting a bundle back there re-enters the trap.
 2. **The API is esbuild-bundled, and that is mandatory.** Vercel's dependency tracing ships no
    `node_modules` into the function, so any bare specifier surviving the build dies at runtime.
 3. **The handler must use Node's `(req, res)` signature.** A web-standard handler returning a
    `Response` is silently dropped and the request hangs until timeout.
-4. **Routing is explicit in `vercel.json`, never filename-derived.** The rewrite
-   `/api/(.*) → /api/handler` matches any depth; a filename catch-all matches one segment only.
+4. **Routing is explicit, never filename-derived.** It lives in the generated
+   `.vercel/output/config.json` — `OUTPUT_CONFIG` in `script/vercel-output.ts` — as
+   `/api/(.*) → /api/handler`, which matches any depth; a filename catch-all matches one segment
+   only. `vercel.json` now carries only the build and ignore commands.
 
 After changing anything about deployment, test a **two-segment** route
 (`/api/games/NPWR24415_00`), not just `/api/health` — the single-segment routes stayed green
@@ -118,7 +122,7 @@ load into ~120 PSN round-trips.
 
 ## The /stats charts
 
-Twelve charts and a KPI strip, all visx, all reading one payload — `GET /api/stats`, the trophy
+Eleven charts and a KPI strip, all visx, all reading one payload — `GET /api/stats`, the trophy
 fan-out cached in Upstash under `trophy-sys:stats`.
 
 - **The archive is versioned.** `ARCHIVE_VERSION` in `stats.ts` gates it: a stored archive whose
@@ -130,7 +134,7 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   list, and it is why the payload roughly doubled.
 - **Reach for the furniture before writing SVG.** `ChartFrame` gives the panel, the chart/table
   toggle and the accessibility floor; `ChartTooltip` + `TooltipLayer` give the one tooltip, which
-  renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the twelve are one
+  renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the eleven are one
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
   `*_COLUMNS`, so `stats.tsx` only wires.
 
