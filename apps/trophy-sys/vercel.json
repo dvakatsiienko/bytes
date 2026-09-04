@@ -1,11 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "ignoreCommand": "npx turbo-ignore trophy-sys",
   "buildCommand": "pnpm build",
-  "outputDirectory": "dist",
-  "framework": "vite",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/handler" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  "ignoreCommand": "npx turbo-ignore trophy-sys"
 }

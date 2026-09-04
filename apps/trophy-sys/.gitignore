@@ -4,3 +4,4 @@
 .trophy-stats.json
 dist/
 .vercel/
+api/

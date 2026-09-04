@@ -16,6 +16,26 @@ bytes, and `main` has carried that ever since. Either shape satisfies the constr
 just has to be in git — but the tree holds the bundle, so a local `pnpm build` produces a real
 diff rather than something to throw away.
 
+### Resolved 2026-09-04 — the Build Output API
+
+The scan order was measured directly rather than argued about. With `api/handler.js` deleted,
+`pnpm build` **did** recreate it, byte-identical to the committed copy — and
+`.vercel/output/functions` was never created at all. The build exited 0 and reported success. That
+is the failure shape in one run: a green build and no function.
+
+The fix is not to keep committing the bundle, it is to stop using the `api/` convention.
+`script/vercel-output.ts` writes the Build Output API v3 tree itself — `static/`,
+`functions/api/handler.func/` and `config.json` — which is the supported way to declare a function
+the build produced. `api/` is now gitignored and empty.
+
+Verified before shipping, exactly as this file prescribes: the built `.func` was copied to a
+directory outside the workspace with no `node_modules` in scope, mounted with
+`createServer(handler)`, and answered `/api/health`, `/api/games?limit=2` and the two-segment
+`/api/games/NPWR22157_00` all **200**. That one probe covers constraints 2, 3 and 4 at once.
+
+📌 Still unproven by a real deploy at the time of writing — it needs one preview deploy to confirm
+Vercel consumes the directory as documented.
+
 ## Constraint 2 — the bundle, and why it is no longer about `psn-api`
 
 Up to `psn-api` 2.18.0 the package was unimportable from ESM in either direction. **2.18.1 fixed
