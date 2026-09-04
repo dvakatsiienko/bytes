@@ -166,7 +166,7 @@ const Bars = (props: BarsProps) => {
             tickFormat={(value) => props.axis?.format(Number(value)) ?? ''}
             tickLabelProps={() => ({
               fill: CHART_INK.axis,
-              fontSize: 9,
+              fontSize: LABEL_FONT,
               textAnchor: 'middle' as const,
             })}
             tickStroke={CHART_INK.axis}

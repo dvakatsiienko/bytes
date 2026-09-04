@@ -81,6 +81,7 @@ export const seriesColor = (hasPlatinum: boolean) =>
 /** Shared by every axis on the route, so the tick ink never drifts apart. */
 export const AXIS_LABEL = {
   fill: CHART_INK.axis,
-  fontSize: 9,
+  /** Matches the chart labels: an axis tick is dense data, not fine print. */
+  fontSize: 11,
   textAnchor: 'middle' as const,
 } as const;
