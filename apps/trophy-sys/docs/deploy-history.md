@@ -33,8 +33,11 @@ directory outside the workspace with no `node_modules` in scope, mounted with
 `createServer(handler)`, and answered `/api/health`, `/api/games?limit=2` and the two-segment
 `/api/games/NPWR22157_00` all **200**. That one probe covers constraints 2, 3 and 4 at once.
 
-📌 Still unproven by a real deploy at the time of writing — it needs one preview deploy to confirm
-Vercel consumes the directory as documented.
+Then confirmed on a real preview deploy the same day: `/api/health` returned
+`{"ok":true,"stateBackend":"kv"}`, `/api/games?limit=2` and the two-segment `/api/games/:id` both
+answered with data, and `/` and the `/stats` deep link both served the shell. The two-segment route
+is the one that settles it: single-segment routes stayed green right through constraint 4's outage,
+so only a `/api/games/:id` counts as evidence.
 
 ## Constraint 2 — the bundle, and why it is no longer about `psn-api`
 
