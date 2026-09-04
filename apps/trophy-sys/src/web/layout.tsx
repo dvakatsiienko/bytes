@@ -7,7 +7,7 @@ import { useGames, useProfile } from './hooks/queries.ts';
 const TABS = [
   { label: 'library', to: '/library' },
   { label: 'stats', to: '/stats' },
-  { label: 'news', to: '/news' },
+  { label: 'log', to: '/log' },
 ] as const;
 
 export const Layout = () => {
@@ -34,15 +34,17 @@ export const Layout = () => {
         </h1>
 
         <nav className='flex gap-1'>
-          {TABS.map((tab) => (
-            <Link
-              activeProps={{ className: 'border-orange text-orange' }}
-              className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-dim hover:text-fg-soft'
-              key={tab.to}
-              to={tab.to}>
-              {tab.label}
-            </Link>
-          ))}
+          {TABS.map((tab) => {
+            return (
+              <Link
+                activeProps={{ className: 'border-orange text-orange' }}
+                className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-dim hover:text-fg-soft'
+                key={tab.to}
+                to={tab.to}>
+                {tab.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <ThemeToggle />

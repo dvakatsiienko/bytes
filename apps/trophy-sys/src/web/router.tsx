@@ -8,7 +8,7 @@ import {
 
 import { Layout } from './layout.tsx';
 import { Library, LibraryEmpty, LibraryGame } from './library.tsx';
-import { News } from './news.tsx';
+import { Log } from './log.tsx';
 
 /**
  * Split out, because /stats is the only route that needs visx and motion and
@@ -52,10 +52,10 @@ const libraryGameRoute = createRoute({
   path: '$gameId',
 });
 
-const newsRoute = createRoute({
-  component: News,
+const logRoute = createRoute({
+  component: Log,
   getParentRoute: () => rootRoute,
-  path: '/news',
+  path: '/log',
 });
 
 const statsRoute = createRoute({
@@ -77,7 +77,7 @@ export const router = createRouter({
   routeTree: rootRoute.addChildren([
     indexRoute,
     libraryRoute.addChildren([libraryIndexRoute, libraryGameRoute]),
-    newsRoute,
+    logRoute,
     statsRoute,
   ]),
 });

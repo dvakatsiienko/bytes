@@ -92,8 +92,16 @@ export interface NewsFeed {
 export interface ArchivedTrophy {
   /** ISO instant the trophy popped. */
   at: string;
+  /**
+   * What the trophy asks for. Optional on purpose: an archive written before
+   * the log route existed is still valid and still draws every chart, so this
+   * arrives on the next scan rather than forcing one.
+   */
+  detail?: string;
   gameId: string;
   grade: TrophyGrade;
+  /** Optional for the same reason as `detail`. */
+  iconUrl?: string;
   name: string;
   /** Global PSN earn rate, as a percent. */
   rarity: number;
