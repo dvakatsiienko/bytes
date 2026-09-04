@@ -21,6 +21,16 @@ const FUNCTION_CONFIG = {
 };
 
 /**
+ * ⚠️ Load-bearing. esbuild emits ESM, the handler is a `.js`, and Node decides
+ * module-vs-script from the nearest package.json — which inside a .func is this
+ * one or nothing. Without it the function loads as CommonJS and dies on its
+ * first `import` with FUNCTION_INVOCATION_FAILED. Vercel's own generated
+ * function carried the app's package.json for exactly this reason; ours has to
+ * bring its own.
+ */
+const FUNCTION_PACKAGE = { type: 'module' };
+
+/**
  * `filesystem` serves the built assets first; everything else falls through to
  * the api function or the SPA shell. The api rule matches any depth — a
  * filename catch-all matches one segment only, which once cost a live outage.
@@ -41,6 +51,10 @@ cpSync('dist', `${OUT}/static`, { recursive: true });
 writeFileSync(
   `${funcDir}/.vc-config.json`,
   `${JSON.stringify(FUNCTION_CONFIG, null, 2)}\n`,
+);
+writeFileSync(
+  `${funcDir}/package.json`,
+  `${JSON.stringify(FUNCTION_PACKAGE, null, 2)}\n`,
 );
 writeFileSync(
   `${OUT}/config.json`,
