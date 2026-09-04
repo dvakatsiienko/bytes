@@ -301,6 +301,7 @@ const Plot = (props: PlotProps) => {
             table view, which is why it carries no role and no tab stop. */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: duplicated in the table view */}
         <rect
+          className='cursor-pointer'
           fill='transparent'
           height={props.height}
           onMouseLeave={tooltip.hideTooltip}

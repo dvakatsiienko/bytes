@@ -83,6 +83,7 @@ export const NightOwl = (props: NightOwlProps) => {
       return (
         <motion.rect
           animate={{ opacity: 1 }}
+          className='cursor-pointer'
           fill={count ? CHART_INK.ring : CHART_INK.grid}
           fillOpacity={count ? shadeOf(count, props.grid.peak) : 0.2}
           height={CELL}
@@ -116,11 +117,13 @@ export const NightOwl = (props: NightOwlProps) => {
     <text
       dominantBaseline='middle'
       fill={CHART_INK.axis}
-      fontSize={11}
+      fontSize={LABEL_FONT}
       key={row.name}
       x={0}
       y={rowIndex * STEP + LABEL_HEIGHT + CELL / 2}>
-      {row.name.length > 24 ? `${row.name.slice(0, 23)}…` : row.name}
+      {row.name.length > LABEL_CHARS
+        ? `${row.name.slice(0, LABEL_CHARS - 1)}…`
+        : row.name}
     </text>
   ));
 
@@ -180,8 +183,18 @@ const peakHour = (row: NightOwlRow) =>
 
 const CELL = 11;
 const STEP = 13;
-const GUTTER = 130;
 const LABEL_HEIGHT = 12;
+
+const LABEL_FONT = 11;
+/** How many characters of a title survive before the ellipsis. */
+const LABEL_CHARS = 22;
+/**
+ * The gutter is derived, never a magic number: JetBrains Mono advances at
+ * 0.6em, so the character budget above *is* the width it needs. A hard-coded
+ * 130 was sized for a 9px label and the titles ran into the grid the moment the
+ * type got bigger.
+ */
+const GUTTER = Math.ceil(LABEL_CHARS * LABEL_FONT * 0.6) + 8;
 
 /** Four strengths of one hue — a magnitude scale, never a second palette. */
 const shadeOf = (count: number, peak: number) => {

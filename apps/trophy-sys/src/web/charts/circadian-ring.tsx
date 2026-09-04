@@ -55,6 +55,7 @@ const Ring = (props: RingProps) => {
         {({ path }) => (
           <motion.path
             animate={{ opacity: 1 }}
+            className='cursor-pointer'
             d={path(hour) ?? ''}
             fill={CHART_INK.ring}
             fillOpacity={0.7}

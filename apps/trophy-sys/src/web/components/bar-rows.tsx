@@ -73,6 +73,9 @@ const Bars = (props: BarsProps) => {
       // stop of its own.
       // biome-ignore lint/a11y/noStaticElementInteractions: duplicated in the table view
       <g
+        // Every row answers a hover, so every row shows the pointer — a row
+        // that reacts and a row that navigates look the same to the hand.
+        className='cursor-pointer'
         key={row.id}
         onMouseEnter={() =>
           tooltip.showTooltip({
@@ -82,10 +85,7 @@ const Bars = (props: BarsProps) => {
           })
         }
         onMouseLeave={tooltip.hideTooltip}
-        {...(props.onSelect && {
-          className: 'cursor-pointer',
-          onClick: () => props.onSelect?.(row.id),
-        })}>
+        {...(props.onSelect && { onClick: () => props.onSelect?.(row.id) })}>
         {/* The full-width catcher, so the gutter and the empty track answer a
             hover too — a 3%-long bar is otherwise almost unpointable. */}
         <rect
