@@ -12,9 +12,11 @@ import { statsLoad, statsSave } from './state.ts';
 const LANES = 5;
 
 /**
- * Bumped whenever the stored shape changes. An archive written by an older
- * build then reads as empty rather than as half a payload, and the route's
- * existing "run the scan" button is what fills it back in.
+ * Bumped whenever the stored shape changes in a way that makes an old archive
+ * actively wrong. Purely additive optional fields do not qualify — `detail` and
+ * `iconUrl` arrived without a bump, because an archive lacking them still draws
+ * every chart and the log simply shows no icon until the next scan. Blanking
+ * the route would have been the more disruptive answer, not the safer one.
  */
 export const ARCHIVE_VERSION = 2;
 
@@ -47,7 +49,7 @@ export const statsFetch = async (): Promise<TrophyArchive> => {
  * Unearned trophies are kept only for titles still under way — the charts that
  * read them ask what is left to do, and a finished title has nothing left.
  */
-export const statsSync = async (): Promise<TrophyArchive> => {
+const scanRun = async (): Promise<TrophyArchive> => {
   const library = await cached('games:800', () => gamesFetch(800));
   const games = library.filter((game) => earnedCount(game) > 0);
 
@@ -71,8 +73,10 @@ export const statsSync = async (): Promise<TrophyArchive> => {
           if (trophy.earned && trophy.earnedAt) {
             trophies.push({
               at: trophy.earnedAt,
+              detail: trophy.detail,
               gameId: game.id,
               grade: trophy.grade,
+              iconUrl: trophy.iconUrl,
               name: trophy.name,
               rarity: trophy.rarity,
             });
@@ -94,8 +98,12 @@ export const statsSync = async (): Promise<TrophyArchive> => {
             rarity: trophy.rarity,
           });
         }
-      } catch {
-        failed.push(game.id);
+      } catch (error) {
+        // The reason travels with the id: a run that lost 14 titles used to
+        // report 14 ids and nothing about why, so diagnosing meant re-running
+        // the whole fan-out.
+        const reason = error instanceof Error ? error.message : String(error);
+        failed.push(`${game.id}: ${reason}`);
       }
     }
   };
@@ -124,4 +132,23 @@ export const statsSync = async (): Promise<TrophyArchive> => {
 
   await statsSave(archive);
   return archive;
+};
+
+/**
+ * One scan at a time per instance. The rescan button disables itself while a
+ * sync runs, but a second tab does not know that — and two overlapping runs
+ * would spend the whole fan-out twice and let the loser's archive win.
+ *
+ * 📌 In-process only. Two serverless instances can still overlap; that needs a
+ * lock in the shared store, which is worth it only once something other than a
+ * human button can start a scan.
+ */
+let scanInFlight: Promise<TrophyArchive> | null = null;
+
+export const statsSync = (): Promise<TrophyArchive> => {
+  scanInFlight ??= scanRun().finally(() => {
+    scanInFlight = null;
+  });
+
+  return scanInFlight;
 };

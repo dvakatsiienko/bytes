@@ -6,6 +6,26 @@ import { statsFetch, statsSync } from './stats.ts';
 
 const GAME_PATH = /^\/api\/games\/([\w-]+)$/;
 
+/**
+ * 800 is PSN's page size for this endpoint, and the whole library rather than a
+ * slice — a lower default silently truncated it. It also matches the key
+ * gameDetailFetch caches under, so the list and any deep link share one fetch.
+ */
+const LIMIT_DEFAULT = 800;
+
+/**
+ * The value reaches PSN and becomes a cache key, so it is clamped rather than
+ * trusted: `?limit=abc` used to pass NaN straight through, and an open range
+ * let a query string mint unbounded cache entries.
+ */
+const limitParse = (raw: string | null) => {
+  const parsed = Number(raw);
+  if (raw === null || !Number.isInteger(parsed) || parsed < 1)
+    return LIMIT_DEFAULT;
+
+  return Math.min(parsed, LIMIT_DEFAULT);
+};
+
 export interface RouteResult {
   body: unknown;
   status: number;
@@ -24,11 +44,7 @@ export const routeResolve = async (
     return ok(await cached('news', () => newsFetch({ commit: false })));
 
   if (path === '/api/games') {
-    // 800 is PSN's page size for this endpoint, and it defaults to the whole
-    // library rather than a slice — a lower default silently truncated it.
-    // It also matches the key gameDetailFetch caches under, so the library
-    // list and any deep link share one fetch.
-    const limit = Number(url.searchParams.get('limit') ?? 800);
+    const limit = limitParse(url.searchParams.get('limit'));
     return ok(await cached(`games:${limit}`, () => gamesFetch(limit)));
   }
 

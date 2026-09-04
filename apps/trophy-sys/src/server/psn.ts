@@ -73,6 +73,16 @@ export const authGet = async (): Promise<AuthorizationPayload> => {
   return session.auth;
 };
 
+/**
+ * PSN hands these back as strings, and a malformed one turns into NaN that
+ * survives every downstream check — a NaN rarity silently falls out of every
+ * bucket in the rarity chart rather than showing up as wrong.
+ */
+const numberOr = (value: unknown, fallback: number) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
 export const profileFetch = async (): Promise<Profile> => {
   const summary = await getUserTrophyProfileSummary(await authGet(), 'me');
   const { bronze, silver, gold, platinum } = summary.earnedTrophies;
@@ -80,7 +90,7 @@ export const profileFetch = async (): Promise<Profile> => {
   return {
     accountId: summary.accountId,
     earned: { bronze, gold, platinum, silver },
-    level: Number(summary.trophyLevel),
+    level: numberOr(summary.trophyLevel, 0),
     levelProgress: summary.progress,
     tier: summary.tier,
     total: bronze + silver + gold + platinum,
@@ -186,7 +196,7 @@ const progressBuild = (
   if (earned) return { current: total, rate: 100, target: total };
 
   return {
-    current: Number(earning?.progress ?? 0),
+    current: numberOr(earning?.progress, 0),
     rate: earning?.progressRate ?? 0,
     target: total,
   };
@@ -228,7 +238,7 @@ export const trophiesFetch = async (game: Game): Promise<TrophySet> => {
       id: definition.trophyId,
       name: definition.trophyName ?? '(hidden)',
       progress: progressBuild(definition, earned, earning),
-      rarity: Number(earning?.trophyEarnedRate ?? 0),
+      rarity: numberOr(earning?.trophyEarnedRate, 0),
     };
   });
 

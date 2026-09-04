@@ -57,13 +57,29 @@ const stateMigrate = (
     ]),
   );
 
+/**
+ * Absent and unreadable are different answers. A missing file is a legitimate
+ * empty — first run, or a fresh checkout. Damaged JSON is not: swallowing it
+ * would report an empty baseline, which reads as seed mode, and the next save
+ * would overwrite the very data that failed to parse.
+ */
 const storeRead = async <T>(key: string, file: URL): Promise<T | null> => {
   if (redis) return (await redis.get<T>(key)) ?? null;
 
+  let raw: string;
   try {
-    return JSON.parse(readFileSync(file, 'utf-8')) as T;
+    raw = readFileSync(file, 'utf-8');
   } catch {
     return null;
+  }
+
+  try {
+    return JSON.parse(raw) as T;
+  } catch (error) {
+    throw new Error(
+      `${file.pathname} holds invalid JSON — refusing to treat a damaged store as empty`,
+      { cause: error },
+    );
   }
 };
 
