@@ -37,7 +37,7 @@ export const Layout = () => {
           {TABS.map((tab) => (
             <Link
               activeProps={{ className: 'border-orange text-orange' }}
-              className='cursor-pointer border border-line px-3 py-1 text-[11px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-dim hover:text-fg-soft'
+              className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-dim hover:text-fg-soft'
               key={tab.to}
               to={tab.to}>
               {tab.label}
@@ -47,7 +47,7 @@ export const Layout = () => {
 
         <ThemeToggle />
 
-        <span className='ml-auto text-[10px] text-dim'>{status}</span>
+        <span className='ml-auto text-[12px] text-dim'>{status}</span>
       </div>
 
       <ProfileBar profile={profile.data ?? null} />

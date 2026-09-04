@@ -23,7 +23,7 @@ export const ChartFrame = (props: ChartFrameProps) => {
       <span className='panel-title'>{props.title}</span>
 
       <div className='flex flex-wrap items-center gap-x-3 gap-y-2 border-line border-b px-4 py-2'>
-        <p className='min-w-0 flex-1 text-[10px] text-dim'>{props.note}</p>
+        <p className='min-w-0 flex-1 text-[12px] text-dim'>{props.note}</p>
 
         {props.controls}
 
@@ -77,8 +77,8 @@ export const ChartTable = <Row,>(props: ChartTableProps<Row>) => {
   });
 
   return (
-    <table className='w-full text-[10px] text-fg-soft'>
-      <thead className='text-[9px] text-mute uppercase tracking-[0.12em]'>
+    <table className='w-full text-[12px] text-fg-soft'>
+      <thead className='text-[12px] text-mute uppercase tracking-[0.12em]'>
         <tr>{headListJSX}</tr>
       </thead>
       <tbody>{rowListJSX}</tbody>

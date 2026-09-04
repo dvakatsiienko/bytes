@@ -55,7 +55,9 @@ export const Library = () => {
   }, [params.gameId, firstId, navigate]);
 
   return (
-    <main className='grid min-h-0 flex-1 grid-cols-[minmax(280px,1fr)_1.4fr] gap-5'>
+    // One column until lg: the two-column track has a 280px floor on the list
+    // alone, so below ~700px the pair cannot fit and the page scrolls sideways.
+    <main className='grid min-h-0 flex-1 gap-5 lg:grid-cols-[minmax(280px,1fr)_1.4fr]'>
       <GameList
         games={arranged}
         onPlatinumChange={setPlatinum}

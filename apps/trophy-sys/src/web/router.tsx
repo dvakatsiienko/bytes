@@ -62,7 +62,7 @@ const statsRoute = createRoute({
   component: () => (
     <Suspense
       fallback={
-        <p className='grid flex-1 place-items-center text-[11px] text-dim'>
+        <p className='grid flex-1 place-items-center text-[12px] text-dim'>
           loading the charts…
         </p>
       }>

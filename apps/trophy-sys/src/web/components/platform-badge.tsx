@@ -26,7 +26,7 @@ export const PlatformBadge = ({ platform }: PlatformBadgeProps) => (
       .filter(Boolean)
       .map((name) => (
         <span
-          className={`border px-1 py-px text-[9px] leading-none tracking-[0.12em] ${CHIP[name] ?? CHIP_UNKNOWN}`}
+          className={`border px-1 py-px text-[12px] leading-none tracking-[0.12em] ${CHIP[name] ?? CHIP_UNKNOWN}`}
           key={name}>
           {name}
         </span>

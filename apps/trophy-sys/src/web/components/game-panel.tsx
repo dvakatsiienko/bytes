@@ -58,13 +58,13 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
   const hasPlatinum = game.earned.platinum > 0;
 
   return (
-    <section className='panel flex min-h-0 flex-col'>
+    <section className='panel flex min-h-0 min-w-0 flex-col'>
       <span className='panel-title select-text'>{game.name}</span>
 
       <div className='flex items-center gap-4 border-line border-b px-4 py-3'>
         <img
           alt=''
-          className='size-14 border border-line object-cover'
+          className='size-14 border border-line bg-bg-soft object-contain'
           height={56}
           src={game.iconUrl}
           width={56}
@@ -81,10 +81,10 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
               </span>
             )}
           </p>
-          <p className='mt-1 flex items-center gap-1.5 text-[11px] text-dim'>
+          <p className='mt-1 flex items-center gap-1.5 text-[12px] text-dim'>
             <PlatformBadge platform={game.platform} />
             {hasPlatinum && (
-              <span className='shrink-0 border border-platinum/50 bg-platinum/10 px-1 py-px text-[9px] text-platinum leading-none tracking-[0.12em]'>
+              <span className='shrink-0 border border-platinum/50 bg-platinum/10 px-1 py-px text-[12px] text-platinum leading-none tracking-[0.12em]'>
                 PLATINUM
               </span>
             )}
@@ -103,7 +103,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
           </p>
         </div>
 
-        <div className='ml-auto shrink-0 text-right text-[11px]'>
+        <div className='ml-auto shrink-0 text-right text-[12px]'>
           <span className={progressTone(game.progress)}>
             {barRender(game.progress, 18)}
           </span>
@@ -113,7 +113,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
 
       <div className='flex items-center gap-2 border-line border-b px-4 py-2'>
         <input
-          className='hint min-w-0 flex-1 border border-line bg-bg-soft px-2 py-1 text-[11px] text-fg placeholder:text-dim focus:border-orange focus:outline-none'
+          className='hint min-w-0 flex-1 border border-line bg-bg-soft px-2 py-1 text-[12px] text-fg placeholder:text-dim focus:border-orange focus:outline-none'
           data-hint='Filters trophies by name and description.'
           onChange={(event) => setQuery(event.target.value)}
           placeholder='filter trophies…'
@@ -140,7 +140,7 @@ export const GamePanel = ({ game, error }: GamePanelProps) => {
       </div>
 
       {shown.length !== game.trophies.length && (
-        <div className='border-line border-b px-4 py-1 text-[10px] text-dim'>
+        <div className='border-line border-b px-4 py-1 text-[12px] text-dim'>
           showing {shown.length} of {game.trophies.length}
         </div>
       )}
@@ -185,7 +185,7 @@ const GroupSection = ({
 
   return (
     <>
-      <header className='sticky top-0 z-10 flex items-center gap-3 border-line border-y bg-bg-lift px-4 py-1.5 text-[10px]'>
+      <header className='sticky top-0 z-10 flex items-center gap-3 border-line border-y bg-bg-lift px-4 py-1.5 text-[12px]'>
         <span className='select-text truncate text-orange uppercase tracking-[0.15em]'>
           {group.id === 'default' ? 'base game' : group.name}
         </span>

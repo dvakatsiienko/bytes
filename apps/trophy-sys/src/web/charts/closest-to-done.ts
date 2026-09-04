@@ -1,9 +1,9 @@
 import type { Game, RemainingTrophy } from '../../shared/types.ts';
+import type { BarChart } from '../components/bar-rows.tsx';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
 import { gameLookup } from '../helpers/stats.ts';
-import type { BarChart } from './bar-rows.tsx';
 
 /** Titles shown before the list stops being a weekly-open view. */
 const LIMIT = 15;

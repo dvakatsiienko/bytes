@@ -17,14 +17,14 @@ export const ProfileBar = ({ profile }: ProfileBarProps) => (
     <span className='panel-title'>profile</span>
 
     <div className='flex items-baseline gap-2'>
-      <span className='text-[10px] text-mute tracking-[0.2em]'>LEVEL</span>
+      <span className='text-[12px] text-mute tracking-[0.2em]'>LEVEL</span>
       <span className='glow text-2xl text-orange leading-none'>
         {profile?.level ?? '--'}
       </span>
-      <span className='text-[11px] text-dim'>tier {profile?.tier ?? '-'}</span>
+      <span className='text-[12px] text-dim'>tier {profile?.tier ?? '-'}</span>
     </div>
 
-    <div className='flex items-center gap-2 text-[11px]'>
+    <div className='flex items-center gap-2 text-[12px]'>
       <span className='text-yellow'>
         {barRender(profile?.levelProgress ?? 0, 16)}
       </span>
@@ -34,7 +34,7 @@ export const ProfileBar = ({ profile }: ProfileBarProps) => (
     <div className='flex gap-5'>
       {COUNTERS.map(({ key, label, color }) => (
         <div className='flex items-baseline gap-1.5' key={key}>
-          <span className='text-[10px] text-dim'>{label}</span>
+          <span className='text-[12px] text-dim'>{label}</span>
           <span className={`${color} text-base`}>
             {profile?.earned[key] ?? 0}
           </span>
@@ -43,7 +43,7 @@ export const ProfileBar = ({ profile }: ProfileBarProps) => (
     </div>
 
     <div className='ml-auto flex items-baseline gap-2'>
-      <span className='text-[10px] text-dim tracking-[0.2em]'>TOTAL</span>
+      <span className='text-[12px] text-dim tracking-[0.2em]'>TOTAL</span>
       <span className='text-base text-fg'>{profile?.total ?? 0}</span>
     </div>
   </header>

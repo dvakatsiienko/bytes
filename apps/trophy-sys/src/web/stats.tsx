@@ -3,16 +3,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { MotionConfig } from 'motion/react';
 
 import type { TrophyArchive } from '../shared/types.ts';
-import { abandonedRuns } from './charts/abandoned-runs.ts';
+import { AbandonedPanel } from './charts/abandoned-panel.tsx';
+import { ABANDONED_COLUMNS, abandonedRuns } from './charts/abandoned-runs.ts';
 import {
-  BACKLOG_COLUMNS,
-  backlogBuckets,
-  backlogChart,
-} from './charts/backlog-funnel.ts';
-import { BacklogPanel } from './charts/backlog-panel.tsx';
-import { BarRows } from './charts/bar-rows.tsx';
-import { EffortLegend } from './charts/chart-legend.tsx';
-import { CircadianRing } from './charts/circadian-ring.tsx';
+  type CircadianHour,
+  CircadianRing,
+  circadianHours,
+  hourRangeFormat,
+} from './charts/circadian-ring.tsx';
 import {
   CLOSEST_COLUMNS,
   CLOSEST_SORTS,
@@ -25,7 +23,11 @@ import {
   WEEKDAY_COLUMNS,
   heatmapWeeks,
 } from './charts/contribution-heatmap.tsx';
-import { EffortScatter } from './charts/effort-scatter.tsx';
+import {
+  type EffortPoint,
+  EffortScatter,
+  effortPoints,
+} from './charts/effort-scatter.tsx';
 import {
   NIGHT_OWL_COLUMNS,
   NightOwl,
@@ -58,21 +60,16 @@ import {
   TrophyProgression,
   progressionMonths,
 } from './charts/trophy-progression.tsx';
+import { BarRows } from './components/bar-rows.tsx';
 import {
   type ChartColumn,
   ChartFrame,
   ChartTable,
 } from './components/chart-frame.tsx';
+import { EffortLegend } from './components/chart-legend.tsx';
 import { KpiStrip } from './components/kpi-strip.tsx';
 import { SegmentedControl } from './components/segmented-control.tsx';
 import { hoursFormat } from './helpers/format.ts';
-import {
-  type CircadianHour,
-  type EffortPoint,
-  circadianHours,
-  effortPoints,
-  hourRangeFormat,
-} from './helpers/stats.ts';
 import { useGames, useStats, useStatsSync } from './hooks/queries.ts';
 
 export const Stats = () => {
@@ -82,6 +79,7 @@ export const Stats = () => {
   const sync = useStatsSync();
 
   const [focusMonth, setFocusMonth] = useState<string | null>(null);
+  const [focusDay, setFocusDay] = useState<string | null>(null);
   const [closestSort, setClosestSort] = useState<ClosestSort>('left');
   const [platinumSort, setPlatinumSort] = useState<PlatinumSort>('hours');
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -108,7 +106,6 @@ export const Stats = () => {
     () => platinumRuns(trophies, gameList, platinumSort),
     [trophies, gameList, platinumSort],
   );
-  const buckets = useMemo(() => backlogBuckets(gameList), [gameList]);
   const abandoned = useMemo(
     () => abandonedRuns(gameList, remaining),
     [gameList, remaining],
@@ -131,7 +128,6 @@ export const Stats = () => {
   // Each builder walks its rows once and returns the bars with the scale they
   // were measured against, so it must not be called twice per render.
   const rarityBars = useMemo(() => rarityChart(tiers), [tiers]);
-  const backlogBars = useMemo(() => backlogChart(buckets), [buckets]);
   const closestBars = useMemo(() => closestChart(closest), [closest]);
   const platinumBars = useMemo(() => platinumChart(platinums), [platinums]);
   const streakBars = useMemo(() => streakChart(streaks), [streaks]);
@@ -146,6 +142,7 @@ export const Stats = () => {
    * share nothing but this one string.
    */
   const dayFocus = (date: string) => {
+    setFocusDay(date);
     setFocusMonth(date.slice(0, 7));
     timelineRef.current?.scrollIntoView({
       behavior: 'smooth',
@@ -183,21 +180,24 @@ export const Stats = () => {
       <main className='flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto'>
         <div className='flex flex-wrap items-center gap-3'>
           <button
-            className='cursor-pointer border border-line px-3 py-1 text-[11px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-orange hover:text-orange disabled:cursor-wait disabled:opacity-50'
+            className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-orange hover:text-orange disabled:cursor-wait disabled:opacity-50'
             disabled={sync.isPending}
             onClick={() => sync.mutate()}
             type='button'>
             {sync.isPending ? 'scanning…' : 'rescan trophies'}
           </button>
 
-          <span className='text-[10px] text-dim'>
+          <span className='text-[12px] text-dim'>
             {archiveStatus(archive, sync.error)}
           </span>
 
           {focusMonth && (
             <button
-              className='cursor-pointer border border-orange px-2 py-0.5 text-[10px] text-orange'
-              onClick={() => setFocusMonth(null)}
+              className='cursor-pointer border border-orange px-2 py-0.5 text-[12px] text-orange'
+              onClick={() => {
+                setFocusMonth(null);
+                setFocusDay(null);
+              }}
               type='button'>
               clear {focusMonth} marker ✕
             </button>
@@ -258,22 +258,18 @@ export const Stats = () => {
           </ChartFrame>
 
           <ChartFrame
-            name='backlog'
-            note='every title by completion · "finished" means no trophies left, which is not the same as owning a platinum — some lists define none'
+            name='abandoned'
+            note='titles dropped one step from the platinum — 80% or more, and stopped'
             table={
               <ChartTable
-                columns={BACKLOG_COLUMNS}
-                rowKey={(bucket) => bucket.label}
-                rows={buckets}
+                columns={ABANDONED_COLUMNS}
+                rowKey={(run) => run.gameId}
+                rows={abandoned}
               />
             }
-            title='backlog'>
+            title='abandoned'>
             {gate(
-              <BacklogPanel
-                abandoned={abandoned}
-                chart={backlogBars}
-                onSelect={gameOpen}
-              />,
+              <AbandonedPanel onSelect={gameOpen} runs={abandoned} />,
               false,
             )}
           </ChartFrame>
@@ -388,7 +384,11 @@ export const Stats = () => {
               }
               title='activity'>
               {gate(
-                <ContributionHeatmap model={heatmap} onSelect={dayFocus} />,
+                <ContributionHeatmap
+                  model={heatmap}
+                  onSelect={dayFocus}
+                  selected={focusDay}
+                />,
               )}
             </ChartFrame>
           </div>
@@ -434,7 +434,7 @@ export const Stats = () => {
 
 /* Helpers */
 const Note = (props: { children: ReactNode }) => (
-  <p className='grid h-40 place-items-center px-6 text-center text-[11px] text-dim'>
+  <p className='grid h-40 place-items-center px-6 text-center text-[12px] text-dim'>
     {props.children}
   </p>
 );

@@ -54,13 +54,13 @@ export const KpiStrip = (props: KpiStripProps) => {
     },
   ].map((tile) => (
     <div className='flex flex-col gap-0.5 px-4 py-2' key={tile.label}>
-      <span className='text-[9px] text-mute uppercase tracking-[0.14em]'>
+      <span className='text-[12px] text-mute uppercase tracking-[0.14em]'>
         {tile.label}
       </span>
       <span className='text-fg text-lg tabular-nums leading-none'>
         {tile.value}
       </span>
-      {tile.hint && <span className='text-[9px] text-dim'>{tile.hint}</span>}
+      {tile.hint && <span className='text-[12px] text-dim'>{tile.hint}</span>}
     </div>
   ));
 
@@ -83,10 +83,10 @@ export const KpiStrip = (props: KpiStripProps) => {
         {tileListJSX}
 
         <div className='flex flex-col gap-1 px-4 py-2'>
-          <span className='text-[9px] text-mute uppercase tracking-[0.14em]'>
+          <span className='text-[12px] text-mute uppercase tracking-[0.14em]'>
             grade split
           </span>
-          <div className='flex gap-3 text-[11px] text-fg-soft'>
+          <div className='flex gap-3 text-[12px] text-fg-soft'>
             {gradeListJSX}
           </div>
         </div>

@@ -5,10 +5,10 @@ import { Arc } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
+import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { TooltipRow } from '../components/chart-tooltip.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
-import { type CircadianHour, hourRangeFormat } from '../helpers/stats.ts';
 
 export const CircadianRing = (props: CircadianRingProps) => (
   <div className='relative h-80 w-full'>
@@ -55,7 +55,6 @@ const Ring = (props: RingProps) => {
         {({ path }) => (
           <motion.path
             animate={{ opacity: 1 }}
-            className='cursor-pointer'
             d={path(hour) ?? ''}
             fill={CHART_INK.ring}
             fillOpacity={0.7}
@@ -87,7 +86,7 @@ const Ring = (props: RingProps) => {
         <text
           dominantBaseline='middle'
           fill={CHART_INK.axis}
-          fontSize={9}
+          fontSize={11}
           key={hour.hour}
           textAnchor='middle'
           x={Math.sin(mid) * (outer + 12)}
@@ -135,6 +134,57 @@ const Ring = (props: RingProps) => {
 };
 
 /* Helpers */
+/**
+ * Bucketed in the *browser's* local time, not UTC. The question the ring
+ * answers is "what time do you play", which is a wall-clock question — the
+ * archive stores instants precisely so this stays a display decision.
+ */
+export const circadianHours = (
+  trophies: ArchivedTrophy[],
+  games: Game[],
+): CircadianHour[] => {
+  const nameById = new Map(games.map((game) => [game.id, game.name]));
+  const buckets = Array.from({ length: 24 }, () => ({
+    count: 0,
+    perGame: new Map<string, number>(),
+  }));
+
+  for (const trophy of trophies) {
+    const bucket = buckets[new Date(trophy.at).getHours()];
+    if (!bucket) continue;
+
+    bucket.count += 1;
+    bucket.perGame.set(
+      trophy.gameId,
+      (bucket.perGame.get(trophy.gameId) ?? 0) + 1,
+    );
+  }
+
+  return buckets.map((bucket, hour) => {
+    let topId: string | null = null;
+    let topCount = 0;
+
+    for (const [gameId, count] of bucket.perGame)
+      if (count > topCount) {
+        topCount = count;
+        topId = gameId;
+      }
+
+    return {
+      count: bucket.count,
+      hour,
+      share: trophies.length ? (bucket.count / trophies.length) * 100 : 0,
+      topGame: topId ? (nameById.get(topId) ?? null) : null,
+    };
+  });
+};
+
+const hourFormat = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
+
+/** The span a spoke covers, which is what its tooltip and table row name. */
+export const hourRangeFormat = (hour: CircadianHour) =>
+  `${hourFormat(hour.hour)}–${hourFormat((hour.hour + 1) % 24)}`;
+
 const SPOKES = 24;
 const SPOKE_ANGLE = (Math.PI * 2) / SPOKES;
 /** A hair of padding so neighbouring spokes read as separate marks. */
@@ -151,6 +201,14 @@ const circadianRows = (hour: CircadianHour): TooltipRow[] => [
 ];
 
 /* Types */
+export interface CircadianHour {
+  count: number;
+  hour: number;
+  /** Percent of all earned trophies. */
+  share: number;
+  topGame: string | null;
+}
+
 interface CircadianRingProps {
   hours: CircadianHour[];
 }

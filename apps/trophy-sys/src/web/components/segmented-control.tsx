@@ -19,7 +19,7 @@ export const SegmentedControl = <Value extends string>(
           </span>
         )}
         <label
-          className={`cursor-pointer px-1.5 text-[10px] uppercase tracking-[0.1em] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-orange ${
+          className={`cursor-pointer px-1.5 text-[12px] uppercase tracking-[0.1em] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-orange ${
             isActive ? 'text-orange' : 'text-dim hover:text-fg-soft'
           }`}>
           <input

@@ -10,10 +10,10 @@ import { motion } from 'motion/react';
 
 import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
+import { SeriesLegend } from '../components/chart-legend.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { AXIS_LABEL, CHART_INK, GRADE_TONE } from '../helpers/chart-theme.ts';
 import { GRADE_ORDER, gameLookup, monthKey } from '../helpers/stats.ts';
-import { SeriesLegend } from './chart-legend.tsx';
 
 export const progressionMonths = (
   trophies: ArchivedTrophy[],
@@ -94,7 +94,7 @@ export const progressionMonths = (
 export const TrophyProgression = (props: TrophyProgressionProps) => {
   if (props.months.length === 0)
     return (
-      <p className='grid h-40 place-items-center px-6 text-center text-[11px] text-dim'>
+      <p className='grid h-40 place-items-center px-6 text-center text-[12px] text-dim'>
         nothing earned yet, so there is no arc to draw.
       </p>
     );
@@ -263,7 +263,7 @@ const Plot = (props: PlotProps) => {
               />
               <text
                 fill={CHART_INK.ring}
-                fontSize={9}
+                fontSize={11}
                 textAnchor={
                   focusIndex > props.months.length / 2 ? 'end' : 'start'
                 }

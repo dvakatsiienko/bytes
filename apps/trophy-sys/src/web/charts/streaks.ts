@@ -1,8 +1,8 @@
 import type { ArchivedTrophy } from '../../shared/types.ts';
+import type { BarChart } from '../components/bar-rows.tsx';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { dayKey } from '../helpers/stats.ts';
-import type { BarChart } from './bar-rows.tsx';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** Runs shown before the list stops being a highlight reel. */

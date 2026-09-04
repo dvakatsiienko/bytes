@@ -6,12 +6,13 @@ import { ParentSize } from '@visx/responsive';
 import { scaleLinear, scaleLog } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
 
+import type { Game } from '../../shared/types.ts';
 import type { TooltipRow } from '../components/chart-tooltip.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
 import { AXIS_LABEL, CHART_INK } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
-import type { EffortPoint } from '../helpers/stats.ts';
+import { countTotal } from '../helpers/stats.ts';
 
 export const EffortScatter = (props: EffortScatterProps) => (
   <div className='relative h-80 w-full'>
@@ -173,6 +174,9 @@ const Plot = (props: PlotProps) => {
                 tooltipTop: MARGIN.top + yScale(point.progress),
               });
             }}
+            // The catcher spans the whole plot but only acts over a mark, so
+            // the cursor follows the mark rather than the rectangle.
+            style={{ cursor: tooltip.tooltipData ? 'pointer' : 'default' }}
             width={innerWidth}
           />
         </Group>
@@ -192,6 +196,32 @@ const Plot = (props: PlotProps) => {
 };
 
 /* Helpers */
+/**
+ * A title with no matched playtime has no place on an hours axis, and a log
+ * scale cannot hold a zero, so both are dropped rather than parked at 1.
+ */
+export const effortPoints = (games: Game[]): EffortPoint[] =>
+  games
+    .filter((game) => (game.playSeconds ?? 0) > 0)
+    .map((game) => {
+      const earned = countTotal(game.earned);
+      const hours = (game.playSeconds ?? 0) / 3600;
+
+      return {
+        earned,
+        gameId: game.id,
+        hasPlatinum: game.earned.platinum > 0,
+        hours,
+        iconUrl: game.iconUrl,
+        name: game.name,
+        perTrophy: earned ? hours / earned : 0,
+        progress: game.progress,
+        trophies: countTotal(game.defined),
+      };
+    })
+    // Big dots drawn first, so a small one is never buried under a large one.
+    .sort((a, b) => b.trophies - a.trophies);
+
 const MARGIN = { bottom: 36, left: 42, right: 14, top: 12 };
 
 /** How far outside a mark still counts as pointing at it. */
@@ -223,6 +253,20 @@ const effortRows = (point: EffortPoint): TooltipRow[] => [
 ];
 
 /* Types */
+export interface EffortPoint {
+  earned: number;
+  gameId: string;
+  hasPlatinum: boolean;
+  hours: number;
+  iconUrl: string;
+  name: string;
+  /** Hours spent per trophy actually earned — the grind rate. */
+  perTrophy: number;
+  progress: number;
+  /** Trophies the title defines, which is what the dot size encodes. */
+  trophies: number;
+}
+
 interface EffortScatterProps {
   onSelect: (gameId: string) => void;
   points: EffortPoint[];

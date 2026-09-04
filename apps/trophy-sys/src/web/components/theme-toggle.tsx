@@ -24,7 +24,7 @@ export const ThemeToggle = () => {
           // left-anchored 15rem hint hangs 108px past a 390px viewport — which
           // the page then scrolls to, because an absolutely positioned
           // pseudo-element still counts toward the document's scroll width.
-          className={`hint hint-right cursor-pointer px-1 text-[11px] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-orange ${
+          className={`hint hint-right cursor-pointer px-1 text-[12px] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-orange ${
             isActive ? 'glow text-orange' : 'text-dim hover:text-fg-soft'
           }`}
           data-hint={option.hint}>

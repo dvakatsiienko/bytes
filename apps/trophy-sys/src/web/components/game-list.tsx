@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import type { Game } from '../../shared/types.ts';
 import {
   GRADE_MARK,
+  PLAYTIME_MISSING_HINT,
   barRender,
   dateFormat,
   playtimeFormat,
@@ -36,6 +37,10 @@ export const GameList = (props: GameListProps) => {
   const gameListJSX = shown.map((game) => {
     const isSelected = game.id === props.selectedId;
     const hasPlatinum = game.earned.platinum > 0;
+    // The row, not the dash, carries the hint: it is the only ancestor wide
+    // enough for the tooltip to sit inside the list's overflow-auto column,
+    // and it is already focusable, so the hint reaches the keyboard too.
+    const missingPlaytime = game.playSeconds === null;
 
     return (
       <button
@@ -43,7 +48,8 @@ export const GameList = (props: GameListProps) => {
           isSelected
             ? 'border-l-orange bg-bg-lift'
             : 'border-l-transparent hover:border-l-dim hover:bg-bg-soft'
-        }`}
+        } ${missingPlaytime ? 'hint' : ''}`}
+        data-hint={missingPlaytime ? PLAYTIME_MISSING_HINT : undefined}
         key={game.id}
         onClick={() => props.onSelect(game.id)}
         type='button'>
@@ -54,7 +60,9 @@ export const GameList = (props: GameListProps) => {
 
         <img
           alt=''
-          className={`size-9 shrink-0 border border-line object-cover transition-all duration-150 ${
+          // contain, not cover: PSN serves square 512² art for some titles and a
+          // 320×176 banner for others, and cover cuts ~45% off every banner.
+          className={`size-9 shrink-0 border border-line bg-bg-soft object-contain transition-all duration-150 ${
             isSelected
               ? 'grayscale-0'
               : 'grayscale-[60%] group-hover:grayscale-0'
@@ -77,16 +85,23 @@ export const GameList = (props: GameListProps) => {
               </span>
             )}
           </span>
-          <span className='mt-0.5 flex items-center gap-1.5 text-[10px] text-dim'>
+          <span className='mt-0.5 flex items-center gap-1.5 text-[12px] text-dim'>
             <PlatformBadge platform={game.platform} />
             <span className='truncate'>
               {dateFormat(game.playedAt ?? game.lastPlayedAt)} ·{' '}
-              {playtimeFormat(game.playSeconds)}
+              <span
+                className={
+                  missingPlaytime
+                    ? 'underline decoration-dotted underline-offset-2'
+                    : ''
+                }>
+                {playtimeFormat(game.playSeconds)}
+              </span>
             </span>
           </span>
         </span>
 
-        <span className='shrink-0 text-right text-[10px]'>
+        <span className='shrink-0 text-right text-[12px]'>
           <span className={progressTone(game.progress)}>
             {barRender(game.progress, 10)}
           </span>
@@ -97,7 +112,7 @@ export const GameList = (props: GameListProps) => {
   });
 
   return (
-    <nav className='panel flex min-h-0 flex-col'>
+    <nav className='panel flex min-h-0 min-w-0 flex-col'>
       <span className='panel-title'>
         library ·{' '}
         {shown.length === props.total
@@ -107,7 +122,7 @@ export const GameList = (props: GameListProps) => {
 
       <div className='flex flex-col gap-2 border-line border-b px-3 py-2'>
         <input
-          className='hint min-w-0 border border-line bg-bg-soft px-2 py-1 text-[11px] text-fg placeholder:text-dim focus:border-orange focus:outline-none'
+          className='hint min-w-0 border border-line bg-bg-soft px-2 py-1 text-[12px] text-fg placeholder:text-dim focus:border-orange focus:outline-none'
           data-hint='Filters the list by title as you type.'
           onChange={(event) => setQuery(event.target.value)}
           placeholder='search titles…'

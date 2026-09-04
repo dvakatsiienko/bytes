@@ -93,32 +93,43 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
   );
 
   const cellListJSX = props.model.columns.flatMap((column, weekIndex) =>
-    column.map((cell) => (
-      // Pointer-only enhancement: the same numbers are in this chart's table
-      // view, and the click only moves a marker on another chart.
-      <motion.rect
-        animate={{ opacity: 1 }}
-        className={cell.count ? 'cursor-pointer' : undefined}
-        fill={cell.count ? CHART_INK.ring : CHART_INK.grid}
-        fillOpacity={cell.count ? shadeOf(cell.count) : 0.25}
-        height={CELL}
-        initial={{ opacity: 0 }}
-        key={cell.date}
-        onClick={() => cell.count && props.onSelect(cell.date)}
-        onMouseEnter={() =>
-          tooltip.showTooltip({
-            tooltipData: cell,
-            tooltipLeft: weekIndex * STEP + CELL,
-            tooltipTop: cell.weekday * STEP + LABEL_HEIGHT,
-          })
-        }
-        onMouseLeave={tooltip.hideTooltip}
-        transition={{ delay: weekIndex * 0.004, duration: 0.25 }}
-        width={CELL}
-        x={weekIndex * STEP}
-        y={cell.weekday * STEP + LABEL_HEIGHT}
-      />
-    )),
+    column.map((cell) => {
+      // An empty day is still a day, and "nothing happened here" is an answer
+      // worth jumping the timeline to — so every cell selects, not just the
+      // earned ones.
+      const isPicked = cell.date === props.selected;
+
+      return (
+        // Pointer-only enhancement: the same numbers are in this chart's table
+        // view, and the click only moves a marker on another chart.
+        <motion.rect
+          animate={{ opacity: 1 }}
+          className='cursor-pointer'
+          fill={cell.count ? CHART_INK.ring : CHART_INK.grid}
+          fillOpacity={cell.count ? shadeOf(cell.count) : 0.25}
+          height={CELL}
+          initial={{ opacity: 0 }}
+          key={cell.date}
+          onClick={() => props.onSelect(cell.date)}
+          onMouseEnter={() =>
+            tooltip.showTooltip({
+              tooltipData: cell,
+              tooltipLeft: weekIndex * STEP + CELL,
+              tooltipTop: cell.weekday * STEP + LABEL_HEIGHT,
+            })
+          }
+          onMouseLeave={tooltip.hideTooltip}
+          // The pick reads as an outline, never as a shade: the fill already
+          // encodes the count, so recolouring it would collide with the scale.
+          stroke={isPicked ? CHART_INK.pick : undefined}
+          strokeWidth={isPicked ? 1.5 : undefined}
+          transition={{ delay: weekIndex * 0.004, duration: 0.25 }}
+          width={CELL}
+          x={weekIndex * STEP}
+          y={cell.weekday * STEP + LABEL_HEIGHT}
+        />
+      );
+    }),
   );
 
   const monthListJSX = props.model.columns.flatMap((column, weekIndex) => {
@@ -132,7 +143,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
     return [
       <text
         fill={CHART_INK.axis}
-        fontSize={8}
+        fontSize={11}
         key={first.date}
         x={weekIndex * STEP}
         y={8}>
@@ -158,7 +169,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
       <text
         dominantBaseline='middle'
         fill={CHART_INK.axis}
-        fontSize={8}
+        fontSize={11}
         x={marginX + MARGIN_WIDTH + 4}
         y={index * STEP + LABEL_HEIGHT + CELL / 2}>
         {weekday.label}
@@ -281,6 +292,8 @@ export interface HeatmapModel {
 
 interface ContributionHeatmapProps {
   model: HeatmapModel;
-  /** Called with a `YYYY-MM-DD` when a day with trophies in it is clicked. */
+  /** Called with a `YYYY-MM-DD` when any day is clicked, empty ones included. */
   onSelect: (date: string) => void;
+  /** The `YYYY-MM-DD` currently pinned, outlined so the pick stays visible. */
+  selected: string | null;
 }

@@ -1,4 +1,6 @@
 import type { Game, RemainingTrophy } from '../../shared/types.ts';
+import type { ChartColumn } from '../components/chart-frame.tsx';
+import { dateFormat, hoursFormat } from '../helpers/format.ts';
 import { GRADE_ORDER, gameLookup } from '../helpers/stats.ts';
 
 /** The band this list is about: one step from the platinum, and stopped. */
@@ -45,6 +47,14 @@ export const gradeBreakdown = (left: RemainingTrophy[]) => {
 
   return parts.length ? parts.join(', ') : '—';
 };
+
+export const ABANDONED_COLUMNS: ChartColumn<AbandonedRun>[] = [
+  { cell: (run) => run.name, head: 'title' },
+  { cell: (run) => `${run.progress}%`, head: 'progress', isNumeric: true },
+  { cell: (run) => gradeBreakdown(run.left), head: 'left' },
+  { cell: (run) => hoursFormat(run.hours), head: 'hours', isNumeric: true },
+  { cell: (run) => dateFormat(run.playedAt), head: 'last played' },
+];
 
 /* Types */
 export interface AbandonedRun {

@@ -10,6 +10,12 @@ import type { TrophyGrade } from '../../shared/types.ts';
 export const CHART_INK = {
   axis: 'var(--p-dim)',
   grid: 'var(--p-line)',
+  /**
+   * The outline on a picked mark. Blue against the orange ramp so it reads as
+   * a different kind of thing rather than a hotter value, and the outline's
+   * presence carries the state on its own — colour is never the only cue.
+   */
+  pick: 'var(--p-blue)',
   /** The one accent hue every magnitude ramp and single-series chart uses. */
   ring: 'var(--p-orange)',
   surface: 'var(--p-bg-lift)',

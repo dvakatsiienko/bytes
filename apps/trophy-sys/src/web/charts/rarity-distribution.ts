@@ -1,8 +1,8 @@
 import type { ArchivedTrophy, Game } from '../../shared/types.ts';
+import type { BarChart } from '../components/bar-rows.tsx';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { CHART_INK, TIER_TONE } from '../helpers/chart-theme.ts';
 import { gameLookup } from '../helpers/stats.ts';
-import type { BarChart } from './bar-rows.tsx';
 
 /**
  * PSNProfiles' own tier names and cut points, kept so the chart reads familiar.
@@ -51,23 +51,37 @@ export const rarityTiers = (
 export const rarityChart = (tiers: RarityTier[]): BarChart => {
   const peak = Math.max(...tiers.map((tier) => tier.count), 1);
 
-  const bars = tiers.map((tier) => ({
-    fraction: tier.count / peak,
-    iconUrl: tier.rarest[0]?.iconUrl,
-    id: tier.label,
-    label: `${tier.label} ${tier.range}`,
-    note: tier.rarest.length
-      ? tier.rarest
-          .map((trophy) => `${trophy.rarity}% ${trophy.name} — ${trophy.game}`)
-          .join(' · ')
-      : 'nothing in this band',
-    rows: [
-      { label: 'trophies', value: String(tier.count) },
-      { label: 'share', value: `${tier.share.toFixed(1)}%` },
-    ],
-    tone: tier.tone,
-    value: String(tier.count),
-  }));
+  const bars = tiers.map((tier) => {
+    // Two bands can hold the same number of trophies by coincidence — `rare`
+    // and `uncommon` both held 616 when this was written. Equal bars read as a
+    // rendering fault, so the tie is stated instead of left to look like one.
+    const tiedWith = tiers
+      .filter((other) => other !== tier && other.count === tier.count)
+      .map((other) => other.label);
+
+    return {
+      fraction: tier.count / peak,
+      iconUrl: tier.rarest[0]?.iconUrl,
+      id: tier.label,
+      label: `${tier.label} ${tier.range}`,
+      note: tier.rarest.length
+        ? tier.rarest
+            .map(
+              (trophy) => `${trophy.rarity}% ${trophy.name} — ${trophy.game}`,
+            )
+            .join(' · ')
+        : 'nothing in this band',
+      rows: [
+        { label: 'trophies', value: String(tier.count) },
+        { label: 'share', value: `${tier.share.toFixed(1)}%` },
+        ...(tiedWith.length
+          ? [{ label: 'ties with', value: tiedWith.join(', ') }]
+          : []),
+      ],
+      tone: tier.tone,
+      value: tiedWith.length ? `${tier.count} · tie` : String(tier.count),
+    };
+  });
 
   return {
     axis: { format: (value) => String(Math.round(value)), max: peak },

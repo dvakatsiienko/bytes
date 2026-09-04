@@ -13,12 +13,12 @@ export const ChartTooltip = (props: ChartTooltipProps) => {
   });
 
   return (
-    <div className='pointer-events-none border border-line bg-bg-lift px-2 py-1.5 text-[10px] leading-relaxed'>
+    <div className='pointer-events-none border border-line bg-bg-lift px-2 py-1.5 text-[12px] leading-relaxed'>
       <div className='flex items-center gap-1.5'>
         {props.iconUrl && (
           <img
             alt=''
-            className='size-5 shrink-0 border border-line object-cover'
+            className='size-5 shrink-0 border border-line bg-bg-soft object-contain'
             height={20}
             src={props.iconUrl}
             width={20}
@@ -30,7 +30,7 @@ export const ChartTooltip = (props: ChartTooltipProps) => {
       </div>
 
       {props.note && (
-        <p className='mt-1 max-w-44 text-[9px] text-mute'>{props.note}</p>
+        <p className='mt-1 max-w-44 text-[12px] text-mute'>{props.note}</p>
       )}
 
       <dl className='mt-1 grid grid-cols-[auto_auto] gap-x-3'>{rowListJSX}</dl>

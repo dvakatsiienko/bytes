@@ -190,7 +190,7 @@
     top: -0.65rem;
     left: 0.75rem;
     padding-inline: 0.4rem;
-    font-size: 10px;
+    font-size: 11px;
     color: var(--color-mute);
     text-transform: uppercase;
     letter-spacing: 0.18em;
@@ -218,7 +218,7 @@
     width: max-content;
     max-width: 15rem;
     padding: 0.3rem 0.5rem;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.4;
     color: var(--color-fg);
     text-transform: none;

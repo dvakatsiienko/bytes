@@ -4,9 +4,9 @@ import { scaleLinear } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
-import type { TooltipRow } from '../components/chart-tooltip.tsx';
-import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { CHART_INK } from '../helpers/chart-theme.ts';
+import type { TooltipRow } from './chart-tooltip.tsx';
+import { ChartTooltip, TooltipLayer } from './chart-tooltip.tsx';
 
 /**
  * One ranked list of horizontal bars, shared by every chart that answers "which
@@ -16,7 +16,7 @@ import { CHART_INK } from '../helpers/chart-theme.ts';
 export const BarRows = (props: BarRowsProps) => {
   if (props.rows.length === 0)
     return (
-      <p className='grid h-24 place-items-center px-6 text-center text-[11px] text-dim'>
+      <p className='grid h-24 place-items-center px-6 text-center text-[12px] text-dim'>
         {props.empty ?? 'nothing to show here'}
       </p>
     );
@@ -98,7 +98,7 @@ const Bars = (props: BarsProps) => {
         <text
           dominantBaseline='middle'
           fill={isActive ? CHART_INK.text : CHART_INK.axis}
-          fontSize={9}
+          fontSize={11}
           x={0}
           y={y + ROW_HEIGHT / 2}>
           {clip(row.label, gutter)}
@@ -136,7 +136,7 @@ const Bars = (props: BarsProps) => {
         <text
           dominantBaseline='middle'
           fill={isActive ? CHART_INK.text : CHART_INK.axis}
-          fontSize={9}
+          fontSize={11}
           textAnchor='end'
           x={props.width}
           y={y + ROW_HEIGHT / 2}>

@@ -19,6 +19,13 @@ export const dateFormat = (iso: string | null) => {
   return new Date(iso).toISOString().slice(0, 10).replace(/-/g, '.');
 };
 
+/**
+ * Shown wherever playtimeFormat returns its dash, so the gap reads as a known
+ * limit rather than a zero or a defect.
+ */
+export const PLAYTIME_MISSING_HINT =
+  'No playtime — PSN serves it from a separate endpoint, joined to trophies by name, and this name found no match.';
+
 /** `—` when the playtime name-join found no match for this title. */
 export const playtimeFormat = (seconds: number | null) => {
   if (seconds === null) return '—';

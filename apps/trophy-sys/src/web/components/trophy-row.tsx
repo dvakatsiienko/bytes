@@ -34,11 +34,11 @@ export const TrophyRow = ({ trophy, note }: TrophyRowProps) => (
       <span className='block select-text truncate text-fg-soft'>
         {trophy.name}
       </span>
-      <span className='block select-text truncate text-[10px] text-dim'>
+      <span className='block select-text truncate text-[12px] text-dim'>
         {note ?? trophy.detail}
       </span>
       {trophy.progress && !trophy.earned ? (
-        <span className='block text-[10px] text-orange'>
+        <span className='block text-[12px] text-orange'>
           {barRender(trophy.progress.rate, 12)}
           <span className='ml-2 text-dim'>
             {trophy.progress.current}/{trophy.progress.target}
@@ -47,7 +47,7 @@ export const TrophyRow = ({ trophy, note }: TrophyRowProps) => (
       ) : null}
     </span>
 
-    <span className='shrink-0 text-right text-[10px] text-dim'>
+    <span className='shrink-0 text-right text-[12px] text-dim'>
       <span className='block'>{dateFormat(trophy.earnedAt)}</span>
       <span className='block text-mute'>{trophy.rarity}%</span>
     </span>

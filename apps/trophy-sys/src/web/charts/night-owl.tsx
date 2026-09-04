@@ -116,7 +116,7 @@ export const NightOwl = (props: NightOwlProps) => {
     <text
       dominantBaseline='middle'
       fill={CHART_INK.axis}
-      fontSize={8}
+      fontSize={11}
       key={row.name}
       x={0}
       y={rowIndex * STEP + LABEL_HEIGHT + CELL / 2}>
@@ -128,7 +128,7 @@ export const NightOwl = (props: NightOwlProps) => {
     (hour) => (
       <text
         fill={CHART_INK.axis}
-        fontSize={8}
+        fontSize={11}
         key={hour}
         textAnchor='middle'
         x={GUTTER + hour * STEP + CELL / 2}

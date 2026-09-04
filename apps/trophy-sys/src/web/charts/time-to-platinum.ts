@@ -1,9 +1,9 @@
 import type { ArchivedTrophy, Game } from '../../shared/types.ts';
+import type { BarChart } from '../components/bar-rows.tsx';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { dateFormat, hoursFormat } from '../helpers/format.ts';
 import { gameLookup } from '../helpers/stats.ts';
-import type { BarChart } from './bar-rows.tsx';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
