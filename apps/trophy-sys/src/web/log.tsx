@@ -1,8 +1,14 @@
 import { Link } from '@tanstack/react-router';
 
 import type { ArchivedTrophy, Game } from '../shared/types.ts';
-import { GRADE_COLOR, GRADE_MARK, dateFormat } from './helpers/format.ts';
-import { countTotal, dayKey, gameLookup } from './helpers/stats.ts';
+import { GRADE_COLOR, GRADE_MARK } from './helpers/format.ts';
+import {
+  DAY_ROLLOVER_HOURS,
+  countTotal,
+  gameLookup,
+  gamingDayKey,
+  trophyOrder,
+} from './helpers/stats.ts';
 import { useGames, useStats } from './hooks/queries.ts';
 
 export const Log = () => {
@@ -27,22 +33,28 @@ export const Log = () => {
 
   if (days.length === 0) return <Note>nothing earned yet.</Note>;
 
+  // Counted from what survived, never from LIMIT: a cut final day is dropped,
+  // so the window's size and the list's size are not the same number.
+  const shown = days.reduce((total, day) => total + day.count, 0);
+
   const dayListJSX = days.map((day) => {
-    const sessionListJSX = day.sessions.map((session) => {
-      return <SessionRow key={session.id} session={session} />;
+    const gameListJSX = day.games.map((gameDay) => {
+      return <GameDayRow gameDay={gameDay} key={gameDay.id} />;
     });
 
     return (
       <section key={day.date}>
         <header className='sticky top-0 z-10 flex items-baseline gap-3 border-line border-y bg-bg-lift px-4 py-1.5 text-[12px]'>
+          {/* Printed, not parsed. `date` is already a local gaming-day key, and
+              sending it back through a Date would read it as UTC midnight. */}
           <span className='select-text text-orange tracking-[0.15em]'>
-            {dateFormat(day.date)}
+            {day.date.replace(/-/g, '.')}
           </span>
           <span className='text-mute'>
             {day.count} {day.count === 1 ? 'trophy' : 'trophies'}
           </span>
         </header>
-        <ul>{sessionListJSX}</ul>
+        <ul>{gameListJSX}</ul>
       </section>
     );
   });
@@ -50,10 +62,12 @@ export const Log = () => {
   return (
     <main className='flex min-h-0 flex-1 flex-col'>
       <section className='panel flex min-h-0 min-w-0 flex-col'>
-        <span className='panel-title'>log · {LIMIT} most recent</span>
+        <span className='panel-title'>log · {shown} most recent</span>
         <p className='border-line border-b px-4 py-2 text-[12px] text-dim'>
-          every trophy you have earned, newest first · a run on one title inside{' '}
-          {SESSION_HOURS} hours is grouped as one sitting, nothing hidden
+          every trophy you have earned, newest first · one row per title per
+          day, nothing hidden · a day runs to{' '}
+          {String(DAY_ROLLOVER_HOURS).padStart(2, '0')}:00, so a past-midnight
+          trophy stays with the evening it came from
         </p>
         <div className='min-h-0 flex-1 overflow-y-auto'>{dayListJSX}</div>
       </section>
@@ -61,10 +75,8 @@ export const Log = () => {
   );
 };
 
-const SessionRow = (props: SessionRowProps) => {
-  const { session } = props;
-
-  const trophyListJSX = session.trophies.map((trophy) => {
+const GameDayRow = (props: GameDayRowProps) => {
+  const trophyListJSX = props.gameDay.trophies.map((trophy) => {
     return (
       <li
         className='flex items-center gap-2 py-1'
@@ -122,19 +134,19 @@ const SessionRow = (props: SessionRowProps) => {
           className='size-8 shrink-0 border border-line bg-bg-soft object-contain'
           height={32}
           loading='lazy'
-          src={session.iconUrl}
+          src={props.gameDay.iconUrl}
           width={32}
         />
         <Link
           className='min-w-0 flex-1 cursor-pointer select-text truncate text-fg-soft hover:text-orange'
-          params={{ gameId: session.gameId }}
+          params={{ gameId: props.gameDay.gameId }}
           to='/library/$gameId'>
-          {session.name}
+          {props.gameDay.name}
         </Link>
-        {session.defined > 0 && <SessionShare session={session} />}
+        {props.gameDay.defined > 0 && <GameDayShare gameDay={props.gameDay} />}
       </div>
 
-      {/* Every trophy of the sitting, listed. The page is short and there is
+      {/* Every trophy of the day, listed. The page is short and there is
           nothing to gain by folding them away. */}
       {/* ml-4 lands the spine under the game icon above it, so the branch
           reads as descending from the title rather than from the row edge. */}
@@ -144,31 +156,31 @@ const SessionRow = (props: SessionRowProps) => {
 };
 
 /**
- * How far this sitting moved the title, in trophies earned of trophies defined.
+ * How far this day moved the title, in trophies earned of trophies defined.
  *
  * 📌 Counts, never PSN's own percentage. PSN weights `progress` by grade in a
  * way this app cannot reproduce — the closest formula fitted 92 of 109 titles,
  * so a figure derived from it would be quietly wrong on the rest. Counts are
  * exact, and the archive's timestamps make the *historical* position exact too:
- * the bar shows where the title stood when the sitting began, not where it
- * stands today.
+ * the bar shows where the title stood when the day began, not where it stands
+ * today.
  */
-const SessionShare = (props: SessionShareProps) => {
-  const { session } = props;
-  const from = session.before / session.defined;
-  const to = (session.before + session.count) / session.defined;
+const GameDayShare = (props: GameDayShareProps) => {
+  const from = props.gameDay.before / props.gameDay.defined;
+  const to =
+    (props.gameDay.before + props.gameDay.count) / props.gameDay.defined;
 
   return (
     <span className='flex shrink-0 items-center gap-2 text-[12px] tabular-nums'>
       <span
         aria-hidden
         className='relative h-1.5 w-24 overflow-hidden bg-line/40'>
-        {/* where the title already stood when the sitting began */}
+        {/* where the title already stood when the day began */}
         <span
           className='absolute inset-y-0 left-0 bg-dim/60'
           style={{ width: `${from * 100}%` }}
         />
-        {/* the step this sitting was — its real place on the run, not today's */}
+        {/* the step this day was — its real place on the run, not today's */}
         <span
           className='absolute inset-y-0 bg-orange'
           style={{ left: `${from * 100}%`, width: `${(to - from) * 100}%` }}
@@ -193,14 +205,6 @@ const Note = ({ children }: { children: string }) => (
 /** How many trophies the log holds. No pagination — this is the whole list. */
 const LIMIT = 200;
 
-/**
- * A sitting, not a clock hour. Trophies on one title inside this window are one
- * play session, which is what makes the list read as a history rather than as
- * two thousand separate lines.
- */
-const SESSION_HOURS = 3;
-const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000;
-
 const timeFormat = (iso: string) =>
   new Date(iso).toLocaleTimeString([], {
     hour: '2-digit',
@@ -209,12 +213,19 @@ const timeFormat = (iso: string) =>
   });
 
 /**
- * Newest first, collapsed into sittings, then cut into days.
+ * Newest first, one row per title per gaming day.
+ *
+ * 📌 The day is the only unit here. An earlier version also collapsed trophies
+ * into "sittings" on a 3-hour gap, which split a single evening whenever the
+ * player stepped away for dinner — 20:21 to 00:11 on one title read as two
+ * separate rows. Two overlapping grouping rules were one too many, and the day
+ * is the one worth keeping, so a title that was touched twice in a day is still
+ * one row. The only split inside a day is a different title.
  *
  * The archive is stored oldest-first, so it is reversed once here rather than
- * sorted per render. A session breaks on a different title or on a gap wider
- * than the window — never on a day boundary, because a session that runs past
- * midnight is still one sitting and lands on the day it started.
+ * sorted per render. Rows are therefore created in newest-first order and their
+ * days never increase, which is what lets the day grouping below just look at
+ * the last one instead of sorting.
  */
 const logDays = (trophies: ArchivedTrophy[], games: Game[]): LogDay[] => {
   const byId = gameLookup(games);
@@ -222,10 +233,10 @@ const logDays = (trophies: ArchivedTrophy[], games: Game[]): LogDay[] => {
   /**
    * How many of a title's trophies existed before a given instant.
    *
-   * The whole archive is walked, not just the window the log shows — a sitting
-   * from 2023 has to be measured against where that title stood in 2023. The
-   * archive is already sorted oldest-first, so a per-game slice keeps that
-   * order and the answer is an index.
+   * The whole archive is walked, not just the window the log shows — a day in
+   * 2023 has to be measured against where that title stood in 2023. The archive
+   * is already sorted oldest-first, so a per-game slice keeps that order and
+   * the answer is an index.
    */
   const earnedAtById = new Map<string, string[]>();
   for (const trophy of trophies) {
@@ -238,97 +249,118 @@ const logDays = (trophies: ArchivedTrophy[], games: Game[]): LogDay[] => {
 
   const recent = trophies.slice(-LIMIT).reverse();
 
-  const sessions: LogSession[] = [];
+  const rows: GameDay[] = [];
+  // Keyed rather than compared against the previous row: a day where two titles
+  // alternate would otherwise open a third row when the first title comes back.
+  const rowByKey = new Map<string, GameDay>();
 
   for (const trophy of recent) {
-    const open = sessions.at(-1);
-    const withinWindow =
-      open &&
-      open.gameId === trophy.gameId &&
-      Date.parse(open.oldestAt) - Date.parse(trophy.at) <= SESSION_MS;
+    const date = gamingDayKey(new Date(trophy.at));
+    const key = `${date}|${trophy.gameId}`;
+    const open = rowByKey.get(key);
 
-    if (open && withinWindow) {
+    if (open) {
       open.count += 1;
       open.oldestAt = trophy.at;
       open.trophies.push(trophy);
-      if (trophy.rarity < open.rarest.rarity) open.rarest = trophy;
       continue;
     }
 
     const game = byId.get(trophy.gameId);
-    sessions.push({
-      at: trophy.at,
+    const row: GameDay = {
       before: 0,
       count: 1,
+      date,
       defined: game ? countTotal(game.defined) : 0,
       gameId: trophy.gameId,
       iconUrl: game?.iconUrl ?? '',
-      id: `${trophy.gameId}-${trophy.at}`,
+      id: key,
       name: game?.name ?? trophy.gameId,
       oldestAt: trophy.at,
-      rarest: trophy,
       trophies: [trophy],
-    });
+    };
+
+    rowByKey.set(key, row);
+    rows.push(row);
   }
 
-  // Filled after the fact: a sitting's oldest trophy is not known until the
-  // sitting stops growing.
-  for (const session of sessions)
-    session.before = earnedBefore(session.gameId, session.oldestAt);
+  // Both filled after the fact: a row's oldest trophy is not known until the
+  // row stops growing, and the tie order cannot be applied to a partial row.
+  for (const row of rows) {
+    row.before = earnedBefore(row.gameId, row.oldestAt);
+    row.trophies.sort(trophyOrder);
+  }
 
   const days: LogDay[] = [];
 
-  for (const session of sessions) {
-    const date = dayKey(new Date(session.at));
+  for (const row of rows) {
     const open = days.at(-1);
 
-    if (open?.date === date) {
-      open.count += session.count;
-      open.sessions.push(session);
+    if (open?.date === row.date) {
+      open.count += row.count;
+      open.games.push(row);
       continue;
     }
 
-    days.push({ count: session.count, date, sessions: [session] });
+    days.push({ count: row.count, date: row.date, games: [row] });
+  }
+
+  /**
+   * Drop the last day when the window cut it in half — when the oldest trophy
+   * the log holds still has older siblings on its own gaming day, back in the
+   * archive. Left in, that day prints a slice of itself as if it were the whole
+   * thing: the invincible evening of 21 trophies read as 12, and its bar showed
+   * a leap nothing on screen accounted for. Every day that remains is whole.
+   */
+  const oldest = recent.at(-1);
+  const last = days.at(-1);
+
+  if (oldest && last && last.date === gamingDayKey(new Date(oldest.at))) {
+    const isCut = trophies.some(
+      (trophy) =>
+        trophy.at < oldest.at &&
+        gamingDayKey(new Date(trophy.at)) === last.date,
+    );
+
+    if (isCut) days.pop();
   }
 
   return days;
 };
 
 /* Types */
-interface SessionRowProps {
-  session: LogSession;
+interface GameDayRowProps {
+  gameDay: GameDay;
 }
 
-interface SessionShareProps {
-  session: LogSession;
+interface GameDayShareProps {
+  gameDay: GameDay;
 }
 
-interface LogSession {
-  /** When the sitting's newest trophy popped — what the row prints. */
-  at: string;
+/** One title's trophies on one gaming day — the log's whole unit. */
+interface GameDay {
   /**
-   * Trophies already earned in this title when the sitting began — what makes
-   * the bar show the step this sitting was, rather than where the title sits
-   * today.
+   * Trophies already earned in this title when the day began — what makes the
+   * bar show the step this day was, rather than where the title sits today.
    */
   before: number;
   count: number;
+  /** The gaming day this row belongs to, as `YYYY-MM-DD`. */
+  date: string;
   /** Trophies the title defines in total — the bar's denominator. */
   defined: number;
   gameId: string;
   iconUrl: string;
   id: string;
   name: string;
-  /** The far end of the sitting, which is what the window is measured against. */
+  /** The day's first trophy, which is where `before` is measured. */
   oldestAt: string;
-  /** Lowest global earn rate in the sitting — the one worth the header badge. */
-  rarest: ArchivedTrophy;
-  /** Every trophy in the sitting, newest first. Nothing is hidden. */
+  /** Every trophy of the day for this title, newest first. Nothing is hidden. */
   trophies: ArchivedTrophy[];
 }
 
 interface LogDay {
   count: number;
   date: string;
-  sessions: LogSession[];
+  games: GameDay[];
 }
