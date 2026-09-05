@@ -52,8 +52,21 @@ const Bars = (props: BarsProps) => {
   const tooltip = useTooltip<BarDatum>();
 
   const gutter = Math.min(Math.max(props.width * 0.34, 90), 190);
+
+  /**
+   * The readout column, measured from the readouts themselves.
+   *
+   * ⚠️ This was a fixed 76px, and it is the same mistake the label clip below
+   * already records — a constant sized for one chart's text. `unfinished`
+   * prints "5.4 left · dormant", eighteen characters and about 119px, so every
+   * readout hung back over the end of its own bar. Deriving it means a chart
+   * cannot introduce a longer readout without the track making room for it.
+   */
+  const valueWidth =
+    Math.max(...props.rows.map((row) => row.value.length)) * CHAR_WIDTH;
+
   const trackWidth = Math.max(
-    props.width - gutter - VALUE_WIDTH - PAD - LABEL_INSET,
+    props.width - gutter - valueWidth - LABEL_INSET - VALUE_GAP,
     1,
   );
 
@@ -214,8 +227,15 @@ const MIN_BAR = 2;
 /** Axis line, its labels, and a gap so the scale never touches the panel edge. */
 const AXIS_HEIGHT = 22;
 const AXIS_PAD = 8;
-/** Room kept at the right edge for the readout, plus a gap before the track. */
-const VALUE_WIDTH = 76;
+/**
+ * Clear space between a full-length bar and its readout.
+ *
+ * 📌 Deliberately wider than the character estimate needs. `CHAR_WIDTH` is
+ * 0.6em, which is the font's advance and runs a shade under the real ink on a
+ * string carrying spaces and a `·` — measured, about 2px over nineteen
+ * characters. This gap is what keeps a rounding error from reading as a touch.
+ */
+const VALUE_GAP = 16;
 
 const LABEL_FONT = 11;
 /**
