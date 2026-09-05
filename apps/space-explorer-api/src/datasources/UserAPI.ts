@@ -3,6 +3,8 @@ import { z } from 'zod';
 
 import { prismaClient } from '@/lib';
 
+import { sessionGone } from '@/utils';
+
 const emailSchema = z.string().email();
 
 export class UserAPI extends RESTDataSource {
@@ -87,7 +89,7 @@ export class UserAPI extends RESTDataSource {
     });
 
     if (user === null) {
-      throw new Error('User not found.');
+      throw sessionGone('User not found.');
     }
 
     return user;
@@ -95,7 +97,7 @@ export class UserAPI extends RESTDataSource {
 
   private validateAuth() {
     if (!this.userEmail) {
-      throw new Error('Not authenticated.');
+      throw sessionGone('Not authenticated.');
     }
 
     return this.userEmail;
