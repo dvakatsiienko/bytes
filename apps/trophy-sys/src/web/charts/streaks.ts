@@ -2,25 +2,47 @@ import type { ArchivedTrophy } from '../../shared/types.ts';
 import type { BarChart } from '../components/bar-rows.tsx';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { BAR_TONE } from '../helpers/chart-theme.ts';
-import { dayKey } from '../helpers/stats.ts';
+import { dayKey, gamingDayKey } from '../helpers/stats.ts';
 
-const DAY_MS = 24 * 60 * 60 * 1000;
 /** Runs shown before the list stops being a highlight reel. */
 const LIMIT = 10;
 
 /**
- * Runs of consecutive local days with at least one trophy. A run is still
+ * A `YYYY-MM-DD` key moved by whole calendar days.
+ *
+ * ⚠️ Calendar arithmetic, never a millisecond delta. A day is not always
+ * 86 400 000 ms: a spring-forward makes it 23 hours and a fall-back 25. The old
+ * test demanded exactly 24, so every run crossing a daylight-saving change was
+ * reported as two broken ones — real in this archive on 2025-03-30 → 03-31, and
+ * due again twice a year in every observing zone.
+ *
+ * Noon anchors the step. No zone shifts far enough from midday to cross a date
+ * boundary, the half-hour and 45-minute zones included, so the date components
+ * survive the arithmetic untouched.
+ */
+const dayStep = (key: string, days: number) => {
+  const date = new Date(`${key}T12:00:00`);
+  date.setDate(date.getDate() + days);
+  return dayKey(date);
+};
+
+/**
+ * Runs of consecutive **gaming** days with at least one trophy. A run is still
  * "current" on the day after it last popped, because the day is not over yet —
  * ending it at midnight would report a broken streak every morning.
+ *
+ * 📌 `gamingDayKey`, not `dayKey`: a session running 22:00 → 02:00 is one day
+ * of play, and counting it as two inflated every streak it touched. The same
+ * boundary that groups /log groups these.
  */
 export const trophyStreaks = (trophies: ArchivedTrophy[]): StreakModel => {
   const days = [
-    ...new Set(trophies.map((trophy) => dayKey(new Date(trophy.at)))),
+    ...new Set(trophies.map((trophy) => gamingDayKey(new Date(trophy.at)))),
   ].sort();
 
   const counts = new Map<string, number>();
   for (const trophy of trophies) {
-    const key = dayKey(new Date(trophy.at));
+    const key = gamingDayKey(new Date(trophy.at));
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
 
@@ -32,10 +54,7 @@ export const trophyStreaks = (trophies: ArchivedTrophy[]): StreakModel => {
   let trophyTotal = 0;
 
   for (const day of days) {
-    const isNext =
-      previous !== undefined &&
-      Date.parse(`${day}T00:00:00`) - Date.parse(`${previous}T00:00:00`) ===
-        DAY_MS;
+    const isNext = previous !== undefined && day === dayStep(previous, 1);
 
     if (isNext) {
       length += 1;
@@ -59,8 +78,8 @@ export const trophyStreaks = (trophies: ArchivedTrophy[]): StreakModel => {
   if (start && previous && length)
     runs.push({ days: length, end: previous, start, trophies: trophyTotal });
 
-  const today = dayKey(new Date());
-  const yesterday = dayKey(new Date(Date.now() - DAY_MS));
+  const today = gamingDayKey(new Date());
+  const yesterday = dayStep(today, -1);
   const last = runs.at(-1);
   const current =
     last && (last.end === today || last.end === yesterday) ? last : null;
@@ -112,7 +131,7 @@ export const STREAK_COLUMNS: ChartColumn<Streak>[] = [
 /* Types */
 export interface Streak {
   days: number;
-  /** Local calendar day, `YYYY-MM-DD`. */
+  /** Local gaming day, `YYYY-MM-DD`. */
   end: string;
   start: string;
   trophies: number;
