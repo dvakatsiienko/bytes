@@ -29,9 +29,14 @@ export const Button = (props: ButtonProps) => {
  * disabled" — and had never been wired up. A disabled button was identical to
  * a live one, which matters here: a tile disables itself the moment its trip is
  * booked.
+ *
+ * ⚠️ `grid`, never `inline-grid`. Call sites place this with auto margins —
+ * `mx-auto` on the login form, `ml-auto` on a launch tile — and an auto margin
+ * only aligns a block-level box. As an inline-grid the login button stopped
+ * matching the input above it and collapsed to the left.
  */
 const buttonCn = cva({
-  base: 'inline-grid min-w-56 cursor-pointer place-content-center rounded-lg bg-accent px-8 py-4 font-bold text-lg text-white uppercase tracking-wide transition-colors hover:bg-accent-light focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 active:bg-accent-lighter disabled:cursor-not-allowed disabled:bg-accent-dark',
+  base: 'grid min-w-56 cursor-pointer place-content-center rounded-lg bg-accent px-8 py-4 font-bold text-lg text-white uppercase tracking-wide transition-colors hover:bg-accent-light focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 active:bg-accent-lighter disabled:cursor-not-allowed disabled:bg-accent-dark',
   variants: {
     mini: {
       true: 'min-w-48 px-6 py-3 text-base',
