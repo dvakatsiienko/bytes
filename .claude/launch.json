@@ -35,9 +35,13 @@
     },
     {
       "name": "space-explorer-ui",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "space-explorer-ui", "dev"],
-      "port": 5173
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "PORT=4000 pnpm --filter @space-explorer/api dev & pnpm --filter @space-explorer/ui dev"
+      ],
+      "port": 5173,
+      "url": "http://localhost:5173"
     },
     {
       "name": "trophy-sys",
