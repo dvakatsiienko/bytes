@@ -1,4 +1,5 @@
 import type { TrophyGrade } from '../../shared/types.ts';
+import { dayKey } from './stats.ts';
 
 export const GRADE_COLOR: Record<TrophyGrade, string> = {
   bronze: 'text-bronze',
@@ -14,10 +15,21 @@ export const GRADE_MARK: Record<TrophyGrade, string> = {
   silver: '●',
 };
 
-export const dateFormat = (iso: string | null) => {
-  if (!iso) return '—';
-  return new Date(iso).toISOString().slice(0, 10).replace(/-/g, '.');
-};
+/**
+ * An instant as `YYYY.MM.DD`, on the local calendar.
+ *
+ * 📌 Local getters, never `toISOString()`: that formats in UTC, so a trophy
+ * earned at 23:40 in any zone ahead of Greenwich printed as the next day.
+ * `dayKey` already answers "which local day is this", so this is that answer
+ * with the separator swapped.
+ *
+ * ⚠️ It takes an **instant**, never a bare `YYYY-MM-DD`. A plain date string
+ * parses as UTC midnight, which is the previous day everywhere west of
+ * Greenwich — a caller already holding a day key must print it directly rather
+ * than send it back through a Date.
+ */
+export const dateFormat = (iso: string | null) =>
+  iso ? dayKey(new Date(iso)).replace(/-/g, '.') : '—';
 
 /**
  * Shown wherever playtimeFormat returns its dash, so the gap reads as a known
