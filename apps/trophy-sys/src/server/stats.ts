@@ -103,6 +103,24 @@ const rowsBuild = (game: Game, set: TrophySet) => {
 type TrophyRows = ReturnType<typeof rowsBuild>;
 
 /**
+ * How the payload in hand was produced — `none` served as stored, `inline`
+ * refreshed before answering, `background` answered stale with the refresh
+ * still running.
+ *
+ * 📌 It exists to settle one question a deploy cannot be reasoned into: whether
+ * this platform hands the function a request context, and therefore whether the
+ * background path ever engages. `/api/stats` prints it as `x-archive-refresh`,
+ * so one curl answers it. It describes the payload, not the HTTP request — a
+ * 60s cache hit reports how the body it is serving was built.
+ */
+export type ArchiveRefresh = 'none' | 'inline' | 'background';
+
+export interface ArchiveRead {
+  archive: TrophyArchive;
+  refresh: ArchiveRefresh;
+}
+
+/**
  * What every read of the archive gets: what is stored, brought up to date
  * cheaply.
  *
@@ -111,18 +129,21 @@ type TrophyRows = ReturnType<typeof rowsBuild>;
  * seconds and was missing from /log for days. The delta closes that gap
  * without paying for the full fan-out.
  */
-export const statsFetch = async (): Promise<TrophyArchive> => {
+export const statsFetch = async (): Promise<ArchiveRead> => {
   const stored = await statsLoad();
   const archive = stored?.version === ARCHIVE_VERSION ? stored : EMPTY;
 
   // No refresh while a full scan is mid-flight: that scan is about to replace
   // every row, and its answer has to be the one kept.
-  if (scanInFlight) return archive;
+  if (scanInFlight) return { archive, refresh: 'none' };
 
   // A read serves the archive even when PSN does not answer. Failing the whole
   // route because the cheap refresh could not run would make /log worse than it
   // was before the refresh existed.
-  return deltaSync(archive).catch(() => archive);
+  return deltaSync(archive).catch(() => ({
+    archive,
+    refresh: 'none' as const,
+  }));
 };
 
 /**
@@ -139,7 +160,7 @@ export const statsFetch = async (): Promise<TrophyArchive> => {
  * (`2026-09-04T21:24:30Z`) and `syncedAt` carries milliseconds, so within the
  * same second the shorter string sorts *after* the longer one.
  */
-const deltaRun = async (archive: TrophyArchive): Promise<TrophyArchive> => {
+const deltaRun = async (archive: TrophyArchive): Promise<ArchiveRead> => {
   const library = await cached('games:800', () => gamesFetch(800));
 
   /**
@@ -170,7 +191,7 @@ const deltaRun = async (archive: TrophyArchive): Promise<TrophyArchive> => {
     return earnedCount(game) !== (storedRows.get(game.id) ?? 0);
   });
 
-  if (drifted.length === 0) return archive;
+  if (drifted.length === 0) return { archive, refresh: 'none' };
 
   /**
    * A handful of titles is worth waiting for; a rebuild is not. Past the
@@ -186,10 +207,13 @@ const deltaRun = async (archive: TrophyArchive): Promise<TrophyArchive> => {
 
   if (keep) {
     keep(deltaApply(archive, drifted));
-    return archive;
+    return { archive, refresh: 'background' };
   }
 
-  return deltaApply(archive, drifted);
+  return {
+    archive: await deltaApply(archive, drifted),
+    refresh: 'inline',
+  };
 };
 
 /** Re-reads the given titles and merges them into the archive. */
@@ -297,9 +321,9 @@ const backgroundKeep = (): BackgroundKeep | null => {
  * dedupe concurrent misses, so two simultaneous reads of a cold key would both
  * fan out and the loser's archive would overwrite the winner's.
  */
-let deltaInFlight: Promise<TrophyArchive> | null = null;
+let deltaInFlight: Promise<ArchiveRead> | null = null;
 
-const deltaSync = (archive: TrophyArchive): Promise<TrophyArchive> => {
+const deltaSync = (archive: TrophyArchive): Promise<ArchiveRead> => {
   deltaInFlight ??= deltaRun(archive).finally(() => {
     deltaInFlight = null;
   });

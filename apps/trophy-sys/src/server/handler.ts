@@ -11,8 +11,11 @@ const requestHandle = async (req: IncomingMessage, res: ServerResponse) => {
   res.setHeader('content-type', 'application/json');
 
   try {
-    const { status, body } = await routeResolve(url, req.method ?? 'GET');
-    res.writeHead(status).end(JSON.stringify(body));
+    const { status, body, headers } = await routeResolve(
+      url,
+      req.method ?? 'GET',
+    );
+    res.writeHead(status, headers).end(JSON.stringify(body));
   } catch (error) {
     res.writeHead(500).end(
       JSON.stringify({

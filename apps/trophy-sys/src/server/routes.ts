@@ -28,6 +28,8 @@ const limitParse = (raw: string | null) => {
 
 export interface RouteResult {
   body: unknown;
+  /** Extra response headers, lower-cased. Most routes need none. */
+  headers?: Record<string, string>;
   status: number;
 }
 
@@ -48,7 +50,17 @@ export const routeResolve = async (
     return ok(await cached(`games:${limit}`, () => gamesFetch(limit)));
   }
 
-  if (path === '/api/stats') return ok(await cached('stats', statsFetch));
+  if (path === '/api/stats') {
+    // The archive refreshes itself on read, and `x-archive-refresh` says which
+    // way it went — the one thing about this route that cannot be established
+    // without a live deploy. See `ArchiveRefresh`.
+    const read = await cached('stats', statsFetch);
+    return {
+      body: read.archive,
+      headers: { 'x-archive-refresh': read.refresh },
+      status: 200,
+    };
+  }
 
   if (path === '/api/stats/sync' && method === 'POST') {
     if (!isStateWritable) {

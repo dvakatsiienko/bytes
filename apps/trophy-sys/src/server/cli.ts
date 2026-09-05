@@ -10,7 +10,7 @@ const commands: Record<string, () => Promise<unknown>> = {
   news: () => newsFetch({ commit: false }),
   profile: profileFetch,
   snapshot: () => newsFetch({ commit: true }),
-  stats: statsFetch,
+  stats: async () => (await statsFetch()).archive,
   // The scan's result is the operation, not the payload — `stats` prints rows.
   'stats-sync': async () => {
     const archive = await statsSync();
