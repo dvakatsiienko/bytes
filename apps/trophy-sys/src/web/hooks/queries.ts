@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import type {
   Game,
@@ -69,16 +69,3 @@ export const useStats = () =>
     queryFn: () => apiGet<TrophyArchive>('/stats'),
     queryKey: ['stats'],
   });
-
-/**
- * Runs the ~79-title fan-out. A button and never a side effect of reading the
- * charts, for the same reason the snapshot is: it costs two PSN calls a title.
- */
-export const useStatsSync = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: () => apiCall<TrophyArchive>('/stats/sync', 'POST'),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stats'] }),
-  });
-};

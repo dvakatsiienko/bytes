@@ -13,6 +13,31 @@ import { isAutoWriteSafe, statsLoad, statsSave } from './state.ts';
 const LANES = 5;
 
 /**
+ * Reads `items` through a worker pool, LANES wide.
+ *
+ * A worker pool, not chunks: chunking stalls on the slowest title in each batch
+ * of five, this keeps all five lanes busy until the list runs out. Both the
+ * full scan and the refresh run through it, so neither can open ~216 PSN calls
+ * at once by growing past what the other was sized for.
+ */
+const pooled = async <T>(items: T[], work: (item: T) => Promise<void>) => {
+  let cursor = 0;
+
+  const lane = async () => {
+    while (cursor < items.length) {
+      const item = items[cursor];
+      cursor += 1;
+      if (item === undefined) return;
+
+      // biome-ignore lint/performance/noAwaitInLoops: the sequencing is the rate limit
+      await work(item);
+    }
+  };
+
+  await Promise.all(Array.from({ length: LANES }, lane));
+};
+
+/**
  * Bumped whenever the stored shape changes in a way that makes an old archive
  * actively wrong. Purely additive optional fields do not qualify — `detail` and
  * `iconUrl` arrived without a bump, because an archive lacking them still draws
@@ -75,6 +100,8 @@ const rowsBuild = (game: Game, set: TrophySet) => {
   return { remaining, trophies };
 };
 
+type TrophyRows = ReturnType<typeof rowsBuild>;
+
 /**
  * What every read of the archive gets: what is stored, brought up to date
  * cheaply.
@@ -88,9 +115,9 @@ export const statsFetch = async (): Promise<TrophyArchive> => {
   const stored = await statsLoad();
   const archive = stored?.version === ARCHIVE_VERSION ? stored : EMPTY;
 
-  // No archive to update, and no delta while a full scan is mid-flight: that
-  // scan is about to replace every row, and its answer has to be the one kept.
-  if (!archive.syncedAt || scanInFlight) return archive;
+  // No refresh while a full scan is mid-flight: that scan is about to replace
+  // every row, and its answer has to be the one kept.
+  if (scanInFlight) return archive;
 
   // A read serves the archive even when PSN does not answer. Failing the whole
   // route because the cheap refresh could not run would make /log worse than it
@@ -113,10 +140,16 @@ export const statsFetch = async (): Promise<TrophyArchive> => {
  * same second the shorter string sorts *after* the longer one.
  */
 const deltaRun = async (archive: TrophyArchive): Promise<TrophyArchive> => {
-  if (!archive.syncedAt) return archive;
-
   const library = await cached('games:800', () => gamesFetch(800));
-  const writtenAt = Date.parse(archive.syncedAt);
+
+  /**
+   * An archive that is missing, empty, or version-mismatched arrives here as
+   * EMPTY — no stamp and no rows — so every played title reads as drifted and
+   * this same path performs the full rebuild. That is the whole reason there is
+   * no button any more: the rebuild is not a separate operation, it is the
+   * refresh with nothing to compare against.
+   */
+  const writtenAt = archive.syncedAt ? Date.parse(archive.syncedAt) : 0;
 
   const storedRows = new Map<string, number>();
   for (const trophy of archive.trophies)
@@ -137,23 +170,48 @@ const deltaRun = async (archive: TrophyArchive): Promise<TrophyArchive> => {
     return earnedCount(game) !== (storedRows.get(game.id) ?? 0);
   });
 
-  // Past the cap this is not an evening of play, it is an archive that wants a
-  // real rebuild — and a fan-out on a page read is the exact cost being avoided
-  // here. The sync button still does the whole job.
-  if (drifted.length === 0 || drifted.length > DELTA_MAX) return archive;
+  if (drifted.length === 0) return archive;
 
-  const refreshed = await Promise.all(
-    drifted.map(async (game) => {
-      try {
-        return { game, rows: rowsBuild(game, await trophiesFetch(game)) };
-      } catch {
-        // A title that fails keeps the rows it already has and is retried on
-        // the next read. Recording it in `failed` would leave a stale error
-        // sitting in the archive long after the title answered again.
-        return null;
-      }
-    }),
-  );
+  /**
+   * A handful of titles is worth waiting for; a rebuild is not. Past the
+   * threshold the stored archive is served straight away and the refetch
+   * finishes after the response, so the next read is whole.
+   *
+   * ⚠️ Only when the platform will actually keep this instance alive — see
+   * `backgroundKeep`. A fan-out fired into a void that never runs it is killed
+   * mid-flight, leaving the archive unwritten and every later read starting it
+   * over, so with no hook available the work is awaited instead.
+   */
+  const keep = drifted.length > INLINE_MAX ? backgroundKeep() : null;
+
+  if (keep) {
+    keep(deltaApply(archive, drifted));
+    return archive;
+  }
+
+  return deltaApply(archive, drifted);
+};
+
+/** Re-reads the given titles and merges them into the archive. */
+const deltaApply = async (
+  archive: TrophyArchive,
+  drifted: Game[],
+): Promise<TrophyArchive> => {
+  const refreshed: ({ game: Game; rows: TrophyRows } | null)[] = [];
+
+  await pooled(drifted, async (game) => {
+    try {
+      refreshed.push({
+        game,
+        rows: rowsBuild(game, await trophiesFetch(game)),
+      });
+    } catch {
+      // A title that fails keeps the rows it already has and is retried on the
+      // next read. Recording it in `failed` would leave a stale error sitting
+      // in the archive long after the title answered again.
+      refreshed.push(null);
+    }
+  });
 
   // The shrink guard: a title only gives up its stored rows to rows that
   // actually arrived. PSN answering with an empty set for a title its own
@@ -201,11 +259,38 @@ const deltaRun = async (archive: TrophyArchive): Promise<TrophyArchive> => {
   return merged;
 };
 
+/** How many titles one request will wait for before answering stale instead. */
+const INLINE_MAX = 5;
+
 /**
- * More titles than one evening can touch. Past this the drift is staleness, not
- * news, and the full scan is the honest answer.
+ * The platform's "keep this instance alive past the response" hook, or null
+ * when there is nobody to ask — a local run, the CLI, a test.
+ *
+ * ⚠️ Read straight off the request context rather than through
+ * `@vercel/functions`. Two reasons, both measured. Its `waitUntil` is
+ * `getContext().waitUntil?.(promise)` — these same three lines — and that
+ * optional call is the hazard: with no context it returns `undefined` and
+ * registers nothing, so abandoned work is indistinguishable from scheduled
+ * work. Importing it also took the function bundle from 180kb to 359kb for
+ * those three lines, because the package re-exports its whole surface through
+ * getters that defeat tree-shaking. Returning null makes the absence something
+ * the caller has to decide about.
  */
-const DELTA_MAX = 5;
+const REQUEST_CONTEXT = Symbol.for('@vercel/request-context');
+
+type BackgroundKeep = (task: Promise<unknown>) => void;
+
+const backgroundKeep = (): BackgroundKeep | null => {
+  const host = globalThis as Record<
+    symbol,
+    { get?: () => unknown } | undefined
+  >;
+  const context = host[REQUEST_CONTEXT]?.get?.() as
+    | { waitUntil?: BackgroundKeep }
+    | undefined;
+
+  return typeof context?.waitUntil === 'function' ? context.waitUntil : null;
+};
 
 /**
  * One delta at a time, for the same reason the scan has one: `cached` does not
@@ -235,33 +320,20 @@ const scanRun = async (): Promise<TrophyArchive> => {
   const trophies: ArchivedTrophy[] = [];
   const remaining: RemainingTrophy[] = [];
   const failed: string[] = [];
-  let cursor = 0;
 
-  const lane = async () => {
-    while (cursor < games.length) {
-      const game = games[cursor];
-      cursor += 1;
-      if (!game) return;
-
-      try {
-        // Promise.all over the library would open ~216 PSN calls at once.
-        // biome-ignore lint/performance/noAwaitInLoops: the sequencing is the rate limit
-        const rows = rowsBuild(game, await trophiesFetch(game));
-        trophies.push(...rows.trophies);
-        remaining.push(...rows.remaining);
-      } catch (error) {
-        // The reason travels with the id: a run that lost 14 titles used to
-        // report 14 ids and nothing about why, so diagnosing meant re-running
-        // the whole fan-out.
-        const reason = error instanceof Error ? error.message : String(error);
-        failed.push(`${game.id}: ${reason}`);
-      }
+  await pooled(games, async (game) => {
+    try {
+      const rows = rowsBuild(game, await trophiesFetch(game));
+      trophies.push(...rows.trophies);
+      remaining.push(...rows.remaining);
+    } catch (error) {
+      // The reason travels with the id: a run that lost 14 titles used to
+      // report 14 ids and nothing about why, so diagnosing meant re-running
+      // the whole fan-out.
+      const reason = error instanceof Error ? error.message : String(error);
+      failed.push(`${game.id}: ${reason}`);
     }
-  };
-
-  // A worker pool, not chunks: chunking stalls on the slowest title in each
-  // batch of five, this keeps all five lanes busy until the library runs out.
-  await Promise.all(Array.from({ length: LANES }, lane));
+  });
 
   // Overwriting a good archive with nothing is the one unrecoverable outcome
   // here, so a run that read no trophies at all fails instead of saving.

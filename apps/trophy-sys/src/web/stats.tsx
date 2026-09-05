@@ -68,13 +68,12 @@ import { EffortLegend } from './components/chart-legend.tsx';
 import { KpiStrip } from './components/kpi-strip.tsx';
 import { SegmentedControl } from './components/segmented-control.tsx';
 import { hoursFormat } from './helpers/format.ts';
-import { useGames, useStats, useStatsSync } from './hooks/queries.ts';
+import { useGames, useStats } from './hooks/queries.ts';
 
 export const Stats = () => {
   const navigate = useNavigate();
   const games = useGames();
   const stats = useStats();
-  const sync = useStatsSync();
 
   const [focusMonth, setFocusMonth] = useState<string | null>(null);
   const [focusDay, setFocusDay] = useState<string | null>(null);
@@ -164,8 +163,8 @@ export const Stats = () => {
     if (needsArchive && !archive?.syncedAt)
       return (
         <Note>
-          no trophy archive yet. run the scan above — it reads every title you
-          have earned in, once, and stores the result.
+          building the trophy archive — it reads every title you have earned in,
+          once. reload in a moment.
         </Note>
       );
 
@@ -438,17 +437,7 @@ export const Stats = () => {
     <MotionConfig reducedMotion='user'>
       <main className='flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto'>
         <div className='flex flex-wrap items-center gap-3'>
-          <button
-            className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-orange hover:text-orange disabled:cursor-wait disabled:opacity-50'
-            disabled={sync.isPending}
-            onClick={() => sync.mutate()}
-            type='button'>
-            {sync.isPending ? 'scanning…' : 'rescan trophies'}
-          </button>
-
-          <span className='text-[12px] text-dim'>
-            {archiveStatus(archive, sync.error)}
-          </span>
+          <span className='text-[12px] text-dim'>{archiveStatus(archive)}</span>
 
           {focusMonth && (
             <button
@@ -493,14 +482,10 @@ const Note = (props: { children: ReactNode }) => (
   </p>
 );
 
-const archiveStatus = (
-  archive: TrophyArchive | undefined,
-  error: Error | null,
-) => {
-  if (error) return `scan failed · ${error.message}`;
-  if (!archive?.syncedAt) return 'archive empty — most charts need a scan';
+const archiveStatus = (archive: TrophyArchive | undefined) => {
+  if (!archive?.syncedAt) return 'building the archive — reload in a moment';
 
-  return `${archive.trophies.length} trophies from ${archive.games} titles · scanned ${archive.syncedAt.slice(0, 10)}`;
+  return `${archive.trophies.length} trophies from ${archive.games} titles · fresh as of ${archive.syncedAt.slice(0, 10)}`;
 };
 
 const streakNote = (current: number) =>

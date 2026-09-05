@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm build",
-  "ignoreCommand": "npx turbo-ignore trophy-sys"
+  "ignoreCommand": "npx turbo-ignore trophy-sys",
+  "crons": [{ "path": "/api/stats", "schedule": "0 4 * * *" }]
 }
