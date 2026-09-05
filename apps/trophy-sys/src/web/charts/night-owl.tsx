@@ -6,7 +6,7 @@ import { motion } from 'motion/react';
 import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
-import { CHART_INK } from '../helpers/chart-theme.ts';
+import { CHART_INK, GRID_CELL, GRID_STEP } from '../helpers/chart-theme.ts';
 import { gameLookup } from '../helpers/stats.ts';
 
 /** Rows in the grid — the busiest titles, and nothing else. */
@@ -100,14 +100,25 @@ const Grid = (props: GridProps) => {
     return { left: cell.right - wrap.left, top: cell.top - wrap.top };
   };
 
-  // The row step comes from the height the panel actually gave, the same way
-  // the bar charts do it — a fixed 13px was taller than this column's share, so
-  // the grid was being clipped away by the panel's own overflow.
+  /**
+   * The row step still comes from the height the panel actually gave — a fixed
+   * step was taller than this column's share and the grid got clipped away by
+   * the panel's own overflow.
+   *
+   * 📌 What changed: it rounds DOWN to a whole pixel and stops at the shared
+   * `GRID_STEP`. So this grid draws the same square as the activity heatmap
+   * whenever the panel affords the room, and when it cannot it gives up whole
+   * pixels rather than landing on 12.66 — which read as a different-sized,
+   * blurrier cell one panel away from a crisp 11px one.
+   */
   const step = Math.min(
-    Math.max((props.height - LABEL_HEIGHT - 4) / props.grid.rows.length, 9),
-    STEP_MAX,
+    Math.max(
+      Math.floor((props.height - LABEL_HEIGHT - 4) / props.grid.rows.length),
+      9,
+    ),
+    GRID_STEP,
   );
-  const cell = Math.max(step - 2, 6);
+  const cell = Math.max(step - (GRID_STEP - GRID_CELL), 6);
   const gridWidth = 24 * step;
   // Everything the grid does not need belongs to the names.
   const gutter = Math.max(props.width - gridWidth - EDGE_PAD, GUTTER_MIN);
@@ -228,8 +239,6 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 const peakHour = (row: NightOwlRow) =>
   row.hours.indexOf(Math.max(...row.hours));
 
-/** The grid never grows past this per row, however tall the panel gets. */
-const STEP_MAX = 16;
 const LABEL_HEIGHT = 12;
 
 const LABEL_FONT = 11;

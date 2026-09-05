@@ -82,6 +82,23 @@ export const EFFORT_SERIES = [
 export const seriesColor = (hasPlatinum: boolean) =>
   hasPlatinum ? EFFORT_SERIES[0].color : EFFORT_SERIES[1].color;
 
+/**
+ * One square, one pitch, for every cell grid on the route.
+ *
+ * 📌 The activity heatmap and the night-owl grid sit one panel apart and read
+ * as the same object, so a reader compares them — and they were 11px against a
+ * derived 12.66px, which looks like a mistake because it is one. The pitch is
+ * the cell plus a one-pixel gutter each side.
+ *
+ * ⚠️ Whole pixels, always. A grid that sizes itself from its container lands on
+ * fractions like 12.66, and a fractional square draws its edges across two
+ * device pixels — the reason the two grids looked differently *sharp* as well
+ * as differently sized. Anything deriving a step from available space rounds
+ * down to an integer and caps here.
+ */
+export const GRID_CELL = 11;
+export const GRID_STEP = GRID_CELL + 2;
+
 /** Shared by every axis on the route, so the tick ink never drifts apart. */
 export const AXIS_LABEL = {
   fill: CHART_INK.axis,

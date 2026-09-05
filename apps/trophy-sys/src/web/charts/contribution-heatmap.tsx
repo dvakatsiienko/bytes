@@ -5,7 +5,7 @@ import { motion } from 'motion/react';
 import type { ArchivedTrophy, Game, TrophyGrade } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
-import { CHART_INK } from '../helpers/chart-theme.ts';
+import { CHART_INK, GRID_CELL, GRID_STEP } from '../helpers/chart-theme.ts';
 import { GRADE_ORDER, dayKey, gameLookup } from '../helpers/stats.ts';
 
 /** A year of columns — enough to hold a whole season's shape on one screen. */
@@ -88,7 +88,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
   /**
    * The grid scales to fill its row, so an SVG coordinate is no longer a screen
    * pixel — the tooltip has to be anchored off the cell's real rect instead of
-   * off `weekIndex * STEP`, or it drifts further with every column.
+   * off `weekIndex * GRID_STEP`, or it drifts further with every column.
    */
   const anchorAt = (event: ReactMouseEvent<SVGRectElement>) => {
     const wrap = wrapRef.current?.getBoundingClientRect();
@@ -97,10 +97,10 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
     return { left: cell.right - wrap.left, top: cell.top - wrap.top };
   };
 
-  const gridWidth = props.model.columns.length * STEP;
+  const gridWidth = props.model.columns.length * GRID_STEP;
   const marginX = LABEL_INSET + gridWidth + 18;
   const width = marginX + MARGIN_WIDTH + 30 + LABEL_INSET;
-  const height = 7 * STEP + 26;
+  const height = 7 * GRID_STEP + 26;
   const peak = Math.max(
     ...props.model.weekdays.map((weekday) => weekday.count),
     1,
@@ -121,7 +121,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
           className='cursor-pointer'
           fill={cell.count ? CHART_INK.ring : CHART_INK.grid}
           fillOpacity={cell.count ? shadeOf(cell.count) : 0.25}
-          height={CELL}
+          height={GRID_CELL}
           initial={{ opacity: 0 }}
           key={cell.date}
           onClick={() => props.onSelect(cell.date)}
@@ -139,9 +139,9 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
           stroke={isPicked ? CHART_INK.pick : undefined}
           strokeWidth={isPicked ? 1.5 : undefined}
           transition={{ delay: weekIndex * 0.004, duration: 0.25 }}
-          width={CELL}
-          x={LABEL_INSET + weekIndex * STEP}
-          y={cell.weekday * STEP + LABEL_HEIGHT}
+          width={GRID_CELL}
+          x={LABEL_INSET + weekIndex * GRID_STEP}
+          y={cell.weekday * GRID_STEP + LABEL_HEIGHT}
         />
       );
     }),
@@ -160,7 +160,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
         fill={CHART_INK.axis}
         fontSize={11}
         key={first.date}
-        x={weekIndex * STEP + LABEL_INSET}
+        x={weekIndex * GRID_STEP + LABEL_INSET}
         y={8}>
         {MONTHS[date.getMonth()]}
       </text>,
@@ -174,20 +174,20 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
           animate={{ scaleX: 1 }}
           fill={CHART_INK.ring}
           fillOpacity={0.6}
-          height={CELL}
+          height={GRID_CELL}
           initial={{ scaleX: 0 }}
           style={{ transformBox: 'fill-box', transformOrigin: 'left' }}
           transition={{ delay: 0.25 + index * 0.03, duration: 0.35 }}
           width={Math.max((weekday.count / peak) * MARGIN_WIDTH, 1)}
           x={marginX}
-          y={index * STEP + LABEL_HEIGHT}
+          y={index * GRID_STEP + LABEL_HEIGHT}
         />
         <text
           dominantBaseline='middle'
           fill={CHART_INK.axis}
           fontSize={11}
           x={marginX + MARGIN_WIDTH + 4}
-          y={index * STEP + LABEL_HEIGHT + CELL / 2}>
+          y={index * GRID_STEP + LABEL_HEIGHT + GRID_CELL / 2}>
           {weekday.label}
         </text>
       </g>
@@ -195,18 +195,21 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
   });
 
   return (
-    <div className='relative w-full py-2' ref={wrapRef}>
+    <div className='relative w-full overflow-x-auto py-2' ref={wrapRef}>
       {/* aria-label rather than <title>: a <title> child is what browsers
           render as their own native tooltip on hover. */}
-      {/* viewBox rather than a pixel width: the panel spans the full row now,
-          and a fixed 725px grid left half of it empty. */}
+      {/* Real pixels, no viewBox. A viewBox once filled a full-row panel, but
+          this grid moved into a half-row column and the same rule then *shrank*
+          it — 799 units squeezed into 686px drew every 11px cell at 9.44px,
+          one panel away from the night owl's crisp 11px. A year of days has an
+          honest width; when the column is narrower than that it scrolls, which
+          is what the wrapper is for. */}
       <svg
         aria-label='Trophies earned per day over the last year, plus a weekday total for each row'
-        className='block w-full'
-        preserveAspectRatio='xMidYMid meet'
+        className='block'
+        height={height}
         role='img'
-        style={{ aspectRatio: `${width} / ${height}` }}
-        viewBox={`0 0 ${width} ${height}`}>
+        width={width}>
         {monthListJSX}
         {cellListJSX}
         {marginListJSX}
@@ -229,8 +232,6 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
 };
 
 /* Helpers */
-const CELL = 11;
-const STEP = 13;
 const LABEL_HEIGHT = 12;
 const MARGIN_WIDTH = 46;
 /** Matches bar-rows and night owl: one inset for every label column. */
