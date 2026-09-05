@@ -98,11 +98,21 @@ export const LaunchTile = (props: LaunchTileProps) => {
 };
 
 /* Styles */
+/**
+ * A floor, not a fixed height.
+ *
+ * ⚠️ `h-48` was a hard height, and a mission name is not a fixed length — a
+ * two-line title pushed the button out through the bottom of its own tile.
+ * Eight of the ten tiles on the first page did it. The bigger button made it
+ * obvious rather than causing it: at the old size the same tiles still spilled,
+ * by sixteen pixels instead of forty. A minimum keeps every tile the same size
+ * when the titles are short and lets the long ones grow.
+ */
 const launchTileCn = cva({
-  base: 'my-4 not-last:mb-8 flex h-48 flex-col justify-between rounded-md bg-center bg-cover px-10 pt-8 pb-4 text-white',
+  base: 'my-4 not-last:mb-8 flex min-h-48 flex-col justify-between gap-4 rounded-md bg-center bg-cover px-10 pt-8 pb-6 text-white',
   variants: {
     isDetailed: {
-      true: 'h-92',
+      true: 'min-h-92',
     },
   },
 });
