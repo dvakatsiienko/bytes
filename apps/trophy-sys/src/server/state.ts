@@ -41,6 +41,24 @@ export const stateBackend = redis ? 'kv' : 'file';
 export const isStateWritable = stateBackend === 'kv' || !process.env.VERCEL;
 
 /**
+ * Whether a write **nobody asked for** may persist.
+ *
+ * ⚠️ `/api/stats` refreshes the archive as a side effect of being read, and a
+ * dev machine loads `.env.local`, whose KV credentials point at the *shared
+ * production* store. Without this guard, opening the page on localhost rewrites
+ * production — measured 2026-09-05, when a local `pnpm dev` moved the live
+ * archive from 2122 rows to 2126 with nobody pressing anything.
+ *
+ * True only when the process and the store belong together: Vercel writing KV,
+ * or a local run writing its own file. Explicit writes — the sync button, the
+ * snapshot — still go wherever the credentials point, because that is the thing
+ * they were asked to do.
+ */
+export const isAutoWriteSafe = process.env.VERCEL
+  ? stateBackend === 'kv'
+  : stateBackend === 'file';
+
+/**
  * The baseline used to be a bare array of earned trophy ids per game. Entries
  * in that shape are widened here, with an empty version so the first read after
  * the upgrade reports no drift rather than flagging every game at once.
