@@ -1,83 +1,82 @@
 import { RESTDataSource } from '@apollo/datasource-rest';
 
-import { LaunchModel } from './LaunchModel';
-import type { Launch, Launchpad, Rocket } from './types';
+import { LaunchModel, rocketFamilies } from './LaunchModel';
+import type { GatewayLaunch, GatewayRocket } from './types';
 
+/**
+ * Reads the Pipeworx gateway.
+ *
+ * ⚠️ `api.spacexdata.com` answers 525 and is not coming back — `r-spacex/SpaceX-API`
+ * was archived in June 2026 and its origin TLS is dead. This gateway rebuilds
+ * the same datasets from Launch Library 2 and space-track.org, synced four times
+ * a day, so the data is current rather than frozen.
+ *
+ * 📌 Two calls serve the whole app, and that is the shape to keep. The gateway
+ * offers no per-launch route and no launchpads route, so everything is derived
+ * from one launch list joined to one rocket list. `RESTDataSource` memoizes GETs
+ * per request, so a query touching a hundred launches still makes two.
+ */
 export class SpaceXAPI extends RESTDataSource {
   constructor() {
     super();
 
-    this.baseURL = 'https://api.spacexdata.com';
+    this.baseURL = 'https://gateway.pipeworx.io/spacex/';
   }
 
+  /**
+   * Every launch the gateway holds — its rolling window of recent flights plus
+   * the next scheduled one, about a hundred rows.
+   *
+   * Sorted ascending by date and numbered from there, because the gateway has
+   * no flight number and `Query.launches` paginates on one: the cursor is the
+   * last item's `flightNumber`, so it has to rise with time and stay stable
+   * between requests.
+   */
   async getLaunches() {
-    const launches = await this.get<Launch[]>('/v5/launches');
-
-    const { rockets, launchpads } = await this.collectLaunchData(launches);
-
-    // skip any launch that can't be fully resolved rather than throwing the
-    // whole page — one launch with a missing rocket/launchpad must not null the
-    // entire non-null `LaunchesPayload!` for every client
-    const models = launches.flatMap((launch) => {
-      try {
-        return [new LaunchModel(launch, rockets, launchpads)];
-      } catch {
-        return [];
-      }
-    });
-
-    // sort ascending by flightNumber so value-based cursor pagination is exact
-    // and hasMore's "last element" is genuinely the highest flight number
-    return models.sort((a, b) => a.flightNumber - b.flightNumber);
-  }
-
-  async getLaunch(id: string) {
-    const launch = await this.get<Launch>(`/v5/launches/${id}`);
-
-    const { rockets, launchpads } = await this.collectLaunchData([launch]);
-
-    const launchModel = new LaunchModel(launch, rockets, launchpads);
-
-    return launchModel;
-  }
-
-  async collectLaunchData(launches: Launch[]) {
-    // fetch resiliently: a single failed rocket/launchpad lookup must not reject
-    // the whole batch. A launch whose data is missing here simply won't match in
-    // LaunchModel — getLaunches skips it, getLaunch (single) still throws.
-    const [rockets, launchpads] = await Promise.all([
-      settled(
-        launches.map((launch) =>
-          this.get<Rocket>(`/v4/rockets/${launch.rocket}`),
-        ),
-      ),
-      settled(
-        launches.map((launch) =>
-          this.get<Launchpad>(`/v4/launchpads/${launch.launchpad}`),
-        ),
-      ),
+    const [launches, rockets] = await Promise.all([
+      this.get<GatewayLaunch[]>('v4/launches'),
+      this.get<GatewayRocket[]>('v4/rockets'),
     ]);
 
-    return { launchpads, rockets };
+    const families = rocketFamilies(rockets);
+
+    return [...launches]
+      .sort((a, b) => Date.parse(a.date_utc) - Date.parse(b.date_utc))
+      .map((launch, index) => new LaunchModel(launch, index + 1, families));
   }
 
-  // strict by default (bookTrips relies on a bogus id throwing to block the write);
-  // allowMissing drops unresolvable ids so trip history survives one dead launch
-  getLaunchesByIds(ids: string[], allowMissing = false) {
-    if (!allowMissing) {
-      return Promise.all(ids.map((id) => this.getLaunch(id)));
-    }
+  /**
+   * One launch by its derived id.
+   *
+   * The gateway has no per-launch route, so this reads the list and finds the
+   * row. It throws when the id resolves to nothing, which is load-bearing:
+   * `bookTrips` relies on a bogus id rejecting to block the write.
+   */
+  async getLaunch(id: string) {
+    const launches = await this.getLaunches();
+    const launch = launches.find((candidate) => candidate.id === id);
 
-    return settled(ids.map((id) => this.getLaunch(id)));
+    if (!launch) throw new Error(`Launch ${id} was not found!`);
+
+    return launch;
   }
-}
 
-async function settled<T>(promises: Promise<T>[]) {
-  const results = await Promise.allSettled(promises);
+  /**
+   * Strict by default so a bad id still blocks a booking; `allowMissing` drops
+   * what it cannot resolve so trip history survives a launch ageing out of the
+   * gateway's window.
+   */
+  async getLaunchesByIds(ids: string[], allowMissing = false) {
+    const launches = await this.getLaunches();
+    const byId = new Map(launches.map((launch) => [launch.id, launch]));
 
-  return results
-    .filter((result): result is PromiseFulfilledResult<Awaited<T>> => {
-      return result.status === 'fulfilled';
-    })
-    .map((result) => result.value);
+    return ids.flatMap((id) => {
+      const launch = byId.get(id);
+
+      if (launch) return [launch];
+      if (allowMissing) return [];
+
+      throw new Error(`Launch ${id} was not found!`);
+    });
+  }
 }
