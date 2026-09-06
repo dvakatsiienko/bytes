@@ -4,15 +4,20 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  redirect,
   useNavigate,
   useParams,
 } from '@tanstack/react-router';
 
+import { BenchNav } from '@/frame/bench-nav';
 import { TicketStrip } from '@/frame/ticket-strip';
 import { VariantBar } from '@/frame/variant-bar';
 
 const Shell = () => {
-  if (!proto) {
+  const params = useParams({ strict: false });
+  const shown = params.lane ? benchModules[params.lane] : proto;
+
+  if (!shown) {
     return (
       <p className='p-10 font-mono text-muted-foreground text-sm'>
         no live proto — run pnpm proto-new &lt;topic&gt;
@@ -22,6 +27,7 @@ const Shell = () => {
 
   return (
     <div className='min-h-screen'>
+      {laneList.length > 0 ? <BenchNav laneList={laneList} /> : null}
       <header className='border-b bg-card/60 backdrop-blur'>
         <div className='mx-auto flex max-w-5xl flex-wrap items-end justify-between gap-4 px-6 py-5'>
           <div>
@@ -38,11 +44,11 @@ const Shell = () => {
               answering
             </p>
             <p className='font-display font-medium text-lg leading-tight'>
-              {proto.protoMeta.question}
+              {shown.protoMeta.question}
             </p>
-            {proto.protoMeta.verdict ? (
+            {shown.protoMeta.verdict ? (
               <p className='mt-1 text-cobalt text-sm'>
-                settled: {proto.protoMeta.verdict}
+                settled: {shown.protoMeta.verdict}
               </p>
             ) : null}
           </div>
@@ -57,8 +63,8 @@ const Shell = () => {
 
       <footer className='mx-auto max-w-5xl px-6 pb-24'>
         <p className='font-mono text-[0.65rem] text-muted-foreground'>
-          {protoDir} · throwaway on purpose — no tests, no persistence, no
-          abstractions
+          {params.lane ? `bench-${params.lane}` : protoDir} · throwaway on
+          purpose — no tests, no persistence, no abstractions
         </p>
       </footer>
     </div>
@@ -90,12 +96,34 @@ const VariantView = () => {
   );
 };
 
+const BenchView = () => {
+  const params = useParams({ from: '/bench/$lane' });
+  const Lane = benchModules[params.lane]?.Proto;
+
+  return (
+    <div data-bench={params.lane}>
+      {Lane ? <Lane /> : <p className='font-mono text-sm'>no such lane</p>}
+    </div>
+  );
+};
+
 /* Router — a variant is a place, so it lives in the path. */
 const rootRoute = createRootRoute({ component: Shell });
 const indexRoute = createRoute({
+  beforeLoad: () => {
+    // Nothing live but bench lanes exist: land on the first lane.
+    if (!proto && laneList[0]) {
+      throw redirect({ params: { lane: laneList[0] }, to: '/bench/$lane' });
+    }
+  },
   component: VariantView,
   getParentRoute: () => rootRoute,
   path: '/',
+});
+const benchRoute = createRoute({
+  component: BenchView,
+  getParentRoute: () => rootRoute,
+  path: '/bench/$lane',
 });
 const variantRoute = createRoute({
   component: VariantView,
@@ -104,7 +132,7 @@ const variantRoute = createRoute({
 });
 
 const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, variantRoute]),
+  routeTree: rootRoute.addChildren([indexRoute, benchRoute, variantRoute]),
 });
 
 export const Frame = () => {
@@ -122,6 +150,19 @@ const protoModules = import.meta.glob<ProtoModule>(
 );
 const [protoPath, proto] = Object.entries(protoModules)[0] ?? [];
 const protoDir = protoPath?.split('/').at(-2);
+
+// Bench lanes sit beside the live proto, keyed by the folder suffix after
+// `bench-`, so `/bench/<lane>` reads straight off the directory name.
+const benchModules = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<ProtoModule>('/src/protos/bench-*/index.tsx', {
+      eager: true,
+    }),
+  ).map(([path, module]) => {
+    return [path.split('/').at(-2)?.replace('bench-', '') ?? '', module];
+  }),
+);
+const laneList = Object.keys(benchModules).sort();
 
 /* Types */
 interface ProtoModule {

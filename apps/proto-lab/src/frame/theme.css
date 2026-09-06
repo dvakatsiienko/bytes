@@ -8,8 +8,11 @@
 /*
   Palette, named: bone (ground) · ink (text) · cobalt (done) ·
   amber (in-flight) · mist (queued) · rule (hairlines).
-  Light only — this platform has one look on purpose.
+  Light by default; [data-theme="dark"] on <html> flips the mapped set for
+  the bench toggle. Elevation by lighter surface, accents desaturated.
 */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   --bone: #f4f5f2;
   --ink: #16181c;
@@ -38,6 +41,25 @@
   --border: var(--rule);
   --input: var(--rule);
   --ring: var(--cobalt);
+}
+
+:root[data-theme="dark"] {
+  --bone: #121212;
+  --ink: #e8e9e6;
+  --cobalt: #7d8ff0;
+  --amber: #f0b83a;
+  --mist: #7b8290;
+  --rule: #2a2b2e;
+
+  --card: #1b1c1e;
+  --popover: #1b1c1e;
+  --primary-foreground: #0f1020;
+  --secondary: #232427;
+  --muted: #232427;
+  --muted-foreground: #a0a5ae;
+  --accent: #232a4a;
+  --destructive: #e06a60;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -82,6 +104,7 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
   ::selection {
+    color: var(--foreground);
     background: var(--accent);
   }
 }
