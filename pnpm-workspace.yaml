@@ -28,3 +28,5 @@ minimumReleaseAgeExclude:
   - lucide-react@1.32.0
   - '@tanstack/react-router@1.170.30'
   - '@tanstack/router-core@1.171.25'
+  - cn@0.2.6
+  - cva@1.0.0-beta.9
