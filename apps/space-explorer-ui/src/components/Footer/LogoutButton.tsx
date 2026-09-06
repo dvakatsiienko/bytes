@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { cartItemsVar, evictPerUserFields, isLoggedInVar } from '@/lib/apollo';
 
-import { LogoutSvg } from './SVG';
 import * as gql from '@/graphql';
 import { clearLocalStorageAuthItems } from '@/utils';
 
@@ -42,14 +41,12 @@ export const LogoutButton = (props: LogoutButtonProps) => {
       disabled={isLoggingOut}
       onClick={logout}
       type='button'>
-      <LogoutSvg className={props.classNameSvg} />
-      Logout
+      {props.children}
     </button>
   );
 };
 
 /* Types */
-interface LogoutButtonProps {
+interface LogoutButtonProps extends React.PropsWithChildren {
   className?: string;
-  classNameSvg?: string;
 }

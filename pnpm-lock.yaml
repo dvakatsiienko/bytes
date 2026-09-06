@@ -605,6 +605,9 @@ importers:
       graphql:
         specifier: 17.0.2
         version: 17.0.2
+      lucide-react:
+        specifier: 1.41.0
+        version: 1.41.0(react@19.2.8)
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -617,9 +620,6 @@ importers:
       react-router-dom:
         specifier: 7.18.3
         version: 7.18.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      tailwind-merge:
-        specifier: 3.6.0
-        version: 3.6.0
       tailwindcss:
         specifier: 4.3.3
         version: 4.3.3
@@ -7747,9 +7747,6 @@ packages:
 
   tabbable@6.5.0:
     resolution: {integrity: sha512-wieBHXygIm7OyQOu5hQlkk62/WyCFYGlWg7L6/ZCUZwx0o398Zkn4pVmMyfYhfMG8kGrj/Krt8eIk6UKC6VzwA==}
-
-  tailwind-merge@3.6.0:
-    resolution: {integrity: sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==}
 
   tailwind-scrollbar@4.0.2:
     resolution: {integrity: sha512-wAQiIxAPqk0MNTPptVe/xoyWi27y+NRGnTwvn4PQnbvB9kp8QUBiGl/wsfoVBHnQxTmhXJSNt9NHTmcz9EivFA==}
@@ -15619,8 +15616,6 @@ snapshots:
   systeminformation@5.33.8: {}
 
   tabbable@6.5.0: {}
-
-  tailwind-merge@3.6.0: {}
 
   tailwind-scrollbar@4.0.2(react@19.2.8)(tailwindcss@4.3.3):
     dependencies:
