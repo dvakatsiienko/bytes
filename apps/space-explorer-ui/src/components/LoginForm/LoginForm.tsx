@@ -27,21 +27,21 @@ export const LoginForm = (props: LoginFormProps) => {
       style={{ backgroundImage: `url(${spaceJpg})` }}>
       <header className='relative mb-10 w-full p-5'>
         <LogoSvg className='relative z-2 mx-auto mb-2 size-14 fill-current' />
-        <CurveSvg className='absolute top-0 left-0 size-full fill-primary' />
+        <CurveSvg className='absolute top-0 left-0 size-full fill-background' />
       </header>
 
       <RocketSvg className='size-60 fill-current' />
       <h1 className='mt-6 mb-12'>Space Explorer</h1>
 
       <form
-        className='w-full max-w-100 rounded-sm bg-white p-7 text-text'
+        className='w-full max-w-100 bg-card p-7 text-card-foreground'
         onSubmit={onSubmit}>
         <input
-          className='w-full rounded-md border border-gray px-5 py-2.5 outline-none focus:border-primary'
+          className='w-full rounded-md border border-line bg-background px-5 py-2.5 outline-none focus:border-primary'
           placeholder='Email'
           {...form.register('email')}
         />
-        <span className='mb-4 inline-block font-bold text-red-500'>
+        <span className='mb-4 inline-block font-bold text-red'>
           {form.formState.errors.email?.message ?? <>&nbsp;</>}
         </span>
         <Button className='mx-auto' type='submit'>

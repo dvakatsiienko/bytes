@@ -22,7 +22,7 @@ export const Header = (props: HeaderProps) => {
       />
       <div>
         <h2>{title}</h2>
-        <h5 className='mt-1 text-text-secondary'>{email}</h5>
+        <h5 className='mt-1 text-mute'>{email}</h5>
       </div>
     </section>
   );

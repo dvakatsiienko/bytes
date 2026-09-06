@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
 
+import { ThemeToggle } from '../ThemeToggle';
 import { LogoutButton } from './LogoutButton';
 import { CartSvg, HomeSvg, ProfileSvg } from './SVG';
 import * as gql from '@/graphql';
@@ -13,7 +14,7 @@ export const Footer = () => {
   const userTripsCount = userProfileQuery.data?.userProfile.trips.length;
 
   return (
-    <footer className='sticky bottom-0 bg-white text-text-secondary'>
+    <footer className='sticky bottom-0 border-line border-t bg-bg-soft text-mute'>
       <section className='mx-auto flex w-full max-w-115 items-center p-5'>
         <Link className={menuItemCn} to='/launches'>
           <HomeSvg className={svgCn} />
@@ -37,6 +38,8 @@ export const Footer = () => {
         </Link>
 
         <LogoutButton className={menuItemCn} classNameSvg={svgCn} />
+
+        <ThemeToggle />
       </section>
     </footer>
   );
@@ -45,6 +48,6 @@ export const Footer = () => {
 /* Styles */
 const menuItemCn =
   'relative cursor-pointer flex-grow text-20 tracking-1.5 uppercase text-center';
-const svgCn = 'block size-15 mx-auto mb-2 fill-secondary';
+const svgCn = 'block size-15 mx-auto mb-2 fill-current';
 const tooltipCoutCn =
-  'absolute -top-2.5 right-5 grid place-content-center size-6.25 rounded-full bg-accent text-white text-sm';
+  'absolute -top-2.5 right-5 grid place-content-center size-6.25 rounded-full bg-primary text-primary-foreground text-xs';

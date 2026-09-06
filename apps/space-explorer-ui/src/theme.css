@@ -1,22 +1,124 @@
 @import "@ui/kit/globals.css";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/jetbrains-mono";
 
+/*
+ * L1 — gruvbox-material, the palette trophy-sys and the sline statusline share.
+ * Light is the base; dark rides kit's one theming mechanism, the `.dark` class
+ * (index.html sets it before first paint, ThemeToggle flips it). Only these
+ * raw --p-* values change per theme — every token below points at them.
+ */
 :root {
-  font-family: "Geist Variable", sans-serif;
+  --p-bg: #fbf1c7;
+  --p-bg-soft: #f2e5bc;
+  --p-bg-lift: #ebdbb2;
+  --p-line: #d5c4a1;
+  --p-dim: #a89984;
+  --p-mute: #928374;
+  --p-fg: #654735;
+  --p-fg-soft: #4f3829;
+  --p-red: #c14a4a;
+  --p-green: #6c782e;
+  --p-yellow: #b47109;
+  --p-blue: #45707a;
+  --p-purple: #945e80;
+  --p-scanline: 0;
 }
 
+.dark {
+  --p-bg: #1d2021;
+  --p-bg-soft: #282828;
+  --p-bg-lift: #32302f;
+  --p-line: #504945;
+  --p-dim: #7c6f64;
+  --p-mute: #928374;
+  --p-fg: #d4be98;
+  --p-fg-soft: #bdae93;
+  --p-red: #ea6962;
+  --p-green: #a9b665;
+  --p-yellow: #d8a657;
+  --p-blue: #7daea3;
+  --p-purple: #d3869b;
+  --p-scanline: 0.16;
+}
+
+/*
+ * L2 — the shadcn vocabulary, re-valued onto L1 and never renamed. One rule
+ * serves both themes because every value is a reference. The accent is the
+ * palette's blue: this app sells seats on launches, and the cold hue reads
+ * as vacuum where trophy-sys's orange read as a CRT.
+ */
 :root,
-body,
-#root {
-  min-height: 100vh;
+.dark {
+  --background: var(--p-bg);
+  --foreground: var(--p-fg);
+  --card: var(--p-bg-soft);
+  --card-foreground: var(--p-fg);
+  --popover: var(--p-bg-lift);
+  --popover-foreground: var(--p-fg);
+  --primary: var(--p-blue);
+  --primary-foreground: var(--p-bg);
+  --secondary: var(--p-bg-lift);
+  --secondary-foreground: var(--p-fg);
+  --muted: var(--p-bg-soft);
+  --muted-foreground: var(--p-mute);
+  --accent: var(--p-bg-lift);
+  --accent-foreground: var(--p-fg);
+  --destructive: var(--p-red);
+  --border: var(--p-line);
+  --input: var(--p-line);
+  --ring: var(--p-blue);
+  --radius: 0;
 }
 
-#root {
-  display: flex;
-  flex-direction: column;
+/* L3 — the palette steps shadcn has no word for. */
+@theme inline {
+  --font-sans: "JetBrains Mono Variable", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-bg-soft: var(--p-bg-soft);
+  --color-bg-lift: var(--p-bg-lift);
+  --color-line: var(--p-line);
+  --color-dim: var(--p-dim);
+  --color-mute: var(--p-mute);
+  --color-fg-soft: var(--p-fg-soft);
+  --color-red: var(--p-red);
+  --color-green: var(--p-green);
+  --color-yellow: var(--p-yellow);
+  --color-purple: var(--p-purple);
 }
 
 @layer base {
+  html,
+  body,
+  #root {
+    min-height: 100dvh;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+  }
+
+  body {
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.01em;
+
+    /*
+     * Chrome — nav, labels, buttons, frames — is nothing anyone wants to copy.
+     * Strings that carry a real name (mission, rocket, site, email) opt back
+     * in with `select-text`.
+     */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
   h1,
   h2,
   h3,
@@ -27,35 +129,74 @@ body,
     font-weight: 600;
   }
 
-  h1 {
-    font-size: 48px;
-    line-height: 1;
+  /*
+   * The accent is blue, so the highlight comes from purple: a second hue,
+   * clearly a selection and not a second accent. Raw --p-*, because Tailwind
+   * drops any theme variable no utility asked for.
+   */
+  ::selection {
+    color: var(--p-fg);
+    background: color-mix(in srgb, var(--p-purple) 35%, transparent);
   }
 
-  h2 {
-    font-size: 40px;
+  /* CRT scanlines — the one deliberate piece of retro theatre. Static, never animated. */
+  body::after {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    content: "";
+    background: repeating-linear-gradient(
+      to bottom,
+      rgb(0 0 0 / var(--p-scanline)) 0px,
+      rgb(0 0 0 / var(--p-scanline)) 1px,
+      transparent 1px,
+      transparent 3px
+    );
   }
 
-  h3 {
-    font-size: 36px;
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
 
-  h5 {
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 4px;
+  ::-webkit-scrollbar-thumb {
+    background: var(--p-line);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 
-@theme {
-  --color-accent: #e535ab;
-  --color-accent-light: #e85ebf; /* Pre-calculated lighten(0.1) for Button hover */
-  --color-accent-lighter: #ec87d3; /* Pre-calculated lighten(0.2) for Button active */
-  --color-accent-dark: #b72a89; /* Pre-calculated darken(0.2) for Button disabled */
-  --color-background: #f7f8fa;
-  --color-grey: #d8d9e0;
-  --color-primary: #220a82;
-  --color-secondary: #14cbc4;
-  --color-text: #343c5a;
-  --color-text-secondary: #747790;
+@layer components {
+  /* The boxed-with-a-label frame; the label sits outside the border, so a panel never scrolls itself. */
+  .panel {
+    position: relative;
+    background: color-mix(in srgb, var(--p-bg-soft) 70%, transparent);
+    border: 1px solid var(--p-line);
+  }
+
+  .panel-title {
+    position: absolute;
+    top: -0.65rem;
+    left: 0.75rem;
+    padding-inline: 0.4rem;
+    font-size: 12px;
+    color: var(--p-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    background: var(--p-bg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }
