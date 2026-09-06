@@ -186,7 +186,7 @@ const Grid = (props: GridProps) => {
     (hour) => (
       <text
         fill={CHART_INK.axis}
-        fontSize={11}
+        fontSize={12}
         key={hour}
         textAnchor='middle'
         x={gutter + hour * step + cell / 2}
@@ -241,7 +241,7 @@ const peakHour = (row: NightOwlRow) =>
 
 const LABEL_HEIGHT = 12;
 
-const LABEL_FONT = 11;
+const LABEL_FONT = 12;
 /** Matches bar-rows and the activity grid: one inset for every label column. */
 const LABEL_INSET = 8;
 /** The names never squeeze below this, however narrow the panel gets. */

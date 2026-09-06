@@ -58,7 +58,7 @@ export const KpiStrip = (props: KpiStripProps) => {
         <span className='text-[12px] text-mute uppercase tracking-[0.14em]'>
           {tile.label}
         </span>
-        <span className='select-text text-fg text-lg tabular-nums leading-none'>
+        <span className='text-fg text-lg tabular-nums leading-none'>
           {tile.value}
         </span>
         {tile.hint && <span className='text-[12px] text-dim'>{tile.hint}</span>}
@@ -72,7 +72,7 @@ export const KpiStrip = (props: KpiStripProps) => {
         <span style={{ color: GRADE_TONE[grade] }}>
           {grade === 'platinum' ? '◆' : '●'}
         </span>
-        <span className='select-text tabular-nums'>{grades[grade]}</span>
+        <span className='tabular-nums'>{grades[grade]}</span>
       </span>
     ),
   );

@@ -14,7 +14,7 @@ export const ProfileBar = (props: ProfileBarProps) => (
 
     <div className='flex items-baseline gap-2'>
       <span className='text-[12px] text-mute tracking-[0.2em]'>LEVEL</span>
-      <span className='glow select-text text-2xl text-orange leading-none'>
+      <span className='glow text-2xl text-orange leading-none'>
         {props.profile?.level ?? '--'}
       </span>
       <span className='text-[12px] text-dim'>
@@ -34,7 +34,7 @@ export const ProfileBar = (props: ProfileBarProps) => (
         return (
           <div className='flex items-baseline gap-1.5' key={key}>
             <span className='text-[12px] text-dim'>{label}</span>
-            <span className={`${color} select-text text-base`}>
+            <span className={`${color} text-base`}>
               {props.profile?.earned[key] ?? 0}
             </span>
           </div>

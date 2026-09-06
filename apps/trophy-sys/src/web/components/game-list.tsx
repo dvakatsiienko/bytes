@@ -44,7 +44,7 @@ export const GameList = (props: GameListProps) => {
 
     return (
       <button
-        className={`group flex w-full cursor-pointer items-center gap-3 border-line/60 border-b border-l-2 px-3 py-2.5 text-left transition-colors duration-150 last:border-b-0 ${
+        className={`group flex w-full cursor-pointer items-center gap-3 border-line/60 border-b border-l-2 px-3 py-2.5 text-left transition-colors duration-150 last:border-b-0 focus-visible:outline focus-visible:outline-orange ${
           isSelected
             ? 'border-l-orange bg-bg-lift'
             : 'border-l-transparent hover:border-l-dim hover:bg-bg-soft'

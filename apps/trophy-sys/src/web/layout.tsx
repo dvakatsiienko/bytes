@@ -27,7 +27,7 @@ export const Layout = () => {
       <div className='flex flex-wrap items-center gap-x-4 gap-y-2'>
         <h1 className='text-lg'>
           <Link
-            className='glow cursor-pointer text-orange tracking-[0.3em] transition-colors hover:text-yellow focus-visible:outline focus-visible:outline-orange'
+            className='glow inline-block cursor-pointer py-0.5 text-orange tracking-[0.3em] transition-colors hover:text-yellow focus-visible:outline focus-visible:outline-orange'
             to='/'>
             TROPHY.SYS
           </Link>
@@ -38,7 +38,7 @@ export const Layout = () => {
             return (
               <Link
                 activeProps={{ className: 'border-orange text-orange' }}
-                className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-dim hover:text-fg-soft'
+                className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-dim hover:text-fg-soft focus-visible:outline focus-visible:outline-orange'
                 key={tab.to}
                 to={tab.to}>
                 {tab.label}
