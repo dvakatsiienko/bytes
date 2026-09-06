@@ -88,7 +88,7 @@ export const LaunchTile = (props: LaunchTileProps) => {
 
         {stamp ? (
           <span
-            className={`pointer-events-none absolute top-4 right-4 z-10 rotate-[-6deg] border-2 px-2 py-0.5 font-bold text-xs uppercase tracking-[0.2em] ${stamp.className}`}>
+            className={`pointer-events-none absolute top-4 right-4 z-10 rotate-[-6deg] border-2 bg-background/75 px-2 py-0.5 font-bold text-xs uppercase tracking-[0.2em] dark:bg-transparent ${stamp.className}`}>
             {stamp.label}
           </span>
         ) : null}
