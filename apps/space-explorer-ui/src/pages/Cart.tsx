@@ -1,8 +1,9 @@
 import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
+import { Button } from '@ui/kit/components/button';
 
 import { cartItemsVar } from '@/lib/apollo';
 
-import { Button, CartItem, Header, Loading } from '@/components';
+import { CartItem, Header, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Cart = () => {

@@ -1,10 +1,10 @@
 import { type VariantProps, cva } from 'cva';
 import { useMutation, useReactiveVar } from '@apollo/client/react';
+import { Button } from '@ui/kit/components/button';
 import { Link } from 'react-router-dom';
 
 import { cartItemsVar } from '@/lib/apollo';
 
-import { Button } from '../Button';
 import galaxyJpg from './img/galaxy.jpg';
 import issJpg from './img/iss.jpg';
 import moonJpg from './img/moon.jpg';
@@ -85,8 +85,8 @@ export const LaunchTile = (props: LaunchTileProps) => {
       <Button
         className='mt-2 ml-auto'
         disabled={isDisabled}
-        mini
-        onClick={submit}>
+        onClick={submit}
+        size='sm'>
         {!props.trip && isBooked ? '✓ Trip Booked' : null}
         {props.trip ? 'Cancel trip' : null}
         {!(props.trip || isBooked) && isInCart ? 'Remove from Cart' : null}

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@apollo/client/react';
+import { Button } from '@ui/kit/components/button';
 
-import { Button, Header, LaunchTile, Loading } from '@/components';
+import { Header, LaunchTile, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Launches = () => {

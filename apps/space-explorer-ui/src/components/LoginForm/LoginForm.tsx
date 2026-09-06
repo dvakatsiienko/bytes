@@ -1,10 +1,11 @@
 import type { useMutation } from '@apollo/client/react';
+import { Button } from '@ui/kit/components/button';
 import { useForm } from 'react-hook-form';
 
 import spaceJpg from './img/space.jpg';
 import { resolver } from './resolver';
 import { CurveSvg, RocketSvg } from './SVG';
-import { Button, LogoSvg } from '@/components';
+import { LogoSvg } from '@/components';
 import type * as gql from '@/graphql';
 
 export const LoginForm = (props: LoginFormProps) => {

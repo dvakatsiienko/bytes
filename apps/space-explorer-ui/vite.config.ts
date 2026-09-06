@@ -9,5 +9,5 @@ export default defineConfig({
     vitePluginProgress(),
     vitePluginTailwindcss(),
   ],
-  resolve: { tsconfigPaths: true },
+  resolve: { dedupe: ['react', 'react-dom'], tsconfigPaths: true },
 });
