@@ -94,9 +94,9 @@
     min-height: 100dvh;
   }
 
-  /* A route with a scrollbar and one without must not shift the page. */
+  /* The scrollbar track is always there, so a short route never shifts the page sideways. */
   html {
-    scrollbar-gutter: stable;
+    overflow-y: scroll;
   }
 
   button:not(:disabled),

@@ -79,7 +79,7 @@ export const LaunchTile = (props: LaunchTileProps) => {
       <div className={bodyCva({ isDetailed: props.isDetailed })}>
         <div
           aria-hidden='true'
-          className='absolute inset-y-0 right-0 isolate w-3/4 bg-primary opacity-40 transition-opacity duration-300 [mask-image:linear-gradient(to_right,transparent,black_55%)] group-hover/ticket:opacity-80 dark:opacity-30 dark:group-hover/ticket:opacity-70'>
+          className='absolute inset-y-0 right-0 isolate -z-10 w-3/4 bg-primary opacity-60 transition-opacity duration-300 [mask-image:linear-gradient(to_right,transparent,black_55%)] group-hover/ticket:opacity-90 dark:opacity-30 dark:group-hover/ticket:opacity-70'>
           <div
             className='size-full bg-center bg-cover mix-blend-luminosity group-hover/ticket:mix-blend-normal'
             style={{ backgroundImage: getBgImage(flightNumber) }}
@@ -88,12 +88,12 @@ export const LaunchTile = (props: LaunchTileProps) => {
 
         {stamp ? (
           <span
-            className={`absolute top-4 right-4 z-10 rotate-[-6deg] border-2 px-2 py-0.5 font-bold text-xs uppercase tracking-[0.2em] ${stamp.className}`}>
+            className={`pointer-events-none absolute top-4 right-4 z-10 rotate-[-6deg] border-2 px-2 py-0.5 font-bold text-xs uppercase tracking-[0.2em] ${stamp.className}`}>
             {stamp.label}
           </span>
         ) : null}
 
-        <div className='relative flex h-full flex-col gap-3'>
+        <div className='flex h-full flex-col gap-3'>
           <p className='text-mute text-xs uppercase tracking-[0.18em]'>
             mission
           </p>
@@ -193,7 +193,7 @@ const seatFace = {
     stamp: { className: 'border-green text-green', label: 'booked' },
   },
   inCart: {
-    actionLabel: 'Remove from cart',
+    actionLabel: 'Remove',
     actionVariant: 'outline',
     stamp: { className: 'border-yellow text-yellow', label: 'in cart' },
   },
