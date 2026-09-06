@@ -1,0 +1,79 @@
+/*
+  bench-cv-impeccable — the dossier world, scoped to this lane.
+  Named after the thing: paper (ground) · ink (text) · field (the green
+  jacket) · field-ink (cream on green) · moss (green as text on paper) ·
+  rule (hairlines) · card (one raised surface).
+  Every pair below clears 4.5:1 for body text; measured in bench/shots.
+*/
+@import "@fontsource-variable/saira/wdth.css";
+
+[data-bench="cv-impeccable"] {
+  --paper: #f6f4ee;
+  --ink: #171a17;
+  --ink-2: #55605a;
+  --field: #276a2b;
+  --field-ink: #f4f1e8;
+  --field-ink-2: #d4e3cc;
+  --card: #fffdf8;
+  --shadow-card:
+    0 1px 2px rgb(23 26 23 / 0.05), 0 4px 10px -6px rgb(23 26 23 / 0.14);
+  --moss: #276a2b;
+  --rule: #dcdad2;
+
+  --font-display: "Saira Variable", "Inter Variable", sans-serif;
+  color: var(--ink);
+
+  background: var(--paper);
+}
+
+:root[data-theme="dark"] [data-bench="cv-impeccable"] {
+  --paper: #121412;
+  --ink: #e7eae4;
+  --ink-2: #a6ada6;
+  --field: #1d4a21;
+  --field-ink: #ece9df;
+  --field-ink-2: #b9cdb0;
+  --card: #1a1d1a;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 10px -6px rgb(0 0 0 / 0.6);
+  --moss: #8fd394;
+  --rule: #2a2e2a;
+}
+
+[data-bench="cv-impeccable"] .cv-display {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 112;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+[data-bench="cv-impeccable"] .cv-narrow {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 80;
+}
+
+[data-bench="cv-impeccable"] ::selection {
+  color: var(--field-ink);
+  background: var(--field);
+}
+
+[data-bench="cv-impeccable"] a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+[data-bench="cv-impeccable"] a:focus-visible,
+[data-bench="cv-impeccable"] button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+[data-bench="cv-impeccable"] .cv-field {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), 0 100%);
+}
+
+@media (min-width: 768px) {
+  [data-bench="cv-impeccable"] .cv-field {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 44px), 0 100%);
+  }
+}

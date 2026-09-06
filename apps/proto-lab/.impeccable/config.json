@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-09-06T12:08:38.882Z",
+        "reason": "lane agent: Inter is proto-lab's house body face (src/frame/theme.css); personality carried by Newsreader display"
+      }
+    ]
+  }
+}

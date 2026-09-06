@@ -4,6 +4,8 @@
 @import "@fontsource-variable/bricolage-grotesque";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/geist";
 
 /*
   Palette, named: bone (ground) · ink (text) · cobalt (done) ·
@@ -94,6 +96,12 @@
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Bricolage Grotesque Variable", "Inter Variable", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --ease-lux: cubic-bezier(0.32, 0.72, 0, 1);
+  --color-lux-shell: var(--lux-shell);
+  --shadow-lux: var(--lux-shadow);
+  --font-lux-serif: "Fraunces Variable", Georgia, serif;
+  --font-lux-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -116,4 +124,54 @@
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/*
+  bench lane cv-theme-designer — editorial-luxury tokens, scoped to the lane.
+  cream (ground) · paper (card core) · ink / ink-soft (text) · sage (accent) ·
+  sage-wash (accent ground) · hair (hairlines) · shadow / inner (bezel depth).
+  The shadcn set is re-mapped inside the scope so the stock utilities warm up.
+*/
+[data-bench="cv-theme-designer"] {
+  --lux-cream: #faf7f1;
+  --lux-paper: #fffdf9;
+  --lux-ink: #221f1b;
+  --lux-ink-soft: #625c53;
+  --lux-sage: #2f7a36;
+  --lux-sage-wash: #e6f0e4;
+  --lux-hair: rgba(34, 31, 27, 0.08);
+  --lux-shell: rgba(34, 31, 27, 0.04);
+  --lux-inner: rgba(255, 255, 255, 0.7);
+  --lux-shadow:
+    inset 0 1px 0 var(--lux-inner), 0 32px 64px -32px rgba(48, 36, 12, 0.22),
+    0 2px 8px rgba(48, 36, 12, 0.04);
+
+  --background: var(--lux-cream);
+  --foreground: var(--lux-ink);
+  --card: var(--lux-paper);
+  --card-foreground: var(--lux-ink);
+  --primary: var(--lux-sage);
+  --primary-foreground: #f4faf2;
+  --muted-foreground: var(--lux-ink-soft);
+  --accent: var(--lux-sage-wash);
+  --accent-foreground: var(--lux-sage);
+  --border: var(--lux-hair);
+  --ring: var(--lux-sage);
+}
+
+:root[data-theme="dark"] [data-bench="cv-theme-designer"] {
+  --lux-cream: #151412;
+  --lux-paper: #1d1b18;
+  --lux-ink: #ece6da;
+  --lux-ink-soft: #a8a196;
+  --lux-sage: #9ccf9d;
+  --lux-sage-wash: #1f2b20;
+  --lux-hair: rgba(236, 230, 218, 0.1);
+  --lux-shell: rgba(236, 230, 218, 0.04);
+  --lux-inner: rgba(255, 255, 255, 0.06);
+  --lux-shadow:
+    inset 0 1px 0 var(--lux-inner), 0 32px 64px -32px rgba(0, 0, 0, 0.7),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+
+  --primary-foreground: #10160f;
 }

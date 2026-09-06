@@ -22,13 +22,12 @@ dima also likes and would like to build somthing like:
 - https://ffern.co/
 - https://spellbrush.com/
 - https://flick.art/
-  📌 open each ref with agent-browser at 1280 and take ONE screenshot before you design — read the actual page, not your memory of it. what to borrow: the restraint, the type, the rhythm. never the layout.
+  📌 open each ref with agent-browser at 1280, ONE screenshot each, then put them away. they are a direction, not a target: do not copy, do not chase them — design a middle-ground pick oriented that way, with your own idea in it.
 
 ## the taste line (dima's words, kept)
 
 - clean, linear-flavoured, leaned but not as minimal as a blog. let the designer be creative.
-- any palette except pink. two refs, NOT specs, use them at will or not at all:
-  nature green (`#2e7d32` / `#e8f5e9` on warm off-white) · bubblegum (`#d04f99` / `#8acfd1` on cream).
+- any palette except pink. no colour refs on purpose — pick the palette yourself, from the person and the taste line.
 - «free to create anything that is pretty, solid and stands out.»
 - neobrutalism: borrow a hint at most, never the style. too expressive.
 - the old cv (`apps/cv`, live at ripeluokte.vercel.app) is «not bad, a bit cramped»; its
@@ -42,6 +41,7 @@ dima also likes and would like to build somthing like:
   never open a sibling `bench-cv-*` directory. never read another lane's output.
 - **packages allowed:** install what you want with `pnpm add --filter proto-lab <pkg>` — motion,
   tailwind plugins, a font, an icon set. exact versions (`npm view <pkg> version` first).
+  📌 five lanes share one `package.json` + lockfile: run one `pnpm add` at a time, and if it fails on a lock or a changed file, wait 10 s and retry — never edit `package.json` by hand.
 - **skills:** load `x:guide-code`, `x:guide-typescript`, `x:guide-react`, `x:guide-ui-ux`,
   `x:browser-headless` — then your lane's design skill, and USE it for the whole design pass, not
   only at the end. say in your report which of its commands/rules you actually applied.

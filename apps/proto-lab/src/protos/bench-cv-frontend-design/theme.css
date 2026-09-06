@@ -1,0 +1,60 @@
+@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/newsreader/wght-italic.css";
+
+/*
+  Lane tokens, scoped to this bench route only.
+  paper (ground) · ink (text) · moss (the one bold field, links) · fern (pale tint) ·
+  ice (availability signal) · stone (hairlines) · dim (secondary text).
+*/
+[data-bench="cv-frontend-design"] {
+  --fd-paper: #f3f1ea;
+  --fd-ink: #17211b;
+  --fd-dim: #5b665e;
+  --fd-moss: #276b2b;
+  --fd-moss-deep: #1f5a25;
+  --fd-fern: #e8f5e9;
+  --fd-ice: #8acfd1;
+  --fd-stone: #d9d5c8;
+  --fd-rail: #276b2b;
+  --fd-rail-ink: #f3f1ea;
+  --fd-rail-dim: #e1eedd;
+  --fd-rail-rule: #4a8f4e;
+
+  --fd-display: "Newsreader Variable", Georgia, serif;
+  font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "tnum" 1;
+  color: var(--fd-ink);
+
+  background: var(--fd-paper);
+}
+
+:root[data-theme="dark"] [data-bench="cv-frontend-design"] {
+  --fd-paper: #141a16;
+  --fd-ink: #e6e9e2;
+  --fd-dim: #a3ada5;
+  --fd-moss: #7fc784;
+  --fd-moss-deep: #1d4022;
+  --fd-fern: #1c2a20;
+  --fd-ice: #8acfd1;
+  --fd-stone: #2c352f;
+  --fd-rail: #1d4022;
+  --fd-rail-ink: #eef4ec;
+  --fd-rail-dim: #b7d6b8;
+  --fd-rail-rule: #3f7a45;
+}
+
+[data-bench="cv-frontend-design"] ::selection {
+  color: var(--fd-ink);
+  background: var(--fd-fern);
+}
+
+:root[data-theme="dark"] [data-bench="cv-frontend-design"] ::selection {
+  color: #eef4ec;
+  background: #2f5a35;
+}
+
+[data-bench="cv-frontend-design"] a:focus-visible {
+  outline: 2px solid var(--fd-ice);
+  outline-offset: 3px;
+  border-radius: 2px;
+}

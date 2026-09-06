@@ -1,0 +1,41 @@
+@import "@fontsource-variable/geist";
+
+/*
+  Forest palette, scoped to this lane. Named after the thing, not the role.
+  ground (page) · surface (raised) · ink / ink-soft (text) · leaf (accent text,
+  links) · moss (accent fill) · moss-ink (text on moss) · tint (soft fill) ·
+  line (hairlines). One radius rule: chips and buttons 6px, panels sharp.
+*/
+[data-bench="cv-taste"] {
+  --ground: #f6f5f0;
+  --surface: #fdfdfb;
+  --ink: #171b17;
+  --ink-soft: #4f5a50;
+  --leaf: #2e7d32;
+  --moss: #2e7d32;
+  --moss-ink: #f6f5f0;
+  --tint: #e8f5e9;
+  --line: #dcdfd6;
+  --font-cv: "Geist Variable", "Inter Variable", ui-sans-serif, sans-serif;
+
+  font-family: var(--font-cv);
+  color: var(--ink);
+  background: var(--ground);
+}
+
+[data-theme="dark"] [data-bench="cv-taste"] {
+  --ground: #121412;
+  --surface: #191c19;
+  --ink: #e6e8e2;
+  --ink-soft: #a3aa9f;
+  --leaf: #86d68f;
+  --moss: #256b2a;
+  --moss-ink: #f3f6f0;
+  --tint: #1c2a1d;
+  --line: #272b27;
+}
+
+[data-bench="cv-taste"] ::selection {
+  color: var(--ink);
+  background: var(--tint);
+}
