@@ -1,7 +1,5 @@
 @import "@ui/kit/globals.css";
 @import "tw-animate-css";
-@import "./accent.css";
-@import "./gray.css";
 
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";

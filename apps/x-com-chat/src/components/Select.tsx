@@ -1,19 +1,18 @@
 import { useState } from 'react';
 import { cva } from 'cva';
-import type * as SelectRadix from '@radix-ui/react-select';
-import useEventListener from '@use-it/event-listener';
-
-import { SpinnerSvg } from '@/components/svg/SpinnerIcon';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/kit/components/button';
 import {
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectLabel,
-  SelectRoot,
+  Select as SelectRoot,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@ui/kit/components/select';
+import useEventListener from '@use-it/event-listener';
+
+import { SpinnerSvg } from '@/components/svg/SpinnerIcon';
 
 export const Select = (props: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,23 +32,25 @@ export const Select = (props: SelectProps) => {
   return (
     <SelectRoot
       defaultValue={props.defaultValue}
+      items={props.options}
       name={props.name}
       onOpenChange={(open: boolean) => setIsOpen(open)}
-      onValueChange={props.onValueChange}
+      onValueChange={(value) => {
+        if (value) props.onValueChange(value);
+      }}
       open={isOpen}
       value={props.value}>
-      <Button asChild variant='secondary'>
-        <SelectTrigger
-          className={selectTriggerCva({
-            className: props.classNameTrigger,
-            intent: 'textarea',
-            loading: props.isLoading,
-          })}>
-          <SelectValue
-            placeholder={props.isLoading ? <SpinnerSvg /> : 'Select...'}
-          />
-        </SelectTrigger>
-      </Button>
+      <SelectTrigger
+        className={selectTriggerCva({
+          className: props.classNameTrigger,
+          intent: 'textarea',
+          loading: props.isLoading,
+        })}
+        render={<Button variant='secondary' />}>
+        <SelectValue
+          placeholder={props.isLoading ? <SpinnerSvg /> : 'Select...'}
+        />
+      </SelectTrigger>
 
       <SelectContent
         className={selectContentCva({
@@ -88,7 +89,7 @@ interface SelectProps {
   isLoading?: boolean;
   label?: string;
   name: string;
-  onValueChange: SelectRadix.SelectProps['onValueChange'];
+  onValueChange: (value: string) => void;
   options: Option[];
   value: string;
 }

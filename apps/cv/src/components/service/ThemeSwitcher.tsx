@@ -12,7 +12,9 @@ export const ThemeSwitcher = (props: ThemeSwitcherProps) => {
 
   if (!mounted) return null;
 
-  const applyTheme = (value: string): void => setTheme(value);
+  const applyTheme = (value: string[]): void => {
+    if (value[0]) setTheme(value[0]);
+  };
 
   const themeGroupItemListJSX = themeList.map((themePreset) => (
     <ToggleGroupItem
@@ -39,10 +41,8 @@ export const ThemeSwitcher = (props: ThemeSwitcherProps) => {
         props.className,
         //
       )}
-      defaultValue='light'
       onValueChange={applyTheme}
-      type='single'
-      value={theme}>
+      value={theme ? [theme] : []}>
       {themeGroupItemListJSX}
     </ToggleGroup>
   );

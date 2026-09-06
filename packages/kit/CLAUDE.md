@@ -29,6 +29,18 @@ Revisit when cva 1.0 goes stable.
 Delete the file in `packages/kit/src/components/`, then run `add` from any app. Re-apply the cva
 swap.
 
+## eject a component
+
+Only on Dima's `y` to an eject request (contract in the root `CLAUDE.md`). Copy
+`src/components/<name>.tsx` into the app's `src/components/ui/`, first line:
+
+```ts
+// ejected from @ui/kit/components/<name> · <date> · <why>
+```
+
+Then point the app's imports at the local copy. `shadcn eject` is a different thing (it inlines
+`shadcn/tailwind.css`); never use it for this.
+
 ## check drift
 
 ```bash

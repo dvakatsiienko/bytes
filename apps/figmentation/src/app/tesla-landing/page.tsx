@@ -62,8 +62,12 @@ const TeslaLandingPage = () => {
 
 const Header = () => {
   const _navLinkListJSX = headerNavLinksList.map((link) => (
-    <Button asChild key={link.label} variant='link'>
-      <NextLink href={link.href}>{link.label}</NextLink>
+    <Button
+      key={link.label}
+      nativeButton={false}
+      render={<NextLink href={link.href} />}
+      variant='link'>
+      {link.label}
     </Button>
   ));
 
@@ -78,11 +82,9 @@ const Header = () => {
                 <UserSvg />
             </div> */}
 
-      <Drawer direction='top'>
-        <DrawerTrigger asChild>
-          <Button className='xl:hidden' variant='link'>
-            Menu
-          </Button>
+      <Drawer swipeDirection='up'>
+        <DrawerTrigger render={<Button className='xl:hidden' variant='link' />}>
+          Menu
         </DrawerTrigger>
 
         <DrawerContent className='after:unset! top-14!'>

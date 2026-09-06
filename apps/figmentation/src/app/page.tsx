@@ -71,23 +71,21 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
 
         <nav className='grid grid-flow-col flex-wrap gap-3 self-end'>
           <Button
-            asChild
             className={cn(
               'inline-flex items-center gap-1 rounded-lg px-4 py-2 transition-color',
               'bg-gray-900 hover:bg-gray-700',
               'font-medium text-sm text-white',
             )}
+            nativeButton={false}
+            render={<NextLink href={hrefApp} />}
             variant='link'>
-            <NextLink href={hrefApp}>
-              Visit
-              {/* this span makes entire card to act as a link */}
-              <span className='absolute inset-0 z-1' />
-            </NextLink>
+            Visit
+            {/* this span makes entire card to act as a link */}
+            <span className='absolute inset-0 z-1' />
           </Button>
 
           {hrefFigmaFile && (
             <Button
-              asChild
               className={cn(
                 'inline-flex items-center gap-0.5 rounded-lg px-4 py-2 transition-colors',
                 'hover:bg-gray-50',
@@ -95,15 +93,18 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
                 'border border-gray-300',
                 'z-2',
               )}
+              nativeButton={false}
+              render={
+                <NextLink
+                  href={hrefFigmaFile}
+                  rel='noopener noreferrer'
+                  target='_blank'
+                />
+              }
               variant='link'>
-              <NextLink
-                href={hrefFigmaFile}
-                rel='noopener noreferrer'
-                target='_blank'>
-                <FigmaSVG className='size-3' />
-                Figma file
-                <ExternalLinkSvg className='mb-2 size-2' />
-              </NextLink>
+              <FigmaSVG className='size-3' />
+              Figma file
+              <ExternalLinkSvg className='mb-2 size-2' />
             </Button>
           )}
         </nav>
@@ -114,12 +115,12 @@ const ProjectCard: React.FC<ProjectCardProps> = (props) => {
 
 /* Types */
 interface ProjectCardProps {
-  title: string;
   description: string;
   hrefApp: string;
   hrefFigmaFile?: string;
-  imageSrc: string;
   imageAlt: string;
+  imageSrc: string;
+  title: string;
 }
 
 export default WelcomePage;

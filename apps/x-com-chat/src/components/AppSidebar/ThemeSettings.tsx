@@ -1,10 +1,9 @@
 'use client';
 
+import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
 import { cn } from '@ui/kit/lib/utils';
 import useEventListener from '@use-it/event-listener';
 import { useTheme } from 'next-themes';
-
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 import { useIsMounted } from '@/hooks/useIsMounted';
 
@@ -15,10 +14,11 @@ export const ThemeSettings = () => {
 
   const [isMounted] = useIsMounted();
 
-  const selectTheme = (value: string) => {
-    if (value === theme || !value) return null;
+  const selectTheme = (value: string[]) => {
+    const [next] = value;
+    if (!next || next === theme) return;
 
-    return setTheme(value);
+    setTheme(next);
   };
 
   useEventListener('keydown', (e: KeyboardEvent) => {
@@ -46,10 +46,8 @@ export const ThemeSettings = () => {
           <span className={settingNameCn}>{theme} theme</span>
           <ToggleGroup
             className={cn(settingGroupCn, 'mb-4')}
-            defaultValue={theme}
             onValueChange={selectTheme}
-            type='single'
-            value={theme}
+            value={theme ? [theme] : []}
             variant='outline'>
             {themeList.map((themeItem) => (
               <ToggleGroupItem

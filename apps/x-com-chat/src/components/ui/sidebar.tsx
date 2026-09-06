@@ -3,10 +3,10 @@
 import * as React from 'react';
 import { type VariantProps, cva } from 'cva';
 import { Slot } from '@radix-ui/react-slot';
+import { Button } from '@ui/kit/components/button';
 import { cn } from '@ui/kit/lib/utils';
 import { PanelLeftIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,

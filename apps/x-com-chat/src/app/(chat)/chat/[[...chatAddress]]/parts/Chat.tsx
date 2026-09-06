@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
+import { Button } from '@ui/kit/components/button';
 import { cn } from '@ui/kit/lib/utils';
 import useEventListener from '@use-it/event-listener';
 import { DefaultChatTransport, type UIMessage, createIdGenerator } from 'ai';
@@ -12,7 +13,6 @@ import { useRouter } from 'next/navigation';
 
 import { Select } from '@/components/Select';
 import { SpinnerSvg } from '@/components/svg/SpinnerIcon';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Tooltip,
@@ -214,7 +214,7 @@ export const Chat = (props: ChatProps) => {
           )}
           onClick={isLoading ? stop : undefined}
           type={isLoading ? 'button' : 'submit'}
-          variant='primary'>
+          variant='default'>
           {isLoading ? <SpinnerSvg spin /> : 'Send'}
         </Button>
       </form>

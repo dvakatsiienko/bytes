@@ -1,9 +1,8 @@
 import { useRef } from 'react';
+import { Button } from '@ui/kit/components/button';
 import { cn } from '@ui/kit/lib/utils';
 import type { UIMessage as TMessage } from 'ai';
 import { AnimatePresence, motion } from 'motion/react';
-
-import { Button } from '@/components/ui/button';
 
 import { useScrollToBottom } from '@/hooks/useScrollToBottom';
 

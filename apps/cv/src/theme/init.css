@@ -1,6 +1,4 @@
 @import "@ui/kit/globals.css";
-@import "./accent.css";
-@import "./gray.css";
 
 @plugin "@tailwindcss/typography";
 @plugin "tailwind-scrollbar" {

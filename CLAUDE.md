@@ -97,9 +97,14 @@ to agents and to code review, and they silently override the repo — a dashboar
   composition over the kit primitive.
 - **eject is gated.** On the smell («too unique, too many workarounds») print
   `eject request: <component> · why composing fails · what structure differs` and stop. Dima's `y`
-  → `shadcn eject`, a provenance header on the copy, one-way door. The kit starts at zero ejects.
+  → copy the file from kit into the app's own `ui/` dir with a provenance header
+  (`// ejected from @ui/kit/components/<name> · <date> · <why>`), one-way door. There is no cli
+  verb for this: `shadcn eject` inlines `shadcn/tailwind.css`, unrelated. The kit starts at zero ejects.
 - **no brand in kit.** No hex, no font names, no logos, no app-conditional logic.
-- **≤4 variants per component.**
+- **kit stays slim.** A variant enters kit only when two apps need it; ≤4 of our own variants on
+  top of the registry's, a fifth is an eject signal. A coder mid-task does not scan the monorepo
+  for the second consumer: it leaves a `variant request: <component> · <variant> · <app>` line in
+  its done-comment; promotion is a periodic sweep.
 - **`baseColor` is `neutral`** and identical in every `components.json`; style, icons and `css`
   match too (the shadcn monorepo guide requires it).
 - **`cva` 1.0 beta everywhere.** shadcn generates `class-variance-authority`; after every

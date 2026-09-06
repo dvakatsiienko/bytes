@@ -261,6 +261,32 @@
       ]
     },
 
+    // shadcn registry output in kit stays byte-close to upstream so `shadcn add --diff` shows
+    // only the cva swap — no key sorting, no class sorting, no null-check rewrites
+    {
+      "assist": {
+        "actions": {
+          "source": {
+            "useSortedKeys": "off"
+          }
+        }
+      },
+      "linter": {
+        "rules": {
+          "nursery": {
+            "useSortedClasses": "off"
+          },
+          "suspicious": {
+            "noEqualsToNull": "off"
+          }
+        }
+      },
+      "includes": [
+        "packages/kit/src/components/**",
+        "**/packages/kit/src/components/**"
+      ]
+    },
+
     // some frameworks and tools expect entities to be exported due to buil-in api
     // disable noDefaultExport for these cases
     {
