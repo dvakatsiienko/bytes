@@ -35,10 +35,14 @@ From the monorepo root: `pnpm dev:trophy-sys`, `pnpm build:trophy-sys`.
 `pnpm trophies` commands: `profile`, `games [limit]`, `game <npCommunicationId>`, `news`,
 `snapshot`, `stats`, `stats-sync`.
 
-📌 `pnpm trophies` loads `.env.local`, so it reads **and writes the production Upstash store**.
-Drop that flag — `node --env-file=.env src/server/cli.ts <cmd>` — to work against the local
-`.trophy-*.json` files instead. That is the way to fill an archive for local chart work without
-touching prod.
+📌 `pnpm trophies` and `pnpm dev` load `.env.dev.local` **last**, and it blanks the KV
+credentials — so both work against the local `.trophy-*.json` files and cannot reach production.
+Editing `.env.local` instead would not hold: `vercel env pull` regenerates it with the production
+credentials, which is how a local `pnpm dev` once moved the live archive from 2122 to 2126 rows
+with nobody pressing anything (2026-09-05).
+
+`.env.dev.local` also carries a verified recipe for running a real Upstash-compatible redis
+locally, for when the KV code path itself is what needs exercising.
 
 ## Querying trophies without the UI (this is how `cw` asks)
 
@@ -55,8 +59,9 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
 ## Auth and state
 
 Three env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`. Locally
-they come from `.env` plus the Vercel-generated `.env.local` (loaded via `node --env-file`, never
-`dotenv`); in production Vercel injects them. Both entrypoints — `src/server/main.ts` and
+they come from three files, loaded in order and last one wins (via `node --env-file`, never
+`dotenv`): `.env` holds `NPSSO`, the Vercel-generated `.env.local` holds the production KV
+credentials, and `.env.dev.local` overrides them for dev. In production Vercel injects them. Both entrypoints — `src/server/main.ts` and
 `src/server/cli.ts` — need the flags. Every key the app reads must also be listed in
 `turbo.jsonc`'s `env` array, because Biome's `noUndeclaredEnvVars` reads that list.
 
