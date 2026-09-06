@@ -36,7 +36,6 @@ bumping framework versions, update the Stack column below — it drifts stale ot
 | `biome-config-polished`    | Unified linting/formatting rules | `extends: ["biome-config-polished"]` |
 | `prettier-config-polished` | Prettier configuration           | Legacy, migrating to Biome           |
 | `kit`                      | Shared UI components             | Common buttons, drawers, icons       |
-| `fonts`                    | Variable font assets             | Manrope, Roboto Flex                 |
 | `typescript-config`        | Base TS configurations           | Extended by all apps                 |
 | `utils`                    | Shared utilities                 | Common calculations, helpers         |
 
@@ -85,6 +84,38 @@ Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only setti
 to agents and to code review, and they silently override the repo — a dashboard edit to
 `trophy-sys`'s Root Directory once broke a deploy that no diff could explain. `trophy-sys` and
 `space-explorer-ui` have one; the Next.js apps do not yet.
+
+## ui-kit
+
+`packages/kit` is the one design system, on shadcn + Base UI. Architecture source of truth:
+[BYT-24](https://linear.app/x-com/issue/BYT-24). Mechanics live in `packages/kit/CLAUDE.md`.
+
+- **kit is the source.** Apps import shadcn components from `@ui/kit/components/*`; an app never
+  generates into its own `ui/` dir. A missing component is added from the app with `shadcn add` —
+  the app's `components.json` `ui` alias routes the file into kit.
+- **compose before eject.** Behaviour differences (lazy search, async states) live in an app-level
+  composition over the kit primitive.
+- **eject is gated.** On the smell («too unique, too many workarounds») print
+  `eject request: <component> · why composing fails · what structure differs` and stop. Dima's `y`
+  → `shadcn eject`, a provenance header on the copy, one-way door. The kit starts at zero ejects.
+- **no brand in kit.** No hex, no font names, no logos, no app-conditional logic.
+- **≤4 variants per component.**
+- **`baseColor` is `neutral`** and identical in every `components.json`; style, icons and `css`
+  match too (the shadcn monorepo guide requires it).
+- **`cva` 1.0 beta everywhere.** shadcn generates `class-variance-authority`; swap the import to
+  `cva` after every `shadcn add`. Remove this line when cva leaves beta.
+- **token layers are frozen:** L1 radix-colors scales → L2 the shadcn vocabulary verbatim → L3 kit
+  extensions. Never rename an L2 token.
+- **surfaces:** `financial` and `space-explorer-ui` are live test surfaces; `figmentation` is exempt
+  (CSS modules by design); `trophy-sys` adopts kit with its redesign.
+
+## next apps
+
+- Use the installed next skills in `.claude/skills/next-*` when working in a Next app.
+- Adopt cache components when they land well and help.
+- `@next/playwright` is allowed only as the harness for `next-cache-components-optimizer`'s
+  `instant()` e2e; install it in the app that adopts it. `agent-browser` stays the fleet browser
+  for everything else.
 
 ## Environment Configuration
 
