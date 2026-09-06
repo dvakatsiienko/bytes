@@ -94,6 +94,16 @@
     min-height: 100dvh;
   }
 
+  /* A route with a scrollbar and one without must not shift the page. */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
   #root {
     display: flex;
     flex-direction: column;

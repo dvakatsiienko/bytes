@@ -13,7 +13,7 @@ export const Footer = () => {
   const userTripsCount = userProfileQuery.data?.userProfile.trips.length;
 
   return (
-    <footer className='sticky bottom-0 border-line border-t bg-bg-soft'>
+    <footer className='sticky bottom-0 z-20 border-line border-t bg-bg-soft'>
       <nav
         aria-label='Main'
         className='mx-auto grid w-full max-w-3xl grid-cols-4 px-4 sm:px-6'>

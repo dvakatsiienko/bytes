@@ -1,60 +1,52 @@
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
+import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
 
 // Three states, not two: a plain light/dark switch strands you with no way to
-// hand control back to the OS. Real radios, so arrow keys work.
+// hand control back to the OS.
 export const ThemeToggle = () => {
   const [theme, setTheme] = useState(themeRead);
 
-  const optionListJSX = themeOptions.map((option, index) => {
-    const isActive = option.value === theme;
-
+  const optionListJSX = themeOptions.map((option) => {
     return (
-      <Fragment key={option.value}>
-        {index > 0 ? (
-          <span aria-hidden='true' className='text-line'>
-            ·
-          </span>
-        ) : null}
-        <label
-          className={`inline-flex min-h-6 min-w-6 cursor-pointer items-center justify-center px-1.5 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary ${
-            isActive
-              ? 'text-primary underline underline-offset-4'
-              : 'text-mute hover:text-fg-soft'
-          }`}
-          title={option.hint}>
-          <input
-            checked={isActive}
-            className='sr-only'
-            name='theme'
-            onChange={() => {
-              themeApply(option.value);
-              setTheme(option.value);
-            }}
-            type='radio'
-            value={option.value}
-          />
-          {option.label}
-        </label>
-      </Fragment>
+      <ToggleGroupItem
+        aria-label={option.hint}
+        className='px-3 text-xs uppercase tracking-[0.18em] aria-pressed:bg-bg-lift aria-pressed:text-primary'
+        key={option.value}
+        title={option.hint}
+        value={option.value}>
+        {option.label}
+      </ToggleGroupItem>
     );
   });
 
   return (
-    <div
+    <ToggleGroup
       aria-label='Colour theme'
-      className='flex items-center gap-0.5 text-xs'
-      role='radiogroup'>
+      onValueChange={(value) => {
+        const [next] = value;
+        if (!isTheme(next)) return;
+        themeApply(next);
+        setTheme(next);
+      }}
+      size='sm'
+      spacing={0}
+      value={[theme]}
+      variant='outline'>
       {optionListJSX}
-    </div>
+    </ToggleGroup>
   );
 };
 
 /* Helpers */
 const themeOptions = [
-  { hint: 'Light palette, pinned', label: 'L', value: 'light' },
-  { hint: 'Dark palette, pinned', label: 'D', value: 'dark' },
-  { hint: 'Follows your OS appearance', label: 'S', value: 'system' },
+  { hint: 'Light palette, pinned', label: 'light', value: 'light' },
+  { hint: 'Dark palette, pinned', label: 'dark', value: 'dark' },
+  { hint: 'Follows your OS appearance', label: 'auto', value: 'system' },
 ] as const satisfies readonly ThemeOption[];
+
+const isTheme = (value: unknown): value is Theme => {
+  return value === 'light' || value === 'dark' || value === 'system';
+};
 
 const themeRead = (): Theme => {
   const stored = localStorage.getItem('theme');

@@ -79,9 +79,9 @@ export const LaunchTile = (props: LaunchTileProps) => {
       <div className={bodyCva({ isDetailed: props.isDetailed })}>
         <div
           aria-hidden='true'
-          className='absolute inset-y-0 right-0 isolate w-3/4 bg-primary opacity-40 [mask-image:linear-gradient(to_right,transparent,black_55%)] dark:opacity-30'>
+          className='absolute inset-y-0 right-0 isolate w-3/4 bg-primary opacity-40 transition-opacity duration-300 [mask-image:linear-gradient(to_right,transparent,black_55%)] group-hover/ticket:opacity-80 dark:opacity-30 dark:group-hover/ticket:opacity-70'>
           <div
-            className='size-full bg-center bg-cover mix-blend-luminosity'
+            className='size-full bg-center bg-cover mix-blend-luminosity group-hover/ticket:mix-blend-normal'
             style={{ backgroundImage: getBgImage(flightNumber) }}
           />
         </div>
@@ -157,7 +157,7 @@ export const LaunchTile = (props: LaunchTileProps) => {
 
 /* Styles */
 const ticketCva = cva({
-  base: 'relative flex flex-col overflow-hidden border border-line bg-bg-soft transition-colors has-[a:focus-visible]:border-primary has-[a:hover]:border-primary has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-primary/40 sm:flex-row',
+  base: 'group/ticket relative isolate flex flex-col overflow-hidden border border-line bg-bg-soft transition-colors has-[a:focus-visible]:border-primary has-[a:hover]:border-primary has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-primary/40 sm:flex-row',
 });
 
 const bodyCva = cva({
