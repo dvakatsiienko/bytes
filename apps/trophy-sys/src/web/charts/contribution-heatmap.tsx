@@ -158,7 +158,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
     return [
       <text
         fill={CHART_INK.axis}
-        fontSize={11}
+        fontSize={12}
         key={first.date}
         x={weekIndex * GRID_STEP + LABEL_INSET}
         y={8}>
@@ -185,7 +185,7 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
         <text
           dominantBaseline='middle'
           fill={CHART_INK.axis}
-          fontSize={11}
+          fontSize={12}
           x={marginX + MARGIN_WIDTH + 4}
           y={index * GRID_STEP + LABEL_HEIGHT + GRID_CELL / 2}>
           {weekday.label}

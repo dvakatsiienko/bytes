@@ -6,7 +6,7 @@
 const CHIP: Record<string, string> = {
   PS3: 'border-line/60 text-mute',
   PS4: 'border-line text-dim',
-  PS5: 'border-fg-soft/60 bg-fg-soft/15 text-fg',
+  PS5: 'border-fg-soft/60 bg-fg-soft/15 text-fg-soft',
   PSPC: 'border-line/60 text-mute',
   PSVITA: 'border-line/60 text-mute',
 };

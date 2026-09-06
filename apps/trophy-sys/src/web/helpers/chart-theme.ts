@@ -103,6 +103,6 @@ export const GRID_STEP = GRID_CELL + 2;
 export const AXIS_LABEL = {
   fill: CHART_INK.axis,
   /** Matches the chart labels: an axis tick is dense data, not fine print. */
-  fontSize: 11,
+  fontSize: 12,
   textAnchor: 'middle' as const,
 } as const;

@@ -47,7 +47,7 @@ export const Log = () => {
         <header className='sticky top-0 z-10 flex items-baseline gap-3 border-line border-y bg-bg-lift px-4 py-1.5 text-[12px]'>
           {/* Printed, not parsed. `date` is already a local gaming-day key, and
               sending it back through a Date would read it as UTC midnight. */}
-          <span className='select-text text-orange tracking-[0.15em]'>
+          <span className='text-orange tracking-[0.15em]'>
             {day.date.replace(/-/g, '.')}
           </span>
           <span className='text-mute'>
@@ -116,7 +116,7 @@ const GameDayRow = (props: GameDayRowProps) => {
           )}
         </span>
 
-        <span className='shrink-0 select-text text-[12px] text-dim tabular-nums'>
+        <span className='shrink-0 text-[12px] text-dim tabular-nums'>
           {trophy.rarity}%
         </span>
         <span className='w-11 shrink-0 text-right text-[12px] text-dim tabular-nums'>
@@ -138,7 +138,7 @@ const GameDayRow = (props: GameDayRowProps) => {
           width={32}
         />
         <Link
-          className='min-w-0 flex-1 cursor-pointer select-text truncate text-fg-soft hover:text-orange'
+          className='min-w-0 flex-1 cursor-pointer select-text truncate py-1 text-fg-soft hover:text-orange focus-visible:outline focus-visible:outline-orange'
           params={{ gameId: props.gameDay.gameId }}
           to='/library/$gameId'>
           {props.gameDay.name}

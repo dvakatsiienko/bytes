@@ -16,22 +16,26 @@
   --p-bg-soft: #f2e5bc;
   --p-bg-lift: #ebdbb2;
   --p-line: #d5c4a1;
-  --p-dim: #a89984;
-  --p-mute: #928374;
+  /*
+   * Same hues as gruvbox-material light, pushed darker until every one holds
+   * 4.5:1 on the lift surface (#ebdbb2), the palest ground text sits on. The
+   * stock values were a naive inversion of dark and the orange read at 3.1:1
+   * there — measured 2026-09-07, the light theme's sharpest failure.
+   */
+  --p-dim: #6c5e4c;
+  --p-mute: #61564c;
   --p-fg: #654735;
   --p-fg-soft: #4f3829;
-  --p-red: #c14a4a;
-  --p-green: #6c782e;
-  --p-yellow: #b47109;
-  --p-orange: #c35e0a;
-  /*
-   */
-  --p-purple: #945e80;
-  --p-blue: #45707a;
-  --p-bronze: #a86a32;
-  --p-silver: #7c6f64;
-  --p-gold: #b47109;
-  --p-platinum: #45707a;
+  --p-red: #aa3a3a;
+  --p-green: #5c6627;
+  --p-yellow: #895607;
+  --p-orange: #9a4a08;
+  --p-purple: #815270;
+  --p-blue: #3f6670;
+  --p-bronze: #875528;
+  --p-silver: #6a5f55;
+  --p-gold: #895607;
+  --p-platinum: #3f6670;
   /* The CRT overlay is scanlines on dark, and grime on light. */
   --p-scanline: 0;
 }
@@ -42,8 +46,8 @@
   --p-bg-soft: #282828;
   --p-bg-lift: #32302f;
   --p-line: #504945;
-  --p-dim: #7c6f64;
-  --p-mute: #928374;
+  --p-dim: #a2968c;
+  --p-mute: #ada296;
   --p-fg: #d4be98;
   --p-fg-soft: #bdae93;
   --p-red: #ea6962;
@@ -66,8 +70,8 @@
     --p-bg-soft: #282828;
     --p-bg-lift: #32302f;
     --p-line: #504945;
-    --p-dim: #7c6f64;
-    --p-mute: #928374;
+    --p-dim: #a2968c;
+    --p-mute: #ada296;
     --p-fg: #d4be98;
     --p-fg-soft: #bdae93;
     --p-red: #ea6962;
@@ -192,7 +196,7 @@
     top: -0.65rem;
     left: 0.75rem;
     padding-inline: 0.4rem;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--color-mute);
     text-transform: uppercase;
     letter-spacing: 0.18em;
@@ -220,7 +224,7 @@
     width: max-content;
     max-width: 15rem;
     padding: 0.3rem 0.5rem;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--color-fg);
     text-transform: none;

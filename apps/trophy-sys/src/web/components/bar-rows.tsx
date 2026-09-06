@@ -237,7 +237,7 @@ const AXIS_PAD = 8;
  */
 const VALUE_GAP = 16;
 
-const LABEL_FONT = 11;
+const LABEL_FONT = 12;
 /**
  * JetBrains Mono advances at 0.6em, so the font size *is* the character width.
  * Derived rather than a constant: a hard-coded 5px-per-character was sized for

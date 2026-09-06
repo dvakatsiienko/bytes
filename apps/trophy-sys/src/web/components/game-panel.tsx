@@ -106,7 +106,7 @@ export const GamePanel = (props: GamePanelProps) => {
         </div>
       </div>
 
-      <div className='flex items-center gap-2 border-line border-b px-4 py-2'>
+      <div className='flex flex-wrap items-center gap-2 border-line border-b px-4 py-2'>
         <input
           className='hint min-w-0 flex-1 border border-line bg-bg-soft px-2 py-1 text-[12px] text-fg placeholder:text-dim focus:border-orange focus:outline-none'
           data-hint='Filters trophies by name and description.'

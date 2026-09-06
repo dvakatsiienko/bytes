@@ -87,7 +87,7 @@ const Ring = (props: RingProps) => {
         <text
           dominantBaseline='middle'
           fill={CHART_INK.axis}
-          fontSize={11}
+          fontSize={12}
           key={hour.hour}
           textAnchor='middle'
           x={Math.sin(mid) * (outer + 12)}

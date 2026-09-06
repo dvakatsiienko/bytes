@@ -267,7 +267,7 @@ const Plot = (props: PlotProps) => {
               />
               <text
                 fill={CHART_INK.ring}
-                fontSize={11}
+                fontSize={12}
                 textAnchor={
                   focusIndex > props.months.length / 2 ? 'end' : 'start'
                 }
