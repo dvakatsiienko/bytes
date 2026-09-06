@@ -16,10 +16,10 @@ export const ThemeToggle = () => {
           </span>
         ) : null}
         <label
-          className={`cursor-pointer px-1 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary ${
+          className={`inline-flex min-h-6 min-w-6 cursor-pointer items-center justify-center px-1.5 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary ${
             isActive
               ? 'text-primary underline underline-offset-4'
-              : 'text-dim hover:text-fg-soft'
+              : 'text-mute hover:text-fg-soft'
           }`}
           title={option.hint}>
           <input

@@ -1,30 +1,36 @@
-import { cx } from 'cva';
-
+import { ThemeToggle } from '../ThemeToggle';
 import dog1Png from './img/dog-1.png';
 import dog2Png from './img/dog-2.png';
 import dog3Png from './img/dog-3.png';
 
 export const Header = (props: HeaderProps) => {
-  const { image, title } = props;
   const token = localStorage.getItem('token');
   const email = token ? window.atob(token) : '';
-  const avatar = image || pickAvatarByEmail(email);
+  const avatar = props.image || pickAvatarByEmail(email);
+  const avatarCn = props.image
+    ? 'border border-line bg-bg-lift'
+    : 'rounded-full';
 
   return (
-    <section className='mb-9 flex items-center'>
-      {/** biome-ignore lint/performance/noImgElement: todo — make nextjs biome rules specific to each next app instaed of applying globally */}
+    <header className='mb-8 flex items-center gap-4 border-line border-b pb-4'>
+      {/** biome-ignore lint/performance/noImgElement: vite app, the next rule does not apply */}
       <img
-        alt='Space dog'
-        className={cx('mr-5 size-33', { 'rounded-full': !image })}
-        height={135}
+        alt=''
+        className={`size-14 shrink-0 object-cover ${avatarCn}`}
+        height={56}
         src={avatar}
-        width={135}
+        width={56}
       />
-      <div>
-        <h2>{title}</h2>
-        <h5 className='mt-1 text-mute'>{email}</h5>
+      <div className='min-w-0'>
+        <h1 className='select-text truncate font-bold text-fg-soft text-lg leading-tight'>
+          {props.title}
+        </h1>
+        <p className='select-text truncate text-mute text-xs'>{email}</p>
       </div>
-    </section>
+      <div className='ml-auto'>
+        <ThemeToggle />
+      </div>
+    </header>
   );
 };
 

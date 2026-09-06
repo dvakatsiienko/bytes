@@ -9,9 +9,9 @@ export const Layout = () => {
 
   return (
     <>
-      <section className='mx-auto flex w-full max-w-150 grow flex-col p-6 pb-10'>
+      <main className='mx-auto flex w-full max-w-3xl grow flex-col px-4 pt-6 pb-10 sm:px-6'>
         <Outlet />
-      </section>
+      </main>
 
       {data?.isLoggedIn ? <Footer /> : null}
     </>

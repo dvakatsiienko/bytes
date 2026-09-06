@@ -1,5 +1,9 @@
-import { LogoSvg } from './SVG';
-
 export const Loading = () => {
-  return <LogoSvg className='m-auto block size-16 fill-line' />;
+  return (
+    <p
+      className='m-auto py-16 text-center text-mute text-xs uppercase tracking-[0.18em]'
+      role='status'>
+      ░░░ loading
+    </p>
+  );
 };

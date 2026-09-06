@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client/react';
 import { cartItemsVar } from '@/lib/apollo';
 
 import { LaunchTile } from './LaunchTile';
+import { Loading } from './Loading';
 import * as gql from '@/graphql';
 
 export const CartItem = (props: CartItemProps) => {
@@ -21,9 +22,13 @@ export const CartItem = (props: CartItemProps) => {
     }
   }, [isBooked, props.launchId]);
 
-  if (loading) return <h4>Loading...</h4>;
+  if (loading) return <Loading />;
   if (launchQuery.error) {
-    return <h4>Failed to load a cart item — retry before booking.</h4>;
+    return (
+      <p className='text-red' role='alert'>
+        Failed to load a cart item. Retry before booking.
+      </p>
+    );
   }
   if (!data) return null;
 

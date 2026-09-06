@@ -1,7 +1,6 @@
 import { useQuery } from '@apollo/client/react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
-import { ThemeToggle } from '../ThemeToggle';
 import { LogoutButton } from './LogoutButton';
 import { CartSvg, HomeSvg, ProfileSvg } from './SVG';
 import * as gql from '@/graphql';
@@ -14,40 +13,40 @@ export const Footer = () => {
   const userTripsCount = userProfileQuery.data?.userProfile.trips.length;
 
   return (
-    <footer className='sticky bottom-0 border-line border-t bg-bg-soft text-mute'>
-      <section className='mx-auto flex w-full max-w-115 items-center p-5'>
-        <Link className={menuItemCn} to='/launches'>
+    <footer className='sticky bottom-0 border-line border-t bg-bg-soft'>
+      <nav
+        aria-label='Main'
+        className='mx-auto grid w-full max-w-3xl grid-cols-4 px-4 sm:px-6'>
+        <NavLink className={menuItemCn} to='/launches'>
           <HomeSvg className={svgCn} />
-          Home
-        </Link>
+          Launches
+        </NavLink>
 
-        <Link className={menuItemCn} to='/cart'>
+        <NavLink className={menuItemCn} to='/cart'>
           <CartSvg className={svgCn} />
-          {Boolean(cartItemsCount) && (
-            <span className={tooltipCoutCn}>{cartItemsCount}</span>
-          )}
+          {cartItemsCount ? (
+            <span className={countCn}>{cartItemsCount}</span>
+          ) : null}
           Cart
-        </Link>
+        </NavLink>
 
-        <Link className={menuItemCn} to='/profile'>
+        <NavLink className={menuItemCn} to='/profile'>
           <ProfileSvg className={svgCn} />
-          {Boolean(userTripsCount) && (
-            <span className={tooltipCoutCn}>{userTripsCount}</span>
-          )}
-          Profile
-        </Link>
+          {userTripsCount ? (
+            <span className={countCn}>{userTripsCount}</span>
+          ) : null}
+          Trips
+        </NavLink>
 
         <LogoutButton className={menuItemCn} classNameSvg={svgCn} />
-
-        <ThemeToggle />
-      </section>
+      </nav>
     </footer>
   );
 };
 
 /* Styles */
 const menuItemCn =
-  'relative cursor-pointer flex-grow text-20 tracking-1.5 uppercase text-center';
-const svgCn = 'block size-15 mx-auto mb-2 fill-current';
-const tooltipCoutCn =
-  'absolute -top-2.5 right-5 grid place-content-center size-6.25 rounded-full bg-primary text-primary-foreground text-xs';
+  'relative flex cursor-pointer flex-col items-center gap-1 border-t-2 border-transparent py-3 text-mute text-xs uppercase tracking-[0.18em] transition-colors hover:text-fg-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-inset aria-[current=page]:border-primary aria-[current=page]:text-primary disabled:opacity-50';
+const svgCn = 'size-7 fill-current';
+const countCn =
+  'absolute top-2 left-1/2 ml-3 grid min-w-5 h-5 place-content-center bg-primary px-1 text-primary-foreground tabular-nums';

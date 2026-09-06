@@ -59,28 +59,38 @@ export const Cart = () => {
   if (bookTripsMeta.called && bookTripsMeta.data?.bookTrips.length)
     message = 'Trips booked.';
 
-  if (!(bookTripsMeta.called || cartItems.length)) message = 'Cart empty.';
+  if (!(bookTripsMeta.called || cartItems.length))
+    message = 'Nothing on hold. Add a launch and it shows up here.';
 
   if (bookTripsMeta.error)
     message = `Booking failed: ${bookTripsMeta.error.message}`;
 
   return (
     <>
-      <Header title='My Cart' />
+      <Header title='My cart' />
 
-      {message ? <h4>{message}</h4> : null}
+      {message ? (
+        <p
+          className={bookTripsMeta.error ? 'mb-6 text-red' : 'mb-6 text-mute'}
+          role='status'>
+          {message}
+        </p>
+      ) : null}
 
-      {Boolean(cartItems.length) && (
-        <section className='sticky top-2.5 z-1000 overflow-hidden'>
-          <Button
-            className='mx-auto'
-            disabled={bookTripsMeta.loading}
-            onClick={bookAll}>
-            Book All
+      {cartItems.length ? (
+        <section className='panel sticky top-4 z-10 mb-8 flex items-center justify-between gap-4 p-4'>
+          <span className='panel-title'>checkout</span>
+          <p className='text-mute text-sm tabular-nums'>
+            {cartItems.length} {cartItems.length === 1 ? 'seat' : 'seats'} on
+            hold
+          </p>
+          <Button disabled={bookTripsMeta.loading} onClick={bookAll}>
+            Book all
           </Button>
         </section>
-      )}
-      {listJSX}
+      ) : null}
+
+      <div className='flex flex-col gap-6'>{listJSX}</div>
     </>
   );
 };

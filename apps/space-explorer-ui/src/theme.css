@@ -12,8 +12,8 @@
   --p-bg-soft: #f2e5bc;
   --p-bg-lift: #ebdbb2;
   --p-line: #d5c4a1;
-  --p-dim: #a89984;
-  --p-mute: #928374;
+  --p-dim: #928374;
+  --p-mute: #665a50;
   --p-fg: #654735;
   --p-fg-soft: #4f3829;
   --p-red: #c14a4a;
@@ -29,8 +29,8 @@
   --p-bg-soft: #282828;
   --p-bg-lift: #32302f;
   --p-line: #504945;
-  --p-dim: #7c6f64;
-  --p-mute: #928374;
+  --p-dim: #928374;
+  --p-mute: #a89984;
   --p-fg: #d4be98;
   --p-fg-soft: #bdae93;
   --p-red: #ea6962;
@@ -170,6 +170,12 @@
 }
 
 @layer components {
+  /* Login backdrop: a static dot grid, the quietest possible starfield. */
+  .starfield {
+    background-image: radial-gradient(var(--p-line) 1px, transparent 1.5px);
+    background-size: 28px 28px;
+  }
+
   /* The boxed-with-a-label frame; the label sits outside the border, so a panel never scrolls itself. */
   .panel {
     position: relative;
