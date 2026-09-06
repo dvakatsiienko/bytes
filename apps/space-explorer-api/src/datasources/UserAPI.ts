@@ -95,7 +95,7 @@ export class UserAPI extends RESTDataSource {
     return user;
   }
 
-  private validateAuth() {
+  validateAuth() {
     if (!this.userEmail) {
       throw sessionGone('Not authenticated.');
     }

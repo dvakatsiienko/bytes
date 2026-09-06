@@ -4,6 +4,9 @@ import { injectLaunchesIntoTrips } from '@/utils';
 
 export const Mutation: MutationResolvers = {
   bookTrips: async (_, args, { dataSources }) => {
+    // refuse an anonymous call before spending a SpaceX round-trip on its ids
+    dataSources.userAPI.validateAuth();
+
     const launchIds = [...new Set(args.launchIds)];
 
     // validate every launch exists before writing anything — a bogus id throws
