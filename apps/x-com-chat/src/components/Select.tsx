@@ -35,7 +35,7 @@ export const Select = (props: SelectProps) => {
       items={props.options}
       name={props.name}
       onOpenChange={(open: boolean) => setIsOpen(open)}
-      onValueChange={(value) => {
+      onValueChange={(value: string | null) => {
         if (value) props.onValueChange(value);
       }}
       open={isOpen}
