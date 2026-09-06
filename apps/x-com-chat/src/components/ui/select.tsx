@@ -1,7 +1,6 @@
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { cn } from '@ui/kit/lib/utils';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-
-import { cn } from '@/utils/cn';
 
 function SelectRoot({
   ...props
@@ -174,11 +173,11 @@ function SelectScrollDownButton({
 }
 
 export {
-  SelectRoot,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectRoot,
   SelectScrollDownButton,
   SelectScrollUpButton,
   SelectSeparator,

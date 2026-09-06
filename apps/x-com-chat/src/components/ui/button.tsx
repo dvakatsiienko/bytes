@@ -2,8 +2,7 @@
 
 import { type VariantProps, cva } from 'cva';
 import { Slot } from '@radix-ui/react-slot';
-
-import { cn } from '@/utils/cn';
+import { cn } from '@ui/kit/lib/utils';
 
 export const Button = (props: ButtonProps) => {
   const { className, variant, size, asChild = false, ...restProps } = props;

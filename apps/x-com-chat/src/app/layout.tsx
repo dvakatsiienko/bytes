@@ -1,4 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs';
+import { cn } from '@ui/kit/lib/utils';
 import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -9,8 +10,6 @@ import { ConvexClientProvider } from '@/components/service/ConvexClientProvider'
 import { JotaiDevtools } from '@/components/service/JotaiDevtools';
 import { ThemeProvider } from '@/components/service/ThemeProvider';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-
-import { cn } from '@/utils/cn';
 
 import { api } from '@/convex/_generated/api';
 import '@/theme/init.css';

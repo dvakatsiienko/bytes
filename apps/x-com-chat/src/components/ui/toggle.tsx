@@ -2,8 +2,7 @@
 
 import { type VariantProps, cva } from 'cva';
 import * as TogglePrimitive from '@radix-ui/react-toggle';
-
-import { cn } from '@/utils/cn';
+import { cn } from '@ui/kit/lib/utils';
 
 function Toggle({
   className,

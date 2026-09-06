@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@ui/kit": "workspace:*",
-    "cva": "1.0.0-beta.4",
+    "cva": "1.0.0-beta.9",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8"

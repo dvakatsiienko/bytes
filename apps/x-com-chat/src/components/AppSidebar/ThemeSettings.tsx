@@ -1,11 +1,11 @@
 'use client';
 
+import { cn } from '@ui/kit/lib/utils';
 import useEventListener from '@use-it/event-listener';
 import { useTheme } from 'next-themes';
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-import { cn } from '@/utils/cn';
 import { useIsMounted } from '@/hooks/useIsMounted';
 
 import { themeList } from './config';

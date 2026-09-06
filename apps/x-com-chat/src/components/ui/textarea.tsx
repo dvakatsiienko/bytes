@@ -2,9 +2,8 @@
 
 import { useRef } from 'react';
 import { type VariantProps, cva } from 'cva';
+import { cn } from '@ui/kit/lib/utils';
 import useEventListener from '@use-it/event-listener';
-
-import { cn } from '@/utils/cn';
 
 function Textarea({ className, ...props }: TextareaProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);

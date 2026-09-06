@@ -2,6 +2,7 @@
 
 import { SignInButton, UserButton, useAuth } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
+import { cn } from '@ui/kit/lib/utils';
 import { useAtomValue } from 'jotai';
 import { AnimatePresence, motion } from 'motion/react';
 import NextLink from 'next/link';
@@ -11,7 +12,6 @@ import { LogoSvg } from '@/components/svg/LogoSvg';
 import { Button } from '@/components/ui/button';
 
 import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
-import { cn } from '@/utils/cn';
 
 import type { Doc } from '@/convex/_generated/dataModel';
 

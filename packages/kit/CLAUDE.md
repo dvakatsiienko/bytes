@@ -22,7 +22,7 @@ import { cva, type VariantProps } from 'cva';
 ```
 
 `cva` 1.0 beta takes an object: `cva({ base, variants, defaultVariants })`, not positional args.
-Remove this section when cva leaves beta.
+Revisit when cva 1.0 goes stable.
 
 ## regenerate a primitive
 
@@ -35,7 +35,7 @@ swap.
 pnpm dlx shadcn@latest add <component> --diff
 ```
 
-Empty output = the kit copy matches the registry except the cva swap.
+The cva import + wrap always shows; read past it. Anything else is drift.
 
 ## consumption
 

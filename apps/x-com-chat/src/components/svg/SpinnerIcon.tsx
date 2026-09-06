@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@ui/kit/lib/utils';
 
 export const SpinnerSvg = (props: SpinnerIconProps) => {
   const { size = 16, spin = true, pageLoader = false, ...restProps } = props;
@@ -92,7 +92,7 @@ export const SpinnerSvg = (props: SpinnerIconProps) => {
 
 /* Types */
 interface SpinnerIconProps extends React.SVGProps<SVGSVGElement> {
+  pageLoader?: boolean;
   size?: number;
   spin?: boolean;
-  pageLoader?: boolean;
 }

@@ -1,10 +1,10 @@
 import { useRef } from 'react';
+import { cn } from '@ui/kit/lib/utils';
 import type { UIMessage as TMessage } from 'ai';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@/components/ui/button';
 
-import { cn } from '@/utils/cn';
 import { useScrollToBottom } from '@/hooks/useScrollToBottom';
 
 import { Message } from './Message';

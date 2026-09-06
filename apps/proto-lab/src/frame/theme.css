@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "@ui/kit/globals.css";
 @import "tw-animate-css";
 
 @import "@fontsource-variable/bricolage-grotesque";

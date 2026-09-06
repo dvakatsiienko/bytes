@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { type VariantProps, cva } from 'cva';
 import { Slot } from '@radix-ui/react-slot';
+import { cn } from '@ui/kit/lib/utils';
 import { PanelLeftIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import { cn } from '@/utils/cn';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';

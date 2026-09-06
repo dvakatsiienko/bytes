@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { type VariantProps, cva } from 'cva';
+import { cn } from '@ui/kit/lib/utils';
 import NextImage, { type ImageProps as NextImageProps } from 'next/image';
-
-import { cn } from '@/utils/cn';
 
 export const Image = (props: ImageProps) => {
   const {
@@ -88,11 +87,11 @@ const imageFallback = '/image-fb.png';
 
 /* Types */
 interface ImageProps extends Omit<NextImageProps, 'src'>, ImageCnProps {
-  src: string | null;
-  mask?: boolean;
-  lassNameContainer?: string;
-  classNamePicture?: string;
   classNameImage?: string;
+  classNamePicture?: string;
+  lassNameContainer?: string;
+  mask?: boolean;
+  src: string | null;
 }
 
 type ImageCnProps = VariantProps<typeof imageCn>;

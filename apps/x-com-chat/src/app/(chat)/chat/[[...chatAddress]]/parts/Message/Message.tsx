@@ -14,7 +14,7 @@ const Markdown = dynamic(
   { ssr: false },
 );
 
-import { cn } from '@/utils/cn';
+import { cn } from '@ui/kit/lib/utils';
 
 const AnimatedBorder = (props: React.PropsWithChildren) => {
   return (

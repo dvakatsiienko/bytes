@@ -102,8 +102,10 @@ to agents and to code review, and they silently override the repo — a dashboar
 - **≤4 variants per component.**
 - **`baseColor` is `neutral`** and identical in every `components.json`; style, icons and `css`
   match too (the shadcn monorepo guide requires it).
-- **`cva` 1.0 beta everywhere.** shadcn generates `class-variance-authority`; swap the import to
-  `cva` after every `shadcn add`. Remove this line when cva leaves beta.
+- **`cva` 1.0 beta everywhere.** shadcn generates `class-variance-authority`; after every
+  `shadcn add` swap the import to `cva` and wrap the args into its object form.
+  `shadcn add --diff` always shows the cva import + wrap; read past it. Revisit when cva 1.0
+  goes stable.
 - **token layers are frozen:** L1 radix-colors scales → L2 the shadcn vocabulary verbatim → L3 kit
   extensions. Never rename an L2 token.
 - **surfaces:** `financial` and `space-explorer-ui` are live test surfaces; `figmentation` is exempt

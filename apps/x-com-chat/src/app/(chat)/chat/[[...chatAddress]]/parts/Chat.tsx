@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
+import { cn } from '@ui/kit/lib/utils';
 import useEventListener from '@use-it/event-listener';
 import { DefaultChatTransport, type UIMessage, createIdGenerator } from 'ai';
 import { useMutation } from 'convex/react';
@@ -20,7 +21,6 @@ import {
 } from '@/components/ui/tooltip';
 
 import { selectedChatIdAtom, selectedFriendIdAtom } from '@/lib/atoms';
-import { cn } from '@/utils/cn';
 
 import { MessageList } from './MessageList';
 import { api } from '@/convex/_generated/api';

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cn } from '@ui/kit/lib/utils';
 import {
   fetchMutation,
   preloadQuery,
@@ -7,8 +8,6 @@ import {
 import { redirect } from 'next/navigation';
 
 import { Image } from '@/components/Image';
-
-import { cn } from '@/utils/cn';
 
 import styles from './parts/styles.module.css';
 import { Chat } from './parts';

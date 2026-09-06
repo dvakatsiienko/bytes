@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [vitePluginReact({ compiler: true }), vitePluginTailwind()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    dedupe: ['react', 'react-dom'],
   },
   server: { port: 5179 },
 });

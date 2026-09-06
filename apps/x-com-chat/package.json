@@ -24,6 +24,7 @@
     "@radix-ui/react-toggle-group": "1.1.19",
     "@radix-ui/react-tooltip": "1.2.16",
     "@tailwindcss/forms": "0.5.11",
+    "@ui/kit": "workspace:*",
     "@use-it/event-listener": "0.1.7",
     "ai": "7.0.90",
     "convex": "1.45.0",
