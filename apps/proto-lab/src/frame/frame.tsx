@@ -28,6 +28,24 @@ const Shell = () => {
   return (
     <div className='min-h-screen'>
       {laneList.length > 0 ? <BenchNav laneList={laneList} /> : null}
+      {params.lane ? (
+        <main>
+          <Outlet />
+        </main>
+      ) : (
+        <ProtoChrome />
+      )}
+    </div>
+  );
+};
+
+// A bench lane owns everything below the nav; the header and ticket strip
+// would bias the judging, so they show only for the live current-* proto.
+const ProtoChrome = () => {
+  if (!proto) return null;
+
+  return (
+    <>
       <header className='border-b bg-card/60 backdrop-blur'>
         <div className='mx-auto flex max-w-5xl flex-wrap items-end justify-between gap-4 px-6 py-5'>
           <div>
@@ -44,11 +62,11 @@ const Shell = () => {
               answering
             </p>
             <p className='font-display font-medium text-lg leading-tight'>
-              {shown.protoMeta.question}
+              {proto.protoMeta.question}
             </p>
-            {shown.protoMeta.verdict ? (
+            {proto.protoMeta.verdict ? (
               <p className='mt-1 text-cobalt text-sm'>
-                settled: {shown.protoMeta.verdict}
+                settled: {proto.protoMeta.verdict}
               </p>
             ) : null}
           </div>
@@ -63,11 +81,11 @@ const Shell = () => {
 
       <footer className='mx-auto max-w-5xl px-6 pb-24'>
         <p className='font-mono text-[0.65rem] text-muted-foreground'>
-          {params.lane ? `bench-${params.lane}` : protoDir} · throwaway on
-          purpose — no tests, no persistence, no abstractions
+          {protoDir} · throwaway on purpose — no tests, no persistence, no
+          abstractions
         </p>
       </footer>
-    </div>
+    </>
   );
 };
 
