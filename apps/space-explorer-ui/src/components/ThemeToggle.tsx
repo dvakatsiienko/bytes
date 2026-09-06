@@ -22,7 +22,7 @@ export const ThemeToggle = () => {
   return (
     <ToggleGroup
       aria-label='Colour theme'
-      onValueChange={(value) => {
+      onValueChange={(value: string[]) => {
         const [next] = value;
         if (!isTheme(next)) return;
         themeApply(next);

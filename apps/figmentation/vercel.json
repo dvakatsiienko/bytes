@@ -1,4 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm i -F 'figmentation...'",
   "ignoreCommand": "npx turbo-ignore figmentation"
 }
