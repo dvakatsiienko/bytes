@@ -52,4 +52,4 @@ const menuItemCn =
   'relative flex cursor-pointer flex-col items-center gap-1 border-t-2 border-transparent py-3 text-mute text-xs uppercase tracking-[0.18em] transition-colors hover:text-fg-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-inset aria-[current=page]:border-primary aria-[current=page]:text-primary disabled:opacity-50';
 const svgCn = 'size-6';
 const countCn =
-  'absolute top-2 left-1/2 ml-3 inline-flex h-5 min-w-5 items-center justify-center bg-primary px-1 text-center text-primary-foreground tabular-nums';
+  'absolute top-2 left-1/2 ml-3 inline-flex h-5 min-w-5 items-center justify-center bg-primary px-1 text-center text-primary-foreground tabular-nums tracking-normal';
