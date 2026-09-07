@@ -20,9 +20,8 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
-const target = resolve(process.argv[2] ?? process.cwd());
 const trees = execFileSync('git', ['worktree', 'list', '--porcelain'], {
-  cwd: target,
+  cwd: process.cwd(),
   encoding: 'utf8',
 })
   .split('\n')
@@ -30,6 +29,14 @@ const trees = execFileSync('git', ['worktree', 'list', '--porcelain'], {
   .map((l) => l.slice('worktree '.length));
 const [main] = trees;
 if (!main) throw new Error('not inside a git worktree');
+// no path: the tree you stand in, or — from the main checkout — the newest one
+// (`camp … && pnpm worktree:seed` is the whole move)
+const cwd = process.cwd();
+const cwdTree = trees.find((t) => cwd === t || cwd.startsWith(`${t}/`));
+const target = resolve(
+  process.argv[2] ??
+    (cwdTree && cwdTree !== main ? cwdTree : (trees.at(-1) ?? main)),
+);
 const index = trees.indexOf(target);
 if (index === -1) throw new Error(`${target} is not a worktree of ${main}`);
 if (index === 0) {

@@ -153,7 +153,7 @@ Multi-context — root `CONTEXT-MAP.md` points at per-app `CONTEXT.md` files. Se
 ## worktrees — one shared checkout, coders branch in their own tree
 
 - the main checkout stays on `main`; a `git switch` there moves every session. a `coder/*` branch lives in `../bytes-<slug>` (`camp ../bytes-<slug> -b coder/BYT-N-<slug> main`).
-- **`pnpm worktree:seed <path>` makes the tree runnable**: copies every gitignored `.env*`, `.claude/settings.local.json` and trophy-sys's caches from the main checkout, runs `CI=1 pnpm install` (lefthook must not rewrite the shared hooks), and writes `.worktree-offset`. cc's `EnterWorktree` hook runs it for a tree it creates; after a hand-made `camp`, run it yourself.
+- **`pnpm worktree:seed <path>` makes the tree runnable**: copies every gitignored `.env*`, `.claude/settings.local.json` and trophy-sys's caches from the main checkout, runs `CI=1 pnpm install` (lefthook must not rewrite the shared hooks), and writes `.worktree-offset`. cc's `EnterWorktree` hook runs it for a tree it creates; after a hand-made `camp`, run it yourself — with no path it seeds the newest tree, so `camp ../bytes-x -b coder/BYT-N-x main && pnpm worktree:seed` is the whole move.
 - **ports move with the tree**: every `dev` script starts through `script/with-port.ts <base>`, which exports `PORT = base + offset` (offset = 10 × worktree index, 0 in the main checkout) and `PORT_OFFSET`. vite configs and the node apis read `PORT`; next reads it natively; trophy-sys's api adds the offset to 5178. an explicit `PORT` in the environment (the desktop launch entries) wins untouched.
 
 📌 untracked files that are not yours and stay: `apps/trophy-sys/{DESIGN,DESIGN-REQUEST,UIKIT-ARCHITECTURE-REVIEW}.md`.
