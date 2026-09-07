@@ -31,3 +31,10 @@ pre-push:
     - name: linear-push
       use_stdin: true
       run: node /Users/dima/dotfiles/script/linear-push.ts hook {1} {2}
+
+commit-msg:
+  jobs:
+    # Strips the `Claude-Session:` trailer the desktop harness asks agents to
+    # append; the `Agent:` trailer is the fingerprint, this one is noise.
+    - name: session-trailer
+      run: sed -i '' -e '/^Claude-Session:/d' {1}
