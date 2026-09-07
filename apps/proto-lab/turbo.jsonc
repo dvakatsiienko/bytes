@@ -1,10 +1,10 @@
 {
-  "$schema": "https://v2-10-0.turborepo.dev/schema.json",
+  "$schema": "https://turborepo.dev/schema.json",
   "extends": ["//"],
   "tasks": {
-    "dev": { "cache": false, "persistent": true },
-    "build": { "outputs": ["dist/**"] },
-    "lint": {},
-    "typecheck": {}
+    // Vite, so the root's Next.js outputs are replaced. `dev`, `lint` and
+    // `typecheck` are inherited from the root as-is — redefining them here only
+    // restated what they already were.
+    "build": { "outputs": ["dist/**"] }
   }
 }

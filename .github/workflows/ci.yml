@@ -19,6 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    # id-token is what lets the remote-cache step exchange a GitHub OIDC token
+    # for a short-lived Turborepo one. contents stays read.
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - uses: actions/checkout@v7
         with:
@@ -35,8 +41,26 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm turbo typecheck
+      # Vercel's remote cache is already on for deploys; this is the same cache,
+      # reached from GitHub. OIDC exchanges the runner's token for a short-lived
+      # one, so there is no long-lived TURBO_TOKEN secret to rotate or leak.
+      # Needs `vars.TURBO_TEAM` set on the repo — until it is, this step is a
+      # no-op and the run just misses cache, exactly as it does today.
+      - name: Remote cache
+        continue-on-error: true
+        uses: vercel/setup-turborepo-remote-cache-action@v1.1.0
+        with:
+          team: ${{ vars.TURBO_TEAM }}
 
+      # `--affected` on a PR: only packages the branch touched, plus their
+      # dependents. It compares against main, which is the base here, and needs
+      # the full history the checkout above already fetches. Pushes to main run
+      # the whole graph, so nothing merges without a complete check.
+      - name: Typecheck
+        run: pnpm turbo run typecheck ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+      # Through turbo rather than a root biome pass, so the per-package `lint`
+      # task is the one CI actually exercises, and its cache is shared with
+      # everyone else's.
       - name: Lint
-        run: pnpm lint:errors
+        run: pnpm turbo run lint ${{ github.event_name == 'pull_request' && '--affected' || '' }}

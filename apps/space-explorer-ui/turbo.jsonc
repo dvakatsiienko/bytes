@@ -1,40 +1,22 @@
 {
-  "$schema": "https://v2-10-0.turborepo.dev/schema.json",
+  "$schema": "https://turborepo.dev/schema.json",
   "extends": ["//"],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true,
+      // codegen and the client both need the api up, so it runs alongside
       "with": ["@space-explorer/api#dev"],
       "dependsOn": ["^prisma:generate"]
     },
     "build": {
+      // Vite, so the root's Next.js outputs are replaced.
       "outputs": ["dist/**"],
-      "env": [
-        "APOLLO_GRAPH_ID",
-        "APOLLO_GRAPH_VARIANT",
-        "APOLLO_KEY",
-        "APOLLO_SCHEMA_REPORTING",
-        "PORT"
-      ]
-    },
-    "lint": {
-      "env": [
-        "APOLLO_GRAPH_ID",
-        "APOLLO_GRAPH_VARIANT",
-        "APOLLO_KEY",
-        "APOLLO_SCHEMA_REPORTING",
-        "PORT"
-      ]
-    },
-    "typecheck": {
-      "env": [
-        "APOLLO_GRAPH_ID",
-        "APOLLO_GRAPH_VARIANT",
-        "APOLLO_KEY",
-        "APOLLO_SCHEMA_REPORTING",
-        "PORT"
-      ]
+      // The four APOLLO_* vars this used to declare — on build, lint AND
+      // typecheck — appear in no source file and in no codegen config. They only
+      // added dead inputs to three hashes. PORT is already in
+      // globalPassThroughEnv; NODE_ENV is framework-inferred.
+      "env": ["VITE_GQL_URL"]
     }
   }
 }
