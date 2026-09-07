@@ -149,3 +149,5 @@ Workspace-level families — role, kind, special, model routing. Project-meaning
 ### Domain docs
 
 Multi-context — root `CONTEXT-MAP.md` points at per-app `CONTEXT.md` files. See `docs/agents/domain.md`.
+
+📌 untracked files that are not yours and stay: `apps/trophy-sys/{DESIGN,DESIGN-REQUEST,UIKIT-ARCHITECTURE-REVIEW}.md`.
