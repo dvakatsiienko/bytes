@@ -46,3 +46,6 @@ pscale.txt
 
 # Claude Code worktrees (embedded git repos)
 .claude/worktrees/
+
+# per-worktree dev port offset, written by script/worktree-seed.ts
+.worktree-offset

@@ -4,7 +4,7 @@
   "scripts": {
     "build": "next build",
     "build:clean": "rimraf .next",
-    "dev": "next dev --inspect",
+    "dev": "node ../../script/with-port.ts 3000 next dev --inspect",
     "dev:analyze": "next experimental-analyze",
     "dev:vc": "vercel dev",
     "lint": "biome lint",

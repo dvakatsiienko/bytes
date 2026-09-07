@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev --inspect",
+    "dev": "node ../../script/with-port.ts 3000 next dev --inspect",
     "lint": "biome lint",
     "serve": "next start",
     "typecheck": "tsc"

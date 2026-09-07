@@ -3,7 +3,13 @@
   "ui": "tui",
   // Declaring this list makes turbo strip every OTHER env var from task
   // environments, so anything the tasks genuinely need must be named here.
-  "globalPassThroughEnv": ["ENABLE_EXPERIMENTAL_COREPACK", "DATABASE_URL"],
+  "globalPassThroughEnv": [
+    "ENABLE_EXPERIMENTAL_COREPACK",
+    "DATABASE_URL",
+    "PORT",
+    "PORT_OFFSET",
+    "API_PORT"
+  ],
   "tasks": {
     "dev": {
       "cache": false,

@@ -6,7 +6,7 @@
   "main": "src/index.ts",
   "scripts": {
     "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
-    "dev": "tsx watch ./src/index.ts",
+    "dev": "node ../../script/with-port.ts 4000 tsx watch ./src/index.ts",
     "postinstall": "prisma generate",
     "lint": "biome lint",
     "prisma:generate": "prisma generate",

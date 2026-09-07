@@ -6,7 +6,7 @@
     "build": "next build",
     "build:clean": "rimraf .next",
     "convex:seed": "convex run chat:seedFriends",
-    "dev": "next dev --inspect",
+    "dev": "node ../../script/with-port.ts 3000 next dev --inspect",
     "dev:convex": "convex dev",
     "lint": "biome lint",
     "serve": "next start",

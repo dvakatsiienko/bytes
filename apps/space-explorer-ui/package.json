@@ -8,7 +8,7 @@
     "build:clean": "rimraf dist",
     "build:vite": "vite build",
     "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\"",
-    "dev": "vite",
+    "dev": "node ../../script/with-port.ts 5173 vite",
     "lint": "biome lint",
     "preview": "vite preview",
     "serve": "run-s build:clean build:vite preview",

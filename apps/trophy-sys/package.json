@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node --run dev:api & node --run dev:web",
+    "dev": "node ../../script/with-port.ts 5177 node --run dev:api & node ../../script/with-port.ts 5177 node --run dev:web",
     "dev:api": "node --watch --env-file=.env --env-file-if-exists=.env.local --env-file-if-exists=.env.dev.local src/server/main.ts",
     "dev:web": "vite",
     "build": "node --run build:web && node --run build:api && node --run build:output",

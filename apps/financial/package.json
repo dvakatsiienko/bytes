@@ -9,7 +9,7 @@
     "db:reinit": "run-s db:reset prisma:generate db:seed",
     "db:reset": "prisma db push --force-reset",
     "db:seed": "prisma db seed",
-    "dev": "next dev --inspect",
+    "dev": "node ../../script/with-port.ts 3000 next dev --inspect",
     "postinstall": "prisma generate",
     "lint": "biome lint",
     "prisma:generate": "prisma generate",

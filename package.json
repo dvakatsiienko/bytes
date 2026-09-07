@@ -1,5 +1,6 @@
 {
   "name": "bytes",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
@@ -28,6 +29,7 @@
     "packages:reinstall": "pnpm dlx rimraf node_modules \"**/node_modules\" \"**/.next\" pnpm-lock.yaml && pnpm install",
     "publish:prettier-config": "pnpm -F='prettier-config-polished' publish",
     "turbo:devtools": "turbo devtools",
+    "worktree:seed": "node ./script/worktree-seed.ts",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {

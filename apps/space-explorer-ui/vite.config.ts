@@ -10,4 +10,5 @@ export default defineConfig({
     vitePluginTailwindcss(),
   ],
   resolve: { dedupe: ['react', 'react-dom'], tsconfigPaths: true },
+  server: { port: Number(process.env.PORT ?? 5173) },
 });
