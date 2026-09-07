@@ -23,8 +23,13 @@ pre-commit:
     # PATH. It is deliberately not `… && package-json-shape . || true`: that form
     # also swallows a REAL failure, so the gate would never fire for us either
     # (measured — the `|| true` covers both branches).
+    # Both globs are needed: `**/package.json` does not match a top-level
+    # `package.json`, so the root manifest — the one most often hand-edited —
+    # used to slip through unchecked.
     - name: package-json-shape
-      glob: '**/package.json'
+      glob:
+        - 'package.json'
+        - '**/package.json'
       run: if command -v package-json-shape >/dev/null; then package-json-shape .; fi
 
 pre-push:
