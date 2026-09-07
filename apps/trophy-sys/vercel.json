@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm i -F 'trophy-sys...'",
   "buildCommand": "pnpm build",
   "crons": [{ "path": "/api/stats", "schedule": "0 4 * * *" }]
 }
