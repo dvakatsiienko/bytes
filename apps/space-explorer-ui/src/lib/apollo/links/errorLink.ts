@@ -2,6 +2,7 @@ import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { ErrorLink } from '@apollo/client/link/error';
 import debug from 'debug';
 
+import { evictPerUserFields } from '../cache';
 import { cartItemsVar, isLoggedInVar } from '../typePolicies';
 
 const logGql = debug('[GraphQL error]');
@@ -44,4 +45,9 @@ const sessionEnd = () => {
   localStorage.removeItem('userId');
   cartItemsVar([]);
   isLoggedInVar(false);
+
+  // Same order LogoutButton uses: clear auth first, then evict. Without this the
+  // departing user's userProfile stayed in the cache, and whoever logged in next
+  // read their trips and email until the network answered.
+  evictPerUserFields();
 };
