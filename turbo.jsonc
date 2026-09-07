@@ -58,10 +58,13 @@
     "typecheck": {
       "dependsOn": ["transit", "prisma:generate"],
       "description": "Checks TypeScript code for errors",
-      // Four apps set `incremental: true`, so `tsc --noEmit` still writes
-      // tsconfig.tsbuildinfo. Without this the file is never restored and no
-      // run is ever actually incremental.
-      "outputs": ["*.tsbuildinfo"],
+      // No `outputs` on purpose. Four apps set `incremental: true` and write
+      // tsconfig.tsbuildinfo, so caching it looks free — it is not worth it:
+      // turbo restores outputs only on a cache HIT, and on a hit tsc never runs,
+      // so the restored file is not read. On a MISS nothing is restored, so a
+      // cold CI run always typechecks from scratch either way. Declaring the
+      // glob only earned five "no output files found" warnings from the
+      // packages that are not incremental.
       // $TURBO_DEFAULT$ already covers package.json, tsconfig.json and every
       // .ts/.tsx file; listing them again only made the config look tighter
       // than it was.
