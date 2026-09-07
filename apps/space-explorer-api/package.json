@@ -6,6 +6,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "node ../../script/with-port.ts 4000 tsx watch ./src/index.ts",
+    "start": "tsx ./src/index.ts",
     "db:studio": "prisma studio",
     "graphql:codegen": "graphql-codegen --config \"./graphql-codegen.yml\"",
     "prisma:generate": "prisma generate",
