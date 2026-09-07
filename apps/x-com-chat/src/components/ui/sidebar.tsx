@@ -302,6 +302,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
       onClick={toggleSidebar}
       tabIndex={-1}
       title='Toggle Sidebar'
+      type='button'
       {...props}
     />
   );
@@ -401,6 +402,7 @@ function SidebarGroupAction({
       )}
       data-sidebar='group-action'
       data-slot='sidebar-group-action'
+      type='button'
       {...props}
     />
   );
@@ -482,6 +484,7 @@ function SidebarMenuButton({
       data-sidebar='menu-button'
       data-size={size}
       data-slot='sidebar-menu-button'
+      type='button'
       {...props}
     />
   );
@@ -532,6 +535,7 @@ function SidebarMenuAction({
       )}
       data-sidebar='menu-action'
       data-slot='sidebar-menu-action'
+      type='button'
       {...props}
     />
   );
