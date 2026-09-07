@@ -13,7 +13,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "prisma:generate": "prisma generate",
-    "postinstall": "node --run prisma:generate",
+    "postinstall": "prisma generate",
     "lint": "biome lint",
     "test": "node --test src/lib/*.test.ts",
     "typecheck": "tsc"

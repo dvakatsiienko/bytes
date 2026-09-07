@@ -1,5 +1,5 @@
 {
-  "$schema": "https://v2-10-0.turborepo.dev/schema.json",
+  "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
   // Declaring this list makes turbo strip every OTHER env var from task
   // environments, so anything the tasks genuinely need must be named here.
@@ -11,6 +11,13 @@
     "API_PORT"
   ],
   "tasks": {
+    // A no-op task with no matching script anywhere. It exists so `lint` and
+    // `typecheck` can depend on their dependencies' SOURCE without waiting for
+    // their dependencies' lint/typecheck to finish: `^lint` would serialise the
+    // graph, and no dependsOn at all would let a stale cache survive a change in
+    // a package you import. This is turbo's "transit node" pattern.
+    "transit": { "dependsOn": ["^transit"] },
+
     "dev": {
       "cache": false,
       "persistent": true,
@@ -18,42 +25,54 @@
     },
     "serve": { "cache": false, "persistent": true },
     "dev:convex": { "cache": false, "persistent": true },
+
     "build": {
-      "dependsOn": ["^build", "lint", "typecheck", "^prisma:generate"],
-      "outputs": [".next/**", "!.next/cache/**"],
+      // `prisma:generate`, not `^prisma:generate`: the client a package builds
+      // against is its OWN, and `^` only reaches dependencies. It used to work
+      // by accident, through typecheck, which did name it correctly.
+      //
+      // lint and typecheck are deliberately NOT here. CI gates both on every PR
+      // and push, so requiring them made each Vercel deploy run five tasks to
+      // produce one artifact, and let a lint error fail a deploy.
+      "dependsOn": ["^build", "prisma:generate"],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"],
       "inputs": [
         "$TURBO_DEFAULT$",
 
-        "!.vscode/**",
-        "!.cursor/**",
-        "!.editorconfig",
+        // Tracked .env files are already covered by $TURBO_DEFAULT$; this is
+        // for the gitignored *.local ones, which a build still reads.
+        ".env*",
 
+        // Only paths that can actually match INSIDE a package earn a line here.
+        // Task inputs are package-relative, so a root-level file can never match
+        // — and root files are not part of a package's hash to begin with
+        // (measured: editing lefthook.yaml leaves every task hash untouched).
         "!CLAUDE.md",
-        "!**/**/README.md",
-
-        "!config/biome.*.jsonc",
-        "!config/biome.jsonc",
-        "!prettier.config.mjs",
-        "!lefthook.yaml",
-        "!coderabbit.yaml"
+        "!**/README.md",
+        "!.vscode/**"
       ]
     },
-    "lint": {},
-    "typecheck": {
-      "dependsOn": ["^typecheck", "prisma:generate"],
-      "description": "Checks TypeScript code for errors",
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "package.json",
-        "tsconfig.json",
 
-        "**/*.{ts,tsx}",
-        "**/*.d.ts"
-      ]
+    "lint": { "dependsOn": ["transit"] },
+
+    "typecheck": {
+      "dependsOn": ["transit", "prisma:generate"],
+      "description": "Checks TypeScript code for errors",
+      // Four apps set `incremental: true`, so `tsc --noEmit` still writes
+      // tsconfig.tsbuildinfo. Without this the file is never restored and no
+      // run is ever actually incremental.
+      "outputs": ["*.tsbuildinfo"],
+      // $TURBO_DEFAULT$ already covers package.json, tsconfig.json and every
+      // .ts/.tsx file; listing them again only made the config look tighter
+      // than it was.
+      "inputs": ["$TURBO_DEFAULT$"]
     },
 
     "prisma:generate": {
-      "inputs": ["./prisma/**/*"]
+      "inputs": ["prisma/**", "package.json"],
+      // The generated client lands here (both schemas set `output`). Undeclared,
+      // it was regenerated every run and a cache hit restored nothing.
+      "outputs": [".generated/prisma/**"]
     }
   }
 }

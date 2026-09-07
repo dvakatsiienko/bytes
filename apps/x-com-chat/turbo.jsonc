@@ -1,13 +1,17 @@
 {
-  "$schema": "https://v2-10-0.turborepo.dev/schema.json",
+  "$schema": "https://turborepo.dev/schema.json",
   "extends": ["//"],
   "tasks": {
     "build": {
+      // Clerk's and Convex's own tooling read these at build time rather than
+      // our source, so they must be declared even though no process.env line
+      // mentions them. NEXT_PUBLIC_CONVEX_URL needs no entry — turbo infers
+      // NEXT_PUBLIC_* for Next.js. OPENROUTER_API_KEY used to sit here and is
+      // referenced nowhere: this app talks to Groq.
       "env": [
         "CLERK_SECRET_KEY",
         "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
         "GROQ_API_KEY",
-        "OPENROUTER_API_KEY",
         "CONVEX_DEPLOY_KEY"
       ]
     },
@@ -15,7 +19,6 @@
       "passThroughEnv": [
         "CLERK_SECRET_KEY",
         "GROQ_API_KEY",
-        "OPENROUTER_API_KEY",
         "CONVEX_DEPLOY_KEY"
       ]
     },
@@ -23,7 +26,6 @@
       "passThroughEnv": [
         "CLERK_SECRET_KEY",
         "GROQ_API_KEY",
-        "OPENROUTER_API_KEY",
         "CONVEX_DEPLOY_KEY"
       ]
     }
