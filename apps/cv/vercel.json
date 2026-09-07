@@ -1,5 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm i -F 'cv...'",
-  "ignoreCommand": "npx turbo-ignore cv"
+  "installCommand": "pnpm i -F 'cv...'"
 }
