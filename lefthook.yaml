@@ -15,11 +15,17 @@ pre-commit:
       stage_fixed: true
 
     # A manifest printed at random used to land and get re-sorted by hand later.
-    # The shape contract lives in script/lib/package-json-shape.ts; this runs it
-    # only when a manifest is actually staged.
+    # The check ships with plugin-x, next to the convention it enforces, so this
+    # repo runs the rules rather than carrying a copy. Only fires when a manifest
+    # is actually staged.
+    #
+    # The `if` guard skips silently for a clone that does not have plugin-x on
+    # PATH. It is deliberately not `… && package-json-shape . || true`: that form
+    # also swallows a REAL failure, so the gate would never fire for us either
+    # (measured — the `|| true` covers both branches).
     - name: package-json-shape
       glob: '**/package.json'
-      run: npx vitest run script/lib/package-json-shape.test.ts
+      run: if command -v package-json-shape >/dev/null; then package-json-shape .; fi
 
 pre-push:
   jobs:
