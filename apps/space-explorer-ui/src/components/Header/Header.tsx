@@ -4,8 +4,7 @@ import dog2Png from './img/dog-2.png';
 import dog3Png from './img/dog-3.png';
 
 export const Header = (props: HeaderProps) => {
-  const token = localStorage.getItem('token');
-  const email = token ? window.atob(token) : '';
+  const email = emailFromToken(localStorage.getItem('token'));
   const avatar = props.image || pickAvatarByEmail(email);
   const avatarCn = props.image
     ? 'border border-line bg-bg-lift'
@@ -35,6 +34,20 @@ export const Header = (props: HeaderProps) => {
 };
 
 /* Helpers */
+// atob throws on anything that is not valid base64 — a token from an older build,
+// or a hand-edited storage entry. Header renders on every protected page and the
+// app has no error boundary, so an unguarded decode whitescreens the whole site
+// with no reachable Logout button.
+function emailFromToken(token: string | null) {
+  if (!token) return '';
+
+  try {
+    return window.atob(token);
+  } catch {
+    return '';
+  }
+}
+
 const max = 25; // 25 letters in the alphabet
 const offset = 97; // letter A's charcode is 97
 const avatars = [dog1Png, dog2Png, dog3Png];

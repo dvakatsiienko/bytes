@@ -5,7 +5,7 @@ import { Header, LaunchTile, Loading } from '@/components';
 import * as gql from '@/graphql';
 
 export const Profile = () => {
-  const { data, loading } = useQuery(gql.UserProfileDocument, {
+  const { data, loading, error } = useQuery(gql.UserProfileDocument, {
     fetchPolicy: 'cache-and-network',
   });
 
@@ -19,10 +19,15 @@ export const Profile = () => {
       <Header title='My trips' />
 
       {loading && !data ? <Loading /> : null}
+      {error && !data ? (
+        <p className='text-red' role='alert'>
+          Could not load your trips: {error.message}
+        </p>
+      ) : null}
 
       <div className='flex flex-col gap-6'>{tripsListJSX}</div>
 
-      {!loading && trips.length === 0 ? (
+      {!(loading || error) && trips.length === 0 ? (
         <section className='panel mt-2 p-6'>
           <span className='panel-title'>manifest</span>
           <p className='text-mute'>

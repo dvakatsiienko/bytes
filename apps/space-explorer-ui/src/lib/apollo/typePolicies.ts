@@ -47,7 +47,7 @@ export const cartItemsVar = makeVar<string[]>(cartRead());
 
 // the cart is a reactive var, so a reload would empty it — mirror every change
 // into localStorage and read it back on boot
-function cartRead(): string[] {
+export function cartRead(): string[] {
   try {
     const parsed: unknown = JSON.parse(localStorage.getItem('cart') ?? '[]');
     return Array.isArray(parsed)
@@ -59,7 +59,22 @@ function cartRead(): string[] {
 }
 
 function cartPersist(items: string[]) {
-  localStorage.setItem('cart', JSON.stringify(items));
+  // Re-subscribe before writing, not after. makeVar clears its listeners before
+  // running them, so a throw here used to unhook persistence for the rest of the
+  // session — and propagate out of the cartItemsVar(...) call that triggered it.
   cartItemsVar.onNextChange(cartPersist);
+
+  try {
+    const next = JSON.stringify(items);
+    // An identical write would still notify other tabs in some browsers, and
+    // their echo would come straight back. Skip it.
+    if (localStorage.getItem('cart') === next) return;
+
+    localStorage.setItem('cart', next);
+  } catch (error) {
+    // Safari private mode, quota, or storage blocked by policy. The cart still
+    // works for this session; it just will not survive a reload.
+    console.error('Could not persist the cart:', error);
+  }
 }
 cartItemsVar.onNextChange(cartPersist);

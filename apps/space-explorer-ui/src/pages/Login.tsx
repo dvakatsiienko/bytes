@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-import { isLoggedInVar } from '@/lib/apollo';
+import { evictPerUserFields, isLoggedInVar } from '@/lib/apollo';
 
 import { Loading, LoginForm } from '@/components';
 import * as gql from '@/graphql';
@@ -18,6 +18,9 @@ export const Login = () => {
         localStorage.setItem('userId', login.id);
 
         isLoggedInVar(true);
+        // The last hole in the cross-user leak: whatever the previous session
+        // left cached goes, however that session ended.
+        evictPerUserFields();
         navigate('/launches');
       }
     },
