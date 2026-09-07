@@ -32,6 +32,11 @@ pre-push:
       use_stdin: true
       run: node /Users/dima/dotfiles/script/linear-push.ts hook {1} {2}
 
+    # Typecheck only what moved since origin/main, so a kit consumer that
+    # breaks under vercel's install never leaves the machine.
+    - name: typecheck-changed
+      run: pnpm turbo typecheck --filter='...[origin/main]'
+
 commit-msg:
   jobs:
     # Strips the `Claude-Session:` trailer the desktop harness asks agents to
