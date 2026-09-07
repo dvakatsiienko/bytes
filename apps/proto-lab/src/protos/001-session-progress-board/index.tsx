@@ -1,4 +1,4 @@
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@ui/kit/components/separator';
 
 import { ContextResidency } from './parts/context-residency';
 import { RoadmapList } from './parts/roadmap-list';

@@ -13,7 +13,7 @@ a system prompt); chats stream from an LLM and persist in real time.
 - **Clerk** — auth, wired through `src/proxy.ts` (Next 16's renamed middleware)
 - **AI SDK 7** (`ai`) + **Groq** provider — streaming chat completions
 - **Jotai** — client UI state
-- **Tailwind v4** + **shadcn/ui** (new-york) + **cva** + **motion**
+- **Tailwind v4** + **shadcn/ui** (base-nova, on Base UI) + **cva** + **motion**
 
 > No Prisma, no SQL database. Persistence is 100% Convex. (No React Query either —
 > reads go through Convex `useQuery`; see `financial` for a React Query reference setup.)
@@ -46,7 +46,8 @@ a system prompt); chats stream from an LLM and persist in real time.
 - Reads: `src/queries/chat.ts` — `useChatHistoryQuery` (Convex `useQuery`, not React Query).
 - Shell: `src/components/AppSidebar/`, `Header.tsx`; theming in `src/theme/*.css`
   (`init.css` is the entry, pulls accent/gray + tailwind `@plugin`s).
-- `src/components/ui/` — vendored shadcn primitives (kept complete).
+- `src/components/ui/` — only the primitives carrying `brand:` styling (`sidebar`, `tooltip`,
+  `textarea`); everything else comes from `@ui/kit/components`.
 
 ## Commands
 
