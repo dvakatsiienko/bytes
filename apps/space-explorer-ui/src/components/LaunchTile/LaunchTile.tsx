@@ -25,7 +25,12 @@ export const LaunchTile = (props: LaunchTileProps) => {
     gql.CancelTripDocument,
     {
       refetchQueries: ['UserProfile'],
-      update(cache) {
+      update(cache, { data }) {
+        // cancelTrip answers false when it deleted nothing — the trip was already
+        // cancelled elsewhere, or is not this user's. Unbooking regardless would
+        // show a seat the user still holds as free.
+        if (!data?.cancelTrip) return;
+
         // the mutation payload carries no Launch, so unbook it in the cache directly
         cache.modify({
           fields: { isBooked: () => false },

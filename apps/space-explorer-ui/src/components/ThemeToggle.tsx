@@ -1,10 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
 
 // Three states, not two: a plain light/dark switch strands you with no way to
 // hand control back to the OS.
 export const ThemeToggle = () => {
   const [theme, setTheme] = useState(themeRead);
+
+  // "auto" resolved prefers-color-scheme once, on click. Flipping the OS
+  // appearance with auto selected then left the page on the stale palette until
+  // a reload — the one thing that option exists to do.
+  useEffect(() => {
+    if (theme !== 'system') return;
+
+    const query = matchMedia('(prefers-color-scheme: dark)');
+    const follow = () => themeApply('system');
+
+    query.addEventListener('change', follow);
+    return () => query.removeEventListener('change', follow);
+  }, [theme]);
 
   const optionListJSX = themeOptions.map((option) => {
     return (

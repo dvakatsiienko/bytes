@@ -55,12 +55,17 @@ export const Cart = () => {
     <CartItem key={launchId} launchId={launchId} />
   ));
 
-  let message: string | null = null;
-  if (bookTripsMeta.called && bookTripsMeta.data?.bookTrips.length)
-    message = 'Trips booked.';
+  // The confirmation belongs to the cart it emptied. Gating it on `called` alone
+  // pinned "Trips booked." for the page's lifetime, so it sat above launches the
+  // user added afterwards.
+  const justBooked =
+    bookTripsMeta.called && Boolean(bookTripsMeta.data?.bookTrips.length);
 
-  if (!(bookTripsMeta.called || cartItems.length))
-    message = 'Nothing on hold. Add a launch and it shows up here.';
+  let message: string | null = null;
+  if (!cartItems.length)
+    message = justBooked
+      ? 'Trips booked.'
+      : 'Nothing on hold. Add a launch and it shows up here.';
 
   if (bookTripsMeta.error)
     message = `Booking failed: ${bookTripsMeta.error.message}`;
