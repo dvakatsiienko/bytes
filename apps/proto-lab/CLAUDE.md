@@ -20,7 +20,7 @@ Two rules keep that true:
 - **Inside a proto, imports are relative** (`./data`, `../data`). An `@/protos/...` path
   breaks the moment the proto is shifted. Frame imports (`@/components/ui/...`) are fine.
 - **Every proto answers one question**, declared in `protoMeta.question` and rendered in
-  the header. `proto-list` greps it back out of each archive, so the folder stays readable
+  the header. `proto:list` greps it back out of each archive, so the folder stays readable
   after the proto is cold. `verdict` records what it settled.
 - **A proto is throwaway.** No tests, no error handling, no abstractions, no persistence —
   memory only. `@/frame/state-inspector` renders live state so a wrong state model is
@@ -37,10 +37,10 @@ pnpm dev          # vite on :5179
 pnpm build        # vite build
 pnpm typecheck    # tsc --noEmit
 pnpm lint         # biome
-pnpm proto-new <topic>     # start a proto when nothing is live
-pnpm proto-shift <topic>   # archive the live proto as NNN-<old topic>, start a blank one
-pnpm proto-clear           # delete every proto, leave a blank current-scratch
-pnpm proto-list            # show archives and the live proto, in order
+pnpm proto:new <topic>     # start a proto when nothing is live
+pnpm proto:shift <topic>   # archive the live proto as NNN-<old topic>, start a blank one
+pnpm proto:clear           # delete every proto, leave a blank current-scratch
+pnpm proto:list            # show archives and the live proto, in order
 ```
 
 ## Design tokens
@@ -71,8 +71,8 @@ Default choices applied unless told otherwise in the moment.
   the file into kit). Restyle through the tokens above, not per-component overrides.
 - **Frame vs content** — a new shared primitive goes to the frame, anything answering this
   proto's question stays in the proto. The frame never reaches into a proto.
-- **Recognition before change** — on any resume or respawn, run `pnpm proto-list` and read the
-  live proto first. Never wipe or shift what is there by default; `proto-shift` is only for a
+- **Recognition before change** — on any resume or respawn, run `pnpm proto:list` and read the
+  live proto first. Never wipe or shift what is there by default; `proto:shift` is only for a
   genuinely new question, and editing the live proto's content is an edit, not a shift.
 - **Data** — mock data in the proto's own `data.ts`, typed with `satisfies`, no fetching.
   Charts use `recharts`.

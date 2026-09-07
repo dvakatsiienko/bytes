@@ -5,7 +5,7 @@ policies, optimistic ui). demo status.
 
 ## shape
 
-- **codegen needs the api running on `localhost:4000`** — `pnpm codegen:graphql` combines the
+- **codegen needs the api running on `localhost:4000`** — `pnpm graphql:codegen` combines the
   remote schema with `src/graphql/schema/client-schema.graphql`; generated types land in
   `src/graphql/index.tsx` — never hand-edit that file
 - apollo link chain: `logger → error → auth → http` (`src/lib/apollo/links/`); the auth link

@@ -14,6 +14,13 @@ pre-commit:
         - '*.css'
       stage_fixed: true
 
+    # A manifest printed at random used to land and get re-sorted by hand later.
+    # The shape contract lives in script/lib/package-json-shape.ts; this runs it
+    # only when a manifest is actually staged.
+    - name: package-json-shape
+      glob: '**/package.json'
+      run: npx vitest run script/lib/package-json-shape.test.ts
+
 pre-push:
   jobs:
     # Links each pushed commit to the ticket its body names, and reverses the

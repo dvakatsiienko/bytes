@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "next build",
     "dev": "node ../../script/with-port.ts 3000 next dev --inspect",
-    "lint": "biome lint",
+    "build": "next build",
     "serve": "next start",
+    "lint": "biome lint",
     "typecheck": "tsc"
   },
   "dependencies": {

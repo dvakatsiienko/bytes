@@ -1,25 +1,25 @@
 {
   "name": "prettier-config-polished",
   "version": "0.0.6",
-  "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
-  "type": "module",
-  "main": "./index.js",
-  "scripts": {
-    "lint": "biome lint"
-  },
-  "exports": {
-    ".": "./index.js"
+  "keywords": ["prettier", "prettierconfig"],
+  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/prettier-config-polished#readme",
+  "bugs": {
+    "url": "https://github.com/dvakatsiienko/bytes/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/dvakatsiienko/bytes.git",
     "directory": "packages/prettier-config-polished"
   },
-  "bugs": {
-    "url": "https://github.com/dvakatsiienko/bytes/issues"
+  "author": "Dima Vakatsiienko <imagnum.satellite@gmail.com>",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
   },
-  "homepage": "https://github.com/dvakatsiienko/bytes/tree/main/packages/prettier-config-polished#readme",
-  "keywords": ["prettier", "prettierconfig"],
+  "scripts": {
+    "lint": "biome lint"
+  },
   "peerDependencies": {
     "prettier": ">=3.0.0"
   }

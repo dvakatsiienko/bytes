@@ -1,7 +1,7 @@
 {
   "name": "trophy-sys",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "node ../../script/with-port.ts 5177 node --run dev:api & node ../../script/with-port.ts 5177 node --run dev:web",
@@ -14,8 +14,8 @@
     "preview": "vite preview",
     "trophies": "node --env-file=.env --env-file-if-exists=.env.local --env-file-if-exists=.env.dev.local src/server/cli.ts",
     "lint": "biome lint",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json",
-    "test": "node --test 'src/**/*.test.ts'"
+    "test": "node --test 'src/**/*.test.ts'",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json"
   },
   "dependencies": {
     "@tanstack/react-query": "5.102.8",

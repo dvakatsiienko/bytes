@@ -4,14 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "node ../../script/with-port.ts 5173 vite",
     "build": "run-p typecheck build:vite",
     "build:clean": "rimraf dist",
     "build:vite": "vite build",
-    "codegen:graphql": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\"",
-    "dev": "node ../../script/with-port.ts 5173 vite",
-    "lint": "biome lint",
     "preview": "vite preview",
     "serve": "run-s build:clean build:vite preview",
+    "graphql:codegen": "gql-gen -r dotenv/config --config \"./graphql-codegen.yml\"",
+    "lint": "biome lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -21,7 +21,7 @@
     "@hookform/resolvers": "5.9.1",
     "@tailwindcss/vite": "4.3.3",
     "@ui/kit": "workspace:*",
-    "cva": "1.0.0-beta.3",
+    "cva": "1.0.0-beta.9",
     "debug": "4.4.3",
     "graphql": "17.0.2",
     "lucide-react": "1.41.0",
@@ -45,10 +45,5 @@
     "rimraf": "6.1.3",
     "vite": "8.2.2",
     "vite-plugin-progress": "0.0.7"
-  },
-  "peerDependenciesMeta": {
-    "prefixer": {
-      "optional": false
-    }
   }
 }
