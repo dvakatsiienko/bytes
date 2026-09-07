@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority';
+import { cva } from 'cva';
 
 export const VariantBar = (props: VariantBarProps) => {
   if (props.keyList.length < 2) {
@@ -33,17 +33,15 @@ export const VariantBar = (props: VariantBarProps) => {
 };
 
 /* Styles */
-const buttonCva = cva(
-  'rounded-full px-4 py-1.5 font-mono text-xs transition-colors',
-  {
-    variants: {
-      active: {
-        false: 'text-muted-foreground hover:text-foreground',
-        true: 'bg-cobalt text-white',
-      },
+const buttonCva = cva({
+  base: 'rounded-full px-4 py-1.5 font-mono text-xs transition-colors',
+  variants: {
+    active: {
+      false: 'text-muted-foreground hover:text-foreground',
+      true: 'bg-cobalt text-white',
     },
   },
-);
+});
 
 /* Types */
 interface VariantBarProps {

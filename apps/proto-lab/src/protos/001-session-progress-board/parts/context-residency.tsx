@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority';
+import { cva } from 'cva';
 import { motion } from 'motion/react';
 
 import type { ResidencyLayer } from '../data';
@@ -139,7 +139,8 @@ const PRECEDENCE_LIST = [
 ] as const;
 
 /* Styles */
-const bandCva = cva('rounded-lg border p-4', {
+const bandCva = cva({
+  base: 'rounded-lg border p-4',
   variants: {
     tier: {
       'always-resident': 'border-cobalt/40 bg-cobalt/[0.05]',
@@ -149,7 +150,8 @@ const bandCva = cva('rounded-lg border p-4', {
   },
 });
 
-const itemCva = cva('rounded px-2 py-1 font-mono text-[0.7rem]', {
+const itemCva = cva({
+  base: 'rounded px-2 py-1 font-mono text-[0.7rem]',
   variants: {
     tier: {
       'always-resident': 'bg-cobalt/10 text-cobalt',
@@ -159,7 +161,8 @@ const itemCva = cva('rounded px-2 py-1 font-mono text-[0.7rem]', {
   },
 });
 
-const budgetCva = cva('w-2 rounded-[1px]', {
+const budgetCva = cva({
+  base: 'w-2 rounded-[1px]',
   variants: {
     fate: {
       dropped: 'h-2 bg-mist/40',

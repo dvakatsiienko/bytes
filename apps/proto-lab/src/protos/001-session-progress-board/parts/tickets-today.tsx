@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority';
+import { cva } from 'cva';
 import { motion } from 'motion/react';
 
 import type { Ticket, TicketState } from '../data';
@@ -65,22 +65,20 @@ const COLUMNS = [
 ] as const satisfies readonly { label: string; state: TicketState }[];
 
 /* Styles */
-const chipCva = cva(
-  'rounded-md px-2.5 py-1.5 font-mono text-[0.8rem] tabular-nums shadow-none ring-1 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md',
-  {
-    variants: {
-      state: {
-        created:
-          'bg-cobalt/10 text-cobalt ring-cobalt/40 hover:bg-cobalt hover:text-white hover:ring-cobalt',
-        done: 'bg-cobalt/10 text-cobalt ring-cobalt/20 hover:bg-cobalt hover:text-white hover:ring-cobalt',
-        'in-progress':
-          'bg-amber/15 text-amber ring-amber/30 hover:bg-amber hover:text-white hover:ring-amber',
-        touched:
-          'text-muted-foreground ring-mist hover:bg-ink hover:text-bone hover:ring-ink',
-      },
+const chipCva = cva({
+  base: 'rounded-md px-2.5 py-1.5 font-mono text-[0.8rem] tabular-nums shadow-none ring-1 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md',
+  variants: {
+    state: {
+      created:
+        'bg-cobalt/10 text-cobalt ring-cobalt/40 hover:bg-cobalt hover:text-white hover:ring-cobalt',
+      done: 'bg-cobalt/10 text-cobalt ring-cobalt/20 hover:bg-cobalt hover:text-white hover:ring-cobalt',
+      'in-progress':
+        'bg-amber/15 text-amber ring-amber/30 hover:bg-amber hover:text-white hover:ring-amber',
+      touched:
+        'text-muted-foreground ring-mist hover:bg-ink hover:text-bone hover:ring-ink',
     },
   },
-);
+});
 
 /* Types */
 interface TicketsTodayProps {

@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority';
+import { cva } from 'cva';
 import { motion } from 'motion/react';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -59,7 +59,8 @@ export const TaskGroup = (props: TaskGroupProps) => {
 };
 
 /* Styles */
-const cardCva = cva('h-full shadow-none transition-colors', {
+const cardCva = cva({
+  base: 'h-full shadow-none transition-colors',
   variants: {
     state: {
       done: 'border-border',
@@ -69,18 +70,16 @@ const cardCva = cva('h-full shadow-none transition-colors', {
   },
 });
 
-const stateCva = cva(
-  'rounded-full px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-[0.15em]',
-  {
-    variants: {
-      state: {
-        done: 'bg-accent text-cobalt',
-        'in-flight': 'bg-amber/15 text-amber',
-        queued: 'bg-muted text-muted-foreground',
-      },
+const stateCva = cva({
+  base: 'rounded-full px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-[0.15em]',
+  variants: {
+    state: {
+      done: 'bg-accent text-cobalt',
+      'in-flight': 'bg-amber/15 text-amber',
+      queued: 'bg-muted text-muted-foreground',
     },
   },
-);
+});
 
 /* Types */
 interface TaskGroupProps {

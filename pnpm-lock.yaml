@@ -459,9 +459,9 @@ importers:
       '@ui/kit':
         specifier: workspace:*
         version: link:../../packages/kit
-      class-variance-authority:
-        specifier: 0.7.1
-        version: 0.7.1
+      cva:
+        specifier: 1.0.0-beta.9
+        version: 1.0.0-beta.9(typescript@7.0.2)
       lucide-react:
         specifier: 1.41.0
         version: 1.41.0(react@19.2.8)
@@ -4022,9 +4022,6 @@ packages:
 
   citty@0.2.2:
     resolution: {integrity: sha512-+6vJA3L98yv+IdfKGZHBNiGW5KHn22e/JwID0Strsz8h4S/csAu/OuICwxrg44k5MRiZHWIo8XXuJgQTriRP4w==}
-
-  class-variance-authority@0.7.1:
-    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
 
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
@@ -10870,10 +10867,6 @@ snapshots:
   chownr@1.1.4: {}
 
   citty@0.2.2: {}
-
-  class-variance-authority@0.7.1:
-    dependencies:
-      clsx: 2.1.1
 
   classnames@2.5.1: {}
 
