@@ -6,7 +6,7 @@ paired with `space-explorer-ui`, which needs this server on `:4000` for its code
 ## shape
 
 - **schema-first**: `src/graphql/schema.graphql` is the source of truth — after editing it, run
-  `pnpm codegen:graphql` to regenerate the types
+  `pnpm graphql:codegen` to regenerate the types
 - resolvers in `src/resolvers/`, one file per type, exported from `index.ts`. resolvers stay
   thin — data fetching belongs in `src/datasources/` (spacex rest source + prisma-backed
   `UserAPI`), never in a resolver

@@ -1,6 +1,7 @@
 {
   "name": "utils",
   "version": "0.0.1",
+  "private": true,
   "main": "./calc.ts",
   "types": "./calc.ts",
   "exports": {

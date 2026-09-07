@@ -1,17 +1,17 @@
 {
   "name": "proto-lab",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
     "dev": "node ../../script/with-port.ts 5179 vite",
-    "lint": "biome lint",
+    "build": "vite build",
     "preview": "vite preview",
-    "proto-clear": "node scripts/proto.ts clear",
-    "proto-list": "node scripts/proto.ts list",
-    "proto-new": "node scripts/proto.ts new",
-    "proto-shift": "node scripts/proto.ts shift",
+    "proto:clear": "node scripts/proto.ts clear",
+    "proto:list": "node scripts/proto.ts list",
+    "proto:new": "node scripts/proto.ts new",
+    "proto:shift": "node scripts/proto.ts shift",
+    "lint": "biome lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -20,7 +20,7 @@
     "@tanstack/react-router": "1.170.32",
     "@ui/kit": "workspace:*",
     "class-variance-authority": "0.7.1",
-    "lucide-react": "1.39.0",
+    "lucide-react": "1.41.0",
     "motion": "13.1.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -41,7 +41,6 @@
     "oxc-transform-react": "0.148.0",
     "tailwindcss": "4.3.3",
     "tw-animate-css": "1.4.0",
-    "typescript": "7.0.2",
     "vite": "8.2.2"
   }
 }

@@ -20,7 +20,7 @@ const Shell = () => {
   if (!shown) {
     return (
       <p className='p-10 font-mono text-muted-foreground text-sm'>
-        no live proto — run pnpm proto-new &lt;topic&gt;
+        no live proto — run pnpm proto:new &lt;topic&gt;
       </p>
     );
   }

@@ -43,7 +43,7 @@ export const variants = { 'tick rail': () => { ... }, 'plain bar': () => { ... }
 ```
 
 A prototype exists to answer one **question**. It is required, shown in the header, and
-`pnpm proto-list` reads it back out of every archive — so an old proto says what it was
+`pnpm proto:list` reads it back out of every archive — so an old proto says what it was
 for without being opened. Write the `verdict` in when you know it.
 
 Exporting `variants` (two or more) puts a switcher at the bottom of the screen and routes
@@ -57,10 +57,10 @@ import would break the moment the proto is shifted.
 ## Lifecycle
 
 ```bash
-pnpm proto-new ledger view     # start one when nothing is live
-pnpm proto-shift ledger view   # archive the live one, start a blank 'ledger view'
-pnpm proto-clear               # delete every proto, leave a blank 'current-scratch'
-pnpm proto-list                # show what is there, in order
+pnpm proto:new ledger view     # start one when nothing is live
+pnpm proto:shift ledger view   # archive the live one, start a blank 'ledger view'
+pnpm proto:clear               # delete every proto, leave a blank 'current-scratch'
+pnpm proto:list                # show what is there, in order
 ```
 
 Shifted protos are kept so you can go back and look. Nothing else is touched — frame,

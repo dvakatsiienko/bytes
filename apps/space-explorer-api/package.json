@@ -5,11 +5,12 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "codegen:graphql": "graphql-codegen --config \"./graphql-codegen.yml\"",
     "dev": "node ../../script/with-port.ts 4000 tsx watch ./src/index.ts",
-    "postinstall": "prisma generate",
-    "lint": "biome lint",
+    "db:studio": "prisma studio",
+    "graphql:codegen": "graphql-codegen --config \"./graphql-codegen.yml\"",
     "prisma:generate": "prisma generate",
+    "postinstall": "node --run prisma:generate",
+    "lint": "biome lint",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -28,7 +29,7 @@
     "@graphql-codegen/cli": "7.4.0",
     "@graphql-codegen/typescript": "6.1.0",
     "@types/node": "26.4.1",
-    "prisma": "7.9.1",
+    "prisma": "7.10.0",
     "tsx": "4.23.13"
   }
 }

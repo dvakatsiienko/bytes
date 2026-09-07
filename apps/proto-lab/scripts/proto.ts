@@ -47,13 +47,13 @@ const toSlug = (words: string[]) => {
     .replace(/^-|-$/g, '');
 
   if (!slug) {
-    throw new Error('a topic is required, e.g. pnpm proto-shift ledger view');
+    throw new Error('a topic is required, e.g. pnpm proto:shift ledger view');
   }
 
   return slug;
 };
 
-// A prototype exists to answer one question. proto-list reads it back out of
+// A prototype exists to answer one question. proto:list reads it back out of
 // each folder, so an archive says what it settled without being opened.
 const readQuestion = async (name: string) => {
   const source = await readFile(
@@ -122,7 +122,7 @@ if (command === 'list') {
 } else if (command === 'new') {
   if (liveProto) {
     throw new Error(
-      `${liveProto} is live — use pnpm proto-shift to archive it first`,
+      `${liveProto} is live — use pnpm proto:shift to archive it first`,
     );
   }
   say(`→ ${await writeBlank(toSlug(topicWords))}`);

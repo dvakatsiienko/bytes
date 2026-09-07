@@ -1,15 +1,15 @@
 {
   "name": "cv",
   "version": "0.0.1",
+  "private": true,
   "scripts": {
-    "build": "next build",
-    "build:clean": "rimraf .next",
     "dev": "node ../../script/with-port.ts 3000 next dev --inspect",
     "dev:analyze": "next experimental-analyze",
     "dev:vc": "vercel dev",
-    "lint": "biome lint",
-    "restart": "run-s build:clean start",
+    "build": "next build",
+    "build:clean": "rimraf .next",
     "serve": "next start",
+    "lint": "biome lint",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -17,7 +17,7 @@
     "@styled-icons/styled-icon": "10.7.1",
     "@ui/kit": "workspace:*",
     "cva": "1.0.0-beta.9",
-    "lucide-react": "1.39.0",
+    "lucide-react": "1.41.0",
     "next": "16.3.4",
     "next-themes": "0.4.6",
     "react": "19.2.8",
