@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority';
+import { cva } from 'cva';
 import { motion } from 'motion/react';
 
 import type { RoadmapItem } from '../data';
@@ -41,20 +41,19 @@ export const RoadmapList = (props: RoadmapListProps) => {
 };
 
 /* Styles */
-const boxCva = cva(
-  'flex size-4 shrink-0 translate-y-[2px] items-center justify-center rounded-[3px] font-mono text-[0.6rem] leading-none',
-  {
-    variants: {
-      state: {
-        done: 'bg-cobalt text-white',
-        'in-flight': 'border-2 border-amber bg-amber/15',
-        queued: 'border border-mist',
-      },
+const boxCva = cva({
+  base: 'flex size-4 shrink-0 translate-y-[2px] items-center justify-center rounded-[3px] font-mono text-[0.6rem] leading-none',
+  variants: {
+    state: {
+      done: 'bg-cobalt text-white',
+      'in-flight': 'border-2 border-amber bg-amber/15',
+      queued: 'border border-mist',
     },
   },
-);
+});
 
-const labelCva = cva('text-sm', {
+const labelCva = cva({
+  base: 'text-sm',
   variants: {
     state: {
       done: 'text-muted-foreground line-through',

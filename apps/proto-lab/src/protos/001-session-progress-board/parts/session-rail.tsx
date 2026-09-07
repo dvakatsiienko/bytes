@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority';
+import { cva } from 'cva';
 import { motion } from 'motion/react';
 
 import type { TaskState } from '../data';
@@ -51,7 +51,8 @@ export const SessionRail = (props: SessionRailProps) => {
 };
 
 /* Styles */
-const tickCva = cva('flex-1 origin-bottom rounded-[2px]', {
+const tickCva = cva({
+  base: 'flex-1 origin-bottom rounded-[2px]',
   variants: {
     state: {
       done: 'bg-cobalt',
