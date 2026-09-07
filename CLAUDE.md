@@ -111,8 +111,8 @@ to agents and to code review, and they silently override the repo — a dashboar
   `shadcn add` swap the import to `cva` and wrap the args into its object form.
   `shadcn add --diff` always shows the cva import + wrap; read past it. Revisit when cva 1.0
   goes stable.
-- **token layers are frozen:** L1 radix-colors scales → L2 the shadcn vocabulary verbatim → L3 kit
-  extensions. Never rename an L2 token.
+- **token layers are frozen:** L1 the 12-step accent/gray scales in `packages/kit/src/styles/`
+  → L2 the shadcn vocabulary verbatim → L3 kit extensions. Never rename an L2 token.
 - **surfaces:** `financial` and `space-explorer-ui` are live test surfaces; `figmentation` is exempt
   (CSS modules by design); `trophy-sys` adopts kit with its redesign.
 

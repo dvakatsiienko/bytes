@@ -7,7 +7,7 @@ The split is the whole point:
 
 - **`src/frame/`** — the stable half: shell, palette tokens, fonts. Survives every reset.
 - **`src/protos/`** — the swappable half: one live `current-<topic>` plus numbered archives.
-- **`src/components/ui/`** — shadcn primitives, owned not sacred (convert-on-touch to house style).
+- **`src/components/ui/`** — app-local primitives only; shared ones live in `@ui/kit/components`.
 
 The contract between the two halves is what the live proto's `index.tsx` exports:
 `protoMeta` (`question` required, `title`, optional `verdict`) plus either `Proto` or a
@@ -66,9 +66,9 @@ Default choices applied unless told otherwise in the moment.
   animations here and there, for pretty sakeness. Entrances, rail ticks, card stagger. Small
   and quick — under ~400ms, low travel, never a whole choreography. `theme.css` already honours
   `prefers-reduced-motion`; keep it that way.
-- **shadcn first** — compose the new-york primitives in `src/components/ui` before writing raw
-  markup; add a missing one with the shadcn cli rather than hand-rolling it. Restyle through the
-  tokens above, not per-component overrides.
+- **shadcn first** — compose the base-nova primitives from `@ui/kit/components` before writing raw
+  markup; add a missing one with the shadcn cli rather than hand-rolling it (the `ui` alias routes
+  the file into kit). Restyle through the tokens above, not per-component overrides.
 - **Frame vs content** — a new shared primitive goes to the frame, anything answering this
   proto's question stays in the proto. The frame never reaches into a proto.
 - **Recognition before change** — on any resume or respawn, run `pnpm proto-list` and read the

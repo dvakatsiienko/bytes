@@ -13,11 +13,10 @@
 
 #### 🖥️ UI
 
-- 🏗️ [Radix primitives](https://www.radix-ui.com/) — a really good headless
-  component lib, [chadcn/ui](https://ui.shadcn.com/) probably also worth to
-  consider
-- 🎨 [Radix palette creator](https://www.radix-ui.com/colors/custom) — for
-  creating theming color pallettes
+- 🏗️ [Base UI](https://base-ui.com/) — the headless component lib behind
+  [shadcn/ui](https://ui.shadcn.com/); primitives come from `@ui/kit`
+- 🎨 12-step accent and gray scales in `packages/kit/src/styles/` — the L1 token
+  layer every theme is built on
 - 💈 [cva](https://beta.cva.style/) — a small but powerful utility intended for
   creating robust component styles composition
 - 🎞️ [motion](https://motion.dev/) — one of the best-in-class animation libs out
