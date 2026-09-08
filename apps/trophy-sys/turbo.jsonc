@@ -16,6 +16,8 @@
         "API_PORT",
         "KV_REST_API_URL",
         "KV_REST_API_TOKEN",
+        "STEAM_API_KEY",
+        "STEAM_ID64",
         "VERCEL"
       ]
     }
