@@ -6,6 +6,7 @@
   "globalPassThroughEnv": [
     "ENABLE_EXPERIMENTAL_COREPACK",
     "DATABASE_URL",
+    "AUTH_SECRET",
     "PORT",
     "PORT_OFFSET",
     "API_PORT"
