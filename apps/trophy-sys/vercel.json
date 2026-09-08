@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm i -F 'trophy-sys...'",
   "buildCommand": "pnpm build",
-  "git": { "deploymentEnabled": { "renovate/*": false } },
+  "git": { "deploymentEnabled": { "renovate/*": false, "coder/*": false } },
   "crons": [{ "path": "/api/stats", "schedule": "0 4 * * *" }]
 }
