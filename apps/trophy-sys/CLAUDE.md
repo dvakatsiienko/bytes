@@ -76,10 +76,13 @@ credentials, and `.env.dev.local` overrides them for dev. In production Vercel i
   `achievementpercentages`, and reading the wrong one yields `{}` — indistinguishable from the
   private case.
 
-📌 **Steam's "Game details" privacy is a separate setting from "My profile".** The profile summary
-can report `communityvisibilitystate: 3` (public) while every `GetPlayerAchievements` call answers
-403 `Profile is not public`. That is the live state as of 2026-09-08, which is why `steam-game`
-raises a named error pointing at the setting instead of reporting zero achievements.
+📌 **Steam's "Game details" privacy is a separate setting from "My profile", and both must be
+public for achievements to read.** A summary reporting `communityvisibilitystate: 3` says nothing
+about the second one: with game details closed, every `GetPlayerAchievements` call answers 403
+`Profile is not public` while the profile itself still reads public. `steam-game` raises a named
+error pointing at the setting rather than returning zero achievements — zero would be the same lie
+as reporting a private profile as an empty library.
+
 - The baseline is `npCommunicationId → trophyId[]`, stored in **Upstash Redis** under
   `trophy-sys:baseline` when KV credentials exist, and in `.trophy-state.json` otherwise. The file
   fallback keeps `pnpm dev` and the CLI working with no store attached; `/api/health` reports
