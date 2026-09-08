@@ -198,6 +198,12 @@ export interface SteamGameDetail extends SteamGame {
 export interface SteamWishlistItem {
   addedAt: string | null;
   id: string;
+  /**
+   * Resolved from the store api, one call per appid, and cached — the wishlist
+   * endpoint itself carries only ids. Falls back to the appid when the store
+   * has nothing, so an entry is never nameless.
+   */
+  name: string;
   /** Steam's own ordering; 0 means unprioritised. */
   priority: number;
 }

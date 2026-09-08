@@ -6,6 +6,7 @@ import type {
   SteamWishlistItem,
 } from '../shared/types.ts';
 import { cached } from './cache.ts';
+import { isAutoWriteSafe, steamNamesLoad, steamNamesSave } from './state.ts';
 
 const API = 'https://api.steampowered.com';
 
@@ -291,6 +292,60 @@ interface RawWishlistItem {
   priority?: number;
 }
 
+const STORE_API = 'https://store.steampowered.com/api/appdetails';
+
+/**
+ * One appid per call, and that is not a preference. The documented
+ * comma-separated form answers a bare `null` — measured 2026-09-08 against
+ * three ids at once — so a batched call looks like a total failure rather than
+ * a partial one.
+ */
+const storeNameFetch = async (appid: string): Promise<string | null> => {
+  try {
+    const url = new URL(STORE_API);
+    url.searchParams.set('appids', appid);
+    url.searchParams.set('filters', 'basic');
+
+    const reply = await fetch(url);
+    if (!reply.ok) return null;
+
+    const body = (await reply.json()) as Record<
+      string,
+      { data?: { name?: string }; success?: boolean } | undefined
+    > | null;
+
+    return body?.[appid]?.data?.name ?? null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Names are fetched once and kept. A game's name does not change, so the store
+ * is grown with whatever is missing rather than refreshed, and a second run
+ * costs nothing.
+ *
+ * Sequential on purpose: 70 parallel calls to the store api is exactly the
+ * shape that earns a rate limit, and this path runs once.
+ */
+const namesResolve = async (ids: string[]) => {
+  const known = await steamNamesLoad();
+  const missing = ids.filter((id) => id && !known[id]);
+
+  for (const id of missing) {
+    // biome-ignore lint/performance/noAwaitInLoops: the sequencing is the rate limit
+    const name = await storeNameFetch(id);
+    if (name) known[id] = name;
+  }
+
+  // Same guard the stats archive uses: an automatic write must not reach a
+  // store the process does not own. A dev run carrying production KV
+  // credentials would otherwise write them.
+  if (missing.length && isAutoWriteSafe) await steamNamesSave(known);
+
+  return known;
+};
+
 /**
  * Measured 2026-09-08: this endpoint answers with an empty list unless `key` is
  * in the query, even though the docs imply the steamid alone is enough.
@@ -304,11 +359,29 @@ export const wishlistFetch = async (): Promise<SteamWishlistItem[]> => {
   if (!ok) throw new Error(`steam wishlist answered ${status}`);
   if (isEmpty) throw privacyError('the wishlist');
 
-  return (payload.items ?? [])
-    .map((item) => ({
-      addedAt: playedAtBuild(item.date_added),
-      id: String(item.appid ?? ''),
-      priority: item.priority ?? 0,
-    }))
-    .sort((a, b) => a.priority - b.priority);
+  const items = (payload.items ?? []).map((item) => ({
+    addedAt: playedAtBuild(item.date_added),
+    id: String(item.appid ?? ''),
+    priority: item.priority ?? 0,
+  }));
+
+  const names = await namesResolve(items.map((item) => item.id));
+
+  return items
+    .map((item) => ({ ...item, name: names[item.id] ?? item.id }))
+    .sort(wishlistOrder);
+};
+
+/**
+ * Steam's own ordering: a prioritised entry comes first, ascending, and 0 means
+ * unprioritised so it sorts last rather than first. Ties break on newest added,
+ * which is the whole ordering today — every entry is currently priority 0.
+ */
+const wishlistOrder = (a: SteamWishlistItem, b: SteamWishlistItem) => {
+  if (a.priority !== b.priority) {
+    if (!a.priority) return 1;
+    if (!b.priority) return -1;
+    return a.priority - b.priority;
+  }
+  return (b.addedAt ?? '').localeCompare(a.addedAt ?? '');
 };

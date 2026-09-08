@@ -2,6 +2,7 @@
 .env*.local
 .trophy-state.json
 .trophy-stats.json
+.steam-names.json
 dist/
 .vercel/
 api/
