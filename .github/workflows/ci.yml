@@ -3,7 +3,11 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    # `renovate/**` is deliberate. renovate.json sets `prCreation: "not-pending"`,
+    # which holds the PR back until the branch's checks finish — and a branch
+    # carrying no checks at all reads as pending forever, so the PR would never
+    # open. Running CI on the bare branch is what gives it something to wait for.
+    branches: [main, 'renovate/**']
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -15,9 +19,9 @@ env:
 
 jobs:
   check:
-    name: lint + typecheck
+    name: lint + typecheck + test + build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
 
     # id-token is what lets the remote-cache step exchange a GitHub OIDC token
     # for a short-lived Turborepo one. contents stays read.
@@ -64,3 +68,13 @@ jobs:
       # everyone else's.
       - name: Lint
         run: pnpm turbo run lint ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+      # Only `financial` and `trophy-sys` define a `test` script today; turbo
+      # skips every package that does not, so this stays green as more arrive.
+      - name: Test
+        run: pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+      # The gate that makes dependency automerge safe: a bump that breaks a
+      # build now fails here instead of in a Vercel production deploy.
+      - name: Build
+        run: pnpm turbo run build ${{ github.event_name == 'pull_request' && '--affected' || '' }}
