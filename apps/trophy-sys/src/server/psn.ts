@@ -97,7 +97,12 @@ export const profileFetch = async (): Promise<Profile> => {
   };
 };
 
-export const gamesFetch = async (limit = 100): Promise<Game[]> => {
+/**
+ * 800, not 100. The old default silently truncated: the library is 109 titles
+ * and every caller taking the default saw the first 100, with nothing in the
+ * response saying so.
+ */
+export const gamesFetch = async (limit = 800): Promise<Game[]> => {
   const [{ trophyTitles }, played] = await Promise.all([
     getUserTitles(await authGet(), 'me', { limit }),
     playtimeFetch(),
@@ -121,6 +126,7 @@ export const gamesFetch = async (limit = 100): Promise<Game[]> => {
       playSeconds: play?.seconds ?? null,
       playedAt: play?.playedAt ?? null,
       progress: title.progress,
+      source: 'psn',
     };
   });
 };

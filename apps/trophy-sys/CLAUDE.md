@@ -33,7 +33,8 @@ pnpm trophies <cmd>   # same data as the API, straight to stdout as JSON
 From the monorepo root: `pnpm dev:trophy-sys`, `pnpm build:trophy-sys`.
 
 `pnpm trophies` commands: `profile`, `games [limit]`, `game <npCommunicationId>`, `news`,
-`snapshot`, `stats`, `stats-sync`.
+`snapshot`, `stats`, `stats-sync`, and the Steam side — `steam-profile`, `steam-games`,
+`steam-game <appid>`, `steam-wishlist`.
 
 📌 `pnpm trophies` and `pnpm dev` load `.env.dev.local` **last**, and it blanks the KV
 credentials — so both work against the local `.trophy-*.json` files and cannot reach production.
@@ -58,7 +59,8 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
 
 ## Auth and state
 
-Three env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`. Locally
+Five env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,
+`STEAM_API_KEY`, `STEAM_ID64`. Locally
 they come from three files, loaded in order and last one wins (via `node --env-file`, never
 `dotenv`): `.env` holds `NPSSO`, the Vercel-generated `.env.local` holds the production KV
 credentials, and `.env.dev.local` overrides them for dev. In production Vercel injects them. Both entrypoints — `src/server/main.ts` and
@@ -67,6 +69,17 @@ credentials, and `.env.dev.local` overrides them for dev. In production Vercel i
 
 - `authGet()` in `psn.ts` holds one in-memory session and refreshes it with the refresh token, so
   the NPSSO→access-code exchange runs once per process.
+- Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
+  guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
+  empty library unless checked. And the envelope key is not always `response`:
+  `GetPlayerAchievements` uses `playerstats`, the global percentages use
+  `achievementpercentages`, and reading the wrong one yields `{}` — indistinguishable from the
+  private case.
+
+📌 **Steam's "Game details" privacy is a separate setting from "My profile".** The profile summary
+can report `communityvisibilitystate: 3` (public) while every `GetPlayerAchievements` call answers
+403 `Profile is not public`. That is the live state as of 2026-09-08, which is why `steam-game`
+raises a named error pointing at the setting instead of reporting zero achievements.
 - The baseline is `npCommunicationId → trophyId[]`, stored in **Upstash Redis** under
   `trophy-sys:baseline` when KV credentials exist, and in `.trophy-state.json` otherwise. The file
   fallback keeps `pnpm dev` and the CLI working with no store attached; `/api/health` reports

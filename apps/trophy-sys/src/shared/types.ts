@@ -16,6 +16,9 @@ export interface Profile {
   total: number;
 }
 
+/** Which service a title came from. */
+export type GameSource = 'psn' | 'steam';
+
 export interface Game {
   defined: TrophyCounts;
   earned: TrophyCounts;
@@ -30,6 +33,7 @@ export interface Game {
   /** Total seconds played, or null when the playtime join missed. */
   playSeconds: number | null;
   progress: number;
+  source: GameSource;
 }
 
 export interface TrophyProgress {
@@ -125,6 +129,83 @@ export interface RemainingTrophy {
   name: string;
   /** Global PSN earn rate, as a percent. */
   rarity: number;
+}
+
+/**
+ * Steam's types stay beside PSN's rather than folding into `Game`, and that is
+ * a deliberate call rather than a shortcut.
+ *
+ * `Game` carries `defined`/`earned` as `TrophyCounts`, which is four named
+ * grades. Steam achievements have no grades at all, and `GetOwnedGames` carries
+ * no achievement counts either — those cost one call per title, 342 of them.
+ * So every way of filling those fields for a Steam title either invents a grade
+ * or reports a real number as zero. Making `Game` a discriminated union instead
+ * would push narrowing onto 45 read sites across the web app, for data that no
+ * UI consumes in this pass.
+ *
+ * `source` still lands on `Game` as the ticket asks, so the two are already
+ * distinguishable when a later pass does merge them.
+ */
+export interface SteamProfile {
+  avatarUrl: string;
+  /** False when Steam answers 200 with an empty body — a private profile. */
+  isPublic: boolean;
+  name: string;
+  profileUrl: string;
+  steamId: string;
+  /** Steam's own `communityvisibilitystate`; 3 is public. */
+  visibility: number;
+}
+
+export interface SteamGame {
+  iconUrl: string;
+  /** The appid, as a string, to sit beside PSN's string ids. */
+  id: string;
+  name: string;
+  /** ISO instant, or null when Steam reports no last-played time. */
+  playedAt: string | null;
+  /** Seconds, converted from the minutes Steam reports. */
+  playSeconds: number;
+  source: 'steam';
+}
+
+export interface SteamAchievement {
+  description: string;
+  earned: boolean;
+  earnedAt: string | null;
+  iconUrl: string;
+  /** Steam's internal name, stable across locales. */
+  id: string;
+  name: string;
+  /**
+   * Percent of all owners holding it — Steam's analogue of PSN rarity. Null
+   * when the global percentages call has nothing for this appid.
+   */
+  rarity: number | null;
+}
+
+export interface SteamGameDetail extends SteamGame {
+  achievements: SteamAchievement[];
+  earned: number;
+  /**
+   * False when Steam answers "Requested app has no stats" — the game is owned
+   * and real, it simply ships no achievements. Distinct from an error.
+   */
+  hasAchievements: boolean;
+  total: number;
+}
+
+export interface SteamWishlistItem {
+  addedAt: string | null;
+  id: string;
+  /**
+   * Resolved from the store api, one call per appid, and cached — the wishlist
+   * endpoint itself carries only ids. Falls back to the appid when the store
+   * has nothing, so an entry is never nameless.
+   */
+  name: string;
+  /** Steam's own ordering; 0 means unprioritised. */
+  priority: number;
 }
 
 /**

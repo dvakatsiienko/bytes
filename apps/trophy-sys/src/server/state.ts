@@ -9,6 +9,9 @@ const STATE_KEY = 'trophy-sys:baseline';
 const STATS_FILE = new URL('../../.trophy-stats.json', import.meta.url);
 const STATS_KEY = 'trophy-sys:stats';
 
+const STEAM_NAMES_FILE = new URL('../../.steam-names.json', import.meta.url);
+const STEAM_NAMES_KEY = 'trophy-sys:steam-names';
+
 export interface GameBaseline {
   defined: number;
   trophies: number[];
@@ -130,3 +133,17 @@ export const statsLoad = () => storeRead<TrophyArchive>(STATS_KEY, STATS_FILE);
 
 export const statsSave = (archive: TrophyArchive) =>
   storeWrite(STATS_KEY, STATS_FILE, archive);
+
+/** appid → store name. */
+export type SteamNames = Record<string, string>;
+
+/**
+ * Steam's wishlist endpoint returns bare appids, and the only name source is
+ * one store call per id. A game's name does not change, so this map is grown
+ * rather than refreshed: 70 calls happen once, and every later run is free.
+ */
+export const steamNamesLoad = async (): Promise<SteamNames> =>
+  (await storeRead<SteamNames>(STEAM_NAMES_KEY, STEAM_NAMES_FILE)) ?? {};
+
+export const steamNamesSave = (names: SteamNames) =>
+  storeWrite(STEAM_NAMES_KEY, STEAM_NAMES_FILE, names);
