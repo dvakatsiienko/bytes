@@ -3,7 +3,11 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    # `renovate/**` is deliberate. renovate.json sets `prCreation: "not-pending"`,
+    # which holds the PR back until the branch's checks finish — and a branch
+    # carrying no checks at all reads as pending forever, so the PR would never
+    # open. Running CI on the bare branch is what gives it something to wait for.
+    branches: [main, 'renovate/**']
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -13,17 +17,53 @@ env:
   TURBO_TELEMETRY_DISABLED: 1
   DO_NOT_TRACK: 1
 
+  # `--affected` was never actually working. On a pull_request, actions/checkout
+  # leaves a detached HEAD with no local `main` ref, so turbo logged "Failed to
+  # resolve base ref 'main'" and fell back to "assuming all files have changed"
+  # — every PR silently ran the whole graph. Turbo's own warning names this env
+  # var as the fix. Empty on a push, where `--affected` is not passed anyway.
+  TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+
 jobs:
   check:
-    name: lint + typecheck
+    name: lint + typecheck + test + build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
 
     # id-token is what lets the remote-cache step exchange a GitHub OIDC token
     # for a short-lived Turborepo one. contents stays read.
     permissions:
       contents: read
       id-token: write
+
+    # `financial` prerenders /dashboard at build time, which queries Postgres.
+    # This container is created and destroyed with the job, so CI gets a real
+    # database of its own and never reaches a deployed one.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: financial
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Points at the throwaway container above and nowhere else.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/financial
+
+      # Better Auth refuses to start on its default secret. This is a CI-only
+      # literal, not a credential: it signs nothing any person will ever hold,
+      # and the real value lives in Vercel. The app reads `AUTH_SECRET` — it is
+      # passed explicitly in src/lib/auth.ts, not picked up by Better Auth's own
+      # env lookup.
+      AUTH_SECRET: ci-only-not-a-real-secret
 
     steps:
       - uses: actions/checkout@v7
@@ -53,9 +93,9 @@ jobs:
           team: ${{ vars.TURBO_TEAM }}
 
       # `--affected` on a PR: only packages the branch touched, plus their
-      # dependents. It compares against main, which is the base here, and needs
-      # the full history the checkout above already fetches. Pushes to main run
-      # the whole graph, so nothing merges without a complete check.
+      # dependents, compared against the base sha in TURBO_SCM_BASE above.
+      # Pushes to main run the whole graph, so nothing merges without a
+      # complete check.
       - name: Typecheck
         run: pnpm turbo run typecheck ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
@@ -64,3 +104,26 @@ jobs:
       # everyone else's.
       - name: Lint
         run: pnpm turbo run lint ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+      # Only `financial` and `trophy-sys` define a `test` script today; turbo
+      # skips every package that does not, so this stays green as more arrive.
+      - name: Test
+        run: pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+      # `db push` rather than `migrate deploy`: this app has no migrations
+      # directory, so pushing the schema straight into the empty container is
+      # the only thing that would work. No seed — /dashboard only counts and
+      # groups, and both are happy against empty tables.
+      - name: Database schema
+        run: pnpm --filter financial db:push
+
+      # The gate that makes dependency automerge safe: a bump that breaks a
+      # build now fails here instead of in a Vercel production deploy.
+      #
+      # `x-com-chat` is the one app still excluded, and that is a real gap
+      # rather than a tidy-up. Its layout.tsx calls preloadQuery against Convex
+      # while Next prerenders, so it needs a reachable deployment — a URL string
+      # is not enough and no service container can stand in for one. It still
+      # gets lint, typecheck and test here.
+      - name: Build
+        run: pnpm turbo run build --filter='!x-com-chat' ${{ github.event_name == 'pull_request' && '--affected' || '' }}
