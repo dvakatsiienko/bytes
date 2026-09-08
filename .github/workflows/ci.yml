@@ -90,5 +90,14 @@ jobs:
       # container or making that route dynamic; neither belongs in a config
       # change. Until one lands, `financial` is covered by lint, typecheck and
       # test here, and by its Vercel deploy for the build.
+      #
+      # x-com-chat needs no such exclusion. Its only build-time env read is a
+      # presence check thrown at module scope in src/app/api/chat/route.ts, and
+      # nothing calls Groq during a build — so a placeholder is enough to keep
+      # the whole app's build under CI. This is not a credential and grants
+      # nothing; the real key lives in Vercel. It rides `globalPassThroughEnv`
+      # in turbo.jsonc, which strips every unnamed var from task environments.
       - name: Build
+        env:
+          GROQ_API_KEY: ci-placeholder-not-a-real-key
         run: pnpm turbo run build --filter='!financial' ${{ github.event_name == 'pull_request' && '--affected' || '' }}
