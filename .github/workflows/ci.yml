@@ -84,8 +84,6 @@ jobs:
       # Vercel's remote cache is already on for deploys; this is the same cache,
       # reached from GitHub. OIDC exchanges the runner's token for a short-lived
       # one, so there is no long-lived TURBO_TOKEN secret to rotate or leak.
-      # Needs `vars.TURBO_TEAM` set on the repo — until it is, this step is a
-      # no-op and the run just misses cache, exactly as it does today.
       - name: Remote cache
         continue-on-error: true
         uses: vercel/setup-turborepo-remote-cache-action@v1.1.0
