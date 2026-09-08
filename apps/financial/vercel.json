@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm i -F 'financial...'",
-  "git": { "deploymentEnabled": { "renovate/*": false } }
+  "git": { "deploymentEnabled": { "renovate/*": false, "coder/*": false } }
 }
