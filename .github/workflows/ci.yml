@@ -17,6 +17,13 @@ env:
   TURBO_TELEMETRY_DISABLED: 1
   DO_NOT_TRACK: 1
 
+  # `--affected` was never actually working. On a pull_request, actions/checkout
+  # leaves a detached HEAD with no local `main` ref, so turbo logged "Failed to
+  # resolve base ref 'main'" and fell back to "assuming all files have changed"
+  # — every PR silently ran the whole graph. Turbo's own warning names this env
+  # var as the fix. Empty on a push, where `--affected` is not passed anyway.
+  TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+
 jobs:
   check:
     name: lint + typecheck + test + build
@@ -76,5 +83,12 @@ jobs:
 
       # The gate that makes dependency automerge safe: a bump that breaks a
       # build now fails here instead of in a Vercel production deploy.
+      #
+      # `financial` is excluded, and that is a real gap. Its `next build`
+      # prerenders /dashboard, which queries Postgres, so the build dies on
+      # ECONNREFUSED with no database in CI. The honest fixes are a service
+      # container or making that route dynamic; neither belongs in a config
+      # change. Until one lands, `financial` is covered by lint, typecheck and
+      # test here, and by its Vercel deploy for the build.
       - name: Build
-        run: pnpm turbo run build ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+        run: pnpm turbo run build --filter='!financial' ${{ github.event_name == 'pull_request' && '--affected' || '' }}
