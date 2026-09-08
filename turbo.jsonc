@@ -8,12 +8,7 @@
     "DATABASE_URL",
     "PORT",
     "PORT_OFFSET",
-    "API_PORT",
-
-    // x-com-chat throws at module scope if this is unset, which is enough to
-    // kill `next build`. CI passes a placeholder so the app stays covered;
-    // passThrough rather than `env` because the value never changes the output.
-    "GROQ_API_KEY"
+    "API_PORT"
   ],
   "tasks": {
     // A no-op task with no matching script anywhere. It exists so `lint` and

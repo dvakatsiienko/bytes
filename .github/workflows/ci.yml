@@ -84,20 +84,15 @@ jobs:
       # The gate that makes dependency automerge safe: a bump that breaks a
       # build now fails here instead of in a Vercel production deploy.
       #
-      # `financial` is excluded, and that is a real gap. Its `next build`
-      # prerenders /dashboard, which queries Postgres, so the build dies on
-      # ECONNREFUSED with no database in CI. The honest fixes are a service
-      # container or making that route dynamic; neither belongs in a config
-      # change. Until one lands, `financial` is covered by lint, typecheck and
-      # test here, and by its Vercel deploy for the build.
-      #
-      # x-com-chat needs no such exclusion. Its only build-time env read is a
-      # presence check thrown at module scope in src/app/api/chat/route.ts, and
-      # nothing calls Groq during a build — so a placeholder is enough to keep
-      # the whole app's build under CI. This is not a credential and grants
-      # nothing; the real key lives in Vercel. It rides `globalPassThroughEnv`
-      # in turbo.jsonc, which strips every unnamed var from task environments.
+      # Two apps are excluded, and that is a real gap rather than a tidy-up.
+      # Both reach a live backend while Next prerenders, so no placeholder value
+      # can stand in for one:
+      #   financial   — /dashboard calls prisma.invoice.count(), dies on
+      #                 ECONNREFUSED with no database here.
+      #   x-com-chat  — layout.tsx calls preloadQuery against Convex, which
+      #                 needs a reachable deployment, not just a URL string.
+      # Both still get lint, typecheck and test here. Closing the gap properly
+      # means a service container, a seeded preview backend, or making those
+      # routes dynamic — none of which is a config change.
       - name: Build
-        env:
-          GROQ_API_KEY: ci-placeholder-not-a-real-key
-        run: pnpm turbo run build --filter='!financial' ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+        run: pnpm turbo run build --filter='!financial' --filter='!x-com-chat' ${{ github.event_name == 'pull_request' && '--affected' || '' }}
