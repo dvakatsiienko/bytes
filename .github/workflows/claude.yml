@@ -6,8 +6,10 @@ on:
   pull_request_review_comment:
     types: [created]
 
+# noise comments (vercel, linear, renovate) must never share a group with a live review:
+# with cancel-in-progress a vercel deploy comment cancelled the first review run (#64)
 concurrency:
-  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}
+  group: claude-${{ github.event.issue.number }}-${{ contains(github.event.comment.body, '@claude') }}
   cancel-in-progress: true
 
 jobs:
