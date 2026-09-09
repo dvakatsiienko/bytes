@@ -41,7 +41,7 @@ jobs:
     # database of its own and never reaches a deployed one.
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
