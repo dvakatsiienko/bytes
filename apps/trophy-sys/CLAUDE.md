@@ -126,6 +126,12 @@ Everything else the app persists rides the same `state.ts` store, one key each:
 `trophy-sys:stats`, `trophy-sys:hidden` (`string[]`), `trophy-sys:npsso` (`string`),
 `trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`).
 
+📌 **`settingsLoad` spreads the store over `SETTINGS_DEFAULT`, so a key already written to the
+store outranks the code default forever.** Changing a default therefore reaches a fresh install
+and nobody else — the live value has to be flipped through `/admin`, or the key deleted. Measured
+on `effortHideUntouched`: the default moved to `true` and production kept answering `false`,
+because a stored `false` was already sitting there.
+
 ## The admin area
 
 `/admin` is the owner's console — hide games, paste a fresh NPSSO, flip a setting. `src/server/admin.ts`
@@ -201,9 +207,17 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the eleven are one
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
   `*_COLUMNS`, so `stats.tsx` only wires.
-- **`AXIS_BOTTOM` in `chart-theme.ts` is the bottom margin every x-axis chart reserves.** Take it
-  from there, never a literal: effort had 36, the ranked bars 22 and everyone else 26, and the
-  panels drifted visibly out of line over months.
+- **Every axis margin is a token in `chart-theme.ts`, never a literal in a chart.** `AXIS_BOTTOM`
+  (26), `AXIS_LEFT` (52), `MONTH_AXIS_RIGHT` (26). Each one replaced a set of hand-typed numbers
+  that had drifted: bottom ran 36/26/22, left ran 38/42/38 — and 38 was too small for the
+  progression's widest tick, so `2,000` drew as `,000` for months. `MONTH_AXIS_RIGHT` holds the
+  half of a `YYYY-MM` label that hangs past the last tick.
+- **A tick count is derived from the width, never asked for flat.** `monthTicks(innerWidth, n)`
+  for the two month axes — both asked for 6 at every width and printed over each other at 390px.
+  `decadeTicks` in `effort-scatter.tsx` pins one tick per power of ten: 📌 **d3 abandons the count
+  you pass a log scale once the domain spans fewer decades than that count, and emits every minor
+  tick instead** — hiding untouched titles narrowed the effort domain enough to print 26
+  overlapping labels.
 
 ### Charts talking to each other
 
