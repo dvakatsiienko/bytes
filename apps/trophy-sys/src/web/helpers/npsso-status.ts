@@ -20,6 +20,28 @@ export const readoutBuild = (status: NpssoStatus) => {
     value: SOURCE_LABEL[status.source],
   });
 
+  // Second, because it is the answer to «is the vercel var stale» — the whole
+  // reason the source row is not enough on its own.
+  rows.push({
+    label: 'env var',
+    tone: ENV_TONE[status.envMatch],
+    value: ENV_LABEL[status.envMatch],
+  });
+
+  // Only when it disagrees with `source`: on every other read it would repeat
+  // the row above, and a row that only ever agrees stops being read.
+  if (status.liveSource !== null && status.liveSource !== status.source)
+    rows.push({
+      label: 'running on',
+      tone: 'text-orange',
+      value: SOURCE_LABEL[status.liveSource],
+    });
+
+  if (status.liveSource === 'env' && status.source === 'store')
+    notes.push(
+      'psn refused the pasted token and the env var worked, so the app is running on the env var. clearing the pasted one makes that the source properly.',
+    );
+
   rows.push(
     age === null
       ? { label: 'age', tone: 'text-dim', value: 'unknown' }
@@ -98,6 +120,22 @@ const SOURCE_TONE = {
   none: 'text-dim',
   store: 'text-fg',
 } as const satisfies Record<NpssoStatus['source'], string>;
+
+const ENV_LABEL = {
+  different: 'different',
+  none: 'not set',
+  same: 'same',
+} as const satisfies Record<NpssoStatus['envMatch'], string>;
+
+/**
+ * `different` is the one worth noticing, not an error: it is normal right after
+ * a paste, and it is exactly what says the vercel var has gone stale.
+ */
+const ENV_TONE = {
+  different: 'text-yellow',
+  none: 'text-dim',
+  same: 'text-fg',
+} as const satisfies Record<NpssoStatus['envMatch'], string>;
 
 const DAY_MS = 86_400_000;
 

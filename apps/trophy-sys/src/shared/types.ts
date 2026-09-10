@@ -279,8 +279,20 @@ export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: true };
 export interface NpssoStatus {
   /** When PSN first refused it, or null while it still works. */
   diedAt: number | null;
+  /**
+   * How the `NPSSO` env var compares to the token the app is actually using —
+   * compared on the server, because neither value may ever reach a client.
+   * `none` means the env var is unset.
+   */
+  envMatch: 'different' | 'none' | 'same';
   /** Measured lifetimes in ms, oldest first — one per token that has died. */
   lifetimes: number[];
+  /**
+   * Which source last minted a working PSN session, or null before this process
+   * has minted one. Not the same as `source`: the store can hold a dead token
+   * while the env var is the one carrying the app.
+   */
+  liveSource: 'env' | 'store' | null;
   /** Null for a token that came from the env var, or predates the measuring. */
   savedAt: number | null;
   source: 'env' | 'none' | 'store';

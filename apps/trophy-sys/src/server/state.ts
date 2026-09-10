@@ -237,11 +237,25 @@ export const npssoDeathRecord = async (failed: string) => {
   ]);
 };
 
-export const npssoStatusLoad = async (): Promise<NpssoStatus> => {
+/**
+ * Drops the pasted token so the env var becomes the source again. Writing null
+ * is the delete both backends already understand — `storeRead` treats it as
+ * empty, so no second primitive is needed.
+ */
+export const npssoClear = () => storeWrite(NPSSO_KEY, NPSSO_FILE, null);
+
+export const npssoStatusLoad = async (
+  liveSource: NpssoStatus['liveSource'] = null,
+): Promise<NpssoStatus> => {
   const [record, deaths] = await Promise.all([
     npssoRecordLoad(),
     npssoDeathsLoad(),
   ]);
+
+  // The comparison happens here and only the verdict travels: an NPSSO is a
+  // session credential, and a status payload is not where one belongs.
+  const env = process.env.NPSSO;
+  const envMatch = envCompare(env, record?.token ?? null);
 
   // A token retired while still working contributes no lifetime: its age is a
   // floor, not a measurement, and mixing the two poisons the estimate.
@@ -252,19 +266,38 @@ export const npssoStatusLoad = async (): Promise<NpssoStatus> => {
   if (!record)
     return {
       diedAt: null,
+      envMatch,
       lifetimes,
+      liveSource,
       savedAt: null,
-      source: process.env.NPSSO ? 'env' : 'none',
+      source: env ? 'env' : 'none',
     };
 
   return {
     diedAt:
       deaths.find((death) => death.token === record.token)?.diedAt ?? null,
+    envMatch,
     lifetimes,
+    liveSource,
     // 0 is the bare-string record: a token from before this was measured.
     savedAt: record.savedAt || null,
     source: 'store',
   };
+};
+
+/**
+ * With nothing stored the env var *is* what the app uses, so it matches by
+ * definition — the question this answers is "does the env var hold what we are
+ * running on", not "does it equal some other string".
+ */
+const envCompare = (
+  env: string | undefined,
+  stored: string | null,
+): NpssoStatus['envMatch'] => {
+  if (!env) return 'none';
+  if (!stored) return 'same';
+
+  return env === stored ? 'same' : 'different';
 };
 
 /**

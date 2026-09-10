@@ -63,6 +63,7 @@ const bodyRead = (body: string, res: Response) =>
 const apiGet = <T>(path: string) => apiCall<T>(path);
 const apiPost = <T>(path: string, sent?: unknown) =>
   apiCall<T>(path, 'POST', sent);
+const apiDelete = <T>(path: string) => apiCall<T>(path, 'DELETE');
 
 export const useProfile = () =>
   useQuery({
@@ -241,6 +242,16 @@ export const useNpssoSave = () => {
   return useMutation({
     mutationFn: (npsso: string) =>
       apiPost<{ ok: true }>('/admin/npsso', { npsso }),
+    onSuccess: () => appRefetch(queryClient),
+  });
+};
+
+/** Forgets the pasted token so the `NPSSO` env var becomes the source again. */
+export const useNpssoDrop = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => apiDelete<{ ok: true }>('/admin/npsso'),
     onSuccess: () => appRefetch(queryClient),
   });
 };

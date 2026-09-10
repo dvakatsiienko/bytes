@@ -19,6 +19,7 @@ import {
   useAdminLogout,
   useAdminSession,
   useHiddenSave,
+  useNpssoDrop,
   useNpssoSave,
   useNpssoStatus,
   useSettings,
@@ -293,18 +294,6 @@ const TokenReadout = () => {
     );
   });
 
-  // Vercel env vars are set at deploy time and cannot be written at runtime, so
-  // the honest answer for that source is a link out rather than a form.
-  const envJSX =
-    status.data.source === 'env' ? (
-      <p className='text-[12px] text-dim leading-relaxed'>
-        a token pasted below outranks this one and lands in kv. to replace the
-        env var itself,{' '}
-        <LinkOut href={VERCEL_ENV_URL}>open the vercel env settings</LinkOut> —
-        that store is not writable from here.
-      </p>
-    ) : null;
-
   return (
     <div className='flex flex-col gap-2'>
       {readout.dead ? <Note tone='error'>{readout.dead}</Note> : null}
@@ -313,10 +302,36 @@ const TokenReadout = () => {
         {rowListJSX}
       </dl>
 
-      {envJSX}
+      {/* Beside the rows it explains: a Vercel env var is written at deploy
+          time and never from here, so the honest control for it is a link. */}
+      <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
+        <LinkOut href={VERCEL_ENV_URL}>edit the vercel env var</LinkOut>
+        {status.data.source === 'store' ? <EnvRestore /> : null}
+      </div>
 
       {noteListJSX}
     </div>
+  );
+};
+
+/**
+ * The store always outranks the env var, so the only way to hand the app back
+ * to Vercel is to forget what was pasted. Two presses, because it throws away
+ * a token that may be the only working one.
+ */
+const EnvRestore = () => {
+  const drop = useNpssoDrop();
+  const [armed, setArmed] = useState(false);
+
+  if (drop.error) return <Note tone='error'>{drop.error.message}</Note>;
+
+  return (
+    <CommandButton
+      disabled={drop.isPending}
+      onClick={() => (armed ? drop.mutate() : setArmed(true))}
+      tone='bare'>
+      {restoreLabel(drop.isPending, armed)}
+    </CommandButton>
   );
 };
 
@@ -756,6 +771,13 @@ const npssoNote = (save: ReturnType<typeof useNpssoSave>) => {
     return <Note tone='ok'>token saved — the app is refetching with it.</Note>;
 
   return null;
+};
+
+/** Says what the press will do, so the second one is never a surprise. */
+const restoreLabel = (isPending: boolean, armed: boolean) => {
+  if (isPending) return 'clearing…';
+
+  return armed ? 'press again to clear it' : 'use the env var instead';
 };
 
 /** Dim while typing, accent the moment the length guard is satisfied. */

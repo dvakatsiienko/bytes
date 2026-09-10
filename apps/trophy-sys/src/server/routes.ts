@@ -7,13 +7,14 @@ import {
   gamesView,
   hiddenSet,
   loginAttempt,
+  npssoDrop,
   npssoSet,
   sessionCookie,
   sessionVerify,
 } from './admin.ts';
 import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
-import { gameDetailFetch, profileFetch } from './psn.ts';
+import { gameDetailFetch, liveSourceRead, profileFetch } from './psn.ts';
 import {
   hiddenLoad,
   isStateWritable,
@@ -132,7 +133,15 @@ export const routeResolve = async (
     if (!authed) return { body: { error: 'not signed in' }, status: 401 };
 
     if (path === '/api/admin/token' && method === 'GET')
-      return ok(await npssoStatusLoad());
+      return ok(await npssoStatusLoad(liveSourceRead()));
+
+    if (path === '/api/admin/npsso' && method === 'DELETE') {
+      if (!isStateWritable) return UNWRITABLE;
+
+      await npssoDrop();
+      cacheClear();
+      return ok({ ok: true });
+    }
 
     if (path === '/api/admin/hidden' && method === 'GET')
       return ok({ ids: await hiddenLoad() });

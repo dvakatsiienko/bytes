@@ -3,7 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { Game } from '../shared/types.ts';
 import { cached } from './cache.ts';
 import { gamesFetch, sessionReset } from './psn.ts';
-import { hiddenLoad, hiddenSave, npssoSave } from './state.ts';
+import { hiddenLoad, hiddenSave, npssoClear, npssoSave } from './state.ts';
 
 export const ADMIN_COOKIE = 'sys_admin';
 
@@ -238,6 +238,16 @@ export const npssoSet = async (value: unknown) => {
   // hide whether the new one works until the access token expires.
   sessionReset();
   return true;
+};
+
+/**
+ * Hands the app back to the `NPSSO` env var by forgetting the pasted token —
+ * the only way to make Vercel the source again, since the store always wins.
+ * The session goes with it, or the next call would still ride the old token.
+ */
+export const npssoDrop = async () => {
+  await npssoClear();
+  sessionReset();
 };
 
 /**

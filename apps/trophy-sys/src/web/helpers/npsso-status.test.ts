@@ -15,7 +15,9 @@ const DAY_MS = 86_400_000;
 
 const statusMake = (over: Partial<NpssoStatus> = {}): NpssoStatus => ({
   diedAt: null,
+  envMatch: 'none',
   lifetimes: [],
+  liveSource: null,
   savedAt: null,
   source: 'store',
   ...over,
@@ -36,6 +38,48 @@ test('the readout names which of the two sources is live', () => {
   assert.equal(
     rowValue(statusMake({ source: 'none' }), 'source'),
     'nothing stored',
+  );
+});
+
+test('the env var row answers whether vercel has gone stale', () => {
+  assert.equal(rowValue(statusMake({ envMatch: 'same' }), 'env var'), 'same');
+  assert.equal(
+    rowValue(statusMake({ envMatch: 'different' }), 'env var'),
+    'different',
+  );
+  assert.equal(
+    rowValue(statusMake({ envMatch: 'none' }), 'env var'),
+    'not set',
+  );
+});
+
+test('«running on» appears only when it disagrees with the source', () => {
+  assert.equal(
+    rowValue(statusMake({ liveSource: null }), 'running on'),
+    undefined,
+  );
+  assert.equal(
+    rowValue(
+      statusMake({ liveSource: 'store', source: 'store' }),
+      'running on',
+    ),
+    undefined,
+    'a row that only ever agrees with the one above it stops being read',
+  );
+  assert.equal(
+    rowValue(statusMake({ liveSource: 'env', source: 'store' }), 'running on'),
+    'env var (deploy-time)',
+  );
+});
+
+test('a pasted token the app is not using explains itself', () => {
+  const readout = readoutBuild(
+    statusMake({ liveSource: 'env', source: 'store' }),
+  );
+
+  assert.ok(
+    readout.notes.some((note) => note.includes('refused the pasted token')),
+    'the fallback having kicked in is the one state the rows alone understate',
   );
 });
 
