@@ -175,16 +175,12 @@ export const shownSave = (ids: string[]) =>
   storeWrite(SHOWN_KEY, SHOWN_FILE, ids);
 
 /**
- * The NPSSO pasted through the admin page, which outranks the env var — the
- * token expires and a redeploy is a poor way to renew it.
+ * The live NPSSO and nothing else. Written ONLY by the admin save.
  *
- * Stored as a record rather than a bare string so the app can measure how long
- * a token actually lasts. Sony publishes no lifetime; the one figure this repo
- * has is an upper bound of 25 days, from a token set 2026-08-16 and found dead
- * 2026-09-10. Each renewal adds a real sample.
- */
-/**
- * The live token and nothing else. Written ONLY by the admin save.
+ * A record rather than a bare string so the app can measure how long a token
+ * actually lasts. Sony publishes no lifetime; the one figure this repo has is an
+ * upper bound of 25 days, from a token set 2026-08-16 and found dead 2026-09-10.
+ * Each renewal adds a real sample.
  *
  * ⚠️ Deaths live under their own key on purpose. Both used to share this
  * record, which made every death a read-modify-write racing the admin's own

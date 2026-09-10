@@ -92,7 +92,7 @@ not a pattern: as a substring it claims Ghost of Tsushima.
 Env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,
 `STEAM_API_KEY`, `STEAM_ID64`, and the admin trio `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SECRET`. Locally
 they come from three files, loaded in order and last one wins (via `node --env-file`, never
-`dotenv`): `.env` holds `NPSSO`, the Vercel-generated `.env.local` holds the production KV
+`dotenv`): `.env` holds the `NPSSO` seed, the Vercel-generated `.env.local` holds the production KV
 credentials, and `.env.dev.local` overrides them for dev. In production Vercel injects them. Both entrypoints — `src/server/main.ts` and
 `src/server/cli.ts` — need the flags. Every key the app reads must also be listed in
 `turbo.jsonc`'s `env` array, because Biome's `noUndeclaredEnvVars` reads that list.

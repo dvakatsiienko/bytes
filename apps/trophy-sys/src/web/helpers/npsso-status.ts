@@ -5,20 +5,17 @@ import { dateFormat } from './format.ts';
  * Every honesty rule for the token readout lives here, in one pure function:
  * no estimate without a measurement, no age without a paste date, and the
  * sample count always said out loud.
+ *
+ * 📌 `source` steers the notes but has no row of its own. It had one, and it
+ * said `pasted here` on every read after the first paste — a row that only ever
+ * says one thing stops being read. The state it existed for, a deploy still on
+ * the env-var seed, is carried by `age: unknown` plus the note beneath it.
  */
 export const readoutBuild = (status: NpssoStatus) => {
   const rows: ReadoutRow[] = [];
   const notes: string[] = [];
 
   const age = status.savedAt === null ? null : daysSince(status.savedAt);
-
-  // First row, because everything under it is about a token whose origin this
-  // names — and because `env` is the one state the paste box below ends.
-  rows.push({
-    label: 'token in use',
-    tone: SOURCE_TONE[status.source],
-    value: SOURCE_LABEL[status.source],
-  });
 
   rows.push(
     age === null
@@ -85,23 +82,6 @@ export const readoutBuild = (status: NpssoStatus) => {
 
   return { dead, notes, rows };
 };
-
-/**
- * Plain words, not the storage layer. Only one of these is the steady state:
- * `env` means nothing has been pasted yet, and the first paste ends it.
- */
-const SOURCE_LABEL = {
-  env: 'the env var (no paste yet)',
-  none: 'nothing stored',
-  store: 'pasted here',
-} as const satisfies Record<NpssoStatus['source'], string>;
-
-/** Yellow for the seed: it works, and it is not where a renewed token goes. */
-const SOURCE_TONE = {
-  env: 'text-yellow',
-  none: 'text-dim',
-  store: 'text-fg',
-} as const satisfies Record<NpssoStatus['source'], string>;
 
 const DAY_MS = 86_400_000;
 

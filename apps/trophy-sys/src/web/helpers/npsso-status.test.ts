@@ -24,19 +24,16 @@ const statusMake = (over: Partial<NpssoStatus> = {}): NpssoStatus => ({
 const rowValue = (status: NpssoStatus, label: string) =>
   readoutBuild(status).rows.find((row) => row.label === label)?.value;
 
-test('the readout names which of the two sources is live', () => {
+test('a seed token says why its age is unknown, without a row for it', () => {
+  const readout = readoutBuild(statusMake({ savedAt: null, source: 'env' }));
+
   assert.equal(
-    rowValue(statusMake({ source: 'store' }), 'token in use'),
-    'pasted here',
+    readout.rows.find((row) => row.label === 'token in use'),
+    undefined,
+    'the row said the same thing on every read once a token had been pasted',
   );
-  assert.equal(
-    rowValue(statusMake({ source: 'env' }), 'token in use'),
-    'the env var (no paste yet)',
-  );
-  assert.equal(
-    rowValue(statusMake({ source: 'none' }), 'token in use'),
-    'nothing stored',
-  );
+  assert.equal(rowValue(statusMake({ source: 'env' }), 'age'), 'unknown');
+  assert.ok(readout.notes.some((note) => note.includes('env var seed')));
 });
 
 test('a token with no paste date reports an unknown age, never a zero', () => {
