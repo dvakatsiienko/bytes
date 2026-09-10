@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: { turbopackRustReactCompiler: true, useTypeScriptCli: true },
   reactCompiler: true,
   reactStrictMode: true,
+  transpilePackages: ['@ui/kit'],
   typescript: { ignoreBuildErrors: true },
 };
 

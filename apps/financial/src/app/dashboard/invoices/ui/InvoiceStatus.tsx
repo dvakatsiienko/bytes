@@ -1,5 +1,5 @@
-import cx from 'clsx';
 import { CheckIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { cn } from '@ui/kit/lib/utils';
 
 /**
  * A rubber stamp, not a pill. Paid sits slightly off-square because a stamp
@@ -11,7 +11,7 @@ export const InvoiceStatus = (props: { status: string }) => {
 
   return (
     <span
-      className={cx(
+      className={cn(
         'caption inline-flex items-center gap-1 border-2 px-2 py-1 font-semibold',
         isPaid ? '-rotate-3 border-seal text-seal' : 'border-flag/70 text-flag',
       )}>

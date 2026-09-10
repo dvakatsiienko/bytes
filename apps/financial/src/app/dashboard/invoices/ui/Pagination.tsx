@@ -1,8 +1,8 @@
 'use client';
 
-import cx from 'clsx';
 // import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { cn } from '@ui/kit/lib/utils';
 import NextLink from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
@@ -72,14 +72,14 @@ export const Pagination = (props: PaginationProps) => {
 const PaginationNumber = (props: PaginationNumberProps) => {
   const { page, href, position, isActive } = props;
 
-  const className = cx(
-    'flex h-10 w-10 items-center justify-center text-sm border border-rule',
+  const className = cn(
+    'flex h-10 w-10 items-center justify-center border border-rule text-sm',
     {
       'hover:bg-bar': !isActive && position !== 'middle',
       'rounded-l-md': position === 'first' || position === 'single',
       'rounded-r-md': position === 'last' || position === 'single',
       'text-rule': position === 'middle',
-      'z-10 bg-seal border-seal text-paper': isActive,
+      'z-10 border-seal bg-seal text-paper': isActive,
     },
   );
 
@@ -95,7 +95,7 @@ const PaginationNumber = (props: PaginationNumberProps) => {
 const PaginationArrow = (props: PaginationArrowProps) => {
   const { href, direction, isDisabled } = props;
 
-  const className = cx(
+  const className = cn(
     'flex h-10 w-10 items-center justify-center border border-rule',
     {
       'hover:bg-bar': !isDisabled,
