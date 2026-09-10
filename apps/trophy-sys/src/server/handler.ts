@@ -23,7 +23,13 @@ const BODY_TOO_LARGE = Symbol('body-too-large');
  */
 const oversized = (body: unknown) => {
   try {
-    return JSON.stringify(body).length > BODY_MAX_BYTES;
+    // Byte length, not string length: `.length` counts UTF-16 code units, so a
+    // body of multi-byte characters measures well under its real size.
+    if (Buffer.isBuffer(body)) return body.length > BODY_MAX_BYTES;
+    if (typeof body === 'string')
+      return Buffer.byteLength(body) > BODY_MAX_BYTES;
+
+    return Buffer.byteLength(JSON.stringify(body)) > BODY_MAX_BYTES;
   } catch {
     // Circular or unserialisable: not a shape any route of ours accepts.
     return true;

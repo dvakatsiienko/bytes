@@ -365,14 +365,11 @@ const GameList = () => {
   const page = ordered.slice(0, shown);
 
   // One request carries the whole new set, so a row and a batch cost the same.
+  // The set itself is derived inside the mutation, from the cache, so two fast
+  // toggles compose instead of the second recomputing from a stale render.
   const hiddenApply = (ids: string[], hide: boolean) => {
-    const next = new Set(hiddenIds);
-    for (const id of ids) {
-      if (hide) next.add(id);
-      else next.delete(id);
-    }
     setBusyIds(ids);
-    save.mutate([...next], { onSettled: () => setBusyIds([]) });
+    save.mutate({ hide, ids }, { onSettled: () => setBusyIds([]) });
   };
 
   const filterSet = (value: string) => {

@@ -83,7 +83,10 @@ const DAY_MS = 86_400_000;
 const daysSince = (epoch: number) =>
   Math.max(0, Math.floor((Date.now() - epoch) / DAY_MS));
 
-const daysOf = (ms: number) => Math.round(ms / DAY_MS);
+// Floored, never rounded: this readout exists because a confident wrong number
+// sent the owner down the wrong path once already. Reporting 26 days for a
+// token that lasted 25 and a half is the same mistake in miniature.
+const daysOf = (ms: number) => Math.floor(ms / DAY_MS);
 
 const dayLabel = (count: number) => `${count} ${count === 1 ? 'day' : 'days'}`;
 

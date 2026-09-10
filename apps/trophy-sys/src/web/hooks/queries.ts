@@ -165,31 +165,56 @@ export const useSettingsSave = () => {
 };
 
 /**
- * The body is the COMPLETE new set — the server replaces rather than merges,
- * so one request covers a single row and a whole filtered batch alike.
+ * Takes the rows to flip, never the whole set: the set is derived here, from
+ * the cache, at the moment the request fires.
  *
- * Written optimistically, and that is load-bearing rather than cosmetic: the
- * caller derives the next set from the cached `hidden` flags, so without the
- * local flip a second toggle fired before the first response computes from a
- * stale set and silently undoes it.
+ * ⚠️ Both halves of that are load-bearing. Deriving in the component reads a
+ * value from the last render, so two fast toggles both computed from the same
+ * starting set and the second silently undid the first. And the rollback is
+ * conditional, because a failure restoring its own snapshot erases every toggle
+ * made after it — which is how the admin once showed rows hidden that the store
+ * never held.
  */
 export const useHiddenSave = () => {
   const queryClient = useQueryClient();
 
+  const hiddenNext = (ids: string[], hide: boolean) => {
+    const games = queryClient.getQueryData<Game[]>(ADMIN_GAMES_KEY) ?? [];
+    const next = new Set(
+      games.filter((game) => game.hidden).map((game) => game.id),
+    );
+
+    for (const id of ids) {
+      if (hide) next.add(id);
+      else next.delete(id);
+    }
+
+    return [...next];
+  };
+
   // Generics are spelled out because `onError` sorts before `onMutate`, and
   // the context type is inferred from whichever comes first.
-  return useMutation<{ ids: string[] }, Error, string[], HiddenContext>({
-    mutationFn: (ids) => apiPost<{ ids: string[] }>('/admin/hidden', { ids }),
-    onError: (_error, _ids, context) =>
-      queryClient.setQueryData(ADMIN_GAMES_KEY, context?.previous),
-    onMutate: async (ids) => {
+  return useMutation<{ ids: string[] }, Error, HiddenFlip, HiddenContext>({
+    mutationFn: (flip) =>
+      apiPost<{ ids: string[] }>('/admin/hidden', {
+        ids: hiddenNext(flip.ids, flip.hide),
+      }),
+    mutationKey: HIDDEN_KEY,
+    onError: (_error, _flip, context) => {
+      // Something newer is still in flight and owns the cache now.
+      if (queryClient.isMutating({ mutationKey: HIDDEN_KEY }) > 1) return;
+      queryClient.setQueryData(ADMIN_GAMES_KEY, context?.previous);
+    },
+    onMutate: async (flip) => {
       await queryClient.cancelQueries({ queryKey: ADMIN_GAMES_KEY });
 
       const previous = queryClient.getQueryData<Game[]>(ADMIN_GAMES_KEY);
-      const hidden = new Set(ids);
+      const flipping = new Set(flip.ids);
 
       queryClient.setQueryData<Game[]>(ADMIN_GAMES_KEY, (games) =>
-        games?.map((game) => ({ ...game, hidden: hidden.has(game.id) })),
+        games?.map((game) =>
+          flipping.has(game.id) ? { ...game, hidden: flip.hide } : game,
+        ),
       );
 
       return { previous };
@@ -197,6 +222,13 @@ export const useHiddenSave = () => {
     onSuccess: () => appRefetch(queryClient),
   });
 };
+
+const HIDDEN_KEY = ['admin', 'hidden'] as const;
+
+export interface HiddenFlip {
+  hide: boolean;
+  ids: string[];
+}
 
 /**
  * A new token invalidates everything, not just the admin keys: repairing the

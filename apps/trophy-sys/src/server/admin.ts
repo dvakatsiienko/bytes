@@ -116,9 +116,10 @@ export const credentialsMatch = (
   );
 
 /**
- * How many wrong passwords are free before the cooldown starts, and the shape
- * of that cooldown: one minute, doubling per further failure, capped so the
- * owner is never more than a coffee away from another try.
+ * How many wrong passwords are free before the cooldown starts, and how long it
+ * lasts: a flat minute. A doubling ladder used to live here, and it was the
+ * mechanism by which a slow trickle of wrong guesses escalated the OWNER's own
+ * wait — so failures reset when a window expires and every cooldown is equal.
  */
 const LOGIN_FAILURE_LIMIT = 5;
 const LOCKOUT_MS = 60_000;

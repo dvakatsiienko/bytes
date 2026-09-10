@@ -89,14 +89,31 @@ const tokensMint = async () => {
 /** Drops the cached session so the next call re-mints from the stored NPSSO. */
 export const sessionReset = () => {
   session = null;
+  minting = null;
 };
+
+/**
+ * Shared by every caller that arrives while a mint is in flight. Without it a
+ * cold process answering several routes at once ran one NPSSO exchange each —
+ * against a rate-limited api, and each failure recording the same death again.
+ */
+let minting: Promise<Awaited<ReturnType<typeof tokensMint>>> | null = null;
 
 export const authGet = async (): Promise<AuthorizationPayload> => {
   if (session && session.expiresAt > Date.now() + 60_000) return session.auth;
 
-  const tokens = session
-    ? await exchangeRefreshTokenForAuthTokens(session.refreshToken)
-    : await tokensMint();
+  minting ??= session
+    ? exchangeRefreshTokenForAuthTokens(session.refreshToken)
+    : tokensMint();
+
+  let tokens: Awaited<typeof minting>;
+  try {
+    tokens = await minting;
+  } finally {
+    // Cleared either way: a memoised rejection would make one expired token
+    // permanent for the life of the process.
+    minting = null;
+  }
 
   session = {
     auth: { accessToken: tokens.accessToken },
