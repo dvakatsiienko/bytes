@@ -322,8 +322,6 @@ const EnvControls = (props: EnvControlsProps) => {
   const drop = useNpssoDrop();
   const [armed, setArmed] = useState(false);
 
-  if (drop.error) return <Note tone='error'>{drop.error.message}</Note>;
-
   return (
     // The helper sits on its own row rather than under the button: at this
     // panel's width a sentence beside the button pushes it off the link's line.
@@ -348,6 +346,11 @@ const EnvControls = (props: EnvControlsProps) => {
             : 'switching forgets the token pasted here, and the app reads the one on vercel again.'}
         </p>
       ) : null}
+
+      {/* Beside the controls, never instead of them. `error` stays set until the
+          next mutate, and the button is the only thing that calls one — an early
+          return here took away both the retry and the link, until a reload. */}
+      {drop.error ? <Note tone='error'>{drop.error.message}</Note> : null}
     </div>
   );
 };
