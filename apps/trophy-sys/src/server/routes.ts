@@ -67,6 +67,17 @@ const UNWRITABLE = {
   status: 501,
 };
 
+/** Null when the admin is unconfigured — never a reason to grant access. */
+const adminAuthed = (request: RouteRequest) => {
+  const config = adminConfig();
+  if (!config) return null;
+
+  return sessionVerify(
+    config,
+    cookieRead(request.headers.cookie, ADMIN_COOKIE),
+  );
+};
+
 export const routeResolve = async (
   url: URL,
   method: string,
@@ -187,7 +198,14 @@ export const routeResolve = async (
 
   if (path === '/api/games') {
     const limit = limitParse(url.searchParams.get('limit'));
-    const all = url.searchParams.get('all') === '1';
+
+    // ⚠️ `all=1` is the admin's view — every title plus the `hidden` flag — and
+    // it was reachable without a cookie, so the whole hide feature came undone
+    // by appending a query string. Unauthenticated callers get the filtered
+    // list rather than a 401: refusing would confirm the parameter exists.
+    const all =
+      url.searchParams.get('all') === '1' && adminAuthed(request) === true;
+
     const key = all ? `games:all:${limit}` : `games:${limit}`;
     return ok(await cached(key, () => gamesView(limit, all)));
   }

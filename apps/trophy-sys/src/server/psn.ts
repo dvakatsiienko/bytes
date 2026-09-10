@@ -70,6 +70,21 @@ const npssoRead = async () => {
   return npsso;
 };
 
+/**
+ * psn-api answers a refused NPSSO with prose naming the access code, and the
+ * only other thing it could plausibly be is a transport failure — which carries
+ * a node error code instead. Matching the prose is fragile, so the fallback is
+ * the safe direction: an unrecognised error is NOT recorded as a death.
+ */
+const rejection = (cause: unknown) => {
+  if (typeof cause === 'object' && cause !== null && 'code' in cause)
+    return false;
+
+  return REFUSAL.test(cause instanceof Error ? cause.message : String(cause));
+};
+
+const REFUSAL = /access code|npsso/i;
+
 const tokensMint = async () => {
   const npsso = await npssoRead();
 
@@ -78,6 +93,12 @@ const tokensMint = async () => {
       await exchangeNpssoForAccessCode(npsso),
     );
   } catch (cause) {
+    // ⚠️ Only a refusal counts as a death. A timeout, a DNS failure or a PSN
+    // outage reaches this same catch, and treating one as an expired token both
+    // poisons the lifetime measurement with a false sample and tells the owner
+    // to go fetch a code that is perfectly fine.
+    if (!rejection(cause)) throw cause;
+
     // Names the token that failed, so a rejection racing a fresh paste cannot
     // write the dead one back. Stamps the death once, so the next token's age
     // can be compared against a measured lifetime rather than folklore.
