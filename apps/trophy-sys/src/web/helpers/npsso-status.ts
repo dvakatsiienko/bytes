@@ -12,37 +12,13 @@ export const readoutBuild = (status: NpssoStatus) => {
 
   const age = status.savedAt === null ? null : daysSince(status.savedAt);
 
-  // First row, because it decides whether the paste box below can replace the
-  // live token at all — an env var is only replaceable in the Vercel dashboard.
+  // First row, because everything under it is about a token whose origin this
+  // names — and because `env` is the one state the paste box below ends.
   rows.push({
     label: 'token in use',
     tone: SOURCE_TONE[status.source],
     value: SOURCE_LABEL[status.source],
   });
-
-  // Only with something pasted to compare against. With the env var already in
-  // use it is the row above wearing a second name, and «same as pasted» when
-  // nothing is pasted is a sentence about nothing.
-  if (status.source === 'store')
-    rows.push({
-      label: 'vercel env var',
-      tone: ENV_TONE[status.envMatch],
-      value: ENV_LABEL[status.envMatch],
-    });
-
-  // Only when it disagrees with `source`: on every other read it would repeat
-  // the row above, and a row that only ever agrees stops being read.
-  if (status.liveSource !== null && status.liveSource !== status.source)
-    rows.push({
-      label: 'running on',
-      tone: 'text-orange',
-      value: SOURCE_LABEL[status.liveSource],
-    });
-
-  if (status.liveSource === 'env' && status.source === 'store')
-    notes.push(
-      'psn refused the token pasted here, and the one on vercel worked — so that is what the app is running on. switching to it below makes it the real setting.',
-    );
 
   rows.push(
     age === null
@@ -54,7 +30,7 @@ export const readoutBuild = (status: NpssoStatus) => {
   else if (status.savedAt === null)
     notes.push(
       status.source === 'env'
-        ? 'this token came from the env var, so there is no paste date to measure its age from.'
+        ? 'this token came from the env var seed, so there is no paste date to measure its age from. pasting one here takes over.'
         : 'this token predates the measuring, so its age is unknown.',
     );
 
@@ -111,38 +87,21 @@ export const readoutBuild = (status: NpssoStatus) => {
 };
 
 /**
- * Plain words, not the storage layer. «pasted (kv)» named the mechanism and
- * left the reader to work out what it meant for them; these name the thing the
- * owner recognises — where the token came from.
+ * Plain words, not the storage layer. Only one of these is the steady state:
+ * `env` means nothing has been pasted yet, and the first paste ends it.
  */
 const SOURCE_LABEL = {
-  env: 'the vercel env var',
+  env: 'the env var (no paste yet)',
   none: 'nothing stored',
-  store: 'the one pasted here',
+  store: 'pasted here',
 } as const satisfies Record<NpssoStatus['source'], string>;
 
-/** Yellow for the env var: it works, and it cannot be replaced from this page. */
+/** Yellow for the seed: it works, and it is not where a renewed token goes. */
 const SOURCE_TONE = {
   env: 'text-yellow',
   none: 'text-dim',
   store: 'text-fg',
 } as const satisfies Record<NpssoStatus['source'], string>;
-
-const ENV_LABEL = {
-  different: 'a different token',
-  none: 'not set',
-  same: 'the same token',
-} as const satisfies Record<NpssoStatus['envMatch'], string>;
-
-/**
- * `different` is the one worth noticing, not an error: it is normal right after
- * a paste, and it is exactly what says the vercel var has gone stale.
- */
-const ENV_TONE = {
-  different: 'text-yellow',
-  none: 'text-dim',
-  same: 'text-fg',
-} as const satisfies Record<NpssoStatus['envMatch'], string>;
 
 const DAY_MS = 86_400_000;
 

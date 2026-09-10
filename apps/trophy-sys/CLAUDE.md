@@ -99,22 +99,15 @@ credentials, and `.env.dev.local` overrides them for dev. In production Vercel i
 
 - `authGet()` in `psn.ts` holds one in-memory session and refreshes it with the refresh token, so
   the NPSSO→access-code exchange runs once per process.
-- `npssoCandidates()` is **async** and the store outranks the env: the pasted token first,
-  `process.env.NPSSO` second. Vercel env vars cannot be written at runtime, so a token pasted
-  through the admin has to live in KV — that is the whole reason for the order. Both are *tried*,
-  in that order: a refusal on the first falls through to the second, so rotating the Vercel var
-  revives a deploy whose pasted token expired, with nobody pasting anything. An env var equal to
-  the stored token is dropped from the list — it is the same refusal, not a second chance. Only a
-  refusal falls through; a timeout or a PSN outage throws immediately, or one outage would burn
-  the fallback too. An expired token throws the sentinel `NPSSO_INVALID` (`src/shared/types.ts`)
-  rather than psn-api's multi-line prose, and the header renders it as a link to the admin.
-- 📌 **The admin's token panel compares the two on the server and sends only the verdict** —
-  `envMatch: same | different | not set`. Neither value may ever enter a status payload. `liveSource`
-  says which token actually minted the live session; it is per-process, in memory, null until the
-  first mint, and `sessionReset()` clears it — it describes a session, so it must not outlive one.
-- 📌 **The store always wins, so the only way back to the env var is to forget the pasted token.**
-  `DELETE /api/admin/npsso` → `npssoClear()`, which writes null (the delete both backends already
-  understand) and resets the session.
+- 📌 **KV is the source of the NPSSO. `process.env.NPSSO` is a bootstrap seed and nothing else.**
+  `npssoRead()` is async and reads `npssoLoad()` first, the env var second — so the seed carries a
+  deploy that has never been pasted into, and the first paste retires it for good. Vercel env vars
+  cannot be written at runtime, and a token expires every few weeks, so a redeploy is the wrong way
+  to renew one. There is deliberately no fallback *back* to the env var on a refusal and no way to
+  clear the stored token: two live sources confused more than they protected (measured with both
+  built, 2026-09-10). The panel says which of the two is in use in one row and stops there.
+  An expired token throws the sentinel `NPSSO_INVALID` (`src/shared/types.ts`) rather than
+  psn-api's multi-line prose, and the header renders it as a link to the admin.
 - Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
   guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
   empty library unless checked. And the envelope key is not always `response`:
@@ -167,7 +160,7 @@ missing, and every admin route then answers 503.** There is deliberately no fall
 missing a var is shut, never open.
 
 - Routes: `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/session`,
-  `GET`+`POST /api/admin/hidden`, `POST`+`DELETE /api/admin/npsso`, `POST /api/admin/settings`,
+  `GET`+`POST /api/admin/hidden`, `POST /api/admin/npsso`, `POST /api/admin/settings`,
   `GET /api/admin/token`.
 - `GET /api/admin/session` never answers 401 — it reports `authed` either way, because the UI uses
   it to pick a screen.

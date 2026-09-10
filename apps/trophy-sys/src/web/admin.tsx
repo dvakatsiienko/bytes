@@ -2,12 +2,7 @@ import { type FormEvent, type ReactNode, useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 
 import type { Game } from '../shared/types.ts';
-import {
-  NPSSO_URL,
-  SETTINGS_DEFAULT,
-  VERCEL_ENV_URL,
-  isNonGame,
-} from '../shared/types.ts';
+import { NPSSO_URL, SETTINGS_DEFAULT, isNonGame } from '../shared/types.ts';
 import { Checkbox } from './components/checkbox.tsx';
 import { CommandButton } from './components/command-button.tsx';
 import { PlatformBadge } from './components/platform-badge.tsx';
@@ -20,7 +15,6 @@ import {
   useAdminLogout,
   useAdminSession,
   useHiddenSave,
-  useNpssoDrop,
   useNpssoSave,
   useNpssoStatus,
   useSettings,
@@ -303,59 +297,11 @@ const TokenReadout = () => {
         {rowListJSX}
       </dl>
 
-      {/* Beside the rows it explains: a Vercel env var is written at deploy
-          time and never from here, so the honest control for it is a link. */}
-      <EnvControls hasPasted={status.data.source === 'store'} />
-
       {noteListJSX}
     </div>
   );
 };
 
-/**
- * The two ways out of a bad token, side by side: change it on Vercel, or stop
- * using the pasted one. The store always outranks the env var, so forgetting
- * what was pasted is the only route back to Vercel — and it takes two presses,
- * because it throws away a token that may be the only working one.
- */
-const EnvControls = (props: EnvControlsProps) => {
-  const drop = useNpssoDrop();
-  const [armed, setArmed] = useState(false);
-
-  return (
-    // The helper sits on its own row rather than under the button: at this
-    // panel's width a sentence beside the button pushes it off the link's line.
-    <div className='flex flex-col gap-1'>
-      <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2'>
-        <LinkOut href={VERCEL_ENV_URL}>change the token on vercel</LinkOut>
-
-        {props.hasPasted ? (
-          <CommandButton
-            disabled={drop.isPending}
-            onClick={() => (armed ? drop.mutate() : setArmed(true))}
-            tone={armed ? 'primary' : 'quiet'}>
-            {restoreLabel(drop.isPending, armed)}
-          </CommandButton>
-        ) : null}
-      </div>
-
-      {props.hasPasted ? (
-        <p className='text-[12px] text-dim leading-relaxed'>
-          {armed
-            ? 'the token pasted here will be forgotten — this cannot be undone.'
-            : 'switching forgets the token pasted here, and the app reads the one on vercel again.'}
-        </p>
-      ) : null}
-
-      {/* Beside the controls, never instead of them. `error` stays set until the
-          next mutate, and the button is the only thing that calls one — an early
-          return here took away both the retry and the link, until a reload. */}
-      {drop.error ? <Note tone='error'>{drop.error.message}</Note> : null}
-    </div>
-  );
-};
-
-/** Display choices, read publicly by /stats and written only from here. */
 const SettingsForm = () => {
   const settings = useSettings();
   const save = useSettingsSave();
@@ -802,13 +748,6 @@ const npssoNote = (save: ReturnType<typeof useNpssoSave>) => {
   return null;
 };
 
-/** Says what the press will do, so the second one is never a surprise. */
-const restoreLabel = (isPending: boolean, armed: boolean) => {
-  if (isPending) return 'switching…';
-
-  return armed ? 'yes, switch to vercel’s' : 'switch to the vercel token';
-};
-
 /** Dim while typing, accent the moment the length guard is satisfied. */
 const counterTone = (typed: number, isReady: boolean) => {
   if (isReady) return 'text-green';
@@ -925,11 +864,6 @@ interface FieldProps {
   suffix?: ReactNode;
   type?: 'email' | 'password' | 'text';
   value: string;
-}
-
-interface EnvControlsProps {
-  /** A token pasted here is what the switch would forget — no paste, no switch. */
-  hasPasted: boolean;
 }
 
 interface LinkOutProps {

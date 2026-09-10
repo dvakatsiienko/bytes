@@ -15,9 +15,7 @@ const DAY_MS = 86_400_000;
 
 const statusMake = (over: Partial<NpssoStatus> = {}): NpssoStatus => ({
   diedAt: null,
-  envMatch: 'none',
   lifetimes: [],
-  liveSource: null,
   savedAt: null,
   source: 'store',
   ...over,
@@ -29,70 +27,15 @@ const rowValue = (status: NpssoStatus, label: string) =>
 test('the readout names which of the two sources is live', () => {
   assert.equal(
     rowValue(statusMake({ source: 'store' }), 'token in use'),
-    'the one pasted here',
+    'pasted here',
   );
   assert.equal(
     rowValue(statusMake({ source: 'env' }), 'token in use'),
-    'the vercel env var',
+    'the env var (no paste yet)',
   );
   assert.equal(
     rowValue(statusMake({ source: 'none' }), 'token in use'),
     'nothing stored',
-  );
-});
-
-test('the vercel row answers whether that token has gone stale', () => {
-  assert.equal(
-    rowValue(statusMake({ envMatch: 'same' }), 'vercel env var'),
-    'the same token',
-  );
-  assert.equal(
-    rowValue(statusMake({ envMatch: 'different' }), 'vercel env var'),
-    'a different token',
-  );
-  assert.equal(
-    rowValue(statusMake({ envMatch: 'none' }), 'vercel env var'),
-    'not set',
-  );
-});
-
-test('with nothing pasted there is no comparison to print', () => {
-  assert.equal(
-    rowValue(statusMake({ envMatch: 'same', source: 'env' }), 'vercel env var'),
-    undefined,
-    '«the same token» against nothing pasted is a sentence about nothing',
-  );
-});
-
-test('«running on» appears only when it disagrees with the source', () => {
-  assert.equal(
-    rowValue(statusMake({ liveSource: null }), 'running on'),
-    undefined,
-  );
-  assert.equal(
-    rowValue(
-      statusMake({ liveSource: 'store', source: 'store' }),
-      'running on',
-    ),
-    undefined,
-    'a row that only ever agrees with the one above it stops being read',
-  );
-  assert.equal(
-    rowValue(statusMake({ liveSource: 'env', source: 'store' }), 'running on'),
-    'the vercel env var',
-  );
-});
-
-test('a pasted token the app is not using explains itself', () => {
-  const readout = readoutBuild(
-    statusMake({ liveSource: 'env', source: 'store' }),
-  );
-
-  assert.ok(
-    readout.notes.some((note) =>
-      note.includes('refused the token pasted here'),
-    ),
-    'the fallback having kicked in is the one state the rows alone understate',
   );
 });
 

@@ -17,7 +17,6 @@ import {
 import type {
   Game,
   GameDetail,
-  NpssoStatus,
   Profile,
   Trophy,
   TrophyCounts,
@@ -55,38 +54,22 @@ interface Session {
   refreshToken: string;
 }
 
-/** One NPSSO worth trying, and where it came from. */
-interface TokenCandidate {
-  source: NpssoSource;
-  token: string;
-}
-
-type NpssoSource = NonNullable<NpssoStatus['liveSource']>;
-
 let session: Session | null = null;
 
 /**
- * A token pasted through the admin page wins over the env var: it is the newer
- * of the two by definition, and renewing an expired NPSSO must not need a
- * redeploy. The env var is not dropped though — it is the fallback, so rotating
- * it in Vercel revives the app when the pasted one has expired.
+ * KV is the source of the NPSSO. `process.env.NPSSO` is a bootstrap seed and
+ * nothing more: it carries a deploy that has never been pasted into, and the
+ * first paste retires it for good. Renewing an expired token must not need a
+ * redeploy, which is the whole reason the store outranks it.
  */
-const npssoCandidates = async (): Promise<TokenCandidate[]> => {
-  const stored = await npssoLoad();
-  const env = process.env.NPSSO ?? null;
-  const list: TokenCandidate[] = [];
-
-  if (stored) list.push({ source: 'store', token: stored });
-  // An env var holding the same string is not a second chance at the same
-  // refusal — it would only record the death twice.
-  if (env && env !== stored) list.push({ source: 'env', token: env });
-
-  if (list.length === 0)
+const npssoRead = async () => {
+  const npsso = (await npssoLoad()) ?? process.env.NPSSO;
+  if (!npsso)
     throw new Error(
-      'NPSSO missing — paste one on the admin page, set it in .env locally, or as a Vercel env var in production',
+      'NPSSO missing — paste one on the admin page, or seed it in .env locally and as a Vercel env var for a first deploy',
     );
 
-  return list;
+  return npsso;
 };
 
 /**
@@ -105,55 +88,31 @@ const rejection = (cause: unknown) => {
 const REFUSAL = /access code|npsso/i;
 
 const tokensMint = async () => {
-  const candidates = await npssoCandidates();
-  let refusal: unknown = null;
+  const npsso = await npssoRead();
 
-  for (const candidate of candidates) {
-    try {
-      // biome-ignore lint/performance/noAwaitInLoops: sequential is the point — the env token is a fallback, and Promise.all would spend both against a rate-limited api on every mint, including the ones that succeed on the first.
-      const tokens = await exchangeAccessCodeForAuthTokens(
-        await exchangeNpssoForAccessCode(candidate.token),
-      );
-      liveSource = candidate.source;
+  try {
+    return await exchangeAccessCodeForAuthTokens(
+      await exchangeNpssoForAccessCode(npsso),
+    );
+  } catch (cause) {
+    // ⚠️ Only a refusal counts as a death. A timeout, a DNS failure or a PSN
+    // outage reaches this same catch, and treating one as an expired token both
+    // poisons the lifetime measurement with a false sample and tells the owner
+    // to go fetch a code that is perfectly fine.
+    if (!rejection(cause)) throw cause;
 
-      return tokens;
-    } catch (cause) {
-      // ⚠️ Only a refusal counts as a death. A timeout, a DNS failure or a PSN
-      // outage reaches this same catch, and treating one as an expired token
-      // both poisons the lifetime measurement with a false sample and tells the
-      // owner to go fetch a code that is perfectly fine. It also must not burn
-      // the fallback: a PSN outage would otherwise bury the env token too.
-      if (!rejection(cause)) throw cause;
-
-      // Names the token that failed, so a rejection racing a fresh paste cannot
-      // write the dead one back. Stamps the death once, so the next token's age
-      // can be compared against a measured lifetime rather than folklore.
-      await npssoDeathRecord(candidate.token);
-      refusal = cause;
-    }
+    // Names the token that failed, so a rejection racing a fresh paste cannot
+    // write the dead one back. Stamps the death once, so the next token's age
+    // can be compared against a measured lifetime rather than folklore.
+    await npssoDeathRecord(npsso);
+    throw new Error(NPSSO_INVALID, { cause });
   }
-
-  liveSource = null;
-  throw new Error(NPSSO_INVALID, { cause: refusal });
 };
-
-/**
- * Which source last minted a working session. Per process and in memory only:
- * a serverless instance that has not minted yet honestly answers null rather
- * than guessing from what is stored.
- */
-let liveSource: NpssoSource | null = null;
-
-export const liveSourceRead = () => liveSource;
 
 /** Drops the cached session so the next call re-mints from the stored NPSSO. */
 export const sessionReset = () => {
   session = null;
   minting = null;
-  // `liveSource` describes the session that just went away. Left standing it
-  // outlives the token it was about: clearing the pasted one flipped `source`
-  // to the env var while this still said the store had minted it.
-  liveSource = null;
 };
 
 /**
