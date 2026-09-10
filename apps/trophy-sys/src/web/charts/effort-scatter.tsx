@@ -10,12 +10,15 @@ import type { Game } from '../../shared/types.ts';
 import type { TooltipRow } from '../components/chart-tooltip.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
-import { AXIS_LABEL, CHART_INK } from '../helpers/chart-theme.ts';
+import { AXIS_BOTTOM, AXIS_LABEL, CHART_INK } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
 import { countTotal } from '../helpers/stats.ts';
 
 export const EffortScatter = (props: EffortScatterProps) => (
-  <div className='relative h-full min-h-64 w-full'>
+  // flex-1 rather than h-full: this chart sits under a legend inside the frame
+  // body, and 100% of the body is more room than is left once the legend has
+  // taken its share — the surplus hangs past the clipped bottom edge.
+  <div className='relative min-h-64 w-full flex-1'>
     <ParentSize>
       {(size) =>
         size.width > 0 ? (
@@ -226,7 +229,7 @@ export const effortPoints = (games: Game[]): EffortPoint[] =>
     // Big dots drawn first, so a small one is never buried under a large one.
     .sort((a, b) => b.trophies - a.trophies);
 
-const MARGIN = { bottom: 36, left: 42, right: 14, top: 12 };
+const MARGIN = { bottom: AXIS_BOTTOM, left: 42, right: 14, top: 12 };
 
 /** How far outside a mark still counts as pointing at it. */
 const TOLERANCE = 4;

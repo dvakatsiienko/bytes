@@ -224,8 +224,13 @@ export const Stats = () => {
           />
         }
         title='effort'>
-        <EffortLegend />
-        {gate(<EffortScatter onSelect={gameOpen} points={points} />, false)}
+        {/* The only panel with a sibling above its chart. Without the flex
+            column both claim the full body height and the scatter's x axis
+            falls off the bottom edge. */}
+        <div className='flex h-full min-h-0 flex-col'>
+          <EffortLegend />
+          {gate(<EffortScatter onSelect={gameOpen} points={points} />, false)}
+        </div>
       </ChartFrame>
     ),
     nightOwl: (

@@ -1,5 +1,6 @@
 import { Link, Outlet } from '@tanstack/react-router';
 
+import { NPSSO_INVALID, NPSSO_URL } from '../shared/types.ts';
 import { ProfileBar } from './components/profile-bar.tsx';
 import { ThemeToggle } from './components/theme-toggle.tsx';
 import { useGames, useProfile } from './hooks/queries.ts';
@@ -14,10 +15,23 @@ export const Layout = () => {
   const profile = useProfile();
   const games = useGames();
 
-  const status =
-    games.error?.message ??
-    profile.error?.message ??
-    `${games.data?.length ?? 0} titles synced`;
+  const error = games.error?.message ?? profile.error?.message ?? null;
+
+  const statusJSX =
+    error === NPSSO_INVALID ? (
+      <>
+        PSN sign-in expired —{' '}
+        <a
+          className='text-orange underline transition-colors hover:text-yellow focus-visible:outline focus-visible:outline-orange'
+          href={NPSSO_URL}
+          rel='noreferrer'
+          target='_blank'>
+          Get new NPSSO code.
+        </a>
+      </>
+    ) : (
+      (error ?? `${games.data?.length ?? 0} titles synced`)
+    );
 
   return (
     <div className='flex h-full flex-col gap-5 p-6'>
@@ -49,7 +63,7 @@ export const Layout = () => {
 
         <ThemeToggle />
 
-        <span className='ml-auto text-[12px] text-dim'>{status}</span>
+        <span className='ml-auto text-[12px] text-dim'>{statusJSX}</span>
       </div>
 
       <ProfileBar profile={profile.data ?? null} />

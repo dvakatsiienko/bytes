@@ -24,8 +24,16 @@ import type {
   TrophyGroup,
   TrophyProgress,
 } from '../shared/types.ts';
+import { NPSSO_INVALID } from '../shared/types.ts';
 import { cached } from './cache.ts';
-import { playtimeFetch, playtimeMatch } from './playtime.ts';
+import {
+  type PlayIndex,
+  nameKey,
+  nameKeyLoose,
+  playtimeFetch,
+  playtimeMatch,
+} from './playtime.ts';
+import { type PurchasedTitle, purchasedFetch } from './purchased.ts';
 
 /**
  * PSN sends these for PS5 titles that count towards a target, but psn-api's
@@ -56,14 +64,22 @@ const npssoRead = () => {
   return npsso;
 };
 
+const tokensMint = async () => {
+  try {
+    return await exchangeAccessCodeForAuthTokens(
+      await exchangeNpssoForAccessCode(npssoRead()),
+    );
+  } catch (cause) {
+    throw new Error(NPSSO_INVALID, { cause });
+  }
+};
+
 export const authGet = async (): Promise<AuthorizationPayload> => {
   if (session && session.expiresAt > Date.now() + 60_000) return session.auth;
 
   const tokens = session
     ? await exchangeRefreshTokenForAuthTokens(session.refreshToken)
-    : await exchangeAccessCodeForAuthTokens(
-        await exchangeNpssoForAccessCode(npssoRead()),
-      );
+    : await tokensMint();
 
   session = {
     auth: { accessToken: tokens.accessToken },
@@ -97,18 +113,92 @@ export const profileFetch = async (): Promise<Profile> => {
   };
 };
 
+const NO_TROPHIES: TrophyCounts = {
+  bronze: 0,
+  gold: 0,
+  platinum: 0,
+  silver: 0,
+};
+
+/**
+ * The owned-but-never-launched titles, as `Game`s.
+ *
+ * Deduplicated against the trophy list by name, because nothing bridges the two
+ * ids: the trophy list is keyed by `npCommunicationId` and the owned list by
+ * `titleId`. That is the same lossy join `playtime.ts` documents, and it reuses
+ * that file's two measured passes rather than growing a second matcher.
+ *
+ * 📌 The join is deliberately on the **bare** name here, not the
+ * platform-qualified one playtime uses. The two failure modes are not
+ * symmetric: a false match drops one row from a list that is already longer
+ * than it was, while a missed match prints a title the user can plainly see
+ * twice. A cross-gen title owned on PS5 and with trophies only on PS4 is one
+ * game either way, so the bare name is also the more truthful key.
+ */
+const unplayedBuild = (
+  purchased: PurchasedTitle[],
+  withTrophies: Game[],
+  played: PlayIndex,
+): Game[] => {
+  const seen = new Set(
+    withTrophies.flatMap((game) => [
+      nameKey(game.name),
+      nameKeyLoose(game.name),
+    ]),
+  );
+
+  const unplayed: Game[] = [];
+
+  for (const title of purchased) {
+    const keys = [nameKey(title.name), nameKeyLoose(title.name)];
+    // Also guards the owned list against itself: one game is commonly two
+    // entitlements (a base game and its upgrade).
+    if (keys.some((key) => seen.has(key))) continue;
+    for (const key of keys) seen.add(key);
+
+    const play = playtimeMatch(played, title.name, title.platform);
+
+    unplayed.push({
+      defined: { ...NO_TROPHIES },
+      earned: { ...NO_TROPHIES },
+      iconUrl: title.iconUrl,
+      id: title.titleId,
+      // There is no such moment for a title with no trophy record. Empty rather
+      // than a fake date: `dateFormat` prints it as the same `—` the playtime
+      // column already uses, and `Date.parse('')` is NaN, so the stats archive's
+      // freshness check reads it as "never newer" instead of "just changed".
+      lastPlayedAt: '',
+      name: title.name,
+      platform: title.platform,
+      playSeconds: play?.seconds ?? null,
+      playedAt: play?.playedAt ?? null,
+      progress: 0,
+      source: 'psn-purchased',
+    });
+  }
+
+  return unplayed;
+};
+
 /**
  * 800, not 100. The old default silently truncated: the library is 109 titles
  * and every caller taking the default saw the first 100, with nothing in the
  * response saying so.
  */
 export const gamesFetch = async (limit = 800): Promise<Game[]> => {
-  const [{ trophyTitles }, played] = await Promise.all([
+  const [{ trophyTitles }, played, purchased] = await Promise.all([
     getUserTitles(await authGet(), 'me', { limit }),
     playtimeFetch(),
+    // Degrades to the trophy library alone rather than taking down a route that
+    // works today. Loud on the way down — a silent empty here would look exactly
+    // like owning nothing extra, which is the bug this whole path exists to fix.
+    purchasedFetch().catch((cause: unknown) => {
+      console.error('purchased library unavailable', cause);
+      return [];
+    }),
   ]);
 
-  return trophyTitles.map((title) => {
+  const withTrophies = trophyTitles.map((title): Game => {
     const play = playtimeMatch(
       played,
       title.trophyTitleName,
@@ -129,12 +219,27 @@ export const gamesFetch = async (limit = 800): Promise<Game[]> => {
       source: 'psn',
     };
   });
+
+  // `limit` binds the whole answer, not just the trophy half. `newsFetch` asks
+  // for 15 meaning "the 15 most recent titles to scan", and appending a few
+  // hundred owned titles past that would have turned its budget into the whole
+  // library.
+  return [
+    ...withTrophies,
+    ...unplayedBuild(purchased, withTrophies, played),
+  ].slice(0, limit);
 };
 
 export const gameDetailFetch = async (gameId: string): Promise<GameDetail> => {
   const games = await cached('games:800', () => gamesFetch(800));
   const game = games.find((candidate) => candidate.id === gameId);
   if (!game) throw new Error(`unknown game ${gameId}`);
+
+  // Its id is a `titleId`, and every trophy endpoint below takes an
+  // `npCommunicationId` — asking would answer 404 for a title that is fine.
+  // There is genuinely nothing to show, so the empty set is the honest answer.
+  if (game.source === 'psn-purchased')
+    return { ...game, groups: [], trophies: [] };
 
   const [set, groups] = await Promise.all([
     trophiesFetch(game),
@@ -215,6 +320,11 @@ export interface TrophySet {
 }
 
 export const trophiesFetch = async (game: Game): Promise<TrophySet> => {
+  // No trophy record exists, so both calls below would spend a PSN round-trip
+  // to 404. The fan-outs in `news.ts` and `stats.ts` walk the whole library, so
+  // this guard is what keeps the owned titles free rather than ~2 calls each.
+  if (game.source === 'psn-purchased') return { trophies: [], version: '' };
+
   const auth = await authGet();
   const npServiceName = serviceName(game);
 

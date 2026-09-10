@@ -23,7 +23,8 @@ const platformKey = (category: string) =>
  */
 // Deliberately no NFKD: it decomposes ™ into the letters "TM", which adds
 // characters to one side of the join and cost 8 matches when measured.
-const nameKey = (name: string) => name.toLowerCase().replace(NON_ALNUM, '');
+export const nameKey = (name: string) =>
+  name.toLowerCase().replace(NON_ALNUM, '');
 
 const ROMAN = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'];
 const NON_ALNUM = /[^a-z0-9]/g;
@@ -52,7 +53,7 @@ const TRAILING_EDITION = new RegExp(`(?:${EDITIONS.join('|')})$`);
 const DURATION = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
 
 /** Second pass, applied only to names the exact match missed. */
-const nameKeyLoose = (name: string) => {
+export const nameKeyLoose = (name: string) => {
   const arabic = name.replace(
     ARABIC,
     (digits) => ROMAN[Number(digits) - 1] ?? digits,

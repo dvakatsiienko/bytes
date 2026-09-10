@@ -16,8 +16,19 @@ export interface Profile {
   total: number;
 }
 
-/** Which service a title came from. */
-export type GameSource = 'psn' | 'steam';
+/**
+ * Which service a title came from, and — for PSN — which of its two libraries.
+ *
+ * `psn` is the trophy library: the title has a trophy record, so it was
+ * launched at least once and every counter on it is measured.
+ *
+ * `psn-purchased` is the owned library minus the trophy library — bought,
+ * never opened. PSN has no trophy record for it at all, so `defined`, `earned`
+ * and `progress` are zero meaning **unknown**, not measured, and `lastPlayedAt`
+ * is empty because there is no such moment. `source` is the discriminator for
+ * that: a reader showing trophy numbers must check it first.
+ */
+export type GameSource = 'psn' | 'psn-purchased' | 'steam';
 
 export interface Game {
   defined: TrophyCounts;
@@ -227,3 +238,13 @@ export interface TrophyArchive {
   /** Bumped when the stored shape changes; an older archive reads as empty. */
   version: number;
 }
+
+/**
+ * psn-api answers an expired NPSSO with a multi-line prose blob carrying a bare
+ * url. The server collapses it to this sentinel so the UI can render the
+ * "get a new code" step as a link instead of printing the blob at the user.
+ */
+export const NPSSO_INVALID = 'NPSSO_INVALID';
+
+/** Where a fresh NPSSO code is minted, while signed in to PSN. */
+export const NPSSO_URL = 'https://ca.account.sony.com/api/v1/ssocookie';

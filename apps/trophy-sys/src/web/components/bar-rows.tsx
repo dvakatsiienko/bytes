@@ -4,7 +4,7 @@ import { scaleLinear } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
 import { motion } from 'motion/react';
 
-import { CHART_INK } from '../helpers/chart-theme.ts';
+import { AXIS_BOTTOM, CHART_INK } from '../helpers/chart-theme.ts';
 import type { TooltipRow } from './chart-tooltip.tsx';
 import { ChartTooltip, TooltipLayer } from './chart-tooltip.tsx';
 
@@ -225,7 +225,13 @@ const LABEL_INSET = 8;
 const PAD = 6;
 const MIN_BAR = 2;
 /** Axis line, its labels, and a gap so the scale never touches the panel edge. */
-const AXIS_HEIGHT = 22;
+/**
+ * The axis draws 24px tall — tickLength plus a 12px label plus its descender —
+ * so the old 22 let every ranked chart hang two pixels past its own box. It is
+ * `AXIS_BOTTOM` so a bar chart ends the same distance above the panel edge as
+ * a plotted one.
+ */
+const AXIS_HEIGHT = AXIS_BOTTOM;
 const AXIS_PAD = 8;
 /**
  * Clear space between a full-length bar and its readout.

@@ -12,7 +12,12 @@ import type { ArchivedTrophy, Game } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { SeriesLegend } from '../components/chart-legend.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
-import { AXIS_LABEL, CHART_INK, GRADE_TONE } from '../helpers/chart-theme.ts';
+import {
+  AXIS_BOTTOM,
+  AXIS_LABEL,
+  CHART_INK,
+  GRADE_TONE,
+} from '../helpers/chart-theme.ts';
 import { GRADE_ORDER, gameLookup, monthKey } from '../helpers/stats.ts';
 
 export const progressionMonths = (
@@ -352,7 +357,7 @@ const GRADE_LEGEND = [...GRADE_ORDER].reverse().map((grade) => ({
   tone: GRADE_TONE[grade],
 }));
 
-const MARGIN = { bottom: 26, left: 38, right: 10, top: 10 };
+const MARGIN = { bottom: AXIS_BOTTOM, left: 38, right: 10, top: 10 };
 /** The velocity band under the area, sharing its x axis. */
 const BAND_HEIGHT = 46;
 

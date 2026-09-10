@@ -106,3 +106,10 @@ export const AXIS_LABEL = {
   fontSize: 12,
   textAnchor: 'middle' as const,
 } as const;
+
+/**
+ * The bottom margin every x-axis reserves, so the plots on the route all end
+ * the same distance above their panel edge. Effort ran 36 against everyone
+ * else's 26 and the extra 10px read as a misaligned panel.
+ */
+export const AXIS_BOTTOM = 26;

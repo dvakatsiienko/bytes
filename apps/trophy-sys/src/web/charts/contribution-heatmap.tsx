@@ -194,8 +194,13 @@ export const ContributionHeatmap = (props: ContributionHeatmapProps) => {
     );
   });
 
+  // overflow-y-hidden is load-bearing: `overflow-x: auto` makes the browser
+  // compute overflow-y as auto too, so the grid grew a second, vertical
+  // scrollbar the moment the panel body stopped being taller than it.
   return (
-    <div className='relative w-full overflow-x-auto py-2' ref={wrapRef}>
+    <div
+      className='relative w-full overflow-x-auto overflow-y-hidden py-1'
+      ref={wrapRef}>
       {/* aria-label rather than <title>: a <title> child is what browsers
           render as their own native tooltip on hover. */}
       {/* Real pixels, no viewBox. A viewBox once filled a full-row panel, but
