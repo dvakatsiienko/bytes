@@ -124,12 +124,11 @@ const SignIn = (props: SignInProps) => {
       <form
         className='panel flex w-full max-w-88 flex-col gap-4 p-5'
         onSubmit={submit}>
+        {/* Deliberately says nothing about what is behind it. The blurb here
+            used to name the PSN token as the thing this console writes, which
+            is precisely the sentence that turns a stumbled-upon page into a
+            worthwhile target. A signed-out screen owes a stranger no context. */}
         <p className='panel-title'>sign in</p>
-
-        <p className='text-[12px] text-dim'>
-          this console writes the PSN token and the display settings. nothing
-          here is readable signed out.
-        </p>
 
         <Field
           autoComplete='username'
