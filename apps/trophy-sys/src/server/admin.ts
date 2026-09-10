@@ -121,8 +121,7 @@ export const credentialsMatch = (
  * owner is never more than a coffee away from another try.
  */
 const LOGIN_FAILURE_LIMIT = 5;
-const LOCKOUT_BASE_MS = 60_000;
-const LOCKOUT_MAX_MS = 900_000;
+const LOCKOUT_MS = 60_000;
 
 /**
  * The login throttle's whole state. Exported as a factory rather than a reset
@@ -155,12 +154,6 @@ export const loginGateCreate = (): LoginGate => ({
  */
 const loginGate = loginGateCreate();
 
-const lockoutMs = (failures: number) =>
-  Math.min(
-    LOCKOUT_BASE_MS * 2 ** (failures - LOGIN_FAILURE_LIMIT),
-    LOCKOUT_MAX_MS,
-  );
-
 export type LoginResult =
   | { kind: 'locked'; retryAfterSeconds: number }
   | { kind: 'ok' }
@@ -172,10 +165,15 @@ const locked = (until: number, now: number): LoginResult => ({
 });
 
 /**
- * The whole login decision: throttle, compare, and the bookkeeping either
- * answer implies. `lockedUntil` is always a moment in the future rather than a
- * flag, so every lockout expires on its own and the owner can never be shut out
- * permanently by an attacker's traffic.
+ * The whole login decision: compare first, then throttle.
+ *
+ * ⚠️ The order is the security property, not a style choice. Checking the
+ * lockout first turned this console into a denial-of-service on its own owner:
+ * a wrong password every few minutes kept the gate locked, the correct password
+ * was refused while it was, and the NPSSO recovery page is exactly what a
+ * locked-out owner needs. A correct password is not a guess, so it is always
+ * honoured — an attacker holding it has already won, and throttling them buys
+ * nothing. What the cooldown throttles is guessing, which is all it ever did.
  */
 export const loginAttempt = (
   config: AdminConfig,
@@ -184,22 +182,32 @@ export const loginAttempt = (
   gate: LoginGate = loginGate,
 ): LoginResult => {
   const now = Date.now();
-  if (gate.lockedUntil > now) return locked(gate.lockedUntil, now);
 
-  if (!credentialsMatch(config, email, password)) {
-    gate.failures += 1;
-    if (gate.failures < LOGIN_FAILURE_LIMIT) return { kind: 'rejected' };
-
-    // Answered on the failure that trips it, not the one after — being told to
-    // wait is more use than a sixth "bad credentials".
-    gate.lockedUntil = now + lockoutMs(gate.failures);
-    return locked(gate.lockedUntil, now);
+  if (credentialsMatch(config, email, password)) {
+    gate.failures = 0;
+    gate.lockedUntil = 0;
+    return { kind: 'ok' };
   }
 
-  // The owner arrived; the cooldown has done its job and starts over.
-  gate.failures = 0;
-  gate.lockedUntil = 0;
-  return { kind: 'ok' };
+  // An expired cooldown ends the window it belonged to. The cooldown is a flat
+  // minute rather than a doubling ladder: carrying failures across windows was
+  // what let a slow trickle of wrong passwords escalate the owner's own wait
+  // without bound, and resetting the count leaves the ladder unreachable.
+  if (gate.lockedUntil && gate.lockedUntil <= now) {
+    gate.failures = 0;
+    gate.lockedUntil = 0;
+  }
+
+  // Already locked: refuse without counting, so hammering cannot extend it.
+  if (gate.lockedUntil > now) return locked(gate.lockedUntil, now);
+
+  gate.failures += 1;
+  if (gate.failures < LOGIN_FAILURE_LIMIT) return { kind: 'rejected' };
+
+  // Answered on the failure that trips it, not the one after — being told to
+  // wait is more use than a sixth "bad credentials".
+  gate.lockedUntil = now + LOCKOUT_MS;
+  return locked(gate.lockedUntil, now);
 };
 
 const stringList = (value: unknown): string[] | null =>

@@ -134,17 +134,52 @@ test('five wrong passwords lock the login, and the answer says for how long', ()
   assert.ok(locked.kind === 'locked' && locked.retryAfterSeconds <= 60);
 });
 
-test('a locked gate refuses the correct password too, and does not extend itself', () => {
+test('a locked gate still admits the correct password', () => {
+  const gate = loginGateCreate();
+  for (let attempt = 0; attempt < 5; attempt += 1)
+    loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
+
+  assert.ok(gate.lockedUntil > Date.now(), 'the gate is locked');
+
+  // The regression this pins: refusing the owner during a cooldown turned the
+  // throttle into a denial of service on the one console that renews the token.
+  assert.deepEqual(loginAttempt(CONFIG, CONFIG.email, CONFIG.password, gate), {
+    kind: 'ok',
+  });
+  assert.equal(gate.lockedUntil, 0, 'the owner arriving clears the gate');
+});
+
+test('hammering during a cooldown cannot push the deadline back', () => {
   const gate = loginGateCreate();
   for (let attempt = 0; attempt < 5; attempt += 1)
     loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
 
   const until = gate.lockedUntil;
-  const blocked = loginAttempt(CONFIG, CONFIG.email, CONFIG.password, gate);
-  assert.equal(blocked.kind, 'locked');
-  // Hammering during a cooldown must not push the deadline back — that is how
-  // a lockout becomes permanent.
+  for (let attempt = 0; attempt < 20; attempt += 1)
+    loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
+
   assert.equal(gate.lockedUntil, until);
+});
+
+test('a slow trickle of wrong passwords cannot escalate the wait', () => {
+  const gate = loginGateCreate();
+  const waits: number[] = [];
+
+  // One guess, wait out the cooldown, guess again — the shape that used to
+  // ratchet the lockout up a rung every round until it pinned at the cap.
+  for (let round = 0; round < 12; round += 1) {
+    const result = loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
+    if (result.kind === 'locked') {
+      waits.push(result.retryAfterSeconds);
+      gate.lockedUntil = Date.now() - 1;
+    }
+  }
+
+  assert.ok(waits.length > 1, 'the gate locked more than once');
+  assert.ok(
+    waits.every((wait) => wait === 60),
+    `every cooldown stays one minute, got ${waits.join(', ')}`,
+  );
 });
 
 test('the cooldown expires on its own and the owner gets back in', () => {
@@ -172,23 +207,4 @@ test('after a success the next five failures start the count over', () => {
   assert.deepEqual(loginAttempt(CONFIG, CONFIG.email, 'wrong', gate), {
     kind: 'rejected',
   });
-});
-
-test('each further failure waits longer, and the wait is capped', () => {
-  const gate = loginGateCreate();
-  const waits: number[] = [];
-
-  for (let round = 0; round < 12; round += 1) {
-    const result = loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
-    if (result.kind === 'locked') {
-      waits.push(result.retryAfterSeconds);
-      gate.lockedUntil = Date.now() - 1;
-    }
-  }
-
-  assert.deepEqual(waits.slice(0, 4), [60, 120, 240, 480]);
-  // 15 minutes, and never more — an attacker must not be able to grow the
-  // owner's own wait without bound.
-  assert.ok(waits.every((wait) => wait <= 900));
-  assert.equal(waits.at(-1), 900);
 });

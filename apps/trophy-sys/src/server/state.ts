@@ -203,12 +203,18 @@ export const npssoSave = async (npsso: string) => {
 };
 
 /**
- * Stamps the moment PSN first refused the stored token. Idempotent: every
- * failing call reaches this, and only the first one records anything.
+ * Stamps the moment PSN first refused a token. Idempotent: every failing call
+ * reaches this, and only the first one records anything.
+ *
+ * ⚠️ Takes the token that actually failed, and writes nothing unless the store
+ * still holds it. This is a read-modify-write over a store the admin page also
+ * writes: without the check, a rejection of the OLD token landing just after a
+ * fresh paste would write back the record it read and silently restore the dead
+ * token — leaving the app broken with no sign of why.
  */
-export const npssoDeathRecord = async () => {
+export const npssoDeathRecord = async (failed: string) => {
   const record = await npssoRecordLoad();
-  if (!record || record.diedAt) return;
+  if (!record || record.diedAt || record.token !== failed) return;
 
   await storeWrite(NPSSO_KEY, NPSSO_FILE, {
     ...record,

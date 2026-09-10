@@ -71,14 +71,17 @@ const npssoRead = async () => {
 };
 
 const tokensMint = async () => {
+  const npsso = await npssoRead();
+
   try {
     return await exchangeAccessCodeForAuthTokens(
-      await exchangeNpssoForAccessCode(await npssoRead()),
+      await exchangeNpssoForAccessCode(npsso),
     );
   } catch (cause) {
-    // Stamps the death once, so the next token's age can be compared against a
-    // real observed lifetime rather than folklore.
-    await npssoDeathRecord();
+    // Names the token that failed, so a rejection racing a fresh paste cannot
+    // write the dead one back. Stamps the death once, so the next token's age
+    // can be compared against a measured lifetime rather than folklore.
+    await npssoDeathRecord(npsso);
     throw new Error(NPSSO_INVALID, { cause });
   }
 };
