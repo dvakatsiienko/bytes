@@ -207,7 +207,7 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the eleven are one
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
   `*_COLUMNS`, so `stats.tsx` only wires.
-- **Every axis margin is a token in `chart-theme.ts`, never a literal in a chart.** `AXIS_BOTTOM`
+- **A margin that holds axis text is a token in `chart-theme.ts`, never a literal.** `AXIS_BOTTOM`
   (26), `AXIS_LEFT` (52), `MONTH_AXIS_RIGHT` (26). Each one replaced a set of hand-typed numbers
   that had drifted: bottom ran 36/26/22, left ran 38/42/38 — and 38 was too small for the
   progression's widest tick, so `2,000` drew as `,000` for months. `MONTH_AXIS_RIGHT` holds the

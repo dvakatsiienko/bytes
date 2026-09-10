@@ -128,7 +128,10 @@ export const AXIS_LEFT = 52;
  * one is 7 characters of the mono face, ~51px, and 6 of them need 306.
  */
 export const monthTicks = (innerWidth: number, months: number) =>
-  Math.max(2, Math.min(6, months, Math.floor(innerWidth / MONTH_TICK_WIDTH)));
+  Math.min(
+    months,
+    Math.max(1, Math.min(6, Math.floor(innerWidth / MONTH_TICK_WIDTH))),
+  );
 
 const MONTH_TICK_WIDTH = 64;
 
