@@ -16,6 +16,12 @@ const HIDDEN_KEY = 'trophy-sys:hidden';
 const NPSSO_FILE = new URL('../../.trophy-npsso.json', import.meta.url);
 const NPSSO_KEY = 'trophy-sys:npsso';
 
+const NPSSO_DEATHS_FILE = new URL(
+  '../../.trophy-npsso-deaths.json',
+  import.meta.url,
+);
+const NPSSO_DEATHS_KEY = 'trophy-sys:npsso-deaths';
+
 const SETTINGS_FILE = new URL('../../.trophy-settings.json', import.meta.url);
 const SETTINGS_KEY = 'trophy-sys:settings';
 
@@ -163,78 +169,98 @@ export const hiddenSave = (ids: string[]) =>
  * has is an upper bound of 25 days, from a token set 2026-08-16 and found dead
  * 2026-09-10. Each renewal adds a real sample.
  */
+/**
+ * The live token and nothing else. Written ONLY by the admin save.
+ *
+ * ⚠️ Deaths live under their own key on purpose. Both used to share this
+ * record, which made every death a read-modify-write racing the admin's own
+ * save: a rejection of the old token landing just after a fresh paste wrote
+ * back the record it had read and silently restored the dead one. Comparing
+ * the token before writing does not help — the record was read before the
+ * save, so it still holds the old token and the comparison passes. Two writers,
+ * two keys, no lost update.
+ */
 interface NpssoRecord {
-  /** When PSN first rejected it. Null while the token still works. */
-  diedAt: number | null;
-  /** Observed lifetimes in ms, oldest first — one per token that has died. */
-  lifetimes: number[];
   savedAt: number;
   token: string;
 }
 
-/** Tolerates the bare string written before the record shape existed. */
-const npssoRecordLoad = async (): Promise<NpssoRecord | null> => {
-  const stored = await storeRead<NpssoRecord | string>(NPSSO_KEY, NPSSO_FILE);
-  if (!stored) return null;
-  if (typeof stored === 'string')
-    return { diedAt: null, lifetimes: [], savedAt: 0, token: stored };
+/** One per token that has died, appended only by the death recorder. */
+interface NpssoDeath {
+  diedAt: number;
+  /** Copied from the record at death, so a lifetime needs no second lookup. */
+  savedAt: number;
+  token: string;
+}
 
-  return stored;
+/** Tolerates both the bare string and the shape that carried deaths inline. */
+const npssoRecordLoad = async (): Promise<NpssoRecord | null> => {
+  const stored = await storeRead<Partial<NpssoRecord> | string>(
+    NPSSO_KEY,
+    NPSSO_FILE,
+  );
+  if (!stored) return null;
+  if (typeof stored === 'string') return { savedAt: 0, token: stored };
+  if (!stored.token) return null;
+
+  return { savedAt: stored.savedAt ?? 0, token: stored.token };
 };
+
+const npssoDeathsLoad = async (): Promise<NpssoDeath[]> =>
+  (await storeRead<NpssoDeath[]>(NPSSO_DEATHS_KEY, NPSSO_DEATHS_FILE)) ?? [];
 
 export const npssoLoad = async () => (await npssoRecordLoad())?.token ?? null;
 
-export const npssoSave = async (npsso: string) => {
-  const previous = await npssoRecordLoad();
-
-  // A replaced token that had already died contributes its measured lifetime.
-  // A replaced token still alive contributes nothing: it was retired early, so
-  // its age is a floor, not a lifetime, and mixing the two poisons the average.
-  const lifetimes = [...(previous?.lifetimes ?? [])];
-  if (previous?.savedAt && previous.diedAt)
-    lifetimes.push(previous.diedAt - previous.savedAt);
-
-  await storeWrite(NPSSO_KEY, NPSSO_FILE, {
-    diedAt: null,
-    lifetimes,
+export const npssoSave = async (npsso: string) =>
+  storeWrite(NPSSO_KEY, NPSSO_FILE, {
     savedAt: Date.now(),
     token: npsso,
   } satisfies NpssoRecord);
-};
 
 /**
- * Stamps the moment PSN first refused a token. Idempotent: every failing call
- * reaches this, and only the first one records anything.
- *
- * ⚠️ Takes the token that actually failed, and writes nothing unless the store
- * still holds it. This is a read-modify-write over a store the admin page also
- * writes: without the check, a rejection of the OLD token landing just after a
- * fresh paste would write back the record it read and silently restore the dead
- * token — leaving the app broken with no sign of why.
+ * Records that PSN refused a token. Idempotent per token: every failing call
+ * reaches this, and only the first one for a given token appends anything.
  */
 export const npssoDeathRecord = async (failed: string) => {
-  const record = await npssoRecordLoad();
-  if (!record || record.diedAt || record.token !== failed) return;
+  const deaths = await npssoDeathsLoad();
+  if (deaths.some((death) => death.token === failed)) return;
 
-  await storeWrite(NPSSO_KEY, NPSSO_FILE, {
-    ...record,
-    diedAt: Date.now(),
-  } satisfies NpssoRecord);
+  const record = await npssoRecordLoad();
+
+  await storeWrite(NPSSO_DEATHS_KEY, NPSSO_DEATHS_FILE, [
+    ...deaths,
+    {
+      diedAt: Date.now(),
+      savedAt: record?.token === failed ? record.savedAt : 0,
+      token: failed,
+    } satisfies NpssoDeath,
+  ]);
 };
 
 export const npssoStatusLoad = async (): Promise<NpssoStatus> => {
-  const record = await npssoRecordLoad();
+  const [record, deaths] = await Promise.all([
+    npssoRecordLoad(),
+    npssoDeathsLoad(),
+  ]);
+
+  // A token retired while still working contributes no lifetime: its age is a
+  // floor, not a measurement, and mixing the two poisons the estimate.
+  const lifetimes = deaths
+    .filter((death) => death.savedAt > 0)
+    .map((death) => death.diedAt - death.savedAt);
+
   if (!record)
     return {
       diedAt: null,
-      lifetimes: [],
+      lifetimes,
       savedAt: null,
       source: process.env.NPSSO ? 'env' : 'none',
     };
 
   return {
-    diedAt: record.diedAt,
-    lifetimes: record.lifetimes,
+    diedAt:
+      deaths.find((death) => death.token === record.token)?.diedAt ?? null,
+    lifetimes,
     // 0 is the bare-string record: a token from before this was measured.
     savedAt: record.savedAt || null,
     source: 'store',

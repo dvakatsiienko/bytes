@@ -20,6 +20,13 @@ const bodyRead = async (req: IncomingMessage): Promise<unknown> => {
   // Vercel's Node launcher parses a JSON body onto `req.body`; the local
   // `node:http` server does not, so the stream is the fallback, never the
   // first read — consuming an already-consumed stream hangs.
+  // Checked before either path: on Vercel the launcher has already parsed the
+  // body by the time this runs, so the byte-counting loop below never sees it —
+  // and production is the deployment that faces the open internet.
+  const declared = Number(req.headers['content-length']);
+  if (Number.isFinite(declared) && declared > BODY_MAX_BYTES)
+    return BODY_TOO_LARGE;
+
   const parsed = (req as IncomingMessage & { body?: unknown }).body;
   if (parsed !== undefined) return parsed;
 
