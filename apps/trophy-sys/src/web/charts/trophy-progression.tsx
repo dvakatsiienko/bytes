@@ -15,8 +15,11 @@ import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import {
   AXIS_BOTTOM,
   AXIS_LABEL,
+  AXIS_LEFT,
   CHART_INK,
   GRADE_TONE,
+  MONTH_AXIS_RIGHT,
+  monthTicks,
 } from '../helpers/chart-theme.ts';
 import { GRADE_ORDER, gameLookup, monthKey } from '../helpers/stats.ts';
 
@@ -290,7 +293,7 @@ const Plot = (props: PlotProps) => {
         <Group left={MARGIN.left} top={bandTop}>
           {bandListJSX}
           <AxisBottom
-            numTicks={Math.min(6, props.months.length)}
+            numTicks={monthTicks(innerWidth, props.months.length)}
             scale={xScale}
             stroke={CHART_INK.axis}
             tickFormat={(value) =>
@@ -357,7 +360,12 @@ const GRADE_LEGEND = [...GRADE_ORDER].reverse().map((grade) => ({
   tone: GRADE_TONE[grade],
 }));
 
-const MARGIN = { bottom: AXIS_BOTTOM, left: 38, right: 10, top: 10 };
+const MARGIN = {
+  bottom: AXIS_BOTTOM,
+  left: AXIS_LEFT,
+  right: MONTH_AXIS_RIGHT,
+  top: 10,
+};
 /** The velocity band under the area, sharing its x axis. */
 const BAND_HEIGHT = 46;
 

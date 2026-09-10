@@ -11,7 +11,14 @@ import { motion } from 'motion/react';
 import type { ArchivedTrophy } from '../../shared/types.ts';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
-import { AXIS_BOTTOM, AXIS_LABEL, CHART_INK } from '../helpers/chart-theme.ts';
+import {
+  AXIS_BOTTOM,
+  AXIS_LABEL,
+  AXIS_LEFT,
+  CHART_INK,
+  MONTH_AXIS_RIGHT,
+  monthTicks,
+} from '../helpers/chart-theme.ts';
 import { median, monthKey } from '../helpers/stats.ts';
 
 /** Months pooled into one rolling reading — the current month and the two before it. */
@@ -163,7 +170,7 @@ const Plot = (props: PlotProps) => {
             tickStroke={CHART_INK.axis}
           />
           <AxisBottom
-            numTicks={Math.min(6, props.months.length)}
+            numTicks={monthTicks(innerWidth, props.months.length)}
             scale={xScale}
             stroke={CHART_INK.axis}
             tickFormat={(value) =>
@@ -224,7 +231,12 @@ const Plot = (props: PlotProps) => {
 };
 
 /* Helpers */
-const MARGIN = { bottom: AXIS_BOTTOM, left: 38, right: 10, top: 10 };
+const MARGIN = {
+  bottom: AXIS_BOTTOM,
+  left: AXIS_LEFT,
+  right: MONTH_AXIS_RIGHT,
+  top: 10,
+};
 
 export const RARITY_DRIFT_COLUMNS: ChartColumn<DriftMonth>[] = [
   { cell: (month) => month.label, head: 'month' },

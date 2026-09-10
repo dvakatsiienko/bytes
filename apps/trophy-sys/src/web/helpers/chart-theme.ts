@@ -113,3 +113,27 @@ export const AXIS_LABEL = {
  * else's 26 and the extra 10px read as a misaligned panel.
  */
 export const AXIS_BOTTOM = 26;
+
+/**
+ * The left margin every y-axis reserves, for the same reason and with the same
+ * history: 38, 42 and 38, hand-typed per chart. 38 was also too small — the
+ * progression's widest tick is `2,000`, which needs 37px of label after the
+ * 12px of tick and gap, so it rendered as `,000` with the digit sliced off.
+ */
+export const AXIS_LEFT = 52;
+
+/**
+ * How many `YYYY-MM` ticks fit across an x axis. Both month charts asked for a
+ * flat 6 whatever the width, so at 390px the labels printed over each other —
+ * one is 7 characters of the mono face, ~51px, and 6 of them need 306.
+ */
+export const monthTicks = (innerWidth: number, months: number) =>
+  Math.max(2, Math.min(6, months, Math.floor(innerWidth / MONTH_TICK_WIDTH)));
+
+const MONTH_TICK_WIDTH = 64;
+
+/**
+ * The last month tick sits on the plot's right edge and its label is centred on
+ * it, so half the text hangs past the svg and is cut. This is that half.
+ */
+export const MONTH_AXIS_RIGHT = 26;
