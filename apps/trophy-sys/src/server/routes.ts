@@ -5,7 +5,7 @@ import {
   clearCookie,
   cookieRead,
   gamesView,
-  hiddenSet,
+  hiddenFlip,
   loginAttempt,
   npssoDrop,
   npssoSet,
@@ -21,6 +21,7 @@ import {
   npssoStatusLoad,
   settingsLoad,
   settingsSave,
+  shownLoad,
   stateBackend,
 } from './state.ts';
 import { statsFetch, statsSync } from './stats.ts';
@@ -143,23 +144,25 @@ export const routeResolve = async (
       return ok({ ok: true });
     }
 
+    // Both lists, because either one alone misreads: `hidden` without `shown`
+    // says nothing about what the auto-hide rule is doing.
     if (path === '/api/admin/hidden' && method === 'GET')
-      return ok({ ids: await hiddenLoad() });
+      return ok({ hidden: await hiddenLoad(), shown: await shownLoad() });
 
     if (path === '/api/admin/hidden' && method === 'POST') {
       if (!isStateWritable) return UNWRITABLE;
 
-      const ids = await hiddenSet(body.ids);
-      if (!ids)
+      const lists = await hiddenFlip(body.ids, body.hide, LIMIT_DEFAULT);
+      if (!lists)
         return {
-          body: { error: 'ids must be an array of strings' },
+          body: { error: 'ids must be an array of strings, hide a boolean' },
           status: 400,
         };
 
       // The library answers are memoised, and the hidden set is what they were
       // filtered by.
       cacheClear();
-      return ok({ ids });
+      return ok(lists);
     }
 
     if (path === '/api/admin/settings' && method === 'POST') {

@@ -252,6 +252,29 @@ export const NPSSO_INVALID = 'NPSSO_INVALID';
 export const NPSSO_URL = 'https://ca.account.sony.com/api/v1/ssocookie';
 
 /**
+ * PSN's entitlement list is what makes the library the *owned* one, and it
+ * carries things nobody plays: soundtracks and artbooks, ~16 of 258 owned
+ * titles. They are hidden by default so a new purchase does not need a manual
+ * sweep — and every match is overridable, one row at a time, from /admin.
+ *
+ * ⚠️ This is a name match, so it will one day claim a real game whose title
+ * contains one of these words. That is why the override exists and why the
+ * admin row says «auto» rather than just «hidden»: the rule is a default the
+ * owner can always see and always overrule, never a verdict.
+ */
+export const isNonGame = (name: string) => {
+  const lower = name.toLowerCase();
+
+  return NON_GAME_PARTS.some((part) => lower.includes(part));
+};
+
+/**
+ * `ost` is deliberately absent: as a substring it claims Ghost of Tsushima.
+ * Each entry has to be a word that cannot appear inside an ordinary title.
+ */
+const NON_GAME_PARTS = ['soundtrack', 'artbook', 'art book'] as const;
+
+/**
  * A Vercel env var cannot be written at runtime, so when the live token came
  * from `NPSSO` rather than the store, the admin can only point at the dashboard.
  */

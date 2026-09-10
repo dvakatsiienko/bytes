@@ -74,6 +74,19 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
 `hidden: boolean` per game (that is the admin's view). `GET /api/settings` is public on purpose —
 the charts read it — and only the write is gated.
 
+📌 **Hidden is a rule plus two override lists, never one stored set.** `isNonGame(name)` in
+`shared/types.ts` hides soundtracks and artbooks by name, so a title bought tomorrow arrives hidden
+with nothing written for it — that is the whole point. The stores hold only *deviations*:
+`trophy-sys:hidden` the ids the rule would show, `trophy-sys:shown` the ids it would hide. So
+`hidden = isNonGame(name) ? !shown.has(id) : hidden.has(id)`, and an unhide survives every later
+sync. The write route takes an intent (`{ ids, hide }`), not a finished set: with a rule in play,
+leaving a rule-hidden id out of a set is indistinguishable from asking to show it.
+
+⚠️ The rule matches on the name, so it will one day claim a real game whose title contains
+`soundtrack` or `artbook`. That is why the admin row says `[x] auto` rather than `[x] hidden`, and
+why one press overrules it — the rule is a visible default, never a verdict. `ost` is deliberately
+not a pattern: as a substring it claims Ghost of Tsushima.
+
 ## Auth and state
 
 Env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,

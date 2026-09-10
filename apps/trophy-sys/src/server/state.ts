@@ -13,6 +13,9 @@ const STATS_KEY = 'trophy-sys:stats';
 const HIDDEN_FILE = new URL('../../.trophy-hidden.json', import.meta.url);
 const HIDDEN_KEY = 'trophy-sys:hidden';
 
+const SHOWN_FILE = new URL('../../.trophy-shown.json', import.meta.url);
+const SHOWN_KEY = 'trophy-sys:shown';
+
 const NPSSO_FILE = new URL('../../.trophy-npsso.json', import.meta.url);
 const NPSSO_KEY = 'trophy-sys:npsso';
 
@@ -159,6 +162,17 @@ export const hiddenLoad = async (): Promise<string[]> =>
 
 export const hiddenSave = (ids: string[]) =>
   storeWrite(HIDDEN_KEY, HIDDEN_FILE, ids);
+
+/**
+ * The other half of the hide state: ids the auto-hide rule matches and the
+ * owner has overruled. Two lists rather than one materialised set, so a title
+ * bought tomorrow inherits the rule without anything being written for it.
+ */
+export const shownLoad = async (): Promise<string[]> =>
+  (await storeRead<string[]>(SHOWN_KEY, SHOWN_FILE)) ?? [];
+
+export const shownSave = (ids: string[]) =>
+  storeWrite(SHOWN_KEY, SHOWN_FILE, ids);
 
 /**
  * The NPSSO pasted through the admin page, which outranks the env var — the

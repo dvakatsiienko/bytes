@@ -1,9 +1,17 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 import type { Game } from '../shared/types.ts';
+import { isNonGame } from '../shared/types.ts';
 import { cached } from './cache.ts';
 import { gamesFetch, sessionReset } from './psn.ts';
-import { hiddenLoad, hiddenSave, npssoClear, npssoSave } from './state.ts';
+import {
+  hiddenLoad,
+  hiddenSave,
+  npssoClear,
+  npssoSave,
+  shownLoad,
+  shownSave,
+} from './state.ts';
 
 export const ADMIN_COOKIE = 'sys_admin';
 
@@ -217,12 +225,53 @@ const stringList = (value: unknown): string[] | null =>
     : null;
 
 /** The body carries the complete new set — a replace, never a merge. */
-export const hiddenSet = async (value: unknown) => {
-  const ids = stringList(value);
-  if (!ids) return null;
+/**
+ * Whether a title is hidden right now. Both stores hold only *deviations* from
+ * the auto-hide rule — `hidden` the ids it would show, `shown` the ids it would
+ * hide — so a soundtrack bought tomorrow is hidden with nothing written for it,
+ * and a title unhidden today stays unhidden through every later sync.
+ */
+const hiddenIs = (game: Game, hidden: Set<string>, shown: Set<string>) =>
+  isNonGame(game.name) ? !shown.has(game.id) : hidden.has(game.id);
 
-  await hiddenSave(ids);
-  return ids;
+/**
+ * The body says what to do — hide or show these ids — rather than carrying a
+ * finished set. With a rule in play a set no longer expresses intent: leaving a
+ * rule-hidden id out of it is indistinguishable from asking to show it.
+ */
+export const hiddenFlip = async (
+  rawIds: unknown,
+  hide: unknown,
+  limit: number,
+) => {
+  const ids = stringList(rawIds);
+  if (!ids || typeof hide !== 'boolean') return null;
+
+  const [games, hidden, shown] = await Promise.all([
+    cached(`games:raw:${limit}`, () => gamesFetch(limit)),
+    hiddenLoad(),
+    shownLoad(),
+  ]);
+
+  const ruled = new Set(
+    games.filter((game) => isNonGame(game.name)).map((game) => game.id),
+  );
+  const nextHidden = new Set(hidden);
+  const nextShown = new Set(shown);
+
+  for (const id of ids) {
+    // Each id is recorded in exactly one list: the one that holds deviations
+    // for its kind. Writing to both would let them contradict each other.
+    if (ruled.has(id)) {
+      if (hide) nextShown.delete(id);
+      else nextShown.add(id);
+    } else if (hide) nextHidden.add(id);
+    else nextHidden.delete(id);
+  }
+
+  await Promise.all([hiddenSave([...nextHidden]), shownSave([...nextShown])]);
+
+  return { hidden: [...nextHidden], shown: [...nextShown] };
 };
 
 /**
@@ -255,15 +304,22 @@ export const npssoDrop = async () => {
  * is the public library with the hidden ones gone.
  */
 export const gamesView = async (limit: number, all: boolean) => {
-  const [games, hidden] = await Promise.all([
+  const [games, hidden, shown] = await Promise.all([
     // The unfiltered library, shared with `gameDetailFetch` so a deep link to a
     // hidden game still resolves from the same fetch.
     cached(`games:raw:${limit}`, () => gamesFetch(limit)),
     hiddenLoad(),
+    shownLoad(),
   ]);
   const hiddenIds = new Set(hidden);
+  const shownIds = new Set(shown);
 
   return all
-    ? games.map((game): Game => ({ ...game, hidden: hiddenIds.has(game.id) }))
-    : games.filter((game) => !hiddenIds.has(game.id));
+    ? games.map(
+        (game): Game => ({
+          ...game,
+          hidden: hiddenIs(game, hiddenIds, shownIds),
+        }),
+      )
+    : games.filter((game) => !hiddenIs(game, hiddenIds, shownIds));
 };
