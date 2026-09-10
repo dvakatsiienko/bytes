@@ -164,10 +164,13 @@ const SignIn = (props: SignInProps) => {
 
 const AdminPanel = () => {
   return (
-    <div className='flex flex-col gap-5'>
+    <div className='flex min-w-0 flex-col gap-5'>
       {/* Two short forms side by side above the workhorse: at 1280px each was
           previously a single field stretched across the full page. */}
-      <div className='grid gap-5 lg:grid-cols-2'>
+      {/* min-w-0: a grid item's min-width defaults to auto, so one long game
+          title stretches the column and then the page. Documented in this app's
+          CLAUDE.md after the activity heatmap did exactly that. */}
+      <div className='grid min-w-0 gap-5 lg:grid-cols-2'>
         <NpssoForm />
         <SettingsForm />
       </div>
@@ -335,7 +338,10 @@ const GameList = () => {
   const [shown, setShown] = useState(PAGE);
   // Which ids this page put in flight. One shared `isPending` would grey out
   // all 258 rows for a write that touches one of them.
-  const [busyIds, setBusyIds] = useState<string[]>([]);
+  // A set, merged and un-merged per request: replacing it meant a second
+  // toggle wiped the first row's pending mark, and clearing it on settle
+  // unlocked rows whose own request was still in flight.
+  const [busyIds, setBusyIds] = useState<ReadonlySet<string>>(new Set());
 
   const all = useMemo(() => games.data ?? [], [games.data]);
   const hiddenIds = useMemo(
@@ -368,8 +374,18 @@ const GameList = () => {
   // The set itself is derived inside the mutation, from the cache, so two fast
   // toggles compose instead of the second recomputing from a stale render.
   const hiddenApply = (ids: string[], hide: boolean) => {
-    setBusyIds(ids);
-    save.mutate({ hide, ids }, { onSettled: () => setBusyIds([]) });
+    setBusyIds((busy) => new Set([...busy, ...ids]));
+    save.mutate(
+      { hide, ids },
+      {
+        onSettled: () =>
+          setBusyIds((busy) => {
+            const next = new Set(busy);
+            for (const id of ids) next.delete(id);
+            return next;
+          }),
+      },
+    );
   };
 
   const filterSet = (value: string) => {
@@ -412,7 +428,7 @@ const GameList = () => {
   const rowListJSX = page.map((game, index) => {
     return (
       <GameRow
-        busy={busyIds.includes(game.id)}
+        busy={busyIds.has(game.id)}
         game={game}
         index={index + 1}
         key={game.id}
