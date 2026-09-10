@@ -10,3 +10,4 @@ dist/
 api/
 .trophy-settings.json
 .trophy-npsso-deaths.json
+.trophy-shown.json
