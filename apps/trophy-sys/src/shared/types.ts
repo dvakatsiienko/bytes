@@ -252,6 +252,13 @@ export const NPSSO_INVALID = 'NPSSO_INVALID';
 export const NPSSO_URL = 'https://ca.account.sony.com/api/v1/ssocookie';
 
 /**
+ * A Vercel env var cannot be written at runtime, so when the live token came
+ * from `NPSSO` rather than the store, the admin can only point at the dashboard.
+ */
+export const VERCEL_ENV_URL =
+  'https://vercel.com/dima-vakatsiienkos-projects/trophy-sys/settings/environment-variables';
+
+/**
  * Display choices the owner makes in the admin page. Read publicly — the charts
  * need them — but written only behind the admin cookie.
  */
@@ -264,7 +271,7 @@ export interface Settings {
   effortHideUntouched: boolean;
 }
 
-export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: false };
+export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: true };
 
 /**
  * What the admin page shows about the live NPSSO. Never carries the token.

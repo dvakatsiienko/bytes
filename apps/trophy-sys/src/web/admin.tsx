@@ -2,7 +2,11 @@ import { type FormEvent, type ReactNode, useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 
 import type { Game } from '../shared/types.ts';
-import { SETTINGS_DEFAULT } from '../shared/types.ts';
+import {
+  NPSSO_URL,
+  SETTINGS_DEFAULT,
+  VERCEL_ENV_URL,
+} from '../shared/types.ts';
 import { Checkbox } from './components/checkbox.tsx';
 import { CommandButton } from './components/command-button.tsx';
 import { PlatformBadge } from './components/platform-badge.tsx';
@@ -203,6 +207,14 @@ const NpssoForm = () => {
 
       <TokenReadout />
 
+      {/* The header carries this link too, but only while PSN is already
+          refusing — and this is the panel where the paste happens. */}
+      <p className='text-[12px] text-dim leading-relaxed'>
+        need a fresh one?{' '}
+        <LinkOut href={NPSSO_URL}>get a new NPSSO code</LinkOut> — sign in to
+        PSN first, then copy the {NPSSO_LENGTH} characters the page prints.
+      </p>
+
       <Field
         autoComplete='off'
         id='admin-npsso'
@@ -281,6 +293,18 @@ const TokenReadout = () => {
     );
   });
 
+  // Vercel env vars are set at deploy time and cannot be written at runtime, so
+  // the honest answer for that source is a link out rather than a form.
+  const envJSX =
+    status.data.source === 'env' ? (
+      <p className='text-[12px] text-dim leading-relaxed'>
+        a token pasted below outranks this one and lands in kv. to replace the
+        env var itself,{' '}
+        <LinkOut href={VERCEL_ENV_URL}>open the vercel env settings</LinkOut> —
+        that store is not writable from here.
+      </p>
+    ) : null;
+
   return (
     <div className='flex flex-col gap-2'>
       {readout.dead ? <Note tone='error'>{readout.dead}</Note> : null}
@@ -288,6 +312,8 @@ const TokenReadout = () => {
       <dl className='flex flex-col divide-y divide-line/60 border border-line'>
         {rowListJSX}
       </dl>
+
+      {envJSX}
 
       {noteListJSX}
     </div>
@@ -663,6 +689,19 @@ const Field = (props: FieldProps) => {
   );
 };
 
+/** The header's link shape, for the two places /admin sends the owner off-site. */
+const LinkOut = (props: LinkOutProps) => {
+  return (
+    <a
+      className='text-orange underline transition-colors hover:text-yellow focus-visible:outline focus-visible:outline-orange'
+      href={props.href}
+      rel='noreferrer'
+      target='_blank'>
+      {props.children}
+    </a>
+  );
+};
+
 /**
  * One shape for every message the page can print, so an error and a success
  * differ by colour and glyph rather than by layout. The bracket glyph is the
@@ -826,6 +865,11 @@ interface FieldProps {
   suffix?: ReactNode;
   type?: 'email' | 'password' | 'text';
   value: string;
+}
+
+interface LinkOutProps {
+  children: ReactNode;
+  href: string;
 }
 
 interface NoteProps {

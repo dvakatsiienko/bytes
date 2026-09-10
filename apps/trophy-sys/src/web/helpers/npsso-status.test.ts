@@ -24,6 +24,21 @@ const statusMake = (over: Partial<NpssoStatus> = {}): NpssoStatus => ({
 const rowValue = (status: NpssoStatus, label: string) =>
   readoutBuild(status).rows.find((row) => row.label === label)?.value;
 
+test('the readout names which of the two sources is live', () => {
+  assert.equal(
+    rowValue(statusMake({ source: 'store' }), 'source'),
+    'pasted (kv)',
+  );
+  assert.equal(
+    rowValue(statusMake({ source: 'env' }), 'source'),
+    'env var (deploy-time)',
+  );
+  assert.equal(
+    rowValue(statusMake({ source: 'none' }), 'source'),
+    'nothing stored',
+  );
+});
+
 test('a token with no paste date reports an unknown age, never a zero', () => {
   const readout = readoutBuild(statusMake({ savedAt: null, source: 'env' }));
 

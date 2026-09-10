@@ -12,6 +12,14 @@ export const readoutBuild = (status: NpssoStatus) => {
 
   const age = status.savedAt === null ? null : daysSince(status.savedAt);
 
+  // First row, because it decides whether the paste box below can replace the
+  // live token at all — an env var is only replaceable in the Vercel dashboard.
+  rows.push({
+    label: 'source',
+    tone: SOURCE_TONE[status.source],
+    value: SOURCE_LABEL[status.source],
+  });
+
   rows.push(
     age === null
       ? { label: 'age', tone: 'text-dim', value: 'unknown' }
@@ -77,6 +85,19 @@ export const readoutBuild = (status: NpssoStatus) => {
 
   return { dead, notes, rows };
 };
+
+const SOURCE_LABEL = {
+  env: 'env var (deploy-time)',
+  none: 'nothing stored',
+  store: 'pasted (kv)',
+} as const satisfies Record<NpssoStatus['source'], string>;
+
+/** Yellow for the env var: it works, and it cannot be replaced from this page. */
+const SOURCE_TONE = {
+  env: 'text-yellow',
+  none: 'text-dim',
+  store: 'text-fg',
+} as const satisfies Record<NpssoStatus['source'], string>;
 
 const DAY_MS = 86_400_000;
 
