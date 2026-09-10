@@ -29,4 +29,4 @@ A visit-card site. Two routes:
 - Tool categories config in `src/app/parts/toolConfig.tsx`
 - `__DEV__` / `__PROD__` flags in `src/frags.ts` — projects section hidden in production
 - External links centralized in `src/links.ts`
-- TypeScript build errors ignored (`ignoreBuildErrors: true`) — use `pnpm typecheck` manually
+- `next build` type-checks. `ignoreBuildErrors` was set here once and removed after the app measured clean against it; `pnpm typecheck` still runs the same check on demand

@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   reactStrictMode: true,
   transpilePackages: ['@ui/kit'],
-  typescript: { ignoreBuildErrors: true },
 };
 
 export default nextConfig;

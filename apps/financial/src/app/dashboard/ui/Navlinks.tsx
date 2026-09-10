@@ -1,11 +1,11 @@
 'use client';
 
-import cx from 'clsx';
 import {
   DocumentDuplicateIcon,
   HomeIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
+import { cn } from '@ui/kit/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -17,7 +17,7 @@ export const NavLinks = () => {
 
     return (
       <Link
-        className={cx(
+        className={cn(
           'flex h-11 grow items-center justify-center gap-3 border-l-2 px-3 text-sm transition-colors md:flex-none md:justify-start',
           pathname === link.href
             ? 'border-l-seal bg-bar font-medium text-ink'

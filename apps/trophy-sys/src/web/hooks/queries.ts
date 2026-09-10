@@ -178,27 +178,12 @@ export const useSettingsSave = () => {
 export const useHiddenSave = () => {
   const queryClient = useQueryClient();
 
-  const hiddenNext = (ids: string[], hide: boolean) => {
-    const games = queryClient.getQueryData<Game[]>(ADMIN_GAMES_KEY) ?? [];
-    const next = new Set(
-      games.filter((game) => game.hidden).map((game) => game.id),
-    );
-
-    for (const id of ids) {
-      if (hide) next.add(id);
-      else next.delete(id);
-    }
-
-    return [...next];
-  };
-
   // Generics are spelled out because `onError` sorts before `onMutate`, and
   // the context type is inferred from whichever comes first.
-  return useMutation<{ ids: string[] }, Error, HiddenFlip, HiddenContext>({
-    mutationFn: (flip) =>
-      apiPost<{ ids: string[] }>('/admin/hidden', {
-        ids: hiddenNext(flip.ids, flip.hide),
-      }),
+  return useMutation<HiddenLists, Error, HiddenFlip, HiddenContext>({
+    // The intent travels, not a finished set: the server owns the auto-hide
+    // rule, so only it can tell which of the two lists an id belongs in.
+    mutationFn: (flip) => apiPost<HiddenLists>('/admin/hidden', flip),
     mutationKey: HIDDEN_KEY,
     onError: (_error, _flip, context) => {
       // Something newer is still in flight and owns the cache now.
@@ -228,6 +213,12 @@ const HIDDEN_KEY = ['admin', 'hidden'] as const;
 export interface HiddenFlip {
   hide: boolean;
   ids: string[];
+}
+
+/** Both halves of the hide state — each holds a deviation from the rule. */
+interface HiddenLists {
+  hidden: string[];
+  shown: string[];
 }
 
 /**

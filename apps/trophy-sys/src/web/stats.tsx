@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { MotionConfig } from 'motion/react';
 
 import type { TrophyArchive } from '../shared/types.ts';
+import { SETTINGS_DEFAULT } from '../shared/types.ts';
 import {
   type CircadianHour,
   CircadianRing,
@@ -87,7 +88,8 @@ export const Stats = () => {
   const trophies = useMemo(() => archive?.trophies ?? [], [archive]);
   const remaining = useMemo(() => archive?.remaining ?? [], [archive]);
 
-  const hideUntouched = settings.data?.effortHideUntouched ?? false;
+  const hideUntouched =
+    settings.data?.effortHideUntouched ?? SETTINGS_DEFAULT.effortHideUntouched;
 
   const points = useMemo(
     () => effortPoints(gameList, hideUntouched),

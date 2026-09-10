@@ -1,4 +1,4 @@
-import { clsx } from 'clsx';
+import { cn } from '@ui/kit/lib/utils';
 import NextLink from 'next/link';
 
 import { display } from '@/theme/fonts';
@@ -7,7 +7,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
   const breadcrumbListJSX = props.breadcrumbList.map((breadcrumb, index) => (
     <li
       aria-current={breadcrumb.active}
-      className={clsx(breadcrumb.active ? 'text-ink' : 'text-ink-soft')}
+      className={cn(breadcrumb.active ? 'text-ink' : 'text-ink-soft')}
       key={breadcrumb.href}>
       <NextLink href={breadcrumb.href}>{breadcrumb.label}</NextLink>
       {index < props.breadcrumbList.length - 1 && (
@@ -21,7 +21,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
       aria-label='Breadcrumb'
       className='mb-8 block border-rule border-b pb-4'>
       <ol
-        className={clsx(
+        className={cn(
           display.className,
           'flex text-2xl tracking-tight md:text-3xl',
         )}>

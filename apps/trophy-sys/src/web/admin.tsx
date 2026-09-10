@@ -2,7 +2,7 @@ import { type FormEvent, type ReactNode, useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 
 import type { Game } from '../shared/types.ts';
-import { SETTINGS_DEFAULT } from '../shared/types.ts';
+import { NPSSO_URL, SETTINGS_DEFAULT, isNonGame } from '../shared/types.ts';
 import { Checkbox } from './components/checkbox.tsx';
 import { CommandButton } from './components/command-button.tsx';
 import { PlatformBadge } from './components/platform-badge.tsx';
@@ -201,8 +201,8 @@ const NpssoForm = () => {
     <form className='panel flex flex-col gap-3 p-5' onSubmit={submit}>
       <p className='panel-title'>psn token</p>
 
-      <TokenReadout />
-
+      {/* The paste box leads the panel: it is the one thing this panel exists
+          to do, and everything under it explains or measures that one act. */}
       <Field
         autoComplete='off'
         id='admin-npsso'
@@ -231,6 +231,16 @@ const NpssoForm = () => {
         type='submit'>
         {save.isPending ? 'saving…' : 'save token'}
       </CommandButton>
+
+      {/* The header carries this link too, but only while PSN is already
+          refusing — and this is the panel where the paste happens. */}
+      <p className='text-[12px] text-dim leading-relaxed'>
+        need a fresh one?{' '}
+        <LinkOut href={NPSSO_URL}>get a new NPSSO code</LinkOut> — sign in to
+        PSN first, then copy the {NPSSO_LENGTH} characters the page prints.
+      </p>
+
+      <TokenReadout />
     </form>
   );
 };
@@ -294,7 +304,6 @@ const TokenReadout = () => {
   );
 };
 
-/** Display choices, read publicly by /stats and written only from here. */
 const SettingsForm = () => {
   const settings = useSettings();
   const save = useSettingsSave();
@@ -342,6 +351,8 @@ const GameList = () => {
   // toggle wiped the first row's pending mark, and clearing it on settle
   // unlocked rows whose own request was still in flight.
   const [busyIds, setBusyIds] = useState<ReadonlySet<string>>(new Set());
+  // Which bulk write is in flight, by the `hide` it carries, or null for none.
+  const [bulkHide, setBulkHide] = useState<boolean | null>(null);
 
   const all = useMemo(() => games.data ?? [], [games.data]);
   const hiddenIds = useMemo(
@@ -370,21 +381,35 @@ const GameList = () => {
 
   const page = ordered.slice(0, shown);
 
-  // One request carries the whole new set, so a row and a batch cost the same.
-  // The set itself is derived inside the mutation, from the cache, so two fast
-  // toggles compose instead of the second recomputing from a stale render.
-  const hiddenApply = (ids: string[], hide: boolean) => {
+  // One request carries the whole batch, so a row and 258 rows cost the same.
+  // The server resolves each id against the auto-hide rule, so two fast toggles
+  // compose instead of the second recomputing from a stale render.
+  const hiddenApply = (ids: string[], hide: boolean, onDone?: () => void) => {
     setBusyIds((busy) => new Set([...busy, ...ids]));
     save.mutate(
       { hide, ids },
       {
-        onSettled: () =>
+        onSettled: () => {
           setBusyIds((busy) => {
             const next = new Set(busy);
             for (const id of ids) next.delete(id);
             return next;
-          }),
+          });
+          onDone?.();
+        },
       },
+    );
+  };
+
+  // The two bulk buttons get their own flag rather than the mutation's global
+  // `isPending`: sharing it greyed them out whenever any single row was mid-
+  // toggle, which is 257 writes that have nothing to do with them.
+  const bulkApply = (hide: boolean) => {
+    setBulkHide(hide);
+    hiddenApply(
+      matched.map((game) => game.id),
+      hide,
+      () => setBulkHide(null),
     );
   };
 
@@ -481,24 +506,14 @@ const GameList = () => {
 
           <span className='ml-auto flex flex-wrap items-center gap-2'>
             <CommandButton
-              disabled={save.isPending || matched.length === 0}
-              onClick={() =>
-                hiddenApply(
-                  matched.map((game) => game.id),
-                  true,
-                )
-              }>
-              hide all matching
+              disabled={bulkHide !== null || matched.length === 0}
+              onClick={() => bulkApply(true)}>
+              {bulkHide === true ? 'hiding…' : 'hide all matching'}
             </CommandButton>
             <CommandButton
-              disabled={save.isPending || matched.length === 0}
-              onClick={() =>
-                hiddenApply(
-                  matched.map((game) => game.id),
-                  false,
-                )
-              }>
-              unhide all matching
+              disabled={bulkHide !== null || matched.length === 0}
+              onClick={() => bulkApply(false)}>
+              {bulkHide === false ? 'unhiding…' : 'unhide all matching'}
             </CommandButton>
             <SegmentedControl
               label='row order'
@@ -573,6 +588,9 @@ const GameList = () => {
  */
 const GameRow = (props: GameRowProps) => {
   const isHidden = Boolean(props.game.hidden);
+  // Derived from the name, not carried in the payload: the rule is shared code,
+  // so both sides reach the same answer without a field that could drift.
+  const byRule = isNonGame(props.game.name);
 
   return (
     <tr
@@ -606,11 +624,11 @@ const GameRow = (props: GameRowProps) => {
       <td className='px-3 py-1.5 text-right'>
         <CommandButton
           ariaLabel={`${isHidden ? 'unhide' : 'hide'} ${props.game.name}`}
-          className={`w-30 whitespace-nowrap px-2 text-left ${stateTone(isHidden, props.busy)}`}
+          className={`w-30 whitespace-nowrap px-2 text-left ${stateTone(isHidden, props.busy, byRule)}`}
           disabled={props.busy}
           onClick={props.onToggle}
           tone='bare'>
-          {stateLabel(isHidden, props.busy)}
+          {stateLabel(isHidden, props.busy, byRule)}
         </CommandButton>
       </td>
     </tr>
@@ -660,6 +678,19 @@ const Field = (props: FieldProps) => {
         value={props.value}
       />
     </div>
+  );
+};
+
+/** The header's link shape, for the two places /admin sends the owner off-site. */
+const LinkOut = (props: LinkOutProps) => {
+  return (
+    <a
+      className='text-orange underline transition-colors hover:text-yellow focus-visible:outline focus-visible:outline-orange'
+      href={props.href}
+      rel='noreferrer'
+      target='_blank'>
+      {props.children}
+    </a>
   );
 };
 
@@ -727,16 +758,24 @@ const counterTone = (typed: number, isReady: boolean) => {
   return 'text-dim';
 };
 
-const stateLabel = (isHidden: boolean, busy: boolean) => {
+/**
+ * Three states, not two: a title hidden because the auto-hide rule matched its
+ * name says «auto», so the owner can tell a rule from their own decision — and
+ * knows the one press that overrules it.
+ */
+const stateLabel = (isHidden: boolean, busy: boolean, byRule: boolean) => {
   if (busy) return '[·] …';
+  if (isHidden) return byRule ? '[x] auto' : '[x] hidden';
 
-  return isHidden ? '[x] hidden' : '[ ] visible';
+  return byRule ? '[ ] kept' : '[ ] visible';
 };
 
-const stateTone = (isHidden: boolean, busy: boolean) => {
+/** «kept» is a decision the owner made against the rule, so it is not quiet. */
+const stateTone = (isHidden: boolean, busy: boolean, byRule: boolean) => {
   if (busy) return 'text-yellow';
+  if (isHidden) return 'text-orange hover:text-yellow';
 
-  return isHidden ? 'text-orange hover:text-yellow' : '';
+  return byRule ? 'text-green hover:text-yellow' : '';
 };
 
 /** Lowercased alternatives from the filter box, `|`-separated. */
@@ -776,12 +815,13 @@ const SORT_OPTIONS = [
 ] as const satisfies readonly { label: string; value: GameSort }[];
 
 /**
- * Typing shortcuts, nothing more. Pressing one only fills the filter box, so
- * the owner sees what matched and presses "hide all matching" himself — no
- * regex here ever decides on its own that a title is not a game.
+ * Typing shortcuts: pressing one fills the filter box and nothing else.
  *
- * `ost` is deliberately absent: as a substring it claims Ghost of Tsushima, and
- * no title in the library spells it that way anyway (checked 2026-09-10).
+ * 📌 They used to be the ONLY way these titles got hidden, and this comment
+ * used to say that no rule here ever decides on its own that a title is not a
+ * game. `isNonGame` now does exactly that, on the same words — the presets
+ * survive as the way to *see* the set the rule governs, and the per-row
+ * override is what keeps the decision the owner's.
  */
 const FILTER_PRESETS = [
   { filter: 'soundtrack', label: 'soundtracks' },
@@ -826,6 +866,11 @@ interface FieldProps {
   suffix?: ReactNode;
   type?: 'email' | 'password' | 'text';
   value: string;
+}
+
+interface LinkOutProps {
+  children: ReactNode;
+  href: string;
 }
 
 interface NoteProps {

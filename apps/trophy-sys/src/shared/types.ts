@@ -252,6 +252,29 @@ export const NPSSO_INVALID = 'NPSSO_INVALID';
 export const NPSSO_URL = 'https://ca.account.sony.com/api/v1/ssocookie';
 
 /**
+ * PSN's entitlement list is what makes the library the *owned* one, and it
+ * carries things nobody plays: soundtracks and artbooks, ~16 of 258 owned
+ * titles. They are hidden by default so a new purchase does not need a manual
+ * sweep — and every match is overridable, one row at a time, from /admin.
+ *
+ * ⚠️ This is a name match, so it will one day claim a real game whose title
+ * contains one of these words. That is why the override exists and why the
+ * admin row says «auto» rather than just «hidden»: the rule is a default the
+ * owner can always see and always overrule, never a verdict.
+ */
+export const isNonGame = (name: string) => {
+  const lower = name.toLowerCase();
+
+  return NON_GAME_PARTS.some((part) => lower.includes(part));
+};
+
+/**
+ * `ost` is deliberately absent: as a substring it claims Ghost of Tsushima.
+ * Each entry has to be a word that cannot appear inside an ordinary title.
+ */
+const NON_GAME_PARTS = ['soundtrack', 'artbook', 'art book'] as const;
+
+/**
  * Display choices the owner makes in the admin page. Read publicly — the charts
  * need them — but written only behind the admin cookie.
  */
@@ -264,7 +287,7 @@ export interface Settings {
   effortHideUntouched: boolean;
 }
 
-export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: false };
+export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: true };
 
 /**
  * What the admin page shows about the live NPSSO. Never carries the token.
@@ -274,7 +297,11 @@ export interface NpssoStatus {
   diedAt: number | null;
   /** Measured lifetimes in ms, oldest first — one per token that has died. */
   lifetimes: number[];
-  /** Null for a token that came from the env var, or predates the measuring. */
+  /** Null for the env-var seed, or for a token that predates the measuring. */
   savedAt: number | null;
+  /**
+   * KV is the source. `env` means nothing has been pasted yet and the app is
+   * running on the bootstrap seed — the first paste ends that for good.
+   */
   source: 'env' | 'none' | 'store';
 }

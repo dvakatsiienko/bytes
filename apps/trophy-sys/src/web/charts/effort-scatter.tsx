@@ -10,7 +10,12 @@ import type { Game } from '../../shared/types.ts';
 import type { TooltipRow } from '../components/chart-tooltip.tsx';
 import { ChartTooltip, TooltipLayer } from '../components/chart-tooltip.tsx';
 import { ScatterMark } from '../components/scatter-mark.tsx';
-import { AXIS_BOTTOM, AXIS_LABEL, CHART_INK } from '../helpers/chart-theme.ts';
+import {
+  AXIS_BOTTOM,
+  AXIS_LABEL,
+  AXIS_LEFT,
+  CHART_INK,
+} from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
 import { countTotal } from '../helpers/stats.ts';
 
@@ -39,10 +44,16 @@ const Plot = (props: PlotProps) => {
   const innerHeight = Math.max(props.height - MARGIN.top - MARGIN.bottom, 1);
 
   const hours = props.points.map((point) => point.hours);
+  const xLow = Math.min(...hours, 0.5);
+  const xHigh = Math.max(...hours, 1);
   const xScale = scaleLog<number>({
-    domain: [Math.min(...hours, 0.5), Math.max(...hours, 1)],
+    domain: [xLow, xHigh],
     range: [0, innerWidth],
   });
+  // d3 falls back to every minor tick — 1,2,3…9 per decade — once a log domain
+  // spans fewer decades than the count asked for, and hiding untouched titles
+  // narrowed this one enough to print 26 labels on top of each other.
+  const xTicks = decadeTicks(xLow, xHigh);
   // Inset by the largest mark's radius at both ends: a 0% title used to sit its
   // centre exactly on the axis, so the bottom half of the dot crossed the line
   // and read as clipped. The axis itself does not move — only the value range
@@ -124,20 +135,20 @@ const Plot = (props: PlotProps) => {
           />
           <GridColumns
             height={innerHeight}
-            numTicks={4}
             scale={xScale}
             stroke={CHART_INK.grid}
             strokeOpacity={0.2}
+            tickValues={xTicks}
             width={innerWidth}
           />
 
           <AxisBottom
-            numTicks={4}
             scale={xScale}
             stroke={CHART_INK.axis}
             tickFormat={(value) => hoursFormat(Number(value))}
             tickLabelProps={() => AXIS_LABEL}
             tickStroke={CHART_INK.axis}
+            tickValues={xTicks}
             top={innerHeight}
           />
           <AxisLeft
@@ -237,7 +248,7 @@ export const effortPoints = (
     // Big dots drawn first, so a small one is never buried under a large one.
     .sort((a, b) => b.trophies - a.trophies);
 
-const MARGIN = { bottom: AXIS_BOTTOM, left: 42, right: 14, top: 12 };
+const MARGIN = { bottom: AXIS_BOTTOM, left: AXIS_LEFT, right: 14, top: 12 };
 
 /** How far outside a mark still counts as pointing at it. */
 const TOLERANCE = 4;
@@ -247,6 +258,17 @@ const MARK_MAX = 15;
 
 const markPeak = (points: EffortPoint[]) =>
   Math.max(...points.map((point) => point.trophies), 2);
+
+/** Every power of ten inside the domain — the readable labelling for a log axis. */
+const decadeTicks = (low: number, high: number) => {
+  const first = Math.ceil(Math.log10(low));
+  const last = Math.floor(Math.log10(high));
+  const ticks: number[] = [];
+
+  for (let power = first; power <= last; power += 1) ticks.push(10 ** power);
+
+  return ticks;
+};
 
 /**
  * d3's sqrt scale over [1, peak] → [4, 15], written out longhand. Area, not

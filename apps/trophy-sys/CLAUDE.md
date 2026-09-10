@@ -74,23 +74,40 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
 `hidden: boolean` per game (that is the admin's view). `GET /api/settings` is public on purpose —
 the charts read it — and only the write is gated.
 
+📌 **Hidden is a rule plus two override lists, never one stored set.** `isNonGame(name)` in
+`shared/types.ts` hides soundtracks and artbooks by name, so a title bought tomorrow arrives hidden
+with nothing written for it — that is the whole point. The stores hold only *deviations*:
+`trophy-sys:hidden` the ids the rule would show, `trophy-sys:shown` the ids it would hide. So
+`hidden = isNonGame(name) ? !shown.has(id) : hidden.has(id)`, and an unhide survives every later
+sync. The write route takes an intent (`{ ids, hide }`), not a finished set: with a rule in play,
+leaving a rule-hidden id out of a set is indistinguishable from asking to show it.
+
+⚠️ The rule matches on the name, so it will one day claim a real game whose title contains
+`soundtrack` or `artbook`. That is why the admin row says `[x] auto` rather than `[x] hidden`, and
+why one press overrules it — the rule is a visible default, never a verdict. `ost` is deliberately
+not a pattern: as a substring it claims Ghost of Tsushima.
+
 ## Auth and state
 
 Env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,
 `STEAM_API_KEY`, `STEAM_ID64`, and the admin trio `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SECRET`. Locally
 they come from three files, loaded in order and last one wins (via `node --env-file`, never
-`dotenv`): `.env` holds `NPSSO`, the Vercel-generated `.env.local` holds the production KV
+`dotenv`): `.env` holds the `NPSSO` seed, the Vercel-generated `.env.local` holds the production KV
 credentials, and `.env.dev.local` overrides them for dev. In production Vercel injects them. Both entrypoints — `src/server/main.ts` and
 `src/server/cli.ts` — need the flags. Every key the app reads must also be listed in
 `turbo.jsonc`'s `env` array, because Biome's `noUndeclaredEnvVars` reads that list.
 
 - `authGet()` in `psn.ts` holds one in-memory session and refreshes it with the refresh token, so
   the NPSSO→access-code exchange runs once per process.
-- `npssoRead()` is **async** and the store outranks the env: `npssoLoad()` first, `process.env.NPSSO`
-  as fallback. Vercel env vars cannot be written at runtime, so a token pasted through the admin has
-  to live in KV — that is the whole reason for the order. An expired token throws the sentinel
-  `NPSSO_INVALID` (`src/shared/types.ts`) rather than psn-api's multi-line prose, and the header
-  renders it as a link to the admin.
+- 📌 **KV is the source of the NPSSO. `process.env.NPSSO` is a bootstrap seed and nothing else.**
+  `npssoRead()` is async and reads `npssoLoad()` first, the env var second — so the seed carries a
+  deploy that has never been pasted into, and the first paste retires it for good. Vercel env vars
+  cannot be written at runtime, and a token expires every few weeks, so a redeploy is the wrong way
+  to renew one. There is deliberately no fallback *back* to the env var on a refusal and no way to
+  clear the stored token: two live sources confused more than they protected (measured with both
+  built, 2026-09-10). The panel says which of the two is in use in one row and stops there.
+  An expired token throws the sentinel `NPSSO_INVALID` (`src/shared/types.ts`) rather than
+  psn-api's multi-line prose, and the header renders it as a link to the admin.
 - Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
   guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
   empty library unless checked. And the envelope key is not always `response`:
@@ -126,6 +143,12 @@ Everything else the app persists rides the same `state.ts` store, one key each:
 `trophy-sys:stats`, `trophy-sys:hidden` (`string[]`), `trophy-sys:npsso` (`string`),
 `trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`).
 
+📌 **`settingsLoad` spreads the store over `SETTINGS_DEFAULT`, so a key already written to the
+store outranks the code default forever.** Changing a default therefore reaches a fresh install
+and nobody else — the live value has to be flipped through `/admin`, or the key deleted. Measured
+on `effortHideUntouched`: the default moved to `true` and production kept answering `false`,
+because a stored `false` was already sitting there.
+
 ## The admin area
 
 `/admin` is the owner's console — hide games, paste a fresh NPSSO, flip a setting. `src/server/admin.ts`
@@ -137,7 +160,8 @@ missing, and every admin route then answers 503.** There is deliberately no fall
 missing a var is shut, never open.
 
 - Routes: `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/session`,
-  `GET`+`POST /api/admin/hidden`, `POST /api/admin/npsso`, `POST /api/admin/settings`.
+  `GET`+`POST /api/admin/hidden`, `POST /api/admin/npsso`, `POST /api/admin/settings`,
+  `GET /api/admin/token`.
 - `GET /api/admin/session` never answers 401 — it reports `authed` either way, because the UI uses
   it to pick a screen.
 - `routeResolve` takes a third `RouteRequest` argument carrying the cookie and host headers plus the
@@ -201,9 +225,17 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the eleven are one
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
   `*_COLUMNS`, so `stats.tsx` only wires.
-- **`AXIS_BOTTOM` in `chart-theme.ts` is the bottom margin every x-axis chart reserves.** Take it
-  from there, never a literal: effort had 36, the ranked bars 22 and everyone else 26, and the
-  panels drifted visibly out of line over months.
+- **A margin that holds axis text is a token in `chart-theme.ts`, never a literal.** `AXIS_BOTTOM`
+  (26), `AXIS_LEFT` (52), `MONTH_AXIS_RIGHT` (26). Each one replaced a set of hand-typed numbers
+  that had drifted: bottom ran 36/26/22, left ran 38/42/38 — and 38 was too small for the
+  progression's widest tick, so `2,000` drew as `,000` for months. `MONTH_AXIS_RIGHT` holds the
+  half of a `YYYY-MM` label that hangs past the last tick.
+- **A tick count is derived from the width, never asked for flat.** `monthTicks(innerWidth, n)`
+  for the two month axes — both asked for 6 at every width and printed over each other at 390px.
+  `decadeTicks` in `effort-scatter.tsx` pins one tick per power of ten: 📌 **d3 abandons the count
+  you pass a log scale once the domain spans fewer decades than that count, and emits every minor
+  tick instead** — hiding untouched titles narrowed the effort domain enough to print 26
+  overlapping labels.
 
 ### Charts talking to each other
 

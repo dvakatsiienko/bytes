@@ -5,6 +5,11 @@ import { dateFormat } from './format.ts';
  * Every honesty rule for the token readout lives here, in one pure function:
  * no estimate without a measurement, no age without a paste date, and the
  * sample count always said out loud.
+ *
+ * 📌 `source` steers the notes but has no row of its own. It had one, and it
+ * said `pasted here` on every read after the first paste — a row that only ever
+ * says one thing stops being read. The state it existed for, a deploy still on
+ * the env-var seed, is carried by `age: unknown` plus the note beneath it.
  */
 export const readoutBuild = (status: NpssoStatus) => {
   const rows: ReadoutRow[] = [];
@@ -22,7 +27,7 @@ export const readoutBuild = (status: NpssoStatus) => {
   else if (status.savedAt === null)
     notes.push(
       status.source === 'env'
-        ? 'this token came from the env var, so there is no paste date to measure its age from.'
+        ? 'this token came from the env var seed, so there is no paste date to measure its age from. pasting one here takes over.'
         : 'this token predates the measuring, so its age is unknown.',
     );
 

@@ -17,7 +17,6 @@ const nextConfig = {
   transpilePackages: ['@ui/kit', 'jotai-devtools'],
   turbopack: {}, // Acknowledge Turbopack usage (webpack config below will be ignored)
   typedRoutes: true, // todo test it out
-  typescript: { ignoreBuildErrors: true },
 } satisfies NextConfig;
 
 export default nextConfig;

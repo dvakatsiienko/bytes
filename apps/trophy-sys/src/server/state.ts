@@ -13,6 +13,9 @@ const STATS_KEY = 'trophy-sys:stats';
 const HIDDEN_FILE = new URL('../../.trophy-hidden.json', import.meta.url);
 const HIDDEN_KEY = 'trophy-sys:hidden';
 
+const SHOWN_FILE = new URL('../../.trophy-shown.json', import.meta.url);
+const SHOWN_KEY = 'trophy-sys:shown';
+
 const NPSSO_FILE = new URL('../../.trophy-npsso.json', import.meta.url);
 const NPSSO_KEY = 'trophy-sys:npsso';
 
@@ -161,16 +164,23 @@ export const hiddenSave = (ids: string[]) =>
   storeWrite(HIDDEN_KEY, HIDDEN_FILE, ids);
 
 /**
- * The NPSSO pasted through the admin page, which outranks the env var — the
- * token expires and a redeploy is a poor way to renew it.
- *
- * Stored as a record rather than a bare string so the app can measure how long
- * a token actually lasts. Sony publishes no lifetime; the one figure this repo
- * has is an upper bound of 25 days, from a token set 2026-08-16 and found dead
- * 2026-09-10. Each renewal adds a real sample.
+ * The other half of the hide state: ids the auto-hide rule matches and the
+ * owner has overruled. Two lists rather than one materialised set, so a title
+ * bought tomorrow inherits the rule without anything being written for it.
  */
+export const shownLoad = async (): Promise<string[]> =>
+  (await storeRead<string[]>(SHOWN_KEY, SHOWN_FILE)) ?? [];
+
+export const shownSave = (ids: string[]) =>
+  storeWrite(SHOWN_KEY, SHOWN_FILE, ids);
+
 /**
- * The live token and nothing else. Written ONLY by the admin save.
+ * The live NPSSO and nothing else. Written ONLY by the admin save.
+ *
+ * A record rather than a bare string so the app can measure how long a token
+ * actually lasts. Sony publishes no lifetime; the one figure this repo has is an
+ * upper bound of 25 days, from a token set 2026-08-16 and found dead 2026-09-10.
+ * Each renewal adds a real sample.
  *
  * ⚠️ Deaths live under their own key on purpose. Both used to share this
  * record, which made every death a read-modify-write racing the admin's own

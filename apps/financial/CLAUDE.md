@@ -16,7 +16,8 @@ modeled after the Next.js App Router dashboard course app.
   against schemas in `src/lib/schemas.ts`; money input via rifm (`AmountInput`), canonical
   amounts are integer cents (`src/lib/money.ts`)
 - **React Query** (`@tanstack/react-query`) — client-side server state
-- Tailwind (+ `@tailwindcss/forms`), heroicons, cva-free (clsx)
+- Tailwind (+ `@tailwindcss/forms`), heroicons, cva-free — classes compose through `cn` from
+  `@ui/kit/lib/utils`, so a conflicting pair resolves last-wins rather than by stylesheet order
 
 ## Architecture
 

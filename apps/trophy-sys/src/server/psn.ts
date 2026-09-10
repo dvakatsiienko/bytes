@@ -57,16 +57,18 @@ interface Session {
 let session: Session | null = null;
 
 /**
- * A token pasted through the admin page wins over the env var: it is the newer
- * of the two by definition, and renewing an expired NPSSO must not need a
- * redeploy.
+ * KV is the source of the NPSSO. `process.env.NPSSO` is a bootstrap seed and
+ * nothing more: it carries a deploy that has never been pasted into, and the
+ * first paste retires it for good. Renewing an expired token must not need a
+ * redeploy, which is the whole reason the store outranks it.
  */
 const npssoRead = async () => {
   const npsso = (await npssoLoad()) ?? process.env.NPSSO;
   if (!npsso)
     throw new Error(
-      'NPSSO missing — paste one on the admin page, set it in .env locally, or as a Vercel env var in production',
+      'NPSSO missing — paste one on the admin page, or seed it in .env locally and as a Vercel env var for a first deploy',
     );
+
   return npsso;
 };
 
