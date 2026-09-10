@@ -87,7 +87,9 @@ export const LibraryEmpty = () => {
 };
 
 export const LibraryGame = () => {
-  const { gameId } = useParams({ from: '/library/$gameId' });
+  // The route ID, not the URL: /library sits under the pathless `_shell`
+  // layout route now, so the URL stayed put and the ID gained a segment.
+  const { gameId } = useParams({ from: '/_shell/library/$gameId' });
   const game = useGame(gameId);
 
   return (

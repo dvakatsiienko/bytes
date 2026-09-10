@@ -16,6 +16,19 @@ response bridges the two. The join is on name and it is lossy by design — 94 o
 so a `—` in the playtime column means the join missed, not that the title was never played. The
 file's own header carries the matching rules and what each one was measured to cost.
 
+`src/server/purchased.ts` is why the library is the **owned** library, not the played one.
+`getUserTitles` is the trophy endpoint — a title appears there only after it was launched once — so
+`purchasedFetch` reads PSN's entitlement list (`getPurchasedGames`, a persisted graphql query on
+`web.np.playstation.com/api/graphql/v1/op`, same access token, paged on `start`/`size`) and
+`gamesFetch` merges the two. 110 titles became 258. The dedupe reuses `playtime.ts`'s measured name
+matcher on the **bare** name — never a second matcher — and `source` on `Game` says which list a row
+came from; `gameDetailFetch` answers an empty trophy set for a `psn-purchased` title rather than
+404ing.
+
+📌 Two limits are PSN's, not fixable here: the endpoint is **PS4/PS5 only** (nothing from PS3 or
+Vita will ever appear), and entitlements are not games — ~16 of the 258 are soundtracks and
+artbooks.
+
 Deployed: <https://trophy-sys.vercel.app>
 
 ## Commands
@@ -55,12 +68,16 @@ Three paths, same JSON:
 - Anywhere → `curl -s https://trophy-sys.vercel.app/api/games`
 
 Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommunicationId`,
-`/api/news`, `POST /api/snapshot`.
+`/api/news`, `/api/settings`, `POST /api/snapshot`.
+
+`GET /api/games` filters the hidden ids out; `GET /api/games?all=1` returns everything with
+`hidden: boolean` per game (that is the admin's view). `GET /api/settings` is public on purpose —
+the charts read it — and only the write is gated.
 
 ## Auth and state
 
-Five env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,
-`STEAM_API_KEY`, `STEAM_ID64`. Locally
+Env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,
+`STEAM_API_KEY`, `STEAM_ID64`, and the admin trio `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SECRET`. Locally
 they come from three files, loaded in order and last one wins (via `node --env-file`, never
 `dotenv`): `.env` holds `NPSSO`, the Vercel-generated `.env.local` holds the production KV
 credentials, and `.env.dev.local` overrides them for dev. In production Vercel injects them. Both entrypoints — `src/server/main.ts` and
@@ -69,6 +86,11 @@ credentials, and `.env.dev.local` overrides them for dev. In production Vercel i
 
 - `authGet()` in `psn.ts` holds one in-memory session and refreshes it with the refresh token, so
   the NPSSO→access-code exchange runs once per process.
+- `npssoRead()` is **async** and the store outranks the env: `npssoLoad()` first, `process.env.NPSSO`
+  as fallback. Vercel env vars cannot be written at runtime, so a token pasted through the admin has
+  to live in KV — that is the whole reason for the order. An expired token throws the sentinel
+  `NPSSO_INVALID` (`src/shared/types.ts`) rather than psn-api's multi-line prose, and the header
+  renders it as a link to the admin.
 - Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
   guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
   empty library unless checked. And the envelope key is not always `response`:
@@ -99,6 +121,27 @@ as reporting a private profile as an empty library.
 📌 `newsFetch({ commit: true })` is a read-modify-write over a now-shared store. Nothing triggers
 it concurrently today, but a cron or a UI button would need a lock — two overlapping snapshots
 would let the loser's trophies resurface as "new".
+
+Everything else the app persists rides the same `state.ts` store, one key each:
+`trophy-sys:stats`, `trophy-sys:hidden` (`string[]`), `trophy-sys:npsso` (`string`),
+`trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`).
+
+## The admin area
+
+`/admin` is the owner's console — hide games, paste a fresh NPSSO, flip a setting. `src/server/admin.ts`
+holds the auth: an HMAC-SHA256 signed `sys_admin` cookie, `timingSafeEqual` on both the password and
+the signature, 30-day expiry, `Secure` dropped only on localhost.
+
+📌 **`adminConfig()` returns null when any of `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_SECRET` is
+missing, and every admin route then answers 503.** There is deliberately no fallback: a deploy
+missing a var is shut, never open.
+
+- Routes: `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/session`,
+  `GET`+`POST /api/admin/hidden`, `POST /api/admin/npsso`, `POST /api/admin/settings`.
+- `GET /api/admin/session` never answers 401 — it reports `authed` either way, because the UI uses
+  it to pick a screen.
+- `routeResolve` takes a third `RouteRequest` argument carrying the cookie and host headers plus the
+  parsed body. Both entrypoints must pass it, or every admin route reads as signed out.
 
 ## Deployment — four constraints that will bite
 
@@ -158,6 +201,9 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the eleven are one
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
   `*_COLUMNS`, so `stats.tsx` only wires.
+- **`AXIS_BOTTOM` in `chart-theme.ts` is the bottom margin every x-axis chart reserves.** Take it
+  from there, never a literal: effort had 36, the ranked bars 22 and everyone else 26, and the
+  panels drifted visibly out of line over months.
 
 ### Charts talking to each other
 
@@ -218,6 +264,11 @@ things about **this** page waste a run otherwise:
   navigation and a game is a resource. `router.tsx` holds the tree; `layout.tsx`, `library.tsx`
   and `news.tsx` are the route components. Deep links work because `vercel.json` rewrites every
   non-`/api` path to `index.html`.
+- **The root route is a bare `<Outlet />`.** The app's routes hang off a pathless `_shell` layout
+  route rendering `Layout`, and `/admin` is a *sibling* of `_shell`, not a child — so the admin
+  still renders when every PSN call is failing, which is exactly when a dead NPSSO needs replacing.
+  A `defaultErrorComponent` catches the rest. 📌 `useParams({ from })` takes a route **id**, and
+  those ids now carry the segment: `'/_shell/library/$gameId'`.
 - Server imports carry the `.ts` extension — node's native TS resolution requires it.
 - `biome.jsonc` is a nested (`root: false`) config extending the monorepo root. It turns off
   `noImgElement` (a Next.js rule, meaningless in a Vite app) and allows the default export the
@@ -225,6 +276,14 @@ things about **this** page waste a run otherwise:
 - Retro look = gruvbox-material, matching the `sline` statusline palette. Colors are Tailwind
   theme tokens in `src/web/theme.css` (`text-orange`, `bg-bg-lift`, `text-gold`…) — no hex in
   components. Progress bars are `█`/`░` runs from `barRender`, not DOM elements.
+- **`@ui/kit` is wired in** — `components.json`, the `@ui/kit: workspace:*` dependency,
+  `lucide-react`, and `resolve.dedupe` in `vite.config.ts`. Import as `@ui/kit/components/button`;
+  the monorepo's kit rules in the root `CLAUDE.md` apply here now. `theme.css` maps the shadcn L2
+  token vocabulary onto the existing gruvbox `--p-*` palette, with `--radius: 0px` — a kit component
+  lands retro without per-component overrides, and the raw `--p-*` variables stay the only thing
+  redefined per theme.
+- `vite.config.ts` keeps `.trophy-*.json` and `.steam-*.json` out of the dev watcher: an admin save
+  writes those files locally and used to trigger a full page reload.
 - Chrome is unselectable: the `body` rule in `theme.css` sets `user-select: none`, and strings
   carrying a real name (game titles, trophy names and descriptions, group names) opt back in with
   Tailwind's `select-text`. Inputs are exempted in the same base layer. `::selection` is derived

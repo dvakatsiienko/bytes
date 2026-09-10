@@ -68,12 +68,13 @@ import { EffortLegend } from './components/chart-legend.tsx';
 import { KpiStrip } from './components/kpi-strip.tsx';
 import { SegmentedControl } from './components/segmented-control.tsx';
 import { hoursFormat } from './helpers/format.ts';
-import { useGames, useStats } from './hooks/queries.ts';
+import { useGames, useSettings, useStats } from './hooks/queries.ts';
 
 export const Stats = () => {
   const navigate = useNavigate();
   const games = useGames();
   const stats = useStats();
+  const settings = useSettings();
 
   const [focusMonth, setFocusMonth] = useState<string | null>(null);
   const [focusDay, setFocusDay] = useState<string | null>(null);
@@ -86,7 +87,12 @@ export const Stats = () => {
   const trophies = useMemo(() => archive?.trophies ?? [], [archive]);
   const remaining = useMemo(() => archive?.remaining ?? [], [archive]);
 
-  const points = useMemo(() => effortPoints(gameList), [gameList]);
+  const hideUntouched = settings.data?.effortHideUntouched ?? false;
+
+  const points = useMemo(
+    () => effortPoints(gameList, hideUntouched),
+    [gameList, hideUntouched],
+  );
   const hours = useMemo(
     () => circadianHours(trophies, gameList),
     [trophies, gameList],
@@ -215,7 +221,7 @@ export const Stats = () => {
     effort: (
       <ChartFrame
         name='effort'
-        note='hours played against completion · log scale · mark size is the trophy count'
+        note={effortNote(hideUntouched)}
         table={
           <ChartTable
             columns={EFFORT_COLUMNS}
@@ -497,6 +503,11 @@ const streakNote = (current: number) =>
   current
     ? `longest runs of days with a trophy · you are ${current} day${current === 1 ? '' : 's'} into one right now`
     : 'longest runs of consecutive days with a trophy · no run is live today';
+
+const effortNote = (hideUntouched: boolean) =>
+  `hours played against completion · log scale · mark size is the trophy count${
+    hideUntouched ? ' · titles with no trophy earned are hidden' : ''
+  }`;
 
 const EFFORT_COLUMNS: ChartColumn<EffortPoint>[] = [
   { cell: (point) => point.name, head: 'title' },

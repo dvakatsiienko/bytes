@@ -1,7 +1,27 @@
+import type { Settings } from '../shared/types.ts';
+import {
+  ADMIN_COOKIE,
+  adminConfig,
+  clearCookie,
+  cookieRead,
+  gamesView,
+  hiddenSet,
+  loginAttempt,
+  npssoSet,
+  sessionCookie,
+  sessionVerify,
+} from './admin.ts';
 import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
-import { gameDetailFetch, gamesFetch, profileFetch } from './psn.ts';
-import { isStateWritable, stateBackend } from './state.ts';
+import { gameDetailFetch, profileFetch } from './psn.ts';
+import {
+  hiddenLoad,
+  isStateWritable,
+  npssoStatusLoad,
+  settingsLoad,
+  settingsSave,
+  stateBackend,
+} from './state.ts';
 import { statsFetch, statsSync } from './stats.ts';
 
 const GAME_PATH = /^\/api\/games\/([\w-]+)$/;
@@ -33,21 +53,143 @@ export interface RouteResult {
   status: number;
 }
 
+/**
+ * The parts of the request the admin routes need beyond the path: the cookie
+ * and host headers, and the parsed JSON body.
+ */
+export interface RouteRequest {
+  body: unknown;
+  headers: Record<string, string | undefined>;
+}
+
+const UNWRITABLE = {
+  body: { error: 'no KV store linked — admin settings cannot persist here' },
+  status: 501,
+};
+
 export const routeResolve = async (
   url: URL,
   method: string,
+  request: RouteRequest = { body: null, headers: {} },
 ): Promise<RouteResult> => {
   const path = url.pathname;
   const ok = (body: unknown) => ({ body, status: 200 });
 
+  if (path.startsWith('/api/admin/')) {
+    const config = adminConfig();
+    if (!config)
+      return { body: { error: 'admin is not configured' }, status: 503 };
+
+    const host = request.headers.host ?? '';
+    const body = (request.body ?? {}) as Record<string, unknown>;
+    const authed = sessionVerify(
+      config,
+      cookieRead(request.headers.cookie, ADMIN_COOKIE),
+    );
+
+    if (path === '/api/admin/session') return ok({ authed });
+
+    if (path === '/api/admin/login' && method === 'POST') {
+      const attempt = loginAttempt(config, body.email, body.password);
+
+      if (attempt.kind === 'locked')
+        return {
+          body: {
+            error: `too many attempts — try again in ${attempt.retryAfterSeconds}s`,
+          },
+          headers: { 'retry-after': String(attempt.retryAfterSeconds) },
+          status: 429,
+        };
+
+      if (attempt.kind === 'rejected')
+        return { body: { error: 'bad credentials' }, status: 401 };
+
+      return {
+        body: { ok: true },
+        headers: { 'set-cookie': sessionCookie(config, host) },
+        status: 200,
+      };
+    }
+
+    if (path === '/api/admin/logout' && method === 'POST')
+      return {
+        body: { ok: true },
+        headers: { 'set-cookie': clearCookie(host) },
+        status: 200,
+      };
+
+    if (!authed) return { body: { error: 'not signed in' }, status: 401 };
+
+    if (path === '/api/admin/token' && method === 'GET')
+      return ok(await npssoStatusLoad());
+
+    if (path === '/api/admin/hidden' && method === 'GET')
+      return ok({ ids: await hiddenLoad() });
+
+    if (path === '/api/admin/hidden' && method === 'POST') {
+      if (!isStateWritable) return UNWRITABLE;
+
+      const ids = await hiddenSet(body.ids);
+      if (!ids)
+        return {
+          body: { error: 'ids must be an array of strings' },
+          status: 400,
+        };
+
+      // The library answers are memoised, and the hidden set is what they were
+      // filtered by.
+      cacheClear();
+      return ok({ ids });
+    }
+
+    if (path === '/api/admin/settings' && method === 'POST') {
+      if (!isStateWritable) return UNWRITABLE;
+
+      if (typeof body.effortHideUntouched !== 'boolean')
+        return {
+          body: { error: 'effortHideUntouched must be a boolean' },
+          status: 400,
+        };
+
+      const settings: Settings = {
+        effortHideUntouched: body.effortHideUntouched,
+      };
+      await settingsSave(settings);
+      cacheClear();
+      return ok(settings);
+    }
+
+    if (path === '/api/admin/npsso' && method === 'POST') {
+      if (!isStateWritable) return UNWRITABLE;
+
+      if (!(await npssoSet(body.npsso)))
+        return {
+          body: { error: 'npsso must be a 64-character token' },
+          status: 400,
+        };
+
+      cacheClear();
+      return ok({ ok: true });
+    }
+
+    return { body: { error: 'not found' }, status: 404 };
+  }
+
   if (path === '/api/health') return ok({ ok: true, stateBackend });
+  // Read without the cookie: the charts need these, and nothing here is a
+  // secret — the write side is what the admin session guards.
+  if (path === '/api/settings')
+    return ok(await cached('settings', settingsLoad));
+
   if (path === '/api/profile') return ok(await cached('profile', profileFetch));
   if (path === '/api/news')
     return ok(await cached('news', () => newsFetch({ commit: false })));
 
   if (path === '/api/games') {
     const limit = limitParse(url.searchParams.get('limit'));
-    return ok(await cached(`games:${limit}`, () => gamesFetch(limit)));
+    const all = url.searchParams.get('all') === '1';
+    const key = all ? `games:all:${limit}` : `games:${limit}`;
+    return ok(await cached(key, () => gamesView(limit, all)));
   }
 
   if (path === '/api/stats') {

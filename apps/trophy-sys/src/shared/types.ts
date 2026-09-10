@@ -33,6 +33,8 @@ export type GameSource = 'psn' | 'psn-purchased' | 'steam';
 export interface Game {
   defined: TrophyCounts;
   earned: TrophyCounts;
+  /** Only set by `GET /api/games?all=1`, which the admin screen reads. */
+  hidden?: boolean;
   iconUrl: string;
   id: string;
   /** When trophy data last changed — not when the game was last played. */
@@ -248,3 +250,31 @@ export const NPSSO_INVALID = 'NPSSO_INVALID';
 
 /** Where a fresh NPSSO code is minted, while signed in to PSN. */
 export const NPSSO_URL = 'https://ca.account.sony.com/api/v1/ssocookie';
+
+/**
+ * Display choices the owner makes in the admin page. Read publicly — the charts
+ * need them — but written only behind the admin cookie.
+ */
+export interface Settings {
+  /**
+   * The effort chart drops titles with no earned trophy. 258 titles include
+   * every game bought and never opened, and each one lands on the same 0%
+   * gridline, so the plot reads as a bar rather than a scatter.
+   */
+  effortHideUntouched: boolean;
+}
+
+export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: false };
+
+/**
+ * What the admin page shows about the live NPSSO. Never carries the token.
+ */
+export interface NpssoStatus {
+  /** When PSN first refused it, or null while it still works. */
+  diedAt: number | null;
+  /** Measured lifetimes in ms, oldest first — one per token that has died. */
+  lifetimes: number[];
+  /** Null for a token that came from the env var, or predates the measuring. */
+  savedAt: number | null;
+  source: 'env' | 'none' | 'store';
+}

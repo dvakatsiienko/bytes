@@ -18,7 +18,10 @@
         "KV_REST_API_TOKEN",
         "STEAM_API_KEY",
         "STEAM_ID64",
-        "VERCEL"
+        "VERCEL",
+        "ADMIN_EMAIL",
+        "ADMIN_PASSWORD",
+        "ADMIN_SECRET"
       ]
     }
   }

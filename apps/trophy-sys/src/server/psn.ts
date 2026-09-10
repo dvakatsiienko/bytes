@@ -34,6 +34,7 @@ import {
   playtimeMatch,
 } from './playtime.ts';
 import { type PurchasedTitle, purchasedFetch } from './purchased.ts';
+import { npssoDeathRecord, npssoLoad } from './state.ts';
 
 /**
  * PSN sends these for PS5 titles that count towards a target, but psn-api's
@@ -55,11 +56,16 @@ interface Session {
 
 let session: Session | null = null;
 
-const npssoRead = () => {
-  const npsso = process.env.NPSSO;
+/**
+ * A token pasted through the admin page wins over the env var: it is the newer
+ * of the two by definition, and renewing an expired NPSSO must not need a
+ * redeploy.
+ */
+const npssoRead = async () => {
+  const npsso = (await npssoLoad()) ?? process.env.NPSSO;
   if (!npsso)
     throw new Error(
-      'NPSSO missing — set it in .env locally, or as a Vercel env var in production',
+      'NPSSO missing — paste one on the admin page, set it in .env locally, or as a Vercel env var in production',
     );
   return npsso;
 };
@@ -67,11 +73,19 @@ const npssoRead = () => {
 const tokensMint = async () => {
   try {
     return await exchangeAccessCodeForAuthTokens(
-      await exchangeNpssoForAccessCode(npssoRead()),
+      await exchangeNpssoForAccessCode(await npssoRead()),
     );
   } catch (cause) {
+    // Stamps the death once, so the next token's age can be compared against a
+    // real observed lifetime rather than folklore.
+    await npssoDeathRecord();
     throw new Error(NPSSO_INVALID, { cause });
   }
+};
+
+/** Drops the cached session so the next call re-mints from the stored NPSSO. */
+export const sessionReset = () => {
+  session = null;
 };
 
 export const authGet = async (): Promise<AuthorizationPayload> => {
@@ -135,7 +149,7 @@ const NO_TROPHIES: TrophyCounts = {
  * twice. A cross-gen title owned on PS5 and with trophies only on PS4 is one
  * game either way, so the bare name is also the more truthful key.
  */
-const unplayedBuild = (
+export const unplayedBuild = (
   purchased: PurchasedTitle[],
   withTrophies: Game[],
   played: PlayIndex,
@@ -231,7 +245,7 @@ export const gamesFetch = async (limit = 800): Promise<Game[]> => {
 };
 
 export const gameDetailFetch = async (gameId: string): Promise<GameDetail> => {
-  const games = await cached('games:800', () => gamesFetch(800));
+  const games = await cached('games:raw:800', () => gamesFetch(800));
   const game = games.find((candidate) => candidate.id === gameId);
   if (!game) throw new Error(`unknown game ${gameId}`);
 

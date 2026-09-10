@@ -206,8 +206,15 @@ const Plot = (props: PlotProps) => {
 /**
  * A title with no matched playtime has no place on an hours axis, and a log
  * scale cannot hold a zero, so both are dropped rather than parked at 1.
+ *
+ * `hideUntouched` drops the rest of the dead weight: a title with no trophy
+ * earned sits on the 0% gridline, and the never-opened half of a 258-title
+ * library turns the scatter into a bar. It is the owner's switch, in /admin.
  */
-export const effortPoints = (games: Game[]): EffortPoint[] =>
+export const effortPoints = (
+  games: Game[],
+  hideUntouched: boolean,
+): EffortPoint[] =>
   games
     .filter((game) => (game.playSeconds ?? 0) > 0)
     .map((game) => {
@@ -226,6 +233,7 @@ export const effortPoints = (games: Game[]): EffortPoint[] =>
         trophies: countTotal(game.defined),
       };
     })
+    .filter((point) => !hideUntouched || point.earned > 0)
     // Big dots drawn first, so a small one is never buried under a large one.
     .sort((a, b) => b.trophies - a.trophies);
 

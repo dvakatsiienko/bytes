@@ -1,13 +1,23 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Redis } from '@upstash/redis';
 
-import type { TrophyArchive } from '../shared/types.ts';
+import type { NpssoStatus, Settings, TrophyArchive } from '../shared/types.ts';
+import { SETTINGS_DEFAULT } from '../shared/types.ts';
 
 const STATE_FILE = new URL('../../.trophy-state.json', import.meta.url);
 const STATE_KEY = 'trophy-sys:baseline';
 
 const STATS_FILE = new URL('../../.trophy-stats.json', import.meta.url);
 const STATS_KEY = 'trophy-sys:stats';
+
+const HIDDEN_FILE = new URL('../../.trophy-hidden.json', import.meta.url);
+const HIDDEN_KEY = 'trophy-sys:hidden';
+
+const NPSSO_FILE = new URL('../../.trophy-npsso.json', import.meta.url);
+const NPSSO_KEY = 'trophy-sys:npsso';
+
+const SETTINGS_FILE = new URL('../../.trophy-settings.json', import.meta.url);
+const SETTINGS_KEY = 'trophy-sys:settings';
 
 const STEAM_NAMES_FILE = new URL('../../.steam-names.json', import.meta.url);
 const STEAM_NAMES_KEY = 'trophy-sys:steam-names';
@@ -133,6 +143,109 @@ export const statsLoad = () => storeRead<TrophyArchive>(STATS_KEY, STATS_FILE);
 
 export const statsSave = (archive: TrophyArchive) =>
   storeWrite(STATS_KEY, STATS_FILE, archive);
+
+/**
+ * The ids the owner has hidden from the public library. Its own key: a
+ * snapshot, a stats sync or a baseline write must never disturb it.
+ */
+export const hiddenLoad = async (): Promise<string[]> =>
+  (await storeRead<string[]>(HIDDEN_KEY, HIDDEN_FILE)) ?? [];
+
+export const hiddenSave = (ids: string[]) =>
+  storeWrite(HIDDEN_KEY, HIDDEN_FILE, ids);
+
+/**
+ * The NPSSO pasted through the admin page, which outranks the env var — the
+ * token expires and a redeploy is a poor way to renew it.
+ *
+ * Stored as a record rather than a bare string so the app can measure how long
+ * a token actually lasts. Sony publishes no lifetime; the one figure this repo
+ * has is an upper bound of 25 days, from a token set 2026-08-16 and found dead
+ * 2026-09-10. Each renewal adds a real sample.
+ */
+interface NpssoRecord {
+  /** When PSN first rejected it. Null while the token still works. */
+  diedAt: number | null;
+  /** Observed lifetimes in ms, oldest first — one per token that has died. */
+  lifetimes: number[];
+  savedAt: number;
+  token: string;
+}
+
+/** Tolerates the bare string written before the record shape existed. */
+const npssoRecordLoad = async (): Promise<NpssoRecord | null> => {
+  const stored = await storeRead<NpssoRecord | string>(NPSSO_KEY, NPSSO_FILE);
+  if (!stored) return null;
+  if (typeof stored === 'string')
+    return { diedAt: null, lifetimes: [], savedAt: 0, token: stored };
+
+  return stored;
+};
+
+export const npssoLoad = async () => (await npssoRecordLoad())?.token ?? null;
+
+export const npssoSave = async (npsso: string) => {
+  const previous = await npssoRecordLoad();
+
+  // A replaced token that had already died contributes its measured lifetime.
+  // A replaced token still alive contributes nothing: it was retired early, so
+  // its age is a floor, not a lifetime, and mixing the two poisons the average.
+  const lifetimes = [...(previous?.lifetimes ?? [])];
+  if (previous?.savedAt && previous.diedAt)
+    lifetimes.push(previous.diedAt - previous.savedAt);
+
+  await storeWrite(NPSSO_KEY, NPSSO_FILE, {
+    diedAt: null,
+    lifetimes,
+    savedAt: Date.now(),
+    token: npsso,
+  } satisfies NpssoRecord);
+};
+
+/**
+ * Stamps the moment PSN first refused the stored token. Idempotent: every
+ * failing call reaches this, and only the first one records anything.
+ */
+export const npssoDeathRecord = async () => {
+  const record = await npssoRecordLoad();
+  if (!record || record.diedAt) return;
+
+  await storeWrite(NPSSO_KEY, NPSSO_FILE, {
+    ...record,
+    diedAt: Date.now(),
+  } satisfies NpssoRecord);
+};
+
+export const npssoStatusLoad = async (): Promise<NpssoStatus> => {
+  const record = await npssoRecordLoad();
+  if (!record)
+    return {
+      diedAt: null,
+      lifetimes: [],
+      savedAt: null,
+      source: process.env.NPSSO ? 'env' : 'none',
+    };
+
+  return {
+    diedAt: record.diedAt,
+    lifetimes: record.lifetimes,
+    // 0 is the bare-string record: a token from before this was measured.
+    savedAt: record.savedAt || null,
+    source: 'store',
+  };
+};
+
+/**
+ * Spread over the defaults rather than returned raw, so a setting added later
+ * reads as its default against a store written before it existed.
+ */
+export const settingsLoad = async (): Promise<Settings> => ({
+  ...SETTINGS_DEFAULT,
+  ...(await storeRead<Partial<Settings>>(SETTINGS_KEY, SETTINGS_FILE)),
+});
+
+export const settingsSave = (settings: Settings) =>
+  storeWrite(SETTINGS_KEY, SETTINGS_FILE, settings);
 
 /** appid → store name. */
 export type SteamNames = Record<string, string>;

@@ -7,7 +7,7 @@ import type {
 import { cached } from './cache.ts';
 import type { TrophySet } from './psn.ts';
 import { gamesFetch, trophiesFetch } from './psn.ts';
-import { isAutoWriteSafe, statsLoad, statsSave } from './state.ts';
+import { hiddenLoad, isAutoWriteSafe, statsLoad, statsSave } from './state.ts';
 
 /** PSN is rate-limited, so this many titles are read at once and no more. */
 const LANES = 5;
@@ -121,6 +121,48 @@ export interface ArchiveRead {
 }
 
 /**
+ * The archive minus the titles the owner hid, applied on the way out and never
+ * on the way in.
+ *
+ * Hidden is a display decision, so the stored archive stays whole: hiding is
+ * then one write to its own key and the next read is already correct, where
+ * baking the set into the archive would make every unhide cost a full rescan of
+ * a title whose rows we still hold.
+ *
+ * All four fields move together. Dropping the rows while leaving `games` alone
+ * is the worse failure of the two, because the charts and the KPI strip would
+ * disagree and the page would look repaired.
+ */
+const archiveVisible = (
+  archive: TrophyArchive,
+  hidden: Set<string>,
+): TrophyArchive => {
+  if (hidden.size === 0) return archive;
+
+  const trophies: ArchivedTrophy[] = [];
+  // Counted from the rows rather than from the hidden set: an id the owner hid
+  // that this archive never held must not subtract from the total.
+  const dropped = new Set<string>();
+
+  for (const row of archive.trophies) {
+    if (hidden.has(row.gameId)) dropped.add(row.gameId);
+    else trophies.push(row);
+  }
+
+  return {
+    ...archive,
+    // `${id}: ${reason}` — a failed title was never counted in `games`, so this
+    // only keeps the error list from naming something the page cannot show.
+    failed: archive.failed.filter(
+      (entry) => !hidden.has(entry.slice(0, entry.indexOf(':'))),
+    ),
+    games: archive.games - dropped.size,
+    remaining: archive.remaining.filter((row) => !hidden.has(row.gameId)),
+    trophies,
+  };
+};
+
+/**
  * What every read of the archive gets: what is stored, brought up to date
  * cheaply.
  *
@@ -130,20 +172,24 @@ export interface ArchiveRead {
  * without paying for the full fan-out.
  */
 export const statsFetch = async (): Promise<ArchiveRead> => {
-  const stored = await statsLoad();
+  const [stored, hidden] = await Promise.all([statsLoad(), hiddenLoad()]);
   const archive = stored?.version === ARCHIVE_VERSION ? stored : EMPTY;
 
   // No refresh while a full scan is mid-flight: that scan is about to replace
   // every row, and its answer has to be the one kept.
-  if (scanInFlight) return { archive, refresh: 'none' };
-
+  //
   // A read serves the archive even when PSN does not answer. Failing the whole
   // route because the cheap refresh could not run would make /log worse than it
   // was before the refresh existed.
-  return deltaSync(archive).catch(() => ({
-    archive,
-    refresh: 'none' as const,
-  }));
+  const read = scanInFlight
+    ? { archive, refresh: 'none' as const }
+    : await deltaSync(archive).catch(() => ({
+        archive,
+        refresh: 'none' as const,
+      }));
+
+  // Last, so the delta still compares against — and stores — the whole archive.
+  return { ...read, archive: archiveVisible(read.archive, new Set(hidden)) };
 };
 
 /**
@@ -161,7 +207,7 @@ export const statsFetch = async (): Promise<ArchiveRead> => {
  * same second the shorter string sorts *after* the longer one.
  */
 const deltaRun = async (archive: TrophyArchive): Promise<ArchiveRead> => {
-  const library = await cached('games:800', () => gamesFetch(800));
+  const library = await cached('games:raw:800', () => gamesFetch(800));
 
   /**
    * An archive that is missing, empty, or version-mismatched arrives here as
@@ -338,7 +384,7 @@ const deltaSync = (archive: TrophyArchive): Promise<ArchiveRead> => {
  * chart.
  */
 const scanRun = async (): Promise<TrophyArchive> => {
-  const library = await cached('games:800', () => gamesFetch(800));
+  const library = await cached('games:raw:800', () => gamesFetch(800));
   const games = library.filter((game) => earnedCount(game) > 0);
 
   const trophies: ArchivedTrophy[] = [];
@@ -392,10 +438,13 @@ const scanRun = async (): Promise<TrophyArchive> => {
  */
 let scanInFlight: Promise<TrophyArchive> | null = null;
 
-export const statsSync = (): Promise<TrophyArchive> => {
+export const statsSync = async (): Promise<TrophyArchive> => {
   scanInFlight ??= scanRun().finally(() => {
     scanInFlight = null;
   });
 
-  return scanInFlight;
+  // The scan saves the whole archive and answers the visible view of it, so the
+  // rescan button and the next `/api/stats` read cannot report different totals.
+  const [archive, hidden] = await Promise.all([scanInFlight, hiddenLoad()]);
+  return archiveVisible(archive, new Set(hidden));
 };
