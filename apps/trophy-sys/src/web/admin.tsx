@@ -201,16 +201,8 @@ const NpssoForm = () => {
     <form className='panel flex flex-col gap-3 p-5' onSubmit={submit}>
       <p className='panel-title'>psn token</p>
 
-      <TokenReadout />
-
-      {/* The header carries this link too, but only while PSN is already
-          refusing — and this is the panel where the paste happens. */}
-      <p className='text-[12px] text-dim leading-relaxed'>
-        need a fresh one?{' '}
-        <LinkOut href={NPSSO_URL}>get a new NPSSO code</LinkOut> — sign in to
-        PSN first, then copy the {NPSSO_LENGTH} characters the page prints.
-      </p>
-
+      {/* The paste box leads the panel: it is the one thing this panel exists
+          to do, and everything under it explains or measures that one act. */}
       <Field
         autoComplete='off'
         id='admin-npsso'
@@ -239,6 +231,16 @@ const NpssoForm = () => {
         type='submit'>
         {save.isPending ? 'saving…' : 'save token'}
       </CommandButton>
+
+      {/* The header carries this link too, but only while PSN is already
+          refusing — and this is the panel where the paste happens. */}
+      <p className='text-[12px] text-dim leading-relaxed'>
+        need a fresh one?{' '}
+        <LinkOut href={NPSSO_URL}>get a new NPSSO code</LinkOut> — sign in to
+        PSN first, then copy the {NPSSO_LENGTH} characters the page prints.
+      </p>
+
+      <TokenReadout />
     </form>
   );
 };
