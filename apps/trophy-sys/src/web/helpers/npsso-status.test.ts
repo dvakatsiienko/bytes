@@ -28,28 +28,39 @@ const rowValue = (status: NpssoStatus, label: string) =>
 
 test('the readout names which of the two sources is live', () => {
   assert.equal(
-    rowValue(statusMake({ source: 'store' }), 'source'),
-    'pasted (kv)',
+    rowValue(statusMake({ source: 'store' }), 'token in use'),
+    'the one pasted here',
   );
   assert.equal(
-    rowValue(statusMake({ source: 'env' }), 'source'),
-    'env var (deploy-time)',
+    rowValue(statusMake({ source: 'env' }), 'token in use'),
+    'the vercel env var',
   );
   assert.equal(
-    rowValue(statusMake({ source: 'none' }), 'source'),
+    rowValue(statusMake({ source: 'none' }), 'token in use'),
     'nothing stored',
   );
 });
 
-test('the env var row answers whether vercel has gone stale', () => {
-  assert.equal(rowValue(statusMake({ envMatch: 'same' }), 'env var'), 'same');
+test('the vercel row answers whether that token has gone stale', () => {
   assert.equal(
-    rowValue(statusMake({ envMatch: 'different' }), 'env var'),
-    'different',
+    rowValue(statusMake({ envMatch: 'same' }), 'vercel env var'),
+    'the same token',
   );
   assert.equal(
-    rowValue(statusMake({ envMatch: 'none' }), 'env var'),
+    rowValue(statusMake({ envMatch: 'different' }), 'vercel env var'),
+    'a different token',
+  );
+  assert.equal(
+    rowValue(statusMake({ envMatch: 'none' }), 'vercel env var'),
     'not set',
+  );
+});
+
+test('with nothing pasted there is no comparison to print', () => {
+  assert.equal(
+    rowValue(statusMake({ envMatch: 'same', source: 'env' }), 'vercel env var'),
+    undefined,
+    '«the same token» against nothing pasted is a sentence about nothing',
   );
 });
 
@@ -68,7 +79,7 @@ test('«running on» appears only when it disagrees with the source', () => {
   );
   assert.equal(
     rowValue(statusMake({ liveSource: 'env', source: 'store' }), 'running on'),
-    'env var (deploy-time)',
+    'the vercel env var',
   );
 });
 
@@ -78,7 +89,9 @@ test('a pasted token the app is not using explains itself', () => {
   );
 
   assert.ok(
-    readout.notes.some((note) => note.includes('refused the pasted token')),
+    readout.notes.some((note) =>
+      note.includes('refused the token pasted here'),
+    ),
     'the fallback having kicked in is the one state the rows alone understate',
   );
 });

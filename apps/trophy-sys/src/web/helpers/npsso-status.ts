@@ -15,18 +15,20 @@ export const readoutBuild = (status: NpssoStatus) => {
   // First row, because it decides whether the paste box below can replace the
   // live token at all — an env var is only replaceable in the Vercel dashboard.
   rows.push({
-    label: 'source',
+    label: 'token in use',
     tone: SOURCE_TONE[status.source],
     value: SOURCE_LABEL[status.source],
   });
 
-  // Second, because it is the answer to «is the vercel var stale» — the whole
-  // reason the source row is not enough on its own.
-  rows.push({
-    label: 'env var',
-    tone: ENV_TONE[status.envMatch],
-    value: ENV_LABEL[status.envMatch],
-  });
+  // Only with something pasted to compare against. With the env var already in
+  // use it is the row above wearing a second name, and «same as pasted» when
+  // nothing is pasted is a sentence about nothing.
+  if (status.source === 'store')
+    rows.push({
+      label: 'vercel env var',
+      tone: ENV_TONE[status.envMatch],
+      value: ENV_LABEL[status.envMatch],
+    });
 
   // Only when it disagrees with `source`: on every other read it would repeat
   // the row above, and a row that only ever agrees stops being read.
@@ -39,7 +41,7 @@ export const readoutBuild = (status: NpssoStatus) => {
 
   if (status.liveSource === 'env' && status.source === 'store')
     notes.push(
-      'psn refused the pasted token and the env var worked, so the app is running on the env var. clearing the pasted one makes that the source properly.',
+      'psn refused the token pasted here, and the one on vercel worked — so that is what the app is running on. switching to it below makes it the real setting.',
     );
 
   rows.push(
@@ -108,10 +110,15 @@ export const readoutBuild = (status: NpssoStatus) => {
   return { dead, notes, rows };
 };
 
+/**
+ * Plain words, not the storage layer. «pasted (kv)» named the mechanism and
+ * left the reader to work out what it meant for them; these name the thing the
+ * owner recognises — where the token came from.
+ */
 const SOURCE_LABEL = {
-  env: 'env var (deploy-time)',
+  env: 'the vercel env var',
   none: 'nothing stored',
-  store: 'pasted (kv)',
+  store: 'the one pasted here',
 } as const satisfies Record<NpssoStatus['source'], string>;
 
 /** Yellow for the env var: it works, and it cannot be replaced from this page. */
@@ -122,9 +129,9 @@ const SOURCE_TONE = {
 } as const satisfies Record<NpssoStatus['source'], string>;
 
 const ENV_LABEL = {
-  different: 'different',
+  different: 'a different token',
   none: 'not set',
-  same: 'same',
+  same: 'the same token',
 } as const satisfies Record<NpssoStatus['envMatch'], string>;
 
 /**
