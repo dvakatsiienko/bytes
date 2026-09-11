@@ -20,7 +20,9 @@ export default defineConfig({
       instances: [{ browser: 'chromium' }],
       provider: playwright(),
     },
-    include: ['src/**/*.test.tsx'],
+    // `.ts` as well as `.tsx`: `src/lib` and `src/hooks` are plain TypeScript,
+    // and a `.tsx`-only glob would skip a test there without saying so.
+    include: ['src/**/*.test.{ts,tsx}'],
     setupFiles: ['./vitest.setup.ts'],
   },
 });

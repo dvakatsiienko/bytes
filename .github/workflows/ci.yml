@@ -135,9 +135,10 @@ jobs:
           pnpm exec playwright
           ${{ steps.playwright-cache.outputs.cache-hit == 'true' && 'install-deps chromium' || 'install --with-deps chromium' }}
 
-      # `financial`, `trophy-sys` and `@ui/kit` define a `test` script today;
-      # turbo skips every package that does not, so this stays green as more
-      # arrive.
+      # Turbo skips every package without a `test` script, so this stays green
+      # as more arrive. The list of which packages have one lives in neither
+      # place on purpose — it was named here, went stale, and the copy in
+      # turbo.jsonc drifted with it.
       - name: Test
         run: pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 

@@ -76,10 +76,11 @@
 
     "lint": { "dependsOn": ["transit"] },
 
-    // Only `financial` and `trophy-sys` have a `test` script; turbo skips the
-    // packages that do not, so this task covers the whole graph either way.
-    // Both suites are `vitest run` over source, so they need the generated
-    // Prisma client but never a build.
+    // Turbo skips every package without a `test` script, so this task covers
+    // the whole graph whoever has one. Deliberately not listing them: the same
+    // sentence in ci.yml named two packages and went stale the day a third
+    // arrived. Every suite is `vitest run` over source, so they need the
+    // generated Prisma client but never a build.
     //
     // This is the CI lane: one cacheable task per package. The root
     // `pnpm test` is the other door — a single vitest run over every project,

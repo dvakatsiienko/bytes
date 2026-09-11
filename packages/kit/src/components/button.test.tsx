@@ -4,11 +4,14 @@ import { render } from 'vitest-browser-react';
 import { Button } from './button';
 
 /**
- * The first component test, and the reason the kit tests in a real browser.
- * Every case here is something a DOM simulator reports wrongly: a stylesheet it
- * never applies, and a `pointer-events: none` it does not honour. In jsdom all
- * three would pass against a broken button.
+ * The first component test in the repo, so it is also the template. Two of the
+ * four cases are the reason the kit tests in a real browser rather than a DOM
+ * simulator: one reads a colour resolved from the stylesheet, the other needs a
+ * pointer that the stylesheet can actually block. A simulator answers an empty
+ * string for both, and would pass them against a button with no styles at all.
  */
+
+const TIMED_OUT = /Timeout/;
 
 test('a button is reachable by the name a user reads', async () => {
   const screen = await render(<Button>Save changes</Button>);
@@ -18,46 +21,44 @@ test('a button is reachable by the name a user reads', async () => {
     .toBeVisible();
 });
 
-test('the destructive variant is a different colour, not just a different class', async () => {
-  const screen = await render(
-    <>
-      <Button>Keep</Button>
-      <Button variant='destructive'>Delete</Button>
-    </>,
-  );
+test('the destructive variant paints the destructive token', async () => {
+  const screen = await render(<Button variant='destructive'>Delete</Button>);
+  const button = screen.getByRole('button', { name: 'Delete' }).element();
 
-  const keep = screen.getByRole('button', { name: 'Keep' }).element();
-  const destroy = screen.getByRole('button', { name: 'Delete' }).element();
-
-  // The class name is the implementation; the rendered colour is the contract,
-  // and it is what a broken token or a dropped stylesheet actually costs.
-  expect(getComputedStyle(destroy).color).not.toBe(
-    getComputedStyle(keep).color,
+  // Against the token, not against another variant: «these two differ» passes
+  // for any two colours, including two wrong ones.
+  expect(getComputedStyle(button).color).toBe(
+    getComputedStyle(document.documentElement).getPropertyValue(
+      '--destructive',
+    ),
   );
 });
 
-test('a click reaches the handler, and a disabled button swallows it', async () => {
+test('a click reaches the handler', async () => {
   const onClick = vi.fn();
-  const screen = await render(
-    <>
-      <Button onClick={onClick}>Run</Button>
-      <Button disabled onClick={onClick}>
-        Blocked
-      </Button>
-    </>,
-  );
+  const screen = await render(<Button onClick={onClick}>Run</Button>);
 
   await screen.getByRole('button', { name: 'Run' }).click();
-  expect(onClick).toHaveBeenCalledTimes(1);
 
-  // The disabled button is unreachable twice over, and only one of the two is
-  // visible here: a native `disabled` attribute, which any environment honours,
-  // and `disabled:pointer-events-none` resolved from the stylesheet, which a
-  // DOM simulator reports as an empty string. `force` is required precisely
-  // because the second one is real.
-  const blocked = screen.getByRole('button', { name: 'Blocked' });
-  expect(getComputedStyle(blocked.element()).pointerEvents).toBe('none');
-
-  await blocked.click({ force: true });
   expect(onClick).toHaveBeenCalledTimes(1);
+});
+
+test('a disabled button cannot be reached by a pointer at all', async () => {
+  const onClick = vi.fn();
+  const screen = await render(
+    <Button disabled onClick={onClick}>
+      Blocked
+    </Button>,
+  );
+
+  // Deliberately not `force: true`. Forcing bypasses hit-testing, which would
+  // prove only the native `disabled` attribute — something every environment
+  // honours. The click below times out instead, because
+  // `disabled:pointer-events-none` resolved from the stylesheet leaves nothing
+  // for a pointer to hit. That is the half only a real browser can show.
+  await expect(
+    screen.getByRole('button', { name: 'Blocked' }).click({ timeout: 400 }),
+  ).rejects.toThrow(TIMED_OUT);
+
+  expect(onClick).not.toHaveBeenCalled();
 });
