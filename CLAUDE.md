@@ -72,30 +72,36 @@ Why it is written down: `trophy-sys` was first built with search-param routing a
 after review. That cost the router, every component reading the params, and the rewrite rule that
 makes deep links load. The rule is cheap; the correction is not.
 
-### Dev dependencies live at the root
+### The shared toolchain lives at the root
 
-**A tool goes into the root `package.json`. An app's manifest lists only what its own code
-imports at runtime, and what a filtered deploy must see.** The sweep is done, not aspirational:
-`@types/*`, vite and its plugins, tailwind and postcss, prisma, tsx, codegen, the test runner and
-the linters all live at the root, one version each. The root manifest is the list — this file does
-not keep a copy of it to go stale.
+**The root `package.json` holds the toolchain every package shares. A tool a subset of apps chose
+stays in those apps — one version, held by the shape test.** An app's manifest lists that, plus
+what its own code imports at runtime and what a filtered deploy must see.
 
-A new tool starts at the root. It only earns a place in an app manifest by being imported by that
-app's own runtime code.
+Root: `typescript`, `vitest`, biome, `@types/*`, `tailwindcss`, `postcss`,
+`@tailwindcss/postcss`, `tsx`, `rimraf`, `prettier`, `npm-run-all2`, turbo, lefthook, playwright.
+Per app: `vite` and its plugins, `@tailwindcss/{vite,typography,forms}`, `tailwind-scrollbar`,
+`tw-animate-css`, `prisma`, `@graphql-codegen/cli`, `babel-plugin-react-compiler`. The manifests
+are the list — this file does not keep a copy of one to go stale.
 
-Why it works: `pnpm run` puts the root `node_modules/.bin` on PATH for every package, and node's
-module walk from `apps/x` reaches the root `node_modules`. A filtered install
-(`pnpm i -F 'cv...'`, vercel's command) still installs the root manifest's devDeps — measured in a
-clean clone on BYT-91: after `pnpm i -F 'cv...'` and `pnpm i -F '@space-explorer/ui...'`, the root
-`.bin` carried `tsc`, `vite`, `run-p` and `run-s`, and `tailwindcss`, `@tailwindcss/postcss` and
-`vite` all resolved from the app directory. One version per tool, one renovate PR per bump, no
-per-app drift — Dima's preference over per-app pinning.
+📌 Why not everything at the root, which is where BYT-91 first put it: **a root bump moves 32 of
+32 task hashes** — measured on a real `prettier` 3.9.6 → 3.9.5, `prisma:generate` included despite
+its hand-narrowed `inputs` — and rebuilds and redeploys every app. A tool three apps use, parked
+at the root, taxes the other five on every one of its bumps. `vite` at the root makes a vite bump
+redeploy four Next apps that never load it.
 
-📌 The trade, measured rather than assumed: a root devDependency bump busts **every** task hash in
-the graph — 32 of 32 on a real `prettier` 3.9.6 → 3.9.5 bump, `prisma:generate` included despite
-its hand-narrowed `inputs`. That is not new (`prettier` was root-only before the sweep) but it now
-applies to every hoisted tool: a `vite` bump used to move three packages and now moves all of
-them. The price of one version per tool is that renovate rebuilds the monorepo per bump.
+**The one-version guarantee no longer comes from there being one declaration.** It comes from
+`package-json-shape`, which fails when a name carries two pins anywhere in the workspace and says
+where each lives. That is what makes per-app placement safe: drift is caught at the commit rather
+than discovered at a bump. The hook narrows its REPORT to the manifests you staged, never its
+comparison.
+
+Why per-app placement still resolves: `pnpm run` puts the root `node_modules/.bin` on PATH for
+every package, and node's module walk from `apps/x` reaches the root `node_modules`. A filtered
+install (`pnpm i -F 'cv...'`, vercel's command) installs the root manifest's devDeps too —
+measured in a clean clone on BYT-91: after `pnpm i -F 'cv...'` and
+`pnpm i -F '@space-explorer/ui...'`, the root `.bin` carried `tsc`, `vite`, `run-p` and `run-s`,
+and `tailwindcss`, `@tailwindcss/postcss` and `vite` all resolved from the app directory.
 
 The exception: a tool that resolves its plugins from its own package location (eslint-style)
 fails in pnpm's strict store. The fix is a `public-hoist-pattern[]` line in `.npmrc`, never a
