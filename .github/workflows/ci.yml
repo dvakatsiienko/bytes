@@ -115,8 +115,44 @@ jobs:
       - name: Lint
         run: pnpm turbo run lint ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
-      # Only `financial` and `trophy-sys` define a `test` script today; turbo
-      # skips every package that does not, so this stays green as more arrive.
+      # `@ui/kit` tests in a real browser, so the runner needs chromium. The
+      # download is ~90 MB and the only part of this job that would be slow, so
+      # it is cached on the lockfile hash — the playwright version lives there,
+      # and a bump is exactly when a fresh browser is required.
+      - name: Cache playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          # Keyed on the ROOT MANIFEST, not the lockfile. `.npmrc` sets
+          # `save-exact`, so `playwright` is pinned literally there and the key
+          # moves when the browser version does. A lockfile key moves on every
+          # dependency change in the monorepo — and a primary-key miss is what
+          # makes this action SAVE, so each renovate PR wrote a fresh entry
+          # carrying the prefix-restored old builds plus the new one, growing
+          # both count and size against a shared 10 GB LRU.
+          key: playwright-${{ runner.os }}-${{ hashFiles('package.json') }}
+          # The net for the misses that remain. 📌 `cache-hit` stays false on a
+          # prefix restore — it means exact match only — so the step below still
+          # takes the `--with-deps` branch; playwright finds the binary present
+          # and skips the download. A real bump restores a stale copy, misses
+          # the version it needs, and fetches.
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      # `--with-deps` only on a miss: it installs system libraries, which the
+      # cache cannot carry. On a hit the browser binary is already restored and
+      # `install-deps` alone re-adds the libraries, which is seconds rather than
+      # a download.
+      - name: Install chromium
+        run: >-
+          pnpm exec playwright
+          ${{ steps.playwright-cache.outputs.cache-hit == 'true' && 'install-deps chromium' || 'install --with-deps chromium' }}
+
+      # Turbo skips every package without a `test` script, so this stays green
+      # as more arrive. The list of which packages have one lives in neither
+      # place on purpose — it was named here, went stale, and the copy in
+      # turbo.jsonc drifted with it.
       - name: Test
         run: pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
