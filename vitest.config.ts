@@ -14,8 +14,9 @@ import { defineConfig } from 'vitest/config';
  * test a second time (measured in dotfiles, 166 = 2 × 83). With `projects`
  * set, the root config collects no files itself and each project's include is
  * rooted at its own package, so nothing can reach a worktree. Verified here by
- * planting a worktree copy and running with and without the exclude: 63 tests
- * both ways. A future root-level project would bring the hazard back with it.
+ * planting a worktree copy and running with and without the exclude: the same
+ * 9 files either way, never 18. A future root-level project would bring the
+ * hazard back with it.
  */
 export default defineConfig({
   test: {
@@ -26,6 +27,11 @@ export default defineConfig({
       'apps/*/vitest.config.{ts,mts}',
       'packages/*/vitest.config.{ts,mts}',
     ],
-    reporters: process.env.CI ? ['default'] : ['tree'],
+    // Only the local run is overridden. Vitest's own default is
+    // `[agent ? 'minimal' : 'default', ...(GITHUB_ACTIONS ? ['github-actions'] : [])]`
+    // (see `reporters` in vitest/dist/chunks/defaults), so spelling out
+    // `['default']` under CI would suppress both the workflow annotations and
+    // the quieter reporter it picks for an agent.
+    ...(process.env.CI ? {} : { reporters: ['tree'] }),
   },
 });

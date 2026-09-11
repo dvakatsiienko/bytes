@@ -52,9 +52,7 @@ test('a seed token says why its age is unknown, without a row for it', () => {
     'the row said the same thing on every read once a token had been pasted',
   ).toBe(undefined);
   expect(rowValue(statusMake({ source: 'env' }), 'age')).toBe('unknown');
-  expect(
-    readout.notes.some((note) => note.includes('env var seed')),
-  ).toBeTruthy();
+  expect(readout.notes).toContainEqual(expect.stringContaining('env var seed'));
 });
 
 test('a token with no paste date reports an unknown age, never a zero', () => {
@@ -62,9 +60,9 @@ test('a token with no paste date reports an unknown age, never a zero', () => {
 
   expect(rowValue(statusMake({ source: 'env' }), 'age')).toBe('unknown');
   expect(
-    readout.notes.some((note) => note.includes('env var')),
+    readout.notes,
     'the env-var case has to say why the age is unknown',
-  ).toBeTruthy();
+  ).toContainEqual(expect.stringContaining('env var'));
 });
 
 test('an age is whole days since the paste', () => {
@@ -86,9 +84,7 @@ test('no measurement means no estimate at all', () => {
     readout.rows.find((row) => row.label === 'rough guess'),
     'an estimate with nothing measured is the exact failure this replaces',
   ).toBe(undefined);
-  expect(
-    readout.notes.some((note) => note.includes('no estimate')),
-  ).toBeTruthy();
+  expect(readout.notes).toContainEqual(expect.stringContaining('no estimate'));
 });
 
 test('one sample is named as one sample, and called a hint', () => {
@@ -96,13 +92,10 @@ test('one sample is named as one sample, and called a hint', () => {
     statusMake({ lifetimes: [25 * DAY_MS], savedAt: Date.now() - 10 * DAY_MS }),
   );
 
-  expect(
-    readout.notes.some((note) => note.includes('1 sample')),
-    'the sample count is never hidden',
-  ).toBeTruthy();
-  expect(
-    readout.notes.some((note) => note.includes('not a trend')),
-  ).toBeTruthy();
+  expect(readout.notes, 'the sample count is never hidden').toContainEqual(
+    expect.stringContaining('1 sample'),
+  );
+  expect(readout.notes).toContainEqual(expect.stringContaining('not a trend'));
 });
 
 test('the estimate uses the shortest lifetime seen, not the average', () => {
@@ -134,7 +127,7 @@ test('a dead token says so, and drops the countdown', () => {
   });
   const readout = readoutBuild(status);
 
-  expect(readout.dead?.includes('psn refused this token')).toBeTruthy();
+  expect(readout.dead).toContain('psn refused this token');
   expect(
     readout.rows.find((row) => row.label === 'rough guess'),
     'a token already dead has no days left to guess at',
@@ -152,9 +145,9 @@ test('no stored grant says so rather than printing a zero-day one', () => {
   const readout = readoutBuild(statusMake({ refresh: GRANT_NONE }));
 
   expect(rowValue(statusMake(), 'grant')).toBe('none');
-  expect(
-    readout.notes.some((note) => note.includes('no refresh grant')),
-  ).toBeTruthy();
+  expect(readout.notes).toContainEqual(
+    expect.stringContaining('no refresh grant'),
+  );
 });
 
 test('days left are floored — the row never promises time it may not have', () => {
@@ -199,9 +192,9 @@ test('a countdown grant runs its days down and never outlives the window', () =>
 
   expect(rowValue(status, 'grant')).toBe('day 9 · 0 days left');
   expect(
-    !readout.notes.some((note) => note.includes('still has days left')),
+    readout.notes,
     'a grant inside its window must never claim the clock was reset',
-  ).toBeTruthy();
+  ).not.toContainEqual(expect.stringContaining('still has days left'));
 });
 
 test('a grant past the window with days left is flagged as the finding', () => {
@@ -218,9 +211,9 @@ test('a grant past the window with days left is flagged as the finding', () => {
   expect(readout.rows.find((row) => row.label === 'grant')?.tone).toBe(
     'text-yellow',
   );
-  expect(
-    readout.notes.some((note) => note.includes('still has days left')),
-  ).toBeTruthy();
+  expect(readout.notes).toContainEqual(
+    expect.stringContaining('still has days left'),
+  );
 });
 
 test('the flag fires the day the window passes, not a day later', () => {
@@ -235,9 +228,9 @@ test('the flag fires the day the window passes, not a day later', () => {
   expect(readout.rows.find((row) => row.label === 'grant')?.tone).toBe(
     'text-yellow',
   );
-  expect(
-    readout.notes.some((note) => note.includes('still has days left')),
-  ).toBeTruthy();
+  expect(readout.notes).toContainEqual(
+    expect.stringContaining('still has days left'),
+  );
 });
 
 test('a grant inside its window to the second is not flagged', () => {
@@ -249,9 +242,9 @@ test('a grant inside its window to the second is not flagged', () => {
   expect(readout.rows.find((row) => row.label === 'grant')?.tone).toBe(
     'text-fg',
   );
-  expect(
-    !readout.notes.some((note) => note.includes('still has days left')),
-  ).toBeTruthy();
+  expect(readout.notes).not.toContainEqual(
+    expect.stringContaining('still has days left'),
+  );
 });
 
 test('an expired grant says so rather than printing negative days', () => {
@@ -272,14 +265,11 @@ test('a refused grant reports the shortest lifetime, and no claim beside it', ()
   const note = readout.notes.find((entry) =>
     entry.includes('refused a refresh'),
   );
+  expect(note, 'the shortest seen, never the average').toContain('7 days');
   expect(
-    note?.includes('7 days'),
-    'the shortest seen, never the average',
-  ).toBeTruthy();
-  expect(
-    !note?.includes('9 days'),
+    note,
     "the only expiresIn in hand belongs to the LIVE grant — quoting it here reads as the dead grant's own promise",
-  ).toBeTruthy();
+  ).not.toContain('9 days');
 });
 
 test('the grant adds exactly one row — this panel has been cut for growing', () => {

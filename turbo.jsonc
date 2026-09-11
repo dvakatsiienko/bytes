@@ -22,8 +22,13 @@
     // `transit` folds transit's hash into its own, so an exclusion declared
     // only on that task is inert — measured on `test`: its own inputs dropped
     // CLAUDE.md (80 vs 82), and editing CLAUDE.md still missed the cache,
-    // because transit had counted the file. Declared here, a docs-only edit
-    // leaves the whole transit-dependent side of the graph cached.
+    // because transit had counted the file.
+    //
+    // Declared here, the exclusion reaches every task that also declares it.
+    // Today that is `test` alone: measured on a CLAUDE.md edit, `test` replays
+    // from cache while `lint` and `typecheck` still miss, because their own
+    // inputs count the file. That is the correct reading of both — a doc
+    // cannot change a test result, and `lint` may one day lint the doc.
     "transit": {
       "dependsOn": ["^transit"],
       "inputs": [

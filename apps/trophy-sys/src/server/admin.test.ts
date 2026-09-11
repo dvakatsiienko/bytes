@@ -126,11 +126,9 @@ test('five wrong passwords lock the login, and the answer says for how long', ()
     ).toStrictEqual({ kind: 'rejected' });
 
   const locked = loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
-  expect(locked.kind).toBe('locked');
-  expect(locked.kind === 'locked' && locked.retryAfterSeconds > 0).toBeTruthy();
-  expect(
-    locked.kind === 'locked' && locked.retryAfterSeconds <= 60,
-  ).toBeTruthy();
+  assert.ok(locked.kind === 'locked');
+  expect(locked.retryAfterSeconds).toBeGreaterThan(0);
+  expect(locked.retryAfterSeconds).toBeLessThanOrEqual(60);
 });
 
 test('a locked gate still admits the correct password', () => {
@@ -138,7 +136,7 @@ test('a locked gate still admits the correct password', () => {
   for (let attempt = 0; attempt < 5; attempt += 1)
     loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
 
-  expect(gate.lockedUntil > Date.now(), 'the gate is locked').toBeTruthy();
+  expect(gate.lockedUntil, 'the gate is locked').toBeGreaterThan(Date.now());
 
   // The regression this pins: refusing the owner during a cooldown turned the
   // throttle into a denial of service on the one console that renews the token.
@@ -176,11 +174,10 @@ test('a slow trickle of wrong passwords cannot escalate the wait', () => {
     }
   }
 
-  expect(waits.length > 1, 'the gate locked more than once').toBeTruthy();
-  expect(
-    waits.every((wait) => wait === 60),
-    `every cooldown stays one minute, got ${waits.join(', ')}`,
-  ).toBeTruthy();
+  expect(waits.length, 'the gate locked more than once').toBeGreaterThan(1);
+  expect([...new Set(waits)], 'every cooldown stays one minute').toStrictEqual([
+    60,
+  ]);
 });
 
 test('the cooldown expires on its own and the owner gets back in', () => {
