@@ -24,6 +24,7 @@
     "chalk": "6.0.0",
     "dotenv": "17.4.2",
     "graphql": "16.14.2",
+    "tsx": "4.23.13",
     "zod": "4.5.4"
   },
   "devDependencies": {

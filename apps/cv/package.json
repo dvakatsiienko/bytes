@@ -25,7 +25,6 @@
   },
   "devDependencies": {
     "masonic": "4.1.0",
-    "mosaic": "1.1.0",
-    "tailwind-scrollbar": "4.0.2"
+    "mosaic": "1.1.0"
   }
 }
