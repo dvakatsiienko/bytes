@@ -220,6 +220,37 @@ test('a grant past the window with days left is flagged as the finding', () => {
   assert.ok(readout.notes.some((note) => note.includes('still has days left')));
 });
 
+test('the flag fires the day the window passes, not a day later', () => {
+  // 10.0 days against a 9.99999-day window. Both display figures read 10, so a
+  // comparison made on them says "not yet" for a further whole day — on the one
+  // reading this readout exists to catch.
+  const status = statusMake({
+    refresh: grantMake({ mintedAt: Date.now() - 10 * DAY_MS }),
+  });
+  const readout = readoutBuild(status);
+
+  assert.equal(
+    readout.rows.find((row) => row.label === 'grant')?.tone,
+    'text-yellow',
+  );
+  assert.ok(readout.notes.some((note) => note.includes('still has days left')));
+});
+
+test('a grant inside its window to the second is not flagged', () => {
+  const status = statusMake({
+    refresh: grantMake({ mintedAt: Date.now() - 9 * DAY_MS }),
+  });
+  const readout = readoutBuild(status);
+
+  assert.equal(
+    readout.rows.find((row) => row.label === 'grant')?.tone,
+    'text-fg',
+  );
+  assert.ok(
+    !readout.notes.some((note) => note.includes('still has days left')),
+  );
+});
+
 test('an expired grant says so rather than printing negative days', () => {
   const status = statusMake({
     refresh: grantMake({ expiresIn: 0, mintedAt: Date.now() - 3 * DAY_MS }),

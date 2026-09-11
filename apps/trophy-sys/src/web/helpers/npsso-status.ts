@@ -101,12 +101,10 @@ const grantRow = (grant: GrantStatus): ReadoutRow => {
   const read = grantRead(grant);
   if (!read) return { label: 'grant', tone: 'text-dim', value: 'none' };
 
-  // Past the window with days still on the clock is the finding, not an error.
-  const surprising = read.age > read.window;
-
   return {
     label: 'grant',
-    tone: surprising || read.leftMs <= 0 ? 'text-yellow' : 'text-fg',
+    // Past the window with days still on the clock is the finding, not an error.
+    tone: read.isOutlived || read.leftMs <= 0 ? 'text-yellow' : 'text-fg',
     value:
       read.leftMs > 0
         ? `day ${read.age} · ${dayLabel(daysOf(read.leftMs))} left`
@@ -134,6 +132,11 @@ const grantRead = (grant: GrantStatus) => {
 
   return {
     age: daysSince(grant.mintedAt),
+    // ⚠️ Decided on exact milliseconds, never on the two display figures. Those
+    // are floored and rounded respectively, so an age of 10.0 days against a
+    // window of 9.99999 compares as 10 > 10 — false — and the reading this
+    // readout exists to catch would sit unflagged for a whole extra day.
+    isOutlived: Date.now() - grant.mintedAt > grant.window * 1000,
     // Counted from the reading, not from now: `expiresIn` is what PSN said at
     // `refreshedAt`, and printing it raw would age the claim by up to a day.
     leftMs: grant.expiresIn * 1000 - (Date.now() - grant.refreshedAt),
@@ -150,7 +153,7 @@ const grantNoteBuild = (grant: GrantStatus) => {
 
   // The finding this row was added to catch, said out loud the moment it lands.
   const read = grantRead(grant);
-  if (read && read.age > read.window && read.leftMs > 0)
+  if (read?.isOutlived && read.leftMs > 0)
     return 'this grant is older than the window psn published for it and still has days left, so a refresh does reset the clock — which is what would let the token renew itself.';
 
   // The shortest, for the same reason the NPSSO readout prefers it: erring

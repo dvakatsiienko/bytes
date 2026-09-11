@@ -184,7 +184,12 @@ const sessionRefreshOrMint = async (): Promise<Session> => {
   // early. A transport failure is still safe (it throws, and never reaches
   // here), and the fallback below is correct either way; only the measurement
   // can be poisoned. The readout under-claims accordingly.
-  await refreshGrantDeathRecord(held);
+  //
+  // 📌 Behind the same guard as the grant write, and for a stronger reason: a
+  // death IS the measurement, so a local run on production KV turning one PSN
+  // blip into a false sample is exactly what this record must not collect.
+  if (isAutoWriteSafe) await refreshGrantDeathRecord(held);
+
   return await sessionMint();
 };
 
@@ -195,8 +200,14 @@ const sessionRefreshOrMint = async (): Promise<Session> => {
  * identical record once per concurrent caller.
  */
 const sessionGet = async (): Promise<Session> => {
+  const started = epoch;
   const fresh = await sessionRefreshOrMint();
-  await grantPersist(fresh.grant);
+
+  // A reset landed while this was in flight, so `fresh` was built from
+  // credentials the owner has since replaced. It still answers the call that
+  // asked for it, but it must not be written anywhere.
+  if (started === epoch) await grantPersist(fresh.grant);
+
   return fresh;
 };
 
@@ -223,6 +234,19 @@ const grantPersist = async (grant: RefreshGrant) => {
 };
 
 /**
+ * Bumped by every reset, and captured by anything holding credentials across an
+ * await.
+ *
+ * ⚠️ Clearing `session` and `minting` does not reach work already in flight. A
+ * refresh that started before a fresh NPSSO was pasted still resolves after it,
+ * and without this counter it would install the superseded session AND write its
+ * grant back over the one `npssoSet` had just cleared — restoring the replaced
+ * credentials for up to the grant's ten days. It is the same lost update the
+ * NPSSO deaths key is split out to avoid, one layer up.
+ */
+let epoch = 0;
+
+/**
  * Drops the cached session so the next call rebuilds one from the store.
  *
  * 📌 It does **not** force an NPSSO exchange any more — the next call finds the
@@ -232,6 +256,7 @@ const grantPersist = async (grant: RefreshGrant) => {
 export const sessionReset = () => {
   session = null;
   minting = null;
+  epoch += 1;
 };
 
 /**
@@ -244,6 +269,7 @@ let minting: Promise<Session> | null = null;
 export const authGet = async (): Promise<AuthorizationPayload> => {
   if (session && session.expiresAt > Date.now() + 60_000) return session.auth;
 
+  const started = epoch;
   minting ??= sessionGet();
 
   let fresh: Session;
@@ -255,7 +281,10 @@ export const authGet = async (): Promise<AuthorizationPayload> => {
     minting = null;
   }
 
-  session = fresh;
+  // Superseded by a reset mid-flight — answer this caller, but leave the cache
+  // empty so the next one builds from whatever the owner just pasted.
+  if (started === epoch) session = fresh;
+
   return fresh.auth;
 };
 
