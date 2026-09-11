@@ -1,240 +1,31 @@
 name: claude
 
+# The interactive lane, and nothing else. `@cc <ask>` in a comment.
+#
+# 📌 The review lane lived here too and is now `review.yml`, deliberately in its
+# own file. A `pull_request: labeled` event created a run in which this file's
+# `review` job was SKIPPED, and GitHub counts a skipped job as satisfying a
+# required status check — so labelling a PR `trophy-sys` reported the required
+# `review` context green on a PR nobody had reviewed. Measured on #74: a skip
+# even OVERWRITES an earlier red conclusion for the same context on the same
+# head. Keeping the lanes in one file means every trigger this file grows is a
+# fresh way to mint a skipped `review`. There is no job named `review` here any
+# more, and adding one back would reopen the hole.
 on:
   issue_comment:
     types: [created]
   pull_request_review_comment:
     types: [created]
-  # The label IS the review request, and the only thing that starts a review.
-  #
-  # `synchronize` was here and is deliberately gone: a push re-reviewed the new
-  # head automatically, and a round costs ~15 minutes of Dima's Opus window, so a
-  # five-commit afternoon spent an hour of it on reviews nobody asked for. A push
-  # now leaves the required check stale on the new head — no merge until the
-  # label is re-applied, which is the explicit ask.
-  pull_request:
-    types: [labeled]
 
-# noise comments (vercel, linear, renovate) must never share a group with a live review:
-# with cancel-in-progress a vercel deploy comment cancelled the first review run (#64)
-#
-# The last term answers «is THIS event asking for a review» — never «does this PR
-# carry the label». A workflow run is created for every labelled event, including
-# an unrelated one like `trophy-sys`, so a label-presence test would drop that run
-# into the live review's group and cancel-in-progress would kill the review: #64
-# again, through labels instead of comments. Greptile caught it on #70.
-#
-# `github.event_name` stays in the key because a pull_request event carries no
-# comment body, so without it the lanes collapse into one `claude--false` group.
+# Noise comments (vercel, linear, renovate) must never share a group with a live
+# assist run: with cancel-in-progress a vercel deploy comment cancelled a run on
+# #64. The last term answers «is THIS comment asking for something».
 concurrency:
-  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event_name }}-${{ (github.event.action == 'labeled' && github.event.label.name == '🤖 review:requested') || contains(github.event.comment.body, '@cc') }}
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}-${{ contains(github.event.comment.body, '@cc') }}
   cancel-in-progress: true
 
 jobs:
-  review:
-    # The label is the ONLY way to start a review. `@claude review` in a comment
-    # used to work too and is gone deliberately: two doors to one action means
-    # two things to keep in step, and the comment door looked like an escape
-    # hatch for a PR that edits this file — which it never was, because the
-    # action refuses itself on any PR whose workflow differs from the default
-    # branch, whichever door opened it.
-    #
-    # 📌 The action ships its own `label_trigger` input and this predicate is
-    # NOT it, deliberately. `label_trigger` is read inside the action, which is
-    # five steps in: an unrelated label — `trophy-sys`, say — would start the
-    # job, mint an app token, count rounds, and only then have the action stand
-    # down. The guard after it would find no review posted and turn the `review`
-    # check RED for a label that never asked for one. A job-level `if` never
-    # starts the job at all.
-    if: >-
-      github.event.action == 'labeled' &&
-      github.event.label.name == '🤖 review:requested'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: read
-      id-token: write
-      actions: read
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
-
-      # The reviewer gets its own face. Without this it posts as `claude[bot]`,
-      # the same identity as the assist lane and as any other Claude app on the
-      # repo, so «who said this» is unanswerable from a thread.
-      - id: reviewer
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ vars.X_REVIEWER_CC_APP_ID }}
-          private-key: ${{ secrets.X_REVIEWER_CC_PRIVATE_KEY }}
-
-      - id: started
-        run: echo "at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
-
-      # Two things are read from the PREVIOUS review runs on this branch, and
-      # both are read here because the action is about to overwrite the sticky
-      # comment that would otherwise hold them.
-      #
-      # 📌 The source is the workflow run list, not the comment body. A run
-      # records its own head sha, so the delta needs no parsing and cannot be
-      # broken by the sticky comment being rewritten — which is exactly what the
-      # action does to it, seconds later, on every round.
-      - id: rounds
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          BRANCH: ${{ github.head_ref || github.event.pull_request.head.ref }}
-        run: |
-          set -euo pipefail
-          # `event == pull_request` is what makes this count REVIEW rounds. A
-          # run is also created for every `@cc …` comment that drives the
-          # assist lane, and those finish successfully — counted, they would eat
-          # a review round nobody spent.
-          runs=$(gh api \
-            "repos/$REPO/actions/workflows/claude.yml/runs?branch=$BRANCH&status=completed&per_page=100" \
-            --jq '[.workflow_runs[] | select(.conclusion == "success" and .event == "pull_request")] | sort_by(.run_number)' \
-            2>/dev/null || echo '[]')
-          count=$(jq 'length' <<<"$runs")
-          last=$(jq -r 'last | .head_sha // ""' <<<"$runs")
-          echo "count=$count" >> "$GITHUB_OUTPUT"
-          echo "last=$last" >> "$GITHUB_OUTPUT"
-          echo "$count completed review rounds on this branch; last reviewed ${last:-none}"
-
-      # The cap. Two rounds per PR: the one at «final», and one after the fixes.
-      # A third is Dima's call, asked through cclio with a few words on what
-      # changed — so this fails early, before spending the window rather than
-      # after.
-      - name: Two review rounds per PR
-        if: steps.rounds.outputs.count >= 2
-        run: |
-          echo "::error::Two review rounds already ran on this branch. A third needs Dima's word through cclio, with what changed since the last review."
-          exit 1
-
-      - uses: anthropics/claude-code-action@v1
-        with:
-          github_token: ${{ steps.reviewer.outputs.token }}
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # The coder's own identity. It changed from `x-coder-bot[bot]` to
-          # `x-coder-cc[bot]`, and until this line caught up every review the
-          # coder asked for died on arrival with «Workflow initiated by
-          # non-human actor».
-          allowed_bots: "x-coder-cc[bot]"
-          # Kept in step with the job's `if` above. The predicate is what gates;
-          # this only stops the action's own default (`claude`) from disagreeing
-          # with us about which label means a review.
-          label_trigger: "🤖 review:requested"
-          trigger_phrase: "@cc"
-          plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
-          plugins: "code-review@claude-code-plugins"
-          # One comment per PR rather than one per round, so the thread stays
-          # readable when a PR is reviewed twice.
-          use_sticky_comment: true
-          include_fix_links: true
-          # The lane is a pull_request event by definition now, which is the
-          # scope the action's own docs give this input.
-          track_progress: true
-          prompt: |
-            /code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}
-
-            ${{ steps.rounds.outputs.last && format('This is a RE-REVIEW. You already reviewed this PR at {0}. Review the commits since that sha, plus the replies on your own open threads — not the whole diff again. Say plainly which of your earlier findings are now fixed, which are answered with a reason, and which still stand.', steps.rounds.outputs.last) || 'This is the first review of this PR. Review the whole diff.' }}
-          claude_args: |
-            --model claude-opus-5
-            --effort high
-            --max-turns 60
-            --allowedTools "mcp__github_inline_comment__create_inline_comment"
-
-      # What a green `review` check means: a review ran on this head, and nothing
-      # it found is sitting unanswered.
-      #
-      # Two failure modes, both measured on #70 and #72:
-      #
-      # 1. The action can stand down and still leave its step successful — it
-      #    does that on any PR whose workflow file differs from the default
-      #    branch. The job went green with no review posted at all, which is a
-      #    gate that passes empty.
-      # 2. A review that posts findings is not a clean review, and a check that
-      #    goes green anyway says the opposite of what happened.
-      #
-      # An ANSWERED thread counts as handled, deliberately. A finding the coder
-      # declines with a reason is work Dima reads in the PR, not a reason to
-      # block correct code — without that rule, one disagreement plus the
-      # two-round cap is a deadlock with no way out.
-      - name: A green review means a clean review
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR: ${{ github.event.pull_request.number }}
-          REPO: ${{ github.repository }}
-          # Read from the token step rather than written out, so the guard
-          # follows the app automatically if the reviewer is ever renamed — the
-          # `allowed_bots` line above is the lesson that made this worth doing.
-          REVIEWER: ${{ steps.reviewer.outputs.app-slug }}[bot]
-          CODER: x-coder-cc[bot]
-          SINCE: ${{ steps.started.outputs.at }}
-        run: |
-          set -euo pipefail
-
-          # A failed call counts as zero rather than killing the step: the point
-          # is to prove what a review did, and an api hiccup proves nothing.
-          #
-          # 📌 `--paginate` emits ONE ARRAY PER PAGE, so anything reading `.[0]`
-          # silently sees only the first 30 comments — and a PR with two review
-          # rounds passes 30 easily. `jq -s add` folds the pages into one array.
-          api() {
-            gh api "repos/$REPO/$1" --paginate 2>/dev/null | jq -s 'add // []' || echo '[]'
-          }
-
-          posted=0
-          for attempt in 1 2 3; do
-            posted=$(
-              { api "issues/$PR/comments"; api "pulls/$PR/comments"; api "pulls/$PR/reviews"; } \
-                | jq -s --arg who "$REVIEWER" --arg since "$SINCE" \
-                    '[.[][] | select(.user.login == $who and ((.created_at // .submitted_at) > $since))] | length'
-            )
-            [ "$posted" -gt 0 ] && break
-            if [ "$attempt" -lt 3 ]; then
-              echo "no review artifact yet (attempt $attempt), waiting for the api to settle"
-              sleep 10
-            fi
-          done
-
-          if [ "$posted" -eq 0 ]; then
-            echo "::error::The review job finished without posting a review. A green check would claim a review that never happened."
-            exit 1
-          fi
-          echo "review artifacts posted this run: $posted"
-
-          # Every inline finding from THIS run, and whether its thread already
-          # carries a coder reply. A thread the reviewer re-raises after the
-          # coder answered it is handled; a fresh one is not.
-          threads=$(api "pulls/$PR/comments")
-          unanswered=$(
-            jq --arg who "$REVIEWER" --arg coder "$CODER" --arg since "$SINCE" '
-              . as $all
-              | [$all[] | select(.user.login == $who and .created_at > $since)]
-              | map(. as $f
-                  | ($f.in_reply_to_id // $f.id) as $root
-                  | { path: $f.path, line: ($f.line // $f.original_line),
-                      answered: ([$all[]
-                        | select(.user.login == $coder
-                                 and ((.in_reply_to_id // .id) == $root))] | length > 0) })
-              | map(select(.answered | not))
-            ' <<<"$threads"
-          )
-          open=$(jq 'length' <<<"$unanswered")
-
-          if [ "$open" -gt 0 ]; then
-            echo "$unanswered" | jq -r '.[] | "  · \(.path):\(.line)"'
-            echo "::error::$open finding(s) from this review have no reply on their thread. Fix them or answer each thread with a reason, then re-apply the label."
-            exit 1
-          fi
-
-          echo "no unanswered findings — clean on this head"
-
   assist:
-    # `@cc <ask>` in a comment. No `review` exclusion any more: the review lane
-    # left the comment door entirely, so there is nothing here to steal.
     if: contains(github.event.comment.body, '@cc')
     runs-on: ubuntu-latest
     permissions:
