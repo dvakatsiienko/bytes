@@ -115,8 +115,29 @@ jobs:
       - name: Lint
         run: pnpm turbo run lint ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
-      # Only `financial` and `trophy-sys` define a `test` script today; turbo
-      # skips every package that does not, so this stays green as more arrive.
+      # `@ui/kit` tests in a real browser, so the runner needs chromium. The
+      # download is ~90 MB and the only part of this job that would be slow, so
+      # it is cached on the lockfile hash — the playwright version lives there,
+      # and a bump is exactly when a fresh browser is required.
+      - name: Cache playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      # `--with-deps` only on a miss: it installs system libraries, which the
+      # cache cannot carry. On a hit the browser binary is already restored and
+      # `install-deps` alone re-adds the libraries, which is seconds rather than
+      # a download.
+      - name: Install chromium
+        run: >-
+          pnpm exec playwright
+          ${{ steps.playwright-cache.outputs.cache-hit == 'true' && 'install-deps chromium' || 'install --with-deps chromium' }}
+
+      # `financial`, `trophy-sys` and `@ui/kit` define a `test` script today;
+      # turbo skips every package that does not, so this stays green as more
+      # arrive.
       - name: Test
         run: pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
