@@ -31,7 +31,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  review:
+  review-parked:
     # The label is the ONLY way to start a review. `@claude review` in a comment
     # used to work too and is gone deliberately: two doors to one action means
     # two things to keep in step, and the comment door looked like an escape

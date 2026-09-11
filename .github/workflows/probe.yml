@@ -1,0 +1,60 @@
+name: probe
+
+# THROWAWAY. Measures how github treats a check named `review` when a later
+# event skips the job, and exercises the check-run api the real gate will use.
+# Deleted with this branch.
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  # Same NAME as the real gate's job, on purpose: the check run it publishes is
+  # the one branch protection reads.
+  review:
+    if: github.event.label.name == 'kit'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "probe: a REAL red conclusion for the context named 'review'"
+          exit 1
+
+  fail-check:
+    if: github.event.label.name == 'cv'
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          id=$(gh api "repos/$REPO/check-runs" -X POST \
+            -f name='review:clean' -f head_sha="$SHA" -f status=in_progress --jq '.id')
+          echo "created check run $id"
+          gh api "repos/$REPO/check-runs/$id" -X PATCH \
+            -f status=completed -f conclusion=failure \
+            -f output[title]='2 findings unanswered' \
+            -f output[summary]=$'  · `src/a.ts:12`\n  · `src/b.ts:44`' --jq '.conclusion'
+
+  pass-check:
+    if: github.event.label.name == 'space-explorer-ui'
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          id=$(gh api "repos/$REPO/check-runs" -X POST \
+            -f name='review:clean' -f head_sha="$SHA" -f status=in_progress --jq '.id')
+          echo "created check run $id"
+          gh api "repos/$REPO/check-runs/$id" -X PATCH \
+            -f status=completed -f conclusion=success \
+            -f output[title]='clean on this head' \
+            -f output[summary]='no unanswered findings' --jq '.conclusion'
