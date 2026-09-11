@@ -283,12 +283,18 @@ export const npssoSet = async (value: unknown) => {
     return false;
 
   await npssoSave(value.trim());
+
   // The in-memory PSN session was minted from the old token; keeping it would
   // hide whether the new one works until the access token expires. The stored
   // refresh grant is the same problem with a ten-day fuse — it was bought by the
   // token being replaced, and it would keep the paste from proving anything.
-  await refreshGrantClear();
+  //
+  // 📌 The reset goes first because it cannot fail. If the grant clear throws,
+  // the route answers 500 and the owner retries — which is right, because the
+  // paste genuinely has not taken effect yet. Clearing first would skip the
+  // reset on that throw and leave a stale session behind a 500 as well.
   sessionReset();
+  await refreshGrantClear();
   return true;
 };
 

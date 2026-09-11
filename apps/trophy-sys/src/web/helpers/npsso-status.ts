@@ -101,43 +101,50 @@ export const readoutBuild = (status: NpssoStatus) => {
  * age past the window says whether a refresh resets the clock.
  */
 const grantRow = (grant: GrantStatus): ReadoutRow => {
-  if (grant.mintedAt === null || grant.refreshedAt === null)
-    return { label: 'refresh grant', tone: 'text-dim', value: 'none' };
-
-  const age = daysSince(grant.mintedAt);
-  const window = grantWindow(grant);
+  const read = grantRead(grant);
+  if (!read) return { label: 'refresh grant', tone: 'text-dim', value: 'none' };
 
   return {
     label: 'refresh grant',
-    tone: age > window ? 'text-yellow' : 'text-fg',
-    value: `day ${age} of ${window}`,
+    tone: read.age > read.window ? 'text-yellow' : 'text-fg',
+    value: `day ${read.age} of ${read.window}`,
   };
 };
 
 /**
- * The grant's full window in days, counted from the mint rather than from the
- * last reading — `expiresIn` is what PSN said at `refreshedAt`, so the days
- * already spent before that reading belong to the window too.
+ * The grant's age and its full window in days, or null when the record carries
+ * no readable pair of clocks.
  *
- * 📌 Rounded, where every other figure in this file is floored. A floor is the
- * conservative choice for an *estimate*, and reporting less time than you have
- * is the harmless direction there. This is not an estimate: it is PSN's own
- * published number, 863999s, and flooring it prints a ten-day grant as nine.
+ * One reader for the row and the note both. Guarded separately they drifted,
+ * and the shape that drift takes is a row printing `none` above a note
+ * asserting that same grant had outlived its window.
+ *
+ * 📌 The window is counted from the mint, not from the last reading —
+ * `expiresIn` is what PSN said at `refreshedAt`, so the days already spent
+ * before that reading belong to the window too. And it is rounded, where every
+ * other figure in this file is floored: a floor is the conservative choice for
+ * an *estimate*, and this is not one. It is PSN's own published 863999s, which
+ * floors a ten-day grant to nine.
  */
-const grantWindow = (grant: GrantStatus) =>
-  Math.round(
-    ((grant.refreshedAt ?? 0) -
-      (grant.mintedAt ?? 0) +
-      grant.expiresIn * 1000) /
-      DAY_MS,
-  );
+const grantRead = (grant: GrantStatus) => {
+  if (grant.mintedAt === null || grant.refreshedAt === null || !grant.expiresIn)
+    return null;
+
+  return {
+    age: daysSince(grant.mintedAt),
+    window: Math.round(
+      (grant.refreshedAt - grant.mintedAt + grant.expiresIn * 1000) / DAY_MS,
+    ),
+  };
+};
 
 const grantNoteBuild = (grant: GrantStatus) => {
   if (grant.mintedAt === null)
     return 'no refresh grant is stored — the next psn call mints one, and cold starts stop spending the npsso.';
 
   // The finding this row was added to catch, said out loud the moment it lands.
-  if (daysSince(grant.mintedAt) > grantWindow(grant))
+  const read = grantRead(grant);
+  if (read && read.age > read.window)
     return 'this grant has outlived the window psn published for it, so a refresh does reset the clock — which is what would let the token renew itself.';
 
   // The shortest, for the same reason the NPSSO readout prefers it: erring
