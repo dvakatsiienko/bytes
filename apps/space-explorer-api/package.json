@@ -27,10 +27,6 @@
     "zod": "4.5.4"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "7.4.0",
-    "@graphql-codegen/typescript": "6.1.0",
-    "@types/node": "26.4.1",
-    "prisma": "7.10.0",
-    "tsx": "4.23.13"
+    "@graphql-codegen/typescript": "6.1.0"
   }
 }

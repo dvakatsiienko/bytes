@@ -24,15 +24,9 @@
     "shadcn": "4.21.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "4.3.3",
-    "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.5",
     "@workspace/typescript-config": "workspace:*",
-    "postcss": "8.5.26",
-    "prettier": "3.9.6",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "tailwindcss": "4.3.3"
+    "react-dom": "19.2.8"
   },
   "peerDependencies": {
     "react": "19.2.8",
