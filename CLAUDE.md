@@ -75,10 +75,13 @@ makes deep links load. The rule is cheap; the correction is not.
 ### Dev dependencies live at the root
 
 **A tool goes into the root `package.json`. An app's manifest lists only what its own code
-imports at runtime, and what a filtered deploy must see.** Root-only today: `typescript`, biome,
-turbo, lefthook, vitest. Hoist the same way: `@types/*`, vite and its plugins, tailwind and
-postcss, prisma, tsx, codegen — anything whose plugin loading starts from a config file or the
-cwd.
+imports at runtime, and what a filtered deploy must see.** The sweep is done, not aspirational:
+`@types/*`, vite and its plugins, tailwind and postcss, prisma, tsx, codegen, the test runner and
+the linters all live at the root, one version each. The root manifest is the list — this file does
+not keep a copy of it to go stale.
+
+A new tool starts at the root. It only earns a place in an app manifest by being imported by that
+app's own runtime code.
 
 Why it works: `pnpm run` puts the root `node_modules/.bin` on PATH for every package, and node's
 module walk from `apps/x` reaches the root `node_modules`. A filtered install
@@ -88,7 +91,14 @@ bump, no per-app drift — Dima's preference over per-app pinning.
 
 The exception: a tool that resolves its plugins from its own package location (eslint-style)
 fails in pnpm's strict store. The fix is a `public-hoist-pattern[]` line in `.npmrc`, never a
-copy into the app.
+copy into the app. The BYT-91 sweep needed none — every tool resolved through the module walk.
+
+📌 What it does trip is biome's `noUndeclaredDependencies`: a build config that imports a
+root-level tool (`vite.config.ts` reaching for `vite`, `prisma.config.ts` for `prisma/config`)
+resolves against the NEAREST manifest — the app's — and reports a dependency that is deliberately
+one level up. The answer is the scoped exemption in `biome-config-polished`, beside the test-file
+entries, and never a copy of the tool back into the app. A `src` file importing something
+undeclared stays an error.
 
 ### Database Patterns
 
