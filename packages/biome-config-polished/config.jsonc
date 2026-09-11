@@ -372,6 +372,12 @@
     // the NEAREST package.json — the app's — so it reports a dependency that is
     // deliberately one level up. Scoped to test files: a `src` file importing
     // something undeclared is still an error.
+    //
+    // 📌 `vite.config` and `prisma.config` were exempt here for one commit of
+    // BYT-91, while `vite` and `prisma` sat at the root. They went back into the
+    // apps that use them, so every one of those configs now imports only what
+    // its own manifest declares — and an exemption nothing needs is one that
+    // hides the next genuinely undeclared import until the build fails.
     {
       "linter": {
         "rules": {

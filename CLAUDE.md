@@ -72,23 +72,75 @@ Why it is written down: `trophy-sys` was first built with search-param routing a
 after review. That cost the router, every component reading the params, and the rewrite rule that
 makes deep links load. The rule is cheap; the correction is not.
 
-### Dev dependencies live at the root
+### The shared toolchain lives at the root
 
-**A tool goes into the root `package.json`. An app's manifest lists only what its own code
-imports at runtime, and what a filtered deploy must see.** Root-only today: `typescript`, biome,
-turbo, lefthook, vitest. Hoist the same way: `@types/*`, vite and its plugins, tailwind and
-postcss, prisma, tsx, codegen — anything whose plugin loading starts from a config file or the
-cwd.
+**The root `package.json` holds the toolchain every package shares. A tool a subset of apps chose
+stays in those apps — one version, held by the shape test.** An app's manifest lists that, plus
+what its own code imports at runtime and what a filtered deploy must see.
 
-Why it works: `pnpm run` puts the root `node_modules/.bin` on PATH for every package, and node's
-module walk from `apps/x` reaches the root `node_modules`. A filtered install
-(`pnpm i -F 'cv...'`, vercel's command) still installs the root manifest's devDeps — measured on a
-scratch clone, `typescript` present at root after it. One version per tool, one renovate PR per
-bump, no per-app drift — Dima's preference over per-app pinning.
+The shape of each, not the whole of either — **the manifests are the list**, and this file keeps no
+copy of one to go stale. Root looks like `typescript`, `vitest`, biome, turbo, `@types/*`,
+`tailwindcss` and `postcss`. Per app looks like `vite` and its plugins, the tailwind plugins a
+given app's stylesheets call, `prisma`, `@graphql-codegen/cli`.
+
+📌 Why not everything at the root, which is where BYT-91 first put it: **a root bump moves 32 of
+32 task hashes** — measured on a real `prettier` 3.9.6 → 3.9.5, `prisma:generate` included despite
+its hand-narrowed `inputs` — and rebuilds and redeploys every app. A tool three apps use, parked
+at the root, taxes the other five on every one of its bumps. `vite` at the root makes a vite bump
+redeploy four Next apps that never load it.
+
+**The one-version guarantee no longer comes from there being one declaration.** It comes from
+`package-json-shape`, which fails when a name carries two pins anywhere in the workspace and says
+where each lives — the hook narrows its REPORT to the manifests you staged, never its comparison.
+It earned its place immediately: it found `graphql` at two majors across the two space-explorer
+apps, which nothing had compared before.
+
+⚠️ Know exactly how far that reaches, because it is narrower than «enforced». It runs from
+`lefthook.yaml` pre-commit, behind an `if command -v` guard, so it is **silently absent** anywhere
+`plugin-x` is not installed: CI, containers, agent sessions. And renovate's automerged patch group
+never fires a local hook at all — the common case is safe only because that group bumps every copy
+of a name together.
+
+**The structural answer is pnpm catalogs**, and it is the one to reach for when this bites: a
+`catalog:` block in `pnpm-workspace.yaml` with `"vite": "catalog:"` in each manifest makes one pin
+per name a property the package manager enforces at install, everywhere, for renovate too, with no
+external binary. Not done here — it touches every manifest and deserves its own verification pass.
+
+Why per-app placement still resolves: `pnpm run` puts the root `node_modules/.bin` on PATH for
+every package, and node's module walk from `apps/x` reaches the root `node_modules`. A filtered
+install (`pnpm i -F 'cv...'`, vercel's command) installs the root manifest's devDeps too —
+measured in a clean clone on BYT-91: after `pnpm i -F 'cv...'` and
+`pnpm i -F '@space-explorer/ui...'`, the root `.bin` carried `tsc`, `vite`, `run-p` and `run-s`,
+and `tailwindcss`, `@tailwindcss/postcss` and `vite` all resolved from the app directory.
 
 The exception: a tool that resolves its plugins from its own package location (eslint-style)
 fails in pnpm's strict store. The fix is a `public-hoist-pattern[]` line in `.npmrc`, never a
-copy into the app.
+copy into the app. The BYT-91 sweep needed none.
+
+⚠️ React Compiler is the case where a missing declaration costs silence rather than an error, and
+the two implementations do NOT travel together. From `@vitejs/plugin-react`'s own README:
+
+- **a vite app** needs `vite` + `@vitejs/plugin-react` + **`oxc-transform-react`**. That is what
+  `react({ compiler: true })` uses — the Rust port, an optional peer loaded from the plugin's own
+  package location. `proto-lab`, `space-explorer-ui` and `trophy-sys` declare exactly those three
+- **a next app** needs **`babel-plugin-react-compiler`**, for `reactCompiler: true`. `cv`,
+  `figmentation` and `financial` declare it and nothing else of this group
+
+`babel-plugin-react-compiler` is also an optional peer of the vite plugin, but only for its Babel
+path, which additionally wants `@rolldown/plugin-babel`, `@babel/core` and the explicit
+`reactCompilerPreset` helper. No vite config here uses that path, so a vite app declaring it would
+be carrying a dependency it never loads.
+
+📌 The hazard is real even so: optional peers resolve **per importer**, so a vite app that declares
+`@vitejs/plugin-react` without `oxc-transform-react` gets the peer-unresolved instance and
+`compiler: true` **degrades silently** — no error, just the slow path. Keep that pair together.
+
+📌 What a ROOT-ONLY tool trips is biome's `noUndeclaredDependencies`: a file inside an app that
+imports one resolves against the NEAREST manifest — the app's — and gets reported as undeclared,
+one level from where the tool deliberately lives. The answer is a scoped exemption in
+`biome-config-polished`, never a copy of the tool back into the app. Today only the vitest globs
+need it, because `vitest` is the root-only tool an app file imports. Keep the exemption list that
+short: one that nothing needs hides the next genuinely undeclared import until the build fails.
 
 ### Database Patterns
 
@@ -100,8 +152,17 @@ copy into the app.
 
 Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only settings are invisible
 to agents and to code review, and they silently override the repo — a dashboard edit to
-`trophy-sys`'s Root Directory once broke a deploy that no diff could explain. `trophy-sys` and
-`space-explorer-ui` have one; the Next.js apps do not yet.
+`trophy-sys`'s Root Directory once broke a deploy that no diff could explain. Six apps have one —
+`cv`, `figmentation`, `financial`, `space-explorer-ui`, `trophy-sys`, `x-com-chat`. `proto-lab`
+and `space-explorer-api` do not; `space-explorer-api` deploys on Railway instead, from
+`railway.json`.
+
+Each `vercel.json` carries a `git.deploymentEnabled` gate naming the branch prefixes that must
+NOT deploy: `renovate/*`, `coder/*`, `scratch/*`. 📌 It is an allowlist by omission, so a prefix
+nobody listed deploys — a throwaway `scratch/*` branch spent six previews that way against an
+account that hits `api-deployments-free-per-day`. Deny-by-default (`{"*": false, "main": true}`)
+would close the class; it changes production deploy behaviour, so it is Dima's call, not a
+drive-by edit.
 
 ## ui-kit
 

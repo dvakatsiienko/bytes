@@ -1,7 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm i -F '@space-explorer/ui...'",
-  "git": { "deploymentEnabled": { "renovate/*": false, "coder/*": false } },
+  "git": {
+    "deploymentEnabled": {
+      "renovate/*": false,
+      "coder/*": false,
+      "scratch/*": false
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
