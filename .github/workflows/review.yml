@@ -251,6 +251,10 @@ jobs:
           # `allowed_bots` line above is the lesson that made this worth doing.
           REVIEWER: ${{ steps.reviewer.outputs.app-slug }}[bot]
           AUTHOR: ${{ github.event.pull_request.user.login }}
+          # The job-run link the action writes into its tracking comment,
+          # whoever ends up owning that comment. Verified present in both the
+          # «review in progress» body and the finished one.
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SINCE: ${{ steps.started.outputs.at }}
         run: |
           set -euo pipefail
@@ -298,28 +302,42 @@ jobs:
             gh api "repos/$REPO/$1" --paginate | jq -s 'add // []'
           }
 
-          # 📌 FRESHNESS, not creation. `use_sticky_comment` makes the action
-          # reuse an existing tracking comment instead of writing a new one, and
-          # its match is loose: `login.includes("claude")` on any bot comment —
-          # so one `@cc` reply from the assist lane earlier in the PR is enough
-          # for the reviewer to EDIT that comment rather than create its own
-          # (`create-initial.ts`, the `idMatch || botNameMatch || bodyMatch`
-          # find). An edit moves `updated_at` and leaves `created_at` at the old
-          # round. Testing creation therefore reads a clean re-review — one that
-          # posts no new inline findings because there are none — as «no review
-          # was posted», which is red plus `exit 1`: the round is not counted,
-          # the check never goes green, and the loop cannot terminate. The
-          # reviewer found this in its own review of this file.
+          # 📌 Two things make a round's own artifact hard to recognise, and
+          # both are `use_sticky_comment` reusing an existing tracking comment
+          # rather than writing a new one (`create-initial.ts`, the
+          # `idMatch || botNameMatch || bodyMatch` find):
           #
-          # A stand-down still counts zero, which is the case this test exists
-          # for: the action that refuses itself writes nothing at all, so there
-          # is no timestamp of either kind to move.
+          #  1. an edit moves `updated_at` and leaves `created_at` at the old
+          #     round — so freshness, not creation
+          #  2. an edit does NOT change a comment's author. The only thing that
+          #     find can match is `claude[bot]` (`botNameMatch` is
+          #     `login.includes("claude")`, and the assist lane keeps that
+          #     identity on purpose), so the comment the reviewer wrote its
+          #     verdict into still reads as authored by `claude[bot]` — and an
+          #     author test for the reviewer drops it entirely
+          #
+          # Miss either and a clean re-review — one that posts no new inline
+          # findings because there are none — counts zero artifacts on any PR
+          # that has ever carried one `@cc` comment. That reports «no review was
+          # posted»: red, `exit 1`, round uncounted, check never green, loop
+          # unable to terminate. The reviewer found this reviewing itself, then
+          # caught the half-fix on the next round.
+          #
+          # The job-run link is the author-independent handle: the action writes
+          # it into that comment whoever owns it.
+          #
+          # A stand-down still counts zero, by construction rather than luck.
+          # `track_progress: true` on a `pull_request` event forces tag mode,
+          # and tag mode writes the comment only after the trigger check and the
+          # human-actor check have both passed — a refusal writes nothing, so no
+          # body can carry this run's link.
           posted=0
           for attempt in 1 2 3; do
             posted=$(
               { api "issues/$PR/comments"; api "pulls/$PR/comments"; api "pulls/$PR/reviews"; } \
-                | jq -s --arg who "$REVIEWER" --arg since "$SINCE" \
-                    '[.[][] | select(.user.login == $who and ((.updated_at // .submitted_at) > $since))] | length'
+                | jq -s --arg who "$REVIEWER" --arg since "$SINCE" --arg run "$RUN" \
+                    '[.[][] | select((((.user.login == $who) or ((.body // "") | contains($run))))
+                                     and ((.updated_at // .submitted_at) > $since))] | length'
             )
             [ "$posted" -gt 0 ] && break
             if [ "$attempt" -lt 3 ]; then
