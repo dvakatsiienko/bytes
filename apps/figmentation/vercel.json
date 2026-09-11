@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm i -F 'figmentation...'",
-  "git": { "deploymentEnabled": { "renovate/*": false, "coder/*": false } }
+  "git": {
+    "deploymentEnabled": {
+      "renovate/*": false,
+      "coder/*": false,
+      "scratch/*": false
+    }
+  }
 }
