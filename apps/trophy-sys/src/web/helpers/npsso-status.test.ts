@@ -151,8 +151,10 @@ test('a dead token says so, and drops the countdown', () => {
 test('no stored grant says so rather than printing a zero-day one', () => {
   const readout = readoutBuild(statusMake({ refresh: GRANT_NONE }));
 
-  assert.equal(rowValue(statusMake(), 'grant'), 'none');
-  assert.ok(readout.notes.some((note) => note.includes('no refresh grant')));
+  expect(rowValue(statusMake(), 'grant')).toBe('none');
+  expect(
+    readout.notes.some((note) => note.includes('no refresh grant')),
+  ).toBeTruthy();
 });
 
 test('days left are floored — the row never promises time it may not have', () => {
@@ -160,8 +162,7 @@ test('days left are floored — the row never promises time it may not have', ()
   // rounds to 10, and the two differ on purpose: `left` is an estimate the
   // owner acts on, so it errs short, while the window is PSN's own published
   // figure and flooring that one would report a ten-day grant as nine.
-  assert.equal(
-    rowValue(statusMake({ refresh: grantMake() }), 'grant'),
+  expect(rowValue(statusMake({ refresh: grantMake() }), 'grant')).toBe(
     'day 0 · 9 days left',
   );
 });
@@ -176,7 +177,7 @@ test('the days left count down from the reading, not from now', () => {
     }),
   });
 
-  assert.equal(rowValue(status, 'grant'), 'day 6 · 7 days left');
+  expect(rowValue(status, 'grant')).toBe('day 6 · 7 days left');
 });
 
 /**
@@ -196,11 +197,11 @@ test('a countdown grant runs its days down and never outlives the window', () =>
   });
   const readout = readoutBuild(status);
 
-  assert.equal(rowValue(status, 'grant'), 'day 9 · 0 days left');
-  assert.ok(
+  expect(rowValue(status, 'grant')).toBe('day 9 · 0 days left');
+  expect(
     !readout.notes.some((note) => note.includes('still has days left')),
     'a grant inside its window must never claim the clock was reset',
-  );
+  ).toBeTruthy();
 });
 
 test('a grant past the window with days left is flagged as the finding', () => {
@@ -210,16 +211,16 @@ test('a grant past the window with days left is flagged as the finding', () => {
   });
   const readout = readoutBuild(status);
 
-  assert.equal(
+  expect(
     rowValue(status, 'grant'),
-    'day 30 · 9 days left',
     'an age past the window with time still on it is what this row exists for',
-  );
-  assert.equal(
-    readout.rows.find((row) => row.label === 'grant')?.tone,
+  ).toBe('day 30 · 9 days left');
+  expect(readout.rows.find((row) => row.label === 'grant')?.tone).toBe(
     'text-yellow',
   );
-  assert.ok(readout.notes.some((note) => note.includes('still has days left')));
+  expect(
+    readout.notes.some((note) => note.includes('still has days left')),
+  ).toBeTruthy();
 });
 
 test('the flag fires the day the window passes, not a day later', () => {
@@ -231,11 +232,12 @@ test('the flag fires the day the window passes, not a day later', () => {
   });
   const readout = readoutBuild(status);
 
-  assert.equal(
-    readout.rows.find((row) => row.label === 'grant')?.tone,
+  expect(readout.rows.find((row) => row.label === 'grant')?.tone).toBe(
     'text-yellow',
   );
-  assert.ok(readout.notes.some((note) => note.includes('still has days left')));
+  expect(
+    readout.notes.some((note) => note.includes('still has days left')),
+  ).toBeTruthy();
 });
 
 test('a grant inside its window to the second is not flagged', () => {
@@ -244,13 +246,12 @@ test('a grant inside its window to the second is not flagged', () => {
   });
   const readout = readoutBuild(status);
 
-  assert.equal(
-    readout.rows.find((row) => row.label === 'grant')?.tone,
+  expect(readout.rows.find((row) => row.label === 'grant')?.tone).toBe(
     'text-fg',
   );
-  assert.ok(
+  expect(
     !readout.notes.some((note) => note.includes('still has days left')),
-  );
+  ).toBeTruthy();
 });
 
 test('an expired grant says so rather than printing negative days', () => {
@@ -258,7 +259,7 @@ test('an expired grant says so rather than printing negative days', () => {
     refresh: grantMake({ expiresIn: 0, mintedAt: Date.now() - 3 * DAY_MS }),
   });
 
-  assert.equal(rowValue(status, 'grant'), 'day 3 · psn says expired');
+  expect(rowValue(status, 'grant')).toBe('day 3 · psn says expired');
 });
 
 test('a refused grant reports the shortest lifetime, and no claim beside it', () => {
@@ -271,11 +272,14 @@ test('a refused grant reports the shortest lifetime, and no claim beside it', ()
   const note = readout.notes.find((entry) =>
     entry.includes('refused a refresh'),
   );
-  assert.ok(note?.includes('7 days'), 'the shortest seen, never the average');
-  assert.ok(
+  expect(
+    note?.includes('7 days'),
+    'the shortest seen, never the average',
+  ).toBeTruthy();
+  expect(
     !note?.includes('9 days'),
     "the only expiresIn in hand belongs to the LIVE grant — quoting it here reads as the dead grant's own promise",
-  );
+  ).toBeTruthy();
 });
 
 test('the grant adds exactly one row — this panel has been cut for growing', () => {
@@ -289,9 +293,8 @@ test('the grant adds exactly one row — this panel has been cut for growing', (
     }),
   );
 
-  assert.deepEqual(
+  expect(
     rows.map((row) => row.label),
-    ['age', 'shortest seen', 'rough guess', 'grant'],
     'the three npsso rows, then one grant row — paste first, then text',
-  );
+  ).toStrictEqual(['age', 'shortest seen', 'rough guess', 'grant']);
 });
