@@ -1,0 +1,450 @@
+name: review
+
+# The review lane lives in its OWN file, and that is the whole point of the file
+# existing. It used to be a job inside `claude.yml`, next to the `issue_comment`
+# and `pull_request_review_comment` triggers — so every comment on a PR created a
+# run in which the `review` job was skipped. GitHub counts a SKIPPED job as
+# satisfying a required status check, so that skip reported GREEN and the branch
+# protection rule was satisfied by a review that never ran: #72 merged with its
+# `review` check reading `skipping`.
+#
+# Measured on PR #74 (a scratch PR, 2026-09-11) with a job named `review` that
+# was made to fail for real, then skipped on a later event for the same head:
+#
+#   label `kit`, job runs and fails   → review FAILURE
+#   label `cv`,  job's `if` is false  → review SKIPPED
+#
+# The skip REPLACED the failure. A check run is keyed on (name, head sha) and
+# protection reads the latest, so one unrelated label on a PR erases a red
+# review and reports the required context as satisfied. The gate was not merely
+# weak, it was reversible by anyone who could add a label.
+#
+# 📌 Which triggers could reach the gate turns on whose sha the run carries,
+# also measured on #74:
+#
+#   pull_request: labeled        PR head sha         → reachable
+#   pull_request_review_comment  PR head sha         → reachable
+#   issue_comment                DEFAULT branch sha  → never touched the PR
+#
+# So a reply on a review thread — the coder answering a finding — was itself
+# enough to green the gate, which is the worst of the three.
+#
+# 📌 The first two also run the PR BRANCH's copy of a workflow, not the default
+# branch's (measured: a review-comment run on a branch that had renamed the job
+# listed the RENAMED name). That is what makes removing the job from
+# `claude.yml` take effect on the branch that removes it, rather than one merge
+# later.
+#
+# Which is why this file has exactly one trigger, one job, and publishes its
+# verdict as a check run it creates itself. A head nobody labelled never gets a
+# `review:clean` check at all — the required context stays PENDING and the merge
+# is blocked. Silence blocks; only a clean review opens.
+on:
+  pull_request:
+    types: [labeled]
+
+# The key answers «is THIS event asking for a review», never «does this PR carry
+# the label». A run is created for every labelled event, an unrelated one like
+# `trophy-sys` included; a label-PRESENCE test would drop that run into the live
+# review's group and cancel-in-progress would kill the review (#64 through
+# comments, then nearly again through labels on #70).
+concurrency:
+  group: review-${{ github.event.pull_request.number }}-${{ github.event.label.name == '🤖 review:requested' }}
+  cancel-in-progress: true
+
+jobs:
+  # 📌 NOT named `review`, and that is load-bearing. A job's name IS the check
+  # context it publishes, so a job called `review` here would still mint a
+  # skipped `review` check on every unrelated label — satisfying the old
+  # required context exactly as before, for as long as `main` still requires it.
+  # With no job of that name anywhere in the repo, the old context can never be
+  # reported by anything, so it blocks until branch protection is switched to
+  # `review:clean`. The fix does not depend on that switch happening promptly.
+  # CodeRabbit caught this.
+  review-round:
+    # The label is the ONLY way to start a review. `@claude review` in a comment
+    # used to work too and is gone deliberately: two doors to one action means
+    # two things to keep in step, and the comment door looked like an escape
+    # hatch for a PR that edits this file — which it never was, because the
+    # action refuses itself on any PR whose workflow differs from the default
+    # branch, whichever door opened it.
+    #
+    # 📌 The action ships its own `label_trigger` input and this predicate is
+    # NOT it, deliberately. `label_trigger` is read inside the action, which is
+    # five steps in: an unrelated label — `trophy-sys`, say — would start the
+    # job, mint an app token and count rounds before the action stood down.
+    # A job-level `if` never starts the job at all.
+    if: >-
+      github.event.action == 'labeled' &&
+      github.event.label.name == '🤖 review:requested'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+      actions: read
+      # Creating and completing the `review:clean` check run, which is the gate.
+      checks: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      # The reviewer gets its own face. Without this it posts as `claude[bot]`,
+      # the same identity as the assist lane and as any other Claude app on the
+      # repo, so «who said this» is unanswerable from a thread.
+      - id: reviewer
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.X_REVIEWER_CC_APP_ID }}
+          private-key: ${{ secrets.X_REVIEWER_CC_PRIVATE_KEY }}
+
+      - id: started
+        run: echo "at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      # Two things are read from the PREVIOUS review runs on this branch, and
+      # both are read here because the action is about to overwrite the sticky
+      # comment that would otherwise hold them.
+      #
+      # 📌 The source is the workflow run list, not the comment body. A run
+      # records its own head sha, so the delta needs no parsing and cannot be
+      # broken by the sticky comment being rewritten — which is exactly what the
+      # action does to it, seconds later, on every round.
+      - id: rounds
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.head_ref || github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          # 📌 Rounds are counted per BRANCH, not per PR. Greptile flagged that
+          # a reused branch name would carry its old rounds into the next PR.
+          # Left as is on purpose: branches here are one per assignment and
+          # deleted on merge, the repo takes no fork PRs, and the failure is on
+          # the safe side — the new PR is capped early and waits for Dima's
+          # word, rather than reviewing more than it should. Narrowing by PR
+          # number would mean trusting `pull_requests[]` on a run, and an empty
+          # one there would UNDER-count, which fails open.
+          #
+          # A round is a run that REACHED the reviewer, whatever the reviewer
+          # then found. That is why the verdict lives in the `review:clean`
+          # check run and never in this job's own conclusion: a job that ends
+          # green means «this round ran», so the count below is the count of
+          # rounds spent. A run that died on the cap below ends red and is not
+          # counted, which is correct — it spent nothing.
+          runs=$(gh api \
+            "repos/$REPO/actions/workflows/review.yml/runs?branch=$BRANCH&status=completed&per_page=100" \
+            --jq '[.workflow_runs[] | select(.conclusion == "success")] | sort_by(.run_number)' \
+            2>/dev/null || echo '[]')
+          count=$(jq 'length' <<<"$runs")
+          last=$(jq -r 'last | .head_sha // ""' <<<"$runs")
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "last=$last" >> "$GITHUB_OUTPUT"
+          echo "$count completed review rounds on this branch; last reviewed ${last:-none}"
+
+      # The cap. Two rounds per PR: the one at «final», and one after the fixes.
+      # A third is Dima's call, asked through cclio with a few words on what
+      # changed — so this fails early, before spending the window rather than
+      # after.
+      #
+      # 📌 Know what this costs now that the gate is real: `review:clean` lives
+      # on a head sha, so a push after the second round leaves the new head with
+      # no check and the PR blocked until Dima grants a third. That is the same
+      # state the old required context reached on a fresh head — the difference
+      # is that it is now deliberate instead of accidental.
+      - name: Two review rounds per PR
+        if: steps.rounds.outputs.count >= 2
+        run: |
+          echo "::error::Two review rounds already ran on this branch. A third needs Dima's word through cclio, with what changed since the last review."
+          exit 1
+
+      # 📌 The check run is created AFTER the cap, never before. A check run is
+      # keyed on (name, head sha) and GitHub shows the latest one, so creating it
+      # first would mean a refused third round replaces an already-green
+      # `review:clean` with a fresh `in_progress` — blocking a PR that had
+      # passed. A re-label on the same head does create a second check run with
+      # this name, and the latest winning is exactly what a re-review wants.
+      - id: check
+        name: Open the review:clean check run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          id=$(gh api "repos/$REPO/check-runs" -X POST \
+            -f name='review:clean' \
+            -f head_sha="$SHA" \
+            -f status=in_progress \
+            -f output[title]='review running' \
+            -f output[summary]='The reviewer is reading this head.' \
+            --jq '.id')
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "review:clean check run $id opened on $SHA"
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          github_token: ${{ steps.reviewer.outputs.token }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # The coder's own identity. It changed from `x-coder-bot[bot]` to
+          # `x-coder-cc[bot]`, and until this line caught up every review the
+          # coder asked for died on arrival with «Workflow initiated by
+          # non-human actor».
+          allowed_bots: "x-coder-cc[bot]"
+          # Kept in step with the job's `if` above. The predicate is what gates;
+          # this only stops the action's own default (`claude`) from disagreeing
+          # with us about which label means a review.
+          label_trigger: "🤖 review:requested"
+          trigger_phrase: "@cc"
+          plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
+          plugins: "code-review@claude-code-plugins"
+          # One comment per PR rather than one per round, so the thread stays
+          # readable when a PR is reviewed twice.
+          use_sticky_comment: true
+          include_fix_links: true
+          # The lane is a pull_request event by definition now, which is the
+          # scope the action's own docs give this input.
+          track_progress: true
+          prompt: |
+            /code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+
+            ${{ steps.rounds.outputs.last && format('This is a RE-REVIEW. You already reviewed this PR at {0}. Review the commits since that sha, plus the replies on your own open threads — not the whole diff again. Say plainly which of your earlier findings are now fixed, which are answered with a reason, and which still stand.', steps.rounds.outputs.last) || 'This is the first review of this PR. Review the whole diff.' }}
+          claude_args: |
+            --model claude-opus-5
+            --effort high
+            --max-turns 60
+            --allowedTools "mcp__github_inline_comment__create_inline_comment"
+
+      # What a green `review:clean` means: a review ran on this head, and nothing
+      # it found is sitting unanswered.
+      #
+      # Two failure modes, both measured on #70 and #72:
+      #
+      # 1. The action can stand down and still leave its step successful — it
+      #    does that on any PR whose workflow file differs from the default
+      #    branch. The job went green with no review posted at all, which is a
+      #    gate that passes empty.
+      # 2. A review that posts findings is not a clean review, and a check that
+      #    goes green anyway says the opposite of what happened.
+      #
+      # An ANSWERED thread counts as handled, deliberately. A finding the coder
+      # declines with a reason is work Dima reads in the PR, not a reason to
+      # block correct code — without that rule, one disagreement plus the
+      # two-round cap is a deadlock with no way out.
+      #
+      # 📌 This step does not fail the job, with one deliberate exception. The
+      # verdict is the check run; the job's own conclusion means «the round
+      # ran», which is what the `rounds` count above reads. A review that found
+      # things still ran, so it exits 0 and counts. The exception is a
+      # stand-down with nothing posted at all — no reviewer was spent, so that
+      # one exits 1 and does not count.
+      - id: guard
+        name: A green review means a clean review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          CHECK: ${{ steps.check.outputs.id }}
+          # Read from the token step rather than written out, so the guard
+          # follows the app automatically if the reviewer is ever renamed — the
+          # `allowed_bots` line above is the lesson that made this worth doing.
+          REVIEWER: ${{ steps.reviewer.outputs.app-slug }}[bot]
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          # The job-run link the action writes into its tracking comment,
+          # whoever ends up owning that comment. Verified present in both the
+          # «review in progress» body and the finished one.
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SINCE: ${{ steps.started.outputs.at }}
+        run: |
+          set -euo pipefail
+
+          # Writing the step output here, next to the PATCH, is what lets the
+          # cleanup step below know a verdict was delivered without asking the
+          # api a second time.
+          # 📌 The patch must not be fatal, for the same reason the cleanup step
+          # below is not: it is a network call, it is the last thing a spent
+          # round does, and under `set -e` a transient 5xx would end the run red
+          # — which un-counts a round that was actually spent and buys a free
+          # extra one. `delivered` is written only when the verdict really
+          # landed, so a failure here hands the check to the cleanup step, which
+          # closes it red. The reviewer caught this one on itself.
+          verdict() {
+            if gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
+              -f status=completed -f conclusion="$1" \
+              -f output[title]="$2" -f output[summary]="$3" --jq '.conclusion'; then
+              echo "delivered=yes" >> "$GITHUB_OUTPUT"
+            else
+              echo "::warning::could not write the verdict — the cleanup step closes the check instead"
+            fi
+          }
+
+          # 📌 `--paginate` emits ONE ARRAY PER PAGE, so anything reading `.[0]`
+          # silently sees only the first 30 comments — and a PR with two review
+          # rounds passes 30 easily. `jq -s add` folds the pages into one array.
+          #
+          # Two fetchers, because an empty answer means opposite things in the
+          # two places they are used, and one helper for both is how a gate
+          # learns to lie.
+          #
+          # `api` swallows a failure into `[]`. That is only safe where empty
+          # means «no proof a review happened», which fails CLOSED.
+          api() {
+            gh api "repos/$REPO/$1" --paginate 2>/dev/null | jq -s 'add // []' || echo '[]'
+          }
+
+          # `apiStrict` refuses to invent an answer. Reading the finding threads
+          # is the other case: there, empty means «nothing unanswered», so a
+          # swallowed failure would mark the review clean without having read a
+          # single comment. Greptile found that, and it is precisely the shape
+          # of lie this whole PR exists to remove.
+          apiStrict() {
+            gh api "repos/$REPO/$1" --paginate | jq -s 'add // []'
+          }
+
+          # 📌 Two things make a round's own artifact hard to recognise, and
+          # both are `use_sticky_comment` reusing an existing tracking comment
+          # rather than writing a new one (`create-initial.ts`, the
+          # `idMatch || botNameMatch || bodyMatch` find):
+          #
+          #  1. an edit moves `updated_at` and leaves `created_at` at the old
+          #     round — so freshness, not creation
+          #  2. an edit does NOT change a comment's author. The only thing that
+          #     find can match is `claude[bot]` (`botNameMatch` is
+          #     `login.includes("claude")`, and the assist lane keeps that
+          #     identity on purpose), so the comment the reviewer wrote its
+          #     verdict into still reads as authored by `claude[bot]` — and an
+          #     author test for the reviewer drops it entirely
+          #
+          # Miss either and a clean re-review — one that posts no new inline
+          # findings because there are none — counts zero artifacts on any PR
+          # that has ever carried one `@cc` comment. That reports «no review was
+          # posted»: red, `exit 1`, round uncounted, check never green, loop
+          # unable to terminate. The reviewer found this reviewing itself, then
+          # caught the half-fix on the next round.
+          #
+          # The job-run link is the author-independent handle: the action writes
+          # it into that comment whoever owns it.
+          #
+          # A stand-down still counts zero, by construction rather than luck.
+          # `track_progress: true` on a `pull_request` event forces tag mode,
+          # and tag mode writes the comment only after the trigger check and the
+          # human-actor check have both passed — a refusal writes nothing, so no
+          # body can carry this run's link.
+          posted=0
+          for attempt in 1 2 3; do
+            posted=$(
+              { api "issues/$PR/comments"; api "pulls/$PR/comments"; api "pulls/$PR/reviews"; } \
+                | jq -s --arg who "$REVIEWER" --arg since "$SINCE" --arg run "$RUN" \
+                    '[.[][] | select((((.user.login == $who) or ((.body // "") | contains($run))))
+                                     and ((.updated_at // .submitted_at) > $since))] | length'
+            )
+            [ "$posted" -gt 0 ] && break
+            if [ "$attempt" -lt 3 ]; then
+              echo "no review artifact yet (attempt $attempt), waiting for the api to settle"
+              sleep 10
+            fi
+          done
+
+          if [ "$posted" -eq 0 ]; then
+            verdict failure 'no review was posted' \
+              'The review job finished without posting anything. A green check would claim a review that never happened. This is what a PR editing its own workflow files looks like: the action refuses itself.'
+            echo "::error::no review artifact posted — review:clean is red"
+            # The ONE path that ends the job red on purpose. A stand-down spent
+            # no reviewer, so it must not eat a round: on a PR that edits these
+            # workflow files the action refuses itself every time, and two
+            # labels would otherwise burn the whole cap on zero reviews.
+            # CodeRabbit caught this. Every other path exits 0 — see the note on
+            # the step, the verdict is the check, not the job.
+            exit 1
+          fi
+          echo "review artifacts posted this run: $posted"
+
+          # Every inline finding from THIS run, and whether its thread already
+          # carries a reply. A thread the reviewer re-raises after it was
+          # answered is handled; a fresh one is not.
+          #
+          # 📌 «Answered», not «answered by the coder». The rule was a hardcoded
+          # `x-coder-cc[bot]`, which made the documented escape — «answer each
+          # thread with a reason, then re-apply the label» — unreachable for
+          # Dima on a PR he opened himself, and would go silently unsatisfiable
+          # the next time the coder app is renamed. The reviewer found that on
+          # itself. A HUMAN reply always counts; a BOT reply counts only from
+          # the PR's own author, so a third-party review bot cannot clear a
+          # finding by answering a thread it does not own.
+          if ! threads=$(apiStrict "pulls/$PR/comments"); then
+            verdict failure 'could not read the review threads' \
+              'The api call that lists the review comments failed, so whether any finding is unanswered is unknown. An unknown state is not a clean review. Re-apply the label to try again.'
+            echo "::warning::could not read the threads — review:clean is red"
+            exit 0
+          fi
+
+          unanswered=$(
+            jq --arg who "$REVIEWER" --arg author "$AUTHOR" --arg since "$SINCE" '
+              . as $all
+              | [$all[] | select(.user.login == $who and .created_at > $since)]
+              | map(. as $f
+                  | ($f.in_reply_to_id // $f.id) as $root
+                  | { path: $f.path, line: ($f.line // $f.original_line),
+                      answered: ([$all[]
+                        | select(.user.login != $who
+                                 and (.user.type != "Bot" or .user.login == $author)
+                                 and ((.in_reply_to_id // .id) == $root))] | length > 0) })
+              | map(select(.answered | not))
+            ' <<<"$threads"
+          )
+          open=$(jq 'length' <<<"$unanswered")
+
+          if [ "$open" -gt 0 ]; then
+            list=$(jq -r '.[] | "- `\(.path):\(.line)`"' <<<"$unanswered")
+            echo "$list"
+            verdict failure "$open finding(s) with no reply" \
+              "$list"$'\n\nFix them, or answer each thread with a reason, then re-apply the label.'
+            echo "::warning::$open unanswered finding(s) — review:clean is red"
+            exit 0
+          fi
+
+          verdict success 'clean on this head' \
+            "The reviewer posted $posted artifact(s) on this head and every finding has a reply."
+          echo "no unanswered findings — clean on this head"
+
+      # A way out. Everything above can end the job early — a crash in the
+      # action, a cancelled run, a step that throws. A check run left
+      # `in_progress` reports as PENDING forever, and a required context that
+      # never resolves is a PR nobody can merge without an admin override.
+      #
+      # 📌 Whether a verdict was delivered is read from the guard's own output,
+      # never from the api. Asking the api would add a call that can fail, and a
+      # failure here would end the run red — which un-counts a round that was
+      # actually spent, the very leak the `rounds` step above was fixed for.
+      # Greptile caught that on this PR. Nothing in this step may fail the job,
+      # which is also why the patch tolerates its own error.
+      - name: Never leave the check hanging
+        if: always() && steps.guard.outputs.delivered != 'yes'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          CHECK: ${{ steps.check.outputs.id }}
+        run: |
+          set -uo pipefail
+
+          # The id normally comes from the step that opened the check. It can be
+          # missing: the run is cancelled between the POST and the write to
+          # `$GITHUB_OUTPUT`, and the check exists with nothing holding its id.
+          # Looking it up by head sha is the only way out for that one, and an
+          # already-completed check is not matched, so a delivered verdict is
+          # never overwritten. Greptile found this window.
+          if [ -z "$CHECK" ]; then
+            CHECK=$(gh api \
+              "repos/$REPO/commits/$SHA/check-runs?check_name=review:clean&status=in_progress" \
+              --jq '.check_runs[0].id // ""' 2>/dev/null || echo "")
+          fi
+          [ -n "$CHECK" ] || exit 0
+
+          gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
+            -f status=completed -f conclusion=failure \
+            -f output[title]='the review round ended without a verdict' \
+            -f output[summary]='The job stopped before the guard could judge it. Re-apply the label to run another round.' \
+            --jq '.conclusion' \
+            || echo "::warning::could not close review:clean — it stays pending and the PR stays blocked, which is the safe side"
