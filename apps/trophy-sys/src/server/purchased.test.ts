@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { assert, expect, test } from 'vitest';
 
 import type { Game } from '../shared/types.ts';
 import type { PlayIndex } from './playtime.ts';
@@ -48,7 +47,7 @@ test('a purchased title already in the trophy list is not added again', () => {
     [trophied('Hollow Knight')],
     NO_PLAY,
   );
-  assert.deepEqual(names(merged), []);
+  expect(names(merged)).toStrictEqual([]);
 });
 
 test('a purchased title with no trophy record is added', () => {
@@ -57,19 +56,21 @@ test('a purchased title with no trophy record is added', () => {
     [trophied('Hollow Knight')],
     NO_PLAY,
   );
-  assert.deepEqual(names(merged), ['Rogue Legacy 2']);
+  expect(names(merged)).toStrictEqual(['Rogue Legacy 2']);
 });
 
 test('an added title carries the purchased identity, not a trophy one', () => {
   const [game] = unplayedBuild([purchased('Sifu')], [], NO_PLAY);
+  // assert.ok, not expect: only the assertion signature narrows `game` for the
+  // property reads below.
   assert.ok(game);
 
-  assert.equal(game.source, 'psn-purchased');
+  expect(game.source).toBe('psn-purchased');
   // Its id is a titleId, and every trophy endpoint takes an npCommunicationId —
   // `gameDetailFetch` branches on `source` because of exactly this.
-  assert.equal(game.id, purchased('Sifu').titleId);
-  assert.equal(game.progress, 0);
-  assert.deepEqual(game.defined, {
+  expect(game.id).toBe(purchased('Sifu').titleId);
+  expect(game.progress).toBe(0);
+  expect(game.defined).toStrictEqual({
     bronze: 0,
     gold: 0,
     platinum: 0,
@@ -77,8 +78,8 @@ test('an added title carries the purchased identity, not a trophy one', () => {
   });
   // Not a fake date: `Date.parse('')` is NaN, which the archive's freshness
   // check reads as "never newer" instead of "just changed".
-  assert.equal(game.lastPlayedAt, '');
-  assert.equal(Number.isNaN(Date.parse(game.lastPlayedAt)), true);
+  expect(game.lastPlayedAt).toBe('');
+  expect(Number.isNaN(Date.parse(game.lastPlayedAt))).toBe(true);
 });
 
 /**
@@ -92,7 +93,7 @@ test('a cross-gen title owned on PS5 with PS4 trophies stays one row', () => {
     [trophied('Ghost of Tsushima', 'PS4')],
     NO_PLAY,
   );
-  assert.deepEqual(names(merged), []);
+  expect(names(merged)).toStrictEqual([]);
 });
 
 test('the loose name pass catches the editions the two lists disagree about', () => {
@@ -105,13 +106,12 @@ test('the loose name pass catches the editions the two lists disagree about', ()
   ];
 
   for (const [owned, withTrophies] of cases)
-    assert.deepEqual(
+    expect(
       names(
         unplayedBuild([purchased(owned)], [trophied(withTrophies)], NO_PLAY),
       ),
-      [],
       `${owned} should match ${withTrophies}`,
-    );
+    ).toStrictEqual([]);
 });
 
 test('a subtitle naming a different game is not merged away', () => {
@@ -122,7 +122,7 @@ test('a subtitle naming a different game is not merged away', () => {
     [trophied('Metal Gear Solid V: Ground Zeroes')],
     NO_PLAY,
   );
-  assert.deepEqual(names(merged), ['Metal Gear Solid V: The Phantom Pain']);
+  expect(names(merged)).toStrictEqual(['Metal Gear Solid V: The Phantom Pain']);
 });
 
 /**
@@ -139,7 +139,7 @@ test('two entitlements of the same game yield one row', () => {
     [],
     NO_PLAY,
   );
-  assert.deepEqual(names(merged), ['Returnal']);
+  expect(names(merged)).toStrictEqual(['Returnal']);
 });
 
 test('playtime is joined onto an added title when the feed has it', () => {
@@ -150,13 +150,13 @@ test('playtime is joined onto an added title when the feed has it', () => {
   };
 
   const [game] = unplayedBuild([purchased('Stray', 'PS5')], [], played);
-  assert.equal(game?.playSeconds, 7200);
-  assert.equal(game?.playedAt, record.playedAt);
+  expect(game?.playSeconds).toBe(7200);
+  expect(game?.playedAt).toBe(record.playedAt);
 });
 
 test('a missed playtime join is null, never zero', () => {
   const [game] = unplayedBuild([purchased('Stray', 'PS5')], [], NO_PLAY);
   // Zero would print as "0m played" for a game the feed simply has no row for.
-  assert.equal(game?.playSeconds, null);
-  assert.equal(game?.playedAt, null);
+  expect(game?.playSeconds).toBe(null);
+  expect(game?.playedAt).toBe(null);
 });

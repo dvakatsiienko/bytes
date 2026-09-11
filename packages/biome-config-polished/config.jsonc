@@ -321,6 +321,13 @@
         "vite.config.ts",
         "**/vite.config.ts",
 
+        // Vitest — `.mts` because a CommonJS package (the Next apps) cannot
+        // load an ESM `.ts` config through Vite's native loader.
+        "vitest.config.ts",
+        "**/vitest.config.ts",
+        "vitest.config.mts",
+        "**/vitest.config.mts",
+
         // Convex
         "**/convex/**",
 
@@ -356,6 +363,26 @@
       "includes": [
         "apps/**/convex/_generated/**",
         "apps/**/graphql/index.{ts,tsx}"
+      ]
+    },
+
+    // The test runner lives in the ROOT devDependencies and nowhere else, the
+    // way `typescript` does. `tsc` never appears in an import so the rule never
+    // sees it; `vitest` is imported by every test file, and the rule resolves
+    // the NEAREST package.json — the app's — so it reports a dependency that is
+    // deliberately one level up. Scoped to test files: a `src` file importing
+    // something undeclared is still an error.
+    {
+      "linter": {
+        "rules": {
+          "correctness": { "noUndeclaredDependencies": "off" }
+        }
+      },
+      "includes": [
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "vitest.config.{ts,mts}",
+        "**/vitest.config.{ts,mts}"
       ]
     }
   ]

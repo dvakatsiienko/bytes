@@ -15,7 +15,7 @@
     "prisma:generate": "prisma generate",
     "postinstall": "prisma generate",
     "lint": "biome lint",
-    "test": "node --test src/lib/*.test.ts",
+    "test": "vitest run",
     "typecheck": "tsc"
   },
   "dependencies": {
