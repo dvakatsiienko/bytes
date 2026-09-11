@@ -7,25 +7,36 @@ on:
     types: [created]
   # The label lane. `@claude review` in a comment still works and is the way to
   # ask for a re-review; the label is what a merge waits on.
+  #
+  # `synchronize` is not optional once the check is required: a fix pushed after
+  # the label leaves the new head with no `review` check at all, so the merge
+  # would jam until somebody removed and re-applied the label. A push to an
+  # already-labelled PR re-reviews the new head instead.
   pull_request:
-    types: [labeled]
+    types: [labeled, synchronize]
 
 # noise comments (vercel, linear, renovate) must never share a group with a live review:
 # with cancel-in-progress a vercel deploy comment cancelled the first review run (#64)
 #
-# `github.event_name` is in the key because a pull_request event carries no
-# comment body: without it every label run and every noise comment would land in
-# the same `claude--false` group, and cancel-in-progress would let a vercel
-# comment kill a review again — the exact bug the group was written for.
+# The last term answers «is THIS event asking for a review» — never «does this PR
+# carry the label». A workflow run is created for every labelled event, including
+# an unrelated one like `trophy-sys`, so a label-presence test would drop that run
+# into the live review's group and cancel-in-progress would kill the review: #64
+# again, through labels instead of comments. Greptile caught it on #70.
+#
+# `github.event_name` stays in the key because a pull_request event carries no
+# comment body, so without it the lanes collapse into one `claude--false` group.
 concurrency:
-  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event_name }}-${{ contains(github.event.comment.body, '@claude') }}
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event_name }}-${{ (github.event.action == 'labeled' && github.event.label.name == '👀 review') || (github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, '👀 review')) || contains(github.event.comment.body, '@claude') }}
   cancel-in-progress: true
 
 jobs:
   review:
     if: >-
-      (github.event_name == 'pull_request' &&
+      (github.event.action == 'labeled' &&
        github.event.label.name == '👀 review') ||
+      (github.event.action == 'synchronize' &&
+       contains(github.event.pull_request.labels.*.name, '👀 review')) ||
       (github.event.issue.pull_request &&
        contains(github.event.comment.body, '@claude review'))
     runs-on: ubuntu-latest
