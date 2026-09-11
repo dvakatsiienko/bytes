@@ -5,10 +5,11 @@ import { Button } from './button';
 
 /**
  * The first component test in the repo, so it is also the template. Two of the
- * four cases are the reason the kit tests in a real browser rather than a DOM
- * simulator: one reads a colour resolved from the stylesheet, the other needs a
- * pointer that the stylesheet can actually block. A simulator answers an empty
- * string for both, and would pass them against a button with no styles at all.
+ * five cases are the reason the kit tests in a real browser rather than a DOM
+ * simulator: both read a value resolved from the stylesheet, and a simulator
+ * answers an empty string for each — passing against a button with no styles at
+ * all. The other three would run anywhere, and are here because they are the
+ * button's behaviour.
  */
 
 const TIMED_OUT = /Timeout/;
@@ -43,7 +44,7 @@ test('a click reaches the handler', async () => {
   expect(onClick).toHaveBeenCalledTimes(1);
 });
 
-test('a disabled button cannot be reached by a pointer at all', async () => {
+test('a disabled button never calls its handler', async () => {
   const onClick = vi.fn();
   const screen = await render(
     <Button disabled onClick={onClick}>
@@ -51,14 +52,23 @@ test('a disabled button cannot be reached by a pointer at all', async () => {
     </Button>,
   );
 
-  // Deliberately not `force: true`. Forcing bypasses hit-testing, which would
-  // prove only the native `disabled` attribute — something every environment
-  // honours. The click below times out instead, because
-  // `disabled:pointer-events-none` resolved from the stylesheet leaves nothing
-  // for a pointer to hit. That is the half only a real browser can show.
+  // Not `force: true`: forcing bypasses hit-testing, and the question here is
+  // whether a real pointer can land at all.
   await expect(
     screen.getByRole('button', { name: 'Blocked' }).click({ timeout: 400 }),
   ).rejects.toThrow(TIMED_OUT);
 
   expect(onClick).not.toHaveBeenCalled();
+});
+
+test('the stylesheet takes a disabled button out of hit-testing', async () => {
+  const screen = await render(<Button disabled>Blocked</Button>);
+  const button = screen.getByRole('button', { name: 'Blocked' }).element();
+
+  // This needs its own assertion, and the test above cannot stand in for it.
+  // Measured: a disabled button with `pointer-events` forced back on still
+  // times out, because the click waits on the native `disabled` attribute. So
+  // deleting `disabled:pointer-events-none` would leave that test green and
+  // this one red, which is the right way round.
+  expect(getComputedStyle(button).pointerEvents).toBe('none');
 });
