@@ -1,7 +1,12 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Redis } from '@upstash/redis';
 
-import type { NpssoStatus, Settings, TrophyArchive } from '../shared/types.ts';
+import type {
+  GrantStatus,
+  NpssoStatus,
+  Settings,
+  TrophyArchive,
+} from '../shared/types.ts';
 import { SETTINGS_DEFAULT } from '../shared/types.ts';
 
 const STATE_FILE = new URL('../../.trophy-state.json', import.meta.url);
@@ -24,6 +29,15 @@ const NPSSO_DEATHS_FILE = new URL(
   import.meta.url,
 );
 const NPSSO_DEATHS_KEY = 'trophy-sys:npsso-deaths';
+
+const GRANT_FILE = new URL('../../.trophy-psn-grant.json', import.meta.url);
+const GRANT_KEY = 'trophy-sys:psn-grant';
+
+const GRANT_DEATHS_FILE = new URL(
+  '../../.trophy-psn-grant-deaths.json',
+  import.meta.url,
+);
+const GRANT_DEATHS_KEY = 'trophy-sys:psn-grant-deaths';
 
 const SETTINGS_FILE = new URL('../../.trophy-settings.json', import.meta.url);
 const SETTINGS_KEY = 'trophy-sys:settings';
@@ -248,9 +262,10 @@ export const npssoDeathRecord = async (failed: string) => {
 };
 
 export const npssoStatusLoad = async (): Promise<NpssoStatus> => {
-  const [record, deaths] = await Promise.all([
+  const [record, deaths, refresh] = await Promise.all([
     npssoRecordLoad(),
     npssoDeathsLoad(),
+    grantStatusLoad(),
   ]);
 
   // A token retired while still working contributes no lifetime: its age is a
@@ -263,6 +278,7 @@ export const npssoStatusLoad = async (): Promise<NpssoStatus> => {
     return {
       diedAt: null,
       lifetimes,
+      refresh,
       savedAt: null,
       source: process.env.NPSSO ? 'env' : 'none',
     };
@@ -271,9 +287,120 @@ export const npssoStatusLoad = async (): Promise<NpssoStatus> => {
     diedAt:
       deaths.find((death) => death.token === record.token)?.diedAt ?? null,
     lifetimes,
+    refresh,
     // 0 is the bare-string record: a token from before this was measured.
     savedAt: record.savedAt || null,
     source: 'store',
+  };
+};
+
+/**
+ * The PSN refresh grant an NPSSO exchange buys, and the reason a cold start no
+ * longer has to spend the NPSSO.
+ *
+ * PSN reports the grant's lifetime as 863999s — ten days, measured 2026-09-11,
+ * and shorter than the NPSSO's observed ~25. So this is not a replacement for
+ * pasting a token; it is what keeps every cold serverless start from running
+ * the NPSSO→access-code exchange, and what makes the grant's real behaviour
+ * observable. 📌 `mintedAt` and `expiresIn` together are the open question:
+ * whether a refresh *resets* the ten days or merely reports what is left of
+ * them. A grant older than ten days that still refreshes answers it, and the
+ * admin panel prints both numbers for exactly that reason.
+ *
+ * 📌 The token does **not** rotate — PSN answers a refresh with the identical
+ * string (measured the same day). So a second process refreshing the same grant
+ * is harmless, and nothing here needs a lock.
+ */
+export interface RefreshGrant {
+  /** `refreshTokenExpiresIn` as PSN reported it at `refreshedAt`, in seconds. */
+  expiresIn: number;
+  /** When an NPSSO bought this grant. Survives every refresh of it. */
+  mintedAt: number;
+  /**
+   * The same figure as PSN first published it, in seconds, never overwritten.
+   *
+   * 📌 Without it there is no window to measure against. `expiresIn` is replaced
+   * on every refresh with what is left, so any window derived from it comes out
+   * constant by construction — `(refreshedAt - mintedAt) + expiresIn` is the
+   * published figure again under a countdown, and grows in lockstep with the age
+   * under a reset. Both make "has this grant outlived its window" unanswerable.
+   */
+  mintedExpiresIn: number;
+  /** When `expiresIn` was last read — the clock it counts down from. */
+  refreshedAt: number;
+  token: string;
+}
+
+/** One per grant PSN has refused, appended only by the death recorder. */
+interface GrantDeath {
+  diedAt: number;
+  /** Copied from the record, so a lifetime needs no second lookup. */
+  mintedAt: number;
+  token: string;
+}
+
+const grantDeathsLoad = async (): Promise<GrantDeath[]> =>
+  (await storeRead<GrantDeath[]>(GRANT_DEATHS_KEY, GRANT_DEATHS_FILE)) ?? [];
+
+export const refreshGrantLoad = async (): Promise<RefreshGrant | null> => {
+  const stored = await storeRead<Partial<RefreshGrant>>(GRANT_KEY, GRANT_FILE);
+  if (!stored?.token) return null;
+
+  return {
+    expiresIn: stored.expiresIn ?? 0,
+    mintedAt: stored.mintedAt ?? 0,
+    // A record written before the window was kept reports the figure it has.
+    mintedExpiresIn: stored.mintedExpiresIn ?? stored.expiresIn ?? 0,
+    refreshedAt: stored.refreshedAt ?? 0,
+    token: stored.token,
+  };
+};
+
+export const refreshGrantSave = (grant: RefreshGrant) =>
+  storeWrite(GRANT_KEY, GRANT_FILE, grant);
+
+/**
+ * Dropped when a fresh NPSSO is pasted. Keeping the old grant would let a paste
+ * change nothing for up to ten days — and the owner pastes precisely when
+ * something is broken, so the next call must prove the new token works.
+ */
+export const refreshGrantClear = () => storeWrite(GRANT_KEY, GRANT_FILE, null);
+
+/**
+ * Records that PSN refused a grant. Idempotent per token, like its NPSSO twin:
+ * the refusal is followed immediately by a fresh mint that overwrites the live
+ * record, so the death has to be kept somewhere that mint cannot clobber.
+ */
+export const refreshGrantDeathRecord = async (dead: RefreshGrant) => {
+  const deaths = await grantDeathsLoad();
+  if (deaths.some((death) => death.token === dead.token)) return;
+
+  await storeWrite(GRANT_DEATHS_KEY, GRANT_DEATHS_FILE, [
+    ...deaths,
+    {
+      diedAt: Date.now(),
+      mintedAt: dead.mintedAt,
+      token: dead.token,
+    } satisfies GrantDeath,
+  ]);
+};
+
+const grantStatusLoad = async (): Promise<GrantStatus> => {
+  const [grant, deaths] = await Promise.all([
+    refreshGrantLoad(),
+    grantDeathsLoad(),
+  ]);
+
+  return {
+    expiresIn: grant?.expiresIn ?? 0,
+    // A grant minted before this was measured has no start, so its span is not
+    // a lifetime — same rule the NPSSO lifetimes follow.
+    lifetimes: deaths
+      .filter((death) => death.mintedAt > 0)
+      .map((death) => death.diedAt - death.mintedAt),
+    mintedAt: grant?.mintedAt || null,
+    refreshedAt: grant?.refreshedAt || null,
+    window: grant?.mintedExpiresIn ?? 0,
   };
 };
 

@@ -8,6 +8,7 @@ import {
   hiddenLoad,
   hiddenSave,
   npssoSave,
+  refreshGrantClear,
   shownLoad,
   shownSave,
 } from './state.ts';
@@ -282,9 +283,32 @@ export const npssoSet = async (value: unknown) => {
     return false;
 
   await npssoSave(value.trim());
+
   // The in-memory PSN session was minted from the old token; keeping it would
-  // hide whether the new one works until the access token expires.
-  sessionReset();
+  // hide whether the new one works until the access token expires. The stored
+  // refresh grant is the same problem with a ten-day fuse — it was bought by the
+  // token being replaced, and it would keep the paste from proving anything.
+  //
+  // ⚠️ The clear goes first, and the order is load-bearing. `sessionReset` bumps
+  // its epoch synchronously while the clear yields on a real KV round-trip, so
+  // resetting first opens a window: a request entering it captures the already
+  // bumped epoch, reads the not-yet-cleared grant, refreshes it successfully —
+  // PSN does not rotate the token — and writes it back over the key the clear is
+  // in the middle of nulling. The paste then changes nothing for ten days.
+  // Clearing first closes both directions: work that started earlier is caught
+  // by the bump that follows it, and work that starts later reads an empty store
+  // and mints from the token just pasted. 📌 Zero-width on the file backend,
+  // whose write is synchronous — this one only bites on KV, so only production.
+  //
+  // 📌 `finally`, because the reset must not be skipped when the clear throws.
+  // The route still answers 500 and the owner retries, which is right — the
+  // paste genuinely has not taken effect.
+  try {
+    await refreshGrantClear();
+  } finally {
+    sessionReset();
+  }
+
   return true;
 };
 

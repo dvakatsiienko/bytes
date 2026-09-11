@@ -11,3 +11,5 @@ api/
 .trophy-settings.json
 .trophy-npsso-deaths.json
 .trophy-shown.json
+.trophy-psn-grant.json
+.trophy-psn-grant-deaths.json

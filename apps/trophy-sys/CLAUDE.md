@@ -97,8 +97,42 @@ credentials, and `.env.dev.local` overrides them for dev. In production Vercel i
 `src/server/cli.ts` — need the flags. Every key the app reads must also be listed in
 `turbo.jsonc`'s `env` array, because Biome's `noUndeclaredEnvVars` reads that list.
 
-- `authGet()` in `psn.ts` holds one in-memory session and refreshes it with the refresh token, so
-  the NPSSO→access-code exchange runs once per process.
+- `authGet()` in `psn.ts` takes the cheapest session it can get, in this order: the in-memory one,
+  the **refresh grant stored in KV**, and only then an NPSSO→access-code exchange. So a cold
+  serverless start — which is every cron run — costs one PSN call and spends no NPSSO.
+
+📌 **The grant is a hard ten-day window from the mint, and a refresh does not extend it.**
+Measured 2026-09-11: PSN reports `refreshTokenExpiresIn: 863999` (10.0000 days) on a fresh grant,
+and the number **counts down** — 863999 → 863830 while the grant aged 172s. So the grant expires
+*before* the NPSSO's observed ~25 days, and this path does not make the token renew itself; it only
+stops every cold start from spending one.
+
+⚠️ **The panel prints the grant's age and its remaining days as two separate numbers, and that
+separation is the instrument — never fold them into one.** A window derived from the live
+`expiresIn` is constant by construction and answers nothing: under a countdown
+`(refreshedAt - mintedAt) + expiresIn` returns the published figure again, and under a reset it
+grows in lockstep with the age. Both make "has this grant outlived its window" unaskable. The
+window therefore comes from `mintedExpiresIn`, stored at the mint and **never overwritten**, and an
+age past it *with days still left* is the reading that would overturn the measurement above.
+
+⚠️ **`exchangeRefreshTokenForAuthTokens` never throws on a refused grant — it returns `{}`.**
+psn-api does not look at the response status on either token call, so the only error check is the
+response shape. `sessionBuild` returns null on a missing `accessToken`; without it a session gets
+`expiresAt: Date.now() + undefined * 1000` = `NaN`, which compares false against every clock, so
+every later call re-mints — forever, against a rate-limited api.
+
+📌 The refresh token **does not rotate**: PSN answers a refresh with the identical string, so two
+processes refreshing one grant cannot disagree and nothing here needs a lock.
+
+⚠️ The grant write is still guarded by **`isAutoWriteSafe`**, because nobody asks for it — it rides
+along on whatever route ran. The tempting exemption is that a grant is the session rather than data;
+that holds for the token and fails for `mintedAt`, which a local run pointed at production KV would
+stamp over with its own. So a local run verifies against the file backend or the local redis recipe
+in `.env.dev.local`, never by writing production.
+
+- Pasting a fresh NPSSO clears the stored grant (`refreshGrantClear` in `npssoSet`). Keeping it
+  would let a paste change nothing for up to ten days, and the owner pastes exactly when something
+  is broken.
 - 📌 **KV is the source of the NPSSO. `process.env.NPSSO` is a bootstrap seed and nothing else.**
   `npssoRead()` is async and reads `npssoLoad()` first, the env var second — so the seed carries a
   deploy that has never been pasted into, and the first paste retires it for good. Vercel env vars
@@ -141,7 +175,12 @@ would let the loser's trophies resurface as "new".
 
 Everything else the app persists rides the same `state.ts` store, one key each:
 `trophy-sys:stats`, `trophy-sys:hidden` (`string[]`), `trophy-sys:npsso` (`string`),
-`trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`).
+`trophy-sys:psn-grant` (a `RefreshGrant`), `trophy-sys:psn-grant-deaths` (one entry per grant PSN
+refused), `trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`).
+
+📌 A **death goes under its own key, never into the live record** — the pattern the NPSSO uses
+and the grant now copies. A refusal is followed immediately by a fresh mint that overwrites the
+live record, so a death written there is clobbered by the very call that discovered it.
 
 📌 **`settingsLoad` spreads the store over `SETTINGS_DEFAULT`, so a key already written to the
 store outranks the code default forever.** Changing a default therefore reaches a fresh install
