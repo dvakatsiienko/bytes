@@ -47,7 +47,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  review:
+  # 📌 NOT named `review`, and that is load-bearing. A job's name IS the check
+  # context it publishes, so a job called `review` here would still mint a
+  # skipped `review` check on every unrelated label — satisfying the old
+  # required context exactly as before, for as long as `main` still requires it.
+  # With no job of that name anywhere in the repo, the old context can never be
+  # reported by anything, so it blocks until branch protection is switched to
+  # `review:clean`. The fix does not depend on that switch happening promptly.
+  # CodeRabbit caught this.
+  review-round:
     # The label is the ONLY way to start a review. `@claude review` in a comment
     # used to work too and is gone deliberately: two doors to one action means
     # two things to keep in step, and the comment door looked like an escape
@@ -219,9 +227,12 @@ jobs:
       # block correct code — without that rule, one disagreement plus the
       # two-round cap is a deadlock with no way out.
       #
-      # 📌 This step does NOT fail the job. The verdict is the check run; the
-      # job's own conclusion means «the round ran», which is what the `rounds`
-      # count above reads.
+      # 📌 This step does not fail the job, with one deliberate exception. The
+      # verdict is the check run; the job's own conclusion means «the round
+      # ran», which is what the `rounds` count above reads. A review that found
+      # things still ran, so it exits 0 and counts. The exception is a
+      # stand-down with nothing posted at all — no reviewer was spent, so that
+      # one exits 1 and does not count.
       - id: guard
         name: A green review means a clean review
         env:
@@ -288,8 +299,14 @@ jobs:
           if [ "$posted" -eq 0 ]; then
             verdict failure 'no review was posted' \
               'The review job finished without posting anything. A green check would claim a review that never happened. This is what a PR editing its own workflow files looks like: the action refuses itself.'
-            echo "::warning::no review artifact posted — review:clean is red"
-            exit 0
+            echo "::error::no review artifact posted — review:clean is red"
+            # The ONE path that ends the job red on purpose. A stand-down spent
+            # no reviewer, so it must not eat a round: on a PR that edits these
+            # workflow files the action refuses itself every time, and two
+            # labels would otherwise burn the whole cap on zero reviews.
+            # CodeRabbit caught this. Every other path exits 0 — see the note on
+            # the step, the verdict is the check, not the job.
+            exit 1
           fi
           echo "review artifacts posted this run: $posted"
 
