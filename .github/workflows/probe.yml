@@ -60,10 +60,16 @@ jobs:
             -f output[summary]='no unanswered findings' --jq '.conclusion'
 
   # The REAL guard script from review.yml, byte for byte, pointed at PR #72 —
-  # 18 real comments, 9 real coder replies. `x-com-chat` renames the replier so
-  # every thread reads unanswered; `trophy-sys` uses the real one.
+  # 18 real comments, 9 real coder replies.
+  #
+  #   x-com-chat  → the replier is renamed, so every thread reads unanswered
+  #   trophy-sys  → the real replier, so every thread reads answered
+  #   bug         → the guard never runs at all, proving the way out
   guard-real:
-    if: github.event.label.name == 'x-com-chat' || github.event.label.name == 'trophy-sys'
+    if: >-
+      github.event.label.name == 'x-com-chat' ||
+      github.event.label.name == 'trophy-sys' ||
+      github.event.label.name == 'bug'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -88,7 +94,16 @@ jobs:
           echo "id=$id" >> "$GITHUB_OUTPUT"
           echo "review:clean check run $id opened on $SHA"
 
-      - name: A green review means a clean review
+      # Stands in for the claude action crashing: the guard below never runs,
+      # so the check is left open and only the way-out step can close it.
+      - name: crash before the guard
+        if: github.event.label.name == 'bug'
+        run: |
+          echo "probe: pretending the reviewer step died"
+          exit 1
+
+      - id: guard
+        name: A green review means a clean review
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: 72
@@ -104,6 +119,7 @@ jobs:
             gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
               -f status=completed -f conclusion="$1" \
               -f output[title]="$2" -f output[summary]="$3" --jq '.conclusion'
+            echo "delivered=yes" >> "$GITHUB_OUTPUT"
           }
 
           api() {
@@ -126,7 +142,7 @@ jobs:
 
           if [ "$posted" -eq 0 ]; then
             verdict failure 'no review was posted' \
-              'The review job finished without posting anything. A green check would claim a review that never happened. This is what a PR editing its own workflow files looks like: the action refuses itself.'
+              'The review job finished without posting anything. A green check would claim a review that never happened.'
             echo "::warning::no review artifact posted — review:clean is red"
             exit 0
           fi
@@ -162,17 +178,16 @@ jobs:
           echo "no unanswered findings — clean on this head"
 
       - name: Never leave the check hanging
-        if: always() && steps.check.outputs.id
+        if: always() && steps.check.outputs.id && steps.guard.outputs.delivered != 'yes'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           CHECK: ${{ steps.check.outputs.id }}
         run: |
-          set -euo pipefail
-          state=$(gh api "repos/$REPO/check-runs/$CHECK" --jq '.status')
-          [ "$state" = "completed" ] && exit 0
+          set -uo pipefail
           gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
             -f status=completed -f conclusion=failure \
             -f output[title]='the review round ended without a verdict' \
             -f output[summary]='The job stopped before the guard could judge it. Re-apply the label to run another round.' \
-            --jq '.conclusion'
+            --jq '.conclusion' \
+            || echo "::warning::could not close review:clean — it stays pending and the PR stays blocked, which is the safe side"
