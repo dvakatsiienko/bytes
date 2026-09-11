@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { expect, test } from 'vitest';
 
 import type { ArchivedTrophy } from '../../shared/types.ts';
 import { trophyStreaks } from './streaks.ts';
@@ -30,73 +29,66 @@ const trophyAt = (local: string): ArchivedTrophy => ({
 /** The length of the single run these trophies should form. */
 const runDays = (locals: string[]) => {
   const model = trophyStreaks(locals.map(trophyAt));
-  assert.equal(
-    model.runs.length,
+  expect(model.runs.length, `expected one run, got ${model.runs.length}`).toBe(
     1,
-    `expected one run, got ${model.runs.length}`,
   );
   return model.runs[0]?.days;
 };
 
 test('a run survives a spring-forward, where the day is 23 hours', () => {
   zoneUse('Europe/Kyiv'); // shifts 2025-03-30
-  assert.equal(
+  expect(
     runDays([
       '2025-03-29T20:00:00',
       '2025-03-30T20:00:00',
       '2025-03-31T20:00:00',
     ]),
-    3,
-  );
+  ).toBe(3);
 });
 
 test('a run survives a fall-back, where the day is 25 hours', () => {
   zoneUse('Europe/Kyiv'); // shifts 2025-10-26
-  assert.equal(
+  expect(
     runDays([
       '2025-10-25T20:00:00',
       '2025-10-26T20:00:00',
       '2025-10-27T20:00:00',
     ]),
-    3,
-  );
+  ).toBe(3);
 });
 
 test('the southern hemisphere shifts the other way round, and still holds', () => {
   zoneUse('Australia/Sydney'); // springs forward 2025-10-05, falls back 2025-04-06
-  assert.equal(
+  expect(
     runDays([
       '2025-10-04T20:00:00',
       '2025-10-05T20:00:00',
       '2025-10-06T20:00:00',
     ]),
-    3,
-  );
-  assert.equal(
+  ).toBe(3);
+  expect(
     runDays([
       '2025-04-05T20:00:00',
       '2025-04-06T20:00:00',
       '2025-04-07T20:00:00',
     ]),
-    3,
-  );
+  ).toBe(3);
 });
 
 test('a half-hour zone is no different', () => {
   zoneUse('Australia/Adelaide'); // UTC+9:30, shifts 2025-10-05
-  assert.equal(
+  expect(
     runDays([
       '2025-10-04T20:00:00',
       '2025-10-05T20:00:00',
       '2025-10-06T20:00:00',
     ]),
-    3,
-  );
+  ).toBe(3);
 });
 
 test('an evening running past midnight is one day of play, not two', () => {
   zoneUse('Europe/Kyiv');
-  assert.equal(runDays(['2025-06-10T22:00:00', '2025-06-11T02:00:00']), 1);
+  expect(runDays(['2025-06-10T22:00:00', '2025-06-11T02:00:00'])).toBe(1);
 });
 
 test('a real gap still breaks the run', () => {
@@ -104,5 +96,5 @@ test('a real gap still breaks the run', () => {
   const model = trophyStreaks(
     ['2025-06-10T20:00:00', '2025-06-12T20:00:00'].map(trophyAt),
   );
-  assert.equal(model.runs.length, 2);
+  expect(model.runs.length).toBe(2);
 });

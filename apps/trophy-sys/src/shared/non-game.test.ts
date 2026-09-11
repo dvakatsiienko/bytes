@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { expect, test } from 'vitest';
 
 import { isNonGame } from './types.ts';
 
@@ -10,29 +9,33 @@ import { isNonGame } from './types.ts';
  */
 
 test('the three shapes psn actually ships', () => {
-  assert.ok(isNonGame('The Alters: Original Soundtrack'));
-  assert.ok(isNonGame('Ravenswatch - Digital Artbook'));
-  assert.ok(isNonGame('ELDEN RING Digital Artbook & Soundtrack'));
+  expect(isNonGame('The Alters: Original Soundtrack')).toBeTruthy();
+  expect(isNonGame('Ravenswatch - Digital Artbook')).toBeTruthy();
+  expect(isNonGame('ELDEN RING Digital Artbook & Soundtrack')).toBeTruthy();
 });
 
 test('casing is not part of the match', () => {
-  assert.ok(isNonGame('ARMORED CORE™ VI FIRES OF RUBICON™ Digital Artbook'));
-  assert.ok(isNonGame('god of war ragnarök digital artbook and soundtrack'));
+  expect(
+    isNonGame('ARMORED CORE™ VI FIRES OF RUBICON™ Digital Artbook'),
+  ).toBeTruthy();
+  expect(
+    isNonGame('god of war ragnarök digital artbook and soundtrack'),
+  ).toBeTruthy();
 });
 
 test('«art book» spelled apart still matches', () => {
-  assert.ok(isNonGame('Some Title Digital Art Book'));
+  expect(isNonGame('Some Title Digital Art Book')).toBeTruthy();
 });
 
 test('a real game keeps its place', () => {
-  assert.ok(!isNonGame('Ghost of Tsushima DIRECTOR’S CUT'));
-  assert.ok(!isNonGame('Rogue Legacy 2'));
-  assert.ok(!isNonGame('ELDEN RING'));
+  expect(!isNonGame('Ghost of Tsushima DIRECTOR’S CUT')).toBeTruthy();
+  expect(!isNonGame('Rogue Legacy 2')).toBeTruthy();
+  expect(!isNonGame('ELDEN RING')).toBeTruthy();
 });
 
 test('«ost» is not a pattern, because it lives inside Ghost', () => {
-  assert.ok(
+  expect(
     !isNonGame('Ghost of Tsushima'),
     'the substring that would claim a real game is deliberately absent',
-  );
+  ).toBeTruthy();
 });

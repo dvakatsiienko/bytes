@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "trophies": "node --env-file=.env --env-file-if-exists=.env.local --env-file-if-exists=.env.dev.local src/server/cli.ts",
     "lint": "biome lint",
-    "test": "node --test 'src/**/*.test.ts'",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json"
   },
   "dependencies": {
@@ -45,6 +45,7 @@
     "esbuild": "0.28.2",
     "oxc-transform-react": "0.148.0",
     "tailwindcss": "4.3.3",
-    "vite": "8.2.2"
+    "vite": "8.2.2",
+    "vitest": "5.0.0"
   }
 }

@@ -321,6 +321,12 @@
         "vite.config.ts",
         "**/vite.config.ts",
 
+        // Vitest — `.mts` because a CommonJS package (the Next apps) cannot
+        // load an ESM `.ts` config through Vite's native loader.
+        "vitest.config.ts",
+        "**/vitest.config.ts",
+        "**/vitest.config.mts",
+
         // Convex
         "**/convex/**",
 

@@ -17,7 +17,22 @@
     // their dependencies' lint/typecheck to finish: `^lint` would serialise the
     // graph, and no dependsOn at all would let a stale cache survive a change in
     // a package you import. This is turbo's "transit node" pattern.
-    "transit": { "dependsOn": ["^transit"] },
+    //
+    // The exclusions matter more than they look. A task that depends on
+    // `transit` folds transit's hash into its own, so an exclusion declared
+    // only on that task is inert — measured on `test`: its own inputs dropped
+    // CLAUDE.md (80 vs 82), and editing CLAUDE.md still missed the cache,
+    // because transit had counted the file. Declared here, a docs-only edit
+    // leaves the whole transit-dependent side of the graph cached.
+    "transit": {
+      "dependsOn": ["^transit"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!CLAUDE.md",
+        "!**/README.md",
+        "!.vscode/**"
+      ]
+    },
 
     "dev": {
       "cache": false,
@@ -58,9 +73,24 @@
 
     // Only `financial` and `trophy-sys` have a `test` script; turbo skips the
     // packages that do not, so this task covers the whole graph either way.
-    // Both suites are `node --test` over source, so they need the generated
+    // Both suites are `vitest run` over source, so they need the generated
     // Prisma client but never a build.
-    "test": { "dependsOn": ["transit", "prisma:generate"] },
+    //
+    // This is the CI lane: one cacheable task per package. The root
+    // `pnpm test` is the other door — a single vitest run over every project,
+    // for a human who wants one readable pass.
+    "test": {
+      "dependsOn": ["transit", "prisma:generate"],
+      // No `outputs`. A test run's product is its exit code and its log, and
+      // turbo caches both without a declaration. `coverage/` is written only
+      // by `pnpm test:coverage` at the root, which is not this task.
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!CLAUDE.md",
+        "!**/README.md",
+        "!.vscode/**"
+      ]
+    },
 
     "typecheck": {
       "dependsOn": ["transit", "prisma:generate"],

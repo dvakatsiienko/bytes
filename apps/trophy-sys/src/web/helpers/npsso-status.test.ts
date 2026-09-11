@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { expect, test } from 'vitest';
 
 import type { GrantStatus, NpssoStatus } from '../../shared/types.ts';
 import { readoutBuild } from './npsso-status.ts';
@@ -48,46 +47,48 @@ const rowValue = (status: NpssoStatus, label: string) =>
 test('a seed token says why its age is unknown, without a row for it', () => {
   const readout = readoutBuild(statusMake({ savedAt: null, source: 'env' }));
 
-  assert.equal(
+  expect(
     readout.rows.find((row) => row.label === 'token in use'),
-    undefined,
     'the row said the same thing on every read once a token had been pasted',
-  );
-  assert.equal(rowValue(statusMake({ source: 'env' }), 'age'), 'unknown');
-  assert.ok(readout.notes.some((note) => note.includes('env var seed')));
+  ).toBe(undefined);
+  expect(rowValue(statusMake({ source: 'env' }), 'age')).toBe('unknown');
+  expect(
+    readout.notes.some((note) => note.includes('env var seed')),
+  ).toBeTruthy();
 });
 
 test('a token with no paste date reports an unknown age, never a zero', () => {
   const readout = readoutBuild(statusMake({ savedAt: null, source: 'env' }));
 
-  assert.equal(rowValue(statusMake({ source: 'env' }), 'age'), 'unknown');
-  assert.ok(
+  expect(rowValue(statusMake({ source: 'env' }), 'age')).toBe('unknown');
+  expect(
     readout.notes.some((note) => note.includes('env var')),
     'the env-var case has to say why the age is unknown',
-  );
+  ).toBeTruthy();
 });
 
 test('an age is whole days since the paste', () => {
   const savedAt = Date.now() - 12 * DAY_MS;
 
-  assert.equal(rowValue(statusMake({ savedAt }), 'age'), '12 days');
+  expect(rowValue(statusMake({ savedAt }), 'age')).toBe('12 days');
 });
 
 test('one day is singular — the readout is read, not parsed', () => {
   const savedAt = Date.now() - 1 * DAY_MS;
 
-  assert.equal(rowValue(statusMake({ savedAt }), 'age'), '1 day');
+  expect(rowValue(statusMake({ savedAt }), 'age')).toBe('1 day');
 });
 
 test('no measurement means no estimate at all', () => {
   const readout = readoutBuild(statusMake({ savedAt: Date.now() }));
 
-  assert.equal(
+  expect(
     readout.rows.find((row) => row.label === 'rough guess'),
-    undefined,
     'an estimate with nothing measured is the exact failure this replaces',
-  );
-  assert.ok(readout.notes.some((note) => note.includes('no estimate')));
+  ).toBe(undefined);
+  expect(
+    readout.notes.some((note) => note.includes('no estimate')),
+  ).toBeTruthy();
 });
 
 test('one sample is named as one sample, and called a hint', () => {
@@ -95,11 +96,13 @@ test('one sample is named as one sample, and called a hint', () => {
     statusMake({ lifetimes: [25 * DAY_MS], savedAt: Date.now() - 10 * DAY_MS }),
   );
 
-  assert.ok(
+  expect(
     readout.notes.some((note) => note.includes('1 sample')),
     'the sample count is never hidden',
-  );
-  assert.ok(readout.notes.some((note) => note.includes('not a trend')));
+  ).toBeTruthy();
+  expect(
+    readout.notes.some((note) => note.includes('not a trend')),
+  ).toBeTruthy();
 });
 
 test('the estimate uses the shortest lifetime seen, not the average', () => {
@@ -110,8 +113,8 @@ test('the estimate uses the shortest lifetime seen, not the average', () => {
     savedAt: Date.now() - 10 * DAY_MS,
   });
 
-  assert.equal(rowValue(status, 'shortest seen'), '20 days');
-  assert.equal(rowValue(status, 'rough guess'), '~10 days left');
+  expect(rowValue(status, 'shortest seen')).toBe('20 days');
+  expect(rowValue(status, 'rough guess')).toBe('~10 days left');
 });
 
 test('an age past the shortest lifetime stops counting down', () => {
@@ -120,7 +123,7 @@ test('an age past the shortest lifetime stops counting down', () => {
     savedAt: Date.now() - 30 * DAY_MS,
   });
 
-  assert.equal(rowValue(status, 'rough guess'), 'past the shortest seen');
+  expect(rowValue(status, 'rough guess')).toBe('past the shortest seen');
 });
 
 test('a dead token says so, and drops the countdown', () => {
@@ -131,12 +134,11 @@ test('a dead token says so, and drops the countdown', () => {
   });
   const readout = readoutBuild(status);
 
-  assert.ok(readout.dead?.includes('psn refused this token'));
-  assert.equal(
+  expect(readout.dead?.includes('psn refused this token')).toBeTruthy();
+  expect(
     readout.rows.find((row) => row.label === 'rough guess'),
-    undefined,
     'a token already dead has no days left to guess at',
-  );
+  ).toBe(undefined);
 });
 
 /**

@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { assert, expect, test } from 'vitest';
 
 /**
  * The broken deploy: a serverless host with no KV credentials, so `state.ts`
@@ -9,7 +8,7 @@ import { test } from 'node:test';
  *
  * `isStateWritable` is computed once when `state.ts` is imported, so this file
  * has to arrange the environment before the import — which is why it is a file
- * of its own. `node --test` runs each file in its own process, so nothing here
+ * of its own. Vitest isolates each file in its own worker, so nothing here
  * reaches the other suites.
  */
 
@@ -29,11 +28,13 @@ const { routeResolve } = await import('./routes.ts');
 
 test('the environment under test is the broken one', () => {
   // If this drifts, every assertion below passes for the wrong reason.
-  assert.equal(stateBackend, 'file');
-  assert.equal(isStateWritable, false);
+  expect(stateBackend).toBe('file');
+  expect(isStateWritable).toBe(false);
 });
 
 const config = adminConfig();
+// assert.ok, not expect: only the assertion signature narrows `config` away
+// from null for every route call below.
 assert.ok(config, 'the admin trio was set above');
 
 const signedIn = {
@@ -51,13 +52,13 @@ const post = (path: string, body: unknown = null, cookie?: string) =>
 
 test('a snapshot refuses with 501 instead of scanning PSN first', async () => {
   const result = await post('/api/snapshot');
-  assert.equal(result.status, 501);
-  assert.match(String((result.body as { error: string }).error), MENTIONS_KV);
+  expect(result.status).toBe(501);
+  expect(String((result.body as { error: string }).error)).toMatch(MENTIONS_KV);
 });
 
 test('a stats sync refuses with 501', async () => {
   const result = await post('/api/stats/sync');
-  assert.equal(result.status, 501);
+  expect(result.status).toBe(501);
 });
 
 test('a signed-in admin write refuses with 501 rather than pretending it saved', async () => {
@@ -66,14 +67,14 @@ test('a signed-in admin write refuses with 501 rather than pretending it saved',
     { ids: ['NPWR1_00'] },
     signedIn.cookie,
   );
-  assert.equal(hidden.status, 501);
+  expect(hidden.status).toBe(501);
 
   const settings = await post(
     '/api/admin/settings',
     { effortHideUntouched: true },
     signedIn.cookie,
   );
-  assert.equal(settings.status, 501);
+  expect(settings.status).toBe(501);
 });
 
 test('the 501 is reached before the payload is validated', async () => {
@@ -84,7 +85,7 @@ test('the 501 is reached before the payload is validated', async () => {
     { ids: 'nope' },
     signedIn.cookie,
   );
-  assert.equal(result.status, 501);
+  expect(result.status).toBe(501);
 });
 
 test('a read-only admin route still answers while the store is unwritable', async () => {
@@ -93,13 +94,13 @@ test('a read-only admin route still answers while the store is unwritable', asyn
     'GET',
     { body: null, headers: { cookie: signedIn.cookie, host: 'example.com' } },
   );
-  assert.equal(session.status, 200);
-  assert.deepEqual(session.body, { authed: true });
+  expect(session.status).toBe(200);
+  expect(session.body).toStrictEqual({ authed: true });
 });
 
 test('an unsigned request is turned away before the store is consulted', async () => {
   const result = await post('/api/admin/hidden', { ids: [] });
-  assert.equal(result.status, 401);
+  expect(result.status).toBe(401);
 });
 
 /**
@@ -131,7 +132,7 @@ test('every admin route answers 503 when the admin vars are missing', async () =
       })),
     );
 
-    for (const { path, status } of results) assert.equal(status, 503, path);
+    for (const { path, status } of results) expect(status, path).toBe(503);
   } finally {
     process.env.ADMIN_EMAIL = saved.email;
     process.env.ADMIN_PASSWORD = saved.password;
