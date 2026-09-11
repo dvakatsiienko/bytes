@@ -29,6 +29,12 @@ name: review
 # So a reply on a review thread — the coder answering a finding — was itself
 # enough to green the gate, which is the worst of the three.
 #
+# 📌 The first two also run the PR BRANCH's copy of a workflow, not the default
+# branch's (measured: a review-comment run on a branch that had renamed the job
+# listed the RENAMED name). That is what makes removing the job from
+# `claude.yml` take effect on the branch that removes it, rather than one merge
+# later.
+#
 # Which is why this file has exactly one trigger, one job, and publishes its
 # verdict as a check run it creates itself. A head nobody labelled never gets a
 # `review:clean` check at all — the required context stays PENDING and the merge
