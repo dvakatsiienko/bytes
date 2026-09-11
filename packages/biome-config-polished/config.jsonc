@@ -366,18 +366,18 @@
       ]
     },
 
-    // The tools live in the ROOT devDependencies and nowhere else, the way
-    // `typescript` does. `tsc` never appears in an import so the rule never
-    // sees it; the ones below are imported by a file inside an app, and the
-    // rule resolves the NEAREST package.json — the app's — so it reports a
-    // dependency that is deliberately one level up.
+    // The test runner lives in the ROOT devDependencies and nowhere else, the
+    // way `typescript` does. `tsc` never appears in an import so the rule never
+    // sees it; `vitest` is imported by every test file, and the rule resolves
+    // the NEAREST package.json — the app's — so it reports a dependency that is
+    // deliberately one level up. Scoped to test files: a `src` file importing
+    // something undeclared is still an error.
     //
-    // Scoped to test files and build configs on purpose: a `src` file importing
-    // something undeclared is still an error, which is the whole value of the
-    // rule. A build config is the one place where importing a root-level tool
-    // is the intended shape — `vite.config.ts` reaches for `vite` and its
-    // plugins, and the answer to that report is never a copy of the tool back
-    // into the app.
+    // 📌 `vite.config` and `prisma.config` were exempt here for one commit of
+    // BYT-91, while `vite` and `prisma` sat at the root. They went back into the
+    // apps that use them, so every one of those configs now imports only what
+    // its own manifest declares — and an exemption nothing needs is one that
+    // hides the next genuinely undeclared import until the build fails.
     {
       "linter": {
         "rules": {
@@ -390,11 +390,7 @@
         "vitest.config.{ts,mts}",
         "**/vitest.config.{ts,mts}",
         "vitest.setup.{ts,mts}",
-        "**/vitest.setup.{ts,mts}",
-        "vite.config.{ts,mts}",
-        "**/vite.config.{ts,mts}",
-        "prisma.config.{ts,mts}",
-        "**/prisma.config.{ts,mts}"
+        "**/vitest.setup.{ts,mts}"
       ]
     }
   ]
