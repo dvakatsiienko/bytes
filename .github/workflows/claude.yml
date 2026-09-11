@@ -5,18 +5,29 @@ on:
     types: [created]
   pull_request_review_comment:
     types: [created]
+  # The label lane. `@claude review` in a comment still works and is the way to
+  # ask for a re-review; the label is what a merge waits on.
+  pull_request:
+    types: [labeled]
 
 # noise comments (vercel, linear, renovate) must never share a group with a live review:
 # with cancel-in-progress a vercel deploy comment cancelled the first review run (#64)
+#
+# `github.event_name` is in the key because a pull_request event carries no
+# comment body: without it every label run and every noise comment would land in
+# the same `claude--false` group, and cancel-in-progress would let a vercel
+# comment kill a review again — the exact bug the group was written for.
 concurrency:
-  group: claude-${{ github.event.issue.number }}-${{ contains(github.event.comment.body, '@claude') }}
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event_name }}-${{ contains(github.event.comment.body, '@claude') }}
   cancel-in-progress: true
 
 jobs:
   review:
     if: >-
-      github.event.issue.pull_request &&
-      contains(github.event.comment.body, '@claude review')
+      (github.event_name == 'pull_request' &&
+       github.event.label.name == '👀 review') ||
+      (github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@claude review'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,11 +45,16 @@ jobs:
           allowed_bots: "x-coder-bot[bot]"
           plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
           plugins: "code-review@claude-code-plugins"
+          # Only the label lane gets a tracking comment. The action's own input
+          # docs scope `track_progress` to pull_request and issue events, so on
+          # the comment lane it would be inert at best — pinning it to the event
+          # keeps the path that already works untouched.
+          track_progress: ${{ github.event_name == 'pull_request' }}
           prompt: |
-            /code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.issue.number }}
+            /code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.issue.number || github.event.pull_request.number }}
 
             the requester's own words, use them as the review focus when they say more than «review»:
-            ${{ github.event.comment.body }}
+            ${{ github.event.comment.body || 'the label was applied with no words — review the whole diff' }}
           claude_args: |
             --model claude-opus-5
             --effort high
