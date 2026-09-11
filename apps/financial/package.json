@@ -15,8 +15,8 @@
     "prisma:generate": "prisma generate",
     "postinstall": "prisma generate",
     "lint": "biome lint",
-    "test": "vitest run",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vitest run"
   },
   "dependencies": {
     "@heroicons/react": "2.2.0",

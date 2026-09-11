@@ -20,8 +20,8 @@
   "files": ["config.jsonc"],
   "scripts": {
     "release": "npm version patch && npm publish --access public",
-    "format": "biome format --write",
-    "lint": "biome lint"
+    "lint": "biome lint",
+    "format": "biome format --write"
   },
   "peerDependencies": {
     "@biomejs/biome": ">=2.4.6"
