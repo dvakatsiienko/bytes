@@ -104,6 +104,15 @@ jobs:
           BRANCH: ${{ github.head_ref || github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
+          # 📌 Rounds are counted per BRANCH, not per PR. Greptile flagged that
+          # a reused branch name would carry its old rounds into the next PR.
+          # Left as is on purpose: branches here are one per assignment and
+          # deleted on merge, the repo takes no fork PRs, and the failure is on
+          # the safe side — the new PR is capped early and waits for Dima's
+          # word, rather than reviewing more than it should. Narrowing by PR
+          # number would mean trusting `pull_requests[]` on a run, and an empty
+          # one there would UNDER-count, which fails open.
+          #
           # A round is a run that REACHED the reviewer, whatever the reviewer
           # then found. That is why the verdict lives in the `review:clean`
           # check run and never in this job's own conclusion: a job that ends
@@ -239,14 +248,27 @@ jobs:
             echo "delivered=yes" >> "$GITHUB_OUTPUT"
           }
 
-          # A failed call counts as zero rather than killing the step: the point
-          # is to prove what a review did, and an api hiccup proves nothing.
-          #
           # 📌 `--paginate` emits ONE ARRAY PER PAGE, so anything reading `.[0]`
           # silently sees only the first 30 comments — and a PR with two review
           # rounds passes 30 easily. `jq -s add` folds the pages into one array.
+          #
+          # Two fetchers, because an empty answer means opposite things in the
+          # two places they are used, and one helper for both is how a gate
+          # learns to lie.
+          #
+          # `api` swallows a failure into `[]`. That is only safe where empty
+          # means «no proof a review happened», which fails CLOSED.
           api() {
             gh api "repos/$REPO/$1" --paginate 2>/dev/null | jq -s 'add // []' || echo '[]'
+          }
+
+          # `apiStrict` refuses to invent an answer. Reading the finding threads
+          # is the other case: there, empty means «nothing unanswered», so a
+          # swallowed failure would mark the review clean without having read a
+          # single comment. Greptile found that, and it is precisely the shape
+          # of lie this whole PR exists to remove.
+          apiStrict() {
+            gh api "repos/$REPO/$1" --paginate | jq -s 'add // []'
           }
 
           posted=0
@@ -274,7 +296,13 @@ jobs:
           # Every inline finding from THIS run, and whether its thread already
           # carries a coder reply. A thread the reviewer re-raises after the
           # coder answered it is handled; a fresh one is not.
-          threads=$(api "pulls/$PR/comments")
+          if ! threads=$(apiStrict "pulls/$PR/comments"); then
+            verdict failure 'could not read the review threads' \
+              'The api call that lists the review comments failed, so whether any finding is unanswered is unknown. An unknown state is not a clean review. Re-apply the label to try again.'
+            echo "::warning::could not read the threads — review:clean is red"
+            exit 0
+          fi
+
           unanswered=$(
             jq --arg who "$REVIEWER" --arg coder "$CODER" --arg since "$SINCE" '
               . as $all
@@ -315,13 +343,28 @@ jobs:
       # Greptile caught that on this PR. Nothing in this step may fail the job,
       # which is also why the patch tolerates its own error.
       - name: Never leave the check hanging
-        if: always() && steps.check.outputs.id && steps.guard.outputs.delivered != 'yes'
+        if: always() && steps.guard.outputs.delivered != 'yes'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
           CHECK: ${{ steps.check.outputs.id }}
         run: |
           set -uo pipefail
+
+          # The id normally comes from the step that opened the check. It can be
+          # missing: the run is cancelled between the POST and the write to
+          # `$GITHUB_OUTPUT`, and the check exists with nothing holding its id.
+          # Looking it up by head sha is the only way out for that one, and an
+          # already-completed check is not matched, so a delivered verdict is
+          # never overwritten. Greptile found this window.
+          if [ -z "$CHECK" ]; then
+            CHECK=$(gh api \
+              "repos/$REPO/commits/$SHA/check-runs?check_name=review:clean&status=in_progress" \
+              --jq '.check_runs[0].id // ""' 2>/dev/null || echo "")
+          fi
+          [ -n "$CHECK" ] || exit 0
+
           gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
             -f status=completed -f conclusion=failure \
             -f output[title]='the review round ended without a verdict' \
