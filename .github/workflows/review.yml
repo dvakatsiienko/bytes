@@ -118,6 +118,12 @@ jobs:
       # A third is Dima's call, asked through cclio with a few words on what
       # changed — so this fails early, before spending the window rather than
       # after.
+      #
+      # 📌 Know what this costs now that the gate is real: `review:clean` lives
+      # on a head sha, so a push after the second round leaves the new head with
+      # no check and the PR blocked until Dima grants a third. That is the same
+      # state the old required context reached on a fresh head — the difference
+      # is that it is now deliberate instead of accidental.
       - name: Two review rounds per PR
         if: steps.rounds.outputs.count >= 2
         run: |
