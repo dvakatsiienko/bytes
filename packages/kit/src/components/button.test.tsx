@@ -16,6 +16,9 @@ import { Button } from './button';
 // error, which is prose, not contract.
 const TIMED_OUT = /timeout/i;
 
+/** What both sides of the variant comparison collapse to when no stylesheet loaded. */
+const NO_STYLESHEET_BLACK = 'rgb(0, 0, 0)';
+
 test('a button is reachable by the name a user reads', async () => {
   const screen = await render(<Button>Save changes</Button>);
 
@@ -42,7 +45,14 @@ test('the destructive variant paints the destructive token', async () => {
   // the browser while `getPropertyValue` returns whatever `globals.css` was
   // authored with, so re-writing that colour as a hex would fail this test with
   // nothing wrong. The probe span puts both sides through one serializer.
+  // Both sides couple, so equality alone is not enough: with no stylesheet the
+  // button falls back to the UA's colour and the span's `var(--destructive)`
+  // resolves to the same black, and the test passes against nothing. Measured —
+  // commenting out the import in vitest.setup.ts leaves this test green without
+  // the second line. The first round's version caught that by accident, because
+  // its right-hand side came back empty.
   expect(getComputedStyle(button).color).toBe(getComputedStyle(token).color);
+  expect(getComputedStyle(button).color).not.toBe(NO_STYLESHEET_BLACK);
 });
 
 test('a click reaches the handler', async () => {

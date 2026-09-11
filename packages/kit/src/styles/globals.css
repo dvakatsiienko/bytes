@@ -4,6 +4,11 @@
 @import "./gray.css";
 
 @source "..";
+/* Tests are colocated with components, so the scan above reaches them. Today
+   that emits nothing extra; the first test asserting on a class string would
+   put test-only utilities into every app's production css, and nothing would
+   report it. */
+@source not "../**/*.test.{ts,tsx}";
 
 @custom-variant dark (&:is(.dark, .dark *));
 
