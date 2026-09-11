@@ -18,6 +18,7 @@ const GRANT_NONE: GrantStatus = {
   lifetimes: [],
   mintedAt: null,
   refreshedAt: null,
+  window: 0,
 };
 
 /** What PSN reports for a freshly minted grant: 863999s, ten days to the second. */
@@ -28,6 +29,7 @@ const grantMake = (over: Partial<GrantStatus> = {}): GrantStatus => ({
   expiresIn: GRANT_CLAIM,
   mintedAt: Date.now(),
   refreshedAt: Date.now(),
+  window: GRANT_CLAIM,
   ...over,
 });
 
@@ -138,30 +140,33 @@ test('a dead token says so, and drops the countdown', () => {
 });
 
 /**
- * The grant row carries two numbers that come from different clocks, which is
- * the only reason it can lie: an age measured here, and a lifetime PSN asserted
- * at some earlier moment. Each case below pins one of those seams.
+ * The grant row carries two readings from different clocks — an age measured
+ * here, and what PSN said was left at some earlier moment. Each case below pins
+ * one seam between them, and the countdown/reset pair pins why they must stay
+ * two numbers rather than one.
  */
 
 test('no stored grant says so rather than printing a zero-day one', () => {
   const readout = readoutBuild(statusMake({ refresh: GRANT_NONE }));
 
-  assert.equal(rowValue(statusMake(), 'refresh grant'), 'none');
+  assert.equal(rowValue(statusMake(), 'grant'), 'none');
   assert.ok(readout.notes.some((note) => note.includes('no refresh grant')));
 });
 
-test('a fresh grant reads as day 0 of psn’s full ten, never nine', () => {
-  // 863999s floors to 9, and a ten-day grant printed as nine is the confident
-  // wrong number this whole readout exists to avoid.
+test('days left are floored — the row never promises time it may not have', () => {
+  // 863999s is 9.99 days and prints as 9. The window it is measured against
+  // rounds to 10, and the two differ on purpose: `left` is an estimate the
+  // owner acts on, so it errs short, while the window is PSN's own published
+  // figure and flooring that one would report a ten-day grant as nine.
   assert.equal(
-    rowValue(statusMake({ refresh: grantMake() }), 'refresh grant'),
-    'day 0 of 10',
+    rowValue(statusMake({ refresh: grantMake() }), 'grant'),
+    'day 0 · 9 days left',
   );
 });
 
-test('the window is counted from the mint, not from the last reading', () => {
-  // PSN said ten days four days into this grant's life, so the window is
-  // fourteen — measuring it from the reading alone would lose the days before.
+test('the days left count down from the reading, not from now', () => {
+  // PSN said ten days two days ago, so eight are left. Printing `expiresIn`
+  // raw would report ten and age the claim by every day since the cron looked.
   const status = statusMake({
     refresh: grantMake({
       mintedAt: Date.now() - 6 * DAY_MS,
@@ -169,28 +174,58 @@ test('the window is counted from the mint, not from the last reading', () => {
     }),
   });
 
-  assert.equal(rowValue(status, 'refresh grant'), 'day 6 of 14');
+  assert.equal(rowValue(status, 'grant'), 'day 6 · 7 days left');
 });
 
-test('a grant outliving psn’s window says so, and says what it means', () => {
+/**
+ * ⚠️ This pair is the reason age and `leftMs` are printed separately. A single
+ * derived window — `(refreshedAt - mintedAt) + expiresIn` — returns the same
+ * figure under both, so the comparison below cannot be made at all.
+ */
+test('a countdown grant runs its days down and never outlives the window', () => {
+  const age = 9 * DAY_MS;
   const status = statusMake({
     refresh: grantMake({
-      mintedAt: Date.now() - 30 * DAY_MS,
-      refreshedAt: Date.now() - 30 * DAY_MS,
+      // What a countdown reports on day 9: one day of the original ten.
+      expiresIn: GRANT_CLAIM - 9 * 86_400,
+      mintedAt: Date.now() - age,
+      refreshedAt: Date.now(),
     }),
   });
   const readout = readoutBuild(status);
 
+  assert.equal(rowValue(status, 'grant'), 'day 9 · 0 days left');
+  assert.ok(
+    !readout.notes.some((note) => note.includes('still has days left')),
+    'a grant inside its window must never claim the clock was reset',
+  );
+});
+
+test('a grant past the window with days left is flagged as the finding', () => {
+  const status = statusMake({
+    // What a RESET would look like on day 30: the full ten reported again.
+    refresh: grantMake({ mintedAt: Date.now() - 30 * DAY_MS }),
+  });
+  const readout = readoutBuild(status);
+
   assert.equal(
-    rowValue(status, 'refresh grant'),
-    'day 30 of 10',
-    'the window outlived is the measurement this row exists for',
+    rowValue(status, 'grant'),
+    'day 30 · 9 days left',
+    'an age past the window with time still on it is what this row exists for',
   );
   assert.equal(
-    readout.rows.find((row) => row.label === 'refresh grant')?.tone,
+    readout.rows.find((row) => row.label === 'grant')?.tone,
     'text-yellow',
   );
-  assert.ok(readout.notes.some((note) => note.includes('outlived')));
+  assert.ok(readout.notes.some((note) => note.includes('still has days left')));
+});
+
+test('an expired grant says so rather than printing negative days', () => {
+  const status = statusMake({
+    refresh: grantMake({ expiresIn: 0, mintedAt: Date.now() - 3 * DAY_MS }),
+  });
+
+  assert.equal(rowValue(status, 'grant'), 'day 3 · psn says expired');
 });
 
 test('a refused grant reports the shortest lifetime, and no claim beside it', () => {
@@ -211,13 +246,19 @@ test('a refused grant reports the shortest lifetime, and no claim beside it', ()
 });
 
 test('the grant adds exactly one row — this panel has been cut for growing', () => {
-  const withGrant = readoutBuild(statusMake({ refresh: grantMake() })).rows;
-  const without = readoutBuild(statusMake({ refresh: GRANT_NONE })).rows;
+  // Counted absolutely, never against another readout that also carries the
+  // row: both sides holding it made the comparison pass at any row count.
+  const { rows } = readoutBuild(
+    statusMake({
+      lifetimes: [20 * DAY_MS],
+      refresh: grantMake({ lifetimes: [7 * DAY_MS] }),
+      savedAt: Date.now() - 3 * DAY_MS,
+    }),
+  );
 
-  assert.equal(withGrant.length, without.length);
-  assert.equal(
-    withGrant.at(-1)?.label,
-    'refresh grant',
-    'paste first, then text',
+  assert.deepEqual(
+    rows.map((row) => row.label),
+    ['age', 'shortest seen', 'rough guess', 'grant'],
+    'the three npsso rows, then one grant row — paste first, then text',
   );
 });

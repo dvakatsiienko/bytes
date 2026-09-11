@@ -37,7 +37,7 @@ import {
 import { type PurchasedTitle, purchasedFetch } from './purchased.ts';
 import type { RefreshGrant } from './state.ts';
 import {
-  isStateWritable,
+  isAutoWriteSafe,
   npssoDeathRecord,
   npssoLoad,
   refreshGrantDeathRecord,
@@ -108,24 +108,28 @@ const REFUSAL = /access code|npsso/i;
  */
 const sessionBuild = (
   tokens: AuthTokensResponse,
-  mintedAt: number,
+  // Null on a mint: this response IS the origin, so both figures come from it.
+  origin: Pick<RefreshGrant, 'mintedAt' | 'mintedExpiresIn'> | null,
 ): Session | null => {
   if (!(tokens.accessToken && tokens.refreshToken && tokens.expiresIn))
     return null;
+
+  const expiresIn = numberOr(tokens.refreshTokenExpiresIn, 0);
 
   return {
     auth: { accessToken: tokens.accessToken },
     expiresAt: Date.now() + tokens.expiresIn * 1000,
     grant: {
-      expiresIn: numberOr(tokens.refreshTokenExpiresIn, 0),
-      mintedAt,
+      expiresIn,
+      mintedAt: origin?.mintedAt ?? Date.now(),
+      mintedExpiresIn: origin?.mintedExpiresIn ?? expiresIn,
       refreshedAt: Date.now(),
       token: tokens.refreshToken,
     },
   };
 };
 
-const grantMint = async (): Promise<Session> => {
+const sessionMint = async (): Promise<Session> => {
   const npsso = await npssoRead();
 
   let tokens: AuthTokensResponse;
@@ -147,7 +151,7 @@ const grantMint = async (): Promise<Session> => {
     throw new Error(NPSSO_INVALID, { cause });
   }
 
-  const minted = sessionBuild(tokens, Date.now());
+  const minted = sessionBuild(tokens, null);
   // Not an NPSSO death: the access code was issued, so the token PSN refused to
   // honour is not the one the owner would be sent to replace.
   if (!minted)
@@ -164,13 +168,13 @@ const grantMint = async (): Promise<Session> => {
  * weeks, no code can renew it, and every cold serverless start used to spend one
  * on the access-code exchange. A stored grant costs one PSN call and no NPSSO.
  */
-const sessionAcquire = async (): Promise<Session> => {
+const sessionRefreshOrMint = async (): Promise<Session> => {
   const held = session?.grant ?? (await refreshGrantLoad());
-  if (!held) return await grantMint();
+  if (!held) return await sessionMint();
 
   const refreshed = sessionBuild(
     await exchangeRefreshTokenForAuthTokens(held.token),
-    held.mintedAt,
+    held,
   );
   if (refreshed) return refreshed;
 
@@ -181,7 +185,7 @@ const sessionAcquire = async (): Promise<Session> => {
   // here), and the fallback below is correct either way; only the measurement
   // can be poisoned. The readout under-claims accordingly.
   await refreshGrantDeathRecord(held);
-  return await grantMint();
+  return await sessionMint();
 };
 
 /**
@@ -191,7 +195,7 @@ const sessionAcquire = async (): Promise<Session> => {
  * identical record once per concurrent caller.
  */
 const sessionGet = async (): Promise<Session> => {
-  const fresh = await sessionAcquire();
+  const fresh = await sessionRefreshOrMint();
   await grantPersist(fresh.grant);
   return fresh;
 };
@@ -201,14 +205,15 @@ const sessionGet = async (): Promise<Session> => {
  * which is the state this whole path exists to end. Failing to write it must not
  * fail the call that was actually asked for, so it is logged and swallowed.
  *
- * 📌 Guarded by `isStateWritable`, not `isAutoWriteSafe`. What `isAutoWriteSafe`
- * exists to stop is a local run rewriting shared *data*; a grant is not data, it
- * is the session. PSN hands back the same token on every refresh, so two writers
- * cannot disagree about what to store, and `.env.dev.local` already keeps the
- * ordinary local run off the production store.
+ * ⚠️ `isAutoWriteSafe`, not `isStateWritable` — nobody asks for this write, it
+ * rides along on whatever route ran. The tempting argument against it is that a
+ * grant is the session rather than data, and PSN hands back the same token on
+ * every refresh, so two writers cannot disagree. That holds for the token and
+ * fails for `mintedAt`: a local run pointed at production KV mints its own grant
+ * and stamps a fresh mint date over the live one, which is the measurement.
  */
 const grantPersist = async (grant: RefreshGrant) => {
-  if (!isStateWritable) return;
+  if (!isAutoWriteSafe) return;
 
   try {
     await refreshGrantSave(grant);

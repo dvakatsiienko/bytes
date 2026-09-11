@@ -299,7 +299,7 @@ export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: true };
  * working means a refresh resets the clock, and that is the whole question.
  */
 export interface GrantStatus {
-  /** `refreshTokenExpiresIn` as PSN last reported it, in seconds. 0 = none stored. */
+  /** How much of the grant PSN said was left at `refreshedAt`, in seconds. */
   expiresIn: number;
   /** Measured lifetimes in ms, oldest first — one per grant PSN has refused. */
   lifetimes: number[];
@@ -307,6 +307,13 @@ export interface GrantStatus {
   mintedAt: number | null;
   /** When `expiresIn` was last read, so a stale claim is not printed as fresh. */
   refreshedAt: number | null;
+  /**
+   * The window PSN published when the grant was minted, in seconds — the figure
+   * an age is compared against. Stored rather than derived: a window computed
+   * from the live `expiresIn` comes out constant by construction, which makes
+   * the comparison unanswerable. 0 when no grant is stored.
+   */
+  window: number;
 }
 
 /**

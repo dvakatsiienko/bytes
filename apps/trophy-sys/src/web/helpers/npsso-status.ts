@@ -89,52 +89,58 @@ export const readoutBuild = (status: NpssoStatus) => {
 };
 
 /**
- * The refresh grant in **one** row, as `day 3 of 10` — its age inside the window
- * PSN claims for it.
+ * The refresh grant in **one** row, as `day 3 · 9 days left`.
  *
- * One fact rather than two joined by a separator: the pair wrapped twice over at
- * 390px, and the row is the whole budget anyway — this panel has been cut three
- * times for growing.
- *
- * 📌 `day 12 of 10` is not a bug, it is the measurement. PSN reports ten days on
- * a grant minted seconds ago and ten again on one refreshed from it, so only an
- * age past the window says whether a refresh resets the clock.
+ * 📌 Labelled `grant`, not `refresh grant`. The longer label wrapped to two
+ * lines at 390px and pushed the value onto two more; five characters of label
+ * buy the whole reading one line, and the panel is titled `psn token`, so the
+ * row reads unambiguously beside `age`. One row is the budget either way — this
+ * panel has been cut three times for growing.
  */
 const grantRow = (grant: GrantStatus): ReadoutRow => {
   const read = grantRead(grant);
-  if (!read) return { label: 'refresh grant', tone: 'text-dim', value: 'none' };
+  if (!read) return { label: 'grant', tone: 'text-dim', value: 'none' };
+
+  // Past the window with days still on the clock is the finding, not an error.
+  const surprising = read.age > read.window;
 
   return {
-    label: 'refresh grant',
-    tone: read.age > read.window ? 'text-yellow' : 'text-fg',
-    value: `day ${read.age} of ${read.window}`,
+    label: 'grant',
+    tone: surprising || read.leftMs <= 0 ? 'text-yellow' : 'text-fg',
+    value:
+      read.leftMs > 0
+        ? `day ${read.age} · ${dayLabel(daysOf(read.leftMs))} left`
+        : `day ${read.age} · psn says expired`,
   };
 };
 
 /**
- * The grant's age and its full window in days, or null when the record carries
- * no readable pair of clocks.
+ * The grant's two readings, or null when the record carries no pair of clocks.
  *
- * One reader for the row and the note both. Guarded separately they drifted,
- * and the shape that drift takes is a row printing `none` above a note
- * asserting that same grant had outlived its window.
+ * One reader for the row and the note both. Guarded separately they drifted, and
+ * the shape that drift takes is a row printing `none` above a note asserting
+ * that same grant had outlived its window.
  *
- * 📌 The window is counted from the mint, not from the last reading —
- * `expiresIn` is what PSN said at `refreshedAt`, so the days already spent
- * before that reading belong to the window too. And it is rounded, where every
- * other figure in this file is floored: a floor is the conservative choice for
- * an *estimate*, and this is not one. It is PSN's own published 863999s, which
- * floors a ten-day grant to nine.
+ * 📌 **Age and `leftMs` are kept apart on purpose, and that is the whole
+ * instrument.** Folding them into one derived figure destroys the signal: the
+ * window a refresh reports is either what is left of the original (so age plus
+ * left is constant) or a fresh full one (so it grows with the age), and any
+ * single number combining them reads the same under both. Printed side by side,
+ * the two answer it — an age past the window with days still left means a
+ * refresh resets the clock.
  */
 const grantRead = (grant: GrantStatus) => {
-  if (grant.mintedAt === null || grant.refreshedAt === null || !grant.expiresIn)
-    return null;
+  if (grant.mintedAt === null || grant.refreshedAt === null) return null;
 
   return {
     age: daysSince(grant.mintedAt),
-    window: Math.round(
-      (grant.refreshedAt - grant.mintedAt + grant.expiresIn * 1000) / DAY_MS,
-    ),
+    // Counted from the reading, not from now: `expiresIn` is what PSN said at
+    // `refreshedAt`, and printing it raw would age the claim by up to a day.
+    leftMs: grant.expiresIn * 1000 - (Date.now() - grant.refreshedAt),
+    // Rounded, where every other figure here is floored. A floor is the
+    // conservative choice for an estimate and this is not one — it is PSN's own
+    // published 863999s, which floors a ten-day grant to nine.
+    window: Math.round((grant.window * 1000) / DAY_MS),
   };
 };
 
@@ -144,14 +150,14 @@ const grantNoteBuild = (grant: GrantStatus) => {
 
   // The finding this row was added to catch, said out loud the moment it lands.
   const read = grantRead(grant);
-  if (read && read.age > read.window)
-    return 'this grant has outlived the window psn published for it, so a refresh does reset the clock — which is what would let the token renew itself.';
+  if (read && read.age > read.window && read.leftMs > 0)
+    return 'this grant is older than the window psn published for it and still has days left, so a refresh does reset the clock — which is what would let the token renew itself.';
 
   // The shortest, for the same reason the NPSSO readout prefers it: erring
-  // early is the harmless direction on a sample this small. It names no claim
-  // to compare against — the only `expiresIn` in hand belongs to the *live*
-  // grant, and putting two grants' numbers in one sentence reads as one grant's
-  // measurement against its own promise. The row above already carries the claim.
+  // early is the harmless direction on a sample this small. It names no window
+  // to compare against — the only one in hand belongs to the *live* grant, and
+  // two grants' numbers in one sentence read as one grant measured against its
+  // own promise.
   if (grant.lifetimes.length)
     return `psn has refused a refresh grant after ${dayLabel(daysOf(Math.min(...grant.lifetimes)))} — the shortest measured so far.`;
 

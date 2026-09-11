@@ -30,11 +30,11 @@ const NPSSO_DEATHS_FILE = new URL(
 );
 const NPSSO_DEATHS_KEY = 'trophy-sys:npsso-deaths';
 
-const GRANT_FILE = new URL('../../.trophy-grant.json', import.meta.url);
+const GRANT_FILE = new URL('../../.trophy-psn-grant.json', import.meta.url);
 const GRANT_KEY = 'trophy-sys:psn-grant';
 
 const GRANT_DEATHS_FILE = new URL(
-  '../../.trophy-grant-deaths.json',
+  '../../.trophy-psn-grant-deaths.json',
   import.meta.url,
 );
 const GRANT_DEATHS_KEY = 'trophy-sys:psn-grant-deaths';
@@ -316,6 +316,16 @@ export interface RefreshGrant {
   expiresIn: number;
   /** When an NPSSO bought this grant. Survives every refresh of it. */
   mintedAt: number;
+  /**
+   * The same figure as PSN first published it, in seconds, never overwritten.
+   *
+   * 📌 Without it there is no window to measure against. `expiresIn` is replaced
+   * on every refresh with what is left, so any window derived from it comes out
+   * constant by construction — `(refreshedAt - mintedAt) + expiresIn` is the
+   * published figure again under a countdown, and grows in lockstep with the age
+   * under a reset. Both make "has this grant outlived its window" unanswerable.
+   */
+  mintedExpiresIn: number;
   /** When `expiresIn` was last read — the clock it counts down from. */
   refreshedAt: number;
   token: string;
@@ -339,6 +349,8 @@ export const refreshGrantLoad = async (): Promise<RefreshGrant | null> => {
   return {
     expiresIn: stored.expiresIn ?? 0,
     mintedAt: stored.mintedAt ?? 0,
+    // A record written before the window was kept reports the figure it has.
+    mintedExpiresIn: stored.mintedExpiresIn ?? stored.expiresIn ?? 0,
     refreshedAt: stored.refreshedAt ?? 0,
     token: stored.token,
   };
@@ -388,6 +400,7 @@ const grantStatusLoad = async (): Promise<GrantStatus> => {
       .map((death) => death.diedAt - death.mintedAt),
     mintedAt: grant?.mintedAt || null,
     refreshedAt: grant?.refreshedAt || null,
+    window: grant?.mintedExpiresIn ?? 0,
   };
 };
 

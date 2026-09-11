@@ -103,10 +103,17 @@ credentials, and `.env.dev.local` overrides them for dev. In production Vercel i
 
 📌 **The grant is a hard ten-day window from the mint, and a refresh does not extend it.**
 Measured 2026-09-11: PSN reports `refreshTokenExpiresIn: 863999` (10.0000 days) on a fresh grant,
-and the number **counts down** — 863999 → 863991 over eight seconds of wall clock. So the grant
-expires *before* the NPSSO's observed ~25 days, and this path does not make the token renew itself;
-it only stops every cold start from spending one. The admin panel prints `day N of 10` from the
-stored `mintedAt` and `expiresIn` precisely so a future `day 12 of 10` would overturn that.
+and the number **counts down** — 863999 → 863830 while the grant aged 172s. So the grant expires
+*before* the NPSSO's observed ~25 days, and this path does not make the token renew itself; it only
+stops every cold start from spending one.
+
+⚠️ **The panel prints the grant's age and its remaining days as two separate numbers, and that
+separation is the instrument — never fold them into one.** A window derived from the live
+`expiresIn` is constant by construction and answers nothing: under a countdown
+`(refreshedAt - mintedAt) + expiresIn` returns the published figure again, and under a reset it
+grows in lockstep with the age. Both make "has this grant outlived its window" unaskable. The
+window therefore comes from `mintedExpiresIn`, stored at the mint and **never overwritten**, and an
+age past it *with days still left* is the reading that would overturn the measurement above.
 
 ⚠️ **`exchangeRefreshTokenForAuthTokens` never throws on a refused grant — it returns `{}`.**
 psn-api does not look at the response status on either token call, so the only error check is the
@@ -114,9 +121,14 @@ response shape. `sessionBuild` returns null on a missing `accessToken`; without 
 `expiresAt: Date.now() + undefined * 1000` = `NaN`, which compares false against every clock, so
 every later call re-mints — forever, against a rate-limited api.
 
-📌 The refresh token **does not rotate**: PSN answers a refresh with the identical string. Two
-processes refreshing one grant cannot disagree, so nothing here needs a lock, and the grant write
-is guarded by `isStateWritable` rather than `isAutoWriteSafe` — a grant is the session, not data.
+📌 The refresh token **does not rotate**: PSN answers a refresh with the identical string, so two
+processes refreshing one grant cannot disagree and nothing here needs a lock.
+
+⚠️ The grant write is still guarded by **`isAutoWriteSafe`**, because nobody asks for it — it rides
+along on whatever route ran. The tempting exemption is that a grant is the session rather than data;
+that holds for the token and fails for `mintedAt`, which a local run pointed at production KV would
+stamp over with its own. So a local run verifies against the file backend or the local redis recipe
+in `.env.dev.local`, never by writing production.
 
 - Pasting a fresh NPSSO clears the stored grant (`refreshGrantClear` in `npssoSet`). Keeping it
   would let a paste change nothing for up to ten days, and the owner pastes exactly when something
