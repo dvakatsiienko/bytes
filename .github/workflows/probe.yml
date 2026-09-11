@@ -1,7 +1,7 @@
 name: probe
 
 # THROWAWAY. Measures how github treats a check named `review` when a later
-# event skips the job, and exercises the check-run api the real gate will use.
+# event skips the job, and runs the real gate's guard script against real data.
 # Deleted with this branch.
 
 on:
@@ -58,3 +58,121 @@ jobs:
             -f status=completed -f conclusion=success \
             -f output[title]='clean on this head' \
             -f output[summary]='no unanswered findings' --jq '.conclusion'
+
+  # The REAL guard script from review.yml, byte for byte, pointed at PR #72 —
+  # 18 real comments, 9 real coder replies. `x-com-chat` renames the replier so
+  # every thread reads unanswered; `trophy-sys` uses the real one.
+  guard-real:
+    if: github.event.label.name == 'x-com-chat' || github.event.label.name == 'trophy-sys'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      checks: write
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          id=$(gh api "repos/$REPO/check-runs" -X POST \
+            -f name='review:clean' \
+            -f head_sha="$SHA" \
+            -f status=in_progress \
+            -f output[title]='review running' \
+            -f output[summary]='The reviewer is reading this head.' \
+            --jq '.id')
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "review:clean check run $id opened on $SHA"
+
+      - name: A green review means a clean review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: 72
+          REPO: ${{ github.repository }}
+          CHECK: ${{ steps.check.outputs.id }}
+          REVIEWER: claude[bot]
+          CODER: ${{ github.event.label.name == 'trophy-sys' && 'x-coder-cc[bot]' || 'nobody[bot]' }}
+          SINCE: "2026-01-01T00:00:00Z"
+        run: |
+          set -euo pipefail
+
+          verdict() {
+            gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
+              -f status=completed -f conclusion="$1" \
+              -f output[title]="$2" -f output[summary]="$3" --jq '.conclusion'
+          }
+
+          api() {
+            gh api "repos/$REPO/$1" --paginate 2>/dev/null | jq -s 'add // []' || echo '[]'
+          }
+
+          posted=0
+          for attempt in 1 2 3; do
+            posted=$(
+              { api "issues/$PR/comments"; api "pulls/$PR/comments"; api "pulls/$PR/reviews"; } \
+                | jq -s --arg who "$REVIEWER" --arg since "$SINCE" \
+                    '[.[][] | select(.user.login == $who and ((.created_at // .submitted_at) > $since))] | length'
+            )
+            [ "$posted" -gt 0 ] && break
+            if [ "$attempt" -lt 3 ]; then
+              echo "no review artifact yet (attempt $attempt), waiting for the api to settle"
+              sleep 10
+            fi
+          done
+
+          if [ "$posted" -eq 0 ]; then
+            verdict failure 'no review was posted' \
+              'The review job finished without posting anything. A green check would claim a review that never happened. This is what a PR editing its own workflow files looks like: the action refuses itself.'
+            echo "::warning::no review artifact posted — review:clean is red"
+            exit 0
+          fi
+          echo "review artifacts posted this run: $posted"
+
+          threads=$(api "pulls/$PR/comments")
+          unanswered=$(
+            jq --arg who "$REVIEWER" --arg coder "$CODER" --arg since "$SINCE" '
+              . as $all
+              | [$all[] | select(.user.login == $who and .created_at > $since)]
+              | map(. as $f
+                  | ($f.in_reply_to_id // $f.id) as $root
+                  | { path: $f.path, line: ($f.line // $f.original_line),
+                      answered: ([$all[]
+                        | select(.user.login == $coder
+                                 and ((.in_reply_to_id // .id) == $root))] | length > 0) })
+              | map(select(.answered | not))
+            ' <<<"$threads"
+          )
+          open=$(jq 'length' <<<"$unanswered")
+
+          if [ "$open" -gt 0 ]; then
+            list=$(jq -r '.[] | "- `\(.path):\(.line)`"' <<<"$unanswered")
+            echo "$list"
+            verdict failure "$open finding(s) with no reply" \
+              "$list"$'\n\nFix them, or answer each thread with a reason, then re-apply the label.'
+            echo "::warning::$open unanswered finding(s) — review:clean is red"
+            exit 0
+          fi
+
+          verdict success 'clean on this head' \
+            "The reviewer posted $posted artifact(s) on this head and every finding has a reply."
+          echo "no unanswered findings — clean on this head"
+
+      - name: Never leave the check hanging
+        if: always() && steps.check.outputs.id
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          CHECK: ${{ steps.check.outputs.id }}
+        run: |
+          set -euo pipefail
+          state=$(gh api "repos/$REPO/check-runs/$CHECK" --jq '.status')
+          [ "$state" = "completed" ] && exit 0
+          gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
+            -f status=completed -f conclusion=failure \
+            -f output[title]='the review round ended without a verdict' \
+            -f output[summary]='The job stopped before the guard could judge it. Re-apply the label to run another round.' \
+            --jq '.conclusion'
