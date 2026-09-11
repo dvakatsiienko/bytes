@@ -30,7 +30,7 @@ pre-commit:
       glob:
         - 'package.json'
         - '**/package.json'
-      run: if command -v package-json-shape >/dev/null; then package-json-shape .; fi
+      run: if command -v package-json-shape >/dev/null; then package-json-shape . {staged_files}; fi
 
 pre-push:
   jobs:
