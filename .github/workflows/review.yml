@@ -213,7 +213,8 @@ jobs:
       # 📌 This step does NOT fail the job. The verdict is the check run; the
       # job's own conclusion means «the round ran», which is what the `rounds`
       # count above reads.
-      - name: A green review means a clean review
+      - id: guard
+        name: A green review means a clean review
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
@@ -228,10 +229,14 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Writing the step output here, next to the PATCH, is what lets the
+          # cleanup step below know a verdict was delivered without asking the
+          # api a second time.
           verdict() {
             gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
               -f status=completed -f conclusion="$1" \
               -f output[title]="$2" -f output[summary]="$3" --jq '.conclusion'
+            echo "delivered=yes" >> "$GITHUB_OUTPUT"
           }
 
           # A failed call counts as zero rather than killing the step: the point
@@ -302,18 +307,24 @@ jobs:
       # action, a cancelled run, a step that throws. A check run left
       # `in_progress` reports as PENDING forever, and a required context that
       # never resolves is a PR nobody can merge without an admin override.
+      #
+      # 📌 Whether a verdict was delivered is read from the guard's own output,
+      # never from the api. Asking the api would add a call that can fail, and a
+      # failure here would end the run red — which un-counts a round that was
+      # actually spent, the very leak the `rounds` step above was fixed for.
+      # Greptile caught that on this PR. Nothing in this step may fail the job,
+      # which is also why the patch tolerates its own error.
       - name: Never leave the check hanging
-        if: always() && steps.check.outputs.id
+        if: always() && steps.check.outputs.id && steps.guard.outputs.delivered != 'yes'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           CHECK: ${{ steps.check.outputs.id }}
         run: |
-          set -euo pipefail
-          state=$(gh api "repos/$REPO/check-runs/$CHECK" --jq '.status')
-          [ "$state" = "completed" ] && exit 0
+          set -uo pipefail
           gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
             -f status=completed -f conclusion=failure \
             -f output[title]='the review round ended without a verdict' \
             -f output[summary]='The job stopped before the guard could judge it. Re-apply the label to run another round.' \
-            --jq '.conclusion'
+            --jq '.conclusion' \
+            || echo "::warning::could not close review:clean — it stays pending and the PR stays blocked, which is the safe side"
