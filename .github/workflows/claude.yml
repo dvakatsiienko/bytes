@@ -27,7 +27,7 @@ on:
 # `github.event_name` stays in the key because a pull_request event carries no
 # comment body, so without it the lanes collapse into one `claude--false` group.
 concurrency:
-  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event_name }}-${{ (github.event.action == 'labeled' && github.event.label.name == '🤖 review:requested') || contains(github.event.comment.body, '@claude') }}
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event_name }}-${{ (github.event.action == 'labeled' && github.event.label.name == '🤖 review:requested') || contains(github.event.comment.body, '@cc') }}
   cancel-in-progress: true
 
 jobs:
@@ -38,6 +38,14 @@ jobs:
     # hatch for a PR that edits this file — which it never was, because the
     # action refuses itself on any PR whose workflow differs from the default
     # branch, whichever door opened it.
+    #
+    # 📌 The action ships its own `label_trigger` input and this predicate is
+    # NOT it, deliberately. `label_trigger` is read inside the action, which is
+    # five steps in: an unrelated label — `trophy-sys`, say — would start the
+    # job, mint an app token, count rounds, and only then have the action stand
+    # down. The guard after it would find no review posted and turn the `review`
+    # check RED for a label that never asked for one. A job-level `if` never
+    # starts the job at all.
     if: >-
       github.event.action == 'labeled' &&
       github.event.label.name == '🤖 review:requested'
@@ -81,7 +89,7 @@ jobs:
         run: |
           set -euo pipefail
           # `event == pull_request` is what makes this count REVIEW rounds. A
-          # run is also created for every `@claude …` comment that drives the
+          # run is also created for every `@cc …` comment that drives the
           # assist lane, and those finish successfully — counted, they would eat
           # a review round nobody spent.
           runs=$(gh api \
@@ -113,6 +121,11 @@ jobs:
           # coder asked for died on arrival with «Workflow initiated by
           # non-human actor».
           allowed_bots: "x-coder-cc[bot]"
+          # Kept in step with the job's `if` above. The predicate is what gates;
+          # this only stops the action's own default (`claude`) from disagreeing
+          # with us about which label means a review.
+          label_trigger: "🤖 review:requested"
+          trigger_phrase: "@cc"
           plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
           plugins: "code-review@claude-code-plugins"
           # One comment per PR rather than one per round, so the thread stays
@@ -220,9 +233,9 @@ jobs:
           echo "no unanswered findings — clean on this head"
 
   assist:
-    if: >-
-      contains(github.event.comment.body, '@claude') &&
-      !contains(github.event.comment.body, '@claude review')
+    # `@cc <ask>` in a comment. No `review` exclusion any more: the review lane
+    # left the comment door entirely, so there is nothing here to steal.
+    if: contains(github.event.comment.body, '@cc')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -241,6 +254,7 @@ jobs:
           # branches, which is the app that already has those rights. Only the
           # reviewer gets its own face.
           allowed_bots: "x-coder-cc[bot]"
+          trigger_phrase: "@cc"
           claude_args: |
             --model claude-opus-5
             --effort high
