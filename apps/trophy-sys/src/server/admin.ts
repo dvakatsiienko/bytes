@@ -8,6 +8,7 @@ import {
   hiddenLoad,
   hiddenSave,
   npssoSave,
+  refreshGrantClear,
   shownLoad,
   shownSave,
 } from './state.ts';
@@ -283,7 +284,10 @@ export const npssoSet = async (value: unknown) => {
 
   await npssoSave(value.trim());
   // The in-memory PSN session was minted from the old token; keeping it would
-  // hide whether the new one works until the access token expires.
+  // hide whether the new one works until the access token expires. The stored
+  // refresh grant is the same problem with a ten-day fuse — it was bought by the
+  // token being replaced, and it would keep the paste from proving anything.
+  await refreshGrantClear();
   sessionReset();
   return true;
 };
