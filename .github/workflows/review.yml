@@ -250,7 +250,7 @@ jobs:
           # follows the app automatically if the reviewer is ever renamed — the
           # `allowed_bots` line above is the lesson that made this worth doing.
           REVIEWER: ${{ steps.reviewer.outputs.app-slug }}[bot]
-          CODER: x-coder-cc[bot]
+          AUTHOR: ${{ github.event.pull_request.user.login }}
           SINCE: ${{ steps.started.outputs.at }}
         run: |
           set -euo pipefail
@@ -258,11 +258,21 @@ jobs:
           # Writing the step output here, next to the PATCH, is what lets the
           # cleanup step below know a verdict was delivered without asking the
           # api a second time.
+          # 📌 The patch must not be fatal, for the same reason the cleanup step
+          # below is not: it is a network call, it is the last thing a spent
+          # round does, and under `set -e` a transient 5xx would end the run red
+          # — which un-counts a round that was actually spent and buys a free
+          # extra one. `delivered` is written only when the verdict really
+          # landed, so a failure here hands the check to the cleanup step, which
+          # closes it red. The reviewer caught this one on itself.
           verdict() {
-            gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
+            if gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
               -f status=completed -f conclusion="$1" \
-              -f output[title]="$2" -f output[summary]="$3" --jq '.conclusion'
-            echo "delivered=yes" >> "$GITHUB_OUTPUT"
+              -f output[title]="$2" -f output[summary]="$3" --jq '.conclusion'; then
+              echo "delivered=yes" >> "$GITHUB_OUTPUT"
+            else
+              echo "::warning::could not write the verdict — the cleanup step closes the check instead"
+            fi
           }
 
           # 📌 `--paginate` emits ONE ARRAY PER PAGE, so anything reading `.[0]`
@@ -288,12 +298,28 @@ jobs:
             gh api "repos/$REPO/$1" --paginate | jq -s 'add // []'
           }
 
+          # 📌 FRESHNESS, not creation. `use_sticky_comment` makes the action
+          # reuse an existing tracking comment instead of writing a new one, and
+          # its match is loose: `login.includes("claude")` on any bot comment —
+          # so one `@cc` reply from the assist lane earlier in the PR is enough
+          # for the reviewer to EDIT that comment rather than create its own
+          # (`create-initial.ts`, the `idMatch || botNameMatch || bodyMatch`
+          # find). An edit moves `updated_at` and leaves `created_at` at the old
+          # round. Testing creation therefore reads a clean re-review — one that
+          # posts no new inline findings because there are none — as «no review
+          # was posted», which is red plus `exit 1`: the round is not counted,
+          # the check never goes green, and the loop cannot terminate. The
+          # reviewer found this in its own review of this file.
+          #
+          # A stand-down still counts zero, which is the case this test exists
+          # for: the action that refuses itself writes nothing at all, so there
+          # is no timestamp of either kind to move.
           posted=0
           for attempt in 1 2 3; do
             posted=$(
               { api "issues/$PR/comments"; api "pulls/$PR/comments"; api "pulls/$PR/reviews"; } \
                 | jq -s --arg who "$REVIEWER" --arg since "$SINCE" \
-                    '[.[][] | select(.user.login == $who and ((.created_at // .submitted_at) > $since))] | length'
+                    '[.[][] | select(.user.login == $who and ((.updated_at // .submitted_at) > $since))] | length'
             )
             [ "$posted" -gt 0 ] && break
             if [ "$attempt" -lt 3 ]; then
@@ -317,8 +343,17 @@ jobs:
           echo "review artifacts posted this run: $posted"
 
           # Every inline finding from THIS run, and whether its thread already
-          # carries a coder reply. A thread the reviewer re-raises after the
-          # coder answered it is handled; a fresh one is not.
+          # carries a reply. A thread the reviewer re-raises after it was
+          # answered is handled; a fresh one is not.
+          #
+          # 📌 «Answered», not «answered by the coder». The rule was a hardcoded
+          # `x-coder-cc[bot]`, which made the documented escape — «answer each
+          # thread with a reason, then re-apply the label» — unreachable for
+          # Dima on a PR he opened himself, and would go silently unsatisfiable
+          # the next time the coder app is renamed. The reviewer found that on
+          # itself. A HUMAN reply always counts; a BOT reply counts only from
+          # the PR's own author, so a third-party review bot cannot clear a
+          # finding by answering a thread it does not own.
           if ! threads=$(apiStrict "pulls/$PR/comments"); then
             verdict failure 'could not read the review threads' \
               'The api call that lists the review comments failed, so whether any finding is unanswered is unknown. An unknown state is not a clean review. Re-apply the label to try again.'
@@ -327,14 +362,15 @@ jobs:
           fi
 
           unanswered=$(
-            jq --arg who "$REVIEWER" --arg coder "$CODER" --arg since "$SINCE" '
+            jq --arg who "$REVIEWER" --arg author "$AUTHOR" --arg since "$SINCE" '
               . as $all
               | [$all[] | select(.user.login == $who and .created_at > $since)]
               | map(. as $f
                   | ($f.in_reply_to_id // $f.id) as $root
                   | { path: $f.path, line: ($f.line // $f.original_line),
                       answered: ([$all[]
-                        | select(.user.login == $coder
+                        | select(.user.login != $who
+                                 and (.user.type != "Bot" or .user.login == $author)
                                  and ((.in_reply_to_id // .id) == $root))] | length > 0) })
               | map(select(.answered | not))
             ' <<<"$threads"
