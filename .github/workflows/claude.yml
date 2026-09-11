@@ -3,14 +3,23 @@ name: claude
 # The interactive lane, and nothing else. `@cc <ask>` in a comment.
 #
 # 📌 The review lane lived here too and is now `review.yml`, deliberately in its
-# own file. A `pull_request: labeled` event created a run in which this file's
-# `review` job was SKIPPED, and GitHub counts a skipped job as satisfying a
-# required status check — so labelling a PR `trophy-sys` reported the required
-# `review` context green on a PR nobody had reviewed. Measured on #74: a skip
-# even OVERWRITES an earlier red conclusion for the same context on the same
-# head. Keeping the lanes in one file means every trigger this file grows is a
-# fresh way to mint a skipped `review`. There is no job named `review` here any
-# more, and adding one back would reopen the hole.
+# own file. Any event here created a run in which the `review` job was SKIPPED,
+# and GitHub counts a skipped job as satisfying a required status check — so the
+# required `review` context reported green on PRs nobody had reviewed. Measured
+# on #74: a skip even OVERWRITES an earlier red conclusion for the same context
+# on the same head.
+#
+# Which triggers could actually do it, measured on #74 — it turns on whose sha
+# the run carries:
+#
+#   pull_request: labeled          PR head sha  → the gate was reachable
+#   pull_request_review_comment    PR head sha  → the gate was reachable
+#   issue_comment                  DEFAULT branch sha → it never touched the PR
+#
+# So a reply on a review thread — the coder answering a finding — was itself
+# enough to turn the gate green. Every trigger this file grows is a fresh way to
+# mint a skipped `review`. There is no job named `review` here any more, and
+# adding one back reopens the hole.
 on:
   issue_comment:
     types: [created]

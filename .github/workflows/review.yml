@@ -19,9 +19,15 @@ name: review
 # review and reports the required context as satisfied. The gate was not merely
 # weak, it was reversible by anyone who could add a label.
 #
-# 📌 A comment event cannot do this: an `issue_comment` run carries the DEFAULT
-# BRANCH's sha, not the PR head, so its skipped jobs land on a commit no PR is
-# gated by. The door was always labels.
+# 📌 Which triggers could reach the gate turns on whose sha the run carries,
+# also measured on #74:
+#
+#   pull_request: labeled        PR head sha         → reachable
+#   pull_request_review_comment  PR head sha         → reachable
+#   issue_comment                DEFAULT branch sha  → never touched the PR
+#
+# So a reply on a review thread — the coder answering a finding — was itself
+# enough to green the gate, which is the worst of the three.
 #
 # Which is why this file has exactly one trigger, one job, and publishes its
 # verdict as a check run it creates itself. A head nobody labelled never gets a
