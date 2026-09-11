@@ -169,7 +169,15 @@ const sessionMint = async (): Promise<Session> => {
  * on the access-code exchange. A stored grant costs one PSN call and no NPSSO.
  */
 const sessionRefreshOrMint = async (): Promise<Session> => {
-  const held = session?.grant ?? (await refreshGrantLoad());
+  // ⚠️ The store, never this process's own copy, even when it holds one. The
+  // epoch guard is module-local, so it cannot see a paste made anywhere else:
+  // a second warm instance refreshing from its own `session.grant` would
+  // succeed — PSN does not rotate the token — and write the retired grant back
+  // over the key `npssoSet` had cleared, with no race needed and nothing in the
+  // record able to say it was retired. Reading the store costs one round-trip
+  // per access-token expiry and makes an empty store mean what it should:
+  // the owner pasted, mint from the new token.
+  const held = await refreshGrantLoad();
   if (!held) return await sessionMint();
 
   const refreshed = sessionBuild(
