@@ -85,13 +85,30 @@ app's own runtime code.
 
 Why it works: `pnpm run` puts the root `node_modules/.bin` on PATH for every package, and node's
 module walk from `apps/x` reaches the root `node_modules`. A filtered install
-(`pnpm i -F 'cv...'`, vercel's command) still installs the root manifest's devDeps — measured on a
-scratch clone, `typescript` present at root after it. One version per tool, one renovate PR per
-bump, no per-app drift — Dima's preference over per-app pinning.
+(`pnpm i -F 'cv...'`, vercel's command) still installs the root manifest's devDeps — measured in a
+clean clone on BYT-91: after `pnpm i -F 'cv...'` and `pnpm i -F '@space-explorer/ui...'`, the root
+`.bin` carried `tsc`, `vite`, `run-p` and `run-s`, and `tailwindcss`, `@tailwindcss/postcss` and
+`vite` all resolved from the app directory. One version per tool, one renovate PR per bump, no
+per-app drift — Dima's preference over per-app pinning.
+
+📌 The trade, measured rather than assumed: a root devDependency bump busts **every** task hash in
+the graph — 32 of 32 on a real `prettier` 3.9.6 → 3.9.5 bump, `prisma:generate` included despite
+its hand-narrowed `inputs`. That is not new (`prettier` was root-only before the sweep) but it now
+applies to every hoisted tool: a `vite` bump used to move three packages and now moves all of
+them. The price of one version per tool is that renovate rebuilds the monorepo per bump.
 
 The exception: a tool that resolves its plugins from its own package location (eslint-style)
 fails in pnpm's strict store. The fix is a `public-hoist-pattern[]` line in `.npmrc`, never a
-copy into the app. The BYT-91 sweep needed none — every tool resolved through the module walk.
+copy into the app. The BYT-91 sweep needed none.
+
+⚠️ For two of them that was not the module walk, and the difference matters.
+`babel-plugin-react-compiler` and `oxc-transform-react` are **optional peer dependencies** of
+`@vitejs/plugin-react`, loaded from the plugin's own package location when `compiler: true` is
+set — exactly the eslint-style case above. They resolve today because pnpm resolves optional
+peers **per importer** and there is now exactly one importer, the root, declaring all three
+together. The day an app re-declares `@vitejs/plugin-react` locally without also declaring those
+two, that app gets the peer-unresolved instance and `compiler: true` **degrades silently** — no
+error, just the slow path. Keep the three together, wherever they live.
 
 📌 What it does trip is biome's `noUndeclaredDependencies`: a build config that imports a
 root-level tool (`vite.config.ts` reaching for `vite`, `prisma.config.ts` for `prisma/config`)
@@ -110,8 +127,17 @@ undeclared stays an error.
 
 Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only settings are invisible
 to agents and to code review, and they silently override the repo — a dashboard edit to
-`trophy-sys`'s Root Directory once broke a deploy that no diff could explain. `trophy-sys` and
-`space-explorer-ui` have one; the Next.js apps do not yet.
+`trophy-sys`'s Root Directory once broke a deploy that no diff could explain. Six apps have one —
+`cv`, `figmentation`, `financial`, `space-explorer-ui`, `trophy-sys`, `x-com-chat`. `proto-lab`
+and `space-explorer-api` do not; `space-explorer-api` deploys on Railway instead, from
+`railway.json`.
+
+Each `vercel.json` carries a `git.deploymentEnabled` gate naming the branch prefixes that must
+NOT deploy: `renovate/*`, `coder/*`, `scratch/*`. 📌 It is an allowlist by omission, so a prefix
+nobody listed deploys — a throwaway `scratch/*` branch spent six previews that way against an
+account that hits `api-deployments-free-per-day`. Deny-by-default (`{"*": false, "main": true}`)
+would close the class; it changes production deploy behaviour, so it is Dima's call, not a
+drive-by edit.
 
 ## ui-kit
 
