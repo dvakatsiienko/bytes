@@ -31,6 +31,7 @@
     "typecheck": "turbo run typecheck",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:setup": "playwright install chromium",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "check": "turbo run lint typecheck",

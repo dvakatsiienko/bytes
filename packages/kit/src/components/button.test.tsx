@@ -12,7 +12,9 @@ import { Button } from './button';
  * button's behaviour.
  */
 
-const TIMED_OUT = /Timeout/;
+// Case-insensitive: the assertion should survive playwright rewording its own
+// error, which is prose, not contract.
+const TIMED_OUT = /timeout/i;
 
 test('a button is reachable by the name a user reads', async () => {
   const screen = await render(<Button>Save changes</Button>);
@@ -23,16 +25,24 @@ test('a button is reachable by the name a user reads', async () => {
 });
 
 test('the destructive variant paints the destructive token', async () => {
-  const screen = await render(<Button variant='destructive'>Delete</Button>);
+  const screen = await render(
+    <>
+      <Button variant='destructive'>Delete</Button>
+      {/* The same token, resolved by the browser rather than read as text. */}
+      <span data-testid='token' style={{ color: 'var(--destructive)' }} />
+    </>,
+  );
+
   const button = screen.getByRole('button', { name: 'Delete' }).element();
+  const token = screen.getByTestId('token').element();
 
   // Against the token, not against another variant: «these two differ» passes
-  // for any two colours, including two wrong ones.
-  expect(getComputedStyle(button).color).toBe(
-    getComputedStyle(document.documentElement).getPropertyValue(
-      '--destructive',
-    ),
-  );
+  // for any two colours, including two wrong ones. And against a RESOLVED
+  // token, not the raw text of the custom property: `color` is serialized by
+  // the browser while `getPropertyValue` returns whatever `globals.css` was
+  // authored with, so re-writing that colour as a hex would fail this test with
+  // nothing wrong. The probe span puts both sides through one serializer.
+  expect(getComputedStyle(button).color).toBe(getComputedStyle(token).color);
 });
 
 test('a click reaches the handler', async () => {

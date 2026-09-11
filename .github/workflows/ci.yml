@@ -125,6 +125,17 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          # The exact key changes on EVERY dependency move, not only a
+          # playwright bump — and this repo automerges renovate PRs, so lockfile
+          # churn is the normal case. Without this, each of them re-downloads
+          # ~90 MB that is already on disk under a neighbouring key. The prefix
+          # restores that copy. 📌 `cache-hit` stays false on a prefix restore —
+          # it means exact match only — so the step below still takes the
+          # `--with-deps` branch; playwright finds the binary present and skips
+          # the download. A real playwright bump restores a stale copy, misses
+          # the version it needs, and fetches.
+          restore-keys: |
+            playwright-${{ runner.os }}-
 
       # `--with-deps` only on a miss: it installs system libraries, which the
       # cache cannot carry. On a hit the browser binary is already restored and
