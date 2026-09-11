@@ -72,6 +72,24 @@ Why it is written down: `trophy-sys` was first built with search-param routing a
 after review. That cost the router, every component reading the params, and the rewrite rule that
 makes deep links load. The rule is cheap; the correction is not.
 
+### Dev dependencies live at the root
+
+**A tool goes into the root `package.json`. An app's manifest lists only what its own code
+imports at runtime, and what a filtered deploy must see.** Root-only today: `typescript`, biome,
+turbo, lefthook, vitest. Hoist the same way: `@types/*`, vite and its plugins, tailwind and
+postcss, prisma, tsx, codegen — anything whose plugin loading starts from a config file or the
+cwd.
+
+Why it works: `pnpm run` puts the root `node_modules/.bin` on PATH for every package, and node's
+module walk from `apps/x` reaches the root `node_modules`. A filtered install
+(`pnpm i -F 'cv...'`, vercel's command) still installs the root manifest's devDeps — measured on a
+scratch clone, `typescript` present at root after it. One version per tool, one renovate PR per
+bump, no per-app drift — Dima's preference over per-app pinning.
+
+The exception: a tool that resolves its plugins from its own package location (eslint-style)
+fails in pnpm's strict store. The fix is a `public-hoist-pattern[]` line in `.npmrc`, never a
+copy into the app.
+
 ### Database Patterns
 
 - **Seeding**: `tsx prisma/seed/init`
