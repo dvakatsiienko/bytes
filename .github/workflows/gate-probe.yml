@@ -1,0 +1,93 @@
+name: gate-probe
+
+# THROWAWAY. Lives only on `scratch/gate-probe` to answer two questions before
+# the review gate is rewritten to use GitHub's native review state instead of a
+# check run it publishes itself:
+#
+#   (a) can the reviewer app submit an APPROVED review at all, and what does the
+#       api report for it — state, author, author_association, and the PR's
+#       reviewDecision / mergeStateStatus?
+#   (b) can a plain workflow step, after the action, run
+#       `gh pr review --approve|--request-changes` as that app, keyed on the
+#       inline-thread count for this head?
+#
+# Delete the branch when the answers are recorded.
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - id: reviewer
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.X_REVIEWER_CC_APP_ID }}
+          private-key: ${{ secrets.X_REVIEWER_CC_PRIVATE_KEY }}
+
+      - name: What the app is
+        env:
+          GH_TOKEN: ${{ steps.reviewer.outputs.token }}
+        run: |
+          set -euo pipefail
+          echo "app-slug: ${{ steps.reviewer.outputs.app-slug }}"
+          gh api user --jq '"token identity: \(.login) (type \(.type))"' || echo "gh api user is not available to an app token"
+
+      # The keying mechanism the real lane would use: findings are inline
+      # threads, so their count on this head decides approve vs request-changes.
+      - id: threads
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          n=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments" \
+                --paginate | jq -s 'add // [] | length')
+          echo "count=$n" >> "$GITHUB_OUTPUT"
+          echo "inline review comments on this PR: $n"
+
+      # 🚨 The two verbs, each as its own step, so the log says which one ran and
+      # a refusal from GitHub is attributable to the verb rather than the lane.
+      - name: Approve as the reviewer app
+        if: steps.threads.outputs.count == '0'
+        env:
+          GH_TOKEN: ${{ steps.reviewer.outputs.token }}
+        run: |
+          set -euo pipefail
+          gh pr review ${{ github.event.pull_request.number }} --approve \
+            --body "probe: approving as the reviewer app, no inline findings on this head."
+
+      - name: Request changes as the reviewer app
+        if: steps.threads.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ steps.reviewer.outputs.token }}
+        run: |
+          set -euo pipefail
+          gh pr review ${{ github.event.pull_request.number }} --request-changes \
+            --body "probe: requesting changes as the reviewer app, ${{ steps.threads.outputs.count }} inline finding(s) on this head."
+
+      # Read back every field the rewrite would depend on.
+      - name: What the api says afterwards
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "--- reviews ---"
+          gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" --paginate \
+            | jq -s 'add // [] | .[] | {user: .user.login, type: .user.type, state, author_association, submitted_at}'
+          echo "--- pr decision ---"
+          gh api graphql -f query='
+            query($owner:String!, $name:String!, $number:Int!) {
+              repository(owner:$owner, name:$name) {
+                pullRequest(number:$number) {
+                  reviewDecision
+                  mergeStateStatus
+                  mergeable
+                  latestReviews(first: 10) { nodes { state author { login } authorAssociation } }
+                }
+              }
+            }' -f owner=${{ github.repository_owner }} -f name=bytes -F number=${{ github.event.pull_request.number }} \
+            --jq '.data.repository.pullRequest'
