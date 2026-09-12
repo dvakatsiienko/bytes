@@ -55,9 +55,22 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: .github/scripts/ci-changes.sh
 
+  # 🚨 NO `needs:` here, and that is the point. `check` is the required context
+  # on `main`, and a job skipped because its dependency failed reports
+  # `skipped` — which GitHub counts as SATISFYING a required check. That is the
+  # #72 trap `review.yml`'s opening comment is written about, and a `needs` edge
+  # would have re-opened it one job upstream: before, a flake in this job's own
+  # checkout turned it RED; with the edge, a flake in `changes` turned it GREEN.
+  # The reviewer found it. `changes` has several ways to go red that are not
+  # «the code is bad» — its own `exit 1`, a malformed package.json, a checkout
+  # flake — and none of them may report this gate as passed.
+  #
+  # 📌 So the one string this job wants from that script, it reads itself. The
+  # script runs twice per PR, here and in `changes`; that is ~7 s against a
+  # skippable main gate, and it also takes the `fetch-depth: 0` clone off the
+  # critical path, since `changes` no longer runs ahead of this job.
   check:
     name: lint + typecheck + test + build
-    needs: changes
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -76,6 +89,11 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Biome VCS needs real history
+
+      - id: touched
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: .github/scripts/ci-changes.sh
 
       # The review gate's decision, fed saved api payloads. It runs here rather
       # than in review.yml because that is the one place it can run at all: a PR
@@ -111,7 +129,7 @@ jobs:
       # 📌 Only when `renovate.json` moved. `npx` downloads the whole of renovate
       # every run — 25 s spent on a file that changes a few times a year.
       - name: Validate renovate config
-        if: needs.changes.outputs.renovate == 'true'
+        if: steps.touched.outputs.renovate == 'true'
         run: npx --yes --package renovate -- renovate-config-validator --strict
 
       # Vercel's remote cache is already on for deploys; this is the same cache,
@@ -413,7 +431,7 @@ jobs:
           # port, a process that exited — turning a failure the service block
           # reported in seconds into a 20-minute hang. The reviewer caught it.
           for _ in $(seq 60); do
-            if docker exec ci-postgres pg_isready -U postgres -q; then
+            if docker exec ci-postgres pg_isready -U postgres -h 127.0.0.1 -q; then
               echo "postgres is up"
               exit 0
             fi
