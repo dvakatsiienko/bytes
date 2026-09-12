@@ -50,6 +50,31 @@ on:
   push:
     branches: [main]
 
+  # The replacement for the Vercel dashboard's Redeploy button. With the git
+  # integration off, a push to `main` and this are the only two ways anything
+  # reaches production — so the manual door has to exist, for the cases a diff
+  # cannot see: a root file that changes a build without moving a manifest, a
+  # commit that carried the skip directive, a build that failed on Vercel's side.
+  #
+  # 📌 The options have to be spelled out; GitHub does not accept a computed
+  # `choice` list. That makes this list a copy, and the script treats it as a
+  # convenience rather than the truth — it validates the choice against
+  # `apps/*/vercel.json` and fails loudly if the two have drifted apart.
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Which app to deploy
+        type: choice
+        default: all
+        options:
+          - all
+          - cv
+          - figmentation
+          - financial
+          - space-explorer-ui
+          - trophy-sys
+          - x-com-chat
+
 # One group PER COMMIT, and that is the whole point — a single shared group
 # would silently lose deployments. GitHub keeps at most one running and one
 # pending run per concurrency group, so a third push EVICTS the second while it
@@ -86,21 +111,24 @@ jobs:
           # turbo diffs this push's range, so the base commit has to be present.
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6
-
+      # 📌 No `pnpm/action-setup`, no pnpm cache and no `pnpm install`, and that
+      # is measured rather than hopeful. turbo answers `--affected --dry=json`
+      # from the manifests and the lockfile alone and returns the IDENTICAL
+      # package list it returns after a full workspace install — checked both
+      # ways on BYT-84. The script fetches the pinned turbo with `npx`.
+      #
+      # It matters because this job is the whole distance between a merge and
+      # production: the install it replaces costs 12-14 s in this repo's CI,
+      # with another 4-6 s for the pnpm setup and a cache restore on top.
       - uses: actions/setup-node@v7
         with:
           # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so pin explicitly
           node-version: 24.0.2
-          cache: pnpm
 
-      # turbo answers «what did this push affect» from the real task graph, and
-      # the binary comes from the workspace.
-      - name: Install
-        run: pnpm install --frozen-lockfile
-
-      - name: Deploy affected apps
+      - name: Deploy
         env:
-          BASE: ${{ github.event.before }}
+          # Empty on a manual run, which is how the script tells the two apart.
+          BASE: ${{ github.event_name == 'push' && github.event.before || '' }}
+          REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.app || '' }}
           HOOKS: ${{ secrets.VERCEL_DEPLOY_HOOKS }}
         run: .github/scripts/deploy-main.sh
