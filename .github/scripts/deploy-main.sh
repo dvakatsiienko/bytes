@@ -9,8 +9,8 @@
 # for the reason ci.yml's chromium step spells out: a path list cannot know
 # that a new package started depending on `kit`, and turbo does.
 #
-# Env: BASE (the sha to diff against), HOOKS (the VERCEL_DEPLOY_HOOKS secret),
-# GITHUB_OUTPUT.
+# Env: BASE (the sha to diff against), HOOKS (the VERCEL_DEPLOY_HOOKS secret).
+# It writes no step output — nothing downstream reads one.
 #
 # 🚨 Every hook url is a bearer credential — anyone holding one can deploy the
 # project. GitHub masks a secret's exact string, NOT a value parsed out of it,
@@ -36,6 +36,22 @@ fi
 # written here would. The directory name is the key in the secret; the package
 # name is what turbo answers with, and the two genuinely differ —
 # `apps/space-explorer-ui` is the package `@space-explorer/ui`.
+#
+# 🚨 Checked in a loop of its own, BEFORE the map is built, because the failure
+# is silent otherwise: a `jq` that cannot read a manifest fails inside an
+# argument substitution, where `set -e` does not see it, and hands back an empty
+# string. The app would then sit in the map under the key `""`, match nothing
+# turbo ever reports, never deploy — and the job would still exit 0 green. An
+# `exit` inside the substitution below would leave the same subshell, so the
+# guard cannot live there.
+for f in apps/*/vercel.json; do
+  dir=$(dirname "$f")
+  if ! jq -e '.name | type == "string" and length > 0' "$dir/package.json" >/dev/null 2>&1; then
+    echo "::error::$dir/package.json has no usable \"name\" — $(basename "$dir") could not be matched to what turbo reports, and would be skipped without a word"
+    exit 1
+  fi
+done
+
 deployable=$(
   for f in apps/*/vercel.json; do
     dir=$(dirname "$f")
@@ -54,7 +70,7 @@ if [ -n "${BASE:-}" ] && git rev-parse --verify --quiet "${BASE}^{commit}" >/dev
   plan=$(TURBO_SCM_BASE="$BASE" pnpm turbo run build --affected --dry=json)
   affected=$(jq -r '[.tasks[] | select(.command != "<NONEXISTENT>") | .package] | unique | .[]' <<<"$plan")
 else
-  echo "no usable base ($BASE) — deploying every app"
+  echo "no usable base (${BASE:-unset}) — deploying every app"
   affected=$(jq -r 'to_entries | .[] | .key' <<<"$deployable")
 fi
 
@@ -106,7 +122,14 @@ while IFS= read -r app; do
   url=$(jq -r --arg app "$app" '.[$app]' <<<"$HOOKS")
   # The response is `{"job":{"id":…,"state":"PENDING"}}`. Printing the job id
   # is what makes a run traceable to a deployment; the url never appears.
-  if reply=$(curl -fsS -X POST "$url"); then
+  #
+  # 📌 Bounded, and deliberately not retried. An unbounded POST that stalls on
+  # app 2 of 6 never fires 3 through 6 and burns the job's whole timeout, which
+  # leaves production genuinely half-deployed with no per-app error to read. A
+  # retry is the wrong repair here: a repeated POST is a second CREATED
+  # deployment, and the per-day count of those is the thing this job exists to
+  # protect.
+  if reply=$(curl -fsS --max-time 30 -X POST "$url"); then
     echo "$app → $(jq -r '.job.id // "no job id in the reply"' <<<"$reply")"
   else
     echo "::error::$app — the deploy hook did not accept the request"
@@ -118,5 +141,3 @@ if [ -n "$failed" ]; then
   echo "::error::deploy hooks failed for:$failed"
   exit 1
 fi
-
-echo "apps=$(tr '\n' ' ' <<<"$apps")" >> "$GITHUB_OUTPUT"
