@@ -157,6 +157,8 @@ short: one that nothing needs hides the next genuinely undeclared import until t
 
 ### Deployment Settings
 
+<!-- 2026-09-12 · deployment shape is deliberately unoptimal: vercel's git integration is off and a ci job curls deploy hooks for the apps turbo lists as affected (BYT-84). the reason is the hobby plan: every git push created six deployments and the branch gates only CANCEL them, and a canceled deployment still counts toward «Deployments Created per Day: 100» (vercel docs, monorepos + limits pages, 2026-08). on a pro plan (6000/day) the git integration would simply stay on and this job would not exist. revisit if the plan changes. -->
+
 Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only settings are invisible
 to agents and to code review, and they silently override the repo — a dashboard edit to
 `trophy-sys`'s Root Directory once broke a deploy that no diff could explain. Six apps have one —
