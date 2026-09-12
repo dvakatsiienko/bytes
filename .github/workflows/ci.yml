@@ -238,7 +238,9 @@ jobs:
   financial:
     name: financial build (postgres)
     needs: changes
-    if: github.event_name == 'push' || needs.changes.outputs.financial == 'true'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      needs.changes.outputs.financial == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -314,7 +316,16 @@ jobs:
   vercel-install:
     name: clean install · ${{ matrix.app.name }}
     needs: changes
-    if: github.event_name == 'push' || needs.changes.outputs.installs == 'true'
+    # 🚨 `refs/heads/main`, not «any push». This workflow's push trigger also
+    # carries `renovate/**` — so without the ref test every renovate branch push
+    # ran all six legs, and the PR renovate then opens (`prCreation:
+    # "not-pending"`) ran them again under a different concurrency key. Twelve
+    # clean-clone legs per bump, at four minutes each, on a change whose entire
+    # point is cutting CI overhead. The PR arm below still covers renovate, which
+    # is where it belongs: a bump moves the lockfile, so the path gate fires.
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      needs.changes.outputs.installs == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -331,25 +342,13 @@ jobs:
       matrix:
         app: ${{ fromJSON(needs.changes.outputs.apps) }}
 
-    # Every app gets the database, not just `financial`. A service is per job and
-    # the six jobs run in parallel, so the wall-clock cost is one container start
-    # rather than six — cheap enough to be worth not special-casing a matrix
-    # entry, and `financial`'s build is exactly where a missing tool would show.
-    services:
-      postgres:
-        image: postgres:18
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: financial
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+    # 📌 No `services:` block, and that is the second draft. The first gave all
+    # six legs a postgres container because only `financial`'s build queries one
+    # and a service cannot be made conditional — which re-added, six times over,
+    # exactly the cost the rider above removed once. The argument for it was
+    # wall-clock (the legs run in parallel); the rider was counting spend, and
+    # five idle containers are spend. The one leg that needs a database starts
+    # one itself, below.
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/financial
       AUTH_SECRET: ci-only-not-a-real-secret
@@ -380,6 +379,20 @@ jobs:
           set -euo pipefail
           echo "$INSTALL"
           eval "$INSTALL"
+
+      # One container, on the one leg that needs one. `financial` prerenders
+      # /dashboard at build time, which queries Postgres; the other five legs
+      # never open a socket. Created and destroyed with the runner, so this
+      # reaches nothing deployed.
+      - name: Postgres
+        if: matrix.app.name == 'financial'
+        run: |
+          set -euo pipefail
+          docker run -d --name ci-postgres -p 5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=financial postgres:18
+          until docker exec ci-postgres pg_isready -U postgres -q; do sleep 1; done
+          echo "postgres is up"
 
       - name: Database schema
         if: matrix.app.name == 'financial'
