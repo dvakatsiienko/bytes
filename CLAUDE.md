@@ -178,6 +178,11 @@ The urls live in the repo secret `VERCEL_DEPLOY_HOOKS`, a json object keyed by A
 (`space-explorer-ui`, not the package name `@space-explorer/ui`). One hook per project, named
 `ci-main`, bound to `main`; manage them with `vercel deploy-hooks list|create|remove`.
 
+⚠️ **`[skip ci]` on a `main` commit now means «do not deploy».** It skips every push-triggered
+workflow, so the apps that commit changed stay stale in production until a later push touches them
+or someone redeploys from the dashboard. Vercel used to deploy regardless of the directive; this
+job is the only trigger now, and GitHub gives a workflow no way to opt out of it.
+
 ⚠️ **Never set `github.enabled: false`.** Vercel documents that one as disabling deploy hooks
 outright, which would leave nothing able to deploy. `git.deploymentEnabled: false` does not touch
 them — measured on BYT-84: a hook built a branch that carried the bool.
@@ -185,7 +190,8 @@ them — measured on BYT-84: a hook built a branch that carried the bool.
 📌 **Preview deployments no longer exist for any branch.** A branch push builds nothing, so CI is
 the only gate a branch gets. That is a real hole for `x-com-chat`: CI cannot build it (prerender
 calls Convex), and its `renovate/*` preview was the one place a bump actually built. Its bumps now
-reach production unbuilt. A label-triggered preview lane is the fix and is its own ticket.
+reach production unbuilt. A label-triggered preview lane is the fix, tracked as
+[BYT-96](https://linear.app/x-com/issue/BYT-96).
 
 📌 A root file that carries no dependencies — `CLAUDE.md`, `.node-version` — deploys nothing,
 because turbo reports nothing affected. A root manifest or lockfile change marks every package

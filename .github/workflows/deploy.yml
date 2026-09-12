@@ -22,9 +22,27 @@
 # integration would simply stay on. Revisit if the plan changes. The same note
 # sits above «Deployment Settings» in the root CLAUDE.md.
 #
-# 📌 `[skip ci]` in a commit subject skips this workflow too, which means a
-# push carrying it does not deploy. That is GitHub's behaviour for every
-# `push`-triggered workflow, not a choice made here.
+# ⚠️ `[skip ci]` or `[ci skip]` in a commit subject skips every
+# `push`-triggered workflow, this one included. A commit carrying one does NOT
+# deploy, and the apps it changed stay stale in production until a later push
+# touches them or somebody redeploys by hand from the Vercel dashboard.
+#
+# That directive used to be harmless here, because Vercel deployed whatever CI
+# did. It is not harmless now: this job is the only trigger there is. GitHub
+# gives a workflow no way to opt out of the directive, so the only guard is not
+# using it on `main`.
+#
+# 🚨 The marker counts ANYWHERE in a commit message, body included — so writing
+# ABOUT it is using it. A commit on BYT-84 that merely quoted it while
+# describing this very paragraph produced no CI run and no review run at all,
+# and the PR sat blocked for twenty minutes with nothing red to explain why:
+# events still arrived, GitHub just created no run for them. In a commit
+# message call it «the skip directive», never in brackets. Exactly the shape of
+# Linear's banned keywords in the `cmt` skill — the message is parsed, not read.
+#
+# 📌 File contents are safe. GitHub reads commit messages only, which is why
+# this header may spell the thing out; measured on this branch, where CI ran
+# green on a tree already containing these lines.
 
 name: Deploy
 
@@ -32,13 +50,20 @@ on:
   push:
     branches: [main]
 
-# Serialised, and NOT cancel-in-progress. Two pushes in quick succession touch
-# different apps, and each job knows only about its own push's diff — cancelling
-# the first would drop its apps on the floor and they would never deploy. Vercel
-# de-duplicates on its side anyway: a second trigger on the same hook cancels
-# the earlier deployment of the same version.
+# One group PER COMMIT, and that is the whole point — a single shared group
+# would silently lose deployments. GitHub keeps at most one running and one
+# pending run per concurrency group, so a third push EVICTS the second while it
+# is still pending. Each run fires hooks only for the apps its own push
+# touched, so an app changed only by the evicted push would never deploy and
+# would sit stale in production with nothing red anywhere.
+#
+# Serialising was never needed for correctness anyway: a deploy hook builds the
+# BRANCH TIP at the moment it is fired, not the commit that triggered it. Two
+# overlapping runs therefore build the same code, and Vercel cancels its own
+# duplicate builds of one version. The thing that must not be lost is a push's
+# app LIST, and a per-commit group is what guarantees every list gets fired.
 concurrency:
-  group: deploy-main
+  group: deploy-main-${{ github.sha }}
   cancel-in-progress: false
 
 env:

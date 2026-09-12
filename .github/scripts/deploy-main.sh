@@ -130,7 +130,21 @@ while IFS= read -r app; do
   # deployment, and the per-day count of those is the thing this job exists to
   # protect.
   if reply=$(curl -fsS --max-time 30 -X POST "$url"); then
-    echo "$app → $(jq -r '.job.id // "no job id in the reply"' <<<"$reply")"
+    # 📌 A reply with no job id counts as a FAILURE for this app, never as a
+    # success with a blank id printed next to it. A 200 carrying an empty or
+    # non-json body proves nothing was queued, and «deployed» is the one thing
+    # that must not be reported about it.
+    #
+    # The check is explicit because `set -e` does not make it for us: a `jq`
+    # that fails inside a command substitution leaves the enclosing command's
+    # exit status alone, so the loop would sail on printing blanks. Measured,
+    # not assumed — a reviewer read this the other way round.
+    if job=$(jq -er '.job.id' <<<"$reply" 2>/dev/null); then
+      echo "$app → $job"
+    else
+      echo "::error::$app — the hook answered without a job id, so nothing is known to be queued"
+      failed="$failed $app"
+    fi
   else
     echo "::error::$app — the deploy hook did not accept the request"
     failed="$failed $app"
