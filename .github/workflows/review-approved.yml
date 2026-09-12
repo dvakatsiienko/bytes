@@ -50,7 +50,16 @@ jobs:
           # 📌 The sha the REVIEW was submitted against, not the PR's current
           # head. They differ when a push lands between the approval and this
           # job, and a check run belongs on the commit a human actually read.
-          SHA: ${{ github.event.review.commit_id }}
+          #
+          # The fallback is not decoration. `commit_id` is verified present on
+          # the REST review object (scratch PR #81), and the webhook payload is
+          # documented as the same schema — but that is an inference, not
+          # something measured, and an empty `head_sha` makes the api call below
+          # fail rather than publish. The PR's current head is the right answer
+          # if the field is ever missing, and the summary names which one was
+          # used so a wrong guess is visible rather than silent.
+          SHA: ${{ github.event.review.commit_id || github.event.pull_request.head.sha }}
+          REVIEWED: ${{ github.event.review.commit_id && 'the reviewed commit' || 'the PR head (review.commit_id was empty)' }}
           WHO: ${{ github.event.sender.login }}
           LINK: ${{ github.event.review.html_url }}
         run: |
@@ -62,6 +71,8 @@ jobs:
             -f conclusion=success \
             -f output[title]="approved by $WHO" \
             -f output[summary]="No reviewer ran on this head. \`$WHO\` approved it: $LINK
+
+          Published on $REVIEWED, \`$SHA\`.
 
           This is the human gate past the two-round cap. It says a person read this head and accepted it — nothing more, and nothing automated can produce it." \
             --jq '.conclusion'
