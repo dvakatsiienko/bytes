@@ -51,18 +51,33 @@ jobs:
       actions: read
       checks: write
     steps:
+      # 🚨 The BASE revision, not the PR's. This job holds `checks: write` and
+      # does nothing but read the api, so it has no use for the PR's files — and
+      # taking them would let a PR rewrite the very scripts that decide whether
+      # to publish its own green. Greptile found this.
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 1
 
       # Before the token step, so an ordinary mid-work push costs one api call
       # and stops there.
+      #
+      # 📌 The missing-script exit is the bootstrap: on the PR that first adds
+      # these scripts they are not on the base yet. Quiet rather than red —
+      # nothing was published, which is this lane's whole contract.
       - id: rounds
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           BRANCH: ${{ github.head_ref || github.event.pull_request.head.ref }}
-        run: .github/scripts/review-rounds.sh
+        run: |
+          set -euo pipefail
+          if [ ! -x .github/scripts/review-rounds.sh ]; then
+            echo "the gate's scripts are not on the base revision yet — nothing to publish"
+            exit 0
+          fi
+          .github/scripts/review-rounds.sh
 
       # Minted for one field: the reviewer's own login, so this job follows the
       # app if it is ever renamed. Same reason the guard reads it from the token

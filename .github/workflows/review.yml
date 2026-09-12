@@ -241,6 +241,30 @@ jobs:
             --max-turns 60
             --allowedTools "mcp__github_inline_comment__create_inline_comment"
 
+      # 🚨 The gate judges with ITS OWN code, never the PR's. The workflow that
+      # runs on a labelled PR is the PR BRANCH's copy, and so is every file the
+      # checkout put in the workspace — so without this a PR could rewrite
+      # `review-guard.sh` to publish a green, and the token in the next step
+      # would let it. The action's anti-tamper covers workflow FILES; a script
+      # beside them is not one. Greptile found this.
+      #
+      # It runs AFTER the action, so a PR that edits the gate is still reviewed
+      # rather than refused before anyone looks at it.
+      #
+      # A restore that fails is red, not «carry on with the PR's copy». The only
+      # PR where these paths are missing from the base is the one that adds
+      # them, and that PR must not be judged by code nobody has reviewed yet.
+      # The job ends red, the round goes uncounted, and the cleanup step below
+      # closes the check.
+      - name: Take the gate's code from the base revision
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin "$BASE"
+          git checkout "$BASE" -- .github/review-gate.jq .github/scripts
+          echo "gate code restored from $BASE"
+
       # The gate. A green `review:clean` means a review ran on this head, the
       # reviewer said itself that the head is clean, and nothing it found is
       # sitting unanswered.
