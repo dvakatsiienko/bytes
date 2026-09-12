@@ -45,6 +45,13 @@ bumping framework versions, update the Stack column below — it drifts stale ot
 
 See root `package.json` "scripts" and each app's `package.json` for the exact command names.
 
+### Turbo filters, measured (2026-09-12)
+
+- Two negative filters INTERSECT: `--filter='!a' --filter='!b'` drops both packages. The docs read
+  as a union; check with `--dry=json` before relying on any filter combination.
+- `turbo run <task> --dry=json` lists every package, including ones without that script
+  (`<NONEXISTENT>`). A «does anything run X this time» gate must filter on the script's presence.
+
 ## Cross-App Conventions
 
 ### State Management Strategies
