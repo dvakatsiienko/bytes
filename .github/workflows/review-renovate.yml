@@ -1,0 +1,63 @@
+name: review-renovate
+
+# `review:clean` is required on `main` and only a reviewed head can get one, so
+# since #75 every renovate PR has been blocked by a gate that was never meant to
+# judge it. Renovate's PRs are a bot bumping pinned versions, held by CI and by
+# the `patches` automerge group; spending an opus review round on each is not the
+# trade, and neither is Dima clicking past a pending gate forty times a month.
+#
+# So: CI green on a renovate head publishes `review:clean` on it, with no
+# reviewer. That is the whole lane. (Dima's word, 2026-09-12.)
+#
+# 🚨 `workflow_run` is the trigger for a reason beyond «CI finished». A
+# `workflow_run` workflow always runs the DEFAULT BRANCH's copy of itself — so
+# unlike every other lane here, nothing on a branch can rewrite what judges it.
+# The rest of this file's review lane spent two rounds learning that lesson the
+# expensive way, through a PR's files and then through a PR's base field.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+concurrency:
+  group: review-renovate-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    # Three conditions, and each one is load-bearing:
+    #
+    # - CI actually passed. A skipped or cancelled run is not a pass.
+    # - the branch is renovate's. A `renovate/*` name alone is not enough —
+    #   anyone with push access can pick that prefix.
+    # - 📌 the run was triggered by renovate itself. This is what makes the
+    #   prefix trustworthy: a human or the coder pushing to a `renovate/*`
+    #   branch is the actor on that run, and this lane stands down. Without it
+    #   the gate has a door marked «name your branch renovate/anything».
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'renovate/') &&
+      github.event.workflow_run.actor.login == 'renovate[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - name: Publish review:clean on the renovate head
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN: ${{ github.event.workflow_run.html_url }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$REPO/check-runs" -X POST \
+            -f name='review:clean' \
+            -f head_sha="$SHA" \
+            -f status=completed \
+            -f conclusion=success \
+            -f output[title]='renovate: CI is the review' \
+            -f output[summary]="No reviewer ran on this head, deliberately. \`$BRANCH\` is renovate's, the run was triggered by renovate itself, and CI passed on it: $RUN
+
+          What this green says is that the bump builds, typechecks, lints and tests — which is the whole of what a version bump can be reviewed for. It says nothing about a human having read it." \
+            --jq '.conclusion'

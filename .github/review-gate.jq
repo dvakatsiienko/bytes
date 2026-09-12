@@ -48,8 +48,17 @@
 # exactly where it is needed, since the verdict lives in the sticky comment,
 # which is an issue comment. Everything else the reviewer writes matches on
 # `$who`.
+#
+# 🚨 `$app != ""` is not defensive noise. With `$app` empty, `("" // "") == ""`
+# is true of every artifact that does not carry the field — so `ours` would
+# match every comment on the PR and the verdict would be read out of anybody's,
+# while `$who` (built as `<slug>[bot]`, so `"[bot]"`) matched nothing and left
+# `$open` at 0. Not a degraded gate, an inverted one: `verdict: clean` is three
+# words the coder can type. An empty slug is unlikely and silent, and the
+# silence landed on the permissive side. The reviewer found it.
 def ours:
-  select(.user.login == $who or ((.performed_via_github_app.slug // "") == $app));
+  select(.user.login == $who
+         or (($app != "") and ((.performed_via_github_app.slug // "") == $app)));
 
 # Freshness, not creation: an edit moves `updated_at` and leaves `created_at` at
 # the round that first created the comment.
@@ -115,14 +124,31 @@ def answerer: select(.user.login != $who and (.user.login == $author or .user.lo
          title: "the reviewer's verdict is findings",
          summary: ((if $open > 0 then "Unanswered on this head:\n\($openlist)\n\n" else "" end)
                    + "Fix what it found, or answer each finding with a reason, then re-apply the label.")}
-      elif $open > 0 then
-        {conclusion: "failure",
-         title: "\($open) finding(s) with no reply",
-         summary: "\($openlist)\n\nFix them, or answer each thread with a reason, then re-apply the label."}
+
+      # 🚨 There is deliberately NO «and zero unanswered threads» clause here,
+      # and it is a departure from what BYT-92 asked for. The ticket wrote
+      # «`clean` + no unanswered inline threads → success» before this was known:
+      # `$raised` is every comment the reviewer posts during the round, and
+      # nothing distinguishes a finding from an acknowledgement. The guard runs
+      # seconds later, so nobody has replied to any of them — meaning ANY round
+      # where the reviewer touched a thread went red, a clean one included. The
+      # prompt asks it to say which earlier findings are fixed, and the natural
+      # place to say so is inside the thread, so the lane red-flagged the
+      # reviewer for following its own instructions. Recovery needed a whole
+      # extra opus round, or Dima.
+      #
+      # The verdict is the single authority, which is the entire point of this
+      # ticket. `clean` is defined to the reviewer as «nothing you raised still
+      # stands», so a thread count that overrides it is the old broken proxy
+      # outvoting the thing that replaced it. Two authorities that can disagree
+      # is the defect class this file exists to remove, not one to keep a copy
+      # of. Answered mode still counts threads — there is no reviewer there to
+      # ask, and counting fails closed. The reviewer found this on itself and
+      # called the choice a policy one; this is the policy.
       else
         {conclusion: "success",
          title: "clean on this head",
-         summary: "The reviewer posted \($posted) artifact(s) on this head, said `verdict: clean`, and every finding it raised has a reply."}
+         summary: "The reviewer posted \($posted) artifact(s) on this head and said `verdict: clean` — its own assertion that nothing it raised still stands."}
       end
     else
       # The post-cap answer check. It publishes a green or it publishes nothing:
@@ -130,6 +156,18 @@ def answerer: select(.user.login != $who and (.user.login == $author or .user.lo
       # designed default for a head nobody reviewed is already a blocked merge.
       ([$in.commits // [] | .[]
         | select((.author.login // "") != $author and (.author.login // "") != $owner)]) as $outsiders
+
+      # 🚨 A set of answers opens exactly ONE head. Every other input here is
+      # frozen at the last round — `$since`, the threads, the verdict — and
+      # `$outsiders` asks only whose the new commits are, never whether any of
+      # them was ever reviewed. So without this, the push that carries the
+      # answers goes green (correct, the point of the lane) and then so does the
+      # next one, and the next: a thousand lines the review never saw, green,
+      # with a summary still naming answers three heads old. «Does this commit
+      # fix a finding» is not machine-decidable; «have these answers already
+      # been spent» is. The reviewer found it.
+      | ([$in.commits // [] | .[] | select(.granted == true)]) as $spent
+
       | if $posted == 0 then
           {conclusion: "skip", title: "the last round left no readable artifact"}
         elif $verdict != "findings" then
@@ -150,6 +188,8 @@ def answerer: select(.user.login != $who and (.user.login == $author or .user.lo
           {conclusion: "skip", title: "\($open) finding(s) from the last round still carry no reply"}
         elif ($outsiders | length) > 0 then
           {conclusion: "skip", title: "\($outsiders | length) commit(s) in the delta belong to neither the author nor the repo owner"}
+        elif ($spent | length) > 0 then
+          {conclusion: "skip", title: "these answers already carried a head green once — a set of answers opens exactly one"}
         else
           {conclusion: "success",
            title: "answered on this head",

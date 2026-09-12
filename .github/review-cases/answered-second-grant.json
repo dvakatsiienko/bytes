@@ -1,0 +1,52 @@
+{
+  "want": "skip",
+  "why": "the answering push already went green; every input here is frozen at the last round, so without this bound the next push — and the next — go green over code no review ever saw",
+  "args": {
+    "mode": "answered",
+    "who": "x-reviewer-cc[bot]",
+    "app": "x-reviewer-cc",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T19:11:18Z"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "performed_via_github_app": { "slug": "x-reviewer-cc" },
+        "created_at": "2026-09-11T17:59:00Z",
+        "updated_at": "2026-09-11T19:11:28Z",
+        "body": "Round two.\r\n\r\nverdict: findings\r\n"
+      }
+    ],
+    "threads": [
+      {
+        "id": 7001,
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T19:12:00Z",
+        "path": "CLAUDE.md",
+        "line": 111,
+        "body": "This paragraph describes a layout the last commit deleted."
+      },
+      {
+        "id": 7002,
+        "in_reply_to_id": 7001,
+        "user": { "login": "x-coder-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T19:18:00Z",
+        "body": "Fixed — the paragraph now names the per-app layout that shipped."
+      }
+    ],
+    "commits": [
+      {
+        "author": { "login": "dvakatsiienko" },
+        "sha": "26cc5c42",
+        "granted": true
+      },
+      {
+        "author": { "login": "dvakatsiienko" },
+        "sha": "aa11bb22",
+        "granted": false
+      }
+    ]
+  }
+}

@@ -1,9 +1,9 @@
 {
   "want": "success",
-  "why": "Dima answering a finding on a PR the coder opened clears it — a hardcoded coder login once made that impossible",
+  "why": "an inline acknowledgement on a clean round must not red it — the verdict is the single authority, and nobody has replied to anything seconds after the round",
   "expect": {
     "verdict": "clean",
-    "open": 0
+    "open": 1
   },
   "args": {
     "mode": "round",
@@ -22,7 +22,7 @@
         },
         "created_at": "2026-09-11T17:12:00Z",
         "updated_at": "2026-09-11T17:12:00Z",
-        "body": "One thing, answered.\n\nverdict: clean\n"
+        "body": "Nothing blocking.\n\nverdict: clean\n"
       }
     ],
     "threads": [
@@ -34,18 +34,18 @@
         },
         "created_at": "2026-09-11T17:11:00Z",
         "path": ".github/workflows/review.yml",
-        "line": 60,
-        "body": "The concurrency key could be simpler."
+        "line": 42,
+        "body": "This retry loop swallows a failure."
       },
       {
         "id": 9002,
         "in_reply_to_id": 9001,
         "user": {
-          "login": "dvakatsiienko",
-          "type": "User"
+          "login": "greptile-apps[bot]",
+          "type": "Bot"
         },
-        "created_at": "2026-09-11T17:15:00Z",
-        "body": "declined: the explicit form is the one I can read six months from now."
+        "created_at": "2026-09-11T17:13:00Z",
+        "body": "Nobody has replied to this yet — the guard runs seconds after the round."
       }
     ],
     "commits": []

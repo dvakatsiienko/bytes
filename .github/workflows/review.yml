@@ -132,18 +132,33 @@ jobs:
       # the base. `git archive` also carries nothing the PR ADDED to that
       # directory, which a `checkout -- ` would have left sitting there.
       #
-      # When the base has no gate — true only for the PR that first adds it —
+      # When the anchor has no gate — true only for the PR that first adds it —
       # nothing untrusted is run in its place. The reviewer still reviews; the
       # guard below refuses to judge and the round ends red and uncounted.
+      #
+      # 🚨 The anchor is the DEFAULT BRANCH, not the PR's base. The base looks
+      # like the right answer and is not: a PR's base branch is editable through
+      # `PATCH /repos/{owner}/{repo}/pulls/{number}` with `pull-requests: write`
+      # alone — the scope the coder holds, and the same scope this file's cap
+      # comment names as the reason a cap must not be self-liftable. Point the
+      # base at a branch carrying a `review-gate.jq` that returns success, push
+      # once, and the job runs the reviewed party's gate while holding
+      # `checks: write`. The default branch is the one ref a PR cannot move.
+      # The reviewer found this on itself, one round after finding the file
+      # version of the same hole.
+      #
+      # It costs one thing: a PR legitimately stacked on another branch is judged
+      # by `main`'s gate rather than its base's. For infrastructure that only
+      # ever lives on `main`, that is the right answer rather than a compromise.
       - id: gate
         env:
-          BASE: ${{ github.event.pull_request.base.sha }}
+          BASE: ${{ github.event.repository.default_branch }}
         run: |
           set -uo pipefail
           dir="$RUNNER_TEMP/gate"
           mkdir -p "$dir"
           if git fetch --no-tags --depth=1 origin "$BASE" &&
-             git archive "$BASE" .github/review-gate.jq .github/scripts | tar -x -C "$dir"; then
+             git archive FETCH_HEAD .github/review-gate.jq .github/scripts | tar -x -C "$dir"; then
             echo "state=ok" >> "$GITHUB_OUTPUT"
             echo "dir=$dir" >> "$GITHUB_OUTPUT"
             echo "gate code taken from $BASE"

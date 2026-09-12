@@ -51,13 +51,20 @@ jobs:
       actions: read
       checks: write
     steps:
-      # 🚨 The BASE revision, not the PR's. This job holds `checks: write` and
-      # does nothing but read the api, so it has no use for the PR's files — and
-      # taking them would let a PR rewrite the very scripts that decide whether
-      # to publish its own green. Greptile found this.
+      # 🚨 The DEFAULT BRANCH, not the PR's anything. This job holds
+      # `checks: write` and does nothing but read the api, so it has no use for
+      # the PR's files — and taking them would let a PR rewrite the very scripts
+      # that decide whether to publish its own green. Greptile found that.
+      #
+      # It said `base.sha` first, which is not an anchor either: a PR's base
+      # branch is editable through `PATCH /repos/{owner}/{repo}/pulls/{number}`
+      # with `pull-requests: write` alone, the scope the coder holds. Point the
+      # base at a branch carrying your own `review-answered.sh`, push once, and
+      # this job runs it. The default branch is the one ref a PR cannot move.
+      # The reviewer found it.
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.base.sha }}
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 1
 
       # Before the token step, so an ordinary mid-work push costs one api call

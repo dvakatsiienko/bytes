@@ -38,6 +38,17 @@ delta=$(gh api "repos/$REPO/compare/$LAST...$SHA" \
   --jq '[.commits[] | {author: {login: (.author.login // "")}, sha: .sha}]') \
   || { echo "nothing published: the delta $LAST...$SHA could not be read"; exit 0; }
 
+# Whether each commit in that window already carries a green. The decision is
+# the jq's — this only fetches the fact, one call per commit, on a window that
+# is a handful of commits by the time anyone is past the cap. A read that fails
+# reports `granted: true`, so an unknown answer refuses rather than grants.
+delta=$(jq -c '.[]' <<<"$delta" | while read -r c; do
+  sha=$(jq -r '.sha' <<<"$c")
+  n=$(gh api "repos/$REPO/commits/$sha/check-runs?check_name=review:clean" \
+        --jq '[.check_runs[] | select(.conclusion == "success")] | length' 2>/dev/null) || n=1
+  jq -c --argjson n "$n" '. + {granted: ($n > 0)}' <<<"$c"
+done | jq -s '.')
+
 decision=$(jq -n --argjson artifacts "$arts" --argjson threads "$threads" --argjson commits "$delta" \
     '{artifacts: $artifacts, threads: $threads, commits: $commits}' \
   | jq --arg mode answered --arg who "$REVIEWER" --arg app "$APP" --arg author "$AUTHOR" \

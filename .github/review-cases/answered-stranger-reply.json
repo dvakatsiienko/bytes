@@ -1,16 +1,15 @@
 {
-  "want": "failure",
-  "why": "the repo is public, so a passer-by can reply on a finding thread — a green anyone can hand out is not a gate",
+  "want": "skip",
+  "why": "a passer-by replying on a finding thread must not carry it — the repo is public, and the answer lane has no reviewer to ask",
   "expect": {
-    "verdict": "clean",
     "open": 1
   },
   "args": {
-    "mode": "round",
+    "mode": "answered",
     "who": "x-reviewer-cc[bot]",
     "author": "x-coder-cc[bot]",
     "owner": "dvakatsiienko",
-    "since": "2026-09-11T17:00:00Z",
+    "since": "2026-09-11T19:11:18Z",
     "app": "x-reviewer-cc"
   },
   "input": {
@@ -20,9 +19,12 @@
           "login": "x-reviewer-cc[bot]",
           "type": "Bot"
         },
-        "created_at": "2026-09-11T17:12:00Z",
-        "updated_at": "2026-09-11T17:12:00Z",
-        "body": "One thing stands.\n\nverdict: clean\n"
+        "created_at": "2026-09-11T17:59:00Z",
+        "updated_at": "2026-09-11T19:11:28Z",
+        "body": "Round two.\r\n\r\nverdict: findings\r\n",
+        "performed_via_github_app": {
+          "slug": "x-reviewer-cc"
+        }
       }
     ],
     "threads": [
@@ -32,7 +34,7 @@
           "login": "x-reviewer-cc[bot]",
           "type": "Bot"
         },
-        "created_at": "2026-09-11T17:11:00Z",
+        "created_at": "2026-09-11T19:12:00Z",
         "path": ".github/review-gate.jq",
         "line": 44,
         "body": "This alias is unbounded."
@@ -44,10 +46,18 @@
           "login": "a-passer-by",
           "type": "User"
         },
-        "created_at": "2026-09-11T17:13:00Z",
+        "created_at": "2026-09-11T19:14:00Z",
         "body": "looks fine to me 👍"
       }
     ],
-    "commits": []
+    "commits": [
+      {
+        "author": {
+          "login": "dvakatsiienko"
+        },
+        "sha": "26cc5c42",
+        "granted": false
+      }
+    ]
   }
 }
