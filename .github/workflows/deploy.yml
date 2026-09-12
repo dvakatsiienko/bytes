@@ -122,6 +122,13 @@ jobs:
       # It matters because this job is the whole distance between a merge and
       # production: the install it replaces costs 12-14 s in this repo's CI,
       # with another 4-6 s for the pnpm setup and a cache restore on top.
+      #
+      # 📌 The NET saving is smaller than those numbers, and saying otherwise
+      # would be the overclaim a reviewer caught: `npx` now fetches turbo and
+      # its platform binary on every run, and the `cache: pnpm` restore that
+      # went away was not replaced. Still a clear win, just not the gross figure.
+      # `--prefer-offline` buys nothing without a cache; an npm cache on this
+      # step is the thing that would, and it is not done here.
       - uses: actions/setup-node@v7
         with:
           # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so pin explicitly

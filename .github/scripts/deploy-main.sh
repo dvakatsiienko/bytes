@@ -105,6 +105,16 @@ else
       echo "::error::the root package.json no longer pins turbo in devDependencies"
       exit 1
     fi
+    # 🚨 An EXACT version, or nothing. `.npmrc` sets `save-exact = true`, so this
+    # field reads `2.10.12` today — but if a range ever lands in it, `npx` picks
+    # the newest match and an untested turbo decides what production deploys.
+    # A reviewer spotted that the empty-check alone was one arm short.
+    case "$turbo_v" in
+      [0-9]*.[0-9]*.[0-9]*) : ;;
+      *)
+        echo "::error::turbo is pinned as '$turbo_v', not an exact version — npx would resolve a turbo this repo never tested, and that turbo decides what deploys"
+        exit 1 ;;
+    esac
     # 🚨 `TURBO_SCM_BASE` is not optional. Without it turbo cannot resolve a
     # base ref, falls back to «assuming all files have changed», and every push
     # deploys all six apps — the affected list silently stops meaning anything.
