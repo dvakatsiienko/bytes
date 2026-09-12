@@ -1,0 +1,25 @@
+{
+  "want": "failure",
+  "why": "a review that states no verdict leaves what it concluded unknown",
+  "expect": { "verdict": null, "posted": 1 },
+  "args": {
+    "mode": "round",
+    "who": "x-reviewer-cc[bot]",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T17:00:00Z",
+    "run": "https://github.com/dvakatsiienko/bytes/actions/runs/100"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T17:12:00Z",
+        "updated_at": "2026-09-11T17:12:00Z",
+        "body": "**Claude finished the task**\n\n### Verdict\n\nThe reversal is the right call. Nothing blocking.\n"
+      }
+    ],
+    "threads": [],
+    "commits": []
+  }
+}

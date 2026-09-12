@@ -1,0 +1,41 @@
+{
+  "want": "failure",
+  "why": "a clean verdict does not clear an inline finding the reviewer left open on this head",
+  "expect": { "verdict": "clean", "open": 1 },
+  "args": {
+    "mode": "round",
+    "who": "x-reviewer-cc[bot]",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T17:00:00Z",
+    "run": "https://github.com/dvakatsiienko/bytes/actions/runs/100"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T17:12:00Z",
+        "updated_at": "2026-09-11T17:12:00Z",
+        "body": "Nothing blocking.\n\nverdict: clean\n"
+      }
+    ],
+    "threads": [
+      {
+        "id": 9001,
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T17:11:00Z",
+        "path": ".github/workflows/review.yml",
+        "line": 42,
+        "body": "This retry loop swallows a failure."
+      },
+      {
+        "id": 9002,
+        "in_reply_to_id": 9001,
+        "user": { "login": "greptile-apps[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T17:13:00Z",
+        "body": "Agreed. A third-party bot cannot clear this."
+      }
+    ],
+    "commits": []
+  }
+}
