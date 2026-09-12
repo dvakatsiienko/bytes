@@ -3,19 +3,25 @@
 # when the last review round's findings have all been answered, without running
 # a reviewer — or publishes nothing at all.
 #
-# Never a red. Every ordinary mid-work push reaches this, and a head with no
-# check is already blocked, which is the safe default; painting those red would
-# make a working PR look broken and teach everyone to ignore the colour. That is
-# also why a failed read exits 0: no evidence means no green, and no green means
-# the merge stays blocked.
+# Never a red on a judgement. Every ordinary mid-work push reaches this, and a
+# head with no check is already blocked, which is the safe default; painting
+# those red would make a working PR look broken and teach everyone to ignore the
+# colour. A read that fails is the one exception: no evidence means no green,
+# and it says so by failing rather than by quietly declining.
 #
 # Env: GH_TOKEN, REPO, PR, OWNER, SHA, REVIEWER, AUTHOR, LAST, SINCE, RUN
 set -euo pipefail
 
-api() { gh api "repos/$REPO/$1" --paginate | jq -s 'add // []'; }
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=.github/scripts/review-api.sh
+. "$here/review-api.sh"
 
-threads=$(api "pulls/$PR/comments") || { echo "could not read the review threads; nothing published"; exit 0; }
-comments=$(api "issues/$PR/comments") || { echo "could not read the comments; nothing published"; exit 0; }
+threads=$(apiStrict "pulls/$PR/comments")
+
+# All three endpoints, the same fold the round guard uses. A verdict written
+# into a submitted review's body rather than the sticky comment is invisible to
+# anything that folds only issue comments, and this check turns on that verdict.
+arts=$(artifacts "$PR")
 
 # The commits this push added on top of what the last round actually read. It is
 # the checkable half of «the delta is the coder's fixes»: whether a commit fixes
@@ -23,14 +29,13 @@ comments=$(api "issues/$PR/comments") || { echo "could not read the comments; no
 # is, is — and the sha range goes into the check's summary so Dima can read the
 # other half himself.
 delta=$(gh api "repos/$REPO/compare/$LAST...$SHA" \
-  --jq '[.commits[] | {author: {login: (.author.login // "")}, sha: .sha}]') \
-  || { echo "could not read the delta; nothing published"; exit 0; }
+  --jq '[.commits[] | {author: {login: (.author.login // "")}, sha: .sha}]')
 
-decision=$(jq -n --argjson artifacts "$comments" --argjson threads "$threads" --argjson commits "$delta" \
+decision=$(jq -n --argjson artifacts "$arts" --argjson threads "$threads" --argjson commits "$delta" \
     '{artifacts: $artifacts, threads: $threads, commits: $commits}' \
   | jq --arg mode answered --arg who "$REVIEWER" --arg author "$AUTHOR" \
        --arg owner "$OWNER" --arg since "$SINCE" --arg run "$RUN" \
-       -f .github/review-gate.jq)
+       -f "$here/../review-gate.jq")
 
 conclusion=$(jq -r '.conclusion' <<<"$decision")
 title=$(jq -r '.title' <<<"$decision")

@@ -4,10 +4,15 @@
 # its own start time, and the action overwrites that comment seconds later on
 # every round.
 #
-# Both jobs in review.yml read this, which is why it is a file. The guard needs
-# the count to enforce the cap and the last head to tell the reviewer what to
-# re-read; the answer check needs the same count to know the cap is spent, plus
-# when the last round started and which run wrote its comment.
+# 🚨 The invariant this rests on: `review.yml` holds ONE job on ONE trigger, so
+# «a successful run of review.yml» and «a round that reached the reviewer» are
+# the same sentence. A workflow run concludes `success` when ANY job in it
+# succeeds, so a second job on a second trigger in that file makes every one of
+# its events a completed round. That is not hypothetical — the post-cap answer
+# check was written into `review.yml` first, and two ordinary pushes would then
+# have eaten the whole cap while spending zero reviews. It lives in
+# `review-answer.yml` for that reason. An unrelated label still concludes
+# `skipped`, not `success`, which is what keeps the count honest today.
 #
 # 📌 Rounds are counted per BRANCH, not per PR. A reused branch name would carry
 # its old rounds into the next PR — left as is on purpose: branches here are one
@@ -17,25 +22,27 @@
 # `pull_requests[]` on a run, and an empty one there would UNDER-count, which
 # fails open.
 #
-# A round is a run that REACHED the reviewer, whatever the reviewer then found.
-# That is why the verdict lives in the `review:clean` check run and never in the
-# job's own conclusion: a job that ends green means «this round ran». A run that
-# died on the cap, or one whose action refused itself, ends red and is not
-# counted — correct, it spent nothing.
+# A run that died on the cap, or one whose action refused itself, ends red and
+# is not counted — correct, it spent nothing.
 #
 # Env: GH_TOKEN, REPO, BRANCH, GITHUB_OUTPUT
 set -euo pipefail
 
+# No `|| echo '[]'` here, and that is the same argument as the paragraph above:
+# a swallowed api failure reports zero rounds, which leaves the cap unenforced
+# and says nothing about it. Failing loudly spends no review and publishes no
+# check, so the PR stays blocked — the safe side.
 runs=$(gh api \
   "repos/$REPO/actions/workflows/review.yml/runs?branch=$BRANCH&status=completed&per_page=100" \
-  --jq '[.workflow_runs[] | select(.conclusion == "success")] | sort_by(.run_number)' \
-  2>/dev/null || echo '[]')
+  --jq '[.workflow_runs[] | select(.conclusion == "success")] | sort_by(.run_number)')
+
+count=$(jq 'length' <<<"$runs")
 
 {
-  echo "count=$(jq 'length' <<<"$runs")"
+  echo "count=$count"
   echo "last=$(jq -r 'last | .head_sha // ""' <<<"$runs")"
   echo "at=$(jq -r 'last | .created_at // ""' <<<"$runs")"
   echo "url=$(jq -r 'last | .html_url // ""' <<<"$runs")"
 } >> "$GITHUB_OUTPUT"
 
-echo "$(jq 'length' <<<"$runs") completed review rounds on $BRANCH; last reviewed $(jq -r 'last | .head_sha // "none"' <<<"$runs")"
+echo "$count completed review rounds on $BRANCH; last reviewed $(jq -r 'last | .head_sha // "none"' <<<"$runs")"

@@ -1,6 +1,6 @@
 # The review gate's decision, as a pure function of what the api returned.
 #
-# It lives in a file rather than inside review.yml for two reasons. The two
+# It lives in a file rather than inside a workflow for two reasons. The two
 # callers below read the same two things — what the reviewer concluded, and
 # whether its findings carry replies — and a second copy of that predicate is
 # how the two would drift. And a decision embedded in a workflow can only be
@@ -8,41 +8,53 @@
 # saved payloads by `.github/scripts/review-cases.sh`, which is what proves a
 # findings round goes red without waiting for a findings round to happen.
 #
-#   $mode == "round"     the guard that judges a review round
-#   $mode == "answered"  the post-cap answer check
+#   $mode == "round"     the guard that judges a review round (review.yml)
+#   $mode == "answered"  the post-cap answer check (review-answer.yml)
 #
 # Input  { artifacts, threads, commits }
-#          artifacts  every comment/review the run may have written, folded
+#          artifacts  every comment/review the round may have written, folded
 #          threads    pulls/N/comments — the inline finding threads
 #          commits    "answered" only: the commits pushed since the last review
 # Args   mode who author owner since run
 #          who     the reviewer app, `<slug>[bot]`
-#          author  the PR's own author — the only bot whose reply clears a finding
-#          owner   the repo owner, who is the other account allowed to push here
+#          author  the PR's own author
+#          owner   the repo owner — the other account allowed to push and answer
 #          since   the moment the round started ("round") or the last round's
 #                  run creation time ("answered")
-#          run     the job-run url the round wrote into its own comment
+#          run     the job-run url that round wrote into its own comment
 # Output { conclusion, title, summary, standdown, posted, verdict, open }
 #          conclusion  "success" | "failure" | "skip"  ("skip" is answered-only:
 #                      publish nothing, leave the head without a check)
 #          standdown   the action refused itself and no reviewer was spent, so
 #                      the round must not count against the cap
 
-# The round's own artifacts. The author test alone is not enough: `use_sticky_comment`
-# reuses an existing tracking comment, and an edit does not change a comment's
-# author — a comment first written by `claude[bot]` still reads as `claude[bot]`
-# after the reviewer writes its verdict into it. The job-run link is the
-# author-independent handle; the action writes it into that comment whoever owns it.
-def ours: select((.user.login == $who) or ((.body // "") | contains($run)));
+# The round's own artifacts. An author test alone is not enough:
+# `use_sticky_comment` reuses an existing tracking comment, and an edit does not
+# change a comment's author — one first written by `claude[bot]` still reads as
+# `claude[bot]` after the reviewer writes its verdict into it. The job-run link
+# is the author-independent handle; the action writes it into that comment
+# whoever owns it.
+#
+# 🚨 That alias is BOUNDED to logins carrying `claude`, which is exactly the
+# action's own `botNameMatch` (`login.includes("claude")`) and so exactly the
+# set of comments it can adopt as its sticky one. Unbounded, any account could
+# post the run url plus a `verdict: clean` line and green the gate itself — the
+# reviewed party included, since the coder holds `pull-requests: write`. Found
+# in review.
+def ours:
+  select(.user.login == $who
+         or (((.user.login // "") | test("claude")) and ((.body // "") | contains($run))));
 
 # Freshness, not creation: an edit moves `updated_at` and leaves `created_at` at
 # the round that first created the comment.
 def touched: select(((.updated_at // .submitted_at // "") > $since));
 
-# A reply that clears a finding. A HUMAN reply always counts; a BOT reply counts
-# only from the PR's own author, so a third-party review bot cannot clear a
-# finding by answering a thread it does not own.
-def answerer: select(.user.login != $who and (.user.type != "Bot" or .user.login == $author));
+# A reply that clears a finding: the PR's own author, or the repo owner. Anyone
+# else's reply is a comment, not an answer — the repo is public, and a green
+# that a passer-by can hand out is not a gate. The owner is named so Dima can
+# answer a finding on a PR he opened himself, which a hardcoded coder login once
+# made impossible.
+def answerer: select(.user.login != $who and (.user.login == $author or .user.login == $owner));
 
 . as $in
 
@@ -67,8 +79,8 @@ def answerer: select(.user.login != $who and (.user.type != "Bot" or .user.login
        | (($f.in_reply_to_id // $f.id)) as $root
        | {path: $f.path,
           line: ($f.line // $f.original_line),
-          answered: ([$all[] | answerer | select((.in_reply_to_id // .id) == $root)] | length > 0)})
-   | map(select(.answered | not))) as $unanswered
+          answered: ([$all[] | answerer | select((.in_reply_to_id // .id) == $root)] | length > 0)})) as $raised
+| ($raised | map(select(.answered | not))) as $unanswered
 | ($unanswered | length) as $open
 | ($unanswered | map("- `\(.path):\(.line)`") | join("\n")) as $openlist
 
@@ -102,22 +114,29 @@ def answerer: select(.user.login != $who and (.user.type != "Bot" or .user.login
       # designed default for a head nobody reviewed is already a blocked merge.
       ([$in.commits // [] | .[]
         | select((.author.login // "") != $author and (.author.login // "") != $owner)]) as $outsiders
-      | (([$in.artifacts // [] | .[], $all[]]
-          | map(answerer | select((.created_at // "") > $since))
-          | length) > 0) as $spoke
       | if $posted == 0 then
           {conclusion: "skip", title: "the last round left no readable artifact"}
         elif $verdict != "findings" then
           {conclusion: "skip", title: "the last round's verdict was \($verdict // "absent") — only a findings round can be answered"}
+
+        # 🚨 The hole this clause closes is the one the whole ticket is about.
+        # «Every finding answered» is counted from inline threads, so a round
+        # that wrote its findings only into its comment raises zero threads and
+        # counts zero unanswered — which is #76 exactly, six findings and a
+        # green check. Declining is the only honest answer: a machine cannot
+        # check off a finding it cannot enumerate. The reviewer's prompt asks
+        # for every blocking finding as an inline thread so this is rare, and
+        # when it is not, a prose-only round needs Dima's third round instead.
+        elif ($raised | length) == 0 then
+          {conclusion: "skip", title: "the last round raised no inline thread — findings living only in its comment cannot be checked off by machine"}
+
         elif $open > 0 then
           {conclusion: "skip", title: "\($open) finding(s) from the last round still carry no reply"}
-        elif ($spoke | not) then
-          {conclusion: "skip", title: "no answer from the author since the last round"}
         elif ($outsiders | length) > 0 then
-          {conclusion: "skip", title: "\($outsiders | length) commit(s) in the delta are not the author's"}
+          {conclusion: "skip", title: "\($outsiders | length) commit(s) in the delta belong to neither the author nor the repo owner"}
         else
           {conclusion: "success",
            title: "answered on this head",
-           summary: "The two-round cap is spent. Every finding of the last review carries a reply, the author answered on the PR, and every commit pushed since that review is the author's own. No reviewer ran on this head — what it green-lights is the answers, not the new code."}
+           summary: "The two-round cap is spent. All \($raised | length) finding(s) the last review raised carry a reply from the author or the repo owner, and every commit pushed since that review belongs to one of them. No reviewer ran on this head — what this green-lights is the answers, not the new code."}
         end
     end)
