@@ -1,12 +1,11 @@
 {
   "want": "failure",
-  "why": "the hole this gate exists to close — six findings in the sticky comment, zero inline threads, and the old guard called that clean",
+  "why": "the hole this gate exists to close \u2014 six findings in the sticky comment, zero inline threads, and the old guard called that clean",
   "expect": {
     "verdict": "findings",
     "open": 0
   },
   "args": {
-    "mode": "round",
     "who": "x-reviewer-cc[bot]",
     "author": "x-coder-cc[bot]",
     "owner": "dvakatsiienko",
@@ -22,10 +21,9 @@
         },
         "created_at": "2026-09-11T17:59:00Z",
         "updated_at": "2026-09-11T17:59:00Z",
-        "body": "#### N1 · The doc and the manifests disagree\r\n\r\n#### N2 · The one-version guarantee never runs in CI\r\n\r\n### Verdict\r\n\r\nN1 and N3 are one mistake.\r\n\r\nverdict: findings\r\n · branch [`coder/BYT-91-hoist`](https://github.com/dvakatsiienko/bytes/tree/coder/BYT-91-hoist)"
+        "body": "#### N1 \u00b7 The doc and the manifests disagree\r\n\r\n#### N2 \u00b7 The one-version guarantee never runs in CI\r\n\r\n### Verdict\r\n\r\nN1 and N3 are one mistake.\r\n\r\nverdict: findings\r\n \u00b7 branch [`coder/BYT-91-hoist`](https://github.com/dvakatsiienko/bytes/tree/coder/BYT-91-hoist)"
       }
     ],
-    "threads": [],
-    "commits": []
+    "threads": []
   }
 }

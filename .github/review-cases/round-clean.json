@@ -7,7 +7,6 @@
     "posted": 1
   },
   "args": {
-    "mode": "round",
     "who": "x-reviewer-cc[bot]",
     "author": "x-coder-cc[bot]",
     "owner": "dvakatsiienko",
@@ -48,7 +47,6 @@
         "created_at": "2026-09-11T17:14:00Z",
         "body": "declined: the swallow is deliberate, the cleanup step closes the check."
       }
-    ],
-    "commits": []
+    ]
   }
 }

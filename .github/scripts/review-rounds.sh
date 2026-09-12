@@ -11,7 +11,7 @@
 # its events a completed round. That is not hypothetical — the post-cap answer
 # check was written into `review.yml` first, and two ordinary pushes would then
 # have eaten the whole cap while spending zero reviews. It lives in
-# `review-answer.yml` for that reason. An unrelated label still concludes
+# its own file for that reason. An unrelated label still concludes
 # `skipped`, not `success`, which is what keeps the count honest today.
 #
 # 📌 Rounds are counted per BRANCH, not per PR. A reused branch name would carry

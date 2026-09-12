@@ -44,9 +44,9 @@ name: review
 # a round is counted as a successful run of THIS FILE, and a workflow run
 # concludes `success` when any job in it succeeds. A second job on a second
 # trigger here would make every one of its events a completed review round — the
-# post-cap answer check was written into this file first, and two ordinary
-# pushes would then have eaten the whole cap while spending zero reviews. It
-# lives in `review-answer.yml`. Caught in review before it shipped.
+# post-cap lane was written into this file first, and two ordinary pushes would
+# then have eaten the whole cap while spending zero reviews. It lives in its own
+# file — `review-approved.yml` now. Caught in review before it shipped.
 on:
   pull_request:
     types: [labeled]
@@ -192,8 +192,8 @@ jobs:
       #
       # 📌 Know what this costs now that the gate is real: `review:clean` lives
       # on a head sha, so a push after the second round leaves the new head with
-      # no check. `review-answer.yml` is the way out when the findings are
-      # answered; when they are not, the PR waits for Dima.
+      # no check. `review-approved.yml` is the way out: Dima approves the head
+      # and that publishes `review:clean` on it.
       #
       # 📌 «Dima's word» is enforced rather than asked for. On a `labeled` event
       # `github.event.sender` IS the account that applied the label, so a third

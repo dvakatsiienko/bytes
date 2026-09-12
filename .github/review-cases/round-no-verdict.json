@@ -6,7 +6,6 @@
     "posted": 1
   },
   "args": {
-    "mode": "round",
     "who": "x-reviewer-cc[bot]",
     "author": "x-coder-cc[bot]",
     "owner": "dvakatsiienko",
@@ -25,7 +24,6 @@
         "body": "**Claude finished the task**\n\n### Verdict\n\nThe reversal is the right call. Nothing blocking.\n"
       }
     ],
-    "threads": [],
-    "commits": []
+    "threads": []
   }
 }

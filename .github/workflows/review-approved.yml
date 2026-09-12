@@ -1,0 +1,67 @@
+name: review-approved
+
+# The way past the two-round cap, and the whole of it: Dima approves the PR and
+# `review:clean` goes green on the head he approved.
+#
+# What this replaces was a lane that tried to decide, without a reviewer, whether
+# a push had answered the last round's findings — reading thread replies, commit
+# authorship, and whether the answers had already been spent. It produced five of
+# the twelve defects on #79 and could never do better than guess, because «is
+# this finding answered» is not a question an api can settle. A human approval is
+# the same judgement, made by the only party entitled to make it, and the api
+# reports it in one field.
+#
+# 🚨 The coder cannot forge this, for two independent reasons, and both are
+# measured rather than assumed (scratch PR #81, 2026-09-12):
+#
+#  1. GitHub refuses an approving review from the PR's own author, and every
+#     coder PR is authored by `x-coder-cc[bot]`.
+#  2. An app's approval does not count anyway. With
+#     `required_approving_review_count: 1` in force, an APPROVED review from
+#     `x-reviewer-cc[bot]` left `reviewDecision` at `REVIEW_REQUIRED` — the app's
+#     `author_association` is `NONE`, so the rule engine ignores it in both
+#     directions. The same PR flipped to `APPROVED` the moment a human approved.
+#
+# So the `sender.login == repository_owner` test below is not belt-and-braces
+# over a weak check; it is the check, and nothing the coder holds can satisfy it.
+on:
+  pull_request_review:
+    types: [submitted]
+
+concurrency:
+  group: review-approved-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    # The owner, an approval, and nothing else. A review from anyone else — the
+    # reviewer app included — reaches this job and stops here.
+    if: >-
+      github.event.review.state == 'approved' &&
+      github.event.sender.login == github.repository_owner
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - name: Publish review:clean on the approved head
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          # 📌 The sha the REVIEW was submitted against, not the PR's current
+          # head. They differ when a push lands between the approval and this
+          # job, and a check run belongs on the commit a human actually read.
+          SHA: ${{ github.event.review.commit_id }}
+          WHO: ${{ github.event.sender.login }}
+          LINK: ${{ github.event.review.html_url }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$REPO/check-runs" -X POST \
+            -f name='review:clean' \
+            -f head_sha="$SHA" \
+            -f status=completed \
+            -f conclusion=success \
+            -f output[title]="approved by $WHO" \
+            -f output[summary]="No reviewer ran on this head. \`$WHO\` approved it: $LINK
+
+          This is the human gate past the two-round cap. It says a person read this head and accepted it — nothing more, and nothing automated can produce it." \
+            --jq '.conclusion'
