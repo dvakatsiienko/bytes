@@ -80,8 +80,11 @@ apps=$(for f in apps/*/vercel.json; do
   name=$(jq -r '.name' "$dir/package.json")
   install=$(jq -r '.installCommand // empty' "$f")
   [ -n "$install" ] || continue
-  # Vercel's own default when the field is absent, which is what every app but
-  # trophy-sys relies on.
+  # 📌 The fallback is what these apps resolve to, not «Vercel's default» —
+  # Vercel's real default is derived from the framework preset, and it lands on
+  # `pnpm run build` here only because every app happens to define that script.
+  # Saying the first thing was the same overstatement this file was just fixed
+  # for, one comment further down.
   build=$(jq -r '.buildCommand // "pnpm run build"' "$f")
   jq -n --arg dir "$dir" --arg name "$name" --arg install "$install" --arg build "$build" \
     '{dir: $dir, name: $name, install: $install, build: $build,
