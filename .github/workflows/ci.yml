@@ -25,6 +25,50 @@ env:
   TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
 
 jobs:
+  # One read of what this push or PR touched, because three consumers need it
+  # and a job's services and matrix are both fixed before its first step runs —
+  # so those two questions cannot be answered inside the job that cares.
+  #
+  # 📌 What does NOT live here: anything a STEP can ask turbo after the install.
+  # A path pattern guessing «is kit affected» is a worse answer than turbo's own
+  # task graph, and it goes stale the first time a new package depends on kit.
+  # See the chromium step below.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # This file sets no workflow-level permissions, so a job that says nothing
+    # takes the repo default. Every other job in here narrows explicitly; this
+    # one reads a diff and writes four strings.
+    permissions:
+      contents: read
+    outputs:
+      renovate: ${{ steps.touched.outputs.renovate }}
+      financial: ${{ steps.touched.outputs.financial }}
+      installs: ${{ steps.touched.outputs.installs }}
+      apps: ${{ steps.touched.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: touched
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: .github/scripts/ci-changes.sh
+
+  # 🚨 NO `needs:` here, and that is the point. `check` is the required context
+  # on `main`, and a job skipped because its dependency failed reports
+  # `skipped` — which GitHub counts as SATISFYING a required check. That is the
+  # #72 trap `review.yml`'s opening comment is written about, and a `needs` edge
+  # would have re-opened it one job upstream: before, a flake in this job's own
+  # checkout turned it RED; with the edge, a flake in `changes` turned it GREEN.
+  # The reviewer found it. `changes` has several ways to go red that are not
+  # «the code is bad» — its own `exit 1`, a malformed package.json, a checkout
+  # flake — and none of them may report this gate as passed.
+  #
+  # 📌 So the one string this job wants from that script, it reads itself. The
+  # script runs twice per PR, here and in `changes`; that is ~7 s against a
+  # skippable main gate, and it also takes the `fetch-depth: 0` clone off the
+  # critical path, since `changes` no longer runs ahead of this job.
   check:
     name: lint + typecheck + test + build
     runs-on: ubuntu-latest
@@ -36,39 +80,20 @@ jobs:
       contents: read
       id-token: write
 
-    # `financial` prerenders /dashboard at build time, which queries Postgres.
-    # This container is created and destroyed with the job, so CI gets a real
-    # database of its own and never reaches a deployed one.
-    services:
-      postgres:
-        image: postgres:18
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: financial
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      # Points at the throwaway container above and nowhere else.
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/financial
-
-      # Better Auth refuses to start on its default secret. This is a CI-only
-      # literal, not a credential: it signs nothing any person will ever hold,
-      # and the real value lives in Vercel. The app reads `AUTH_SECRET` — it is
-      # passed explicitly in src/lib/auth.ts, not picked up by Better Auth's own
-      # env lookup.
-      AUTH_SECRET: ci-only-not-a-real-secret
+    # 📌 No postgres service here any more. Only `financial`'s build needs one,
+    # the container cost 24 s of every run whether or not `financial` was
+    # touched, and a service is fixed at job-definition time so it cannot be
+    # made conditional. `financial` builds in its own job below instead.
 
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Biome VCS needs real history
+
+      - id: touched
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: .github/scripts/ci-changes.sh
 
       # The review gate's decision, fed saved api payloads. It runs here rather
       # than in review.yml because that is the one place it can run at all: a PR
@@ -100,7 +125,11 @@ jobs:
       #
       # It cannot catch a semantically wrong config: a rule that parses fine and
       # matches nothing stays green here.
+      #
+      # 📌 Only when `renovate.json` moved. `npx` downloads the whole of renovate
+      # every run — 25 s spent on a file that changes a few times a year.
       - name: Validate renovate config
+        if: steps.touched.outputs.renovate == 'true'
         run: npx --yes --package renovate -- renovate-config-validator --strict
 
       # Vercel's remote cache is already on for deploys; this is the same cache,
@@ -125,11 +154,40 @@ jobs:
       - name: Lint
         run: pnpm turbo run lint ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
+      # 📌 Whether chromium is needed is turbo's question, not a path pattern's.
+      # `@ui/kit` is the only package that tests in a real browser, and `test`
+      # runs under the same `--affected` as the step below — so the task graph
+      # already knows the answer exactly, including the case a path list would
+      # miss: a new package depending on kit. `<NONEXISTENT>` is how turbo spells
+      # a package that has no such script, and the graph lists those too.
+      #
+      # Worth 15 s even on a cache hit, because `install-deps` re-adds system
+      # libraries the cache cannot carry.
+      - id: browser
+        name: Does anything test in a browser this run?
+        run: |
+          set -euo pipefail
+          plan=$(pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }} --dry=json)
+          # 📌 A COUNT, not `jq -e`. `jq -e` answers 1 for «false» and 5 for «I
+          # could not parse that», and the `if` reads both as «no browser tests»
+          # — a gate whose broken state is indistinguishable from its negative
+          # state. An unparseable plan leaves `kit` empty here, and the
+          # comparison below then fails the step out loud.
+          kit=$(jq '[.tasks[] | select(.task == "test" and .package == "@ui/kit" and .command != "<NONEXISTENT>")] | length' <<<"$plan")
+          if [ "$kit" -gt 0 ]; then
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            echo "@ui/kit tests are in the plan — chromium is needed"
+          else
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo "no browser tests in the plan — skipping chromium"
+          fi
+
       # `@ui/kit` tests in a real browser, so the runner needs chromium. The
       # download is ~90 MB and the only part of this job that would be slow, so
       # it is cached on the lockfile hash — the playwright version lives there,
       # and a bump is exactly when a fresh browser is required.
       - name: Cache playwright browsers
+        if: steps.browser.outputs.needed == 'true'
         id: playwright-cache
         uses: actions/cache@v6
         with:
@@ -155,6 +213,7 @@ jobs:
       # `install-deps` alone re-adds the libraries, which is seconds rather than
       # a download.
       - name: Install chromium
+        if: steps.browser.outputs.needed == 'true'
         run: >-
           pnpm exec playwright
           ${{ steps.playwright-cache.outputs.cache-hit == 'true' && 'install-deps chromium' || 'install --with-deps chromium' }}
@@ -166,20 +225,238 @@ jobs:
       - name: Test
         run: pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
+      # The gate that makes dependency automerge safe: a bump that breaks a
+      # build now fails here instead of in a Vercel production deploy.
+      #
+      # Two apps are excluded, for two different reasons, and both are real gaps
+      # rather than tidy-ups:
+      #
+      # `x-com-chat`'s layout.tsx calls preloadQuery against Convex while Next
+      # prerenders, so it needs a reachable deployment — a URL string is not
+      # enough and no service container can stand in for one.
+      #
+      # `financial` prerenders /dashboard, which queries Postgres. It builds in
+      # its own job below, where the container it needs is worth starting. 📌
+      # Measured before relying on it: two negative filters INTERSECT — the plan
+      # drops both packages, not neither. Turbo's docs say filters union, which
+      # reads the other way for negations.
+      - name: Build
+        run: pnpm turbo run build --filter='!x-com-chat' --filter='!financial' ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+  # `financial` alone needs a database to build, because it prerenders
+  # /dashboard. A service container is fixed at job-definition time, so the only
+  # way to stop paying for it on every unrelated run is to give it a job of its
+  # own and skip that job — 24 s off the common path, at the cost of one extra
+  # setup on the runs that do touch it.
+  #
+  # 📌 On a push to `main` this always runs. `--affected` is not passed there, so
+  # the whole graph builds and `financial` is always in it — the same reason the
+  # check job above builds everything on main.
+  #
+  # ⚠️ If either of the two new jobs is ever made a REQUIRED check on `main`,
+  # read `review.yml`'s opening comment first: GitHub counts a skipped job as
+  # satisfying a required context, so a conditional job as a required check is a
+  # gate that passes by not running. These are deliberately not required; the
+  # `main` push is what makes them unskippable where it matters.
+  financial:
+    name: financial build (postgres)
+    needs: changes
+    # Both arms carry an event test, for the reason spelled out on the
+    # `vercel-install` gate below: a `renovate/**` branch push reaches an
+    # untested `||` arm, and reaches it unconditionally on a branch's first push.
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+
+    # Created and destroyed with the job, so CI gets a real database of its own
+    # and never reaches a deployed one.
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: financial
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Points at the throwaway container above and nowhere else.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/financial
+
+      # Better Auth refuses to start on its default secret. This is a CI-only
+      # literal, not a credential: it signs nothing any person will ever hold,
+      # and the real value lives in Vercel. The app reads `AUTH_SECRET` — it is
+      # passed explicitly in src/lib/auth.ts, not picked up by Better Auth's own
+      # env lookup.
+      AUTH_SECRET: ci-only-not-a-real-secret
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Remote cache
+        continue-on-error: true
+        uses: vercel/setup-turborepo-remote-cache-action@v1.1.0
+        with:
+          team: ${{ vars.TURBO_TEAM }}
+
       # `db push` rather than `migrate deploy`: this app has no migrations
       # directory, so pushing the schema straight into the empty container is
       # the only thing that would work. No seed — /dashboard only counts and
       # groups, and both are happy against empty tables.
       - name: Database schema
         run: pnpm --filter financial db:push
-
-      # The gate that makes dependency automerge safe: a bump that breaks a
-      # build now fails here instead of in a Vercel production deploy.
-      #
-      # `x-com-chat` is the one app still excluded, and that is a real gap
-      # rather than a tidy-up. Its layout.tsx calls preloadQuery against Convex
-      # while Next prerenders, so it needs a reachable deployment — a URL string
-      # is not enough and no service container can stand in for one. It still
-      # gets lint, typecheck and test here.
       - name: Build
-        run: pnpm turbo run build --filter='!x-com-chat' ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+        run: pnpm turbo run build --filter=financial
+
+  # The clean-clone check, and the only one that catches a tool the pnpm store
+  # cannot reach from an app directory. Everything else in this file runs after
+  # one `pnpm install --frozen-lockfile` at the root, which puts the whole
+  # workspace on disk — so a package an app's build needs but its manifest never
+  # declares resolves anyway, and the failure waits for a Vercel deploy.
+  #
+  # 📌 The command is not written here. It is read out of each app's own
+  # `vercel.json` `installCommand`, so this cannot drift from what production
+  # actually runs; the app list is the set of apps that HAVE a `vercel.json`,
+  # for the same reason. Measured by hand on BYT-91 at four minutes per app.
+  #
+  # It runs on every merge to `main`, and on a PR only when a manifest or the
+  # lockfile moved — which is the only thing that can change what a filtered
+  # install resolves.
+  vercel-install:
+    name: clean install · ${{ matrix.app.name }}
+    needs: changes
+    # 🚨 BOTH arms carry an event test, and the second one is the whole lesson.
+    # This workflow's push trigger also carries `renovate/**`, so the first
+    # version ran all six legs on every renovate branch push AND again on the PR
+    # renovate opens — twelve clean-clone legs per bump, four minutes each, on a
+    # change whose point is cutting CI overhead.
+    #
+    # Adding `refs/heads/main` to the push arm did NOT fix that, which is the
+    # part worth remembering: the `||` arm had no event test, so the branch push
+    # still reached it. And it reached it unconditionally — on a branch's FIRST
+    # push `github.event.before` is the all-zero sha, `ci-changes.sh` correctly
+    # rejects it as unusable and answers «everything changed», so `installs` is
+    # `true` by construction there. The reviewer caught the second version with
+    # the commit still titled for fixing the first.
+    #
+    # `check` alone satisfies renovate's `prCreation: "not-pending"`, so gating
+    # this arm on `pull_request` costs the branch nothing.
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && needs.changes.outputs.installs == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Spelled out because this job runs a command read out of a file the PR can
+    # edit. That is no worse than the rest of CI, which runs the PR's own package
+    # scripts — but a job with nothing to write should say so.
+    permissions:
+      contents: read
+
+    strategy:
+      # One app's broken resolution says nothing about the other five, and
+      # finding all of them in one run beats finding them one merge at a time.
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.changes.outputs.apps) }}
+
+    # 📌 No `services:` block, and that is the second draft. The first gave all
+    # six legs a postgres container because only `financial`'s build queries one
+    # and a service cannot be made conditional — which re-added, six times over,
+    # exactly the cost the rider above removed once. The argument for it was
+    # wall-clock (the legs run in parallel); the rider was counting spend, and
+    # five idle containers are spend. The one leg that needs a database starts
+    # one itself, below.
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/financial
+      AUTH_SECRET: ci-only-not-a-real-secret
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          # 📌 No pnpm cache, deliberately. A warm store is the thing that hides
+          # the failure this job exists to find: it can satisfy an import from a
+          # package the filtered install never asked for. A clean clone means a
+          # clean store.
+
+      # From the repo ROOT, which is where Vercel runs it — `-F` resolves against
+      # the workspace root either way, and the root is the shape BYT-91 measured.
+      #
+      # 📌 Through an env var rather than interpolated into the script. The value
+      # comes out of a `vercel.json` the PR can edit, and a command assembled by
+      # string substitution is the classic way a workflow runs something its
+      # author did not write. The var also spares the single quotes in
+      # `pnpm i -F 'cv...'` a round of shell parsing they do not need.
+      - name: Filtered install, exactly as Vercel runs it
+        env:
+          INSTALL: ${{ matrix.app.install }}
+        run: |
+          set -euo pipefail
+          echo "$INSTALL"
+          eval "$INSTALL"
+
+      # One container, on the one leg that needs one. `financial` prerenders
+      # /dashboard at build time, which queries Postgres; the other five legs
+      # never open a socket. Created and destroyed with the runner, so this
+      # reaches nothing deployed.
+      - name: Postgres
+        if: matrix.app.name == 'financial'
+        run: |
+          set -euo pipefail
+          docker run -d --name ci-postgres -p 5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=financial postgres:18
+          # 📌 Bounded. An unbounded `until` spins for the job's whole timeout
+          # when the container is never coming up — a bad image pull, a bound
+          # port, a process that exited — turning a failure the service block
+          # reported in seconds into a 20-minute hang. The reviewer caught it.
+          for _ in $(seq 60); do
+            if docker exec ci-postgres pg_isready -U postgres -h 127.0.0.1 -q; then
+              echo "postgres is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::postgres did not come up in 60s"
+          docker logs ci-postgres || true
+          exit 1
+
+      - name: Database schema
+        if: matrix.app.name == 'financial'
+        run: pnpm --filter financial db:push
+
+      # No turbo, no remote cache. The point is the app's own build command
+      # resolving its own tools from its own directory, which is what Vercel
+      # does — a cache hit would prove nothing about resolution.
+      #
+      # The command is `vercel.json`'s `buildCommand`, or Vercel's own default
+      # when the field is absent. Through env for the same reason as the install.
+      - name: Build
+        if: matrix.app.buildable
+        working-directory: ${{ matrix.app.dir }}
+        env:
+          BUILD: ${{ matrix.app.build }}
+        run: |
+          set -euo pipefail
+          echo "$BUILD"
+          eval "$BUILD"
