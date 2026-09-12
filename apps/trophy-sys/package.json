@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "5.102.8",
-    "@tanstack/react-router": "1.170.33",
+    "@tanstack/react-router": "1.170.34",
     "@ui/kit": "workspace:*",
     "@upstash/redis": "1.38.4",
     "@visx/axis": "4.0.0",
