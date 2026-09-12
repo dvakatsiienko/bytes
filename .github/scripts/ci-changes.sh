@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# What this push or PR touched, and the vercel apps worth a clean-clone install.
+# One read, so the jobs that need it do not each re-derive it.
+#
+# 📌 Only what a JOB has to decide before it starts lives here. A service
+# container and a matrix are both fixed at job-definition time, so `financial`
+# and the app list are read from paths. Everything a STEP decides is better
+# asked of turbo after the install, where the answer is exact rather than a path
+# guess — see the chromium step in ci.yml.
+#
+# The `financial` test is deliberately wide: its build is affected by its own
+# app, by any shared package it consumes, and by a lockfile move. Over-matching
+# costs one skipped-container job's worth of nothing; under-matching costs a
+# build that fails looking for a database. Wrong on the safe side, on purpose.
+#
+# Env: BASE (the ref or sha to diff against), GITHUB_OUTPUT
+set -euo pipefail
+
+if [ -n "${BASE:-}" ] && git rev-parse --verify --quiet "$BASE" >/dev/null; then
+  files=$(git diff --name-only "$BASE"...HEAD)
+  echo "diffed against $BASE"
+else
+  # A push to main with no usable base, or a first commit: assume everything
+  # changed. The riders then run, which is exactly what they did before.
+  files=$(git ls-files)
+  echo "no usable base — treating every file as changed"
+fi
+
+has() { grep -qE "$1" <<<"$files"; }
+
+{
+  has '^renovate\.json$'                              && echo "renovate=true" || echo "renovate=false"
+  has '^(apps/financial/|packages/|pnpm-lock\.yaml$|package\.json$)' \
+                                                      && echo "financial=true" || echo "financial=false"
+  # A manifest or the lockfile is the only thing that can change what a filtered
+  # install resolves — plus the definition of the job that checks it, so a change
+  # to the matrix is exercised by the PR that makes it rather than one merge
+  # later. That rule paid for itself immediately: this script's own first PR
+  # touched no manifest at all.
+  has '(^|/)package\.json$|^pnpm-lock\.yaml$|^pnpm-workspace\.yaml$|(^|/)vercel\.json$|^\.github/(workflows/ci\.yml|scripts/ci-changes\.sh)$' \
+                                                      && echo "installs=true" || echo "installs=false"
+} >> "$GITHUB_OUTPUT"
+
+# The apps a clean-clone install is worth running for are the ones Vercel
+# actually deploys, and the command is the one Vercel actually runs — both read
+# from `vercel.json` rather than listed here, so this cannot drift from what
+# production does.
+#
+# `build` is false where a build needs something no container can stand in for.
+# `x-com-chat` calls preloadQuery against Convex while Next prerenders, so it
+# needs a reachable deployment; a URL string is not enough. It still proves its
+# filtered install resolves, which is the thing this job exists to catch.
+apps=$(for f in apps/*/vercel.json; do
+  dir=$(dirname "$f")
+  name=$(jq -r '.name' "$dir/package.json")
+  install=$(jq -r '.installCommand // empty' "$f")
+  [ -n "$install" ] || continue
+  jq -n --arg dir "$dir" --arg name "$name" --arg install "$install" \
+    '{dir: $dir, name: $name, install: $install, build: ($name != "x-com-chat")}'
+done | jq -sc 'sort_by(.name)')
+
+echo "apps=$apps" >> "$GITHUB_OUTPUT"
+echo "$apps" | jq -r '.[] | "  \(.name): \(.install)\(if .build then "" else "  (install only)" end)"'
