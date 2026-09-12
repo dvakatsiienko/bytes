@@ -1,6 +1,23 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  // Two root files that change what an install PRODUCES without appearing in
+  // any package. turbo's built-in globals cover the root manifest, the lockfile
+  // and this file — not these — so without this key a commit touching only one
+  // of them marks nothing affected.
+  //
+  // That was a silent production hole once `.github/workflows/deploy.yml`
+  // became the only thing that deploys: `.npmrc`'s `public-hoist-pattern[]` is
+  // named in CLAUDE.md as THE fix for a pnpm strict-store resolution failure,
+  // and `pnpm-workspace.yaml`'s `allowBuilds` decides whether `sharp`, `prisma`
+  // and `@tailwindcss/oxide` run their postinstall at all. So the very commit
+  // repairing a broken Vercel build would deploy nothing and exit 0 green.
+  //
+  // Measured on BYT-84 in a throwaway clone, each case a real commit touching
+  // one file: without this key both answer «nothing affected»; with it both
+  // answer all 8 buildable packages, while a CLAUDE.md edit still answers
+  // nothing. It also fixes task hashing, which had the same blind spot.
+  "globalDependencies": [".npmrc", "pnpm-workspace.yaml"],
   // Declaring this list makes turbo strip every OTHER env var from task
   // environments, so anything the tasks genuinely need must be named here.
   "globalPassThroughEnv": [

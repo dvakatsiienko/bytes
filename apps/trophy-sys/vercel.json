@@ -3,11 +3,7 @@
   "installCommand": "pnpm i -F 'trophy-sys...'",
   "buildCommand": "pnpm build",
   "git": {
-    "deploymentEnabled": {
-      "renovate/*": false,
-      "coder/*": false,
-      "scratch/*": false
-    }
+    "deploymentEnabled": false
   },
   "crons": [{ "path": "/api/stats", "schedule": "0 4 * * *" }]
 }

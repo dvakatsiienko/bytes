@@ -61,3 +61,36 @@ commit-msg:
     # append; the `Agent:` trailer is the fingerprint, this one is noise.
     - name: session-trailer
       run: sed -i '' -e '/^Claude-Session:/d' {1}
+
+    # GitHub honours a CI-skip marker ANYWHERE in a commit message, body
+    # included, and it skips every push- and pull_request-triggered workflow.
+    # Since BYT-84 that includes `deploy.yml`, which is now the only thing that
+    # deploys production — so one of these in a message means the commit
+    # reaches `main` and ships nothing, with no failing check to say so.
+    #
+    # This exists because writing ABOUT the marker is using it: a BYT-84 commit
+    # that merely quoted it while documenting this exact hazard produced no CI
+    # run and no review run, and the PR sat blocked with nothing red for twenty
+    # minutes. The message is parsed, not read — the same trap as Linear's
+    # keywords, and the same answer: a mechanical guard, not a good intention.
+    #
+    # Describe it in prose instead: «the skip directive», never in brackets.
+    #
+    # ⚠️ It guards LOCAL commits only, which is not the only way a message
+    # reaches `main`. A squash or merge commit's message is composed on
+    # github.com out of the PR title and body, and a push from an Actions runner
+    # has no lefthook at all — so the PR BODY is unguarded by this. It still
+    # earns its place: a local commit body is the route that actually cost this
+    # branch twenty minutes. A reviewer named the gap; closing it needs a check
+    # on the PR body, which is its own change.
+    #
+    # 📌 The list is GitHub's documented set, read from their docs rather than
+    # recalled: the five bracketed forms plus the unbracketed `skip-checks:true`
+    # trailer. `***NO_CI***` is NOT one of them — that is Travis, and a reviewer
+    # flagged it as worth checking rather than asserting it, correctly.
+    - name: no-ci-skip-marker
+      run: |
+        if grep -qiE '\[(skip[ -]?(ci|actions)|(ci|actions)[ -]?skip|no[ -]?ci)\]|skip-checks:[[:space:]]*true' {1}; then
+          echo "commit-msg: this message contains a CI-skip marker, which would stop deploy.yml — the only thing that deploys production. Write «the skip directive» in prose instead of the bracketed or skip-checks form."
+          exit 1
+        fi

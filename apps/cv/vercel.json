@@ -2,10 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm i -F 'cv...'",
   "git": {
-    "deploymentEnabled": {
-      "renovate/*": false,
-      "coder/*": false,
-      "scratch/*": false
-    }
+    "deploymentEnabled": false
   }
 }
