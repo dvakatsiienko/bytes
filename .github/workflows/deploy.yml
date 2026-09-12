@@ -75,8 +75,8 @@ on:
           - trophy-sys
           - x-com-chat
 
-# One group PER COMMIT, and that is the whole point — a single shared group
-# would silently lose deployments. GitHub keeps at most one running and one
+# 🚨 NO `concurrency:` block, and it must stay that way — a shared group
+# silently loses deployments. GitHub keeps at most one running and one
 # pending run per concurrency group, so a third push EVICTS the second while it
 # is still pending. Each run fires hooks only for the apps its own push
 # touched, so an app changed only by the evicted push would never deploy and
@@ -86,10 +86,12 @@ on:
 # BRANCH TIP at the moment it is fired, not the commit that triggered it. Two
 # overlapping runs therefore build the same code, and Vercel cancels its own
 # duplicate builds of one version. The thing that must not be lost is a push's
-# app LIST, and a per-commit group is what guarantees every list gets fired.
-concurrency:
-  group: deploy-main-${{ github.sha }}
-  cancel-in-progress: false
+# app LIST.
+#
+# A per-commit group was the first fix, and a reviewer pointed out it decided
+# nothing — unique per run. Worse, a manual run and a push CAN share a sha,
+# which quietly put the queue back. So there is no block at all, which is the
+# honest version of the same intent.
 
 env:
   TURBO_TELEMETRY_DISABLED: 1

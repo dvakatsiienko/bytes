@@ -195,8 +195,20 @@ reach production unbuilt. A label-triggered preview lane is the fix, tracked as
 
 📌 A root file that carries no dependencies — `CLAUDE.md`, `.node-version` — deploys nothing,
 because turbo reports nothing affected. A root manifest or lockfile change marks every package
-affected, so a renovate bump does reach production. Both measured on BYT-84. To redeploy by hand,
-use the Redeploy button in the Vercel dashboard.
+affected, so a renovate bump does reach production. Both measured on BYT-84.
+
+⚠️ **A root file that changes a BUILD must be a `globalDependencies` entry in `turbo.jsonc`, or
+the commit that fixes production deploys nothing and exits green.** `.npmrc` and
+`pnpm-workspace.yaml` are there for exactly that reason — the first carries `public-hoist-pattern[]`,
+the second `allowBuilds`. Add any future file of that kind to the same key; a path list in the
+deploy script would go stale, turbo's own answer does not.
+
+📌 `--affected` is package-level, not task-inputs-level, so the `transit` exclusions do not reach
+it: editing `apps/cv/CLAUDE.md` still deploys `cv`. Only ROOT docs deploy nothing.
+
+To deploy by hand — a build that died on Vercel's side, a commit that carried the skip directive —
+run the **Deploy** workflow from the Actions tab and pick an app, or `all`. The Vercel dashboard's
+Redeploy button also still works.
 
 ## ui-kit
 

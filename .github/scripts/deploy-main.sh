@@ -125,9 +125,20 @@ else
   #   · a change to a root file carrying no dependencies — `CLAUDE.md`,
   #     `.node-version` — marks NOTHING affected, and deploys nothing.
   # The second one is the win, not a gap: that is the six deployments a docs
-  # commit used to spend. A root file that changes what Vercel builds without
-  # moving a manifest would be missed; a manual run of this workflow is the
-  # answer when that happens.
+  # commit used to spend.
+  #
+  # 🚨 The class of root file that changes a BUILD without moving a manifest is
+  # not hypothetical, and it had two named members in this repo: `.npmrc` and
+  # `pnpm-workspace.yaml`. A commit touching only one of them answered «nothing
+  # affected» and exited 0 green — so the very commit repairing a broken Vercel
+  # install would have deployed nothing, in a line that reads like the saving
+  # this job is proud of. Both are now `globalDependencies` in `turbo.jsonc`,
+  # which fixes it through turbo's own mechanism rather than a path list here
+  # that would go stale. A reviewer caught it; the measurement is on that key.
+  #
+  # 📌 `--affected` is package-level, not inputs-level, so the `transit`
+  # exclusions do not reach it: editing `apps/cv/CLAUDE.md` still deploys `cv`.
+  # Wasteful, never wrong, and not worth a path list to avoid.
   apps=$(
     while IFS= read -r pkg; do
       [ -n "$pkg" ] || continue
@@ -208,6 +219,14 @@ done <<<"$apps"
 # enough to match a row here to a build there.
 summary ""
 summary "Builds and logs live in the Vercel dashboard; the job id above identifies the deployment each hook started."
+# 📌 Re-running a partly failed job re-fires the hooks that already succeeded,
+# because there is no per-app record of what got through — up to five redundant
+# CREATED deployments against the very budget this job exists to protect. Not
+# worth the state needed to make it idempotent, but worth knowing before anyone
+# reaches for Re-run: the manual `workflow_dispatch` above deploys ONE app, and
+# that is the cheaper repair.
+summary ""
+summary "> Re-running this job re-fires every hook listed above. To repair a single app, run the **Deploy** workflow manually and choose just that one."
 
 if [ -n "$failed" ]; then
   echo "::error::deploy hooks failed for:$failed"
