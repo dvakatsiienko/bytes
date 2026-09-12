@@ -57,7 +57,7 @@ jobs:
           GH_TOKEN: ${{ steps.reviewer.outputs.token }}
         run: |
           set -euo pipefail
-          gh pr review ${{ github.event.pull_request.number }} --approve \
+          gh pr review ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --approve \
             --body "probe: approving as the reviewer app, no inline findings on this head."
 
       - name: Request changes as the reviewer app
@@ -66,7 +66,7 @@ jobs:
           GH_TOKEN: ${{ steps.reviewer.outputs.token }}
         run: |
           set -euo pipefail
-          gh pr review ${{ github.event.pull_request.number }} --request-changes \
+          gh pr review ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --request-changes \
             --body "probe: requesting changes as the reviewer app, ${{ steps.threads.outputs.count }} inline finding(s) on this head."
 
       # Read back every field the rewrite would depend on.
