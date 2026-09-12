@@ -2,10 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm i -F 'x-com-chat...'",
   "git": {
-    "deploymentEnabled": {
-      "renovate/*": true,
-      "coder/*": false,
-      "scratch/*": false
-    }
+    "deploymentEnabled": false
   }
 }
