@@ -166,12 +166,31 @@ to agents and to code review, and they silently override the repo — a dashboar
 and `space-explorer-api` do not; `space-explorer-api` deploys on Railway instead, from
 `railway.json`.
 
-Each `vercel.json` carries a `git.deploymentEnabled` gate naming the branch prefixes that must
-NOT deploy: `renovate/*`, `coder/*`, `scratch/*`. 📌 It is an allowlist by omission, so a prefix
-nobody listed deploys — a throwaway `scratch/*` branch spent six previews that way against an
-account that hits `api-deployments-free-per-day`. Deny-by-default (`{"*": false, "main": true}`)
-would close the class; it changes production deploy behaviour, so it is Dima's call, not a
-drive-by edit.
+**Vercel's git integration is off.** Every `vercel.json` carries `git.deploymentEnabled: false` —
+the bool, not the branch-prefix object it replaced. The object never stopped a deployment being
+created, it only let Vercel CANCEL one afterwards, and a canceled deployment still counts against
+the hobby «Deployments Created per Day» cap. The bool is the only form with no webhook path at all.
+
+**`.github/workflows/deploy.yml` is the trigger, and the only one.** On a push to `main` it asks
+turbo which packages the push affected, and POSTs a Vercel deploy hook for each affected app.
+Vercel still clones, builds with its own cache and keeps its own logs; it no longer decides when.
+The urls live in the repo secret `VERCEL_DEPLOY_HOOKS`, a json object keyed by APP DIRECTORY name
+(`space-explorer-ui`, not the package name `@space-explorer/ui`). One hook per project, named
+`ci-main`, bound to `main`; manage them with `vercel deploy-hooks list|create|remove`.
+
+⚠️ **Never set `github.enabled: false`.** Vercel documents that one as disabling deploy hooks
+outright, which would leave nothing able to deploy. `git.deploymentEnabled: false` does not touch
+them — measured on BYT-84: a hook built a branch that carried the bool.
+
+📌 **Preview deployments no longer exist for any branch.** A branch push builds nothing, so CI is
+the only gate a branch gets. That is a real hole for `x-com-chat`: CI cannot build it (prerender
+calls Convex), and its `renovate/*` preview was the one place a bump actually built. Its bumps now
+reach production unbuilt. A label-triggered preview lane is the fix and is its own ticket.
+
+📌 A root file that carries no dependencies — `CLAUDE.md`, `.node-version` — deploys nothing,
+because turbo reports nothing affected. A root manifest or lockfile change marks every package
+affected, so a renovate bump does reach production. Both measured on BYT-84. To redeploy by hand,
+use the Redeploy button in the Vercel dashboard.
 
 ## ui-kit
 
