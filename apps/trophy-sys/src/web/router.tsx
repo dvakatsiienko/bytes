@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react';
 import {
+  type ErrorComponentProps,
   Link,
   Outlet,
   createRootRoute,
@@ -27,13 +28,16 @@ const Stats = lazy(() =>
  * at /admin, because the usual cause is a PSN token the owner has to replace.
  * Declared before the routes because they reference it at module init.
  */
-const RouteError = (props: { error: Error }) => {
+const RouteError = (props: ErrorComponentProps) => {
+  const message =
+    props.error instanceof Error ? props.error.message : String(props.error);
+
   return (
     <div className='flex h-full flex-col items-start gap-3 p-6'>
       <h1 className='text-lg text-orange tracking-[0.3em]'>TROPHY.SYS</h1>
       <p className='text-[13px] text-red'>something broke while rendering.</p>
       <pre className='max-w-full select-text overflow-x-auto border border-line bg-bg-lift p-3 text-[12px] text-fg-soft'>
-        {props.error.message}
+        {message}
       </pre>
       <Link
         className='cursor-pointer border border-line px-3 py-1 text-[12px] text-orange uppercase tracking-[0.15em] transition-colors hover:border-orange focus-visible:outline focus-visible:outline-orange'
