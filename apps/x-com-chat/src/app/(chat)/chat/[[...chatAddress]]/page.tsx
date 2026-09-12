@@ -104,11 +104,18 @@ export default async function ChatPage(props: ChatPageProps) {
 }
 
 type ChatPageParams = Promise<{
-  chatAddress: ChatAddress;
+  chatAddress?: ChatAddress;
 }>;
 
 /* Types */
 interface ChatPageProps {
   params: ChatPageParams;
 }
-type ChatAddress = ['chatId' | undefined, 'friendId' | undefined];
+
+// `[[...chatAddress]]` is an OPTIONAL catch-all, so Next passes no
+// `chatAddress` at all for a bare `/chat` — hence the `?` above, and hence the
+// optional chaining at the top of the component. The previous shape declared it
+// required, with `'chatId' | undefined` where the id string belongs; biome
+// 2.5.12 then read the receiver as non-nullish and asked for the `?.` to go,
+// which would have crashed `/chat`. The type was what was wrong.
+type ChatAddress = [chatId?: string, friendId?: string];
