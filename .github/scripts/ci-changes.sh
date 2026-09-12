@@ -30,7 +30,13 @@ has() { grep -qE "$1" <<<"$files"; }
 
 {
   has '^renovate\.json$'                              && echo "renovate=true" || echo "renovate=false"
-  has '^(apps/financial/|packages/|pnpm-lock\.yaml$|package\.json$)' \
+  # 📌 Root `turbo.jsonc` is in the list because `apps/financial/turbo.jsonc`
+  # extends `//` — a change to the inherited `build` task reaches this app's
+  # build, and the check job now excludes `financial` explicitly, so missing it
+  # would let a broken financial build merge untested. Greptile found that.
+  # This job's own definition is in the list for the same reason the install
+  # matrix's is: a change to the job should be exercised by the PR that makes it.
+  has '^(apps/financial/|packages/|pnpm-lock\.yaml$|package\.json$|turbo\.jsonc$|\.github/(workflows/ci\.yml|scripts/ci-changes\.sh)$)' \
                                                       && echo "financial=true" || echo "financial=false"
   # A manifest or the lockfile is the only thing that can change what a filtered
   # install resolves — plus the definition of the job that checks it, so a change
