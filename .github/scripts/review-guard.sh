@@ -73,7 +73,7 @@ for attempt in 1 2 3; do
 
   decision=$(jq -n --argjson artifacts "$arts" --argjson threads "$threads" \
       '{artifacts: $artifacts, threads: $threads}' \
-    | jq --arg mode round --arg who "$REVIEWER" --arg app "$APP" --arg author "$AUTHOR" \
+    | jq --arg who "$REVIEWER" --arg app "$APP" --arg author "$AUTHOR" \
          --arg owner "$OWNER" --arg since "$SINCE" \
          -f "$here/../review-gate.jq")
 

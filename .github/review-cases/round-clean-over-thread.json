@@ -1,12 +1,11 @@
 {
   "want": "success",
-  "why": "an inline acknowledgement on a clean round must not red it — the verdict is the single authority, and nobody has replied to anything seconds after the round",
+  "why": "an inline acknowledgement on a clean round must not red it \u2014 the verdict is the single authority, and nobody has replied to anything seconds after the round",
   "expect": {
     "verdict": "clean",
     "open": 1
   },
   "args": {
-    "mode": "round",
     "who": "x-reviewer-cc[bot]",
     "author": "x-coder-cc[bot]",
     "owner": "dvakatsiienko",
@@ -45,9 +44,8 @@
           "type": "Bot"
         },
         "created_at": "2026-09-11T17:13:00Z",
-        "body": "Nobody has replied to this yet — the guard runs seconds after the round."
+        "body": "Nobody has replied to this yet \u2014 the guard runs seconds after the round."
       }
-    ],
-    "commits": []
+    ]
   }
 }

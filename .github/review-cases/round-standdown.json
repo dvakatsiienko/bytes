@@ -1,11 +1,10 @@
 {
   "want": "failure",
-  "why": "the action refused itself and posted nothing — the round is red and must not count",
+  "why": "the action refused itself and posted nothing \u2014 the round is red and must not count",
   "expect": {
     "standdown": true
   },
   "args": {
-    "mode": "round",
     "who": "x-reviewer-cc[bot]",
     "author": "x-coder-cc[bot]",
     "owner": "dvakatsiienko",
@@ -24,7 +23,6 @@
         "body": "Greptile summary, from a different bot entirely."
       }
     ],
-    "threads": [],
-    "commits": []
+    "threads": []
   }
 }

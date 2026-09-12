@@ -27,7 +27,6 @@ for f in "$here"/review-cases/*.json; do
   want=$(jq -r '.want' "$f")
 
   out=$(jq '.input' "$f" | jq \
-    --arg mode "$(jq -r '.args.mode' "$f")" \
     --arg who "$(jq -r '.args.who' "$f")" \
     --arg author "$(jq -r '.args.author' "$f")" \
     --arg owner "$(jq -r '.args.owner' "$f")" \
