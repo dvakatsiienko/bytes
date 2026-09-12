@@ -98,8 +98,11 @@ jobs:
           OWNER: ${{ github.repository_owner }}
           SHA: ${{ github.event.pull_request.head.sha }}
           REVIEWER: ${{ steps.reviewer.outputs.app-slug }}[bot]
+          # The same value without the `[bot]` suffix — the api reports it on an
+          # issue comment as `performed_via_github_app.slug`, which is the gate's
+          # identity handle for the reviewer's sticky comment.
+          APP: ${{ steps.reviewer.outputs.app-slug }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
           LAST: ${{ steps.rounds.outputs.last }}
           SINCE: ${{ steps.rounds.outputs.at }}
-          RUN: ${{ steps.rounds.outputs.url }}
         run: .github/scripts/review-answered.sh

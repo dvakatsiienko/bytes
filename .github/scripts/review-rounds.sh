@@ -42,7 +42,6 @@ count=$(jq 'length' <<<"$runs")
   echo "count=$count"
   echo "last=$(jq -r 'last | .head_sha // ""' <<<"$runs")"
   echo "at=$(jq -r 'last | .created_at // ""' <<<"$runs")"
-  echo "url=$(jq -r 'last | .html_url // ""' <<<"$runs")"
 } >> "$GITHUB_OUTPUT"
 
 echo "$count completed review rounds on $BRANCH; last reviewed $(jq -r 'last | .head_sha // "none"' <<<"$runs")"

@@ -32,7 +32,7 @@ for f in "$here"/review-cases/*.json; do
     --arg author "$(jq -r '.args.author' "$f")" \
     --arg owner "$(jq -r '.args.owner' "$f")" \
     --arg since "$(jq -r '.args.since' "$f")" \
-    --arg run "$(jq -r '.args.run' "$f")" \
+    --arg app "$(jq -r '.args.app' "$f")" \
     -f "$prog")
 
   got=$(jq -r '.conclusion' <<<"$out")

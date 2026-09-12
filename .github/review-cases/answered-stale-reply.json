@@ -1,0 +1,57 @@
+{
+  "want": "skip",
+  "why": "a re-review posts its new finding inside the existing thread, where round one's reply is already sitting — without a time bound that old reply marks the fresh finding answered",
+  "expect": { "verdict": "findings", "open": 1 },
+  "args": {
+    "mode": "answered",
+    "who": "x-reviewer-cc[bot]",
+    "app": "x-reviewer-cc",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T19:11:18Z"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "performed_via_github_app": { "slug": "x-reviewer-cc" },
+        "created_at": "2026-09-11T17:59:00Z",
+        "updated_at": "2026-09-11T19:11:28Z",
+        "body": "Round two.\r\n\r\nverdict: findings\r\n"
+      },
+      {
+        "user": { "login": "x-coder-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T19:19:44Z",
+        "updated_at": "2026-09-11T19:19:44Z",
+        "body": "Pushed."
+      }
+    ],
+    "threads": [
+      {
+        "id": 7001,
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T17:11:00Z",
+        "path": "CLAUDE.md",
+        "line": 111,
+        "body": "Round one: this paragraph is stale."
+      },
+      {
+        "id": 7002,
+        "in_reply_to_id": 7001,
+        "user": { "login": "x-coder-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T17:40:00Z",
+        "body": "Fixed in the next commit."
+      },
+      {
+        "id": 7003,
+        "in_reply_to_id": 7001,
+        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "created_at": "2026-09-11T19:12:00Z",
+        "path": "CLAUDE.md",
+        "line": 111,
+        "body": "Round two, same thread: the rewrite introduced a different wrong claim."
+      }
+    ],
+    "commits": [{ "author": { "login": "dvakatsiienko" }, "sha": "26cc5c42" }]
+  }
+}

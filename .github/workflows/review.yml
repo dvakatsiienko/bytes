@@ -116,7 +116,43 @@ jobs:
       - id: started
         run: echo "at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
-      # Three things are read from the PREVIOUS review runs on this branch, and
+      # 🚨 The gate judges with ITS OWN code, never the PR's. Everything the
+      # checkout put in the workspace is the PR branch's copy, so without this a
+      # PR could rewrite `review-guard.sh` to publish a green, or
+      # `review-rounds.sh` to report zero rounds and lift its own cap. The job
+      # holds `checks: write`, and the action's anti-tamper covers workflow
+      # FILES — a script beside one is not a workflow file. Greptile found the
+      # guard half, the reviewer the cap half.
+      #
+      # 📌 It extracts ELSEWHERE rather than restoring in place, and that is the
+      # whole trick. Restoring into the worktree would show the reviewer the
+      # base's copy of the very files the PR changes; doing it after the action
+      # instead left the cap read running the PR's copy, four steps earlier. A
+      # separate directory gets both — the reviewer sees the PR, the gate runs
+      # the base. `git archive` also carries nothing the PR ADDED to that
+      # directory, which a `checkout -- ` would have left sitting there.
+      #
+      # When the base has no gate — true only for the PR that first adds it —
+      # nothing untrusted is run in its place. The reviewer still reviews; the
+      # guard below refuses to judge and the round ends red and uncounted.
+      - id: gate
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -uo pipefail
+          dir="$RUNNER_TEMP/gate"
+          mkdir -p "$dir"
+          if git fetch --no-tags --depth=1 origin "$BASE" &&
+             git archive "$BASE" .github/review-gate.jq .github/scripts | tar -x -C "$dir"; then
+            echo "state=ok" >> "$GITHUB_OUTPUT"
+            echo "dir=$dir" >> "$GITHUB_OUTPUT"
+            echo "gate code taken from $BASE"
+          else
+            echo "state=missing" >> "$GITHUB_OUTPUT"
+            echo "::warning::the gate is not on the base revision — this head cannot be judged"
+          fi
+
+      # Two things are read from the PREVIOUS review runs on this branch, and
       # they are read here because the action is about to overwrite the sticky
       # comment that would otherwise hold them.
       #
@@ -126,11 +162,13 @@ jobs:
       # which is exactly what the action does to it, seconds later, on every
       # round. The script carries why a round is counted the way it is.
       - id: rounds
+        if: steps.gate.outputs.state == 'ok'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           BRANCH: ${{ github.head_ref || github.event.pull_request.head.ref }}
-        run: .github/scripts/review-rounds.sh
+          GATE: ${{ steps.gate.outputs.dir }}
+        run: "$GATE/.github/scripts/review-rounds.sh"
 
       # The cap. Two rounds per PR: the one at «final», and one after the fixes.
       # A third is Dima's call, asked through cclio with a few words on what
@@ -241,30 +279,6 @@ jobs:
             --max-turns 60
             --allowedTools "mcp__github_inline_comment__create_inline_comment"
 
-      # 🚨 The gate judges with ITS OWN code, never the PR's. The workflow that
-      # runs on a labelled PR is the PR BRANCH's copy, and so is every file the
-      # checkout put in the workspace — so without this a PR could rewrite
-      # `review-guard.sh` to publish a green, and the token in the next step
-      # would let it. The action's anti-tamper covers workflow FILES; a script
-      # beside them is not one. Greptile found this.
-      #
-      # It runs AFTER the action, so a PR that edits the gate is still reviewed
-      # rather than refused before anyone looks at it.
-      #
-      # A restore that fails is red, not «carry on with the PR's copy». The only
-      # PR where these paths are missing from the base is the one that adds
-      # them, and that PR must not be judged by code nobody has reviewed yet.
-      # The job ends red, the round goes uncounted, and the cleanup step below
-      # closes the check.
-      - name: Take the gate's code from the base revision
-        env:
-          BASE: ${{ github.event.pull_request.base.sha }}
-        run: |
-          set -euo pipefail
-          git fetch --no-tags --depth=1 origin "$BASE"
-          git checkout "$BASE" -- .github/review-gate.jq .github/scripts
-          echo "gate code restored from $BASE"
-
       # The gate. A green `review:clean` means a review ran on this head, the
       # reviewer said itself that the head is clean, and nothing it found is
       # sitting unanswered.
@@ -291,13 +305,27 @@ jobs:
           # follows the app automatically if the reviewer is ever renamed — the
           # `allowed_bots` line above is the lesson that made this worth doing.
           REVIEWER: ${{ steps.reviewer.outputs.app-slug }}[bot]
+          # The same value without the `[bot]` suffix. The api reports it on an
+          # issue comment as `performed_via_github_app.slug`, which is how the
+          # gate recognises the reviewer's sticky comment even when the login on
+          # it belongs to whoever created the comment first.
+          APP: ${{ steps.reviewer.outputs.app-slug }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
-          # The job-run link the action writes into its tracking comment,
-          # whoever ends up owning that comment. Verified present in both the
-          # «review in progress» body and the finished one.
-          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SINCE: ${{ steps.started.outputs.at }}
-        run: .github/scripts/review-guard.sh
+          GATE: ${{ steps.gate.outputs.dir }}
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.gate.outputs.state }}" != "ok" ]; then
+            gh api "repos/$REPO/check-runs/$CHECK" -X PATCH \
+              -f status=completed -f conclusion=failure \
+              -f output[title]='the gate is not on the base revision' \
+              -f output[summary]='This head can only be judged by the base revision of the gate, and the base carries none. The review above still ran — read it. This is the bootstrap case for the PR that first adds the gate.' \
+              --jq '.conclusion'
+            echo "delivered=yes" >> "$GITHUB_OUTPUT"
+            echo "::error::the gate is not on the base revision — review:clean is red"
+            exit 1
+          fi
+          "$GATE/.github/scripts/review-guard.sh"
 
       # A way out. Everything above can end the job early — a crash in the
       # action, a cancelled run, a step that throws. A check run left

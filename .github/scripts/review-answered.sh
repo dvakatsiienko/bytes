@@ -9,7 +9,7 @@
 # colour. A read that fails is the one exception: no evidence means no green,
 # and it says so by failing rather than by quietly declining.
 #
-# Env: GH_TOKEN, REPO, PR, OWNER, SHA, REVIEWER, AUTHOR, LAST, SINCE, RUN
+# Env: GH_TOKEN, REPO, PR, OWNER, SHA, REVIEWER, APP, AUTHOR, LAST, SINCE
 set -euo pipefail
 
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -28,13 +28,20 @@ arts=$(artifacts "$PR")
 # a finding or adds unreviewed work is not machine-decidable, but whose commit it
 # is, is — and the sha range goes into the check's summary so Dima can read the
 # other half himself.
+#
+# 📌 It tolerates its own failure rather than ending the lane red: a force-push
+# away from the last reviewed head makes this 404, and «green or nothing» is
+# this lane's contract. It is also unpaginated, so a delta past 250 commits
+# would be truncated — the truncation can only ADD unseen commits, never remove
+# an outsider's, so it fails toward publishing nothing.
 delta=$(gh api "repos/$REPO/compare/$LAST...$SHA" \
-  --jq '[.commits[] | {author: {login: (.author.login // "")}, sha: .sha}]')
+  --jq '[.commits[] | {author: {login: (.author.login // "")}, sha: .sha}]') \
+  || { echo "nothing published: the delta $LAST...$SHA could not be read"; exit 0; }
 
 decision=$(jq -n --argjson artifacts "$arts" --argjson threads "$threads" --argjson commits "$delta" \
     '{artifacts: $artifacts, threads: $threads, commits: $commits}' \
-  | jq --arg mode answered --arg who "$REVIEWER" --arg author "$AUTHOR" \
-       --arg owner "$OWNER" --arg since "$SINCE" --arg run "$RUN" \
+  | jq --arg mode answered --arg who "$REVIEWER" --arg app "$APP" --arg author "$AUTHOR" \
+       --arg owner "$OWNER" --arg since "$SINCE" \
        -f "$here/../review-gate.jq")
 
 conclusion=$(jq -r '.conclusion' <<<"$decision")

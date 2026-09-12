@@ -7,18 +7,24 @@
     "author": "x-coder-cc[bot]",
     "owner": "dvakatsiienko",
     "since": "2026-09-11T19:11:18Z",
-    "run": "https://github.com/dvakatsiienko/bytes/actions/runs/200"
+    "app": "x-reviewer-cc"
   },
   "input": {
     "artifacts": [
       {
-        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "user": {
+          "login": "x-reviewer-cc[bot]",
+          "type": "Bot"
+        },
         "created_at": "2026-09-11T17:59:00Z",
         "updated_at": "2026-09-11T19:11:28Z",
         "body": "Round two.\r\n\r\nverdict: findings\r\n"
       },
       {
-        "user": { "login": "x-coder-cc[bot]", "type": "Bot" },
+        "user": {
+          "login": "x-coder-cc[bot]",
+          "type": "Bot"
+        },
         "created_at": "2026-09-11T19:19:44Z",
         "updated_at": "2026-09-11T19:19:44Z",
         "body": "All three land. N1 and N3 are one mistake; fixed in 26cc5c4."
@@ -27,7 +33,10 @@
     "threads": [
       {
         "id": 7001,
-        "user": { "login": "x-reviewer-cc[bot]", "type": "Bot" },
+        "user": {
+          "login": "x-reviewer-cc[bot]",
+          "type": "Bot"
+        },
         "created_at": "2026-09-11T19:12:00Z",
         "path": "CLAUDE.md",
         "line": 111,
@@ -36,11 +45,21 @@
       {
         "id": 7002,
         "in_reply_to_id": 7001,
-        "user": { "login": "x-coder-cc[bot]", "type": "Bot" },
+        "user": {
+          "login": "x-coder-cc[bot]",
+          "type": "Bot"
+        },
         "created_at": "2026-09-11T19:18:00Z",
         "body": "Fixed — the paragraph now names the per-app layout that shipped."
       }
     ],
-    "commits": [{ "author": { "login": "dvakatsiienko" }, "sha": "26cc5c42" }]
+    "commits": [
+      {
+        "author": {
+          "login": "dvakatsiienko"
+        },
+        "sha": "26cc5c42"
+      }
+    ]
   }
 }

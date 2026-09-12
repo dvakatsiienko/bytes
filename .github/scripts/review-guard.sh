@@ -28,7 +28,7 @@
 # a stand-down with nothing posted at all — no reviewer was spent, so that one
 # exits 1 and does not count.
 #
-# Env: GH_TOKEN, REPO, PR, OWNER, CHECK, REVIEWER, AUTHOR, RUN, SINCE,
+# Env: GH_TOKEN, REPO, PR, OWNER, CHECK, REVIEWER, APP, AUTHOR, SINCE,
 #      GITHUB_OUTPUT
 set -euo pipefail
 
@@ -58,8 +58,9 @@ publish() {
 # A stand-down counts zero artifacts by construction rather than luck.
 # `track_progress: true` on a `pull_request` event forces tag mode, and tag mode
 # writes the comment only after the trigger check and the human-actor check have
-# both passed — a refusal writes nothing, so no body can carry this run's link.
-# The retry is for the api settling after a real post, not for a refusal.
+# both passed — a refusal writes nothing, and nothing else on the PR carries the
+# reviewer app's identity. The retry is for the api settling after a real post,
+# not for a refusal.
 for attempt in 1 2 3; do
   if ! threads=$(apiStrict "pulls/$PR/comments"); then
     publish failure 'could not read the review threads' \
@@ -72,8 +73,8 @@ for attempt in 1 2 3; do
 
   decision=$(jq -n --argjson artifacts "$arts" --argjson threads "$threads" \
       '{artifacts: $artifacts, threads: $threads}' \
-    | jq --arg mode round --arg who "$REVIEWER" --arg author "$AUTHOR" \
-         --arg owner "$OWNER" --arg since "$SINCE" --arg run "$RUN" \
+    | jq --arg mode round --arg who "$REVIEWER" --arg app "$APP" --arg author "$AUTHOR" \
+         --arg owner "$OWNER" --arg since "$SINCE" \
          -f "$here/../review-gate.jq")
 
   if [ "$(jq -r '.posted' <<<"$decision")" -gt 0 ]; then break; fi

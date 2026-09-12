@@ -15,35 +15,41 @@
 #          artifacts  every comment/review the round may have written, folded
 #          threads    pulls/N/comments — the inline finding threads
 #          commits    "answered" only: the commits pushed since the last review
-# Args   mode who author owner since run
-#          who     the reviewer app, `<slug>[bot]`
+# Args   mode who app author owner since
+#          who     the reviewer app's login, `<slug>[bot]`
+#          app     the reviewer app's slug, as the api reports it on a comment
 #          author  the PR's own author
 #          owner   the repo owner — the other account allowed to push and answer
 #          since   the moment the round started ("round") or the last round's
 #                  run creation time ("answered")
-#          run     the job-run url that round wrote into its own comment
 # Output { conclusion, title, summary, standdown, posted, verdict, open }
 #          conclusion  "success" | "failure" | "skip"  ("skip" is answered-only:
 #                      publish nothing, leave the head without a check)
 #          standdown   the action refused itself and no reviewer was spent, so
 #                      the round must not count against the cap
 
-# The round's own artifacts. An author test alone is not enough:
+# The round's own artifacts. A login test alone is not quite enough:
 # `use_sticky_comment` reuses an existing tracking comment, and an edit does not
 # change a comment's author — one first written by `claude[bot]` still reads as
-# `claude[bot]` after the reviewer writes its verdict into it. The job-run link
-# is the author-independent handle; the action writes it into that comment
-# whoever owns it.
+# `claude[bot]` after the reviewer writes its verdict into it.
 #
-# 🚨 That alias is BOUNDED to logins carrying `claude`, which is exactly the
-# action's own `botNameMatch` (`login.includes("claude")`) and so exactly the
-# set of comments it can adopt as its sticky one. Unbounded, any account could
-# post the run url plus a `verdict: clean` line and green the gate itself — the
-# reviewed party included, since the coder holds `pull-requests: write`. Found
-# in review.
+# 🚨 The second clause is an IDENTITY, never a body. Two earlier versions asked
+# the prose: first «any comment carrying the job-run url», then «a login
+# containing `claude` carrying it». Both were forgeable by the reviewed party —
+# the second because `claude.yml` carries `allowed_bots: "x-coder-cc[bot]"`, so
+# the coder can reach the assist lane with `@cc` and have `claude[bot]` write
+# whatever it is told to write, run url and `verdict: clean` included. On a
+# stand-down round, which is the normal case for this lane's own maintenance,
+# that turned a red uncounted round into a green. The reviewer found it on
+# itself, having found the looser version of it one round earlier.
+#
+# 📌 `performed_via_github_app` is present on ISSUE comments only — measured on
+# this PR: absent on `pulls/N/comments` and on `pulls/N/reviews`. That is
+# exactly where it is needed, since the verdict lives in the sticky comment,
+# which is an issue comment. Everything else the reviewer writes matches on
+# `$who`.
 def ours:
-  select(.user.login == $who
-         or (((.user.login // "") | test("claude")) and ((.body // "") | contains($run))));
+  select(.user.login == $who or ((.performed_via_github_app.slug // "") == $app));
 
 # Freshness, not creation: an edit moves `updated_at` and leaves `created_at` at
 # the round that first created the comment.
@@ -79,7 +85,17 @@ def answerer: select(.user.login != $who and (.user.login == $author or .user.lo
        | (($f.in_reply_to_id // $f.id)) as $root
        | {path: $f.path,
           line: ($f.line // $f.original_line),
-          answered: ([$all[] | answerer | select((.in_reply_to_id // .id) == $root)] | length > 0)})) as $raised
+          # 🚨 The reply must be NEWER than the finding it answers. Without the
+          # time bound, `answered` asks only «does this thread hold an answerer
+          # comment», so a re-review — which the prompt asks to post inside the
+          # existing thread — is pre-answered by the previous round's reply.
+          # `$open` then reads 0 over a standing finding, and the answer lane
+          # publishes a green whose one claim is the one thing it never checked.
+          # The reviewer found this on itself.
+          answered: ([$all[]
+                      | answerer
+                      | select(((.in_reply_to_id // .id) == $root) and (.created_at > $f.created_at))]
+                     | length > 0)})) as $raised
 | ($raised | map(select(.answered | not))) as $unanswered
 | ($unanswered | length) as $open
 | ($unanswered | map("- `\(.path):\(.line)`") | join("\n")) as $openlist
