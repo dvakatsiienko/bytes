@@ -30,7 +30,23 @@ on:
 
 concurrency:
   group: review-approved-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  # 🚨 NOT `cancel-in-progress`. A run joins this group BEFORE its job's `if` is
+  # evaluated, so any other review submitted on this PR — a `commented` one, a
+  # reply submitted as a review, a second approval — would cancel the publish in
+  # flight and then skip on the `if`, leaving the approval with no check, no
+  # error, and nothing anywhere saying why. That is silence in the one lane past
+  # the cap.
+  #
+  # Not hypothetical: greptile submitted a review on this very PR and the job
+  # skipped exactly that way (`event=pull_request_review actor=greptile-apps[bot]
+  # conclusion=skipped`). It landed outside a publish window; it did not have to.
+  #
+  # `review.yml` took this bug twice, from #64 and #70, and fixed it by putting
+  # the discriminator INTO the group key. This file dropped that half of the
+  # pattern. Queueing is the right answer here rather than replacement: there is
+  # nothing to save by cancelling one idempotent POST, and two approvals on two
+  # different heads both deserve their check.
+  cancel-in-progress: false
 
 jobs:
   publish:
