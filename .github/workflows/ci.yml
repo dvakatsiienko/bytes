@@ -70,6 +70,16 @@ jobs:
         with:
           fetch-depth: 0 # Biome VCS needs real history
 
+      # The review gate's decision, fed saved api payloads. It runs here rather
+      # than in review.yml because that is the one place it can run at all: a PR
+      # that edits a workflow already on the default branch makes the review
+      # action refuse itself, so the gate's findings path can never be exercised
+      # on the PR that changes it. jq and bash only, about a second, no install
+      # — cheap enough that narrowing it to `.github/**` changes would cost more
+      # in config than it saves in runtime.
+      - name: Review gate cases
+        run: .github/scripts/review-cases.sh
+
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v7

@@ -1,0 +1,58 @@
+{
+  "want": "skip",
+  "why": "a finding of the last round carries no reply, so the push answers nothing",
+  "expect": {
+    "open": 1
+  },
+  "args": {
+    "mode": "answered",
+    "who": "x-reviewer-cc[bot]",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T19:11:18Z",
+    "app": "x-reviewer-cc"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": {
+          "login": "x-reviewer-cc[bot]",
+          "type": "Bot"
+        },
+        "created_at": "2026-09-11T17:59:00Z",
+        "updated_at": "2026-09-11T19:11:28Z",
+        "body": "Round two.\r\n\r\nverdict: findings\r\n"
+      },
+      {
+        "user": {
+          "login": "x-coder-cc[bot]",
+          "type": "Bot"
+        },
+        "created_at": "2026-09-11T19:19:44Z",
+        "updated_at": "2026-09-11T19:19:44Z",
+        "body": "Pushed the fixes."
+      }
+    ],
+    "threads": [
+      {
+        "id": 7001,
+        "user": {
+          "login": "x-reviewer-cc[bot]",
+          "type": "Bot"
+        },
+        "created_at": "2026-09-11T19:12:00Z",
+        "path": "CLAUDE.md",
+        "line": 111,
+        "body": "This paragraph describes a layout the last commit deleted."
+      }
+    ],
+    "commits": [
+      {
+        "author": {
+          "login": "dvakatsiienko"
+        },
+        "sha": "26cc5c42"
+      }
+    ]
+  }
+}

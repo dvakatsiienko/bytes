@@ -1,0 +1,30 @@
+{
+  "want": "failure",
+  "why": "the action refused itself and posted nothing — the round is red and must not count",
+  "expect": {
+    "standdown": true
+  },
+  "args": {
+    "mode": "round",
+    "who": "x-reviewer-cc[bot]",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T17:00:00Z",
+    "app": "x-reviewer-cc"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": {
+          "login": "greptile-apps[bot]",
+          "type": "Bot"
+        },
+        "created_at": "2026-09-11T17:05:00Z",
+        "updated_at": "2026-09-11T17:05:00Z",
+        "body": "Greptile summary, from a different bot entirely."
+      }
+    ],
+    "threads": [],
+    "commits": []
+  }
+}

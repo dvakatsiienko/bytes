@@ -1,0 +1,31 @@
+{
+  "want": "failure",
+  "why": "the hole this gate exists to close — six findings in the sticky comment, zero inline threads, and the old guard called that clean",
+  "expect": {
+    "verdict": "findings",
+    "open": 0
+  },
+  "args": {
+    "mode": "round",
+    "who": "x-reviewer-cc[bot]",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T17:00:00Z",
+    "app": "x-reviewer-cc"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": {
+          "login": "x-reviewer-cc[bot]",
+          "type": "Bot"
+        },
+        "created_at": "2026-09-11T17:59:00Z",
+        "updated_at": "2026-09-11T17:59:00Z",
+        "body": "#### N1 · The doc and the manifests disagree\r\n\r\n#### N2 · The one-version guarantee never runs in CI\r\n\r\n### Verdict\r\n\r\nN1 and N3 are one mistake.\r\n\r\nverdict: findings\r\n · branch [`coder/BYT-91-hoist`](https://github.com/dvakatsiienko/bytes/tree/coder/BYT-91-hoist)"
+      }
+    ],
+    "threads": [],
+    "commits": []
+  }
+}

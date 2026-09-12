@@ -1,0 +1,63 @@
+{
+  "want": "skip",
+  "why": "a passer-by replying on a finding thread must not carry it — the repo is public, and the answer lane has no reviewer to ask",
+  "expect": {
+    "open": 1
+  },
+  "args": {
+    "mode": "answered",
+    "who": "x-reviewer-cc[bot]",
+    "author": "x-coder-cc[bot]",
+    "owner": "dvakatsiienko",
+    "since": "2026-09-11T19:11:18Z",
+    "app": "x-reviewer-cc"
+  },
+  "input": {
+    "artifacts": [
+      {
+        "user": {
+          "login": "x-reviewer-cc[bot]",
+          "type": "Bot"
+        },
+        "created_at": "2026-09-11T17:59:00Z",
+        "updated_at": "2026-09-11T19:11:28Z",
+        "body": "Round two.\r\n\r\nverdict: findings\r\n",
+        "performed_via_github_app": {
+          "slug": "x-reviewer-cc"
+        }
+      }
+    ],
+    "threads": [
+      {
+        "id": 9001,
+        "user": {
+          "login": "x-reviewer-cc[bot]",
+          "type": "Bot"
+        },
+        "created_at": "2026-09-11T19:12:00Z",
+        "path": ".github/review-gate.jq",
+        "line": 44,
+        "body": "This alias is unbounded."
+      },
+      {
+        "id": 9002,
+        "in_reply_to_id": 9001,
+        "user": {
+          "login": "a-passer-by",
+          "type": "User"
+        },
+        "created_at": "2026-09-11T19:14:00Z",
+        "body": "looks fine to me 👍"
+      }
+    ],
+    "commits": [
+      {
+        "author": {
+          "login": "dvakatsiienko"
+        },
+        "sha": "26cc5c42",
+        "granted": false
+      }
+    ]
+  }
+}
