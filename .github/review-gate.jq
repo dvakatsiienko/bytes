@@ -85,8 +85,8 @@ def answerer: select(.user.login != $who and (.user.type != "Bot" or .user.login
       elif $verdict == "findings" then
         {conclusion: "failure",
          title: "the reviewer's verdict is findings",
-         summary: (if $open > 0 then "Unanswered on this head:\n\($openlist)\n\n" else "" end)
-                  + "Fix what it found, or answer each finding with a reason, then re-apply the label."}
+         summary: ((if $open > 0 then "Unanswered on this head:\n\($openlist)\n\n" else "" end)
+                   + "Fix what it found, or answer each finding with a reason, then re-apply the label.")}
       elif $open > 0 then
         {conclusion: "failure",
          title: "\($open) finding(s) with no reply",

@@ -9,9 +9,16 @@
 # fields worth pinning, `args` the six jq arguments, `input` the payload.
 # Delete the `verdict:` line out of `round-findings.json` and this goes red —
 # that is the check that the test is testing something.
+#
+# 📌 The runner's jq is older than a mac's. jq 1.8 accepts `a + b` as an object
+# value where 1.7 demands parentheses, so the suite passed locally and failed to
+# compile in CI on the first run. The version is printed for that reason: when
+# this goes red on a machine and green on another, the version line is the first
+# thing to compare.
 set -euo pipefail
 
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+echo "  jq $(jq --version)"
 prog="$here/review-gate.jq"
 failed=0
 
