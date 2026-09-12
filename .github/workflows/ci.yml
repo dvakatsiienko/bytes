@@ -37,15 +37,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      renovate: ${{ steps.f.outputs.renovate }}
-      financial: ${{ steps.f.outputs.financial }}
-      installs: ${{ steps.f.outputs.installs }}
-      apps: ${{ steps.f.outputs.apps }}
+      renovate: ${{ steps.touched.outputs.renovate }}
+      financial: ${{ steps.touched.outputs.financial }}
+      installs: ${{ steps.touched.outputs.installs }}
+      apps: ${{ steps.touched.outputs.apps }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - id: f
+      - id: touched
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: .github/scripts/ci-changes.sh
@@ -145,7 +145,13 @@ jobs:
         run: |
           set -euo pipefail
           plan=$(pnpm turbo run test ${{ github.event_name == 'pull_request' && '--affected' || '' }} --dry=json)
-          if jq -e '[.tasks[] | select(.task == "test" and .package == "@ui/kit" and .command != "<NONEXISTENT>")] | length > 0' <<<"$plan" >/dev/null; then
+          # 📌 A COUNT, not `jq -e`. `jq -e` answers 1 for «false» and 5 for «I
+          # could not parse that», and the `if` reads both as «no browser tests»
+          # — a gate whose broken state is indistinguishable from its negative
+          # state. An unparseable plan leaves `kit` empty here, and the
+          # comparison below then fails the step out loud.
+          kit=$(jq '[.tasks[] | select(.task == "test" and .package == "@ui/kit" and .command != "<NONEXISTENT>")] | length' <<<"$plan")
+          if [ "$kit" -gt 0 ]; then
             echo "needed=true" >> "$GITHUB_OUTPUT"
             echo "@ui/kit tests are in the plan — chromium is needed"
           else
@@ -382,7 +388,15 @@ jobs:
       # No turbo, no remote cache. The point is the app's own build command
       # resolving its own tools from its own directory, which is what Vercel
       # does — a cache hit would prove nothing about resolution.
+      #
+      # The command is `vercel.json`'s `buildCommand`, or Vercel's own default
+      # when the field is absent. Through env for the same reason as the install.
       - name: Build
-        if: matrix.app.build
+        if: matrix.app.buildable
         working-directory: ${{ matrix.app.dir }}
-        run: pnpm run build
+        env:
+          BUILD: ${{ matrix.app.build }}
+        run: |
+          set -euo pipefail
+          echo "$BUILD"
+          eval "$BUILD"
