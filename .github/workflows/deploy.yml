@@ -1,0 +1,81 @@
+# The only thing that deploys production, since 2026-09-12 (BYT-84).
+#
+# Vercel's git integration used to do this by itself. It was turned off —
+# `git.deploymentEnabled: false` in all six `vercel.json` — because of the
+# hobby plan. Every push to any branch created six deployments, one per
+# project, and the branch-prefix gates that were supposed to stop that only
+# ever CANCELED them after creation. A canceled deployment still counts
+# toward «Deployments Created per Day: 100» (Vercel's monorepo and limits
+# docs, 2026-08), and the account reached 100/100 on 2026-09-11.
+#
+# So Vercel is still the build-and-deploy service — it clones, builds with its
+# own cache, and keeps its own logs. It just no longer decides WHEN. This job
+# does, by POSTing a per-project deploy hook for the apps turbo reports as
+# affected. Measured on BYT-84: a deploy hook fires normally while the branch
+# it builds carries `git.deploymentEnabled: false`.
+#
+# ⚠️ The one setting that WOULD break this is the deprecated
+# `github.enabled: false`, which Vercel documents as disabling deploy hooks
+# outright. No app sets it and none may.
+#
+# 📌 On a pro plan (6000 deployments/day) none of this would exist — the git
+# integration would simply stay on. Revisit if the plan changes. The same note
+# sits above «Deployment Settings» in the root CLAUDE.md.
+#
+# 📌 `[skip ci]` in a commit subject skips this workflow too, which means a
+# push carrying it does not deploy. That is GitHub's behaviour for every
+# `push`-triggered workflow, not a choice made here.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Serialised, and NOT cancel-in-progress. Two pushes in quick succession touch
+# different apps, and each job knows only about its own push's diff — cancelling
+# the first would drop its apps on the floor and they would never deploy. Vercel
+# de-duplicates on its side anyway: a second trigger on the same hook cancels
+# the earlier deployment of the same version.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
+
+jobs:
+  deploy:
+    name: deploy affected apps
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # It reads the repo and POSTs to Vercel. It writes nothing back to GitHub.
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # turbo diffs this push's range, so the base commit has to be present.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so pin explicitly
+          node-version: 24.0.2
+          cache: pnpm
+
+      # turbo answers «what did this push affect» from the real task graph, and
+      # the binary comes from the workspace.
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy affected apps
+        env:
+          BASE: ${{ github.event.before }}
+          HOOKS: ${{ secrets.VERCEL_DEPLOY_HOOKS }}
+        run: .github/scripts/deploy-main.sh
