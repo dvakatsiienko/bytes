@@ -36,6 +36,11 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # This file sets no workflow-level permissions, so a job that says nothing
+    # takes the repo default. Every other job in here narrows explicitly; this
+    # one reads a diff and writes four strings.
+    permissions:
+      contents: read
     outputs:
       renovate: ${{ steps.touched.outputs.renovate }}
       financial: ${{ steps.touched.outputs.financial }}
@@ -238,9 +243,12 @@ jobs:
   financial:
     name: financial build (postgres)
     needs: changes
+    # Both arms carry an event test, for the reason spelled out on the
+    # `vercel-install` gate below: a `renovate/**` branch push reaches an
+    # untested `||` arm, and reaches it unconditionally on a branch's first push.
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      needs.changes.outputs.financial == 'true'
+      (github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -316,16 +324,25 @@ jobs:
   vercel-install:
     name: clean install · ${{ matrix.app.name }}
     needs: changes
-    # 🚨 `refs/heads/main`, not «any push». This workflow's push trigger also
-    # carries `renovate/**` — so without the ref test every renovate branch push
-    # ran all six legs, and the PR renovate then opens (`prCreation:
-    # "not-pending"`) ran them again under a different concurrency key. Twelve
-    # clean-clone legs per bump, at four minutes each, on a change whose entire
-    # point is cutting CI overhead. The PR arm below still covers renovate, which
-    # is where it belongs: a bump moves the lockfile, so the path gate fires.
+    # 🚨 BOTH arms carry an event test, and the second one is the whole lesson.
+    # This workflow's push trigger also carries `renovate/**`, so the first
+    # version ran all six legs on every renovate branch push AND again on the PR
+    # renovate opens — twelve clean-clone legs per bump, four minutes each, on a
+    # change whose point is cutting CI overhead.
+    #
+    # Adding `refs/heads/main` to the push arm did NOT fix that, which is the
+    # part worth remembering: the `||` arm had no event test, so the branch push
+    # still reached it. And it reached it unconditionally — on a branch's FIRST
+    # push `github.event.before` is the all-zero sha, `ci-changes.sh` correctly
+    # rejects it as unusable and answers «everything changed», so `installs` is
+    # `true` by construction there. The reviewer caught the second version with
+    # the commit still titled for fixing the first.
+    #
+    # `check` alone satisfies renovate's `prCreation: "not-pending"`, so gating
+    # this arm on `pull_request` costs the branch nothing.
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      needs.changes.outputs.installs == 'true'
+      (github.event_name == 'pull_request' && needs.changes.outputs.installs == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -391,8 +408,20 @@ jobs:
           docker run -d --name ci-postgres -p 5432:5432 \
             -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
             -e POSTGRES_DB=financial postgres:18
-          until docker exec ci-postgres pg_isready -U postgres -q; do sleep 1; done
-          echo "postgres is up"
+          # 📌 Bounded. An unbounded `until` spins for the job's whole timeout
+          # when the container is never coming up — a bad image pull, a bound
+          # port, a process that exited — turning a failure the service block
+          # reported in seconds into a 20-minute hang. The reviewer caught it.
+          for _ in $(seq 60); do
+            if docker exec ci-postgres pg_isready -U postgres -q; then
+              echo "postgres is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::postgres did not come up in 60s"
+          docker logs ci-postgres || true
+          exit 1
 
       - name: Database schema
         if: matrix.app.name == 'financial'

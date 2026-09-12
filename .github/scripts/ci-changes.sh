@@ -91,5 +91,14 @@ apps=$(for f in apps/*/vercel.json; do
       buildable: ($name != "x-com-chat")}'
 done | jq -sc 'sort_by(.name)')
 
+# An empty list reaches `fromJSON` as `matrix: {app: []}`, which GitHub rejects
+# with a matrix error rather than a sentence. One `vercel.json` losing its
+# `installCommand` is all it takes, so say what happened while the value is
+# still here.
+if [ "$apps" = "[]" ]; then
+  echo "::error::no apps/*/vercel.json carries an installCommand — the clean-install matrix would be empty"
+  exit 1
+fi
+
 echo "apps=$apps" >> "$GITHUB_OUTPUT"
 echo "$apps" | jq -r '.[] | "  \(.name): \(.install) → \(if .buildable then .build else "(install only)" end)"'
