@@ -24,6 +24,7 @@
     "packages:reinstall": "pnpm dlx rimraf node_modules \"**/node_modules\" \"**/.next\" pnpm-lock.yaml && pnpm install",
     "pretest": "playwright install chromium",
     "prettier-config:publish": "pnpm -F='prettier-config-polished' publish",
+    "projects:sync": "node script/projects-sync.ts",
     "turbo:devtools": "turbo devtools",
     "worktree:seed": "node ./script/worktree-seed.ts",
     "lint": "turbo run lint",

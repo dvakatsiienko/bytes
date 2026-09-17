@@ -70,6 +70,14 @@ Three paths, same JSON:
 Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommunicationId`,
 `/api/news`, `/api/settings`, `POST /api/snapshot`.
 
+📌 **Shapes that bit `cw` (2026-09-17)** — `games` and `steam-games` return bare arrays, not
+`{games: […]}`. `progress` is base + DLC combined and is not a platinum flag: a platinumed game
+can read 89 %; read the platinum trophy's own `earned`, and filter `group == "default"` for base
+progress. `playSeconds` / `lastPlayedAt` are `null` on never-launched entries. A PSN title gets
+its `npCommId` only after the first launch on the console, so absence from `games` never proves
+he does not own it; a `0.0h` `lastPlayedAt` means one launch, not play. The library is ~259 PSN
+entries (soundtracks, demos and companion apps count) and ~342 Steam games.
+
 `GET /api/games` filters the hidden ids out; `GET /api/games?all=1` returns everything with
 `hidden: boolean` per game (that is the admin's view). `GET /api/settings` is public on purpose —
 the charts read it — and only the write is gated.
