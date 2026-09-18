@@ -2,19 +2,25 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "timezone": "Europe/Kyiv",
-
   "semanticCommits": "disabled",
   "commitMessagePrefix": "🌲 evergreen:",
-
   "rangeStrategy": "bump",
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "prCreation": "not-pending",
-
   "separateMajorMinor": true,
   "separateMinorPatch": true,
-
   "packageRules": [
+    {
+      "description": "toolchain pins are owned by `pnpm toolchain:sync` (installed node + pnpm are the truth): .node-version, packageManager and engines never move here — #41 re-pinned node to a patch fnm did not have",
+      "enabled": false,
+      "matchManagers": ["nodenv", "nvm"]
+    },
+    {
+      "description": "same contract for the manifest fields",
+      "enabled": false,
+      "matchDepTypes": ["packageManager", "engines"]
+    },
     {
       "description": "patches: one grouped pr overnight, automerged once ci is green",
       "matchUpdateTypes": ["patch", "pin", "pinDigest", "digest"],
