@@ -44,9 +44,9 @@
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
-    "@vitest/browser-playwright": "5.0.0",
-    "@vitest/coverage-v8": "5.0.0",
-    "@vitest/ui": "5.0.0",
+    "@vitest/browser-playwright": "5.0.1",
+    "@vitest/coverage-v8": "5.0.1",
+    "@vitest/ui": "5.0.1",
     "biome-config-polished": "workspace:*",
     "lefthook": "2.1.14",
     "npm-run-all2": "9.0.3",
@@ -61,7 +61,7 @@
     "turbo": "2.10.13",
     "typescript": "7.0.2",
     "ultracite": "7.10.8",
-    "vitest": "5.0.0",
+    "vitest": "5.0.1",
     "vitest-browser-react": "2.3.0"
   },
   "engines": {
