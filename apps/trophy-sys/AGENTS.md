@@ -1,4 +1,4 @@
-# CLAUDE.md — trophy-sys, PSN trophy tracker
+# AGENTS.md — trophy-sys, PSN trophy tracker
 
 A retro-terminal trophy dashboard over the PlayStation Network API. Two runtimes from one codebase:
 
@@ -357,7 +357,7 @@ things about **this** page waste a run otherwise:
   components. Progress bars are `█`/`░` runs from `barRender`, not DOM elements.
 - **`@ui/kit` is wired in** — `components.json`, the `@ui/kit: workspace:*` dependency,
   `lucide-react`, and `resolve.dedupe` in `vite.config.ts`. Import as `@ui/kit/components/button`;
-  the monorepo's kit rules in the root `CLAUDE.md` apply here now. `theme.css` maps the shadcn L2
+  the monorepo's kit rules in the root `AGENTS.md` apply here now. `theme.css` maps the shadcn L2
   token vocabulary onto the existing gruvbox `--p-*` palette, with `--radius: 0px` — a kit component
   lands retro without per-component overrides, and the raw `--p-*` variables stay the only thing
   redefined per theme.

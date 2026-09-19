@@ -1,4 +1,4 @@
-# CLAUDE.md - Monorepo Coordination Layer
+# AGENTS.md - Monorepo Coordination Layer
 
 This file provides structural coordination and navigation guidance for Claude
 Code when working across this Turborepo-powered monorepo.
@@ -193,7 +193,7 @@ calls Convex), and its `renovate/*` preview was the one place a bump actually bu
 reach production unbuilt. A label-triggered preview lane is the fix, tracked as
 [BYT-96](https://linear.app/x-com/issue/BYT-96).
 
-📌 A root file that carries no dependencies — `CLAUDE.md`, `.node-version` — deploys nothing,
+📌 A root file that carries no dependencies — `AGENTS.md`, `.node-version` — deploys nothing,
 because turbo reports nothing affected. A root manifest or lockfile change marks every package
 affected, so a renovate bump does reach production. Both measured on BYT-84.
 
@@ -213,7 +213,7 @@ Redeploy button also still works.
 ## ui-kit
 
 `packages/kit` is the one design system, on shadcn + Base UI. Architecture source of truth:
-[BYT-24](https://linear.app/x-com/issue/BYT-24). Mechanics live in `packages/kit/CLAUDE.md`.
+[BYT-24](https://linear.app/x-com/issue/BYT-24). Mechanics live in `packages/kit/AGENTS.md`.
 
 - **kit is the source.** Apps import shadcn components from `@ui/kit/components/*`; an app never
   generates into its own `ui/` dir. A missing component is added from the app with `shadcn add` —

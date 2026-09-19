@@ -61,4 +61,4 @@ Gruvbox-material, matching the `sline` statusline. Progress bars are `█` and `
 runs, not DOM elements. There are CRT scanlines, and they were not a mistake.
 
 📌 Deployment has four constraints that will bite you — they live in
-[CLAUDE.md](./CLAUDE.md), not here.
+[AGENTS.md](./AGENTS.md), not here.

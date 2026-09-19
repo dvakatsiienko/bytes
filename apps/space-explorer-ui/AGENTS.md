@@ -1,4 +1,4 @@
-# CLAUDE.md — space-explorer-ui
+# AGENTS.md — space-explorer-ui
 
 vite react client for `space-explorer-api` — an apollo client demo (pagination, cache type
 policies, optimistic ui). demo status.

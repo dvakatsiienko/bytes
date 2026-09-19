@@ -1,4 +1,4 @@
-# CLAUDE.md — proto-lab, prototype platform
+# AGENTS.md — proto-lab, prototype platform
 
 A permanent Vite app that replaces throwaway HTML prototypes. Everything is preinstalled so a
 new prototype starts at zero setup cost.

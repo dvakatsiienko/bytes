@@ -47,7 +47,7 @@ has() { grep -qE "$1" <<<"$files"; }
   # to the matrix is exercised by the PR that makes it rather than one merge
   # later. That rule paid for itself immediately: this script's own first PR
   # touched no manifest at all.
-  # 📌 `.npmrc` is in the list and it is not padding. CLAUDE.md names its
+  # 📌 `.npmrc` is in the list and it is not padding. AGENTS.md names its
   # `public-hoist-pattern[]` as THE fix for «a tool that resolves its plugins
   # from its own package location fails in pnpm's strict store» — which is
   # exactly the failure `vercel-install` exists to catch. An `.npmrc` edit moves
@@ -67,7 +67,7 @@ has() { grep -qE "$1" <<<"$files"; }
 # this very comment that both came from the file. `apps/trophy-sys/vercel.json`
 # already sets `"buildCommand": "pnpm build"` — equivalent today, silently
 # divergent the day it stops being. A comment that overstates what the code does
-# is the failure this repo's CLAUDE.md exists to prevent, and it was caught in
+# is the failure this repo's AGENTS.md exists to prevent, and it was caught in
 # review rather than by the code.
 #
 # `buildable` is false where a build needs something no container can stand in

@@ -1,6 +1,6 @@
 # packages/kit — mechanics
 
-The contract (rules, why) is the `## ui-kit` section of the root `CLAUDE.md`. This file is only how.
+The contract (rules, why) is the `## ui-kit` section of the root `AGENTS.md`. This file is only how.
 
 ## add a component
 
@@ -31,7 +31,7 @@ swap.
 
 ## eject a component
 
-Only on Dima's `y` to an eject request (contract in the root `CLAUDE.md`). Copy
+Only on Dima's `y` to an eject request (contract in the root `AGENTS.md`). Copy
 `src/components/<name>.tsx` into the app's `src/components/ui/`, first line:
 
 ```ts

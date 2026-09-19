@@ -1,4 +1,4 @@
-# CLAUDE.md — space-explorer-api
+# AGENTS.md — space-explorer-api
 
 graphql server demo — apollo server over the spacex public api plus sqlite trip bookings.
 paired with `space-explorer-ui`, which needs this server on `:4000` for its codegen.

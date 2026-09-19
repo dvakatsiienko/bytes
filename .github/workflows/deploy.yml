@@ -20,7 +20,7 @@
 #
 # 📌 On a pro plan (6000 deployments/day) none of this would exist — the git
 # integration would simply stay on. Revisit if the plan changes. The same note
-# sits above «Deployment Settings» in the root CLAUDE.md.
+# sits above «Deployment Settings» in the root AGENTS.md.
 #
 # ⚠️ `[skip ci]` or `[ci skip]` in a commit subject skips every
 # `push`-triggered workflow, this one included. A commit carrying one does NOT

@@ -132,7 +132,7 @@ else
   #   · a change to a root MANIFEST or the lockfile marks every package affected
   #     — a renovate automerge that moves only `package.json` + `pnpm-lock.yaml`
   #     listed all eight buildable packages, so a bump does reach production;
-  #   · a change to a root file carrying no dependencies — `CLAUDE.md`,
+  #   · a change to a root file carrying no dependencies — `AGENTS.md`,
   #     `.node-version` — marks NOTHING affected, and deploys nothing.
   # The second one is the win, not a gap: that is the six deployments a docs
   # commit used to spend.
