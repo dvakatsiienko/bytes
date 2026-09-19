@@ -1,4 +1,4 @@
-# CLAUDE.md — figmentation
+# AGENTS.md — figmentation
 
 CSS/design experiments showcase. Each route is an isolated visual demo — no
 shared app logic, no backend.

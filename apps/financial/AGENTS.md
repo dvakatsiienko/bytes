@@ -1,4 +1,4 @@
-# CLAUDE.md — financial
+# AGENTS.md — financial
 
 Financial dashboard (invoices, customers, revenue) with credentials auth. WIP,
 modeled after the Next.js App Router dashboard course app.

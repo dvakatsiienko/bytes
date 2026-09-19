@@ -1,4 +1,4 @@
-# CLAUDE.md — x-com-chat
+# AGENTS.md — x-com-chat
 
 AI chat app with customizable alien 👽 friends. Each friend is a persona (a name +
 a system prompt); chats stream from an LLM and persist in real time.
