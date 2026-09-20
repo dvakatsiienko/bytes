@@ -1,5 +1,6 @@
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, gamesFetch, profileFetch } from './psn.ts';
+import { resolverExplain, resolverInstall } from './resolver.ts';
 import { statsFetch, statsSync } from './stats.ts';
 import {
   gameDetailFetch as steamGameDetailFetch,
@@ -39,4 +40,13 @@ if (!run) {
   process.exit(1);
 }
 
-console.log(JSON.stringify(await run(), null, 2));
+resolverInstall();
+
+try {
+  console.log(JSON.stringify(await run(), null, 2));
+} catch (error) {
+  const explained = resolverExplain(error);
+  if (!explained) throw error;
+  console.error(explained);
+  process.exit(1);
+}
