@@ -94,3 +94,14 @@ commit-msg:
           echo "commit-msg: this message contains a CI-skip marker, which would stop deploy.yml — the only thing that deploys production. Write «the skip directive» in prose instead of the bracketed or skip-checks form."
           exit 1
         fi
+
+    # Linear's parser reads every push: one of its keywords next to a ticket id
+    # («fixes BYT-1», «closes DOT-2», «ref BYT-3») assigns dima and moves the
+    # ticket behind our back. The only allowed form is `- ticket: BYT-N` with an
+    # optional `(closes)` AFTER the id, which the pre-push hook applies itself.
+    - name: no-linear-keyword
+      run: |
+        if grep -qiE '\b(refs?|references|part of|contributes to|towards?|close[sd]?|fix(es|ed)?|resolve[sd]?|complete[sd]?|implement(s|ed)?)\b[[:space:]]*:?[[:space:]]*(DOT|BYT)-[0-9]+' {1}; then
+          echo "commit-msg: a Linear keyword sits next to a ticket id — Linear would assign dima and move the ticket. Write «- ticket: BYT-N» (with «(closes)» after the id) and nothing else beside an id."
+          exit 1
+        fi
