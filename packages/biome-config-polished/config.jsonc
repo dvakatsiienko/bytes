@@ -211,6 +211,11 @@
         // output out of CLI scripts and leaves them running mute. Console noise
         // is a review question, not a thing to autofix.
         "noConsole": "off",
+        // ultracite raises this to error; biome's own default is warn. off until
+        // biomejs/biome#11278 lands — its inference thinks RegExp.exec() is non-nullable,
+        // and the only form it accepts throws on a non-match. 2026-09-20: 466 files,
+        // 2 hits, both that bug, 0 real.
+        "noUnnecessaryConditions": "off",
         "noUnknownAtRules": "off", // ultracite rule — there are too much custom at-rules from tailwind. review this rule when it will go out from nursery.
         "noUndeclaredEnvVars": "error",
         "noLeakedRender": "off", // ultracite rule — && operator is useful
