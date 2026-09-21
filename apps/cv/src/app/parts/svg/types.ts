@@ -1,3 +1,5 @@
-export interface TSvgProps extends React.SVGProps<SVGSVGElement> {
+import type { SVGProps } from 'react';
+
+export interface TSvgProps extends SVGProps<SVGSVGElement> {
   size?: number;
 }
