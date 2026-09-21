@@ -21,6 +21,6 @@
     "lint": "biome lint"
   },
   "peerDependencies": {
-    "prettier": ">=3.0.3"
+    "prettier": ">=3.9.8"
   }
 }
