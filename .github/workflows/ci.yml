@@ -110,7 +110,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so pin explicitly
-          node-version: 24.0.2
+          node-version: 24.21.0
           cache: pnpm
 
       - name: Install
@@ -306,7 +306,7 @@ jobs:
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
-          node-version: 24.0.2
+          node-version: 24.21.0
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -393,7 +393,7 @@ jobs:
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
-          node-version: 24.0.2
+          node-version: 24.21.0
           # 📌 No pnpm cache, deliberately. A warm store is the thing that hides
           # the failure this job exists to find: it can satisfy an import from a
           # package the filtered install never asked for. A clean clone means a

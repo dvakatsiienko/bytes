@@ -18,18 +18,18 @@
   },
   "dependencies": {
     "@base-ui/react": "1.8.0",
-    "cn": "0.2.6",
+    "cn": "0.3.0",
     "cva": "1.0.0-beta.10",
-    "lucide-react": "1.41.0",
+    "lucide-react": "1.47.0",
     "shadcn": "4.21.0"
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "peerDependencies": {
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   }
 }
