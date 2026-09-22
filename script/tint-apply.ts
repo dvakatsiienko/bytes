@@ -7,10 +7,9 @@
  *        pnpm tint:apply --check    → exit 1 on drift, write nothing
  *
  * 📌 the block is peacock 4.4.1's own output for these settings, running inside Cursor:
- * the same keys, the same tinycolor math, the same sorted order. that is what lets the
- * extension recognise the colour and reproduce the file byte-for-byte when it re-applies.
- * the title bar carries the colour; `elementAdjustments` darkens the activity and status bars
- * one step, a peacock setting rather than our own shading, so its re-apply keeps them.
+ * the same keys, the same tinycolor math, the same order. that is what lets the extension
+ * recognise the colour and reproduce the file byte-for-byte when it re-applies. only the
+ * title bar is tinted; the sash hover border is peacock's default accent and comes with it.
  */
 
 import {
@@ -23,18 +22,57 @@ import {
 import { join } from 'node:path';
 import tinycolor from 'tinycolor2';
 
-// peacock's constants: the element step, the inactive alpha, the two foregrounds, and the gray
+// peacock's constants: its element step, the inactive alpha, the dark foreground, and the gray
 // it forces onto a LIGHT title bar in Cursor, which paints editor toolbar icons with that token
 const STEP = 10;
 const INACTIVE_ALPHA = 0x99 / 0xff;
 const DARK_FOREGROUND = '#15202b';
 const LIGHT_FOREGROUND = '#e7e7e7';
 const CURSOR_TITLE_FOREGROUND = '#595959';
-const elementAdjustments = {
-  activityBar: 'darken',
-  statusBar: 'darken',
-  titleBar: 'none',
-} as const;
+
+// every colour key peacock manages (its `ColorSettings`): its merge drops the ones a new
+// apply does not set, which is how switching an element off clears that element's keys
+const peacockKeys = [
+  'activityBar.activeBackground',
+  'activityBar.activeBorder',
+  'activityBar.background',
+  'activityBar.foreground',
+  'activityBar.inactiveForeground',
+  'activityBarBadge.background',
+  'activityBarBadge.foreground',
+  'activityBarTop.background',
+  'activityBarTop.activeBackground',
+  'activityBarTop.activeBorder',
+  'activityBarTop.foreground',
+  'activityBarTop.inactiveForeground',
+  'commandCenter.border',
+  'commandCenter.foreground',
+  'editorGroup.border',
+  'panel.border',
+  'sideBar.border',
+  'sash.hoverBorder',
+  'editorError.foreground',
+  'editorWarning.foreground',
+  'editorInfo.foreground',
+  'statusBar.border',
+  'statusBar.background',
+  'statusBar.foreground',
+  'statusBar.debuggingBorder',
+  'statusBar.debuggingBackground',
+  'statusBar.debuggingForeground',
+  'statusBarItem.hoverBackground',
+  'statusBarItem.remoteBackground',
+  'statusBarItem.remoteForeground',
+  'tab.activeBorder',
+  'tab.activeBackground',
+  'titleBar.activeBackground',
+  'titleBar.activeForeground',
+  'titleBar.border',
+  'titleBar.inactiveBackground',
+  'titleBar.inactiveForeground',
+  'window.activeBorder',
+  'window.inactiveBorder',
+];
 
 const isCheck = process.argv.includes('--check');
 const tint = JSON.parse(readFileSync('tint.json', 'utf8')) as Tint;
@@ -77,8 +115,8 @@ console.log(
 
 /* Helpers */
 
-// merged, never overwritten: every key the file already holds stays where it is, and inside
-// the colour block only peacock's own keys are replaced
+// merged, never overwritten: a key the file holds outside the `peacock.*` settings and
+// peacock's own colour keys stays where it is. those two are this script's, and are rewritten
 function settingsWith(
   current: string | undefined,
   color: string,
@@ -93,102 +131,57 @@ function settingsWith(
       { cause: error },
     );
   }
-  const block = peacockBlock(color);
-  const customizations = settings['workbench.colorCustomizations'] ?? {};
+  const customizations = Object.fromEntries(
+    Object.entries(
+      (settings['workbench.colorCustomizations'] ?? {}) as Record<
+        string,
+        string
+      >,
+    ).filter(([key]) => !peacockKeys.includes(key)),
+  );
   const next = {
-    ...settings,
-    'peacock.affectActivityBar': true,
-    'peacock.affectStatusBar': true,
+    ...Object.fromEntries(
+      Object.entries(settings).filter(
+        ([key]) =>
+          !key.startsWith('peacock.') &&
+          key !== 'workbench.colorCustomizations',
+      ),
+    ),
+    'peacock.affectActivityBar': false,
+    'peacock.affectStatusBar': false,
     'peacock.affectTitleBar': true,
     'peacock.color': color,
-    'peacock.elementAdjustments': elementAdjustments,
     // peacock's own merge: existing keys keep their place, its keys land after them
     'workbench.colorCustomizations': {
-      ...(customizations as Record<string, string>),
-      ...block,
+      ...customizations,
+      ...peacockBlock(color),
     },
   };
   return `${JSON.stringify(next, null, 2)}\n`;
 }
 
 function peacockBlock(color: string) {
-  const title = elementStyle(color, elementAdjustments.titleBar);
-  const activity = elementStyle(color, elementAdjustments.activityBar);
-  const status = elementStyle(color, elementAdjustments.statusBar);
-  const titleForeground = tinycolor(title.background).isLight()
+  const title = hex(tinycolor(color));
+  const foreground = foregroundOf(title);
+  const inactiveForeground = hex(
+    tinycolor(foreground).setAlpha(INACTIVE_ALPHA),
+  );
+  const titleForeground = tinycolor(title).isLight()
     ? CURSOR_TITLE_FOREGROUND
-    : title.foreground;
-
-  return sortKeys({
-    'activityBar.activeBackground': activity.background,
-    'activityBar.activeBorder': activity.foreground,
-    'activityBar.background': activity.background,
-    'activityBar.foreground': activity.foreground,
-    'activityBar.inactiveForeground': activity.inactiveForeground,
-    'activityBarBadge.background': activity.badgeBackground,
-    'activityBarBadge.foreground': activity.badgeForeground,
-    'activityBarTop.activeBackground': activity.background,
-    'activityBarTop.activeBorder': activity.foreground,
-    'activityBarTop.background': activity.background,
-    'activityBarTop.foreground': activity.foreground,
-    'activityBarTop.inactiveForeground': activity.inactiveForeground,
-    'commandCenter.border': title.inactiveForeground,
-    'commandCenter.foreground': titleForeground,
-    'sash.hoverBorder': activity.background,
-    'statusBar.background': status.background,
-    'statusBar.debuggingBackground': status.background,
-    'statusBar.debuggingForeground': status.foreground,
-    'statusBar.foreground': status.foreground,
-    'statusBarItem.hoverBackground': status.hoverBackground,
-    'statusBarItem.remoteBackground': status.badgeBackground,
-    'statusBarItem.remoteForeground': status.foreground,
-    'titleBar.activeBackground': title.background,
-    'titleBar.activeForeground': titleForeground,
-    'titleBar.inactiveBackground': title.inactiveBackground,
-    'titleBar.inactiveForeground': title.inactiveForeground,
-  });
-}
-
-function elementStyle(color: string, adjustment: 'darken' | 'none') {
-  const background =
-    adjustment === 'darken' ? darken(color) : hex(tinycolor(color));
-  const foreground = foregroundOf(background);
-  const badgeBackground = readableAccent(background);
+    : foreground;
 
   return {
-    background,
-    badgeBackground,
-    badgeForeground: foregroundOf(badgeBackground),
-    foreground,
-    hoverBackground: hex(
-      tinycolor(background).isLight()
-        ? tinycolor(background).darken()
-        : tinycolor(background).lighten(),
+    'commandCenter.border': inactiveForeground,
+    'commandCenter.foreground': titleForeground,
+    // the activity bar's colour even with the bar off: peacock's default adjustment lightens it
+    'sash.hoverBorder': hex(tinycolor(color).lighten(STEP)),
+    'titleBar.activeBackground': title,
+    'titleBar.activeForeground': titleForeground,
+    'titleBar.inactiveBackground': hex(
+      tinycolor(title).setAlpha(INACTIVE_ALPHA),
     ),
-    inactiveBackground: hex(tinycolor(background).setAlpha(INACTIVE_ALPHA)),
-    inactiveForeground: hex(tinycolor(foreground).setAlpha(INACTIVE_ALPHA)),
+    'titleBar.inactiveForeground': inactiveForeground,
   };
-}
-
-// the first of 16 shades of the triad accent that clears 2:1 against the background, least
-// contrast first — peacock's badge colour, ported line for line
-function readableAccent(background: string) {
-  const [, accent] = tinycolor(background).triad();
-  let { h, s, l } = accent?.toHsl() ?? { h: 0, l: 0, s: 0 };
-  if (s === 0) h = 60 * Math.round(l * 6);
-  if (s < 0.15) s = 0.5;
-
-  const shade = Array.from({ length: 16 }, (_, index) => {
-    const color = tinycolor({ h, l: index / 16, s });
-    return {
-      contrast: tinycolor.readability(color, background),
-      hex: hex(color),
-    };
-  })
-    .sort((a, z) => a.contrast - z.contrast)
-    .find((one) => one.contrast >= 2);
-
-  return shade?.hex ?? '#ffffff';
 }
 
 function darken(color: string) {
@@ -201,13 +194,6 @@ function foregroundOf(background: string) {
 
 function hex(color: tinycolor.Instance) {
   return color.getAlpha() < 1 ? color.toHex8String() : color.toHexString();
-}
-
-function sortKeys<T>(record: Record<string, T>) {
-  return Object.fromEntries(
-    // code-unit order, the comparison peacock's `Object.keys().sort()` makes
-    Object.entries(record).sort(([a], [z]) => (a < z ? -1 : 1)),
-  );
 }
 
 /* Types */
