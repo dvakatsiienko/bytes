@@ -33,8 +33,7 @@
     "motion": "13.4.0",
     "psn-api": "2.18.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "undici": "8.10.2"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@fontsource-variable/jetbrains-mono": "5.3.0",
@@ -42,6 +41,7 @@
     "@vitejs/plugin-react": "6.1.1",
     "esbuild": "0.28.2",
     "oxc-transform-react": "0.150.0",
+    "undici": "8.10.2",
     "vite": "8.3.0"
   }
 }
