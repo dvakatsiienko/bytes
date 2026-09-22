@@ -24,7 +24,7 @@ import { TABS } from './layout.tsx';
 
 /**
  * The one route that lives outside `Layout`, so it renders with PSN dead —
- * which is the state it exists to repair. It reads only /api/console/* and
+ * which is the state it exists to repair. It reads only /api/admin/* and
  * /api/games?all=1, and never touches the profile or news queries.
  */
 export const ConsoleView = () => {
