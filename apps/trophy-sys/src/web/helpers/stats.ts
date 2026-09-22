@@ -31,7 +31,7 @@ export const dayKey = (date: Date) =>
  * evening that runs 22:00 → 00:38 is one sitting to the person who played it,
  * and a midnight boundary filed half of it under the next day's header.
  *
- * 📌 The split, and it is deliberate. On this key: /log, and `trophyStreaks` —
+ * 📌 The split, and it is deliberate. On this key: /journal, and `trophyStreaks` —
  * both answer "how many days did you play", where a 22:00 → 02:00 session is
  * one. On plain `dayKey`: the contribution heatmap, because a square in a
  * calendar grid is a claim about the calendar and moving it would put a trophy

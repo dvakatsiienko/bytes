@@ -11,7 +11,7 @@ import {
 } from './helpers/stats.ts';
 import { useGames, useStats } from './hooks/queries.ts';
 
-export const Log = () => {
+export const Journal = () => {
   const games = useGames();
   const stats = useStats();
 
@@ -24,8 +24,8 @@ export const Log = () => {
   if (!archive?.syncedAt)
     return (
       <Note>
-        no trophy archive yet. open /stats and run the scan once — the log reads
-        the same archive.
+        no trophy archive yet. open /campaign and run the scan once — the
+        journal reads the same archive.
       </Note>
     );
 

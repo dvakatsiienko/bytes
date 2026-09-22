@@ -192,7 +192,7 @@ live record, so a death written there is clobbered by the very call that discove
 
 📌 **`settingsLoad` spreads the store over `SETTINGS_DEFAULT`, so a key already written to the
 store outranks the code default forever.** Changing a default therefore reaches a fresh install
-and nobody else — the live value has to be flipped through `/admin`, or the key deleted. Measured
+and nobody else — the live value has to be flipped through `/console`, or the key deleted. Measured
 on `effortHideUntouched`: the default moved to `true` and production kept answering `false`,
 because a stored `false` was already sitting there.
 

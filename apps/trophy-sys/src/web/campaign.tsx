@@ -71,7 +71,7 @@ import { SegmentedControl } from './components/segmented-control.tsx';
 import { hoursFormat } from './helpers/format.ts';
 import { useGames, useSettings, useStats } from './hooks/queries.ts';
 
-export const Stats = () => {
+export const Campaign = () => {
   const navigate = useNavigate();
   const games = useGames();
   const stats = useStats();

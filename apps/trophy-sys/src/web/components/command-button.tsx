@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /**
  * The app's button, in the nav's own language: a bordered box, uppercase and
  * tracked, dim until touched. The kit ships a filled accent button — the one
- * shape this palette uses nowhere else, and the reason /admin read as a
+ * shape this palette uses nowhere else, and the reason /console read as a
  * different program than the tabs beside it.
  *
  * Three tones, and no more: `quiet` is a nav tab, `primary` is the one

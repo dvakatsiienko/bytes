@@ -33,7 +33,7 @@ const dayStep = (key: string, days: number) => {
  *
  * 📌 `gamingDayKey`, not `dayKey`: a session running 22:00 → 02:00 is one day
  * of play, and counting it as two inflated every streak it touched. The same
- * boundary that groups /log groups these.
+ * boundary that groups /journal groups these.
  */
 export const trophyStreaks = (trophies: ArchivedTrophy[]): StreakModel => {
   const days = [

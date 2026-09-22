@@ -9,23 +9,23 @@ import {
   redirect,
 } from '@tanstack/react-router';
 
-import { Admin } from './admin.tsx';
+import { ConsoleView } from './console.tsx';
+import { Journal } from './journal.tsx';
 import { Layout } from './layout.tsx';
 import { Library, LibraryEmpty, LibraryGame } from './library.tsx';
-import { Log } from './log.tsx';
 
 /**
- * Split out, because /stats is the only route that needs visx and motion and
+ * Split out, because /campaign is the only route that needs visx and motion and
  * `/` redirects to /library. Loading a charting library to look at a game list
  * is most of the bundle spent on a page the visitor may never open.
  */
-const Stats = lazy(() =>
-  import('./stats.tsx').then((module) => ({ default: module.Stats })),
+const Campaign = lazy(() =>
+  import('./campaign.tsx').then((module) => ({ default: module.Campaign })),
 );
 
 /**
  * A render that throws used to paint white. It now says what broke and points
- * at /admin, because the usual cause is a PSN token the owner has to replace.
+ * at /console, because the usual cause is a PSN token the owner has to replace.
  * Declared before the routes because they reference it at module init.
  */
 const RouteError = (props: ErrorComponentProps) => {
@@ -41,7 +41,7 @@ const RouteError = (props: ErrorComponentProps) => {
       </pre>
       <Link
         className='cursor-pointer border border-line px-3 py-1 text-[12px] text-orange uppercase tracking-[0.15em] transition-colors hover:border-orange focus-visible:outline focus-visible:outline-orange'
-        to='/admin'>
+        to='/console'>
         go to admin
       </Link>
     </div>
@@ -49,9 +49,9 @@ const RouteError = (props: ErrorComponentProps) => {
 };
 
 /**
- * The root renders nothing but its outlet, so /admin owes the PSN data
+ * The root renders nothing but its outlet, so /console owes the PSN data
  * nothing. `Layout` calls useProfile and useGames, both of which fail on a
- * dead NPSSO — and repairing that token is exactly what /admin is for, so it
+ * dead NPSSO — and repairing that token is exactly what /console is for, so it
  * cannot sit under the thing that breaks. Every other route keeps its URL by
  * hanging off a pathless layout route instead.
  */
@@ -97,13 +97,13 @@ const libraryGameRoute = createRoute({
   path: '$gameId',
 });
 
-const logRoute = createRoute({
-  component: Log,
+const journalRoute = createRoute({
+  component: Journal,
   getParentRoute: () => shellRoute,
-  path: '/log',
+  path: '/journal',
 });
 
-const statsRoute = createRoute({
+const campaignRoute = createRoute({
   component: () => (
     <Suspense
       fallback={
@@ -111,17 +111,17 @@ const statsRoute = createRoute({
           loading the charts…
         </p>
       }>
-      <Stats />
+      <Campaign />
     </Suspense>
   ),
   getParentRoute: () => shellRoute,
-  path: '/stats',
+  path: '/campaign',
 });
 
-const adminRoute = createRoute({
-  component: Admin,
+const consoleRoute = createRoute({
+  component: ConsoleView,
   getParentRoute: () => rootRoute,
-  path: '/admin',
+  path: '/console',
 });
 
 export const router = createRouter({
@@ -130,10 +130,10 @@ export const router = createRouter({
     shellRoute.addChildren([
       indexRoute,
       libraryRoute.addChildren([libraryIndexRoute, libraryGameRoute]),
-      logRoute,
-      statsRoute,
+      journalRoute,
+      campaignRoute,
     ]),
-    adminRoute,
+    consoleRoute,
   ]),
 });
 

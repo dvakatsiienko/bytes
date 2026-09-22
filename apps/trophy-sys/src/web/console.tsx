@@ -20,13 +20,14 @@ import {
   useSettings,
   useSettingsSave,
 } from './hooks/queries.ts';
+import { TABS } from './layout.tsx';
 
 /**
  * The one route that lives outside `Layout`, so it renders with PSN dead —
- * which is the state it exists to repair. It reads only /api/admin/* and
+ * which is the state it exists to repair. It reads only /api/console/* and
  * /api/games?all=1, and never touches the profile or news queries.
  */
-export const Admin = () => {
+export const ConsoleView = () => {
   const session = useAdminSession();
 
   const authed = session.data?.authed === true;
@@ -40,11 +41,9 @@ export const Admin = () => {
 };
 
 /**
- * The nav is copied from `Layout` rather than shared, because reusing `Layout`
- * would pull in useProfile and useGames — the two calls that fail on the dead
- * token this page exists to replace. It is copied down to the theme toggle and
- * the right-hand status slot: the point is that /admin is the fourth tab of
- * one program, not a console bolted to its side.
+ * The header is copied from `Layout` rather than shared, because rendering
+ * `Layout` would call useProfile and useGames — the two calls that fail on the
+ * dead token this page exists to replace. Only the tab list is imported.
  */
 const AdminHeader = (props: AdminHeaderProps) => {
   const logout = useAdminLogout();
@@ -52,6 +51,7 @@ const AdminHeader = (props: AdminHeaderProps) => {
   const tabListJSX = TABS.map((tab) => {
     return (
       <Link
+        activeProps={{ className: 'glow border-orange text-orange' }}
         className='cursor-pointer border border-line px-3 py-1 text-[12px] text-dim uppercase tracking-[0.15em] transition-colors hover:border-dim hover:text-fg-soft focus-visible:outline focus-visible:outline-orange'
         key={tab.to}
         to={tab.to}>
@@ -70,14 +70,7 @@ const AdminHeader = (props: AdminHeaderProps) => {
         </Link>
       </h1>
 
-      <nav className='flex gap-1'>
-        {tabListJSX}
-        {/* Not a Link — /admin is where we already are. It wears the shape
-            `Layout` gives an active tab so the row reads as one set. */}
-        <span className='glow border border-orange px-3 py-1 text-[12px] text-orange uppercase tracking-[0.15em]'>
-          admin
-        </span>
-      </nav>
+      <nav className='flex gap-1'>{tabListJSX}</nav>
 
       <ThemeToggle />
 
@@ -654,7 +647,7 @@ const EmptyRow = (props: EmptyRowProps) => {
 
 /**
  * Label plus input, in the app's own control language: an uppercase tracked
- * caption over the library's search-box frame. Local to /admin — it is the
+ * caption over the library's search-box frame. Local to /console — it is the
  * only route with real forms on it.
  */
 const Field = (props: FieldProps) => {
@@ -681,7 +674,7 @@ const Field = (props: FieldProps) => {
   );
 };
 
-/** The header's link shape, for the two places /admin sends the owner off-site. */
+/** The header's link shape, for the two places /console sends the owner off-site. */
 const LinkOut = (props: LinkOutProps) => {
   return (
     <a
@@ -785,14 +778,6 @@ const needlesParse = (filter: string) =>
     .split('|')
     .map((part) => part.trim())
     .filter(Boolean);
-
-/** The nav's own copy — see the comment at the header. `/admin` is not listed
- *  anywhere on purpose: the route works, it is simply not advertised. */
-const TABS = [
-  { label: 'library', to: '/library' },
-  { label: 'stats', to: '/stats' },
-  { label: 'log', to: '/log' },
-] as const;
 
 /**
  * `w-40` on platform is the worst case measured, not a guess: `PS3 PSVITA PS4`

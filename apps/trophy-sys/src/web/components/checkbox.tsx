@@ -4,7 +4,7 @@
  * the tree and only the paint is ours, so the keyboard, the label association
  * and the accessibility tree are the platform's.
  *
- * The same bracket glyph carries every binary state on /admin — a row's
+ * The same bracket glyph carries every binary state on /console — a row's
  * hidden flag reads `[x] hidden` from this alphabet, not from a second one.
  */
 export const Checkbox = (props: CheckboxProps) => {

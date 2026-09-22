@@ -5,10 +5,11 @@ import { ProfileBar } from './components/profile-bar.tsx';
 import { ThemeToggle } from './components/theme-toggle.tsx';
 import { useGames, useProfile } from './hooks/queries.ts';
 
-const TABS = [
+export const TABS = [
   { label: 'library', to: '/library' },
-  { label: 'stats', to: '/stats' },
-  { label: 'log', to: '/log' },
+  { label: 'campaign', to: '/campaign' },
+  { label: 'journal', to: '/journal' },
+  { label: 'console', to: '/console' },
 ] as const;
 
 export const Layout = () => {

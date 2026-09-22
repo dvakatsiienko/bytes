@@ -220,7 +220,7 @@ const Plot = (props: PlotProps) => {
  *
  * `hideUntouched` drops the rest of the dead weight: a title with no trophy
  * earned sits on the 0% gridline, and the never-opened half of a 258-title
- * library turns the scatter into a bar. It is the owner's switch, in /admin.
+ * library turns the scatter into a bar. It is the owner's switch, in /console.
  */
 export const effortPoints = (
   games: Game[],
