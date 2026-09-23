@@ -62,3 +62,5 @@ runs, not DOM elements. There are CRT scanlines, and they were not a mistake.
 
 📌 Deployment has four constraints that will bite you — they live in
 [AGENTS.md](./AGENTS.md), not here.
+
+<!-- avatar test: checks the vercel project avatar shows on pr comments -->
