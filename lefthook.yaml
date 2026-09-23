@@ -48,7 +48,7 @@ pre-push:
     # everything and exits 0.
     - name: linear-push
       use_stdin: true
-      run: node /Users/dima/dotfiles/script/linear-push.ts hook {1} {2}
+      run: node /Users/dima/frame/script/linear-push.ts hook {1} {2}
 
     # Typecheck only what moved since origin/main, so a kit consumer that
     # breaks under vercel's install never leaves the machine.
