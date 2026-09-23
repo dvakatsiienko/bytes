@@ -210,6 +210,12 @@ To deploy by hand — a build that died on Vercel's side, a commit that carried 
 run the **Deploy** workflow from the Actions tab and pick an app, or `all`. The Vercel dashboard's
 Redeploy button also still works.
 
+**An app removed from `apps/` takes its GitHub environments with it, in the same change** — its
+`Production – <app>` and `Preview – <app>` rows otherwise sit in the repo's Deployments sidebar
+forever (13 such rows were pruned on 2026-09-23). `gh api repos/dvakatsiienko/bytes/environments
+-q '.environments[].name'` lists them; `gh api -X DELETE .../environments/<url-encoded name>`
+removes one.
+
 ## ui-kit
 
 `packages/kit` is the one design system, on shadcn + Base UI. Architecture source of truth:
