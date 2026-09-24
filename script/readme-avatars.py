@@ -83,17 +83,22 @@ def coins(p, k):
             f'<path transform="translate(45 66) scale(.9)" d="{SPARK}" fill="#fff3c4"/>')
 
 
+# the last pair is each drawing's bbox centre in its own 120-unit space, shadow left out, measured in a browser;
+# a redrawn prop is re-measured, or it drifts off the glass centre
 AVATARS = dict(
-    trophy_sys=('trophy-sys: a glass jar holding a brass trophy, gold label', trophy, '#d4a543', '#6e4f18'),
-    x_com_chat=('x-com chat: a glass jar holding a small green alien with a speech bubble, green label', alien, '#8ec07c', '#4f6b3e'),
-    space_explorer=('space explorer: a glass jar holding a paper rocket, blue label', rocket, '#83a598', '#34457a'),
-    cv=('cv: a glass jar holding a pinned paper id card, paper label', card, '#efe2c4', '#8a6a3a'),
-    financial=('financial: a glass jar holding brass coins and a ledger sheet, orange label', coins, '#fe8019', '#9c4430'),
+    trophy_sys=('trophy-sys: a glass jar holding a brass trophy, gold label', trophy, '#d4a543', '#6e4f18', (60, 64.3)),
+    x_com_chat=('x-com chat: a glass jar holding a small green alien with a speech bubble, green label', alien, '#8ec07c', '#4f6b3e', (68, 55.7)),
+    space_explorer=('space explorer: a glass jar holding a paper rocket, blue label', rocket, '#83a598', '#34457a', (60, 62)),
+    cv=('cv: a glass jar holding a pinned paper id card, paper label', card, '#efe2c4', '#8a6a3a', (60, 57.1)),
+    financial=('financial: a glass jar holding brass coins and a ledger sheet, orange label', coins, '#fe8019', '#9c4430', (66.3, 64.3)),
 )
+SCALE = .56
+GLASS_CENTRE = (60, 59.5)  # the clear glass between the lid (y 31) and the label (y 88)
 
 
 def avatar(name, k):
-    label, body, tint, tag = AVATARS[name]
+    label, body, tint, tag, (cx, cy) = AVATARS[name]
+    tx, ty = GLASS_CENTRE[0] - SCALE * cx, GLASS_CENTRE[1] - SCALE * cy
     p = f'{name}-{k}-'
     glass, edge = ('#cfe6ee', '#7fb4d6') if k == 'light' else ('#8fa6b8', '#6f93b0')
     paper = (f'<filter id="{p}paper" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="1.5" stdDeviation="1.5" '
@@ -104,7 +109,7 @@ def avatar(name, k):
             f'<ellipse cx="60" cy="112" rx="36" ry="4" fill="#000" opacity=".16"/>'
             f'<rect x="22" y="30" width="76" height="80" rx="14" fill="{glass}" fill-opacity=".35" stroke="{edge}" stroke-opacity=".8" stroke-width="1.6"/>'
             f'<g clip-path="url(#{p}clip)"><rect x="22" y="30" width="76" height="80" fill="{tint}" opacity=".18"/>'
-            f'<g transform="translate(26 30) scale(.56)">{body(p, k)}</g></g>'
+            f'<g class="content" transform="translate({tx:.1f} {ty:.1f}) scale({SCALE})">{body(p, k)}</g></g>'
             f'<path d="M30 44v44" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/><circle cx="31" cy="38" r="1.8" fill="#fff" opacity=".8"/>'
             f'<g filter="url(#{p}paper)"><rect x="41" y="88" width="38" height="15" rx="2" fill="#efe2c4"/></g><path d="M47 95.5h26" stroke="{tag}" stroke-width="2.4" stroke-linecap="round"/>'
             f'<rect x="18" y="14" width="84" height="18" rx="4" fill="url(#{p}brass)"/>{ridges}<ellipse cx="60" cy="15.5" rx="41" ry="2.4" fill="#f8e3a0" opacity=".85"/>'
