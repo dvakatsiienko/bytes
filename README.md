@@ -13,6 +13,15 @@
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><img src="assets/hero-light.svg" width="100%" alt="bytes — the apps: a glass jar with a brass lid, fireflies glowing inside"></picture>
 
+## 🧪 hero takes
+
+iteration only: three indoor takes, day over night. the one dima picks replaces the jar above.
+
+**take 1 — by the fire**
+
+<img src="assets/takes/take-1-day.svg" width="100%" alt="take 1, day: the cabin inside by the fire, sunlight through the window">
+<img src="assets/takes/take-1-night.svg" width="100%" alt="take 1, night: the fire and the firefly jar light the cabin">
+
 ## 🛸 apps
 
 ### 🎮 trophy-sys
