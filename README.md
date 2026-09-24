@@ -39,7 +39,7 @@
 
 [live](https://space-explorer-ui.vercel.app) | [source](apps/space-explorer-ui) | [api](https://space-explorer-api.up.railway.app/) | [api source](apps/space-explorer-api)
 
-<details><summary>peek</summary><img src="assets/apps/space-explorer-ui.webp" width="100%" alt="space explorer: the boarding card with an apollo rocket and an email login, dark theme"></details>
+<details><summary>peek</summary><img src="assets/apps/space-explorer-ui.webp" width="100%" alt="space explorer: upcoming launches as mission cards, each with its rocket, site and flight number, dark theme"></details>
 
 <br clear="all">
 
