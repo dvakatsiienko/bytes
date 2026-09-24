@@ -1,5 +1,3 @@
-🫙 **bytes**: a turborepo of the apps i build and run.
-
 <p align="center">
   <a href="https://github.com/dvakatsiienko/bytes/actions/workflows/ci.yml"><img src="https://raw.githubusercontent.com/dvakatsiienko/bytes/badges/ci.svg" alt="ci"></a>
   <img src="assets/badges/tests.svg" alt="tests">
