@@ -1,4 +1,4 @@
-🫙 **bytes**: the apps.
+🫙 **bytes**: a turborepo of the apps i build and run.
 
 <p align="center">
   <img src="assets/badges/apps.svg" alt="apps">
@@ -11,74 +11,64 @@
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><img src="assets/hero-light.svg" width="100%" alt="bytes — the apps: a glass jar with a brass lid, fireflies glowing inside"></picture>
 
-### 🧭 toc
+## 🛸 apps
 
-- [trophy-sys](#-trophy-sys) — psn trophies in a dos terminal
-- [x-com chat](#-x-com-chat) — chat with alien friends
-- [space explorer](#%EF%B8%8F-space-explorer) — a graphql client and its server
-- [financial](#-financial) — invoices on one sheet
-- [cv](#-cv) — the cover page
-- [figmentation](#%EF%B8%8F-figmentation) — figma files, rebuilt in css
-- [shared](#-shared) — the kit, the configs, the workbench
+### 🎮 trophy-sys
 
-## 🎮 trophy-sys
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/trophy-sys-dark.svg"><img align="right" width="120" src="assets/avatars/trophy-sys-light.svg" alt="trophy-sys avatar"></picture>
 
-a playstation trophy tracker that looks like a dos terminal: the whole psn library, every
-trophy per game and dlc, and what is new since the last look.
+a playstation trophy tracker that looks like a dos terminal.
 
 [live](https://trophy-sys.vercel.app) | [source](apps/trophy-sys)
 
-<img src="assets/apps/trophy-sys.webp" width="100%" alt="trophy-sys: the library of synced games next to one game's trophy list">
+<details><summary>peek</summary><img src="assets/apps/trophy-sys.webp" width="100%" alt="trophy-sys: the library of synced games next to one game's trophy list"></details>
 
-## 👽 x-com chat
+<br clear="all">
 
-an ai chat with alien friends, each with its own quirks. a friend's picture shifts as the chat
-goes on.
+### 👽 x-com chat
+
+an ai chat with alien friends, each with its own quirks.
 
 [live](https://x-com-chat.vercel.app) | [source](apps/x-com-chat)
 
-<img src="assets/apps/x-com-chat.webp" width="100%" alt="x-com chat: a conversation with jacob, his portrait on the left">
+<details><summary>peek</summary><img src="assets/apps/x-com-chat.webp" width="100%" alt="x-com chat: a conversation with jacob, his portrait on the left"></details>
 
-## 🛰️ space explorer
+<br clear="all">
 
-a graphql pair: an apollo client books a seat on the next spacex launch, an apollo server with
-prisma answers it.
+### 🛰️ space explorer
 
-[live](https://space-explorer-ui.vercel.app) | [api](https://space-explorer-api.up.railway.app/) | [ui source](apps/space-explorer-ui) | [api source](apps/space-explorer-api)
+a graphql pair: book a seat on the next spacex launch.
 
-<img src="assets/apps/space-explorer-ui.webp" width="100%" alt="space explorer: the boarding card with an apollo rocket and an email login">
+[live](https://space-explorer-ui.vercel.app) | [source](apps/space-explorer-ui) | [api](https://space-explorer-api.up.railway.app/) | [api source](apps/space-explorer-api)
 
-## 🏄 financial
+<details><summary>peek</summary><img src="assets/apps/space-explorer-ui.webp" width="100%" alt="space explorer: the boarding card with an apollo rocket and an email login"></details>
 
-invoicing, kept straight: what was billed, what was paid, what is still owed, on one sheet.
+<br clear="all">
 
-[live](https://financical.vercel.app) | [source](apps/financial)
+### 🦦 cv
 
-<img src="assets/apps/financial.webp" width="100%" alt="financial: a sheet of march payments, all settled">
-
-## 🦦 cv
-
-the cover page: a short brief and the tools in use, grouped by what they do.
+the cover page: a short brief and the tools in use.
 
 [live](https://ripeluokte.vercel.app) | [source](apps/cv)
 
-<img src="assets/apps/cv.webp" width="100%" alt="cv: the brief card and the grid of tools">
+<details><summary>peek</summary><img src="assets/apps/cv.webp" width="100%" alt="cv: the brief card and the grid of tools"></details>
 
-## ☘️ figmentation
+<br clear="all">
 
-figma files rebuilt in plain css modules. clinique is the first one.
+### 🏄 financial
 
-[live](https://figmentation.vercel.app/clinique) | [source](apps/figmentation) | [figma file](https://www.figma.com/design/C83qYEFPJ8C66yIrTjEk29/Clinique?m=auto&t=p08olW2Pvhdsl68U-6)
+invoicing, kept straight: billed, paid, still owed.
 
-<img src="assets/apps/figmentation.webp" width="100%" alt="figmentation: the clinique product page for even better glow">
+[live](https://financical.vercel.app) | [source](apps/financial)
 
-## 🧰 shared
+<details><summary>peek</summary><img src="assets/apps/financial.webp" width="100%" alt="financial: a sheet of march payments, all settled"></details>
 
-- [`kit`](packages/kit) — the one design system, shadcn on base ui
-- [`biome-config-polished`](packages/biome-config-polished) — lint and format rules for every app
-- [`prettier-config-polished`](packages/prettier-config-polished) — the same, for prettier, [on npm](https://www.npmjs.com/package/prettier-config-polished)
-- [`typescript-config`](packages/typescript-config) and [`utils`](packages/utils) — the base tsconfigs and small helpers
-- [`proto-lab`](apps/proto-lab) — a local vite workbench for prototypes, never deployed
+<br clear="all">
+
+## 🧰 libraries
+
+- [`biome-config-polished`](packages/biome-config-polished) — the lint and format rules every app extends
+- [`prettier-config-polished`](packages/prettier-config-polished) — the prettier rules, [on npm](https://www.npmjs.com/package/prettier-config-polished)
 
 ## 🏎️ run it
 

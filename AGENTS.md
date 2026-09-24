@@ -267,11 +267,12 @@ its own memory file. Common patterns:
 
 ## the readme stays true
 
-`README.md` shows live facts: the badge row, one section per deployed app, each with its live url
-and a screenshot. **A change to what it shows lands with its README update in the same commit** —
+`README.md` shows live facts: the badge row, one row per app with its avatar, live url and a
+screenshot behind «peek». **A change to what it shows lands with its README update in the same commit** —
 a new or removed app, a moved url, a toolchain bump. `pnpm badges:sync` redraws `assets/badges/`
-from the repo (it runs the tests to count them). The hero is `python3 script/hero.py`, which
-borrows the jar and the lettering from `~/frame/brand/profile`, so it runs on dima's mac only. An
+from the repo (it runs the tests to count them). The hero and the app avatars are `python3
+script/readme-art.py`, which borrows the jar and the lettering from `~/frame/brand/profile`, so
+it runs on dima's mac only. An
 app shot is retaken with agent-browser at 1280×800 on the production url and saved as
 `assets/apps/<app>.webp`, under 300 kb.
 
