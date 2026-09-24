@@ -1,10 +1,18 @@
 /**
  * badges:sync — redraws the readme's badges into assets/badges/ from what the repo holds today.
  * the style is frame's (gruvbox, scanlines, softly rounded), so the two readmes read as one family.
+ * `--ci <result> <dir>` draws only ci.svg: the ci workflow calls it after every main run and pushes
+ * it to the orphan `badges` branch, which is how a badge in our own style still turns red live.
  */
 
 import { execFileSync } from 'node:child_process';
-import { globSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  globSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 
 const root = `${import.meta.dirname}/../`;
@@ -36,6 +44,22 @@ function badge(label: string, value: string, color: string): string {
 </g>
 </svg>
 `;
+}
+
+const ciAt = process.argv.indexOf('--ci');
+if (ciAt >= 0) {
+  const isPassing = process.argv[ciAt + 1] === 'success';
+  const dir = process.argv[ciAt + 2] ?? '.';
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    `${dir}/ci.svg`,
+    badge(
+      'ci',
+      isPassing ? 'passing' : 'failing',
+      isPassing ? '#b8bb26' : '#fb4934',
+    ),
+  );
+  process.exit(0);
 }
 
 const readJson = <T>(path: string): T =>
@@ -70,13 +94,16 @@ const pnpm = readJson<Manifest>('package.json').packageManager?.replace(
   '',
 );
 
+const renovate = existsSync(`${root}renovate.json`) ? 'enabled' : 'off';
+
 const badges = [
-  { color: '#d3869b', label: 'apps', value: apps.length },
-  { color: '#83a598', label: 'packages', value: packages.length },
   { color: '#b8bb26', label: 'tests', value: tests },
-  { color: '#fe8019', label: 'deps', value: deps.size },
+  { color: '#689d6a', label: 'renovate', value: renovate },
   { color: '#8ec07c', label: 'node', value: node },
   { color: '#fabd2f', label: 'pnpm', value: pnpm },
+  { color: '#d3869b', label: 'apps', value: apps.length },
+  { color: '#83a598', label: 'packages', value: packages.length },
+  { color: '#fe8019', label: 'deps', value: deps.size },
 ];
 
 mkdirSync(out, { recursive: true });

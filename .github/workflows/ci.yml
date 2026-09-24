@@ -460,3 +460,45 @@ jobs:
           set -euo pipefail
           echo "$BUILD"
           eval "$BUILD"
+
+  # The readme's ci badge in the repo's own style, redrawn after every main run. It lives on an
+  # orphan `badges` branch, one commit force-replaced each time, so a status never lands in main's
+  # history. A cancelled run is skipped: superseded is not failed.
+  #
+  # 📌 The `needs:` edge here is safe where `check`'s header forbids one: this job is not a
+  # required context and gates nothing, it only reports. A skipped leg (an app the push did not
+  # touch) is not a failure; only a `failure` among the three turns the badge red. It runs on a
+  # push to `main` only, so the write token never meets branch or pull-request code.
+  badge:
+    name: ci badge
+    needs: [check, financial, vercel-install]
+    if: >-
+      always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+
+      - name: Draw and publish
+        env:
+          RESULT: ${{ contains(needs.*.result, 'failure') && 'failure' || 'success' }}
+          TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          node script/badges-sync.ts --ci "$RESULT" /tmp/badge
+          cd /tmp/badge
+          git init -q -b badges
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ci.svg
+          git commit -q -m "ci badge: $RESULT"
+          git push -q -f "https://x-access-token:$TOKEN@github.com/$REPO.git" badges

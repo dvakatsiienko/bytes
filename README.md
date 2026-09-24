@@ -1,12 +1,14 @@
 🫙 **bytes**: a turborepo of the apps i build and run.
 
 <p align="center">
-  <img src="assets/badges/apps.svg" alt="apps">
-  <img src="assets/badges/packages.svg" alt="packages">
+  <a href="https://github.com/dvakatsiienko/bytes/actions/workflows/ci.yml"><img src="https://raw.githubusercontent.com/dvakatsiienko/bytes/badges/ci.svg" alt="ci"></a>
   <img src="assets/badges/tests.svg" alt="tests">
-  <img src="assets/badges/deps.svg" alt="deps">
+  <img src="assets/badges/renovate.svg" alt="renovate">
   <img src="assets/badges/node.svg" alt="node">
   <img src="assets/badges/pnpm.svg" alt="pnpm">
+  <img src="assets/badges/apps.svg" alt="apps">
+  <img src="assets/badges/packages.svg" alt="packages">
+  <img src="assets/badges/deps.svg" alt="deps">
 </p>
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><img src="assets/hero-light.svg" width="100%" alt="bytes — the apps: a glass jar with a brass lid, fireflies glowing inside"></picture>
