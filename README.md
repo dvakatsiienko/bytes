@@ -13,11 +13,9 @@
 
 ## 🛸 apps
 
-### 🎮 trophy-sys
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/trophy-sys-dark.svg"><img align="right" width="110" src="assets/avatars/trophy-sys-light.svg" alt="trophy-sys: its jar"></picture>
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/trophy-sys-dark.svg"><img align="right" width="120" src="assets/avatars/trophy-sys-light.svg" alt="trophy-sys avatar"></picture>
-
-a playstation trophy tracker that looks like a dos terminal.
+**trophy-sys** — a playstation trophy tracker that looks like a dos terminal.
 
 [live](https://trophy-sys.vercel.app) | [source](apps/trophy-sys)
 
@@ -25,9 +23,9 @@ a playstation trophy tracker that looks like a dos terminal.
 
 <br clear="all">
 
-### 👽 x-com chat
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/x-com-chat-dark.svg"><img align="right" width="110" src="assets/avatars/x-com-chat-light.svg" alt="x-com chat: its jar"></picture>
 
-an ai chat with alien friends, each with its own quirks.
+**x-com chat** — an ai chat with alien friends, each with its own quirks.
 
 [live](https://x-com-chat.vercel.app) | [source](apps/x-com-chat)
 
@@ -35,19 +33,19 @@ an ai chat with alien friends, each with its own quirks.
 
 <br clear="all">
 
-### 🛰️ space explorer
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/space-explorer-dark.svg"><img align="right" width="110" src="assets/avatars/space-explorer-light.svg" alt="space explorer: its jar"></picture>
 
-a graphql pair: book a seat on the next spacex launch.
+**space explorer** — a graphql pair: book a seat on the next spacex launch.
 
 [live](https://space-explorer-ui.vercel.app) | [source](apps/space-explorer-ui) | [api](https://space-explorer-api.up.railway.app/) | [api source](apps/space-explorer-api)
 
-<details><summary>peek</summary><img src="assets/apps/space-explorer-ui.webp" width="100%" alt="space explorer: the boarding card with an apollo rocket and an email login"></details>
+<details><summary>peek</summary><img src="assets/apps/space-explorer-ui.webp" width="100%" alt="space explorer: the boarding card with an apollo rocket and an email login, dark theme"></details>
 
 <br clear="all">
 
-### 🦦 cv
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/cv-dark.svg"><img align="right" width="110" src="assets/avatars/cv-light.svg" alt="cv: its jar"></picture>
 
-the cover page: a short brief and the tools in use.
+**cv** — the cover page: a short brief and the tools in use.
 
 [live](https://ripeluokte.vercel.app) | [source](apps/cv)
 
@@ -55,9 +53,9 @@ the cover page: a short brief and the tools in use.
 
 <br clear="all">
 
-### 🏄 financial
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/financial-dark.svg"><img align="right" width="110" src="assets/avatars/financial-light.svg" alt="financial: its jar"></picture>
 
-invoicing, kept straight: billed, paid, still owed.
+**financial** — invoicing, kept straight: billed, paid, still owed.
 
 [live](https://financical.vercel.app) | [source](apps/financial)
 
