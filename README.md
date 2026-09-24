@@ -11,26 +11,7 @@
   <img src="assets/badges/deps.svg" alt="deps">
 </p>
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><img src="assets/hero-light.svg" width="100%" alt="bytes — the apps: a glass jar with a brass lid, fireflies glowing inside"></picture>
-
-## 🧪 hero takes
-
-iteration only: three indoor takes, day over night. the one dima picks replaces the jar above.
-
-**take 1 — by the fire**
-
-<img src="assets/takes/take-1-day.svg" width="100%" alt="take 1, day: the cabin inside by the fire, sunlight through the window">
-<img src="assets/takes/take-1-night.svg" width="100%" alt="take 1, night: the fire and the firefly jar light the cabin">
-
-**take 2 — the workbench**
-
-<img src="assets/takes/take-2-day.svg" width="100%" alt="take 2, day: the rex at a desk with a paper mac, window light across the desk">
-<img src="assets/takes/take-2-night.svg" width="100%" alt="take 2, night: the mac screen and the firefly jar light the desk">
-
-**take 3 — the doorway**
-
-<img src="assets/takes/take-3-day.svg" width="100%" alt="take 3, day: the rex on the cabin porch holding the jar, the grove and the wizard tower behind">
-<img src="assets/takes/take-3-night.svg" width="100%" alt="take 3, night: firelight through the open door, the moon and fireflies over the grove">
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><img src="assets/hero-light.svg" width="100%" alt="bytes — the apps: inside a paper-cut log cabin, a paper t-rex reads in the armchair by day and sleeps on the rug by the fire at night"></picture>
 
 ## 🛸 apps
 
