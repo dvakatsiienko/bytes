@@ -59,7 +59,7 @@
 
 [live](https://financical.vercel.app) | [source](apps/financial)
 
-<details><summary>peek</summary><img src="assets/apps/financial.webp" width="100%" alt="financial: a sheet of march payments, all settled"></details>
+<details><summary>peek</summary><img src="assets/apps/financial.webp" width="100%" alt="financial: the dashboard with collected and pending totals, twelve months of revenue and the latest invoices"></details>
 
 <br clear="all">
 
