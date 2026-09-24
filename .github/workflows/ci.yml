@@ -469,6 +469,12 @@ jobs:
   # required context and gates nothing, it only reports. A skipped leg (an app the push did not
   # touch) is not a failure; only a `failure` among the three turns the badge red. It runs on a
   # push to `main` only, so the write token never meets branch or pull-request code.
+  #
+  # ⚠️ Vercel builds every branch push unless the app's own `vercel.json` says
+  # `git.deploymentEnabled: false`, and those files live under `apps/*`. An orphan tree holding
+  # only ci.svg made six ERROR previews per main run («Root Directory apps/<app> does not
+  # exist»), each counted against the daily cap. So the tree carries every app's `vercel.json`,
+  # copied from this checkout: derived, never a hand list.
   badge:
     name: ci badge
     needs: [check, financial, vercel-install]
@@ -495,10 +501,11 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           node script/badges-sync.ts --ci "$RESULT" /tmp/badge
+          cp --parents apps/*/vercel.json /tmp/badge/
           cd /tmp/badge
           git init -q -b badges
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ci.svg
+          git add -A
           git commit -q -m "ci badge: $RESULT"
           git push -q -f "https://x-access-token:$TOKEN@github.com/$REPO.git" badges
