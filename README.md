@@ -27,6 +27,11 @@ iteration only: three indoor takes, day over night. the one dima picks replaces 
 <img src="assets/takes/take-2-day.svg" width="100%" alt="take 2, day: the rex at a desk with a paper mac, window light across the desk">
 <img src="assets/takes/take-2-night.svg" width="100%" alt="take 2, night: the mac screen and the firefly jar light the desk">
 
+**take 3 — the doorway**
+
+<img src="assets/takes/take-3-day.svg" width="100%" alt="take 3, day: the rex on the cabin porch holding the jar, the grove and the wizard tower behind">
+<img src="assets/takes/take-3-night.svg" width="100%" alt="take 3, night: firelight through the open door, the moon and fireflies over the grove">
+
 ## 🛸 apps
 
 ### 🎮 trophy-sys

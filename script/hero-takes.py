@@ -234,7 +234,85 @@ def take_bench(night, i):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="{aria}"><clipPath id="c{i}"><rect width="{W}" height="{H}" rx="16"/></clipPath><g clip-path="url(#c{i})">{body}</g></svg>\n'
 
 
-TAKES = {1: take_fire, 2: take_bench}
+
+def grove_palette(night):
+    if night:
+        return dict(grove.NIGHT, rexHi='#8e4a43', meadow='#34506a', meadow2='#3d5a78', haze='#35446c', haze2='#2e3c60', edge='#2c4560', edge2='#253b54')
+    return dict(grove.DAY, rexHi='#d77552', meadow='#a9c07e', meadow2='#bdd096', haze='#c9c69c', haze2='#b8b68c', edge='#94ae7c', edge2='#809a6a') | grove.BLUE_DAY
+
+
+def cabin_front(P, W, night, f, i, x0=20, x1=372, top=96, base=248, dx0=140, dx1=230):
+    w = x1 - x0
+    logs = ''.join(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="{W["log"]}" stroke-width="2"/>' for y in range(top + 19, base, 19))
+    ends = ''.join(f'<circle cx="{sx}" cy="{y + 9.5}" r="5" fill="{W["end"]}" stroke="{W["log"]}" stroke-width="1.5"/>' for y in range(top, base - 10, 19) for sx in (x0 - 2, x1 + 2))
+    cx, apex, eave = (x0 + x1) / 2, top - 84, top + 4
+    L, R = x0 - 26, x1 + 26
+    shingles = ''.join(f'<path d="M{L + (cx - L) * t:.1f} {eave - (eave - apex) * t:.1f}H{R - (R - cx) * t:.1f}" stroke="{W["roof2"]}" stroke-width="2"/>' for t in (.2, .4, .6, .8))
+    roof = (f'<path fill="{W["roof"]}" d="M{L} {eave}L{cx} {apex}L{R} {eave}Z"/>{shingles}'
+            f'<path d="M{L - 3} {eave + 2}L{cx} {apex - 3}L{R + 3} {eave + 2}" stroke="{W["trim"]}" stroke-width="4" fill="none" stroke-linejoin="round"/>')
+    chim = f'<rect x="{x1 - 70}" y="{apex + 6}" width="24" height="60" fill="{P["rock"]}"/><rect x="{x1 - 74}" y="{apex + 2}" width="32" height="7" fill="{P["gr2"]}"/>'
+    smoke = f'<path d="M{x1 - 58} {apex - 4}c-10-12 8-20 0-32s8-16 2-28" stroke="{"#fffaf0" if not night else "#9aa1b4"}" stroke-width="6" fill="none" stroke-linecap="round" opacity="{.55 if not night else .25}"/>'
+    inside = (f'<radialGradient id="in{i}" cx=".3" cy=".75" r=".9"><stop offset="0" stop-color="{"#ffcf6a" if night else "#b98a5a"}"/><stop offset=".5" stop-color="{"#e2873a" if night else "#7c5236"}"/><stop offset="1" stop-color="{"#5a2a18" if night else "#4a3226"}"/></radialGradient>')
+    door = (f'<rect x="{dx0 - 7}" y="{top + 30}" width="{dx1 - dx0 + 14}" height="{base - top - 30}" fill="{W["trim"]}"/>'
+            f'<rect x="{dx0}" y="{top + 36}" width="{dx1 - dx0}" height="{base - top - 36}" fill="url(#in{i})"/>'
+            f'<path fill="{W["door"]}" d="M{dx1} {top + 36}L{dx1 + 34} {top + 44}V{base + 6}L{dx1} {base}Z"/>'
+            + ''.join(f'<path d="M{dx1 + 11 * k} {top + 38 + 2.4 * k}V{base + 2 * k}" stroke="{W["log"]}" stroke-width="1.2"/>' for k in (1, 2))
+            + f'<circle cx="{dx1 + 26}" cy="{(top + base) / 2 + 8}" r="2" fill="{W["end"]}"/>')
+    wx, wy = x1 - 96, top + 44
+    win = (f'<rect x="{wx - 4}" y="{wy - 4}" width="64" height="48" fill="{W["trim"]}"/><rect x="{wx}" y="{wy}" width="56" height="40" fill="{W["win"]}"/>'
+           f'<path d="M{wx + 28} {wy}v40M{wx} {wy + 20}h56" stroke="{W["trim"]}" stroke-width="3"/>'
+           f'<rect x="{wx - 12}" y="{wy - 4}" width="8" height="48" fill="{W["shutter"]}"/><rect x="{wx + 60}" y="{wy - 4}" width="8" height="48" fill="{W["shutter"]}"/>'
+           f'<rect x="{wx - 6}" y="{wy + 42}" width="68" height="7" fill="{W["log"]}"/>'
+           + ''.join(f'<circle cx="{wx + dx}" cy="{wy + 41}" r="3.2" fill="{W["flower"] if k % 2 == 0 else "#f2c14e"}"/>' for k, dx in enumerate((4, 16, 28, 40, 52))))
+    lantern = (f'<path d="M{dx0 - 18} {top + 44}h8" stroke="{W["metal"]}" stroke-width="2"/><rect x="{dx0 - 24}" y="{top + 46}" width="10" height="14" rx="2" fill="{"#ffd27a" if night else W["metal"]}"/>'
+               + (f'<circle cx="{dx0 - 19}" cy="{top + 53}" r="18" fill="#ffd27a" opacity=".2"/>' if night else ''))
+    porch = f'<rect x="{dx0 - 26}" y="{base}" width="{dx1 - dx0 + 64}" height="8" rx="2" fill="{P["rock"]}"/><rect x="{dx0 - 16}" y="{base + 8}" width="{dx1 - dx0 + 44}" height="7" rx="2" fill="{P["hl"]}"/>'
+    glow = (f'<ellipse cx="{(dx0 + dx1) / 2}" cy="{base - 30}" rx="150" ry="100" fill="url(#glow{i})"/><ellipse cx="{wx + 28}" cy="{wy + 20}" rx="70" ry="50" fill="url(#glow{i})"/>') if night else ''
+    return (inside, f'{smoke}<g filter="url(#{f})">{chim}<rect x="{x0}" y="{top}" width="{w}" height="{base - top}" fill="{W["wall"]}"/>{logs}{ends}{door}{win}{roof}</g>'
+            f'<g filter="url(#{f})">{porch}</g>{lantern}', glow)
+
+
+def signpost(R, f, x=640, top=150, base=262):
+    w, h = 150, 58
+    return (f'<g filter="url(#{f})"><rect x="{x - 5}" y="{top + 20}" width="10" height="{base - top - 20}" fill="{R["log"]}"/>'
+            f'<g transform="rotate(-2 {x} {top + h / 2})"><rect x="{x - w / 2}" y="{top}" width="{w}" height="{h}" rx="5" fill="{R["sign"]}"/>'
+            + ''.join(f'<path d="M{x - w / 2 + 8} {top + k}h{w - 16}" stroke="{R["log"]}" stroke-opacity=".25"/>' for k in (14, 30, 46))
+            + f'{outline("bytes", x, top + 34, 34, "Bold", "middle", R["ink"])}{outline("the apps", x, top + 50, 12, "Regular", "middle", R["ink"])}</g></g>'
+            + ''.join(f'<circle cx="{x + dx}" cy="{top + 8}" r="2" fill="{R["log"]}"/>' for dx in (-64, 64)))
+
+
+def take_door(night, i):
+    k = 'night' if night else 'day'
+    R, P, f = ROOM[k], grove_palette(night), f'ps{i}'
+    Wd = grove.WOOD2[k]
+    p = f'{i}t-'
+    inside, cabin, glow = cabin_front(P, Wd, night, f, i)
+    if night:
+        sky = (''.join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="#f4efdc"/>' for x, y, r in grove.STARS if x > 420)
+               + grove.hanging_stars(P, f, [(470, 60, 7), (560, 36, 6), (760, 40, 7)]) + grove.orb(P, night, f, 690, 70))
+    else:
+        sky = grove.clouds(P, f, [(470, 52), (560, 28)]) + grove.sunburst(690, 70, P, f)
+    rex = f'{grove.shadow(202, 262, 70, night)}<g transform="translate(128 157) scale(.7)">{grove.rex(P, i, 116, 0, detail=True)}</g>'
+    jar = f'<g transform="translate(126 180) scale(.36)">{tour.jar(p, "dark" if night else "light")}</g>'
+    path = ''.join(grove.stone(x, y, rx, ry, P, f) for x, y, rx, ry in [(300, 268, 12, 4), (340, 276, 14, 4.6), (392, 284, 17, 5.4), (456, 294, 20, 6.2)])
+    ferns = ''.join(grove.fern(x, y, h, P['fern' if n % 2 else 'fern2'], f) for n, (x, y, h) in enumerate([(30, 282, 40), (520, 270, 30), (560, 296, 42), (760, 282, 44)]))
+    tufts = ''.join(grove.tuft(x, y, s, P['grass']) for x, y, s in [(110, 280, 1.1), (470, 268, 1), (600, 288, 1), (700, 296, 1.2), (250, 292, 1), (420, 262, .9)])
+    trees = grove.pine(772, 262, 200, P['pine2'], P['pineS'], f, 6) + grove.pine(812, 256, 150, P['pine'], P['pineS'], f, 5) + grove.pine(-4, 262, 150, P['pine2'], P['pineS'], f, 5)
+    flies = grove.fireflies(i, [(470, 220), (540, 190), (600, 236), (730, 210), (100, 250), (380, 236), (520, 250)]) if night else ''
+    body = (f'{grove.defs(i, night, P, grove.comet_defs(i) + inside)}{tour.defs(p, "dark" if night else "light")}'
+            f'<rect width="{W}" height="{H}" fill="url(#sk{i})"/>{sky}{grove.meadow(P, f, night, i)}'
+            f'<path fill="{P["gr"]}" filter="url(#{f})" d="M0 244C150 236 300 240 450 238S680 240 800 236V300H0Z"/>'
+            f'{cabin}{glow}{rex}{jar}{signpost(R, f)}'
+            f'<path fill="{P["gr2"]}" filter="url(#{f})" d="M0 280C140 274 260 282 400 278S640 274 800 280V300H0Z"/>'
+            f'{path}{grove.porcini(520, 284, 1, night, f)}{grove.chanterelle(534, 288, .7, night, f)}{ferns}{tufts}{trees}{grove.bush(84, 296, 1.2, P, f)}{flies}'
+            f'<rect width="{W}" height="{H}" filter="url(#gr{i})"/>')
+    aria = ('bytes — the apps, the doorway: the log cabin with its door open, firelight inside, the paper t-rex on the porch holding the firefly jar, '
+            'a wooden bytes signpost in the grass, the grove and the wizard tower behind, '
+            + ('night: the moon, hanging stars and fireflies' if night else 'day: a paper sunburst and clouds'))
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="{aria}"><clipPath id="c{i}"><rect width="{W}" height="{H}" rx="16"/></clipPath><g clip-path="url(#c{i})">{body}</g></svg>\n'
+
+
+TAKES = {1: take_fire, 2: take_bench, 3: take_door}
 
 if __name__ == '__main__':
     OUT.mkdir(parents=True, exist_ok=True)
