@@ -159,7 +159,82 @@ def take_fire(night, i):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="{aria}"><clipPath id="c{i}"><rect width="{W}" height="{H}" rx="16"/></clipPath><g clip-path="url(#c{i})">{body}</g></svg>\n'
 
 
-TAKES = {1: take_fire}
+SHELF_JARS = [('#d4a543', '#6e4f18'), ('#8ec07c', '#4f6b3e'), ('#83a598', '#34457a'), ('#efe2c4', '#8a6a3a'), ('#fe8019', '#9c4430')]
+
+
+def shelf_jar(x, base, fill, tag, night):
+    glass = '#cfe6ee' if not night else '#8fa6b8'
+    return (f'<rect x="{x - 11}" y="{base - 28}" width="22" height="28" rx="4" fill="{glass}" fill-opacity=".35" stroke="#7fb4d6" stroke-opacity=".7"/>'
+            f'<rect x="{x - 9}" y="{base - 17}" width="18" height="15" rx="3" fill="{fill}" opacity=".85"/>'
+            f'<rect x="{x - 12}" y="{base - 33}" width="24" height="6" rx="1.5" fill="#c9973a"/><path d="M{x - 7} {base - 26}v9" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>'
+            f'<rect x="{x - 6}" y="{base - 12}" width="12" height="7" rx="1" fill="#efe2c4"/><path d="M{x - 3.5} {base - 8.5}h7" stroke="{tag}" stroke-width="1.2"/>')
+
+
+def shelves(R, night, f, x0=160, x1=380):
+    boards = ''.join(f'<rect x="{x0}" y="{y}" width="{x1 - x0}" height="7" rx="1.5" fill="{R["log"]}"/><path fill="{R["log"]}" d="M{x0 + 14} {y + 7}h8l-4 10zM{x1 - 22} {y + 7}h8l-4 10z"/>' for y in (76, 136))
+    jars = ''.join(shelf_jar(x0 + 32 + k * 40, 76, fill, tag, night) for k, (fill, tag) in enumerate(SHELF_JARS))
+    books = ''.join(f'<rect x="{x0 + 20 + k * 11}" y="{136 - h}" width="10" height="{h}" rx="1" fill="{c}"/>' for k, (h, c) in enumerate(((30, '#9c4430'), (26, '#5d7a4c'), (32, '#34457a'), (24, '#b57614'))))
+    plant = (f'<path fill="#b5623a" d="M{x1 - 50} {136 - 14}h20l-3 14h-14z"/>'
+             + ''.join(f'<path d="M{x1 - 40} {122}q{dx} -14 {dx * 1.6:.0f} -22" stroke="{R["curtain"]}" stroke-width="3" fill="none" stroke-linecap="round"/>' for dx in (-8, -2, 5, 10)))
+    return f'<g filter="url(#{f})">{boards}{books}{plant}</g>{jars}' + grove.chanterelle(x0 + 100, 136, 1.1, night, f) + grove.porcini(x0 + 130, 136, .9, night, f)
+
+
+def stove(R, night, f, x=86, base=244):
+    iron, iron2 = ('#3c3836', '#504945') if not night else ('#23201e', '#34302c')
+    steam = f'<path d="M{x + 16} {base - 104}c-6-8 6-12 0-20s6-10 1-17" stroke="{"#fffaf0" if not night else "#cfd6f0"}" stroke-width="3" fill="none" stroke-linecap="round" opacity="{.6 if not night else .3}"/>'
+    return (f'<rect x="{x - 7}" y="16" width="14" height="{base - 78}" fill="{iron2}"/><rect x="{x - 9}" y="{base - 90}" width="18" height="6" fill="{iron}"/>'
+            f'<g filter="url(#{f})"><rect x="{x - 36}" y="{base - 62}" width="72" height="50" rx="4" fill="{iron}"/><rect x="{x - 40}" y="{base - 66}" width="80" height="7" rx="2" fill="{iron2}"/>'
+            f'<rect x="{x - 18}" y="{base - 50}" width="36" height="24" rx="3" fill="{iron2}"/>'
+            + ''.join(f'<path d="M{x - 12 + k * 6} {base - 46}v16" stroke="{iron}" stroke-width="2"/>' for k in range(5))
+            + f'<path d="M{x - 30} {base - 12}v12M{x + 30} {base - 12}v12" stroke="{iron}" stroke-width="5" stroke-linecap="round"/></g>'
+            f'{steam}<g filter="url(#{f})"><ellipse cx="{x}" cy="{base - 78}" rx="20" ry="13" fill="#b87333"/><path fill="#b87333" d="M{x + 14} {base - 82}q12-4 16-16l3 2q-4 16-17 20z"/>'
+            f'<path d="M{x - 12} {base - 90}q12-16 24 0" stroke="{iron}" stroke-width="3" fill="none"/><ellipse cx="{x}" cy="{base - 90}" rx="8" ry="2.4" fill="#8a5424"/></g>'
+            f'<path d="M{x - 13} {base - 84}q3-5 8-6" stroke="#fff" stroke-opacity=".45" stroke-width="2" fill="none" stroke-linecap="round"/>')
+
+
+def mac(R, night, f, i, x=410, base=206):
+    body, shade = ('#e8dcc0', '#cdbf9f') if not night else ('#9a917e', '#7d7565')
+    screen = '#243024' if not night else '#141a14'
+    rows = ''.join(f'<rect x="{x - 15}" y="{base - 62 + k * 6}" width="{w}" height="2.4" fill="{c}"/>' for k, (w, c) in enumerate(((14, '#d3869b'), (20, '#8ec07c'), (12, '#83a598'), (17, '#fabd2f'))))
+    glow = f'<ellipse cx="{x}" cy="{base - 50}" rx="90" ry="70" fill="url(#scr{i})"/>' if night else ''
+    return (f'{glow}<g filter="url(#{f})"><path fill="{shade}" d="M{x - 26} {base}l4-8h44l4 8z"/><rect x="{x - 30}" y="{base - 80}" width="60" height="72" rx="6" fill="{body}"/>'
+            f'<rect x="{x - 23}" y="{base - 73}" width="46" height="36" rx="4" fill="{shade}"/></g><rect x="{x - 20}" y="{base - 70}" width="40" height="30" rx="3" fill="{screen}"/>{rows}'
+            f'<rect x="{x + 4}" y="{base - 44}" width="4" height="2.4" fill="#fabd2f"/><path d="M{x + 2} {base - 24}h18" stroke="{shade}" stroke-width="2.4" stroke-linecap="round"/>'
+            f'<g filter="url(#{f})"><path fill="{body}" d="M{x - 34} {base + 4}h62l4 6h-70z"/></g>'
+            + ''.join(f'<path d="M{x - 30 + k * 7} {base + 7}h4" stroke="{shade}" stroke-width="1.6"/>' for k in range(9)))
+
+
+def desk(R, f, x0=250, x1=560, top=206):
+    return (f'<g filter="url(#{f})"><rect x="{x0}" y="{top}" width="{x1 - x0}" height="9" rx="2" fill="{R["log"]}"/>'
+            f'<rect x="{x0 + 6}" y="{top + 9}" width="{x1 - x0 - 12}" height="{244 - top - 13}" fill="{R["log"]}"/>'
+            + ''.join(f'<path d="M{x0 + 18 + k * 94} {top + 22}h70" stroke="{R["trim"]}" stroke-opacity=".45" stroke-width="2"/><circle cx="{x0 + 53 + k * 94}" cy="{top + 30}" r="2" fill="{R["trim"]}" fill-opacity=".6"/>' for k in range(3))
+            + f'<path d="M{x0 + 6} {top + 9}V240M{x1 - 6} {top + 9}V240" stroke="{R["beam"]}" stroke-width="3"/></g>'
+            f'<path d="M{x0 + 2} {top + 1.5}H{x1 - 2}" stroke="{R["trim"]}" stroke-opacity=".3"/>')
+
+
+def take_bench(night, i):
+    k = 'night' if night else 'day'
+    R, P, f = ROOM[k], palette(night), f'ps{i}'
+    p = f'{i}t-'
+    scr = f'<radialGradient id="scr{i}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#b8e0a8" stop-opacity=".45"/><stop offset="1" stop-color="#b8e0a8" stop-opacity="0"/></radialGradient>'
+    win_defs, win = window(R, P, night, f, i, x=620)
+    lamp_jar = f'<g transform="translate(262 128) scale(.5)">{tour.jar(p, "dark" if night else "light")}</g>'
+    jar_glow = f'<ellipse cx="322" cy="176" rx="130" ry="90" fill="url(#glow{i})"/>' if night else ''
+    light = (f'<path fill="#fff3d0" opacity=".28" d="M616 194H764L600 300H400Z"/><path fill="#fff3d0" opacity=".22" d="M420 206H600L588 215H410Z"/>' if not night
+             else f'<path fill="#9fb4e8" opacity=".08" d="M616 194H764L600 300H400Z"/>')
+    mug = f'<g filter="url(#{f})"><rect x="468" y="192" width="13" height="14" rx="2" fill="{R["pot"]}"/><path d="M481 195q6 3 0 8" stroke="{R["pot"]}" stroke-width="2" fill="none"/></g>'
+    rex = f'<g transform="translate(462 150) scale(.62)">{grove.rex(P, i, 116, 0, detail=True)}</g>'
+    body = (f'{grove.defs(i, night, P, grove.comet_defs(i) + win_defs + scr)}{tour.defs(p, "dark" if night else "light")}'
+            f'{room(R, f)}{win}{light}{jar_glow}{stove(R, night, f)}{shelves(R, night, f)}{sign(R, f, cx=535, y=34)}'
+            f'{rex}{desk(R, f)}{mac(R, night, f, i)}{mug}{lamp_jar}'
+            f'<rect width="{W}" height="{H}" filter="url(#gr{i})"/>')
+    aria = ('bytes — the apps, the workbench: the paper t-rex at a wooden desk with a paper mac, the firefly jar as the desk lamp, '
+            'shelves of small jars and books behind, a kettle on an iron stove, the bytes sign on the wall, '
+            + ('night: the screen and the jar are the only lights' if night else 'day: window light across the desk'))
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="{aria}"><clipPath id="c{i}"><rect width="{W}" height="{H}" rx="16"/></clipPath><g clip-path="url(#c{i})">{body}</g></svg>\n'
+
+
+TAKES = {1: take_fire, 2: take_bench}
 
 if __name__ == '__main__':
     OUT.mkdir(parents=True, exist_ok=True)
