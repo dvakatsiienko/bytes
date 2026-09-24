@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="24" viewBox="0 0 80 24" role="img" aria-label="node: 24">
+<defs>
+<clipPath id="r"><rect width="80" height="24" rx="4"/></clipPath>
+<pattern id="scan" width="3" height="3" patternUnits="userSpaceOnUse"><rect width="3" height="1" fill="#000" opacity=".06"/></pattern>
+</defs>
+<g clip-path="url(#r)">
+<rect width="48" height="24" fill="#1d2021"/>
+<rect x="48" width="32" height="24" fill="#8ec07c"/>
+<rect width="80" height="24" fill="url(#scan)"/>
+</g>
+<g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="13" text-anchor="middle">
+<text x="24" y="16.5" fill="#ebdbb2">node</text>
+<text x="64" y="16.5" fill="#1d2021" font-weight="700">24</text>
+</g>
+</svg>

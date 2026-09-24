@@ -1,57 +1,91 @@
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/dvakatsiienko/bytes?utm_source=oss&utm_medium=github&utm_campaign=dvakatsiienko%2Fturborepo&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+🫙 **bytes**: the apps.
 
-# Bytes
+<p align="center">
+  <img src="assets/badges/apps.svg" alt="apps">
+  <img src="assets/badges/packages.svg" alt="packages">
+  <img src="assets/badges/tests.svg" alt="tests">
+  <img src="assets/badges/deps.svg" alt="deps">
+  <img src="assets/badges/node.svg" alt="node">
+  <img src="assets/badges/pnpm.svg" alt="pnpm">
+</p>
 
-🏎️ The monorepo is wired up with [turborepo](https://turbo.build/).
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><img src="assets/hero-light.svg" width="100%" alt="bytes — the apps: a glass jar with a brass lid, fireflies glowing inside"></picture>
 
-## 🛸 Apps
+### 🧭 toc
 
-Apps R&D-ed or vibe coded.
+- [trophy-sys](#-trophy-sys) — psn trophies in a dos terminal
+- [x-com chat](#-x-com-chat) — chat with alien friends
+- [space explorer](#%EF%B8%8F-space-explorer) — a graphql client and its server
+- [financial](#-financial) — invoices on one sheet
+- [cv](#-cv) — the cover page
+- [figmentation](#%EF%B8%8F-figmentation) — figma files, rebuilt in css
+- [shared](#-shared) — the kit, the configs, the workbench
 
-#### 👽 X-COM Chat
+## 🎮 trophy-sys
 
-[Website](https://x-com-chat.vercel.app) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/x-com-chat)
+a playstation trophy tracker that looks like a dos terminal: the whole psn library, every
+trophy per game and dlc, and what is new since the last look.
 
-#### 🛰️ Space Explorer UI
+[live](https://trophy-sys.vercel.app) | [source](apps/trophy-sys)
 
-[Website](https://space-explorer-ui.vercel.app) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/space-explorer-ui)
+<img src="assets/apps/trophy-sys.webp" width="100%" alt="trophy-sys: the library of synced games next to one game's trophy list">
 
-#### 📡 Space Explorer API
+## 👽 x-com chat
 
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/space-explorer-api)
+an ai chat with alien friends, each with its own quirks. a friend's picture shifts as the chat
+goes on.
 
-#### 🦦 Cover
+[live](https://x-com-chat.vercel.app) | [source](apps/x-com-chat)
 
-[Website](https://ripeluokte.vercel.app) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/cv)
+<img src="assets/apps/x-com-chat.webp" width="100%" alt="x-com chat: a conversation with jacob, his portrait on the left">
 
-#### 🏄‍♂️ Financial 🚧 WIP 🚧
+## 🛰️ space explorer
 
-[Website](https://financical.vercel.app/) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/financial)
+a graphql pair: an apollo client books a seat on the next spacex launch, an apollo server with
+prisma answers it.
 
-#### 🎮 Trophy Sys
+[live](https://space-explorer-ui.vercel.app) | [api](https://space-explorer-api.up.railway.app/) | [ui source](apps/space-explorer-ui) | [api source](apps/space-explorer-api)
 
-You may discover the games I play on PS5. Steam too, but less.
+<img src="assets/apps/space-explorer-ui.webp" width="100%" alt="space explorer: the boarding card with an apollo rocket and an email login">
 
-[Website](https://trophy-sys.vercel.app) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/trophy-sys)
+## 🏄 financial
 
-## 🎨 Engineering and Design
+invoicing, kept straight: what was billed, what was paid, what is still owed, on one sheet.
 
-Apps made during my Figma UI prototyping exploration.
+[live](https://financical.vercel.app) | [source](apps/financial)
 
-#### ☘️ Clinique
+<img src="assets/apps/financial.webp" width="100%" alt="financial: a sheet of march payments, all settled">
 
-[Website](https://figmentation.vercel.app/clinique) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/apps/figmentation) |
-[Figma file](https://www.figma.com/design/C83qYEFPJ8C66yIrTjEk29/Clinique?m=auto&t=p08olW2Pvhdsl68U-6)
+## 🦦 cv
 
-## 🧰 Libraries
+the cover page: a short brief and the tools in use, grouped by what they do.
 
-#### 💄 prettier-config-polished
+[live](https://ripeluokte.vercel.app) | [source](apps/cv)
 
-[npm](https://www.npmjs.com/package/prettier-config-polished) |
-[Source](https://github.com/dvakatsiienko/bytes/tree/main/packages/prettier-config-polished)
+<img src="assets/apps/cv.webp" width="100%" alt="cv: the brief card and the grid of tools">
+
+## ☘️ figmentation
+
+figma files rebuilt in plain css modules. clinique is the first one.
+
+[live](https://figmentation.vercel.app/clinique) | [source](apps/figmentation) | [figma file](https://www.figma.com/design/C83qYEFPJ8C66yIrTjEk29/Clinique?m=auto&t=p08olW2Pvhdsl68U-6)
+
+<img src="assets/apps/figmentation.webp" width="100%" alt="figmentation: the clinique product page for even better glow">
+
+## 🧰 shared
+
+- [`kit`](packages/kit) — the one design system, shadcn on base ui
+- [`biome-config-polished`](packages/biome-config-polished) — lint and format rules for every app
+- [`prettier-config-polished`](packages/prettier-config-polished) — the same, for prettier, [on npm](https://www.npmjs.com/package/prettier-config-polished)
+- [`typescript-config`](packages/typescript-config) and [`utils`](packages/utils) — the base tsconfigs and small helpers
+- [`proto-lab`](apps/proto-lab) — a local vite workbench for prototypes, never deployed
+
+## 🏎️ run it
+
+a pnpm workspace, run by [turborepo](https://turborepo.com).
+
+```bash
+pnpm i
+pnpm dev:trophy-sys   # or any dev:<app>
+pnpm badges:sync      # redraw the badges above
+```
