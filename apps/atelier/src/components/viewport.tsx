@@ -149,7 +149,18 @@ export const Viewport = (props: ViewportProps) => {
             </div>
           ) : null}
           <div className='rounded-[10px] bg-surface p-4 shadow-lamp'>
-            <ReadmeFrame width={props.actions.readme}>{contentJSX}</ReadmeFrame>
+            <ReadmeFrame width={props.actions.readme}>
+              {props.actions.isStage || pair ? (
+                contentJSX
+              ) : (
+                <div
+                  className='mx-auto'
+                  data-testid='flat-piece'
+                  style={{ width: flatWidth(props.piece) }}>
+                  {contentJSX}
+                </div>
+              )}
+            </ReadmeFrame>
           </div>
           {shownTake && list ? (
             <TakeRecord list={list} take={shownTake} />
@@ -169,6 +180,19 @@ const Missing = (props: { what: string; isLoading: boolean }) => {
     </p>
   );
 };
+
+/* Helpers */
+
+/** the header, the toolbar, the viewport's padding and the mat's: what stands between the window and a piece */
+const CHROME_HEIGHT = '13rem';
+
+/**
+ * A flat piece is drawn for its own size: a 512 px favicon stretched over the
+ * bench reads as a different picture. It shows at that size, narrower when the
+ * frame or the window height would clip it; the zoom gives the detail.
+ */
+const flatWidth = (piece: Piece) =>
+  `min(100%, ${piece.size.w}px, calc((100dvh - ${CHROME_HEIGHT}) * ${piece.size.w / piece.size.h}))`;
 
 /* Types */
 
