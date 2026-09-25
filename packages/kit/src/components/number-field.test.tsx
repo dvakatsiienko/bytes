@@ -116,3 +116,14 @@ test('escape undoes the edit made since focus', async () => {
 
   await expect.element(field).toHaveValue('0.60');
 });
+
+test('an edit that ends in garbage restores the value from before the edit', async () => {
+  const { screen } = await renderField();
+  const field = screen.getByRole('spinbutton', { name: 'ambient' });
+
+  await field.fill('');
+  await userEvent.type(field, '0.8xf');
+  await userEvent.tab();
+
+  await expect.element(field).toHaveValue('0.60');
+});

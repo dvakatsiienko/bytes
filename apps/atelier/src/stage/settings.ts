@@ -250,6 +250,17 @@ const HEX = /^#[0-9a-f]{6}$/i;
 export const isHex = (value: string): value is Hex => HEX.test(value);
 
 /** a saved set, read back from a take or storage: known keys of the right type win, the rest falls back */
+/** each number's allowed range, read from its control: a saved set can hold no value the panel could not */
+const ranges = new Map<string, { min: number; max: number }>(
+  controls.flatMap((group) =>
+    group.rows.flatMap((row) =>
+      row.kind === 'number'
+        ? [[row.key, { max: row.max, min: row.min }] as const]
+        : [],
+    ),
+  ),
+);
+
 export const toSettings = (value: unknown): Settings => {
   const input =
     typeof value === 'object' && value !== null
@@ -263,9 +274,16 @@ export const toSettings = (value: unknown): Settings => {
     } else if (key === 'sunTint') {
       if (typeof candidate === 'string' && HEX.test(candidate))
         out[key] = candidate.toLowerCase();
+    } else if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+      const range = ranges.get(key);
+      out[key] = range
+        ? Math.min(range.max, Math.max(range.min, candidate))
+        : candidate;
+      // the seed picks a random stream: only whole numbers name one
+      if (key === 'seed') out[key] = Math.round(out[key] as number);
     } else if (
-      typeof candidate === typeof fallback &&
-      (typeof candidate !== 'number' || Number.isFinite(candidate))
+      typeof candidate === 'boolean' &&
+      typeof fallback === 'boolean'
     ) {
       out[key] = candidate;
     }

@@ -10,10 +10,8 @@ const api = async <T>(
 ): Promise<T> => {
   const response = await fetch(path, {
     body: init?.body === undefined ? undefined : JSON.stringify(init.body),
-    headers:
-      init?.body === undefined
-        ? undefined
-        : { 'content-type': 'application/json' },
+    // every write says json: the server refuses anything else
+    headers: init ? { 'content-type': 'application/json' } : undefined,
     method: init?.method ?? 'GET',
   });
   const body: unknown = await response.json();

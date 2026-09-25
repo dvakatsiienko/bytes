@@ -102,21 +102,58 @@ export const takeFile = (piece: string, id: string, file: TakeFile) =>
 
 export const listTakes = async (piece: string): Promise<TakeList> => {
   const ids = await takeIds(piece);
-  const takes = await Promise.all(ids.map((id) => readTake(piece, id)));
+  const results = await Promise.allSettled(
+    ids.map((id) => readTake(piece, id)),
+  );
+  const takes = results.flatMap((result, index) => {
+    if (result.status === 'fulfilled') return [result.value];
+    // one unreadable take (a merge conflict in its json) must not hide the others
+    console.warn(
+      `atelier: skipped take ${piece}/${ids[index]}: ${String(result.reason)}`,
+    );
+    return [];
+  });
   return { current: await readCurrent(piece), takes: takes.reverse() };
 };
 
 /** writes `takes/<piece>/<nn>-<time>[-note]/`; the first take of a time becomes current */
-export const saveTake = async (input: NewTake): Promise<Take> => {
-  const ids = await takeIds(input.piece);
-  const last = ids.at(-1);
-  const index = last ? Number.parseInt(last, 10) + 1 : 1;
+let saving: Promise<unknown> = Promise.resolve();
+
+/** saves run one after another, so two bakes landing together never read the same next number */
+export const saveTake = (input: NewTake): Promise<Take> => {
+  const run = saving.then(() => writeTake(input));
+  saving = run.catch(() => undefined);
+  return run;
+};
+
+/**
+ * Claims the next free number with a plain mkdir, which fails when the folder
+ * exists: a take is never written over, even by a second process baking at
+ * the same moment.
+ */
+const claimFolder = async (piece: string, time: Time, note: string) => {
+  await mkdir(join(takesRoot(), piece), { recursive: true });
+  const last = (await takeIds(piece)).at(-1);
+  const first = last ? Number.parseInt(last, 10) + 1 : 1;
+  for (let index = first; index < first + 50; index += 1) {
+    const id = [String(index).padStart(2, '0'), time, slugOf(note)]
+      .filter(Boolean)
+      .join('-');
+    try {
+      // biome-ignore lint/performance/noAwaitInLoops: each attempt depends on the one before failing
+      await mkdir(join(takesRoot(), piece, id));
+      return id;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+    }
+  }
+  throw new Error(`no free take number for ${piece} after ${first + 49}`);
+};
+
+const writeTake = async (input: NewTake): Promise<Take> => {
   const note = input.note.trim();
-  const id = [String(index).padStart(2, '0'), input.time, slugOf(note)]
-    .filter(Boolean)
-    .join('-');
+  const id = await claimFolder(input.piece, input.time, note);
   const dir = join(takesRoot(), input.piece, id);
-  await mkdir(dir, { recursive: true });
   const meta = {
     bakedAt: new Date().toISOString(),
     files: input.svg ? ['bake.webp', 'piece.svg'] : ['bake.webp'],

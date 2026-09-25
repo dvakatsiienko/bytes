@@ -1,4 +1,4 @@
-import { mkdtemp, readdir } from 'node:fs/promises';
+import { mkdtemp, readdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, expect, test } from 'vitest';
@@ -94,4 +94,23 @@ test('the take after 99 is 100, not a second 100', async () => {
   const ids = (await listTakes('market')).takes.map((take) => take.id);
 
   expect(ids.slice(0, 2)).toEqual(['101-day', '100-day']);
+});
+
+test('a take whose record does not parse is left out, the rest still list', async () => {
+  const good = await bake('day');
+  const broken = await bake('night');
+  await writeFile(
+    join(process.env.ATELIER_TAKES_DIR ?? '', 'market', broken.id, 'take.json'),
+    '<<<<<<< HEAD',
+  );
+
+  expect((await listTakes('market')).takes.map((take) => take.id)).toEqual([
+    good.id,
+  ]);
+});
+
+test('two takes saved at the same moment get two folders', async () => {
+  const [a, b] = await Promise.all([bake('day'), bake('day')]);
+
+  expect(a.id).not.toBe(b.id);
 });

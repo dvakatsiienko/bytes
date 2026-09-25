@@ -18,8 +18,8 @@ const clamp = (value: number, min: number, max: number) =>
 
 /**
  * A numeric text field that applies a value only when the whole text is a
- * number, so a slip like `xfasdf1.00` never reaches the value and blur brings
- * the last good one back. ↑/↓ step, shift ×10, alt ×0.1; Escape undoes the
+ * number, so a slip like `xfasdf1.00` never reaches the value, and an edit that
+ * ends invalid restores the value from before it. ↑/↓ step, shift ×10, alt ×0.1; Escape undoes the
  * edit since focus.
  */
 function NumberField({
@@ -89,6 +89,9 @@ function NumberField({
       data-slot='number-field'
       inputMode='decimal'
       onBlur={(event) => {
+        // an edit that ends invalid is rejected whole: a valid prefix typed on
+        // the way (`1.3` of `1.3xf`) never survives it
+        if (isInvalid) commit(valueAtFocus.current, decimalsOf(step) + 2);
         setDraft(null);
         onBlur?.(event);
       }}

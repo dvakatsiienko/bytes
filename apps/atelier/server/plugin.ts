@@ -16,7 +16,11 @@ import {
   takeFile,
   updateTake,
 } from './takes.ts';
-import type { IncomingMessage, ServerResponse } from 'node:http';
+import type {
+  IncomingHttpHeaders,
+  IncomingMessage,
+  ServerResponse,
+} from 'node:http';
 
 /**
  * The studio's local api, mounted on the vite dev server under `/api`. It
@@ -28,6 +32,10 @@ export const atelierApi = (): Plugin => ({
   configureServer(server) {
     server.httpServer?.on('close', closeBrowser);
     server.middlewares.use('/api', (req, res) => {
+      if (!isTrustedRequest(req)) {
+        send(res, 403, { error: 'writes come from the studio page, as json' });
+        return;
+      }
       route(server, req, res).catch((error: unknown) => {
         send(res, 500, {
           error: error instanceof Error ? error.message : String(error),
@@ -37,6 +45,21 @@ export const atelierApi = (): Plugin => ({
   },
   name: 'atelier-api',
 });
+
+/**
+ * Any web page can send a request to localhost. A write is accepted only from
+ * this server's own page and only as json: a cross-site json request needs a
+ * preflight this server never answers, so the browser stops it first.
+ */
+export const isTrustedRequest = (req: {
+  method?: string;
+  headers: IncomingHttpHeaders;
+}) => {
+  if (req.method === 'GET' || req.method === 'HEAD') return true;
+  const { origin, host } = req.headers;
+  if (origin !== undefined && origin !== `http://${host}`) return false;
+  return (req.headers['content-type'] ?? '').startsWith('application/json');
+};
 
 const route = async (
   server: ViteDevServer,
@@ -115,11 +138,13 @@ const route = async (
     if (takeFileName) {
       const type =
         takeFileName === 'piece.svg' ? 'image/svg+xml' : 'image/webp';
-      return sendFile(
-        res,
-        await readFile(takeFile(piece, id, takeFileName)),
-        type,
+      // a lit take has no piece.svg: that is a missing file, not a server error
+      const data = await readFile(takeFile(piece, id, takeFileName)).catch(
+        () => null,
       );
+      if (!data)
+        return send(res, 404, { error: `take ${id} has no ${takeFileName}` });
+      return sendFile(res, data, type);
     }
   }
   return send(res, 404, { error: 'not found' });

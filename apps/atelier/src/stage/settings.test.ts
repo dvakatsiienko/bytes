@@ -33,3 +33,14 @@ test('a tint that is not a six-digit hex falls back to white', () => {
 test('anything that is not an object is the defaults', () => {
   expect(toSettings('xfasdf1.00')).toEqual(defaults);
 });
+
+test('a number outside its control range is held at the range', () => {
+  expect(toSettings({ ambient: -4, exposure: 1e9 })).toMatchObject({
+    ambient: 0.2,
+    exposure: 2,
+  });
+});
+
+test('the seed is a whole number', () => {
+  expect(toSettings({ seed: 0.5 }).seed).toBe(1);
+});
