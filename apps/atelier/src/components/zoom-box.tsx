@@ -296,6 +296,16 @@ const scaleOf = (context: ReactZoomPanPinchContextState) => context.state.scale;
 
 const preventDefault = (event: Event) => event.preventDefault();
 
+/** the library's own cancel is not exported; these are the public fields it clears */
+const stopAnimation = (zoom: Zoom) => {
+  const { instance } = zoom;
+  if (instance.animationFrame !== null)
+    cancelAnimationFrame(instance.animationFrame);
+  instance.animationFrame = null;
+  instance.isAnimating = false;
+  instance.animation = null;
+};
+
 /** where each box last saw the pointer over the art, for «1:1 where you pointed» */
 const lastPointers = new WeakMap<HTMLElement, { current: Point | null }>();
 
@@ -398,6 +408,8 @@ const handleWheel = (context: ZoomContext) => {
     // nothing to pan: the page keeps its scroll
     if (!isZoom && scale <= fitScale + 0.001) return;
     event.preventDefault();
+    // a settle still easing would overwrite this step on its next frame
+    stopAnimation(context.zoom);
     const box = wrapper.getBoundingClientRect();
     const point = { x: event.clientX - box.left, y: event.clientY - box.top };
     const next = wheelTransform(

@@ -98,6 +98,14 @@ const Workbench = (props: WorkbenchProps) => {
             className='rounded-sm'
             href='/'
             onClick={(event) => {
+              // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
+              if (
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey
+              )
+                return;
               event.preventDefault();
               navigate({ piece: pieces[0].id, view: { kind: 'live' } });
             }}>
