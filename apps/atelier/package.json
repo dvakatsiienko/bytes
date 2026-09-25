@@ -21,7 +21,6 @@
     "@ui/kit": "workspace:*",
     "cn": "0.3.0",
     "jotai": "2.20.3",
-    "leva": "0.10.1",
     "lucide-react": "1.47.0",
     "react": "19.3.0",
     "react-compare-slider": "4.0.0",

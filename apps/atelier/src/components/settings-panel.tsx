@@ -11,7 +11,7 @@ import {
 } from '@ui/kit/components/select';
 import { Slider } from '@ui/kit/components/slider';
 import { Switch } from '@ui/kit/components/switch';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { CopyIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,18 +19,7 @@ import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
 import type { ControlRow, Settings } from '../stage/settings.ts';
 import { controls, defaults, isHex, looks } from '../stage/settings.ts';
-import {
-  controlSetAtom,
-  patchSettingsAtom,
-  settingsByPieceAtom,
-} from '../state.ts';
-import { LevaControls } from './leva-controls';
-import { Segmented } from './segmented';
-
-const controlSetOptions = [
-  { label: 'kit', value: 'kit' },
-  { label: 'leva', value: 'leva' },
-] as const;
+import { patchSettingsAtom, settingsByPieceAtom } from '../state.ts';
 
 /** a flat piece is its svg: of every setting only the seed reaches it */
 const flatControls = controls.filter((group) => group.title === 'seed');
@@ -40,7 +29,6 @@ export const SettingsPanel = (props: SettingsPanelProps) => {
   const settings =
     useAtomValue(settingsByPieceAtom)[props.piece.id] ?? defaults;
   const patchSettings = useSetAtom(patchSettingsAtom);
-  const [controlSet, setControlSet] = useAtom(controlSetAtom);
   const update = (patch: Partial<Settings>) =>
     patchSettings(props.piece.id, patch);
   const groupList = props.actions.isStage ? controls : flatControls;
@@ -77,14 +65,6 @@ export const SettingsPanel = (props: SettingsPanelProps) => {
       className='flex h-full min-h-0 flex-col'>
       <header className='flex items-center justify-between gap-2 border-border border-b px-4 py-2'>
         <h2 className='truncate font-serif text-lg'>{props.piece.id}</h2>
-        {props.actions.isStage ? (
-          <Segmented
-            ariaLabel='control set'
-            onValueChange={setControlSet}
-            options={controlSetOptions}
-            value={controlSet}
-          />
-        ) : null}
       </header>
       <ScrollArea className='min-h-0 flex-1'>
         {props.actions.isStage ? null : (
@@ -93,13 +73,7 @@ export const SettingsPanel = (props: SettingsPanelProps) => {
             settings do not reach it.
           </p>
         )}
-        <div className='pt-3'>
-          {controlSet === 'leva' && props.actions.isStage ? (
-            <LevaControls onChange={update} settings={settings} />
-          ) : (
-            groupListJSX
-          )}
-        </div>
+        <div className='pt-3'>{groupListJSX}</div>
       </ScrollArea>
       <footer className='flex gap-2 border-border border-t px-4 py-2'>
         <Button

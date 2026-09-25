@@ -37,7 +37,6 @@ const persisted = <T>(
 
 export const themes = ['system', 'light', 'dark'] as const;
 export const readmeWidths = ['fit', 'phone', 'desktop'] as const;
-export const controlSets = ['kit', 'leva'] as const;
 
 export const themeAtom = persisted<Theme>(
   'atelier:theme',
@@ -83,7 +82,6 @@ export const timeAtom = atom<Time>('day');
 export const readmeAtom = atom<ReadmeWidth>('fit');
 export const isPlayingAtom = atom(false);
 export const compareModeAtom = atom<'side' | 'slider'>('side');
-export const controlSetAtom = atom<ControlSet>('kit');
 export const isPaletteOpenAtom = atom(false);
 export const zoomAtom = atom<Zoom | null>(null);
 /** the take whose stash form is open, wherever it was asked for */
@@ -93,7 +91,6 @@ export const stashFormAtom = atom<string | null>(null);
 
 export type Theme = (typeof themes)[number];
 export type ReadmeWidth = (typeof readmeWidths)[number];
-export type ControlSet = (typeof controlSets)[number];
 
 export interface Zoom {
   alt: string;
