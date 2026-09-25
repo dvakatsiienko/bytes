@@ -1,3 +1,4 @@
+import { atelierFavicon } from './atelier-favicon.ts';
 import { market } from './market.ts';
 import type { Palette } from './palette.ts';
 import { palettes } from './palette.ts';
@@ -71,6 +72,14 @@ export const pieces = [
     ship: { path: 'assets/atelier/tour-bytes', repo: 'profile' },
     size: tileSize,
     title: 'bytes: a shop sign and a firefly lantern on a Lanternhill wall',
+  },
+  {
+    draw: atelierFavicon,
+    group: 'icons',
+    id: 'atelier-favicon',
+    kind: 'favicon',
+    size: { h: 512, w: 512 },
+    title: 'atelier: a hanging lamp lighting a paper card on the bench',
   },
   ...appNames.map((app) => {
     return {

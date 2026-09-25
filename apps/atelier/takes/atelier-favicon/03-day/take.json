@@ -1,0 +1,14 @@
+{
+  "bakedAt": "2026-09-25T14:29:12.813Z",
+  "files": ["bake.webp", "piece.svg"],
+  "frames": 1,
+  "note": "duplicate bake",
+  "piece": "atelier-favicon",
+  "seed": 1,
+  "sourceHash": "27911a08b6ca",
+  "stash": {
+    "good": "the final mark, same pixels as 01/02",
+    "notYet": "duplicate bake: only internal svg ids changed, 01/02 stay current"
+  },
+  "time": "day"
+}
