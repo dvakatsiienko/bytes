@@ -1,18 +1,14 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { Dialog, DialogContent, DialogTitle } from '@ui/kit/components/dialog';
 import { useAtom } from 'jotai';
 import { MinusIcon, PlusIcon, ScanIcon } from 'lucide-react';
+import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 import { zoomAtom } from '../state.ts';
+import { MAX_SCALE, MIN_SCALE, wheelTransform } from '../zoom.ts';
 
-/**
- * The library ADDS `step × deltaY` to the scale per wheel event. A mouse tick
- * is ~100 of deltaY, so a fixed step either crawls at 8× or leaps at 0.3×.
- * Scaling the step by the current scale makes every tick the same +15 %.
- */
-const WHEEL_GROWTH_PER_DELTA = 0.0015;
 /** a button press or a +/− key multiplies the scale by this; the library's steps are absolute, so they follow the scale */
 const PRESS_FACTOR = 1.5;
 const ANIMATION_MS = 160;
@@ -25,15 +21,49 @@ const fitScale = (wrapper: HTMLElement, image: HTMLImageElement) =>
     (wrapper.clientHeight - FIT_INSET * 2) / image.naturalHeight,
   );
 
+/** the whole image in the box; runs on both the library's init and the image's load, whichever comes last */
+const fitView = (zoom: ReactZoomPanPinchRef, animationMs: number) => {
+  const wrapper = zoom.instance.wrapperComponent;
+  const image = zoom.instance.contentComponent?.querySelector('img');
+  if (wrapper && image?.naturalWidth)
+    zoom.centerView(fitScale(wrapper, image), animationMs);
+};
+
 /**
- * Pixel inspection: opens fitted, wheel or pinch to zoom, drag to pan, +/−
- * and the arrows once the image has focus. Past 100 % the image draws with
- * hard pixels, so what you see is what the file holds.
+ * The library's own wheel zoom adds a step to the scale and settles on a bound
+ * after each gesture: a pinch sank to 55 % and stayed there. The wheel is ours
+ * instead; the library keeps drag, keys and the animated buttons.
+ */
+const handleWheel = (zoom: ReactZoomPanPinchRef) => (event: WheelEvent) => {
+  const wrapper = zoom.instance.wrapperComponent;
+  if (!wrapper) return;
+  event.preventDefault();
+  const box = wrapper.getBoundingClientRect();
+  const { positionX, positionY, scale } = zoom.instance.state;
+  const next = wheelTransform(
+    { scale, x: positionX, y: positionY },
+    {
+      ctrlKey: event.ctrlKey,
+      deltaMode: event.deltaMode,
+      deltaX: event.deltaX,
+      deltaY: event.deltaY,
+      metaKey: event.metaKey,
+      pointX: event.clientX - box.left,
+      pointY: event.clientY - box.top,
+    },
+  );
+  zoom.setTransform(next.x, next.y, next.scale, 0);
+};
+
+/**
+ * Pixel inspection: opens fitted; pinch or ⌘-scroll zooms around the pointer,
+ * a plain scroll or a drag pans, +/− and the arrows once the image has focus.
+ * Past 100 % the image draws with hard pixels, so what you see is what the
+ * file holds.
  */
 export const ZoomDialog = () => {
   const [zoom, setZoom] = useAtom(zoomAtom);
   const [scale, setScale] = useState(1);
-  const image = useRef<HTMLImageElement>(null);
 
   return (
     <Dialog
@@ -53,21 +83,21 @@ export const ZoomDialog = () => {
               zoomStep: scale * (PRESS_FACTOR - 1),
             }}
             limitToBounds={false}
-            maxScale={16}
-            minScale={0.1}
+            maxScale={MAX_SCALE}
+            minScale={MIN_SCALE}
+            onInit={(ref) => {
+              ref.instance.wrapperComponent?.addEventListener(
+                'wheel',
+                handleWheel(ref),
+                { passive: false },
+              );
+              fitView(ref, 0);
+            }}
             onTransform={(_ref, state) => setScale(state.scale)}
-            smooth
-            wheel={{ step: WHEEL_GROWTH_PER_DELTA * scale }}>
+            wheel={{ disabled: true }}>
             {(controls) => {
-              const fit = (animationMs: number) => {
-                const wrapper = controls.instance.wrapperComponent;
-                if (wrapper && image.current?.naturalWidth) {
-                  controls.centerView(
-                    fitScale(wrapper, image.current),
-                    animationMs,
-                  );
-                }
-              };
+              const fit = (animationMs: number) =>
+                fitView(controls, animationMs);
               return (
                 <>
                   <div className='flex items-center gap-1'>
@@ -119,19 +149,12 @@ export const ZoomDialog = () => {
                     contentClass='cursor-grab active:cursor-grabbing'
                     wrapperClass='min-h-0 flex-1 !w-full rounded-md bg-chip'>
                     {/* biome-ignore lint/correctness/useImageSize: any image can be zoomed; it draws at its own natural size on purpose */}
+                    {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: onLoad is the fit signal, not an interaction */}
                     <img
                       alt={zoom.alt}
                       className='max-w-none select-none'
                       draggable={false}
-                      ref={(node) => {
-                        image.current = node;
-                        // fit once the image knows its size
-                        if (node?.complete) fit(0);
-                        else
-                          node?.addEventListener('load', () => fit(0), {
-                            once: true,
-                          });
-                      }}
+                      onLoad={() => fit(0)}
                       src={zoom.src}
                       style={{
                         imageRendering: scale > 1 ? 'pixelated' : 'auto',
