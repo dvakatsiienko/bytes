@@ -61,6 +61,18 @@ export const settingsByPieceAtom = persisted<Record<string, Settings>>(
   },
 );
 
+/** the last bake note per piece, offered again on its next bake */
+export const bakeNotesAtom = persisted<Record<string, string>>(
+  'atelier:bake-notes',
+  {},
+  (raw) =>
+    Object.fromEntries(
+      Object.entries(typeof raw === 'object' && raw !== null ? raw : {}).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string',
+      ),
+    ),
+);
+
 /** merge a patch into one piece's settings; `null` drops them back to the defaults */
 export const patchSettingsAtom = atom(
   null,
@@ -84,6 +96,8 @@ export const isPlayingAtom = atom(false);
 export const compareModeAtom = atom<'side' | 'slider'>('side');
 export const isPaletteOpenAtom = atom(false);
 export const zoomAtom = atom<Zoom | null>(null);
+/** a bake waiting for its note: how many frames it will bake, or null when none is asked */
+export const bakeAskAtom = atom<number | null>(null);
 /** the take whose stash form is open, wherever it was asked for */
 export const stashFormAtom = atom<string | null>(null);
 

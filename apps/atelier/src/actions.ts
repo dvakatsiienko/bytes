@@ -9,6 +9,8 @@ import { navigate, useRoute } from './route.ts';
 import { stageScenes } from './stage/scenes.ts';
 import { defaults } from './stage/settings.ts';
 import {
+  bakeAskAtom,
+  bakeNotesAtom,
   isPaletteOpenAtom,
   isPlayingAtom,
   patchSettingsAtom,
@@ -42,6 +44,8 @@ export const useStudioActions = (piece: Piece) => {
   const settings = useAtomValue(settingsByPieceAtom)[piece.id] ?? defaults;
   const takes = useTakes(piece.id).data?.takes ?? [];
   const bakeMutation = useBake();
+  const [bakeAsk, setBakeAsk] = useAtom(bakeAskAtom);
+  const [bakeNotes, setBakeNotes] = useAtom(bakeNotesAtom);
   const isStage = Boolean(stageScenes[piece.id]);
   const hasMotion = isStage && !stageScenes[piece.id]?.isStill;
   const { view } = route;
@@ -71,12 +75,20 @@ export const useStudioActions = (piece: Piece) => {
       : null;
   };
 
-  /** a still, or with `frames` a motion loop baked as an animated webp */
-  const bake = (frames = 1) => {
+  /** every bake asks for its note first: a still, or with `frames` a motion loop */
+  const askBake = (frames = 1) => {
+    if (!bakeMutation.isPending) setBakeAsk(frames);
+  };
+
+  /** the asked bake, with its note; the note is kept for this piece's next bake */
+  const bake = (note: string) => {
+    const frames = bakeAsk ?? 1;
+    setBakeAsk(null);
     if (bakeMutation.isPending) return;
+    setBakeNotes({ ...bakeNotes, [piece.id]: note });
     const pending = bakeMutation.mutateAsync({
       frames,
-      note: '',
+      note,
       piece: piece.id,
       settings,
       time,
@@ -139,9 +151,13 @@ export const useStudioActions = (piece: Piece) => {
   };
 
   return {
-    bake: () => bake(),
+    askBake: () => askBake(),
     // 72 frames: 12 a second over the six-second loop, the rate the stage plays at
-    bakeLoop: () => bake(72),
+    askBakeLoop: () => askBake(72),
+    bake,
+    bakeAsk,
+    bakeNote: bakeNotes[piece.id] ?? '',
+    cancelBake: () => setBakeAsk(null),
     copyImage,
     copySettings,
     cycleReadme: () => setReadme(next(readmeWidths, readme)),

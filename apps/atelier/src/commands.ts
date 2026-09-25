@@ -15,13 +15,18 @@ export const commandsOf = (
     } as const;
   });
   return [
-    { group: 'bench', keys: 'b', label: 'bake this view', run: actions.bake },
+    {
+      group: 'bench',
+      keys: 'b',
+      label: 'bake this view',
+      run: actions.askBake,
+    },
     ...(actions.hasMotion
       ? [
           {
             group: 'bench',
             label: 'bake a motion loop (animated webp)',
-            run: actions.bakeLoop,
+            run: actions.askBakeLoop,
           } as const,
         ]
       : []),

@@ -16,7 +16,7 @@ import { useRoute } from '../route.ts';
 import { defaults } from '../stage/settings.ts';
 import { compareModeAtom, settingsByPieceAtom } from '../state.ts';
 import { useTakes } from '../takes.ts';
-import { BenchAction } from './bench-action';
+import { BakeButton } from './bake-button';
 import { CompareView } from './compare-view';
 import { LiveView } from './live-view';
 import { ReadmeFrame } from './readme-frame';
@@ -128,12 +128,7 @@ export const Viewport = (props: ViewportProps) => {
             variant='ghost'>
             <CopyIcon />
           </Button>
-          <BenchAction
-            disabled={props.actions.isBaking}
-            onClick={props.actions.bake}
-            title={`bake ${props.actions.time} (b)`}>
-            {props.actions.isBaking ? 'baking…' : 'bake'}
-          </BenchAction>
+          <BakeButton actions={props.actions} />
         </div>
       </div>
       <div className='min-h-0 flex-1 overflow-auto p-6'>
