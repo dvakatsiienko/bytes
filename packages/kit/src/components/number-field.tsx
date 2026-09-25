@@ -19,8 +19,8 @@ const clamp = (value: number, min: number, max: number) =>
 /**
  * A numeric text field that applies a value only when the whole text is a
  * number, so a slip like `xfasdf1.00` never reaches the value, and an edit that
- * ends invalid restores the value from before it. ↑/↓ step, shift ×10, alt ×0.1; Escape undoes the
- * edit since focus.
+ * ends invalid restores the last confirmed value. ↑/↓ step, shift ×10,
+ * alt ×0.1; Escape goes back to the last confirmed value too.
  */
 function NumberField({
   value,
@@ -35,7 +35,9 @@ function NumberField({
   ...props
 }: NumberFieldProps) {
   const [draft, setDraft] = useState<string | null>(null);
-  const valueAtFocus = useRef(value);
+  // what a rejected edit falls back to: the value at focus, then every value
+  // confirmed since — by enter, by an arrow step, by a valid blur
+  const confirmed = useRef(value);
   // An alt-step can land finer than `step`; show it rather than round it away.
   const format = (n: number) => {
     const fixed = n.toFixed(decimalsOf(step));
@@ -46,6 +48,16 @@ function NumberField({
   const commit = (next: number, precision: number) => {
     const rounded = Number(clamp(next, min, max).toFixed(precision));
     if (rounded !== value) onValueChange(rounded);
+    return rounded;
+  };
+
+  /** ends an edit: invalid text falls back to the last confirmed value, valid text becomes it */
+  const settle = () => {
+    const parsed = draft === null ? null : parse(draft);
+    if (isInvalid) commit(confirmed.current, decimalsOf(step) + 2);
+    else if (parsed !== null)
+      confirmed.current = commit(parsed, decimalsOf(step) + 2);
+    setDraft(null);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,14 +71,12 @@ function NumberField({
     onKeyDown?.(event);
     if (event.defaultPrevented) return;
     if (event.key === 'Escape') {
-      commit(valueAtFocus.current, decimalsOf(step) + 2);
+      commit(confirmed.current, decimalsOf(step) + 2);
       setDraft(null);
       return;
     }
     if (event.key === 'Enter') {
-      // the same rule as blur: an edit that ends invalid is rejected whole
-      if (isInvalid) commit(valueAtFocus.current, decimalsOf(step) + 2);
-      setDraft(null);
+      settle();
       return;
     }
     if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
@@ -76,7 +86,10 @@ function NumberField({
     else if (event.altKey) scale = 0.1;
     const direction = event.key === 'ArrowUp' ? 1 : -1;
     const base = draft === null ? value : (parse(draft) ?? value);
-    commit(base + direction * step * scale, decimalsOf(step * scale));
+    confirmed.current = commit(
+      base + direction * step * scale,
+      decimalsOf(step * scale),
+    );
     setDraft(null);
   };
 
@@ -93,13 +106,12 @@ function NumberField({
       onBlur={(event) => {
         // an edit that ends invalid is rejected whole: a valid prefix typed on
         // the way (`1.3` of `1.3xf`) never survives it
-        if (isInvalid) commit(valueAtFocus.current, decimalsOf(step) + 2);
-        setDraft(null);
+        settle();
         onBlur?.(event);
       }}
       onChange={handleChange}
       onFocus={(event) => {
-        valueAtFocus.current = value;
+        confirmed.current = value;
         onFocus?.(event);
       }}
       onKeyDown={handleKeyDown}

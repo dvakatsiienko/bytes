@@ -32,7 +32,12 @@ export const bake = async (input: BakeInput): Promise<BakeOutput> => {
   const piece = findPiece(input.piece);
   if (!piece) throw new Error(`no piece «${input.piece}»`);
 
-  if (stageScenes[piece.id]) {
+  const spec = stageScenes[piece.id];
+  if (spec?.isStill && input.frames > 1)
+    throw new Error(
+      `«${piece.id}» has no motion yet: a loop would repeat one frame`,
+    );
+  if (spec) {
     const pngs = await renderInBrowser(input, piece.size);
     const [still] = pngs;
     if (pngs.length === 1 && still) return { webp: await toWebp(still) };

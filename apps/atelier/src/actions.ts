@@ -43,6 +43,7 @@ export const useStudioActions = (piece: Piece) => {
   const takes = useTakes(piece.id).data?.takes ?? [];
   const bakeMutation = useBake();
   const isStage = Boolean(stageScenes[piece.id]);
+  const hasMotion = isStage && !stageScenes[piece.id]?.isStill;
   const { view } = route;
   const shownTake =
     view.kind === 'take'
@@ -147,6 +148,7 @@ export const useStudioActions = (piece: Piece) => {
     cycleTheme: () => setTheme(next(themes, theme)),
     goLive: () => navigate({ piece: piece.id, view: { kind: 'live' } }),
     goPiece: (id: string) => navigate({ piece: id, view: { kind: 'live' } }),
+    hasMotion,
     isBaking: bakeMutation.isPending,
     isPlaying,
     isStage,

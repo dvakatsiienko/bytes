@@ -114,6 +114,7 @@ const workshopScene: SceneSpec = {
     objects: [],
     tick: () => undefined,
   }),
+  isStill: true,
   layers: (p) => [{ body: workshop(p), depth: 0, name: 'scene' }],
   wind: {},
 };
@@ -136,6 +137,8 @@ export interface Extras {
 
 export interface SceneSpec {
   extras: (p: Palette) => Extras;
+  /** nothing in it moves yet (no wind, no lights that flicker): a loop would be one frame repeated */
+  isStill?: boolean;
   layers: (p: Palette, seed: number) => readonly Layer[];
   /** sheet name → how the wind moves it: `rooted` bends more toward the top, `hanging` bobs evenly */
   wind: Record<string, { mode: 'rooted' | 'hanging'; strength: number }>;

@@ -138,3 +138,29 @@ test('enter on an edit that ends in garbage restores the value from before the e
 
   await expect.element(field).toHaveValue('0.60');
 });
+
+test('a bad edit after a confirmed one restores the confirmed value', async () => {
+  const { screen } = await renderField();
+  const field = screen.getByRole('spinbutton', { name: 'ambient' });
+
+  await field.fill('0.4');
+  await userEvent.keyboard('{Enter}');
+  await field.fill('');
+  await userEvent.type(field, '0.45z');
+  await userEvent.keyboard('{Enter}');
+
+  await expect.element(field).toHaveValue('0.40');
+});
+
+test('a bad edit after arrow steps restores the stepped value', async () => {
+  const { screen } = await renderField();
+  const field = screen.getByRole('spinbutton', { name: 'ambient' });
+
+  await field.click();
+  await userEvent.keyboard('{ArrowUp}{ArrowUp}');
+  await field.fill('');
+  await userEvent.type(field, '9k');
+  await userEvent.tab();
+
+  await expect.element(field).toHaveValue('0.62');
+});

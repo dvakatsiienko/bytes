@@ -16,7 +16,7 @@ export const commandsOf = (
   });
   return [
     { group: 'bench', keys: 'b', label: 'bake this view', run: actions.bake },
-    ...(actions.isStage
+    ...(actions.hasMotion
       ? [
           {
             group: 'bench',
@@ -62,7 +62,7 @@ export const commandsOf = (
       label: 'cycle readme width',
       run: actions.cycleReadme,
     },
-    ...(actions.isStage
+    ...(actions.hasMotion
       ? [
           {
             group: 'view',

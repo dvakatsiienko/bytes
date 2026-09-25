@@ -98,7 +98,7 @@ export const Viewport = (props: ViewportProps) => {
           options={readmeOptions}
           value={props.actions.readme}
         />
-        {view.kind === 'live' && props.actions.isStage ? (
+        {view.kind === 'live' && props.actions.hasMotion ? (
           <Button
             aria-pressed={props.actions.isPlaying}
             onClick={props.actions.togglePlay}
