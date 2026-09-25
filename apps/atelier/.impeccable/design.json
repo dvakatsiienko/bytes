@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T00:00:00Z",
+  "title": "Design System: atelier",
+  "extensions": {
+    "colorMeta": {
+      "terracotta": {
+        "role": "primary",
+        "displayName": "Terracotta",
+        "canonical": "#c8553d"
+      },
+      "lamp-gold": {
+        "role": "primary",
+        "displayName": "Lamp Gold",
+        "canonical": "#ffd978"
+      },
+      "day-ground": {
+        "role": "neutral",
+        "displayName": "Sky Wash",
+        "canonical": "#eaf2f7"
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Indigo",
+        "canonical": "#121629"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "app name and scene titles"
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "every exact value: settings keys, numbers, seeds, paths"
+      }
+    },
+    "shadows": [
+      {
+        "name": "lamp",
+        "value": "0 18px 48px -18px rgb(10 14 30 / .45)",
+        "purpose": "the canvas only — the one lifted thing"
+      },
+      {
+        "name": "float",
+        "value": "0 6px 18px -6px rgb(10 14 30 / .35)",
+        "purpose": "popovers, command palette, toasts"
+      },
+      {
+        "name": "hairline",
+        "value": "0 1px 2px rgb(0 0 0 / .12)",
+        "purpose": "the active segment"
+      }
+    ],
+    "motion": [
+      {
+        "name": "chrome",
+        "value": "150ms cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "fades and slides in the chrome, 120–180 ms, never looping"
+      },
+      {
+        "name": "key-press",
+        "value": "80ms ease-out",
+        "purpose": "the bench action's 2px press"
+      }
+    ],
+    "focus": {
+      "value": "2px solid, offset 2px",
+      "day": "#3f6fb0",
+      "night": "#b3a6ee",
+      "rule": "tab / shift+tab reach every control in reading order"
+    },
+    "northStar": "the crafter and the lamp",
+    "antiReferences": ["generic saas dashboard", "neobrutalism"]
+  },
+  "components": [
+    {
+      "name": "Bench Action",
+      "kind": "button",
+      "refersTo": "bench-action",
+      "description": "the one accent action per region (bake, ship); the tactile control",
+      "html": "<button class=\"ds-bench\">bake</button>",
+      "css": ".ds-bench { background:#c8553d; color:#fff; border:0; border-radius:6px; padding:6px 12px; box-shadow:0 2px 0 #9c3f2c; cursor:pointer; transition:transform 80ms ease-out, box-shadow 80ms ease-out; } .ds-bench:active { transform:translateY(2px); box-shadow:0 0 0 #9c3f2c; } .ds-bench:focus-visible { outline:2px solid #3f6fb0; outline-offset:2px; }"
+    }
+  ]
+}
