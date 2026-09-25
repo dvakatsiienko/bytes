@@ -10,10 +10,10 @@ export const useBuild = () =>
     queryKey: ['build'],
   }).data;
 
-/** the other ateliers that answer right now; a server that stops drops out on the next ask */
+/** the other ateliers that answer right now; a server that stops drops out on the next ask, about 10 s at most — inside the switcher's 15 s promise */
 export const useOthers = () =>
   useQuery({
     queryFn: () => api<Other[]>('/api/ateliers'),
     queryKey: ['ateliers'],
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   }).data ?? [];
