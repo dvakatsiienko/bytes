@@ -15,7 +15,8 @@ export const frameChromeHeight = (width: ReadmeWidth) =>
 /**
  * The piece as a readme shows it. `fit` is the bare piece at the bench's width;
  * `phone` and `desktop` wrap it in github's page chrome at the real content
- * width, light by day and dark by night, so a take is judged where it lands.
+ * width — or the bench's, when that is narrower — light by day and dark by
+ * night, so a take is judged where it lands.
  */
 export const ReadmeFrame = (props: ReadmeFrameProps) => {
   if (props.width === 'fit')
@@ -25,7 +26,8 @@ export const ReadmeFrame = (props: ReadmeFrameProps) => {
   const pad = pads[props.width];
   return (
     <div
-      className='mx-auto overflow-hidden rounded-md border border-gh-line bg-gh'
+      className='mx-auto max-w-full overflow-hidden rounded-md border border-gh-line bg-gh'
+      // github's column is fluid too: at most this wide, narrower on a narrower bench
       style={{ width: width + pad * 2 }}>
       <div
         className='flex items-center gap-2 border-gh-line border-b px-4 font-mono text-[12px] text-gh-muted'

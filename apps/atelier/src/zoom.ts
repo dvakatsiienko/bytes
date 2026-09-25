@@ -1,31 +1,42 @@
-export const MIN_SCALE = 0.1;
 export const MAX_SCALE = 16;
-/** the zoom viewer's range; the canvas zooms from its laid-out size (1) up */
-export const viewerRange: Range = { max: MAX_SCALE, min: MIN_SCALE };
-
-/** a scroll in lines, not pixels (a mouse on some systems): about one line of text each */
+/** the lowest zoom, as a share of fit: a little air around the whole image */
+const MIN_OF_FIT = 0.9;
+/** a scroll in lines (some mice) is about one line of text each */
 const LINE_PX = 16;
-/** one mouse-wheel notch reports ~100 px; capping a single event keeps a notch at ×1.5, not ×2.7 */
-const MAX_ZOOM_DELTA = 40;
-/** scale changes by e^(−0.01 × delta): a pinch's small deltas zoom smoothly, and in and out cancel */
-const ZOOM_PER_DELTA = 0.01;
+/** one event's zoom is capped at one mouse notch, so a spike never jumps (at ±50 px a notch could not reach ×1.19) */
+const MAX_DELTA_PX = 100;
+/** px of scroll per doubling: a 100 px mouse notch is ×1.19 */
+const WHEEL_PX_PER_DOUBLING = 400;
+/** a pinch sends small deltas, so it doubles in a quarter of the distance */
+const PINCH_PX_PER_DOUBLING = 100;
+/** a toolbar press or a ± key multiplies the scale by this; small on purpose (dima halved it from 1.1), and the one number to tune */
+export const PRESS_FACTOR = 1.05;
+/** a gesture that ends within 4 % of a landmark scale lands on it */
+const SNAP_TOLERANCE = 0.04;
+/** how far a pan may stretch past the art's edge before it springs back */
+export const OVERSHOOT_PX = 80;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
-/** a toolbar press or a +/− key multiplies the scale by this, so one in and one out cancel */
-const PRESS_FACTOR = 1.5;
+/** from 0.9 × fit up to 16× — or up to fit, for an image so small that its fit is past 16× */
+export const rangeOf = (fit: number): Range => ({
+  max: Math.max(MAX_SCALE, fit),
+  min: fit * MIN_OF_FIT,
+});
+
+const toPx = (delta: number, wheel: Wheel) => {
+  if (wheel.deltaMode === 1) return delta * LINE_PX;
+  if (wheel.deltaMode === 2) return delta * wheel.pageHeight;
+  return delta;
+};
 
 /**
  * The library's zoomIn / zoomOut ADD their step to the scale, so a fixed step
- * is ×1.5 one way and ×0.5 the other. This is the step that makes a press
- * multiply (in) or divide (out) by the same factor, inside the scale range.
+ * is not the same factor both ways. This is the step that makes a press
+ * multiply (in) or divide (out) by the same factor, inside the range.
  */
-export const pressStep = (
-  scale: number,
-  direction: 1 | -1,
-  range = viewerRange,
-) =>
+export const pressStep = (scale: number, direction: 1 | -1, range: Range) =>
   Math.abs(
     clamp(scale * PRESS_FACTOR ** direction, range.min, range.max) - scale,
   );
@@ -33,26 +44,30 @@ export const pressStep = (
 /**
  * One wheel event against the zoom's transform (`translate(x, y) scale(s)`,
  * origin top left). A trackpad pinch arrives as a wheel event with `ctrlKey`;
- * it and ⌘-scroll zoom around the pointer, so the image point under it stays
- * put. Any other scroll pans — or zooms too, where a plain scroll is the zoom.
+ * it, ⌘-scroll and — where the scroll is the zoom — a plain scroll multiply
+ * the scale by 2^(−px ÷ K) around the pointer, so the image point under it
+ * stays put and an equal scroll back returns the exact scale. Any other
+ * scroll pans.
  */
 export const wheelTransform = (
   view: View,
   wheel: Wheel,
-  range = viewerRange,
+  range: Range,
   plainScroll: 'pan' | 'zoom' = 'pan',
 ): View => {
-  const unit = wheel.deltaMode === 1 ? LINE_PX : 1;
   if (!(wheel.ctrlKey || wheel.metaKey || plainScroll === 'zoom'))
     return {
       scale: view.scale,
-      x: view.x - wheel.deltaX * unit,
-      y: view.y - wheel.deltaY * unit,
+      x: view.x - toPx(wheel.deltaX, wheel),
+      y: view.y - toPx(wheel.deltaY, wheel),
     };
 
-  const delta = clamp(wheel.deltaY * unit, -MAX_ZOOM_DELTA, MAX_ZOOM_DELTA);
+  const px = clamp(toPx(wheel.deltaY, wheel), -MAX_DELTA_PX, MAX_DELTA_PX);
+  const perDoubling = wheel.ctrlKey
+    ? PINCH_PX_PER_DOUBLING
+    : WHEEL_PX_PER_DOUBLING;
   const scale = clamp(
-    view.scale * Math.exp(-delta * ZOOM_PER_DELTA),
+    view.scale * 2 ** (-px / perDoubling),
     range.min,
     range.max,
   );
@@ -64,11 +79,23 @@ export const wheelTransform = (
   };
 };
 
-/** per axis at rest: art wider than the box covers it edge to edge; art that fits sits in the middle */
-const settleAxis = (offset: number, box: number, shown: number) =>
-  shown <= box ? (box - shown) / 2 : clamp(offset, box - shown, 0);
+/** the landmark the scale lands on at a gesture's end, if it is within 4 % of one */
+export const snapScale = (scale: number, landmarks: readonly number[]) =>
+  landmarks.find((mark) => Math.abs(scale / mark - 1) <= SNAP_TOLERANCE) ??
+  scale;
 
-/** per axis mid-gesture: at least half of the art, or half the box, stays in view */
+/** per axis: art wider than the box covers it, give or take `slack`; art that fits sits in the middle, give or take `slack` */
+const settleAxis = (
+  offset: number,
+  box: number,
+  shown: number,
+  slack: number,
+) =>
+  shown <= box
+    ? clamp(offset, (box - shown) / 2 - slack, (box - shown) / 2 + slack)
+    : clamp(offset, box - shown - slack, slack);
+
+/** per axis mid-zoom: at least half of the art, or half the box, stays in view */
 const overlapAxis = (offset: number, box: number, shown: number) => {
   const overlap = Math.min(shown, box) / 2;
   return clamp(offset, overlap - shown, box - overlap);
@@ -76,13 +103,18 @@ const overlapAxis = (offset: number, box: number, shown: number) => {
 
 /**
  * Where the art rests: covering the box when it is larger, centred when it
- * fits. A pan settles at once; a zoom settles once the gesture stops, because
- * settling mid-pinch would pull the art off the pointer.
+ * fits. With `slack`, a pan in progress may stretch that far past the edge
+ * and springs back when it rests.
  */
-export const settleInView = (view: View, box: Box, content: Box): View => ({
+export const settleInView = (
+  view: View,
+  box: Box,
+  content: Box,
+  slack = 0,
+): View => ({
   scale: view.scale,
-  x: settleAxis(view.x, box.width, content.width * view.scale),
-  y: settleAxis(view.y, box.height, content.height * view.scale),
+  x: settleAxis(view.x, box.width, content.width * view.scale, slack),
+  y: settleAxis(view.y, box.height, content.height * view.scale, slack),
 });
 
 /**
@@ -114,13 +146,14 @@ export interface View {
   y: number;
 }
 
-/** the wheel event's fields, with the pointer relative to the zoom box */
+/** the wheel event's fields, the pointer relative to the zoom box, and the page height a page-mode scroll counts in */
 export interface Wheel {
   ctrlKey: boolean;
   deltaMode: number;
   deltaX: number;
   deltaY: number;
   metaKey: boolean;
+  pageHeight: number;
   pointX: number;
   pointY: number;
 }

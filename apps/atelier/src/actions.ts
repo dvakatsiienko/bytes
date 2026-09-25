@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import type { Piece } from '../art/pieces.ts';
 import { pieceSvg, pieces } from '../art/pieces.ts';
 import { errorText } from './error-text.ts';
+import { resolveTheme, toggledTheme, useMediaQuery } from './hooks.ts';
 import { copyPng, stageCanvas, svgDataUrl } from './image.ts';
 import { navigate, useRoute } from './route.ts';
 import { stageScenes } from './stage/scenes.ts';
@@ -18,7 +19,6 @@ import {
   readmeWidths,
   settingsByPieceAtom,
   themeAtom,
-  themes,
   timeAtom,
   zoomAtom,
 } from './state.ts';
@@ -37,6 +37,7 @@ export const useStudioActions = (piece: Piece) => {
   const [time, setTime] = useAtom(timeAtom);
   const [readme, setReadme] = useAtom(readmeAtom);
   const [theme, setTheme] = useAtom(themeAtom);
+  const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
   const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
   const setZoom = useSetAtom(zoomAtom);
   const setPaletteOpen = useSetAtom(isPaletteOpenAtom);
@@ -158,7 +159,6 @@ export const useStudioActions = (piece: Piece) => {
     copyImage,
     copySettings,
     cycleReadme: () => setReadme(next(readmeWidths, readme)),
-    cycleTheme: () => setTheme(next(themes, theme)),
     goLive: () => navigate({ piece: piece.id, view: { kind: 'live' } }),
     goPiece: (id: string) => navigate({ piece: id, view: { kind: 'live' } }),
     hasMotion,
@@ -177,9 +177,10 @@ export const useStudioActions = (piece: Piece) => {
     setReadme,
     setTheme,
     setTime,
-    theme,
+    theme: resolveTheme(theme, prefersDark),
     time,
     togglePlay: () => setIsPlaying(!isPlaying),
+    toggleTheme: () => setTheme(toggledTheme(theme, prefersDark)),
     toggleTime: () => setTime(time === 'day' ? 'night' : 'day'),
     zoom,
   };

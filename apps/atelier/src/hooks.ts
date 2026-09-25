@@ -15,10 +15,20 @@ export const useMediaQuery = (query: string) =>
   );
 
 /** `system` follows the OS; the `dark` class on <html> is what the kit's tokens read */
+export const resolveTheme = (theme: Theme, prefersDark: boolean) => {
+  if (theme !== 'system') return theme;
+  return prefersDark ? 'dark' : 'light';
+};
+
+/** the `t` key: the other of the two looks on screen now; `system` stays one click away in the header */
+export const toggledTheme = (theme: Theme, prefersDark: boolean) =>
+  resolveTheme(theme, prefersDark) === 'dark' ? 'light' : 'dark';
+
 export const useResolvedTheme = (theme: Theme) => {
-  const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
-  const system = prefersDark ? 'dark' : 'light';
-  const resolved = theme === 'system' ? system : theme;
+  const resolved = resolveTheme(
+    theme,
+    useMediaQuery('(prefers-color-scheme: dark)'),
+  );
   useEffect(() => {
     document.documentElement.classList.toggle('dark', resolved === 'dark');
   }, [resolved]);

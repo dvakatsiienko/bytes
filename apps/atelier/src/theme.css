@@ -102,6 +102,20 @@
   outline-offset: 2px;
 }
 
+/* Rings answer the keyboard (src/modality.ts): after a pointer press, or before
+   any input, a focused control shows none — a click into the ⌘K field matches
+   :focus-visible too. The kit's box-shadow ring and a field's ring-coloured
+   border go quiet with the outline. */
+:root:not([data-modality="keyboard"]) :focus-visible {
+  --tw-ring-shadow: 0 0 #0000;
+  outline: none;
+}
+
+:root:not([data-modality="keyboard"])
+  :is(input, textarea, [data-slot="select-trigger"]):focus-visible {
+  border-color: var(--input);
+}
+
 ::selection {
   color: var(--foreground);
   background: color-mix(in srgb, var(--ring) 35%, var(--background));

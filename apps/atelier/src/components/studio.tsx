@@ -93,7 +93,25 @@ const Workbench = (props: WorkbenchProps) => {
       className='flex h-dvh flex-col bg-background text-foreground'
       data-time={actions.time}>
       <header className='flex h-12 shrink-0 items-center justify-between gap-4 border-border border-b px-4'>
-        <h1 className='font-serif text-2xl leading-none'>atelier</h1>
+        <h1 className='font-serif text-2xl leading-none'>
+          <a
+            className='rounded-sm'
+            href='/'
+            onClick={(event) => {
+              // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
+              if (
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey
+              )
+                return;
+              event.preventDefault();
+              navigate({ piece: pieces[0].id, view: { kind: 'live' } });
+            }}>
+            atelier
+          </a>
+        </h1>
         <div className='flex min-w-0 items-center gap-1'>
           <BuildBadge />
           <Button onClick={actions.openPalette} size='sm' variant='ghost'>

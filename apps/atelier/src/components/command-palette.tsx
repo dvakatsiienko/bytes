@@ -25,6 +25,7 @@ export const CommandPalette = (props: CommandPaletteProps) => {
       .map((command) => {
         return (
           <CommandItem
+            className='gap-3 px-3 py-2.5'
             key={command.label}
             onSelect={() => {
               setIsOpen(false);
@@ -41,21 +42,26 @@ export const CommandPalette = (props: CommandPaletteProps) => {
         );
       });
     return (
-      <CommandGroup heading={group} key={group}>
+      <CommandGroup
+        className='p-1.5 **:[[cmdk-group-heading]]:px-3 **:[[cmdk-group-heading]]:pt-3 **:[[cmdk-group-heading]]:pb-1.5'
+        heading={group}
+        key={group}>
         {itemListJSX}
       </CommandGroup>
     );
   });
 
   return (
+    // roomier than the kit's default: a wider panel, 40 px rows, air around the field (DESIGN.md spacing 8 / 12 / 16)
     <CommandDialog
+      className='sm:max-w-xl'
       description='run a studio command or open a piece'
       onOpenChange={setIsOpen}
       open={isOpen}
       title='commands'>
-      <Command>
+      <Command className='**:data-[slot=input-group]:h-10! **:data-[slot=command-input-wrapper]:p-2 **:data-[slot=command-input-wrapper]:pb-1'>
         <CommandInput placeholder='type a command or a piece…' />
-        <CommandList>
+        <CommandList className='max-h-[26rem] pb-1.5'>
           <CommandEmpty>nothing matches</CommandEmpty>
           {groupListJSX}
         </CommandList>

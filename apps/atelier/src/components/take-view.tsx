@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, buttonVariants } from '@ui/kit/components/button';
 import { Input } from '@ui/kit/components/input';
 import {
@@ -24,21 +24,33 @@ import { stashFormAtom, zoomAtom } from '../state.ts';
 import { useTakeActions } from '../take-actions.ts';
 import { takeUrl, useShownTake } from '../takes.ts';
 
+/** a second click within this long makes a double-click, which zooms the canvas; macOS's default is about as long */
+const DOUBLE_CLICK_MS = 300;
+
 /** the webp a take baked; a click opens it in the zoom */
 export const TakeImage = (props: TakeImageProps) => {
   const setZoom = useSetAtom(zoomAtom);
+  const pendingClick = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // a click just before the view changes must not open the viewer over the next one
+  useEffect(() => () => clearTimeout(pendingClick.current), []);
   const aspectRatio = `${props.piece.size.w} / ${props.piece.size.h}`;
+  const openViewer = () =>
+    setZoom({
+      alt: `${props.piece.title}, take ${props.take.id}`,
+      src: takeUrl(props.take),
+    });
   return (
     <button
       aria-label={`zoom into take ${props.take.id}`}
       className='block w-full cursor-zoom-in'
       onClick={(event) => {
+        clearTimeout(pendingClick.current);
         // a zoomed canvas is already the zoom; its drags end in a click
         if (event.currentTarget.closest('[data-zoomed="true"]')) return;
-        setZoom({
-          alt: `${props.piece.title}, take ${props.take.id}`,
-          src: takeUrl(props.take),
-        });
+        // Enter or Space opens at once; a mouse click waits out a double-click, which zooms the canvas instead
+        if (event.detail === 0) return openViewer();
+        if (event.detail === 1)
+          pendingClick.current = setTimeout(openViewer, DOUBLE_CLICK_MS);
       }}
       type='button'>
       <img

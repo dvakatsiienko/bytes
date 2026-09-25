@@ -5,7 +5,11 @@ import { BakeView } from '@/components/bake-view';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Studio } from '@/components/studio';
 
+import { trackModality } from '@/modality.ts';
+
 import '@/theme.css';
+
+trackModality();
 
 const rootNode = document.getElementById('root');
 const bakePiece = new URLSearchParams(location.search).get('bake');
