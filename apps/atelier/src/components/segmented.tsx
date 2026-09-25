@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
 
 /**
@@ -7,11 +8,21 @@ import { ToggleGroup, ToggleGroupItem } from '@ui/kit/components/toggle-group';
  * toggle group, never a fork of it.
  */
 export const Segmented = <T extends string>(props: SegmentedProps<T>) => {
+  const trough = useRef<HTMLDivElement>(null);
+
+  // a hotkey can change the value while focus sits on the old segment; its
+  // focus ring would then read as the selection, so focus follows the value
+  useEffect(() => {
+    const node = trough.current;
+    if (!(node && props.value && node.contains(document.activeElement))) return;
+    node.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus();
+  }, [props.value]);
+
   const itemListJSX = props.options.map((option) => {
     return (
       <ToggleGroupItem
         aria-label={option.label}
-        className='h-7 min-w-0 gap-1.5 rounded-md px-2.5 font-medium text-[13px] text-foreground hover:bg-surface/60 aria-pressed:bg-surface aria-pressed:shadow-hairline'
+        className='h-7 min-w-0 gap-1.5 rounded-md px-2.5 font-medium text-[13px] text-foreground hover:bg-segment-on/60 aria-pressed:bg-segment-on aria-pressed:shadow-hairline'
         key={option.value}
         title={option.isIconOnly ? option.label : undefined}
         value={option.value}>
@@ -22,7 +33,9 @@ export const Segmented = <T extends string>(props: SegmentedProps<T>) => {
   });
 
   return (
-    <div className='inline-flex items-center rounded-lg bg-chip p-[3px]'>
+    <div
+      className='inline-flex items-center rounded-lg bg-chip p-[3px]'
+      ref={trough}>
       {props.label ? (
         <span className='select-none px-1.5 font-medium text-[12px] text-muted-foreground uppercase tracking-[0.08em]'>
           {props.label}

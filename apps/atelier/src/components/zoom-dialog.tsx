@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { Dialog, DialogContent, DialogTitle } from '@ui/kit/components/dialog';
 import { useAtom } from 'jotai';
@@ -16,6 +16,14 @@ const WHEEL_GROWTH_PER_DELTA = 0.0015;
 /** a button press or a +/− key multiplies the scale by this; the library's steps are absolute, so they follow the scale */
 const PRESS_FACTOR = 1.5;
 const ANIMATION_MS = 160;
+/** air around a fitted image, so it never sits flush on the box edge */
+const FIT_INSET = 32;
+
+const fitScale = (wrapper: HTMLElement, image: HTMLImageElement) =>
+  Math.min(
+    (wrapper.clientWidth - FIT_INSET * 2) / image.naturalWidth,
+    (wrapper.clientHeight - FIT_INSET * 2) / image.naturalHeight,
+  );
 
 /**
  * Pixel inspection: opens fitted, wheel or pinch to zoom, drag to pan, +/−
@@ -25,6 +33,7 @@ const ANIMATION_MS = 160;
 export const ZoomDialog = () => {
   const [zoom, setZoom] = useAtom(zoomAtom);
   const [scale, setScale] = useState(1);
+  const image = useRef<HTMLImageElement>(null);
 
   return (
     <Dialog
@@ -38,7 +47,6 @@ export const ZoomDialog = () => {
           <TransformWrapper
             centerOnInit
             doubleClick={{ disabled: true }}
-            fitOnInit
             keyboard={{
               disabled: false,
               panStep: 60,
@@ -51,6 +59,15 @@ export const ZoomDialog = () => {
             smooth
             wheel={{ step: WHEEL_GROWTH_PER_DELTA * scale }}>
             {(controls) => {
+              const fit = (animationMs: number) => {
+                const wrapper = controls.instance.wrapperComponent;
+                if (wrapper && image.current?.naturalWidth) {
+                  controls.centerView(
+                    fitScale(wrapper, image.current),
+                    animationMs,
+                  );
+                }
+              };
               return (
                 <>
                   <div className='flex items-center gap-1'>
@@ -81,7 +98,7 @@ export const ZoomDialog = () => {
                       <PlusIcon />
                     </Button>
                     <Button
-                      onClick={() => controls.resetTransform(ANIMATION_MS)}
+                      onClick={() => fit(ANIMATION_MS)}
                       size='sm'
                       title='fit the whole image'
                       variant='outline'>
@@ -106,6 +123,15 @@ export const ZoomDialog = () => {
                       alt={zoom.alt}
                       className='max-w-none select-none'
                       draggable={false}
+                      ref={(node) => {
+                        image.current = node;
+                        // fit once the image knows its size
+                        if (node?.complete) fit(0);
+                        else
+                          node?.addEventListener('load', () => fit(0), {
+                            once: true,
+                          });
+                      }}
                       src={zoom.src}
                       style={{
                         imageRendering: scale > 1 ? 'pixelated' : 'auto',

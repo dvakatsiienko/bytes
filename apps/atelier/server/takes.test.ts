@@ -84,3 +84,14 @@ test('the takes list is newest first', async () => {
     '01-day',
   ]);
 });
+
+test('the take after 99 is 100, not a second 100', async () => {
+  for (let index = 0; index < 101; index += 1) {
+    // biome-ignore lint/performance/noAwaitInLoops: each take's number depends on the one before
+    await bake('day');
+  }
+
+  const ids = (await listTakes('market')).takes.map((take) => take.id);
+
+  expect(ids.slice(0, 2)).toEqual(['101-day', '100-day']);
+});

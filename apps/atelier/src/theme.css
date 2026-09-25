@@ -13,6 +13,7 @@
   --color-lamp-edge: var(--lamp-edge);
   --color-surface: var(--surface);
   --color-chip: var(--chip);
+  --color-segment-on: var(--segment-on);
   --color-gh: var(--gh);
   --color-gh-line: var(--gh-line);
   --color-gh-muted: var(--gh-muted);
@@ -37,6 +38,7 @@
   --secondary: #dde8f0;
   --secondary-foreground: #22324a;
   --chip: #dde8f0;
+  --segment-on: #ffffff;
   --muted: #dde8f0;
   --muted-foreground: #56667c;
   --accent: #dde8f0;
@@ -66,6 +68,8 @@
   --secondary: #252c52;
   --secondary-foreground: #e8ecf6;
   --chip: #252c52;
+  /* the studio artifact's pressed tone: a pressed segment must be lighter than its trough */
+  --segment-on: #3a4378;
   --muted: #252c52;
   --muted-foreground: #9aa3c8;
   --accent: #252c52;

@@ -72,9 +72,12 @@ const readCurrent = async (piece: string): Promise<Current> => {
 
 const takeIds = async (piece: string) => {
   try {
-    return (await readdir(join(takesRoot(), piece)))
-      .filter((name) => TAKE_ID.test(name))
-      .sort();
+    return (
+      (await readdir(join(takesRoot(), piece)))
+        .filter((name) => TAKE_ID.test(name))
+        // by number: as text, `100-day` sorts before `99-day`
+        .sort((a, b) => Number.parseInt(a, 10) - Number.parseInt(b, 10))
+    );
   } catch {
     return [];
   }
