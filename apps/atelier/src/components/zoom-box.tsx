@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { cn } from 'cn';
 import {
@@ -226,11 +226,20 @@ const ScaleBadge = (props: { className: string }) => {
  */
 const ZoomBehaviour = (props: ZoomBehaviourProps) => {
   const controls = useControls();
+  // the listeners attach once; reduced motion may change while they live
+  const ms = useRef(props.ms);
+  ms.current = props.ms;
   useTransformInit(({ instance }) => {
     const wrapper = instance.wrapperComponent;
     const content = instance.contentComponent;
     if (!(wrapper && content)) return;
-    const context = { mode: props.mode, ms: props.ms, zoom: controls };
+    const context: ZoomContext = {
+      mode: props.mode,
+      get ms() {
+        return ms.current;
+      },
+      zoom: controls,
+    };
     const lastPointer: { current: Point | null } = { current: null };
     const handleFit = () => {
       if (props.mode.isInline) return;
