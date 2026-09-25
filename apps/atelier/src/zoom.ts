@@ -34,15 +34,16 @@ export const pressStep = (
  * One wheel event against the zoom's transform (`translate(x, y) scale(s)`,
  * origin top left). A trackpad pinch arrives as a wheel event with `ctrlKey`;
  * it and ⌘-scroll zoom around the pointer, so the image point under it stays
- * put. Any other scroll pans.
+ * put. Any other scroll pans — or zooms too, where a plain scroll is the zoom.
  */
 export const wheelTransform = (
   view: View,
   wheel: Wheel,
   range = viewerRange,
+  plainScroll: 'pan' | 'zoom' = 'pan',
 ): View => {
   const unit = wheel.deltaMode === 1 ? LINE_PX : 1;
-  if (!(wheel.ctrlKey || wheel.metaKey))
+  if (!(wheel.ctrlKey || wheel.metaKey || plainScroll === 'zoom'))
     return {
       scale: view.scale,
       x: view.x - wheel.deltaX * unit,
@@ -63,14 +64,18 @@ export const wheelTransform = (
   };
 };
 
+/** per axis: art wider than the box covers it edge to edge; art that fits sits in the middle */
+const keepAxis = (offset: number, box: number, shown: number) =>
+  shown <= box ? (box - shown) / 2 : clamp(offset, box - shown, 0);
+
 /**
- * A zoomed canvas never shows past the art's edge: at scale s the content is
- * s × the box, so its offset stays between box − s × box and 0, per axis.
+ * The art never leaves the box: a drag or a scroll that would show past its
+ * edge stops at the edge, and art at fit or smaller stays centred.
  */
-export const clampToBox = (view: View, box: Box): View => ({
+export const keepInView = (view: View, box: Box, content: Box): View => ({
   scale: view.scale,
-  x: clamp(view.x, box.width * (1 - view.scale), 0),
-  y: clamp(view.y, box.height * (1 - view.scale), 0),
+  x: keepAxis(view.x, box.width, content.width * view.scale),
+  y: keepAxis(view.y, box.height, content.height * view.scale),
 });
 
 /* Types */

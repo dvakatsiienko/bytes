@@ -14,7 +14,7 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import type { Range } from '../zoom.ts';
 import {
   MAX_SCALE,
-  clampToBox,
+  keepInView,
   pressStep,
   viewerRange,
   wheelTransform,
@@ -25,16 +25,18 @@ const ANIMATION_MS = 160;
 const FIT_INSET = 60;
 
 /**
- * `viewer`: the zoom dialog — opens fitted, free to pan past the edges.
- * `canvas`: the piece on the bench — 1× is its laid-out size, it never zooms
- * out past that or pans past the art's edge, and a plain scroll is the page's
- * until it is zoomed in.
+ * `viewer`: the zoom dialog — opens fitted, every scroll zooms.
+ * `canvas`: the piece on the bench, zoomed in place — 1× is its laid-out size
+ * and the floor; pinch or ⌘-scroll zooms, and a plain scroll is the page's
+ * until the art is zoomed in, then it pans.
+ * In both the art never leaves the box.
  */
 const modes = {
   canvas: {
     fit: (zoom: ReactZoomPanPinchRef, animationMs: number) =>
       zoom.setTransform(0, 0, 1, animationMs),
-    isBounded: true,
+    isInline: true,
+    plainScroll: 'pan',
     range: { max: MAX_SCALE, min: 1 },
   },
   viewer: {
@@ -50,7 +52,9 @@ const modes = {
           animationMs,
         );
     },
-    isBounded: false,
+    isInline: false,
+    // the zoom viewer is for zooming: a plain wheel zooms, as in the react-zoom-pan-pinch demo
+    plainScroll: 'zoom',
     range: viewerRange,
   },
 } satisfies Record<string, ZoomMode>;
@@ -67,10 +71,12 @@ export const ZoomBox = (props: ZoomBoxProps) => {
 
   return (
     <TransformWrapper
-      centerOnInit={!mode.isBounded}
+      autoAlignment={{ sizeX: 0, sizeY: 0 }}
+      centerOnInit={!mode.isInline}
+      centerZoomedOut
       doubleClick={{ disabled: true }}
       keyboard={{ disabled: false, panStep: 60 }}
-      limitToBounds={mode.isBounded}
+      limitToBounds
       maxScale={mode.range.max}
       minScale={mode.range.min}
       onInit={(ref) => {
@@ -98,7 +104,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
           scale: state.scale,
         })
       }
-      panning={{ disabled: mode.isBounded && !isZoomed }}
+      panning={{ disabled: mode.isInline && !isZoomed }}
       wheel={{ disabled: true }}>
       {(controls) => {
         const toolListJSX = [
@@ -147,7 +153,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
           );
         });
         // the canvas keeps its tools out of the art until it is zoomed, hovered or focused
-        const quietClass = mode.isBounded
+        const quietClass = mode.isInline
           ? 'opacity-0 transition-opacity duration-150 group-hover/zoom:opacity-100 group-focus-within/zoom:opacity-100 group-data-[zoomed=true]/zoom:opacity-100'
           : '';
 
@@ -170,15 +176,15 @@ export const ZoomBox = (props: ZoomBoxProps) => {
             </div>
             <TransformComponent
               contentClass={cn(
-                mode.isBounded ? '!w-full' : '',
-                isZoomed || !mode.isBounded
+                mode.isInline ? '!w-full' : '',
+                isZoomed || !mode.isInline
                   ? 'cursor-grab active:cursor-grabbing'
                   : '',
               )}
               contentStyle={{
                 imageRendering: view.isPixelated ? 'pixelated' : 'auto',
               }}
-              wrapperClass={mode.isBounded ? '!w-full' : '!h-full !w-full'}
+              wrapperClass={mode.isInline ? '!w-full' : '!h-full !w-full'}
               wrapperProps={{
                 'aria-label':
                   'zoom box: pinch or ⌘-scroll, + and −, arrows to pan',
@@ -230,7 +236,7 @@ const handleWheel =
     const { positionX, positionY, scale } = zoom.instance.state;
     const isZoomGesture = event.ctrlKey || event.metaKey;
     // an unzoomed canvas leaves a plain scroll to the page
-    if (mode.isBounded && !isZoomGesture && scale <= mode.range.min + 0.001)
+    if (mode.isInline && !isZoomGesture && scale <= mode.range.min + 0.001)
       return;
     event.preventDefault();
     const box = wrapper.getBoundingClientRect();
@@ -246,12 +252,15 @@ const handleWheel =
         pointY: event.clientY - box.top,
       },
       mode.range,
+      mode.plainScroll,
     );
-    const shown = mode.isBounded
-      ? clampToBox(next, {
-          height: wrapper.clientHeight,
-          width: wrapper.clientWidth,
-        })
+    const content = zoom.instance.contentComponent;
+    const shown = content
+      ? keepInView(
+          next,
+          { height: wrapper.clientHeight, width: wrapper.clientWidth },
+          { height: content.offsetHeight, width: content.offsetWidth },
+        )
       : next;
     zoom.setTransform(shown.x, shown.y, shown.scale, 0);
   };
@@ -289,6 +298,7 @@ interface ZoomBoxProps {
 
 interface ZoomMode {
   fit: (zoom: ReactZoomPanPinchRef, animationMs: number) => void;
-  isBounded: boolean;
+  isInline: boolean;
+  plainScroll: 'pan' | 'zoom';
   range: Range;
 }

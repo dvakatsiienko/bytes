@@ -4,7 +4,7 @@ import type { View, Wheel } from './zoom.ts';
 import {
   MAX_SCALE,
   MIN_SCALE,
-  clampToBox,
+  keepInView,
   pressStep,
   wheelTransform,
 } from './zoom.ts';
@@ -119,33 +119,56 @@ describe('pressStep', () => {
   });
 });
 
-describe('clampToBox', () => {
+describe('keepInView', () => {
   const box = { height: 300, width: 500 };
+  const content = { height: 200, width: 400 };
 
-  it('keeps the zoomed art covering the whole box, however far it is pushed', () => {
-    for (const scale of [1, 1.7, 4]) {
+  it('keeps art larger than the box covering it, however far it is pushed', () => {
+    for (const scale of [1.6, 4]) {
       for (const [x, y] of [
         [9999, 9999],
         [-9999, -9999],
         [-40, 25],
       ] as const) {
-        const view = clampToBox({ scale, x, y }, box);
+        const view = keepInView({ scale, x, y }, box, content);
         expect(view.x).toBeLessThanOrEqual(0);
         expect(view.y).toBeLessThanOrEqual(0);
-        expect(view.x + box.width * scale).toBeGreaterThanOrEqual(box.width);
-        expect(view.y + box.height * scale).toBeGreaterThanOrEqual(box.height);
+        expect(view.x + content.width * scale).toBeGreaterThanOrEqual(
+          box.width,
+        );
+        expect(view.y + content.height * scale).toBeGreaterThanOrEqual(
+          box.height,
+        );
       }
+    }
+  });
+
+  it('centres art that fits the box, wherever it was pushed', () => {
+    for (const scale of [0.3, 1]) {
+      const view = keepInView({ scale, x: 9999, y: -9999 }, box, content);
+      expect(view.x).toBeCloseTo((box.width - content.width * scale) / 2, 9);
+      expect(view.y).toBeCloseTo((box.height - content.height * scale) / 2, 9);
     }
   });
 
   it('leaves a view that already covers the box alone', () => {
     const view = { scale: 2, x: -120, y: -80 };
-    expect(clampToBox(view, box)).toEqual(view);
+    expect(keepInView(view, box, box)).toEqual(view);
   });
 });
 
 describe('a range', () => {
   const canvas = { max: 16, min: 1 };
+
+  it('zooms on a plain scroll where the scroll is the zoom', () => {
+    const next = wheelTransform(
+      start,
+      wheelOf({ deltaY: -30 }),
+      undefined,
+      'zoom',
+    );
+    expect(next.scale).toBeGreaterThan(start.scale);
+  });
 
   it('stops a pinch out at its floor and a press out at its floor', () => {
     let view: View = { scale: 2, x: 0, y: 0 };
