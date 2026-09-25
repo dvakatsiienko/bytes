@@ -4,6 +4,7 @@ import { atom } from 'jotai';
 import type { Time } from '../art/time.ts';
 import type { Settings } from './stage/settings.ts';
 import { defaults, toSettings } from './stage/settings.ts';
+import type { TakeFilter } from './takes.ts';
 
 /**
  * Per-viewer conveniences only: the studio theme and the working settings.
@@ -96,6 +97,7 @@ export const isPlayingAtom = atom(false);
 export const compareModeAtom = atom<'side' | 'slider'>('side');
 export const isPaletteOpenAtom = atom(false);
 export const zoomAtom = atom<Zoom | null>(null);
+export const takeFilterAtom = atom<TakeFilter>('all');
 /** a bake waiting for its note: how many frames it will bake, or null when none is asked */
 export const bakeAskAtom = atom<number | null>(null);
 /** the take whose stash form is open, wherever it was asked for */

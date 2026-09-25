@@ -7,23 +7,30 @@ import {
 } from '@ui/kit/components/context-menu';
 import { ScrollArea } from '@ui/kit/components/scroll-area';
 import { cn } from 'cn';
+import { useAtom } from 'jotai';
 import { MoonIcon, SunIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
 import { navigate, pathOf, useRoute } from '../route.ts';
+import { takeFilterAtom } from '../state.ts';
 import { useTakeActions } from '../take-actions.ts';
-import { takeUrl, useTakes } from '../takes.ts';
+import type { TakeFilter } from '../takes.ts';
+import { filterTakes, takeFilters, takeUrl, useTakes } from '../takes.ts';
+import { Segmented } from './segmented';
 
 /** the piece's takes, newest first; the one on screen wears the lamp outline */
 export const TakesRail = (props: TakesRailProps) => {
   const route = useRoute();
   const query = useTakes(props.piece.id);
   const actions = useTakeActions();
+  const [filter, setFilter] = useAtom(takeFilterAtom);
   const list = query.data;
   const shownId = route.view.kind === 'take' ? route.view.take : null;
   const shown = list?.takes.find((take) => take.id === shownId);
 
-  const cardListJSX = (list?.takes ?? []).map((take) => {
+  const shownTakes = list ? filterTakes(list, filter) : [];
+
+  const cardListJSX = shownTakes.map((take) => {
     const isShown = take.id === shownId;
     const isCurrent = list?.current[take.time] === take.id;
     const takeRoute = {
@@ -123,13 +130,27 @@ export const TakesRail = (props: TakesRailProps) => {
         id='takes-title'>
         takes
         <span className='font-mono normal-case tracking-normal'>
-          {list ? list.takes.length : ''}
+          {list && filter !== 'all'
+            ? `${shownTakes.length} of ${list.takes.length}`
+            : list?.takes.length}
         </span>
       </h2>
+      {list && list.takes.length > 0 ? (
+        <div className='px-4 pb-2'>
+          <Segmented
+            ariaLabel='show takes'
+            onValueChange={setFilter}
+            options={filterOptions}
+            value={filter}
+          />
+        </div>
+      ) : null}
       <ScrollArea className='min-h-0 flex-1'>
-        {list && list.takes.length === 0 ? (
+        {list && shownTakes.length === 0 ? (
           <p className='px-4 py-2 text-muted-foreground text-sm'>
-            no takes yet — bake one with the bake button or b
+            {list.takes.length === 0
+              ? 'no takes yet — bake one with the bake button or b'
+              : emptyText[filter]}
           </p>
         ) : null}
         {query.isError ? (
@@ -150,6 +171,16 @@ const Chip = (props: { children: string }) => {
     </span>
   );
 };
+
+/* Helpers */
+
+const filterOptions = takeFilters.map((value) => ({ label: value, value }));
+
+const emptyText = {
+  all: '',
+  current: 'no take ships yet — promote one',
+  stashed: 'nothing stashed',
+} as const satisfies Record<TakeFilter, string>;
 
 /* Types */
 

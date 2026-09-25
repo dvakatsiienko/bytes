@@ -4,6 +4,8 @@ import type { Time } from '../art/time.ts';
 import type { Stash, Take, TakeList } from '../server/takes.ts';
 import type { Settings } from './stage/settings.ts';
 
+export type TakeFilter = (typeof takeFilters)[number];
+
 const api = async <T>(
   path: string,
   init?: { method: string; body?: unknown },
@@ -26,6 +28,16 @@ const api = async <T>(
 };
 
 const takesKey = (piece: string) => ['takes', piece] as const;
+
+export const takeFilters = ['all', 'current', 'stashed'] as const;
+
+/** `current` is what ships, by day or by night; `stashed` is what waits for another job */
+export const filterTakes = (list: TakeList, filter: TakeFilter) => {
+  if (filter === 'all') return list.takes;
+  if (filter === 'stashed') return list.takes.filter((take) => take.stash);
+  const current = new Set(Object.values(list.current));
+  return list.takes.filter((take) => current.has(take.id));
+};
 
 export const takeUrl = (
   take: Pick<Take, 'piece' | 'id'>,
