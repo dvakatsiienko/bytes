@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Take, TakeList } from '../server/takes.ts';
-import { filterTakes, takeFilters } from './takes.ts';
+import { api, filterTakes, takeFilters } from './takes.ts';
 
 const takeOf = (id: string, isStashed = false) =>
   ({
@@ -29,5 +29,23 @@ describe('filterTakes', () => {
     };
     for (const filter of takeFilters)
       expect(idsOf(filterTakes(list, filter))).toEqual(expected[filter]);
+  });
+});
+
+describe('api', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('throws the server error on a failed answer, so nothing reads an error body as data', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          Response.json({ error: 'spawn git ENOENT' }, { status: 500 }),
+        ),
+    );
+    await expect(api('/api/build')).rejects.toThrow('spawn git ENOENT');
   });
 });
