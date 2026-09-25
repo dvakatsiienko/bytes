@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import type { Piece } from '../art/pieces.ts';
 import { pieceSvg, pieces } from '../art/pieces.ts';
+import { errorText } from './error-text.ts';
 import { copyPng, stageCanvas, svgDataUrl } from './image.ts';
 import { navigate, useRoute } from './route.ts';
 import { stageScenes } from './stage/scenes.ts';
@@ -23,9 +24,6 @@ import { takeUrl, useBake, useTakes } from './takes.ts';
 
 const next = <T>(list: readonly T[], value: T) =>
   list[(list.indexOf(value) + 1) % list.length] as T;
-
-const errorText = (error: unknown) =>
-  error instanceof Error ? error.message : String(error);
 
 /**
  * Every action the studio offers, in one place: the toolbar buttons, the bare
@@ -72,9 +70,11 @@ export const useStudioActions = (piece: Piece) => {
       : null;
   };
 
-  const bake = () => {
+  /** a still, or with `frames` a motion loop baked as an animated webp */
+  const bake = (frames = 1) => {
     if (bakeMutation.isPending) return;
     const pending = bakeMutation.mutateAsync({
+      frames,
       note: '',
       piece: piece.id,
       settings,
@@ -82,7 +82,10 @@ export const useStudioActions = (piece: Piece) => {
     });
     toast.promise(pending, {
       error: (error: unknown) => `bake failed: ${errorText(error)}`,
-      loading: `baking ${piece.id} · ${time}…`,
+      loading:
+        frames > 1
+          ? `baking a ${frames}-frame loop of ${piece.id} · ${time}…`
+          : `baking ${piece.id} · ${time}…`,
       success: (take) => ({
         action: {
           label: 'open',
@@ -135,7 +138,9 @@ export const useStudioActions = (piece: Piece) => {
   };
 
   return {
-    bake,
+    bake: () => bake(),
+    // 72 frames: 12 a second over the six-second loop, the rate the stage plays at
+    bakeLoop: () => bake(72),
     copyImage,
     copySettings,
     cycleReadme: () => setReadme(next(readmeWidths, readme)),
@@ -164,5 +169,7 @@ export const useStudioActions = (piece: Piece) => {
     zoom,
   };
 };
+
+/* Types */
 
 export type StudioActions = ReturnType<typeof useStudioActions>;

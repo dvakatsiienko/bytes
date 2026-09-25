@@ -47,6 +47,7 @@ export const useBake = () => {
       time: Time;
       settings: Settings;
       note: string;
+      frames: number;
     }) => api<Take>('/api/bake', { body: input, method: 'POST' }),
     onSuccess: (take) =>
       client.invalidateQueries({ queryKey: takesKey(take.piece) }),

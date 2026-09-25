@@ -21,7 +21,14 @@ beforeEach(async () => {
 });
 
 const bake = (time: 'day' | 'night', note = '') =>
-  saveTake({ note, piece: 'market', settings: defaults, time, webp });
+  saveTake({
+    frames: 1,
+    note,
+    piece: 'market',
+    settings: defaults,
+    time,
+    webp,
+  });
 
 test('a take folder is named by its index, its time and its note', async () => {
   await bake('day');

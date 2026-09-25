@@ -60,6 +60,10 @@ export const TakeRecord = (props: TakeRecordProps) => {
   const facts = [
     ['time', props.take.time],
     ['seed', String(props.take.seed)],
+    [
+      'frames',
+      props.take.frames > 1 ? `${props.take.frames}, looping` : 'still',
+    ],
     ['source', props.take.sourceHash],
     ['baked', new Date(props.take.bakedAt).toLocaleString()],
   ] as const;
@@ -132,7 +136,7 @@ export const TakeRecord = (props: TakeRecordProps) => {
             <ArchiveIcon /> unstash
           </Button>
         ) : (
-          <StashForm take={props.take} />
+          <StashForm key={props.take.id} take={props.take} />
         )}
         <Popover>
           <PopoverTrigger

@@ -4,6 +4,7 @@ import type { PerspectiveCamera } from 'three';
 
 import { palettes } from '../../art/palette.ts';
 import type { Time } from '../../art/time.ts';
+import { errorText } from '../error-text.ts';
 import type { Stage } from '../stage/build.ts';
 import { buildScene, cameraDistance } from '../stage/build.ts';
 import { createRenderer, fov } from '../stage/renderer.ts';
@@ -43,12 +44,14 @@ const StageDriver = (props: StageCanvasProps) => {
   const pendingSignal = useRef<string | null>(null);
   const clock = useRef(0);
   const onRendered = useRef(props.onRendered);
+  const onFrame = useRef(props.onFrame);
   const onProgress = useRef(props.onProgress);
   const onError = useRef(props.onError);
   const { invalidate } = three;
 
   useEffect(() => {
     onRendered.current = props.onRendered;
+    onFrame.current = props.onFrame;
     onProgress.current = props.onProgress;
     onError.current = props.onError;
   });
@@ -87,10 +90,7 @@ const StageDriver = (props: StageCanvasProps) => {
         invalidate();
       })
       .catch((error: unknown) => {
-        if (!isCancelled)
-          onError.current?.(
-            error instanceof Error ? error.message : String(error),
-          );
+        if (!isCancelled) onError.current?.(errorText(error));
       });
     return () => {
       isCancelled = true;
@@ -124,12 +124,18 @@ const StageDriver = (props: StageCanvasProps) => {
   useFrame((_state, delta) => {
     if (props.isPlaying)
       clock.current = (clock.current + delta / LOOP_SECONDS) % 1;
-    const isDrawn = renderer.render(settings.current, clock.current);
+    const t = props.t ?? clock.current;
+    const isDrawn = renderer.render(settings.current, t);
     if (isDrawn && pendingSignal.current) {
       onRendered.current?.(pendingSignal.current);
       pendingSignal.current = null;
     }
+    if (isDrawn) onFrame.current?.(t);
   }, 1);
+
+  useEffect(() => {
+    if (props.t !== undefined) invalidate();
+  }, [props.t, invalidate]);
 
   return null;
 };
@@ -141,10 +147,14 @@ interface StageCanvasProps {
   dpr?: number;
   isPlaying: boolean;
   onError?: (message: string) => void;
+  /** after every drawn frame, with the loop time it drew */
+  onFrame?: (t: number) => void;
   onProgress?: (done: number, total: number) => void;
   onRendered?: (label: string) => void;
   pieceId: string;
   settings: Settings;
   spec: SceneSpec;
+  /** a fixed loop time in [0, 1) instead of the clock: a loop bake draws frame i of n at t = i / n */
+  t?: number;
   time: Time;
 }

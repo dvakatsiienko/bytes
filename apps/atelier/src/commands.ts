@@ -16,6 +16,15 @@ export const commandsOf = (
   });
   return [
     { group: 'bench', keys: 'b', label: 'bake this view', run: actions.bake },
+    ...(actions.isStage
+      ? [
+          {
+            group: 'bench',
+            label: 'bake a motion loop (animated webp)',
+            run: actions.bakeLoop,
+          } as const,
+        ]
+      : []),
     {
       group: 'bench',
       keys: 'c',

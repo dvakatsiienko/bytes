@@ -2,13 +2,11 @@ import { useSetAtom } from 'jotai';
 import { toast } from 'sonner';
 
 import type { Take } from '../server/takes.ts';
+import { errorText } from './error-text.ts';
 import { copyPng } from './image.ts';
 import { navigate } from './route.ts';
 import { patchSettingsAtom, stashFormAtom, timeAtom } from './state.ts';
 import { takeUrl, usePromote, useUpdateTake } from './takes.ts';
-
-const errorText = (error: unknown) =>
-  error instanceof Error ? error.message : String(error);
 
 /** what can be done to one take; the card's context menu and the take view share these */
 export const useTakeActions = () => {

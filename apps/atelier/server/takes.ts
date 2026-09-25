@@ -157,6 +157,7 @@ const writeTake = async (input: NewTake): Promise<Take> => {
   const meta = {
     bakedAt: new Date().toISOString(),
     files: input.svg ? ['bake.webp', 'piece.svg'] : ['bake.webp'],
+    frames: input.frames,
     note,
     piece: input.piece,
     seed: input.settings.seed,
@@ -215,6 +216,8 @@ export interface Stash {
 export interface Take {
   bakedAt: string;
   files: TakeFile[];
+  /** 1 for a still; more for a motion loop baked as an animated webp */
+  frames: number;
   id: string;
   note: string;
   piece: string;
@@ -242,6 +245,7 @@ export interface TakePatch {
 }
 
 interface NewTake {
+  frames: number;
   note: string;
   piece: string;
   settings: Settings;

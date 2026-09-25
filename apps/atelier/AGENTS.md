@@ -40,6 +40,8 @@ Done when the piece shows in the rail and renders by day and by night:
 ## Bake, compare, ship
 
 - **Bake** writes a take: the bench button, `b`, or `pnpm atelier:bake <piece> [day|night|both]`.
+  `--loop [frames]` (or «bake a motion loop» in ⌘K) bakes the stage's six-second motion into a
+  looping animated webp at 1×, 72 frames by default; `take.json` records `frames`.
   One code path for all three (`server/bake.ts`): a lit scene renders in headless chromium at
   2×, a flat piece goes svgo → resvg; sharp writes the webp. The first take of a time becomes
   current; `promote` changes it.
@@ -61,4 +63,4 @@ Done when the piece shows in the rail and renders by day and by night:
   The passes are three's own (`src/stage/renderer.ts`). They match pmndrs `postprocessing` in
   colour (measured on BYT-103); the two differ only in edge blur and antialiasing.
 - Chromium's first bake on a fresh machine needs `pnpm exec playwright install chromium`; the
-  bake error says so.
+  bake error says so. On a mac it renders on the GPU (Metal), elsewhere in software (SwiftShader).

@@ -4,6 +4,7 @@ import type { Plugin, ViteDevServer } from 'vite';
 
 import type * as piecesModule from '../art/pieces.ts';
 import { isTime } from '../art/time.ts';
+import { errorText } from '../src/error-text.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
 import { bake, closeBrowser } from './bake.ts';
 import type { Stash, TakePatch } from './takes.ts';
@@ -38,7 +39,7 @@ export const atelierApi = (): Plugin => ({
       }
       route(server, req, res).catch((error: unknown) => {
         send(res, 500, {
-          error: error instanceof Error ? error.message : String(error),
+          error: errorText(error),
         });
       });
     });
@@ -86,10 +87,12 @@ const route = async (
     if (!isTime(body.time))
       return send(res, 400, { error: 'time is day or night' });
     const settings = toSettings(body.settings);
+    const frames = loopFrames(body.frames);
     const origin = server.resolvedUrls?.local[0];
     if (!origin)
       return send(res, 500, { error: 'the dev server has no local url' });
     const baked = await bake({
+      frames,
       load: (path) => server.ssrLoadModule(path),
       origin,
       piece: piece.id,
@@ -98,6 +101,7 @@ const route = async (
     });
     const note = typeof body.note === 'string' ? body.note.slice(0, 200) : '';
     const take = await saveTake({
+      frames,
       note,
       piece: piece.id,
       settings,
@@ -151,6 +155,15 @@ const route = async (
   }
   return send(res, 404, { error: 'not found' });
 };
+
+/** a loop is 2–240 frames; anything else bakes a still */
+const loopFrames = (value: unknown) =>
+  typeof value === 'number' &&
+  Number.isInteger(value) &&
+  value >= 2 &&
+  value <= 240
+    ? value
+    : 1;
 
 const toPatch = (body: Record<string, unknown>): TakePatch => {
   const patch: TakePatch = {};

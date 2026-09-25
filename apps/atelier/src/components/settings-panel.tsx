@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 
 import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
+import { errorText } from '../error-text.ts';
 import type { ControlRow, Settings } from '../stage/settings.ts';
 import { controls, defaults, isHex, looks } from '../stage/settings.ts';
 import { patchSettingsAtom, settingsByPieceAtom } from '../state.ts';
@@ -100,9 +101,7 @@ const copyValue = async (key: string, value: string | number | boolean) => {
       </span>,
     );
   } catch (error) {
-    toast.error(
-      `copy failed: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    toast.error(`copy failed: ${errorText(error)}`);
   }
 };
 

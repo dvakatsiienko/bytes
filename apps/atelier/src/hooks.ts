@@ -51,7 +51,12 @@ export const useHotkeys = (
         event.defaultPrevented
       )
         return;
-      if (isTyping(event.target) || document.querySelector('[role="dialog"]'))
+      if (
+        isTyping(event.target) ||
+        document.querySelector(
+          '[role="dialog"], [role="listbox"], [role="menu"]',
+        )
+      )
         return;
       const command = commands.find(
         (candidate) => candidate.keys === event.key,
