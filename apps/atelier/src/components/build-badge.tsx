@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import type { Build } from '../../server/build.ts';
+import { api } from '../takes.ts';
 
 /**
  * Which checkout this studio runs from: «main · 2a407e1f» on the daemon,
@@ -8,8 +9,9 @@ import type { Build } from '../../server/build.ts';
  * pull shows without a reload.
  */
 export const BuildBadge = () => {
+  // api() throws on a failed answer, so a git that cannot run leaves the badge hidden, never «undefined»
   const build = useQuery({
-    queryFn: async (): Promise<Build> => (await fetch('/api/build')).json(),
+    queryFn: () => api<Build>('/api/build'),
     queryKey: ['build'],
   }).data;
   if (!build) return null;

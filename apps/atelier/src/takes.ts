@@ -7,7 +7,7 @@ import type { Settings } from './stage/settings.ts';
 
 export type TakeFilter = (typeof takeFilters)[number];
 
-const api = async <T>(
+export const api = async <T>(
   path: string,
   init?: { method: string; body?: unknown },
 ): Promise<T> => {
