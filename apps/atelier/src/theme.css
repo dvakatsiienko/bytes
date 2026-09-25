@@ -1,0 +1,125 @@
+@import "@ui/kit/globals.css";
+@import "tw-animate-css";
+@import "@fontsource/young-serif";
+@import "@fontsource-variable/figtree";
+@import "@fontsource-variable/jetbrains-mono";
+
+@theme inline {
+  --font-sans: "Figtree Variable", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Young Serif", Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, Menlo, monospace;
+  --color-lamp: var(--lamp);
+  --color-lamp-ink: var(--lamp-ink);
+  --color-lamp-edge: var(--lamp-edge);
+  --color-surface: var(--surface);
+  --color-chip: var(--chip);
+  --color-segment-on: var(--segment-on);
+  --color-gh: var(--gh);
+  --color-gh-line: var(--gh-line);
+  --color-gh-muted: var(--gh-muted);
+  --shadow-lamp: 0 18px 48px -18px rgb(10 14 30 / 0.45);
+  --shadow-float: 0 6px 18px -6px rgb(10 14 30 / 0.35);
+  --shadow-hairline: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+
+/* DESIGN.md «day»: the kit's L2 names carry the neutrals; the accent is its
+   own token, so a slider or a switch never borrows the lamp. */
+:root {
+  --radius: 10px;
+  --background: #eaf2f7;
+  --foreground: #22324a;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #22324a;
+  --popover: #ffffff;
+  --popover-foreground: #22324a;
+  --primary: #22324a;
+  --primary-foreground: #ffffff;
+  --secondary: #dde8f0;
+  --secondary-foreground: #22324a;
+  --chip: #dde8f0;
+  --segment-on: #ffffff;
+  --muted: #dde8f0;
+  --muted-foreground: #56667c;
+  --accent: #dde8f0;
+  --accent-foreground: #22324a;
+  --border: #cfdbe5;
+  --input: #cfdbe5;
+  --ring: #3f6fb0;
+  /* DESIGN.md terracotta #c8553d, one step darker: white on it reads 4.67:1, not 4.35 */
+  --lamp: #c25039;
+  --lamp-ink: #ffffff;
+  --lamp-edge: #963b29;
+  --gh: #ffffff;
+  --gh-line: #d1d9e0;
+  --gh-muted: #59636e;
+}
+
+/* DESIGN.md «night» */
+.dark {
+  --background: #121629;
+  --foreground: #e8ecf6;
+  --surface: #1a2040;
+  --card: #1a2040;
+  --card-foreground: #e8ecf6;
+  --popover: #222a50;
+  --popover-foreground: #e8ecf6;
+  --primary: #e8ecf6;
+  --primary-foreground: #1a1f3a;
+  --secondary: #252c52;
+  --secondary-foreground: #e8ecf6;
+  --chip: #252c52;
+  /* the studio artifact's pressed tone: a pressed segment must be lighter than its trough */
+  --segment-on: #3a4378;
+  --muted: #252c52;
+  --muted-foreground: #9aa3c8;
+  --accent: #252c52;
+  --accent-foreground: #e8ecf6;
+  --border: #2c3460;
+  --input: #2c3460;
+  --ring: #b3a6ee;
+  --lamp: #ffd978;
+  --lamp-ink: #1a1f3a;
+  --lamp-edge: #c9a64a;
+}
+
+/* the readme chrome follows the time of day, not the studio theme: a night
+   bake is judged on github's dark page */
+[data-time="night"] {
+  --gh: #0d1117;
+  --gh-line: #30363d;
+  --gh-muted: #9198a1;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Unlayered, so it wins over `outline-none` in the kit's utilities: DESIGN.md
+   asks for a 2px ring, offset 2px, on every control. */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+::selection {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--ring) 35%, var(--background));
+}
+
+@layer base {
+  body {
+    @apply font-sans text-sm antialiased;
+  }
+  button:not(:disabled),
+  a[href],
+  summary,
+  [role="button"]:not([aria-disabled="true"]),
+  [role="switch"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="slider"] {
+    cursor: pointer;
+  }
+}

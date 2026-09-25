@@ -24,6 +24,7 @@ bumping framework versions, update the Stack column below — it drifts stale ot
 | `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
 | `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, Auth.js       | WIP        |
 | `proto-lab`          | Prototype platform, swappable proto slot | Vite 8, React 19, Tailwind v4, shadcn | Active Dev |
+| `atelier`            | Art studio: scenes as code, lit and baked | Vite 8, React 19.3, three.js + r3f, kit | Active Dev, local only |
 | `figmentation`       | CSS/design experiments                  | Next.js 16, CSS Modules           | Showcase   |
 | `trophy-sys`         | PSN trophy tracker, retro terminal UI   | Vite 8, React 19, TanStack, Upstash | Active Dev |
 
@@ -162,9 +163,9 @@ short: one that nothing needs hides the next genuinely undeclared import until t
 Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only settings are invisible
 to agents and to code review, and they silently override the repo — a dashboard edit to
 `trophy-sys`'s Root Directory once broke a deploy that no diff could explain. Six apps have one —
-`cv`, `figmentation`, `financial`, `space-explorer-ui`, `trophy-sys`, `x-com-chat`. `proto-lab`
-and `space-explorer-api` do not; `space-explorer-api` deploys on Railway instead, from
-`railway.json`.
+`cv`, `figmentation`, `financial`, `space-explorer-ui`, `trophy-sys`, `x-com-chat`. `proto-lab`,
+`atelier` and `space-explorer-api` do not; `space-explorer-api` deploys on Railway instead, from
+`railway.json`, and `atelier` never deploys — it is a local studio.
 
 **Vercel's git integration is off.** Every `vercel.json` carries `git.deploymentEnabled: false` —
 the bool, not the branch-prefix object it replaced. The object never stopped a deployment being

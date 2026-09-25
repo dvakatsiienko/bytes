@@ -8,6 +8,7 @@
   "scripts": {
     "dev:@space-explorer/api": "turbo run @space-explorer/api#dev",
     "dev:@space-explorer/ui": "turbo run @space-explorer/ui#dev",
+    "dev:atelier": "turbo run atelier#dev",
     "dev:cv": "turbo run cv#dev",
     "dev:figmentation": "turbo run figmentation#dev",
     "dev:financial": "turbo run financial#dev",

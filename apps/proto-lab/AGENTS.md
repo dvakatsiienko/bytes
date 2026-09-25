@@ -54,16 +54,10 @@ Three faces: Bricolage Grotesque (display), Inter (body), JetBrains Mono (data a
 
 ## Neighbours — prototypes that live elsewhere
 
-- **the diorama studio** — readme art (frame, the github profile, bytes) is prototyped outside
-  this app. The page is a private claude.ai artifact
-  (https://claude.ai/artifact/4YAEdDqeH5SrSCUWnkB13h): every piece in v1 and v2, day and night,
-  readme widths, click to zoom. Its source art lives in `~/frame/brand/diorama/` (bible, palette,
-  `.ts` generators, `pnpm diorama:draw`).
-- **the diorama stage** — `~/frame/brand/diorama/stage`, a vite + three.js page on :7380
-  (`pnpm diorama:dev` in frame): the svg sheets as lit paper planes, light sliders, `?bake`
-  renders the 2× png a readme ships.
+- **atelier** — readme art (frame, the github profile, bytes) is drawn, lit and baked in
+  `apps/atelier`: takes, compare, readme widths, zoom. Its `AGENTS.md` has the recipes.
 - the split: a question about app state or interaction is a proto here; a question about how an
-  image looks is the studio's. The recipe trace is `~/frame/cclio/docs/recipes/diorama-draw.md`.
+  image looks is atelier's.
 
 ## Notes
 
