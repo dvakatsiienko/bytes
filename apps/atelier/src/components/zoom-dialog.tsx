@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { Dialog, DialogContent, DialogTitle } from '@ui/kit/components/dialog';
 import { useAtom } from 'jotai';
-import { MinusIcon, PlusIcon, ScanIcon } from 'lucide-react';
+import {
+  LocateFixedIcon,
+  ScanIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from 'lucide-react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
@@ -12,8 +17,8 @@ import { MAX_SCALE, MIN_SCALE, wheelTransform } from '../zoom.ts';
 /** a button press or a +/− key multiplies the scale by this; the library's steps are absolute, so they follow the scale */
 const PRESS_FACTOR = 1.5;
 const ANIMATION_MS = 160;
-/** air around a fitted image, so it never sits flush on the box edge */
-const FIT_INSET = 32;
+/** air around a fitted image: clear of the box edge, the floating toolbar and the scale badge */
+const FIT_INSET = 60;
 
 const fitScale = (wrapper: HTMLElement, image: HTMLImageElement) =>
   Math.min(
@@ -98,56 +103,66 @@ export const ZoomDialog = () => {
             {(controls) => {
               const fit = (animationMs: number) =>
                 fitView(controls, animationMs);
+              const toolListJSX = [
+                {
+                  icon: <ZoomInIcon />,
+                  label: 'zoom in',
+                  run: () =>
+                    controls.zoomIn(scale * (PRESS_FACTOR - 1), ANIMATION_MS),
+                  title: 'zoom in (+)',
+                },
+                {
+                  icon: <ZoomOutIcon />,
+                  label: 'zoom out',
+                  run: () =>
+                    controls.zoomOut(
+                      scale * (1 - 1 / PRESS_FACTOR),
+                      ANIMATION_MS,
+                    ),
+                  title: 'zoom out (−)',
+                },
+                {
+                  icon: <ScanIcon />,
+                  label: 'fit',
+                  run: () => fit(ANIMATION_MS),
+                  title: 'reset: fit the whole image',
+                },
+                {
+                  icon: <span className='font-mono text-[12px]'>1:1</span>,
+                  label: 'one to one',
+                  run: () => controls.centerView(1, ANIMATION_MS),
+                  title: 'one image pixel per screen pixel',
+                },
+                {
+                  icon: <LocateFixedIcon />,
+                  label: 'center',
+                  run: () => controls.centerView(scale, ANIMATION_MS),
+                  title: 'center the image, keep the scale',
+                },
+              ].map((tool) => {
+                return (
+                  <Button
+                    aria-label={tool.label}
+                    key={tool.label}
+                    onClick={tool.run}
+                    size='icon-sm'
+                    title={tool.title}
+                    variant='ghost'>
+                    {tool.icon}
+                  </Button>
+                );
+              });
               return (
-                <>
-                  <div className='flex items-center gap-1'>
-                    <Button
-                      aria-label='zoom out'
-                      onClick={() =>
-                        controls.zoomOut(
-                          scale * (1 - 1 / PRESS_FACTOR),
-                          ANIMATION_MS,
-                        )
-                      }
-                      size='icon-sm'
-                      title='zoom out (−)'
-                      variant='outline'>
-                      <MinusIcon />
-                    </Button>
-                    <Button
-                      aria-label='zoom in'
-                      onClick={() =>
-                        controls.zoomIn(
-                          scale * (PRESS_FACTOR - 1),
-                          ANIMATION_MS,
-                        )
-                      }
-                      size='icon-sm'
-                      title='zoom in (+)'
-                      variant='outline'>
-                      <PlusIcon />
-                    </Button>
-                    <Button
-                      onClick={() => fit(ANIMATION_MS)}
-                      size='sm'
-                      title='fit the whole image'
-                      variant='outline'>
-                      <ScanIcon /> fit
-                    </Button>
-                    <Button
-                      onClick={() => controls.centerView(1, ANIMATION_MS)}
-                      size='sm'
-                      title='one image pixel per screen pixel'
-                      variant='outline'>
-                      1:1
-                    </Button>
-                    <span className='ml-2 font-mono text-[12px] text-muted-foreground tabular-nums'>
-                      {Math.round(scale * 100)} %
-                    </span>
+                <div className='relative min-h-0 flex-1 overflow-hidden rounded-lg border border-foreground/15 bg-chip dark:bg-background'>
+                  <div
+                    aria-label='zoom'
+                    className='absolute top-3 left-3 z-10 flex items-center gap-0.5 rounded-lg bg-popover p-1 shadow-float'
+                    role='toolbar'>
+                    {toolListJSX}
                   </div>
                   <TransformComponent
                     contentClass='cursor-grab active:cursor-grabbing'
-                    wrapperClass='min-h-0 flex-1 !w-full rounded-md bg-chip'>
+                    wrapperClass='!h-full !w-full'>
                     {/* biome-ignore lint/correctness/useImageSize: any image can be zoomed; it draws at its own natural size on purpose */}
                     {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: onLoad is the fit signal, not an interaction */}
                     <img
@@ -161,7 +176,12 @@ export const ZoomDialog = () => {
                       }}
                     />
                   </TransformComponent>
-                </>
+                  <output
+                    aria-label='scale'
+                    className='pointer-events-none absolute right-3 bottom-3 z-10 rounded-md bg-popover px-2 py-1 font-mono text-[12px] tabular-nums shadow-float'>
+                    {scale.toFixed(2)}×
+                  </output>
+                </div>
               );
             }}
           </TransformWrapper>
