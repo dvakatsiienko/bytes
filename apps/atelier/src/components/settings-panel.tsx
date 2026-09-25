@@ -138,9 +138,7 @@ const SettingRow = (props: SettingRowProps) => {
 
   const labelJSX = (
     <label className='min-w-0' htmlFor={id}>
-      <span className='block text-[13px] text-foreground'>
-        {props.row.label}
-      </span>
+      <span className='block text-foreground text-sm'>{props.row.label}</span>
       <code className='block font-mono text-[12px] text-muted-foreground'>
         {props.row.key}
       </code>

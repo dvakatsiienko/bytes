@@ -98,14 +98,6 @@ export const Viewport = (props: ViewportProps) => {
           options={readmeOptions}
           value={props.actions.readme}
         />
-        {pair ? (
-          <Segmented
-            ariaLabel='compare mode'
-            onValueChange={setCompareMode}
-            options={compareOptions}
-            value={compareMode}
-          />
-        ) : null}
         {view.kind === 'live' && props.actions.isStage ? (
           <Button
             aria-pressed={props.actions.isPlaying}
@@ -146,6 +138,16 @@ export const Viewport = (props: ViewportProps) => {
       </div>
       <div className='min-h-0 flex-1 overflow-auto p-6'>
         <div className='mx-auto flex max-w-[1400px] flex-col gap-6'>
+          {pair ? (
+            <div className='flex justify-end'>
+              <Segmented
+                ariaLabel='compare mode'
+                onValueChange={setCompareMode}
+                options={compareOptions}
+                value={compareMode}
+              />
+            </div>
+          ) : null}
           <div className='rounded-[10px] bg-surface p-4 shadow-lamp'>
             <ReadmeFrame width={props.actions.readme}>{contentJSX}</ReadmeFrame>
           </div>

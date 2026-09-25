@@ -46,9 +46,10 @@
   --border: #cfdbe5;
   --input: #cfdbe5;
   --ring: #3f6fb0;
-  --lamp: #c8553d;
+  /* DESIGN.md terracotta #c8553d, one step darker: white on it reads 4.67:1, not 4.35 */
+  --lamp: #c25039;
   --lamp-ink: #ffffff;
-  --lamp-edge: #9c3f2c;
+  --lamp-edge: #963b29;
   --gh: #ffffff;
   --gh-line: #d1d9e0;
   --gh-muted: #59636e;
