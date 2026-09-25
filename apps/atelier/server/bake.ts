@@ -74,17 +74,28 @@ const gpuArgs =
 const launch = () => chromium.launch({ args: gpuArgs });
 
 /** one browser for the server's life: launching per bake costs a second each time */
-const getBrowser = () => {
-  browser ??= launch().catch((error: unknown) => {
-    browser = null;
-    const message = errorText(error);
-    throw new Error(
-      message.includes("Executable doesn't exist")
-        ? 'playwright has no chromium yet — run `pnpm exec playwright install chromium` once'
-        : message,
-    );
-  });
-  return browser;
+export const getBrowser = () => {
+  if (browser) return browser;
+  const launching: Promise<Browser> = launch()
+    .then((launched) => {
+      // a crashed or closed chromium must not be handed to the next bake; a
+      // late event from an old browser must not clear a newer one
+      launched.on('disconnected', () => {
+        if (browser === launching) browser = null;
+      });
+      return launched;
+    })
+    .catch((error: unknown) => {
+      if (browser === launching) browser = null;
+      const message = errorText(error);
+      throw new Error(
+        message.includes("Executable doesn't exist")
+          ? 'playwright has no chromium yet — run `pnpm exec playwright install chromium` once'
+          : message,
+      );
+    });
+  browser = launching;
+  return launching;
 };
 
 export const closeBrowser = async () => {
