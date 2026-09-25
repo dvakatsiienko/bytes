@@ -11,6 +11,14 @@ const schemeQuery = /\(\s*prefers-color-scheme\s*:\s*dark\s*\)/g;
 export const pinColorScheme = (svg: string, scheme: 'light' | 'dark') =>
   svg.replace(schemeQuery, scheme === 'dark' ? 'all' : 'not all');
 
+/** DESIGN.md lamp gold, ringed in lamp ink so it reads on the terracotta tile and on the night one */
+const devDot =
+  '<circle cx="432" cy="80" r="64" fill="#ffd978" stroke="#1a1f3a" stroke-width="16"/>';
+
+/** a dev studio's icon carries a small lamp-gold dot in its top-right corner */
+export const markDev = (svg: string) =>
+  svg.replace('</svg>', `${devDot}</svg>`);
+
 let adaptiveSvg: Promise<string> | undefined;
 
 const loadAdaptiveSvg = async () => {
@@ -24,7 +32,7 @@ const loadAdaptiveSvg = async () => {
  * the first swap. A failed load keeps the icon it has and is not cached, so
  * the next theme change tries again.
  */
-export const showFavicon = async (scheme: 'light' | 'dark') => {
+export const showFavicon = async (scheme: 'light' | 'dark', isDev: boolean) => {
   adaptiveSvg ??= loadAdaptiveSvg();
   let svg: string;
   try {
@@ -34,5 +42,6 @@ export const showFavicon = async (scheme: 'light' | 'dark') => {
     return;
   }
   const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-  if (link) link.href = svgDataUrl(pinColorScheme(svg, scheme));
+  const pinned = pinColorScheme(svg, scheme);
+  if (link) link.href = svgDataUrl(isDev ? markDev(pinned) : pinned);
 };

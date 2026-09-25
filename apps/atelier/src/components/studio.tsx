@@ -13,8 +13,14 @@ import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 import type { Piece } from '../../art/pieces.ts';
 import { findPiece, pieces } from '../../art/pieces.ts';
 import { useStudioActions } from '../actions.ts';
+import { useBuild } from '../build.ts';
 import { commandsOf } from '../commands.ts';
-import { useHotkeys, useMediaQuery, useResolvedTheme } from '../hooks.ts';
+import {
+  useHotkeys,
+  useMediaQuery,
+  useResolvedTheme,
+  useTabMark,
+} from '../hooks.ts';
 import { navigate, useRoute } from '../route.ts';
 import { themeAtom } from '../state.ts';
 import { BuildBadge } from './build-badge';
@@ -59,6 +65,7 @@ const Workbench = (props: WorkbenchProps) => {
   const commands = commandsOf(actions);
   const theme = useAtomValue(themeAtom);
   const resolvedTheme = useResolvedTheme(theme);
+  useTabMark(resolvedTheme, useBuild()?.isDev ?? false);
   const isWide = useMediaQuery('(min-width: 1100px)');
   useHotkeys(commands, actions.openPalette);
 

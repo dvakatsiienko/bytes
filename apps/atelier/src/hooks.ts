@@ -14,16 +14,23 @@ export const useMediaQuery = (query: string) =>
     () => matchMedia(query).matches,
   );
 
-/** `system` follows the OS; the `dark` class on <html> is what the kit's tokens read, and the tab icon follows too */
+/** `system` follows the OS; the `dark` class on <html> is what the kit's tokens read */
 export const useResolvedTheme = (theme: Theme) => {
   const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
   const system = prefersDark ? 'dark' : 'light';
   const resolved = theme === 'system' ? system : theme;
   useEffect(() => {
     document.documentElement.classList.toggle('dark', resolved === 'dark');
-    showFavicon(resolved);
   }, [resolved]);
   return resolved;
+};
+
+/** the tab: its icon follows the theme; a dev studio says so in the title and with a dot on the icon, so it is never mistaken for main */
+export const useTabMark = (resolved: 'light' | 'dark', isDev: boolean) => {
+  useEffect(() => {
+    showFavicon(resolved, isDev);
+    document.title = isDev ? 'atelier · dev' : 'atelier';
+  }, [resolved, isDev]);
 };
 
 const isTyping = (target: EventTarget | null) =>

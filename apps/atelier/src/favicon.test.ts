@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { pinColorScheme, showFavicon } from './favicon.ts';
+import { markDev, pinColorScheme, showFavicon } from './favicon.ts';
 
 const adaptive = readFileSync(
   new URL('../public/favicon.svg', import.meta.url),
@@ -10,6 +10,8 @@ const adaptive = readFileSync(
 const schemeQuery = /prefers-color-scheme/g;
 const alwaysOn = /@media all\b/g;
 const alwaysOff = /@media not all\b/g;
+const lampGold = /#ffd978"/g;
+const devDot = /<circle cx="432"[^>]*\/>/;
 
 describe('pinColorScheme', () => {
   it('leaves no colour-scheme query for the browser to decide, in either theme', () => {
@@ -44,11 +46,24 @@ describe('showFavicon', () => {
       .mockResolvedValueOnce(new Response(adaptive));
     vi.stubGlobal('fetch', fetchMock);
 
-    await expect(showFavicon('dark')).resolves.toBeUndefined();
+    await expect(showFavicon('dark', false)).resolves.toBeUndefined();
     expect(link.href).toBe('/favicon.svg');
 
-    await showFavicon('dark');
+    await showFavicon('dark', false);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(decodeURIComponent(link.href).match(alwaysOn)).not.toBeNull();
+  });
+});
+
+describe('markDev', () => {
+  it('adds exactly one lamp-gold dot, in either theme, and leaves the rest of the icon as it was', () => {
+    for (const scheme of ['light', 'dark'] as const) {
+      const pinned = pinColorScheme(adaptive, scheme);
+      const marked = markDev(pinned);
+      expect(marked.match(lampGold)?.length ?? 0).toBe(
+        (pinned.match(lampGold)?.length ?? 0) + 1,
+      );
+      expect(marked.replace(devDot, '')).toBe(pinned);
+    }
   });
 });
