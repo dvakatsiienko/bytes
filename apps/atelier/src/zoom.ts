@@ -19,9 +19,9 @@ export const OVERSHOOT_PX = 80;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
-/** from 0.9 × fit up to 16× */
+/** from 0.9 × fit up to 16× — or up to fit, for an image so small that its fit is past 16× */
 export const rangeOf = (fit: number): Range => ({
-  max: MAX_SCALE,
+  max: Math.max(MAX_SCALE, fit),
   min: fit * MIN_OF_FIT,
 });
 

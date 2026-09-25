@@ -168,6 +168,15 @@ describe('rangeOf', () => {
     expect(rangeOf(0.5)).toEqual({ max: 16, min: 0.45 });
     expect(rangeOf(1)).toEqual({ max: 16, min: 0.9 });
   });
+
+  it('always holds fit, its floor below its ceiling, even for an icon whose fit is past 16×', () => {
+    for (const fit of [0.05, 1, 17.78, 36, 64]) {
+      const span = rangeOf(fit);
+      expect(span.min).toBeLessThanOrEqual(fit);
+      expect(span.max).toBeGreaterThanOrEqual(fit);
+      expect(span.min).toBeLessThan(span.max);
+    }
+  });
 });
 
 describe('snapScale', () => {

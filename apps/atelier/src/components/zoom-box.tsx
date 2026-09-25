@@ -22,7 +22,6 @@ import {
 
 import { useMediaQuery } from '../hooks.ts';
 import {
-  MAX_SCALE,
   OVERSHOOT_PX,
   keepOverlap,
   pressStep,
@@ -65,7 +64,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
   // booleans, so a transform frame only re-renders the box when one flips
   const [isZoomed, setIsZoomed] = useState(false);
   const [isPixelated, setIsPixelated] = useState(false);
-  const [minScale, setMinScale] = useState(rangeOf(1).min);
+  const [range, setRange] = useState(rangeOf(1));
 
   return (
     <TransformWrapper
@@ -81,8 +80,8 @@ export const ZoomBox = (props: ZoomBoxProps) => {
       doubleClick={{ disabled: true }}
       keyboard={{ disabled: false }}
       limitToBounds
-      maxScale={MAX_SCALE}
-      minScale={minScale}
+      maxScale={range.max}
+      minScale={range.min}
       onPanningStop={(ref) => settle({ mode, ms, zoom: ref }, false)}
       onTransform={(ref, state) => {
         setIsZoomed(state.scale > fitOf(ref, mode) + 0.001);
@@ -164,7 +163,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
             <ZoomBehaviour
               mode={mode}
               ms={ms}
-              onFit={(scale) => setMinScale(rangeOf(scale).min)}
+              onFit={(scale) => setRange(rangeOf(scale))}
             />
             <div
               aria-label='zoom'
@@ -464,7 +463,7 @@ const handleDoubleClick = (context: ZoomContext) => (event: MouseEvent) => {
   const fitScale = fitOf(context.zoom, context.mode);
   if (Math.abs(scale / fitScale - 1) > 0.04) return fit(context);
   const closer = Math.min(
-    MAX_SCALE,
+    rangeOf(fitScale).max,
     Math.max(fitScale * 2, oneToOne(context.zoom)),
   );
   context.zoom.zoomToPoint(closer, event.clientX, event.clientY, context.ms);
@@ -481,7 +480,7 @@ interface ZoomBoxProps {
 interface ZoomBehaviourProps {
   mode: ZoomMode;
   ms: number;
-  /** the viewer's fit, once the image knows its size: the range's floor follows it */
+  /** the viewer's fit, once the image knows its size and on every resize: the range follows it */
   onFit: (scale: number) => void;
 }
 
