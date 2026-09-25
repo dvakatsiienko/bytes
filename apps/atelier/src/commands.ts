@@ -80,8 +80,8 @@ export const commandsOf = (
     {
       group: 'view',
       keys: 't',
-      label: `cycle theme (now ${actions.theme})`,
-      run: actions.cycleTheme,
+      label: `switch light and dark (now ${actions.theme})`,
+      run: actions.toggleTheme,
     },
     {
       group: 'settings',
