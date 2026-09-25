@@ -12,16 +12,18 @@ import {
 
 import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
-import { useRoute } from '../route.ts';
+import { pathOf, useRoute } from '../route.ts';
 import { defaults } from '../stage/settings.ts';
+import type { ReadmeWidth } from '../state.ts';
 import { compareModeAtom, settingsByPieceAtom } from '../state.ts';
-import { useTakes } from '../takes.ts';
-import { BenchAction } from './bench-action';
+import { useShownTake } from '../takes.ts';
+import { BakeButton } from './bake-button';
 import { CompareView } from './compare-view';
 import { LiveView } from './live-view';
-import { ReadmeFrame } from './readme-frame';
+import { ReadmeFrame, frameChromeHeight } from './readme-frame';
 import { Segmented } from './segmented';
-import { TakeImage, TakeRecord } from './take-view';
+import { TakeImage } from './take-view';
+import { ZoomBox } from './zoom-box';
 
 const timeOptions = [
   { icon: <SunIcon />, label: 'day', value: 'day' },
@@ -45,10 +47,9 @@ export const Viewport = (props: ViewportProps) => {
   const settings =
     useAtomValue(settingsByPieceAtom)[props.piece.id] ?? defaults;
   const [compareMode, setCompareMode] = useAtom(compareModeAtom);
-  const list = useTakes(props.piece.id).data;
+  const { list, take: shownTake } = useShownTake(props.piece.id);
   const { view } = route;
   const takeOf = (id: string) => list?.takes.find((take) => take.id === id);
-  const shownTake = view.kind === 'take' ? takeOf(view.take) : undefined;
   const pair =
     view.kind === 'compare'
       ? ([takeOf(view.a), takeOf(view.b)] as const)
@@ -128,12 +129,7 @@ export const Viewport = (props: ViewportProps) => {
             variant='ghost'>
             <CopyIcon />
           </Button>
-          <BenchAction
-            disabled={props.actions.isBaking}
-            onClick={props.actions.bake}
-            title={`bake ${props.actions.time} (b)`}>
-            {props.actions.isBaking ? 'baking…' : 'bake'}
-          </BenchAction>
+          <BakeButton actions={props.actions} />
         </div>
       </div>
       <div className='min-h-0 flex-1 overflow-auto p-6'>
@@ -149,11 +145,28 @@ export const Viewport = (props: ViewportProps) => {
             </div>
           ) : null}
           <div className='rounded-[10px] bg-surface p-4 shadow-lamp'>
-            <ReadmeFrame width={props.actions.readme}>{contentJSX}</ReadmeFrame>
+            <ReadmeFrame width={props.actions.readme}>
+              {pair ? (
+                contentJSX
+              ) : (
+                <div
+                  className='mx-auto'
+                  data-testid={props.actions.isStage ? undefined : 'flat-piece'}
+                  style={{
+                    width: props.actions.isStage
+                      ? undefined
+                      : flatWidth(props.piece, props.actions.readme),
+                  }}>
+                  <ZoomBox
+                    // a new piece, take, time or frame starts unzoomed
+                    key={`${pathOf(route)}:${props.actions.time}:${props.actions.readme}`}
+                    mode='canvas'>
+                    {contentJSX}
+                  </ZoomBox>
+                </div>
+              )}
+            </ReadmeFrame>
           </div>
-          {shownTake && list ? (
-            <TakeRecord list={list} take={shownTake} />
-          ) : null}
         </div>
       </div>
     </section>
@@ -169,6 +182,19 @@ const Missing = (props: { what: string; isLoading: boolean }) => {
     </p>
   );
 };
+
+/* Helpers */
+
+/** the header, the toolbar, the viewport's padding and the mat's: what stands between the window and a piece */
+const CHROME_HEIGHT = '13rem';
+
+/**
+ * A flat piece is drawn for its own size: a 512 px favicon stretched over the
+ * bench reads as a different picture. It shows at that size, narrower when the
+ * frame or the window height would clip it; the zoom gives the detail.
+ */
+const flatWidth = (piece: Piece, readme: ReadmeWidth) =>
+  `min(100%, ${piece.size.w}px, calc((100dvh - ${CHROME_HEIGHT} - ${frameChromeHeight(readme)}px) * ${piece.size.w / piece.size.h}))`;
 
 /* Types */
 

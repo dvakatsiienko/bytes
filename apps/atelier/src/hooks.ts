@@ -1,6 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 
 import type { StudioCommand } from './commands.ts';
+import { showFavicon } from './favicon.ts';
 import type { Theme } from './state.ts';
 
 export const useMediaQuery = (query: string) =>
@@ -13,13 +14,14 @@ export const useMediaQuery = (query: string) =>
     () => matchMedia(query).matches,
   );
 
-/** `system` follows the OS; the `dark` class on <html> is what the kit's tokens read */
+/** `system` follows the OS; the `dark` class on <html> is what the kit's tokens read, and the tab icon follows too */
 export const useResolvedTheme = (theme: Theme) => {
   const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
   const system = prefersDark ? 'dark' : 'light';
   const resolved = theme === 'system' ? system : theme;
   useEffect(() => {
     document.documentElement.classList.toggle('dark', resolved === 'dark');
+    showFavicon(resolved);
   }, [resolved]);
   return resolved;
 };

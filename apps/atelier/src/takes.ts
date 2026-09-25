@@ -2,7 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { Time } from '../art/time.ts';
 import type { Stash, Take, TakeList } from '../server/takes.ts';
+import { useRoute } from './route.ts';
 import type { Settings } from './stage/settings.ts';
+
+export type TakeFilter = (typeof takeFilters)[number];
 
 const api = async <T>(
   path: string,
@@ -27,6 +30,16 @@ const api = async <T>(
 
 const takesKey = (piece: string) => ['takes', piece] as const;
 
+export const takeFilters = ['all', 'current', 'stashed'] as const;
+
+/** `current` is what ships, by day or by night; `stashed` is what waits for another job */
+export const filterTakes = (list: TakeList, filter: TakeFilter) => {
+  if (filter === 'all') return list.takes;
+  if (filter === 'stashed') return list.takes.filter((take) => take.stash);
+  const current = new Set(Object.values(list.current));
+  return list.takes.filter((take) => current.has(take.id));
+};
+
 export const takeUrl = (
   take: Pick<Take, 'piece' | 'id'>,
   file: 'bake.webp' | 'bake.avif' | 'piece.svg' = 'bake.webp',
@@ -38,6 +51,17 @@ export const useTakes = (piece: string) =>
     queryFn: () => api<TakeList>(`/api/takes/${encodeURIComponent(piece)}`),
     queryKey: takesKey(piece),
   });
+
+/** the take the route shows, when it is one of this piece's takes */
+export const useShownTake = (piece: string) => {
+  const { view } = useRoute();
+  const list = useTakes(piece).data;
+  const take =
+    view.kind === 'take'
+      ? list?.takes.find((candidate) => candidate.id === view.take)
+      : undefined;
+  return { list, take };
+};
 
 export const useBake = () => {
   const client = useQueryClient();

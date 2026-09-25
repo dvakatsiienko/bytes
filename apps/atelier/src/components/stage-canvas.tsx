@@ -27,7 +27,9 @@ export const StageCanvas = (props: StageCanvasProps) => {
       dpr={props.dpr ?? [1, 2]}
       flat
       frameloop={props.isPlaying ? 'always' : 'demand'}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}>
+      gl={{ antialias: true, preserveDrawingBuffer: true }}
+      // the laid-out size, not the zoomed one: a 16× canvas zoom must not ask for a 16× drawing buffer
+      resize={{ offsetSize: true }}>
       <StageDriver {...props} />
     </Canvas>
   );

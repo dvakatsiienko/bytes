@@ -1,0 +1,245 @@
+import { describe, expect, it } from 'vitest';
+
+import type { View, Wheel } from './zoom.ts';
+import {
+  MAX_SCALE,
+  MIN_SCALE,
+  keepOverlap,
+  pressStep,
+  settleInView,
+  wheelTransform,
+} from './zoom.ts';
+
+const start: View = { scale: 0.8, x: 40, y: -30 };
+const wheelOf = (patch: Partial<Wheel>): Wheel => ({
+  ctrlKey: false,
+  deltaMode: 0,
+  deltaX: 0,
+  deltaY: 0,
+  metaKey: false,
+  pointX: 300,
+  pointY: 200,
+  ...patch,
+});
+/** trackpad pinch (ctrl), ⌘-scroll, a mouse notch in lines */
+const zooms = [
+  { ctrlKey: true, deltaY: -3 },
+  { ctrlKey: true, deltaY: 7 },
+  { deltaY: -100, metaKey: true },
+  { deltaMode: 1, deltaY: 3, metaKey: true },
+] as const;
+const imagePointUnder = (view: View, x: number, y: number) => ({
+  x: (x - view.x) / view.scale,
+  y: (y - view.y) / view.scale,
+});
+
+describe('wheelTransform', () => {
+  it('keeps the image point under the pointer in place on every zoom', () => {
+    for (const zoom of zooms) {
+      for (const [pointX, pointY] of [
+        [0, 0],
+        [300, 200],
+        [913, 41],
+      ] as const) {
+        const next = wheelTransform(
+          start,
+          wheelOf({ ...zoom, pointX, pointY }),
+        );
+        const before = imagePointUnder(start, pointX, pointY);
+        const after = imagePointUnder(next, pointX, pointY);
+        expect(after.x).toBeCloseTo(before.x, 9);
+        expect(after.y).toBeCloseTo(before.y, 9);
+      }
+    }
+  });
+
+  it('returns to the start scale when a zoom is undone by the opposite zoom', () => {
+    for (const zoom of zooms) {
+      const there = wheelTransform(start, wheelOf(zoom));
+      const back = wheelTransform(
+        there,
+        wheelOf({ ...zoom, deltaY: -zoom.deltaY }),
+      );
+      expect(back.scale).toBeCloseTo(start.scale, 9);
+    }
+  });
+
+  it('keeps growing while a pinch keeps going in, up to the max', () => {
+    let view: View = { scale: 0.5, x: 0, y: 0 };
+    const scales: number[] = [];
+    for (let i = 0; i < 400; i += 1) {
+      view = wheelTransform(view, wheelOf({ ctrlKey: true, deltaY: -4 }));
+      scales.push(view.scale);
+    }
+    expect(scales.some((scale) => scale > 1)).toBe(true);
+    expect(scales).toEqual(scales.toSorted((a, b) => a - b));
+    expect(view.scale).toBe(MAX_SCALE);
+  });
+
+  it('never leaves the scale range, however hard the wheel goes', () => {
+    for (const deltaY of [-1e6, 1e6]) {
+      let view = start;
+      for (let i = 0; i < 300; i += 1)
+        view = wheelTransform(view, wheelOf({ ctrlKey: true, deltaY }));
+      expect(view.scale).toBeGreaterThanOrEqual(MIN_SCALE);
+      expect(view.scale).toBeLessThanOrEqual(MAX_SCALE);
+    }
+  });
+
+  it('pans by the scroll and keeps the scale when no zoom key is held', () => {
+    for (const [deltaMode, unit] of [
+      [0, 1],
+      [1, 16],
+    ] as const) {
+      const next = wheelTransform(
+        start,
+        wheelOf({ deltaMode, deltaX: 12, deltaY: -5 }),
+      );
+      expect(next).toEqual({
+        scale: start.scale,
+        x: start.x - 12 * unit,
+        y: start.y + 5 * unit,
+      });
+    }
+  });
+});
+
+describe('pressStep', () => {
+  it('makes one press in and one press out cancel, from any scale inside the range', () => {
+    for (const from of [0.2, 0.53, 1, 3.7, 10]) {
+      const zoomedIn = from + pressStep(from, 1);
+      expect(zoomedIn - pressStep(zoomedIn, -1)).toBeCloseTo(from, 9);
+      const zoomedOut = from - pressStep(from, -1);
+      expect(zoomedOut + pressStep(zoomedOut, 1)).toBeCloseTo(from, 9);
+    }
+  });
+
+  it('never steps past the scale range', () => {
+    expect(MAX_SCALE + pressStep(MAX_SCALE, 1)).toBe(MAX_SCALE);
+    expect(MIN_SCALE - pressStep(MIN_SCALE, -1)).toBe(MIN_SCALE);
+  });
+});
+
+describe('settleInView', () => {
+  const box = { height: 300, width: 500 };
+  const content = { height: 200, width: 400 };
+
+  it('keeps art larger than the box covering it, however far it is pushed', () => {
+    for (const scale of [1.6, 4]) {
+      for (const [x, y] of [
+        [9999, 9999],
+        [-9999, -9999],
+        [-40, 25],
+      ] as const) {
+        const view = settleInView({ scale, x, y }, box, content);
+        expect(view.x).toBeLessThanOrEqual(0);
+        expect(view.y).toBeLessThanOrEqual(0);
+        expect(view.x + content.width * scale).toBeGreaterThanOrEqual(
+          box.width,
+        );
+        expect(view.y + content.height * scale).toBeGreaterThanOrEqual(
+          box.height,
+        );
+      }
+    }
+  });
+
+  it('centres art that fits the box, wherever it was pushed', () => {
+    for (const scale of [0.3, 1]) {
+      const view = settleInView({ scale, x: 9999, y: -9999 }, box, content);
+      expect(view.x).toBeCloseTo((box.width - content.width * scale) / 2, 9);
+      expect(view.y).toBeCloseTo((box.height - content.height * scale) / 2, 9);
+    }
+  });
+
+  it('leaves a view that already covers the box alone', () => {
+    const view = { scale: 2, x: -120, y: -80 };
+    expect(settleInView(view, box, box)).toEqual(view);
+  });
+});
+
+describe('keepOverlap', () => {
+  const box = { height: 300, width: 500 };
+  const content = { height: 200, width: 400 };
+  const visible = (offset: number, shown: number, size: number) =>
+    Math.min(size, offset + shown) - Math.max(0, offset);
+
+  it('keeps half the art, or half the box, in sight however far it is pushed', () => {
+    for (const scale of [0.3, 1, 4]) {
+      for (const [x, y] of [
+        [9999, 9999],
+        [-9999, -9999],
+      ] as const) {
+        const view = keepOverlap({ scale, x, y }, box, content);
+        const [shownX, shownY] = [
+          content.width * scale,
+          content.height * scale,
+        ];
+        expect(visible(view.x, shownX, box.width)).toBeCloseTo(
+          Math.min(shownX, box.width) / 2,
+          9,
+        );
+        expect(visible(view.y, shownY, box.height)).toBeCloseTo(
+          Math.min(shownY, box.height) / 2,
+          9,
+        );
+      }
+    }
+  });
+
+  it('holds the point under the pointer through a whole pinch from fit, the pointer over the art', () => {
+    const fit = 0.5;
+    const fitted: View = {
+      scale: fit,
+      x: (box.width - content.width * fit) / 2,
+      y: (box.height - content.height * fit) / 2,
+    };
+    for (const [pointX, pointY] of [
+      [160, 110],
+      [250, 150],
+      [340, 190],
+    ] as const) {
+      let view = fitted;
+      const before = imagePointUnder(view, pointX, pointY);
+      for (let i = 0; i < 60; i += 1) {
+        view = keepOverlap(
+          wheelTransform(
+            view,
+            wheelOf({ ctrlKey: true, deltaY: -2.5, pointX, pointY }),
+          ),
+          box,
+          content,
+        );
+        const after = imagePointUnder(view, pointX, pointY);
+        expect(after.x).toBeCloseTo(before.x, 9);
+        expect(after.y).toBeCloseTo(before.y, 9);
+      }
+    }
+  });
+});
+
+describe('a range', () => {
+  const canvas = { max: 16, min: 1 };
+
+  it('zooms on a plain scroll where the scroll is the zoom', () => {
+    const next = wheelTransform(
+      start,
+      wheelOf({ deltaY: -30 }),
+      undefined,
+      'zoom',
+    );
+    expect(next.scale).toBeGreaterThan(start.scale);
+  });
+
+  it('stops a pinch out at its floor and a press out at its floor', () => {
+    let view: View = { scale: 2, x: 0, y: 0 };
+    for (let i = 0; i < 200; i += 1)
+      view = wheelTransform(
+        view,
+        wheelOf({ ctrlKey: true, deltaY: 40 }),
+        canvas,
+      );
+    expect(view.scale).toBe(1);
+    expect(1 - pressStep(1, -1, canvas)).toBe(1);
+  });
+});
