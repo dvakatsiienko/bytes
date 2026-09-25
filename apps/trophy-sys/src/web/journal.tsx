@@ -186,8 +186,9 @@ const GameDayShare = (props: GameDayShareProps) => {
           style={{ left: `${from * 100}%`, width: `${(to - from) * 100}%` }}
         />
       </span>
-      <span className='w-20 text-right text-mute'>
-        {Math.round(from * 100)} → {Math.round(to * 100)}%
+      {/* fixed width keeps the bars aligned down the day */}
+      <span className='w-40 text-right text-mute'>
+        {Math.round(from * 100)}% → {Math.round(to * 100)}% of trophies
       </span>
     </span>
   );
