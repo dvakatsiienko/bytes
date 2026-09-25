@@ -7,7 +7,7 @@ import { isTime } from '../art/time.ts';
 import { errorText } from '../src/error-text.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
 import { bake, closeBrowser } from './bake.ts';
-import { readBuild } from './build.ts';
+import { readBuild, readOthers } from './build.ts';
 import type { Stash, TakePatch } from './takes.ts';
 import {
   TAKE_FILES,
@@ -82,6 +82,9 @@ const route = async (
 
   if (req.method === 'GET' && parts[0] === 'build' && parts.length === 1)
     return send(res, 200, await readBuild());
+  // separate from /api/build, which answers for itself only: two servers probing each other's probe would never end
+  if (req.method === 'GET' && parts[0] === 'ateliers' && parts.length === 1)
+    return send(res, 200, await readOthers());
 
   if (req.method === 'POST' && parts[0] === 'bake' && parts.length === 1) {
     const body = await readBody(req);
