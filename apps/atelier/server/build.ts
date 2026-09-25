@@ -27,20 +27,30 @@ export const readBuild = async (): Promise<Build> => {
   return { branch, isDev: offsetOf() > 0, sha };
 };
 
-/** every worktree in `git worktree list --porcelain` but the one at `self` */
+/** every worktree in `git worktree list --porcelain` but the one at `self`; git lists the main checkout first */
 export const otherTrees = (porcelain: string, self: string) =>
   porcelain
     .split('\n')
     .filter((line) => line.startsWith('worktree '))
-    .map((line) => line.slice('worktree '.length))
-    .filter((tree) => tree !== self);
+    .map((line, index) => ({
+      isMain: index === 0,
+      path: line.slice('worktree '.length),
+    }))
+    .filter((tree) => tree.path !== self);
 
-const treeOffset = async (tree: string) =>
-  Number(
-    (
-      await readFile(join(tree, '.worktree-offset'), 'utf8').catch(() => '0')
-    ).trim(),
-  ) || 0;
+/**
+ * A worktree's port offset from its `.worktree-offset`. Only the main checkout
+ * may go without one (it runs at the base port); a worktree without the file
+ * was never seeded, and read as 0 it would pose as main.
+ */
+const treeOffset = async (tree: Tree) => {
+  const text = await readFile(
+    join(tree.path, '.worktree-offset'),
+    'utf8',
+  ).catch(() => null);
+  if (text === null) return tree.isMain ? 0 : null;
+  return Number(text.trim()) || 0;
+};
 
 const isBuild = (value: unknown): value is Build =>
   typeof value === 'object' &&
@@ -63,7 +73,9 @@ export const readOthers = async (): Promise<Other[]> => {
   ]);
   const found = await Promise.all(
     otherTrees(porcelain, self).map(async (tree): Promise<Other | null> => {
-      const port = base + (await treeOffset(tree));
+      const offset = await treeOffset(tree);
+      if (offset === null) return null;
+      const port = base + offset;
       if (port === Number(process.env.PORT)) return null;
       try {
         const answer: unknown = await (
@@ -72,17 +84,27 @@ export const readOthers = async (): Promise<Other[]> => {
           })
         ).json();
         if (!isBuild(answer)) return null;
-        const name = answer.branch === 'HEAD' ? basename(tree) : answer.branch;
+        const name =
+          answer.branch === 'HEAD' ? basename(tree.path) : answer.branch;
         return { ...answer, name, port };
       } catch {
         return null;
       }
     }),
   );
-  return found.filter((other) => other !== null);
+  // two trees can claim one port (a copied offset): one link per server
+  return [
+    ...new Map(
+      found
+        .filter((other) => other !== null)
+        .map((other) => [other.port, other]),
+    ).values(),
+  ];
 };
 
 /* Types */
+
+type Tree = ReturnType<typeof otherTrees>[number];
 
 export interface Build {
   /** `HEAD` on a detached checkout */

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import { otherTrees, readBuild } from './build.ts';
 
@@ -30,11 +30,27 @@ test('lists every worktree but its own, detached ones included', () => {
     '',
   ].join('\n');
   expect(otherTrees(porcelain, '/repo/.claude/worktrees/a')).toEqual([
-    '/repo',
-    '/repo/.claude/worktrees/v',
+    { isMain: true, path: '/repo' },
+    { isMain: false, path: '/repo/.claude/worktrees/v' },
   ]);
   expect(otherTrees(porcelain, '/repo')).toEqual([
-    '/repo/.claude/worktrees/a',
-    '/repo/.claude/worktrees/v',
+    { isMain: false, path: '/repo/.claude/worktrees/a' },
+    { isMain: false, path: '/repo/.claude/worktrees/v' },
   ]);
 });
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
+test.each([
+  ['10', true],
+  ['0', false],
+  [undefined, false],
+] as const)(
+  'with PORT_OFFSET %s it is dev: %s — a worktree runs above 0, main at 0 or with none',
+  async (offset, isDev) => {
+    vi.stubEnv('PORT_OFFSET', offset);
+    expect((await readBuild()).isDev).toBe(isDev);
+  },
+);
