@@ -7,6 +7,7 @@ import { isTime } from '../art/time.ts';
 import { errorText } from '../src/error-text.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
 import { bake, closeBrowser } from './bake.ts';
+import { readBuild } from './build.ts';
 import type { Stash, TakePatch } from './takes.ts';
 import {
   TAKE_FILES,
@@ -78,6 +79,9 @@ const route = async (
   )) as typeof settingsModule;
   const url = new URL(req.url ?? '/', 'http://atelier');
   const parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
+
+  if (req.method === 'GET' && parts[0] === 'build' && parts.length === 1)
+    return send(res, 200, await readBuild());
 
   if (req.method === 'POST' && parts[0] === 'bake' && parts.length === 1) {
     const body = await readBody(req);

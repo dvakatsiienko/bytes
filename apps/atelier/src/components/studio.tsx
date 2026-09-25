@@ -17,6 +17,7 @@ import { commandsOf } from '../commands.ts';
 import { useHotkeys, useMediaQuery, useResolvedTheme } from '../hooks.ts';
 import { navigate, useRoute } from '../route.ts';
 import { themeAtom } from '../state.ts';
+import { BuildBadge } from './build-badge';
 import { CommandPalette } from './command-palette';
 import { PieceRail } from './piece-rail';
 import { Segmented } from './segmented';
@@ -86,7 +87,8 @@ const Workbench = (props: WorkbenchProps) => {
       data-time={actions.time}>
       <header className='flex h-12 shrink-0 items-center justify-between gap-4 border-border border-b px-4'>
         <h1 className='font-serif text-2xl leading-none'>atelier</h1>
-        <div className='flex items-center gap-1'>
+        <div className='flex min-w-0 items-center gap-1'>
+          <BuildBadge />
           <Button onClick={actions.openPalette} size='sm' variant='ghost'>
             commands <Kbd>⌘K</Kbd>
           </Button>
