@@ -4,8 +4,9 @@ import type { View, Wheel } from './zoom.ts';
 import {
   MAX_SCALE,
   MIN_SCALE,
-  keepInView,
+  keepOverlap,
   pressStep,
+  settleInView,
   wheelTransform,
 } from './zoom.ts';
 
@@ -119,7 +120,7 @@ describe('pressStep', () => {
   });
 });
 
-describe('keepInView', () => {
+describe('settleInView', () => {
   const box = { height: 300, width: 500 };
   const content = { height: 200, width: 400 };
 
@@ -130,7 +131,7 @@ describe('keepInView', () => {
         [-9999, -9999],
         [-40, 25],
       ] as const) {
-        const view = keepInView({ scale, x, y }, box, content);
+        const view = settleInView({ scale, x, y }, box, content);
         expect(view.x).toBeLessThanOrEqual(0);
         expect(view.y).toBeLessThanOrEqual(0);
         expect(view.x + content.width * scale).toBeGreaterThanOrEqual(
@@ -145,7 +146,7 @@ describe('keepInView', () => {
 
   it('centres art that fits the box, wherever it was pushed', () => {
     for (const scale of [0.3, 1]) {
-      const view = keepInView({ scale, x: 9999, y: -9999 }, box, content);
+      const view = settleInView({ scale, x: 9999, y: -9999 }, box, content);
       expect(view.x).toBeCloseTo((box.width - content.width * scale) / 2, 9);
       expect(view.y).toBeCloseTo((box.height - content.height * scale) / 2, 9);
     }
@@ -153,7 +154,67 @@ describe('keepInView', () => {
 
   it('leaves a view that already covers the box alone', () => {
     const view = { scale: 2, x: -120, y: -80 };
-    expect(keepInView(view, box, box)).toEqual(view);
+    expect(settleInView(view, box, box)).toEqual(view);
+  });
+});
+
+describe('keepOverlap', () => {
+  const box = { height: 300, width: 500 };
+  const content = { height: 200, width: 400 };
+  const visible = (offset: number, shown: number, size: number) =>
+    Math.min(size, offset + shown) - Math.max(0, offset);
+
+  it('keeps half the art, or half the box, in sight however far it is pushed', () => {
+    for (const scale of [0.3, 1, 4]) {
+      for (const [x, y] of [
+        [9999, 9999],
+        [-9999, -9999],
+      ] as const) {
+        const view = keepOverlap({ scale, x, y }, box, content);
+        const [shownX, shownY] = [
+          content.width * scale,
+          content.height * scale,
+        ];
+        expect(visible(view.x, shownX, box.width)).toBeCloseTo(
+          Math.min(shownX, box.width) / 2,
+          9,
+        );
+        expect(visible(view.y, shownY, box.height)).toBeCloseTo(
+          Math.min(shownY, box.height) / 2,
+          9,
+        );
+      }
+    }
+  });
+
+  it('holds the point under the pointer through a whole pinch from fit, the pointer over the art', () => {
+    const fit = 0.5;
+    const fitted: View = {
+      scale: fit,
+      x: (box.width - content.width * fit) / 2,
+      y: (box.height - content.height * fit) / 2,
+    };
+    for (const [pointX, pointY] of [
+      [160, 110],
+      [250, 150],
+      [340, 190],
+    ] as const) {
+      let view = fitted;
+      const before = imagePointUnder(view, pointX, pointY);
+      for (let i = 0; i < 60; i += 1) {
+        view = keepOverlap(
+          wheelTransform(
+            view,
+            wheelOf({ ctrlKey: true, deltaY: -2.5, pointX, pointY }),
+          ),
+          box,
+          content,
+        );
+        const after = imagePointUnder(view, pointX, pointY);
+        expect(after.x).toBeCloseTo(before.x, 9);
+        expect(after.y).toBeCloseTo(before.y, 9);
+      }
+    }
   });
 });
 

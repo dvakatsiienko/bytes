@@ -64,18 +64,36 @@ export const wheelTransform = (
   };
 };
 
-/** per axis: art wider than the box covers it edge to edge; art that fits sits in the middle */
-const keepAxis = (offset: number, box: number, shown: number) =>
+/** per axis at rest: art wider than the box covers it edge to edge; art that fits sits in the middle */
+const settleAxis = (offset: number, box: number, shown: number) =>
   shown <= box ? (box - shown) / 2 : clamp(offset, box - shown, 0);
 
+/** per axis mid-gesture: at least half of the art, or half the box, stays in view */
+const overlapAxis = (offset: number, box: number, shown: number) => {
+  const overlap = Math.min(shown, box) / 2;
+  return clamp(offset, overlap - shown, box - overlap);
+};
+
 /**
- * The art never leaves the box: a drag or a scroll that would show past its
- * edge stops at the edge, and art at fit or smaller stays centred.
+ * Where the art rests: covering the box when it is larger, centred when it
+ * fits. A pan settles at once; a zoom settles once the gesture stops, because
+ * settling mid-pinch would pull the art off the pointer.
  */
-export const keepInView = (view: View, box: Box, content: Box): View => ({
+export const settleInView = (view: View, box: Box, content: Box): View => ({
   scale: view.scale,
-  x: keepAxis(view.x, box.width, content.width * view.scale),
-  y: keepAxis(view.y, box.height, content.height * view.scale),
+  x: settleAxis(view.x, box.width, content.width * view.scale),
+  y: settleAxis(view.y, box.height, content.height * view.scale),
+});
+
+/**
+ * Mid-zoom the art only has to stay in sight: half of it, or half the box,
+ * whichever is smaller. A pinch over the art keeps the point under the
+ * pointer, so this bites only when the pointer sits beside the art.
+ */
+export const keepOverlap = (view: View, box: Box, content: Box): View => ({
+  scale: view.scale,
+  x: overlapAxis(view.x, box.width, content.width * view.scale),
+  y: overlapAxis(view.y, box.height, content.height * view.scale),
 });
 
 /* Types */

@@ -14,13 +14,16 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import type { Range } from '../zoom.ts';
 import {
   MAX_SCALE,
-  keepInView,
+  keepOverlap,
   pressStep,
+  settleInView,
   viewerRange,
   wheelTransform,
 } from '../zoom.ts';
 
 const ANIMATION_MS = 160;
+/** how long the wheel must rest before a gesture counts as over */
+const SETTLE_MS = 200;
 /** air around a fitted image in the viewer: clear of the box edge, the toolbar and the badge */
 const FIT_INSET = 60;
 
@@ -229,8 +232,9 @@ const oneToOne = (zoom: ReactZoomPanPinchRef) => {
  * after each gesture: a pinch sank to 55 % and stayed there. The wheel is ours
  * instead; the library keeps drag, the arrows and the animated buttons.
  */
-const handleWheel =
-  (zoom: ReactZoomPanPinchRef, mode: ZoomMode) => (event: WheelEvent) => {
+const handleWheel = (zoom: ReactZoomPanPinchRef, mode: ZoomMode) => {
+  let settle: ReturnType<typeof setTimeout> | undefined;
+  return (event: WheelEvent) => {
     const wrapper = zoom.instance.wrapperComponent;
     if (!wrapper) return;
     const { positionX, positionY, scale } = zoom.instance.state;
@@ -255,15 +259,27 @@ const handleWheel =
       mode.plainScroll,
     );
     const content = zoom.instance.contentComponent;
-    const shown = content
-      ? keepInView(
-          next,
-          { height: wrapper.clientHeight, width: wrapper.clientWidth },
-          { height: content.offsetHeight, width: content.offsetWidth },
-        )
-      : next;
+    if (!content) return;
+    const sizes = () =>
+      [
+        { height: wrapper.clientHeight, width: wrapper.clientWidth },
+        { height: content.offsetHeight, width: content.offsetWidth },
+      ] as const;
+    const isZoom = isZoomGesture || mode.plainScroll === 'zoom';
+    // a pan stops at the edge at once; a zoom only keeps the art in sight, so the pointer holds
+    const shown = isZoom
+      ? keepOverlap(next, ...sizes())
+      : settleInView(next, ...sizes());
     zoom.setTransform(shown.x, shown.y, shown.scale, 0);
+    clearTimeout(settle);
+    settle = setTimeout(() => {
+      const { positionX: x, positionY: y, scale: rested } = zoom.instance.state;
+      const settled = settleInView({ scale: rested, x, y }, ...sizes());
+      if (settled.x !== x || settled.y !== y)
+        zoom.setTransform(settled.x, settled.y, rested, ANIMATION_MS);
+    }, SETTLE_MS);
   };
+};
 
 /** one zoom press around the box centre: in multiplies, out divides, by the same factor */
 const press = (
