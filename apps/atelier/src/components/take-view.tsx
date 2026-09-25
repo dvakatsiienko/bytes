@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, buttonVariants } from '@ui/kit/components/button';
 import { Input } from '@ui/kit/components/input';
 import {
@@ -31,6 +31,8 @@ const DOUBLE_CLICK_MS = 300;
 export const TakeImage = (props: TakeImageProps) => {
   const setZoom = useSetAtom(zoomAtom);
   const pendingClick = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // a click just before the view changes must not open the viewer over the next one
+  useEffect(() => () => clearTimeout(pendingClick.current), []);
   const aspectRatio = `${props.piece.size.w} / ${props.piece.size.h}`;
   const openViewer = () =>
     setZoom({

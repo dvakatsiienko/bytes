@@ -263,6 +263,11 @@ const ZoomBehaviour = (props: ZoomBehaviourProps) => {
     wrapper.addEventListener('gesturechange', preventDefault);
     // load does not bubble, but it does pass ancestors on the way down
     content.addEventListener('load', handleFit, { capture: true });
+    // a resized window moves fit, and the range's floor with it
+    const resize = new ResizeObserver(() => {
+      if (!props.mode.isInline) props.onFit(fitOf(controls, props.mode));
+    });
+    resize.observe(wrapper);
     lastPointers.set(wrapper, lastPointer);
     handleFit();
     return () => {
@@ -273,6 +278,7 @@ const ZoomBehaviour = (props: ZoomBehaviourProps) => {
       wrapper.removeEventListener('gesturestart', preventDefault);
       wrapper.removeEventListener('gesturechange', preventDefault);
       content.removeEventListener('load', handleFit, { capture: true });
+      resize.disconnect();
       lastPointers.delete(wrapper);
     };
   });
