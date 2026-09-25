@@ -13,9 +13,26 @@ export const pinColorScheme = (svg: string, scheme: 'light' | 'dark') =>
 
 let adaptiveSvg: Promise<string> | undefined;
 
-/** the tab icon follows the resolved theme; the link keeps `/favicon.svg` until the first swap */
+const loadAdaptiveSvg = async () => {
+  const response = await fetch('/favicon.svg');
+  if (!response.ok) throw new Error(`favicon.svg answered ${response.status}`);
+  return response.text();
+};
+
+/**
+ * The tab icon follows the resolved theme; the link keeps `/favicon.svg` until
+ * the first swap. A failed load keeps the icon it has and is not cached, so
+ * the next theme change tries again.
+ */
 export const showFavicon = async (scheme: 'light' | 'dark') => {
-  adaptiveSvg ??= fetch('/favicon.svg').then((response) => response.text());
+  adaptiveSvg ??= loadAdaptiveSvg();
+  let svg: string;
+  try {
+    svg = await adaptiveSvg;
+  } catch {
+    adaptiveSvg = undefined;
+    return;
+  }
   const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-  if (link) link.href = svgDataUrl(pinColorScheme(await adaptiveSvg, scheme));
+  if (link) link.href = svgDataUrl(pinColorScheme(svg, scheme));
 };

@@ -20,10 +20,9 @@ import {
 
 import type { Piece } from '../../art/pieces.ts';
 import type { Take, TakeList } from '../../server/takes.ts';
-import { useRoute } from '../route.ts';
 import { stashFormAtom, zoomAtom } from '../state.ts';
 import { useTakeActions } from '../take-actions.ts';
-import { takeUrl, useTakes } from '../takes.ts';
+import { takeUrl, useShownTake } from '../takes.ts';
 
 /** the webp a take baked; a click opens it in the zoom */
 export const TakeImage = (props: TakeImageProps) => {
@@ -55,12 +54,7 @@ export const TakeImage = (props: TakeImageProps) => {
 
 /** the take on screen, beside the canvas so its actions never scroll away; nothing on the live view */
 export const TakePanel = (props: { piece: Piece }) => {
-  const { view } = useRoute();
-  const list = useTakes(props.piece.id).data;
-  const take =
-    view.kind === 'take'
-      ? list?.takes.find((candidate) => candidate.id === view.take)
-      : undefined;
+  const { list, take } = useShownTake(props.piece.id);
   return list && take ? <TakeRecord list={list} take={take} /> : null;
 };
 

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { Time } from '../art/time.ts';
 import type { Stash, Take, TakeList } from '../server/takes.ts';
+import { useRoute } from './route.ts';
 import type { Settings } from './stage/settings.ts';
 
 export type TakeFilter = (typeof takeFilters)[number];
@@ -50,6 +51,17 @@ export const useTakes = (piece: string) =>
     queryFn: () => api<TakeList>(`/api/takes/${encodeURIComponent(piece)}`),
     queryKey: takesKey(piece),
   });
+
+/** the take the route shows, when it is one of this piece's takes */
+export const useShownTake = (piece: string) => {
+  const { view } = useRoute();
+  const list = useTakes(piece).data;
+  const take =
+    view.kind === 'take'
+      ? list?.takes.find((candidate) => candidate.id === view.take)
+      : undefined;
+  return { list, take };
+};
 
 export const useBake = () => {
   const client = useQueryClient();

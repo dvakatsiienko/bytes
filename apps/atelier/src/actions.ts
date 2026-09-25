@@ -22,7 +22,7 @@ import {
   timeAtom,
   zoomAtom,
 } from './state.ts';
-import { takeUrl, useBake, useTakes } from './takes.ts';
+import { takeUrl, useBake, useShownTake } from './takes.ts';
 
 const next = <T>(list: readonly T[], value: T) =>
   list[(list.indexOf(value) + 1) % list.length] as T;
@@ -42,17 +42,14 @@ export const useStudioActions = (piece: Piece) => {
   const setPaletteOpen = useSetAtom(isPaletteOpenAtom);
   const patchSettings = useSetAtom(patchSettingsAtom);
   const settings = useAtomValue(settingsByPieceAtom)[piece.id] ?? defaults;
-  const takes = useTakes(piece.id).data?.takes ?? [];
+  const { list, take: shownTake } = useShownTake(piece.id);
+  const takes = list?.takes ?? [];
   const bakeMutation = useBake();
   const [bakeAsk, setBakeAsk] = useAtom(bakeAskAtom);
   const [bakeNotes, setBakeNotes] = useAtom(bakeNotesAtom);
   const isStage = Boolean(stageScenes[piece.id]);
   const hasMotion = isStage && !stageScenes[piece.id]?.isStill;
   const { view } = route;
-  const shownTake =
-    view.kind === 'take'
-      ? takes.find((take) => take.id === view.take)
-      : undefined;
 
   /** what is on screen as an image source: a take, the flat svg, or the live canvas */
   const onScreen = () => {

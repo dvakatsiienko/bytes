@@ -14,12 +14,13 @@ import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
 import { useRoute } from '../route.ts';
 import { defaults } from '../stage/settings.ts';
+import type { ReadmeWidth } from '../state.ts';
 import { compareModeAtom, settingsByPieceAtom } from '../state.ts';
-import { useTakes } from '../takes.ts';
+import { useShownTake } from '../takes.ts';
 import { BakeButton } from './bake-button';
 import { CompareView } from './compare-view';
 import { LiveView } from './live-view';
-import { ReadmeFrame } from './readme-frame';
+import { ReadmeFrame, frameChromeHeight } from './readme-frame';
 import { Segmented } from './segmented';
 import { TakeImage } from './take-view';
 
@@ -45,10 +46,9 @@ export const Viewport = (props: ViewportProps) => {
   const settings =
     useAtomValue(settingsByPieceAtom)[props.piece.id] ?? defaults;
   const [compareMode, setCompareMode] = useAtom(compareModeAtom);
-  const list = useTakes(props.piece.id).data;
+  const { list, take: shownTake } = useShownTake(props.piece.id);
   const { view } = route;
   const takeOf = (id: string) => list?.takes.find((take) => take.id === id);
-  const shownTake = view.kind === 'take' ? takeOf(view.take) : undefined;
   const pair =
     view.kind === 'compare'
       ? ([takeOf(view.a), takeOf(view.b)] as const)
@@ -151,7 +151,9 @@ export const Viewport = (props: ViewportProps) => {
                 <div
                   className='mx-auto'
                   data-testid='flat-piece'
-                  style={{ width: flatWidth(props.piece) }}>
+                  style={{
+                    width: flatWidth(props.piece, props.actions.readme),
+                  }}>
                   {contentJSX}
                 </div>
               )}
@@ -183,8 +185,8 @@ const CHROME_HEIGHT = '13rem';
  * bench reads as a different picture. It shows at that size, narrower when the
  * frame or the window height would clip it; the zoom gives the detail.
  */
-const flatWidth = (piece: Piece) =>
-  `min(100%, ${piece.size.w}px, calc((100dvh - ${CHROME_HEIGHT}) * ${piece.size.w / piece.size.h}))`;
+const flatWidth = (piece: Piece, readme: ReadmeWidth) =>
+  `min(100%, ${piece.size.w}px, calc((100dvh - ${CHROME_HEIGHT} - ${frameChromeHeight(readme)}px) * ${piece.size.w / piece.size.h}))`;
 
 /* Types */
 
