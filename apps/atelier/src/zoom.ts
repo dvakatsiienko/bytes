@@ -9,8 +9,8 @@ const MAX_DELTA_PX = 100;
 const WHEEL_PX_PER_DOUBLING = 400;
 /** a pinch sends small deltas, so it doubles in a quarter of the distance */
 const PINCH_PX_PER_DOUBLING = 100;
-/** a toolbar press or a ± key multiplies the scale by this; small on purpose, and the one number to tune */
-export const PRESS_FACTOR = 1.1;
+/** a toolbar press or a ± key multiplies the scale by this; small on purpose (dima halved it from 1.1), and the one number to tune */
+export const PRESS_FACTOR = 1.05;
 /** a gesture that ends within 4 % of a landmark scale lands on it */
 const SNAP_TOLERANCE = 0.04;
 /** how far a pan may stretch past the art's edge before it springs back */
