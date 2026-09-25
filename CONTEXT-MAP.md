@@ -11,6 +11,7 @@ Each app in this monorepo is a bounded context. Per-app `CONTEXT.md` files are c
 - [space-explorer-ui](./apps/space-explorer-ui/CONTEXT.md) — GraphQL client demo
 - [space-explorer-api](./apps/space-explorer-api/CONTEXT.md) — GraphQL server demo
 - [trophy-sys](./apps/trophy-sys/CONTEXT.md) — PSN trophy tracker with a retro terminal UI
+- [atelier](./apps/atelier/CONTEXT.md) — the fleet's art studio: readme art drawn as code, lit and baked (local only)
 
 ## Relationships
 
