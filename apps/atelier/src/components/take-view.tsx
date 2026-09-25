@@ -32,12 +32,14 @@ export const TakeImage = (props: TakeImageProps) => {
     <button
       aria-label={`zoom into take ${props.take.id}`}
       className='block w-full cursor-zoom-in'
-      onClick={() =>
+      onClick={(event) => {
+        // a zoomed canvas is already the zoom; its drags end in a click
+        if (event.currentTarget.closest('[data-zoomed="true"]')) return;
         setZoom({
           alt: `${props.piece.title}, take ${props.take.id}`,
           src: takeUrl(props.take),
-        })
-      }
+        });
+      }}
       type='button'>
       <img
         alt={`${props.piece.title}, take ${props.take.id}`}

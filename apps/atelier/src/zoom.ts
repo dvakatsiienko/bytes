@@ -1,5 +1,7 @@
 export const MIN_SCALE = 0.1;
 export const MAX_SCALE = 16;
+/** the zoom viewer's range; the canvas zooms from its laid-out size (1) up */
+export const viewerRange: Range = { max: MAX_SCALE, min: MIN_SCALE };
 
 /** a scroll in lines, not pixels (a mouse on some systems): about one line of text each */
 const LINE_PX = 16;
@@ -19,9 +21,13 @@ const PRESS_FACTOR = 1.5;
  * is ×1.5 one way and ×0.5 the other. This is the step that makes a press
  * multiply (in) or divide (out) by the same factor, inside the scale range.
  */
-export const pressStep = (scale: number, direction: 1 | -1) =>
+export const pressStep = (
+  scale: number,
+  direction: 1 | -1,
+  range = viewerRange,
+) =>
   Math.abs(
-    clamp(scale * PRESS_FACTOR ** direction, MIN_SCALE, MAX_SCALE) - scale,
+    clamp(scale * PRESS_FACTOR ** direction, range.min, range.max) - scale,
   );
 
 /**
@@ -30,7 +36,11 @@ export const pressStep = (scale: number, direction: 1 | -1) =>
  * it and ⌘-scroll zoom around the pointer, so the image point under it stays
  * put. Any other scroll pans.
  */
-export const wheelTransform = (view: View, wheel: Wheel): View => {
+export const wheelTransform = (
+  view: View,
+  wheel: Wheel,
+  range = viewerRange,
+): View => {
   const unit = wheel.deltaMode === 1 ? LINE_PX : 1;
   if (!(wheel.ctrlKey || wheel.metaKey))
     return {
@@ -42,8 +52,8 @@ export const wheelTransform = (view: View, wheel: Wheel): View => {
   const delta = clamp(wheel.deltaY * unit, -MAX_ZOOM_DELTA, MAX_ZOOM_DELTA);
   const scale = clamp(
     view.scale * Math.exp(-delta * ZOOM_PER_DELTA),
-    MIN_SCALE,
-    MAX_SCALE,
+    range.min,
+    range.max,
   );
   const ratio = scale / view.scale;
   return {
@@ -53,7 +63,27 @@ export const wheelTransform = (view: View, wheel: Wheel): View => {
   };
 };
 
+/**
+ * A zoomed canvas never shows past the art's edge: at scale s the content is
+ * s × the box, so its offset stays between box − s × box and 0, per axis.
+ */
+export const clampToBox = (view: View, box: Box): View => ({
+  scale: view.scale,
+  x: clamp(view.x, box.width * (1 - view.scale), 0),
+  y: clamp(view.y, box.height * (1 - view.scale), 0),
+});
+
 /* Types */
+
+export interface Range {
+  max: number;
+  min: number;
+}
+
+export interface Box {
+  height: number;
+  width: number;
+}
 
 export interface View {
   scale: number;

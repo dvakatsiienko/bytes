@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import type { View, Wheel } from './zoom.ts';
-import { MAX_SCALE, MIN_SCALE, pressStep, wheelTransform } from './zoom.ts';
+import {
+  MAX_SCALE,
+  MIN_SCALE,
+  clampToBox,
+  pressStep,
+  wheelTransform,
+} from './zoom.ts';
 
 const start: View = { scale: 0.8, x: 40, y: -30 };
 const wheelOf = (patch: Partial<Wheel>): Wheel => ({
@@ -110,5 +116,46 @@ describe('pressStep', () => {
   it('never steps past the scale range', () => {
     expect(MAX_SCALE + pressStep(MAX_SCALE, 1)).toBe(MAX_SCALE);
     expect(MIN_SCALE - pressStep(MIN_SCALE, -1)).toBe(MIN_SCALE);
+  });
+});
+
+describe('clampToBox', () => {
+  const box = { height: 300, width: 500 };
+
+  it('keeps the zoomed art covering the whole box, however far it is pushed', () => {
+    for (const scale of [1, 1.7, 4]) {
+      for (const [x, y] of [
+        [9999, 9999],
+        [-9999, -9999],
+        [-40, 25],
+      ] as const) {
+        const view = clampToBox({ scale, x, y }, box);
+        expect(view.x).toBeLessThanOrEqual(0);
+        expect(view.y).toBeLessThanOrEqual(0);
+        expect(view.x + box.width * scale).toBeGreaterThanOrEqual(box.width);
+        expect(view.y + box.height * scale).toBeGreaterThanOrEqual(box.height);
+      }
+    }
+  });
+
+  it('leaves a view that already covers the box alone', () => {
+    const view = { scale: 2, x: -120, y: -80 };
+    expect(clampToBox(view, box)).toEqual(view);
+  });
+});
+
+describe('a range', () => {
+  const canvas = { max: 16, min: 1 };
+
+  it('stops a pinch out at its floor and a press out at its floor', () => {
+    let view: View = { scale: 2, x: 0, y: 0 };
+    for (let i = 0; i < 200; i += 1)
+      view = wheelTransform(
+        view,
+        wheelOf({ ctrlKey: true, deltaY: 40 }),
+        canvas,
+      );
+    expect(view.scale).toBe(1);
+    expect(1 - pressStep(1, -1, canvas)).toBe(1);
   });
 });

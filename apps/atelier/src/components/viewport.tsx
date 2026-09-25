@@ -12,7 +12,7 @@ import {
 
 import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
-import { useRoute } from '../route.ts';
+import { pathOf, useRoute } from '../route.ts';
 import { defaults } from '../stage/settings.ts';
 import type { ReadmeWidth } from '../state.ts';
 import { compareModeAtom, settingsByPieceAtom } from '../state.ts';
@@ -23,6 +23,7 @@ import { LiveView } from './live-view';
 import { ReadmeFrame, frameChromeHeight } from './readme-frame';
 import { Segmented } from './segmented';
 import { TakeImage } from './take-view';
+import { ZoomBox } from './zoom-box';
 
 const timeOptions = [
   { icon: <SunIcon />, label: 'day', value: 'day' },
@@ -145,16 +146,23 @@ export const Viewport = (props: ViewportProps) => {
           ) : null}
           <div className='rounded-[10px] bg-surface p-4 shadow-lamp'>
             <ReadmeFrame width={props.actions.readme}>
-              {props.actions.isStage || pair ? (
+              {pair ? (
                 contentJSX
               ) : (
                 <div
                   className='mx-auto'
-                  data-testid='flat-piece'
+                  data-testid={props.actions.isStage ? undefined : 'flat-piece'}
                   style={{
-                    width: flatWidth(props.piece, props.actions.readme),
+                    width: props.actions.isStage
+                      ? undefined
+                      : flatWidth(props.piece, props.actions.readme),
                   }}>
-                  {contentJSX}
+                  <ZoomBox
+                    // a new piece, take, time or frame starts unzoomed
+                    key={`${pathOf(route)}:${props.actions.time}:${props.actions.readme}`}
+                    mode='canvas'>
+                    {contentJSX}
+                  </ZoomBox>
                 </div>
               )}
             </ReadmeFrame>
