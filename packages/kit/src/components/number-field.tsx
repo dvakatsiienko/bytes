@@ -64,6 +64,8 @@ function NumberField({
       return;
     }
     if (event.key === 'Enter') {
+      // the same rule as blur: an edit that ends invalid is rejected whole
+      if (isInvalid) commit(valueAtFocus.current, decimalsOf(step) + 2);
       setDraft(null);
       return;
     }

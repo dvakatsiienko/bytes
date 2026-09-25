@@ -47,9 +47,11 @@ export const atelierApi = (): Plugin => ({
 });
 
 /**
- * Any web page can send a request to localhost. A write is accepted only from
- * this server's own page and only as json: a cross-site json request needs a
- * preflight this server never answers, so the browser stops it first.
+ * Any web page can send a request to localhost. The Origin check is the
+ * guard: a browser always sends Origin on a cross-site write, and only this
+ * server's own page (or a tool with no Origin at all) gets through. Requiring
+ * json on top closes the no-Origin form posts. Vite's cors does answer a
+ * preflight, so the preflight is not what stops a foreign page.
  */
 export const isTrustedRequest = (req: {
   method?: string;

@@ -249,7 +249,6 @@ const HEX = /^#[0-9a-f]{6}$/i;
 
 export const isHex = (value: string): value is Hex => HEX.test(value);
 
-/** a saved set, read back from a take or storage: known keys of the right type win, the rest falls back */
 /** each number's allowed range, read from its control: a saved set can hold no value the panel could not */
 const ranges = new Map<string, { min: number; max: number }>(
   controls.flatMap((group) =>
@@ -261,6 +260,7 @@ const ranges = new Map<string, { min: number; max: number }>(
   ),
 );
 
+/** a saved set, read back from a take or storage: known keys of the right type win, the rest falls back */
 export const toSettings = (value: unknown): Settings => {
   const input =
     typeof value === 'object' && value !== null

@@ -58,7 +58,8 @@ Done when the piece shows in the rail and renders by day and by night:
 - `ATELIER_TAKES_DIR` points the take store at a scratch folder: tests and verifier rounds use
   it, so they never write into the real takes. It is declared in the root `turbo.jsonc`.
 - The stage's «exact» look is no tone mapping on sRGB maps: a lit spot shows its map's colour.
-  The passes are three's own (`src/stage/renderer.ts`), on purpose — see BYT-103.
+  The passes are three's own (`src/stage/renderer.ts`). They match pmndrs `postprocessing` in
+  colour (measured on BYT-103); the two differ only in edge blur and antialiasing.
 - The settings panel carries a kit/leva switch: an A/B for dima. The losing side gets deleted.
 - Chromium's first bake on a fresh machine needs `pnpm exec playwright install chromium`; the
   bake error says so.

@@ -127,3 +127,14 @@ test('an edit that ends in garbage restores the value from before the edit', asy
 
   await expect.element(field).toHaveValue('0.60');
 });
+
+test('enter on an edit that ends in garbage restores the value from before the edit', async () => {
+  const { screen } = await renderField();
+  const field = screen.getByRole('spinbutton', { name: 'ambient' });
+
+  await field.fill('');
+  await userEvent.type(field, '0.42q');
+  await userEvent.keyboard('{Enter}');
+
+  await expect.element(field).toHaveValue('0.60');
+});
