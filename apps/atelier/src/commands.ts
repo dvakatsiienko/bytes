@@ -4,7 +4,9 @@ import type { StudioActions } from './actions.ts';
  * The one list of commands: the palette shows it, the bare hotkeys read their
  * keys from it. A command without `keys` is palette-only.
  */
-export const commandsOf = (actions: StudioActions): readonly Command[] => {
+export const commandsOf = (
+  actions: StudioActions,
+): readonly StudioCommand[] => {
   const pieceCommands = actions.pieces.map((piece) => {
     return {
       group: 'pieces',
@@ -91,7 +93,7 @@ export const commandGroups = [
 
 /* Types */
 
-export interface Command {
+export interface StudioCommand {
   group: (typeof commandGroups)[number];
   /** a bare key, pressed outside any text field */
   keys?: string;

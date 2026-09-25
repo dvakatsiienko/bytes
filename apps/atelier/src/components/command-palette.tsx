@@ -1,4 +1,5 @@
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -10,7 +11,7 @@ import {
 import { Kbd } from '@ui/kit/components/kbd';
 import { useAtom } from 'jotai';
 
-import type { Command } from '../commands.ts';
+import type { StudioCommand } from '../commands.ts';
 import { commandGroups } from '../commands.ts';
 import { isPaletteOpenAtom } from '../state.ts';
 
@@ -52,11 +53,13 @@ export const CommandPalette = (props: CommandPaletteProps) => {
       onOpenChange={setIsOpen}
       open={isOpen}
       title='commands'>
-      <CommandInput placeholder='type a command or a piece…' />
-      <CommandList>
-        <CommandEmpty>nothing matches</CommandEmpty>
-        {groupListJSX}
-      </CommandList>
+      <Command>
+        <CommandInput placeholder='type a command or a piece…' />
+        <CommandList>
+          <CommandEmpty>nothing matches</CommandEmpty>
+          {groupListJSX}
+        </CommandList>
+      </Command>
     </CommandDialog>
   );
 };
@@ -64,5 +67,5 @@ export const CommandPalette = (props: CommandPaletteProps) => {
 /* Types */
 
 interface CommandPaletteProps {
-  commands: readonly Command[];
+  commands: readonly StudioCommand[];
 }

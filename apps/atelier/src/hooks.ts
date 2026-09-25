@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from 'react';
 
-import type { Command } from './commands.ts';
+import type { StudioCommand } from './commands.ts';
 import type { Theme } from './state.ts';
 
 export const useMediaQuery = (query: string) =>
@@ -33,7 +33,7 @@ const isTyping = (target: EventTarget | null) =>
 
 /** bare keys outside text fields and open dialogs; ⌘K / ctrl+K opens the palette from anywhere */
 export const useHotkeys = (
-  commands: readonly Command[],
+  commands: readonly StudioCommand[],
   openPalette: () => void,
 ) => {
   useEffect(() => {

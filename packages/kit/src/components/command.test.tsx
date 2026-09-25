@@ -2,7 +2,13 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Command, CommandInput, CommandItem, CommandList } from './command';
+import {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from './command';
 
 const renderCommand = (onSelect = vi.fn()) =>
   render(
@@ -33,4 +39,25 @@ test('enter runs the highlighted command', async () => {
   await userEvent.keyboard('{Enter}');
 
   expect(onSelect).toHaveBeenCalledWith('cycle the theme');
+});
+
+test('an open command dialog shows its commands', async () => {
+  const screen = await render(
+    <CommandDialog open title='commands'>
+      <Command>
+        <CommandInput aria-label='search' />
+        <CommandList>
+          <CommandItem>bake the scene</CommandItem>
+        </CommandList>
+      </Command>
+    </CommandDialog>,
+  );
+
+  await expect
+    .element(
+      screen
+        .getByRole('dialog')
+        .getByRole('option', { name: 'bake the scene' }),
+    )
+    .toBeVisible();
 });

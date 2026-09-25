@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 
 import { BakeView } from '@/components/bake-view';
+import { ErrorBoundary } from '@/components/error-boundary';
 import { Studio } from '@/components/studio';
 
 import '@/theme.css';
@@ -14,9 +15,11 @@ if (rootNode) {
     bakePiece ? (
       <BakeView pieceId={bakePiece} />
     ) : (
-      <QueryClientProvider client={new QueryClient()}>
-        <Studio />
-      </QueryClientProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={new QueryClient()}>
+          <Studio />
+        </QueryClientProvider>
+      </ErrorBoundary>
     ),
   );
 }
