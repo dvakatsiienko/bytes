@@ -12,10 +12,8 @@ import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 import { zoomAtom } from '../state.ts';
-import { MAX_SCALE, MIN_SCALE, wheelTransform } from '../zoom.ts';
+import { MAX_SCALE, MIN_SCALE, pressStep, wheelTransform } from '../zoom.ts';
 
-/** a button press or a +/− key multiplies the scale by this; the library's steps are absolute, so they follow the scale */
-const PRESS_FACTOR = 1.5;
 const ANIMATION_MS = 160;
 /** air around a fitted image: clear of the box edge, the floating toolbar and the scale badge */
 const FIT_INSET = 60;
@@ -60,6 +58,25 @@ const handleWheel = (zoom: ReactZoomPanPinchRef) => (event: WheelEvent) => {
   zoom.setTransform(next.x, next.y, next.scale, 0);
 };
 
+/** one zoom press around the box centre: in multiplies, out divides, by the same factor */
+const press = (zoom: ReactZoomPanPinchRef, direction: 1 | -1) => {
+  const step = pressStep(zoom.instance.state.scale, direction);
+  if (direction === 1) zoom.zoomIn(step, ANIMATION_MS);
+  else zoom.zoomOut(step, ANIMATION_MS);
+};
+
+/** + / = and − / _ press like the toolbar; 0 fits the whole image, like the fit tool */
+const handlePressKeys =
+  (zoom: ReactZoomPanPinchRef) => (event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.key === '+' || event.key === '=') press(zoom, 1);
+    else if (event.key === '-' || event.key === '_') press(zoom, -1);
+    else if (event.key === '0') fitView(zoom, ANIMATION_MS);
+    else return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+
 /**
  * Pixel inspection: opens fitted; pinch or ⌘-scroll zooms around the pointer,
  * a plain scroll or a drag pans, +/− and the arrows once the image has focus.
@@ -82,11 +99,7 @@ export const ZoomDialog = () => {
           <TransformWrapper
             centerOnInit
             doubleClick={{ disabled: true }}
-            keyboard={{
-              disabled: false,
-              panStep: 60,
-              zoomStep: scale * (PRESS_FACTOR - 1),
-            }}
+            keyboard={{ disabled: false, panStep: 60 }}
             limitToBounds={false}
             maxScale={MAX_SCALE}
             minScale={MIN_SCALE}
@@ -95,6 +108,12 @@ export const ZoomDialog = () => {
                 'wheel',
                 handleWheel(ref),
                 { passive: false },
+              );
+              // ahead of the library's own key handler on the same box: it would add one fixed step both ways
+              ref.instance.wrapperComponent?.addEventListener(
+                'keydown',
+                handlePressKeys(ref),
+                { capture: true },
               );
               fitView(ref, 0);
             }}
@@ -107,18 +126,13 @@ export const ZoomDialog = () => {
                 {
                   icon: <ZoomInIcon />,
                   label: 'zoom in',
-                  run: () =>
-                    controls.zoomIn(scale * (PRESS_FACTOR - 1), ANIMATION_MS),
+                  run: () => press(controls, 1),
                   title: 'zoom in (+)',
                 },
                 {
                   icon: <ZoomOutIcon />,
                   label: 'zoom out',
-                  run: () =>
-                    controls.zoomOut(
-                      scale * (1 - 1 / PRESS_FACTOR),
-                      ANIMATION_MS,
-                    ),
+                  run: () => press(controls, -1),
                   title: 'zoom out (−)',
                 },
                 {

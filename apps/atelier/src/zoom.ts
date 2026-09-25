@@ -11,6 +11,19 @@ const ZOOM_PER_DELTA = 0.01;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
+/** a toolbar press or a +/− key multiplies the scale by this, so one in and one out cancel */
+const PRESS_FACTOR = 1.5;
+
+/**
+ * The library's zoomIn / zoomOut ADD their step to the scale, so a fixed step
+ * is ×1.5 one way and ×0.5 the other. This is the step that makes a press
+ * multiply (in) or divide (out) by the same factor, inside the scale range.
+ */
+export const pressStep = (scale: number, direction: 1 | -1) =>
+  Math.abs(
+    clamp(scale * PRESS_FACTOR ** direction, MIN_SCALE, MAX_SCALE) - scale,
+  );
+
 /**
  * One wheel event against the zoom's transform (`translate(x, y) scale(s)`,
  * origin top left). A trackpad pinch arrives as a wheel event with `ctrlKey`;

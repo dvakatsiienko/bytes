@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { View, Wheel } from './zoom.ts';
-import { MAX_SCALE, MIN_SCALE, wheelTransform } from './zoom.ts';
+import { MAX_SCALE, MIN_SCALE, pressStep, wheelTransform } from './zoom.ts';
 
 const start: View = { scale: 0.8, x: 40, y: -30 };
 const wheelOf = (patch: Partial<Wheel>): Wheel => ({
@@ -94,5 +94,21 @@ describe('wheelTransform', () => {
         y: start.y + 5 * unit,
       });
     }
+  });
+});
+
+describe('pressStep', () => {
+  it('makes one press in and one press out cancel, from any scale inside the range', () => {
+    for (const from of [0.2, 0.53, 1, 3.7, 10]) {
+      const zoomedIn = from + pressStep(from, 1);
+      expect(zoomedIn - pressStep(zoomedIn, -1)).toBeCloseTo(from, 9);
+      const zoomedOut = from - pressStep(from, -1);
+      expect(zoomedOut + pressStep(zoomedOut, 1)).toBeCloseTo(from, 9);
+    }
+  });
+
+  it('never steps past the scale range', () => {
+    expect(MAX_SCALE + pressStep(MAX_SCALE, 1)).toBe(MAX_SCALE);
+    expect(MIN_SCALE - pressStep(MIN_SCALE, -1)).toBe(MIN_SCALE);
   });
 });
