@@ -21,7 +21,7 @@ import { CompareView } from './compare-view';
 import { LiveView } from './live-view';
 import { ReadmeFrame } from './readme-frame';
 import { Segmented } from './segmented';
-import { TakeImage, TakeRecord } from './take-view';
+import { TakeImage } from './take-view';
 
 const timeOptions = [
   { icon: <SunIcon />, label: 'day', value: 'day' },
@@ -162,9 +162,6 @@ export const Viewport = (props: ViewportProps) => {
               )}
             </ReadmeFrame>
           </div>
-          {shownTake && list ? (
-            <TakeRecord list={list} take={shownTake} />
-          ) : null}
         </div>
       </div>
     </section>

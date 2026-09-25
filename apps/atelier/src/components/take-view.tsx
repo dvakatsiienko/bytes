@@ -20,9 +20,10 @@ import {
 
 import type { Piece } from '../../art/pieces.ts';
 import type { Take, TakeList } from '../../server/takes.ts';
+import { useRoute } from '../route.ts';
 import { stashFormAtom, zoomAtom } from '../state.ts';
 import { useTakeActions } from '../take-actions.ts';
-import { takeUrl } from '../takes.ts';
+import { takeUrl, useTakes } from '../takes.ts';
 
 /** the webp a take baked; a click opens it in the zoom */
 export const TakeImage = (props: TakeImageProps) => {
@@ -52,8 +53,19 @@ export const TakeImage = (props: TakeImageProps) => {
   );
 };
 
+/** the take on screen, beside the canvas so its actions never scroll away; nothing on the live view */
+export const TakePanel = (props: { piece: Piece }) => {
+  const { view } = useRoute();
+  const list = useTakes(props.piece.id).data;
+  const take =
+    view.kind === 'take'
+      ? list?.takes.find((candidate) => candidate.id === view.take)
+      : undefined;
+  return list && take ? <TakeRecord list={list} take={take} /> : null;
+};
+
 /** everything that makes a take reproducible, and what can be done to it */
-export const TakeRecord = (props: TakeRecordProps) => {
+const TakeRecord = (props: TakeRecordProps) => {
   const actions = useTakeActions();
   const isCurrent = props.list.current[props.take.time] === props.take.id;
   const others = props.list.takes.filter((take) => take.id !== props.take.id);
@@ -70,9 +82,9 @@ export const TakeRecord = (props: TakeRecordProps) => {
 
   const factListJSX = facts.map(([label, value]) => {
     return (
-      <div className='flex flex-col' key={label}>
+      <div className='flex flex-col last:col-span-2' key={label}>
         <dt className='text-[12px] text-muted-foreground'>{label}</dt>
-        <dd className='select-all font-mono text-[12px]'>{value}</dd>
+        <dd className='select-all break-all font-mono text-[12px]'>{value}</dd>
       </div>
     );
   });
@@ -93,8 +105,8 @@ export const TakeRecord = (props: TakeRecordProps) => {
   return (
     <section
       aria-label={`take ${props.take.id}`}
-      className='flex flex-col gap-4 rounded-lg border border-border bg-surface p-4'>
-      <header className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
+      className='flex shrink-0 flex-col gap-3 border-border border-b px-4 py-3'>
+      <header className='flex flex-wrap items-baseline gap-x-2 gap-y-1'>
         <h2 className='font-serif text-lg'>{props.take.id}</h2>
         {isCurrent ? (
           <span className='text-muted-foreground text-sm'>
@@ -102,7 +114,7 @@ export const TakeRecord = (props: TakeRecordProps) => {
           </span>
         ) : null}
       </header>
-      <dl className='grid grid-cols-2 gap-3 sm:grid-cols-4'>{factListJSX}</dl>
+      <dl className='grid grid-cols-2 gap-x-3 gap-y-2'>{factListJSX}</dl>
       <NoteField
         key={props.take.id}
         onSave={(note) => actions.saveNote(props.take, note)}
@@ -120,7 +132,7 @@ export const TakeRecord = (props: TakeRecordProps) => {
           </p>
         </div>
       ) : null}
-      <div className='flex flex-wrap gap-2'>
+      <div className='flex flex-wrap gap-1.5'>
         <Button
           disabled={isCurrent}
           onClick={() => actions.promote(props.take)}
@@ -142,7 +154,7 @@ export const TakeRecord = (props: TakeRecordProps) => {
           <PopoverTrigger
             disabled={others.length === 0}
             render={<Button size='sm' variant='outline' />}>
-            <GitCompareIcon /> compare with…
+            <GitCompareIcon /> compare…
           </PopoverTrigger>
           <PopoverContent align='start' className='w-56 p-1'>
             <PopoverTitle className='px-2 py-1 text-muted-foreground text-xs'>
@@ -163,20 +175,23 @@ export const TakeRecord = (props: TakeRecordProps) => {
           variant='outline'>
           <CopyIcon /> copy png
         </Button>
+      </div>
+      <div className='flex items-center gap-1'>
+        <span className='mr-1 text-[12px] text-muted-foreground'>download</span>
         <a
-          className={buttonVariants({ size: 'sm', variant: 'outline' })}
+          className={buttonVariants({ size: 'sm', variant: 'ghost' })}
           download={`${props.take.piece}-${props.take.id}.webp`}
           href={takeUrl(props.take)}>
           <DownloadIcon /> webp
         </a>
         <a
-          className={buttonVariants({ size: 'sm', variant: 'outline' })}
+          className={buttonVariants({ size: 'sm', variant: 'ghost' })}
           href={takeUrl(props.take, 'bake.avif')}>
           <DownloadIcon /> avif
         </a>
         {props.take.files.includes('piece.svg') ? (
           <a
-            className={buttonVariants({ size: 'sm', variant: 'outline' })}
+            className={buttonVariants({ size: 'sm', variant: 'ghost' })}
             download={`${props.take.piece}-${props.take.id}.svg`}
             href={takeUrl(props.take, 'piece.svg')}>
             <DownloadIcon /> svg
