@@ -18,7 +18,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@tanstack/react-query": "5.103.1",
+    "@tanstack/react-query": "5.103.2",
     "@tanstack/react-router": "1.170.38",
     "@ui/kit": "workspace:*",
     "@upstash/redis": "1.38.4",
@@ -30,7 +30,7 @@
     "@visx/shape": "4.0.0",
     "@visx/tooltip": "4.0.0",
     "lucide-react": "1.47.0",
-    "motion": "13.4.0",
+    "motion": "13.4.1",
     "psn-api": "2.18.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"
