@@ -15,7 +15,9 @@ export const ZoomDialog = () => {
       <DialogContent
         className='flex h-[90dvh] w-[94vw] max-w-none flex-col gap-3 p-3 sm:max-w-none'
         data-viewer>
-        <DialogTitle className='truncate pr-8 font-normal text-sm'>
+        <DialogTitle
+          className='truncate pr-8 font-normal text-sm'
+          title={zoom?.alt}>
           {zoom?.alt}
         </DialogTitle>
         {zoom ? (
