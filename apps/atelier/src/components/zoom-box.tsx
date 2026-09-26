@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import { Button } from '@ui/kit/components/button';
+import { Toolbar, ToolbarButton } from '@ui/kit/components/toolbar';
 import { cn } from 'cn';
 import {
   LocateFixedIcon,
@@ -136,16 +137,20 @@ export const ZoomBox = (props: ZoomBoxProps) => {
           },
         ].map((tool) => {
           return (
-            <Button
+            <ToolbarButton
               aria-label={tool.label}
-              className='hover:bg-foreground/10'
               key={tool.label}
               onClick={tool.run}
-              size='icon-sm'
-              title={tool.title}
-              variant='ghost'>
+              render={
+                <Button
+                  className='hover:bg-foreground/10'
+                  size='icon-sm'
+                  variant='ghost'
+                />
+              }
+              title={tool.title}>
               {tool.icon}
-            </Button>
+            </ToolbarButton>
           );
         });
         // the canvas keeps its tools out of the art until it is zoomed, hovered or focused
@@ -165,16 +170,15 @@ export const ZoomBox = (props: ZoomBoxProps) => {
               ms={ms}
               onFit={(scale) => setRange(rangeOf(scale))}
             />
-            <div
+            <Toolbar
               aria-label='zoom'
               className={cn(
-                'absolute top-3 left-3 z-10 flex items-center gap-0.5 rounded-lg p-1',
+                'absolute top-3 left-3 z-10 rounded-lg p-1',
                 floatingClass,
                 quietClass,
-              )}
-              role='toolbar'>
+              )}>
               {toolListJSX}
-            </div>
+            </Toolbar>
             <TransformComponent
               contentClass={cn(
                 mode.isInline ? '!w-full' : '',
