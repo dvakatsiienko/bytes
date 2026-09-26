@@ -158,8 +158,10 @@ export const TakesRail = (props: TakesRailProps) => {
             takes did not load: {query.error.message}
           </p>
         ) : null}
-        {/* pt-1 is the selected row's outline, width + offset, so the scroll box never cuts it */}
-        <ul className='flex flex-col gap-1 px-2 pt-1 pb-3'>{cardListJSX}</ul>
+        {/* pt-1 is the selected row's outline, width + offset, so the scroll box never cuts it; pr-4 also clears the 10 px scrollbar */}
+        <ul className='flex flex-col gap-1 pt-1 pr-4 pb-3 pl-2'>
+          {cardListJSX}
+        </ul>
       </ScrollArea>
     </section>
   );
