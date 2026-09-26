@@ -16,6 +16,9 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   server: {
+    allowedHosts: ['.local'],
+    // open on the lan so a phone on the same wi-fi can view it; `.local` = the mac's bonjour name
+    host: true,
     port: Number(process.env.PORT ?? 5180),
     strictPort: true,
     // bakes and exports land here while the server runs; none of it is a module
