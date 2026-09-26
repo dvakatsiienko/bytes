@@ -300,3 +300,8 @@ Multi-context — root `CONTEXT-MAP.md` points at per-app `CONTEXT.md` files. Se
 - **ports move with the tree**: every `dev` script starts through `script/with-port.ts <base>`, which exports `PORT = base + offset` (offset = 10 × worktree index, 0 in the main checkout) and `PORT_OFFSET`. vite configs and the node apis read `PORT`; next reads it natively; trophy-sys's api adds the offset to 5178. an explicit `PORT` in the environment (the desktop launch entries) wins untouched.
 
 📌 untracked files that are not yours and stay: `apps/trophy-sys/{DESIGN,DESIGN-REQUEST,UIKIT-ARCHITECTURE-REVIEW}.md`.
+
+## vercel hazards
+
+- **every branch pushed to a repo with vercel projects is built by every project unless the branch itself carries the opt-out** — `git.deploymentEnabled: false` is read from each app's `vercel.json` on THAT commit, not from main; an orphan `badges` branch holding one svg started 6 preview builds, all dying on «Root Directory does not exist» and all counted on the daily 100 (bytes, 2026-09-24). a single-file or orphan branch carries `cp --parents apps/*/vercel.json` in the job that pushes it
+- **a lockfile change that reshapes the pnpm store needs a cache-less first vercel build** — vercel restores the previous `node_modules`, and pnpm keeps a stale hoisted link (`@types/react@19.2.18` after the override pinned 19.3.0, 2026-09-21). `vercel deploy --prod --force` from the REPO ROOT with the root `.vercel` link switched to the project; an app-dir deploy dies on «Root Directory does not exist», and `vercel link` writes an `.env.local` (oidc token) plus an `.env*` gitignore line — revert both
