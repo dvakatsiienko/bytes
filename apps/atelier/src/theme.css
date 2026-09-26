@@ -136,4 +136,16 @@
   [role="slider"] {
     cursor: pointer;
   }
+  /* a click on the track sets the value; the thumb is held and dragged */
+  [data-slot="slider"]:not([data-disabled]) {
+    cursor: pointer;
+  }
+  [data-slot="slider-thumb"],
+  [data-slot="slider-thumb"] input {
+    cursor: grab;
+  }
+  [data-slot="slider"][data-dragging],
+  [data-slot="slider"][data-dragging] * {
+    cursor: grabbing;
+  }
 }

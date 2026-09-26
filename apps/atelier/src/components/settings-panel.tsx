@@ -111,7 +111,9 @@ const SettingRow = (props: SettingRowProps) => {
 
   const labelJSX = (
     <label className='min-w-0' htmlFor={id}>
-      <span className='block text-foreground text-sm'>{props.row.label}</span>
+      <span className='block text-foreground text-sm' id={`${id}-label`}>
+        {props.row.label}
+      </span>
       <code className='block font-mono text-[12px] text-muted-foreground'>
         {props.row.key}
       </code>
@@ -144,7 +146,8 @@ const SettingRow = (props: SettingRowProps) => {
         />
         {copyJSX}
         <Slider
-          aria-label={props.row.label}
+          // base-ui hands a root's labelledby to each thumb's range input; a plain label stays on the group
+          aria-labelledby={`${id}-label`}
           className='col-span-3'
           max={props.row.max}
           min={props.row.min}
