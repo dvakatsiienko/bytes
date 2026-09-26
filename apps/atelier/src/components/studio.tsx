@@ -109,6 +109,7 @@ const Workbench = (props: WorkbenchProps) => {
       className='flex h-dvh flex-col bg-background text-foreground'
       data-time={actions.time}>
       <header className='flex h-12 shrink-0 items-center justify-between gap-4 border-border border-b px-4'>
+        <Wordmark />
         <Section name='header'>
           <HeaderContent actions={actions} theme={theme} />
         </Section>
@@ -145,41 +146,41 @@ const Workbench = (props: WorkbenchProps) => {
 };
 
 /** the wordmark home, the build badge, ⌘K and the theme */
+/** the way home, outside the header's section: a crashed header keeps it and the page's one h1 */
+const Wordmark = () => {
+  return (
+    <h1 className='font-serif text-2xl leading-none'>
+      <a
+        className='rounded-sm'
+        href='/'
+        onClick={(event) => {
+          // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+            return;
+          event.preventDefault();
+          navigate({ piece: pieces[0].id, view: { kind: 'live' } });
+        }}>
+        atelier
+      </a>
+    </h1>
+  );
+};
+
+/** the build badge, ⌘K and the theme */
 const HeaderContent = (props: HeaderContentProps) => {
   return (
-    <>
-      <h1 className='font-serif text-2xl leading-none'>
-        <a
-          className='rounded-sm'
-          href='/'
-          onClick={(event) => {
-            // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
-            if (
-              event.metaKey ||
-              event.ctrlKey ||
-              event.shiftKey ||
-              event.altKey
-            )
-              return;
-            event.preventDefault();
-            navigate({ piece: pieces[0].id, view: { kind: 'live' } });
-          }}>
-          atelier
-        </a>
-      </h1>
-      <div className='flex min-w-0 items-center gap-1'>
-        <BuildBadge />
-        <Button onClick={props.actions.openPalette} size='sm' variant='ghost'>
-          commands <Kbd>⌘K</Kbd>
-        </Button>
-        <Segmented
-          ariaLabel='theme'
-          onValueChange={props.actions.setTheme}
-          options={themeOptions}
-          value={props.theme}
-        />
-      </div>
-    </>
+    <div className='flex min-w-0 items-center gap-1'>
+      <BuildBadge />
+      <Button onClick={props.actions.openPalette} size='sm' variant='ghost'>
+        commands <Kbd>⌘K</Kbd>
+      </Button>
+      <Segmented
+        ariaLabel='theme'
+        onValueChange={props.actions.setTheme}
+        options={themeOptions}
+        value={props.theme}
+      />
+    </div>
   );
 };
 

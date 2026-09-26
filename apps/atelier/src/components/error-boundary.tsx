@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button } from '@ui/kit/components/button';
+import { cn } from 'cn';
 import { LampDeskIcon, RotateCcwIcon } from 'lucide-react';
 import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -19,6 +20,7 @@ export const Section = (props: SectionProps) => {
         return (
           <SectionFallback
             {...fallback}
+            box={sections[props.name].box}
             isRow={sections[props.name].isRow}
             what={sections[props.name].what}
           />
@@ -29,7 +31,8 @@ export const Section = (props: SectionProps) => {
         if (details.reason === 'imperative-api') retried.add(props.name);
       }}
       resetKeys={[path]}>
-      <DevCrash section={props.name} />
+      {/* keyed by the path: the compiler keeps an element whose props never change, so only a remount reads the new url */}
+      <DevCrash key={path} section={props.name} />
       {props.children}
     </ErrorBoundary>
   );
@@ -62,7 +65,7 @@ const SectionFallback = (props: SectionFallbackProps) => {
   if (props.isRow)
     return (
       <div
-        className='flex h-full min-h-0 items-center gap-2 text-muted-foreground text-sm'
+        className='flex h-full min-h-0 min-w-0 items-center gap-2 text-muted-foreground text-sm'
         role='alert'>
         <LampDeskIcon aria-hidden className='size-4 shrink-0' />
         <p
@@ -79,7 +82,10 @@ const SectionFallback = (props: SectionFallbackProps) => {
 
   return (
     <div
-      className='flex h-full min-h-40 flex-col items-center justify-center gap-3 p-6 text-center'
+      className={cn(
+        'flex min-h-40 flex-col items-center justify-center gap-3 overflow-auto p-6 text-center',
+        props.box,
+      )}
       role='alert'>
       <span className='grid size-10 place-items-center rounded-full bg-chip text-muted-foreground'>
         <LampDeskIcon aria-hidden className='size-5' />
@@ -132,15 +138,26 @@ const isDev = import.meta.env.DEV;
 
 const retried = new Set<SectionName>();
 
-/** each section and the words its fallback uses; header and toolbar are one row high */
+/**
+ * each section, the words its fallback uses, and the box it keeps: header and
+ * toolbar are one row high; the pieces list holds its capped share of the rail
+ * so the takes list below it stays in view
+ */
 const sections = {
-  header: { isRow: true, what: 'the header' },
-  panel: { isRow: false, what: 'the side panel' },
-  pieces: { isRow: false, what: 'the pieces list' },
-  takes: { isRow: false, what: 'the takes list' },
-  toolbar: { isRow: true, what: 'the bench tools' },
-  viewport: { isRow: false, what: 'the piece' },
-} as const satisfies Record<string, { isRow: boolean; what: string }>;
+  header: { box: '', isRow: true, what: 'the header tools' },
+  panel: { box: 'h-full', isRow: false, what: 'the side panel' },
+  pieces: {
+    box: 'max-h-[45%] shrink-0 border-border border-b',
+    isRow: false,
+    what: 'the pieces list',
+  },
+  takes: { box: 'min-h-0 flex-1', isRow: false, what: 'the takes list' },
+  toolbar: { box: '', isRow: true, what: 'the bench tools' },
+  viewport: { box: 'h-full', isRow: false, what: 'the piece' },
+} as const satisfies Record<
+  string,
+  { box: string; isRow: boolean; what: string }
+>;
 
 /* Types */
 
@@ -152,6 +169,7 @@ interface SectionProps {
 }
 
 interface SectionFallbackProps extends FallbackProps {
+  box: string;
   isRow: boolean;
   what: string;
 }
