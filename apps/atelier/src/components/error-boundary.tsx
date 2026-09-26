@@ -24,7 +24,10 @@ export const Section = (props: SectionProps) => {
           />
         );
       }}
-      onReset={() => retried.add(props.name)}
+      // only the button ends a test crash; a new route (resetKeys) keeps it throwing
+      onReset={(details) => {
+        if (details.reason === 'imperative-api') retried.add(props.name);
+      }}
       resetKeys={[path]}>
       <DevCrash section={props.name} />
       {props.children}
