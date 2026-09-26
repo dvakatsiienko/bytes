@@ -71,6 +71,7 @@ const Workbench = (props: WorkbenchProps) => {
   const path = pathOf(useRoute());
   const setIsPlaying = useSetAtom(isPlayingAtom);
   // leaving a view stops the motion it played; coming back shows a still frame
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new path is the leave, so the cleanup runs on it
   useEffect(() => {
     return () => setIsPlaying(false);
   }, [path, setIsPlaying]);

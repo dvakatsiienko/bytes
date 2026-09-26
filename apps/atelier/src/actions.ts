@@ -86,31 +86,53 @@ export const useStudioActions = (piece: Piece) => {
     setBakeAsk(null);
     if (bakeMutation.isPending) return;
     setBakeNotes({ ...bakeNotes, [piece.id]: note });
-    const pending = bakeMutation.mutateAsync({
-      frames,
-      note,
-      piece: piece.id,
-      settings,
-      time,
-    });
-    toast.promise(pending, {
-      error: (error: unknown) => `bake failed: ${errorText(error)}`,
-      loading:
-        frames > 1
-          ? `baking a ${frames}-frame loop of ${piece.id} · ${time}…`
-          : `baking ${piece.id} · ${time}…`,
-      success: (take) => ({
-        action: {
-          label: 'open',
-          onClick: () =>
-            navigate({
-              piece: piece.id,
-              view: { kind: 'take', take: take.id },
-            }),
+    // one toast for the whole bake: its title stays, the line under it says the step and the seconds so far
+    const title =
+      frames > 1
+        ? `baking a ${frames}-frame loop of ${piece.id} · ${time}`
+        : `baking ${piece.id} · ${time}`;
+    const started = Date.now();
+    const seconds = () => `${Math.round((Date.now() - started) / 1000)} s`;
+    let step = 'starting';
+    const id = toast.loading(title, { description: step });
+    const show = () =>
+      toast.loading(title, { description: `${step} · ${seconds()}`, id });
+    const tick = setInterval(show, 1000);
+    bakeMutation
+      .mutateAsync({
+        frames,
+        note,
+        onStep: (current) => {
+          step = current;
+          show();
         },
-        message: `baked take ${take.id}`,
-      }),
-    });
+        piece: piece.id,
+        settings,
+        time,
+      })
+      .then((take) =>
+        toast.success(`baked take ${take.id}`, {
+          action: {
+            label: 'open',
+            onClick: () =>
+              navigate({
+                piece: piece.id,
+                view: { kind: 'take', take: take.id },
+              }),
+          },
+          description: `in ${seconds()}`,
+          duration: 4000,
+          id,
+        }),
+      )
+      .catch((error: unknown) =>
+        toast.error(`bake failed: ${errorText(error)}`, {
+          description: `at «${step}» after ${seconds()}`,
+          duration: 8000,
+          id,
+        }),
+      )
+      .finally(() => clearInterval(tick));
   };
 
   const copyImage = async () => {

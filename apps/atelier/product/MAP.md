@@ -57,9 +57,11 @@
   - when dima presses `b` or the bake button
   - then a note field opens with the piece's last note selected
   - and Enter bakes: a «baking <piece> · <time>…» toast, then «baked take <id>» with an «open» action, and the take tops the takes list
-- 🧭 bake shows progress
+- ✅ bake shows progress
   - given a bake is running
-  - then dima sees what it is doing now (a step, the files being written, or an eta), not only a spinner
+  - then its toast names the step it is on (the browser, the stage, `frame n of 72`, the webp, saving) and the seconds so far
+  - and a motion loop's webp step, the long one, says about how many seconds it takes
+  - decision: the estimate learns from the last loop the server encoded — an animated webp costs ~1 µs per frame pixel (70 of homestead's 76 s)
 - ✅ bake a motion loop
   - given a piece that moves
   - when dima runs «bake a motion loop» from ⌘K

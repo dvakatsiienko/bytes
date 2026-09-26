@@ -16,6 +16,12 @@ const LOOP_SCALE = 1;
 /** one loop of the stage's motion, as `LOOP_SECONDS` in the stage canvas */
 const LOOP_MS = 6000;
 const BAKE_TIMEOUT = 90_000;
+/**
+ * An animated webp encodes at ~1 µs per frame pixel on dima's mac (homestead,
+ * 72 frames of 1600×600: ~71 s of a 76 s bake). The first loop's estimate
+ * starts there; each loop encoded after it sets the pace for the next.
+ */
+let encodeMsPerPixel = 0.001;
 
 /**
  * One bake, for the dev server's button and for `atelier:bake` alike. `load`
@@ -40,16 +46,26 @@ export const bake = async (input: BakeInput): Promise<BakeOutput> => {
   if (spec) {
     const pngs = await renderInBrowser(input, piece.size);
     const [still] = pngs;
-    if (pngs.length === 1 && still) return { webp: await toWebp(still) };
+    if (pngs.length === 1 && still) {
+      input.onStep?.('writing the webp');
+      return { webp: await toWebp(still) };
+    }
+    const pixels = pngs.length * piece.size.w * piece.size.h * LOOP_SCALE ** 2;
+    input.onStep?.(
+      `writing the animated webp, about ${Math.ceil((encodeMsPerPixel * pixels) / 1000)} s`,
+    );
+    const encodeStart = performance.now();
     const delay = Math.round(LOOP_MS / pngs.length);
     const webp = await sharp(pngs, { join: { animated: true } })
       .webp({ delay: pngs.map(() => delay), effort: 6, loop: 0, quality: 88 })
       .toBuffer();
+    encodeMsPerPixel = (performance.now() - encodeStart) / pixels;
     return { webp };
   }
   if (input.frames > 1)
     throw new Error(`«${piece.id}» is a flat piece: it has no motion to loop`);
 
+  input.onStep?.('drawing the svg');
   const optimized = optimize(pieceSvg(piece, input.time, input.settings.seed), {
     multipass: true,
   }).data;
@@ -58,6 +74,7 @@ export const bake = async (input: BakeInput): Promise<BakeOutput> => {
   })
     .render()
     .asPng();
+  input.onStep?.('writing the webp');
   return { svg: `${optimized}\n`, webp: await toWebp(png) };
 };
 
@@ -114,6 +131,7 @@ const renderInBrowser = async (
   size: { w: number; h: number },
 ) => {
   const isLoop = input.frames > 1;
+  input.onStep?.('opening the headless browser');
   const page = await (await getBrowser()).newPage({
     deviceScaleFactor: isLoop ? LOOP_SCALE : STILL_SCALE,
     viewport: { height: size.h, width: size.w },
@@ -125,6 +143,7 @@ const renderInBrowser = async (
     url.searchParams.set('set', JSON.stringify(input.settings));
     url.searchParams.set('frames', String(input.frames));
     url.searchParams.set('dpr', String(isLoop ? LOOP_SCALE : STILL_SCALE));
+    input.onStep?.('drawing the stage');
     await page.goto(url.href);
     // the bake view sets `data-baked` on <html>: «ok» after the first frame, or the error
     const handle = await page.waitForFunction(
@@ -157,6 +176,7 @@ const renderInBrowser = async (
     };
     const pngs: Buffer[] = [];
     for (let index = 0; index < input.frames; index += 1) {
+      if (isLoop) input.onStep?.(`frame ${index + 1} of ${input.frames}`);
       // biome-ignore lint/performance/noAwaitInLoops: one canvas, so the frames are drawn one after another
       pngs.push(await grab(index));
     }
@@ -172,6 +192,8 @@ interface BakeInput {
   /** 1 bakes a still; more bakes that many frames of the motion loop into an animated webp */
   frames: number;
   load: (url: string) => Promise<Record<string, unknown>>;
+  /** what the bake does now, in words dima reads while it runs */
+  onStep?: (step: string) => void;
   /** the dev server's own url, which serves the bake view */
   origin: string;
   piece: string;

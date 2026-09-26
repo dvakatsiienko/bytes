@@ -1,31 +1,63 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { Time } from '../art/time.ts';
+import type { BakeEvent } from '../server/plugin.ts';
 import type { Stash, Take, TakeList } from '../server/takes.ts';
 import { useRoute } from './route.ts';
 import type { Settings } from './stage/settings.ts';
 
 export type TakeFilter = (typeof takeFilters)[number];
 
-export const api = async <T>(
-  path: string,
-  init?: { method: string; body?: unknown },
-): Promise<T> => {
-  const response = await fetch(path, {
+const request = (path: string, init?: { method: string; body?: unknown }) =>
+  fetch(path, {
     body: init?.body === undefined ? undefined : JSON.stringify(init.body),
     // every write says json: the server refuses anything else
     headers: init ? { 'content-type': 'application/json' } : undefined,
     method: init?.method ?? 'GET',
   });
-  const body: unknown = await response.json();
-  if (!response.ok) {
-    const message =
-      typeof body === 'object' && body !== null && 'error' in body
-        ? String(body.error)
-        : response.statusText;
-    throw new Error(message);
+
+const failure = async (response: Response) => {
+  const body: unknown = await response.json().catch(() => null);
+  return new Error(
+    typeof body === 'object' && body !== null && 'error' in body
+      ? String(body.error)
+      : response.statusText,
+  );
+};
+
+export const api = async <T>(
+  path: string,
+  init?: { method: string; body?: unknown },
+): Promise<T> => {
+  const response = await request(path, init);
+  if (!response.ok) throw await failure(response);
+  return (await response.json()) as T;
+};
+
+/** a bake answers one json line per step as it runs; the last line is the take or the error */
+const postBake = async (
+  input: BakeRequest,
+  onStep: (step: string) => void,
+): Promise<Take> => {
+  const response = await request('/api/bake', { body: input, method: 'POST' });
+  if (!(response.ok && response.body)) throw await failure(response);
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  let rest = '';
+  for (;;) {
+    // biome-ignore lint/performance/noAwaitInLoops: a stream is read one chunk after another
+    const chunk = await reader.read();
+    if (chunk.done) break;
+    const lines = (rest + chunk.value).split('\n');
+    rest = lines.pop() ?? '';
+    for (const line of lines) {
+      if (!line) continue;
+      const event = JSON.parse(line) as BakeEvent;
+      if ('step' in event) onStep(event.step);
+      else if ('take' in event) return event.take;
+      else throw new Error(event.error);
+    }
   }
-  return body as T;
+  throw new Error('the bake ended without a take');
 };
 
 const takesKey = (piece: string) => ['takes', piece] as const;
@@ -66,13 +98,11 @@ export const useShownTake = (piece: string) => {
 export const useBake = () => {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (input: {
-      piece: string;
-      time: Time;
-      settings: Settings;
-      note: string;
-      frames: number;
-    }) => api<Take>('/api/bake', { body: input, method: 'POST' }),
+    mutationFn: ({
+      onStep,
+      ...input
+    }: BakeRequest & { onStep: (step: string) => void }) =>
+      postBake(input, onStep),
     onSuccess: (take) =>
       client.invalidateQueries({ queryKey: takesKey(take.piece) }),
   });
@@ -107,3 +137,13 @@ export const usePromote = () => {
     onSuccess: (list, take) => client.setQueryData(takesKey(take.piece), list),
   });
 };
+
+/* Types */
+
+interface BakeRequest {
+  frames: number;
+  note: string;
+  piece: string;
+  settings: Settings;
+  time: Time;
+}

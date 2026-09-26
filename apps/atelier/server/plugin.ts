@@ -8,7 +8,7 @@ import { errorText } from '../src/error-text.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
 import { bake, closeBrowser } from './bake.ts';
 import { readBuild, readOthers } from './build.ts';
-import type { Stash, TakePatch } from './takes.ts';
+import type { Stash, Take, TakePatch } from './takes.ts';
 import {
   TAKE_FILES,
   listTakes,
@@ -98,24 +98,37 @@ const route = async (
     const origin = server.resolvedUrls?.local[0];
     if (!origin)
       return send(res, 500, { error: 'the dev server has no local url' });
-    const baked = await bake({
-      frames,
-      load: (path) => server.ssrLoadModule(path),
-      origin,
-      piece: piece.id,
-      settings,
-      time: body.time,
-    });
     const note = typeof body.note === 'string' ? body.note.slice(0, 200) : '';
-    const take = await saveTake({
-      frames,
-      note,
-      piece: piece.id,
-      settings,
-      time: body.time,
-      ...baked,
-    });
-    return send(res, 201, take);
+    // a bake runs for seconds: the answer is one json line per step, the take (or the error) last
+    res.statusCode = 200;
+    res.setHeader('content-type', 'application/x-ndjson');
+    res.setHeader('cache-control', 'no-cache');
+    const line = (event: BakeEvent) => res.write(`${JSON.stringify(event)}\n`);
+    try {
+      const baked = await bake({
+        frames,
+        load: (path) => server.ssrLoadModule(path),
+        onStep: (step) => line({ step }),
+        origin,
+        piece: piece.id,
+        settings,
+        time: body.time,
+      });
+      line({ step: 'saving the take' });
+      const take = await saveTake({
+        frames,
+        note,
+        piece: piece.id,
+        settings,
+        time: body.time,
+        ...baked,
+      });
+      line({ take });
+    } catch (error) {
+      line({ error: errorText(error) });
+    }
+    res.end();
+    return;
   }
 
   const [area, piece, takeId, file] = parts;
@@ -162,6 +175,9 @@ const route = async (
   }
   return send(res, 404, { error: 'not found' });
 };
+
+/** one line of a bake's answer: a step while it runs, then the take or the error */
+export type BakeEvent = { step: string } | { take: Take } | { error: string };
 
 /** a loop is 2–240 frames; anything else bakes a still */
 const loopFrames = (value: unknown) =>
