@@ -40,11 +40,11 @@ export const PieceRail = (props: PieceRailProps) => {
         aria-labelledby={`group-${group}`}
         className='px-2 pb-3'
         key={group}>
-        <h2
-          className='px-2 pb-1 font-medium text-[12px] text-muted-foreground uppercase tracking-[0.08em]'
+        <h3
+          className='px-2 pb-1 font-mono text-[12px] text-muted-foreground'
           id={`group-${group}`}>
           {group}
-        </h2>
+        </h3>
         <ul>{itemListJSX}</ul>
       </section>
     );
@@ -52,10 +52,18 @@ export const PieceRail = (props: PieceRailProps) => {
 
   return (
     <nav
-      aria-label='pieces'
+      aria-labelledby='pieces-title'
       className='flex max-h-[45%] min-h-0 shrink-0 flex-col border-border border-b'>
+      <h2
+        className='flex items-baseline justify-between px-4 pt-3 pb-1 font-medium text-[12px] text-muted-foreground uppercase tracking-[0.08em]'
+        id='pieces-title'>
+        pieces
+        <span className='font-mono normal-case tracking-normal'>
+          {pieces.length}
+        </span>
+      </h2>
       <ScrollArea className='min-h-0 flex-1'>
-        <div className='pt-3'>{groupListJSX}</div>
+        <div className='pt-1'>{groupListJSX}</div>
       </ScrollArea>
     </nav>
   );

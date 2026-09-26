@@ -10,7 +10,7 @@
   - given any screen
   - when dima clicks a piece in the pieces list
   - then its live view opens at `/<piece>` and the row is marked selected
-- 🧭 a visible «PIECES» title over the pieces list, matching TAKES
+- ✅ a visible «PIECES» title over the pieces list, matching TAKES, with the piece count
 - ✅ the «atelier» wordmark goes home
   - when dima clicks the wordmark
   - then the first piece's live view opens; ⌘-click opens it in a new tab
@@ -82,7 +82,7 @@
 - ✅ a take row
   - then each row shows the thumbnail, the time of day, the note or «no note», and a current or stash chip
   - and a right-click offers open, compare with the shown take, promote, stash or unstash, use its settings, copy png
-- 🐞 the selected row's ring shows whole, first and last row included
+- ✅ the selected row's ring shows whole, first and last row included
 - ✅ previous and next take
   - when dima presses `[` or `]`, or picks them in ⌘K
   - then `]` opens the next take down the list (older) and `[` the next one up (newer); from the live view `]` starts at the newest and `[` at the oldest

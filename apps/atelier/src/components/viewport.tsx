@@ -80,7 +80,7 @@ export const Viewport = (props: ViewportProps) => {
   }
 
   return (
-    <section aria-label='viewport' className='flex h-full min-h-0 flex-col'>
+    <main aria-label='viewport' className='flex h-full min-h-0 flex-col'>
       <div className='flex flex-wrap items-center gap-2 border-border border-b px-4 py-2'>
         {view.kind === 'live' ? null : (
           <Button onClick={props.actions.goLive} size='sm' variant='ghost'>
@@ -169,7 +169,7 @@ export const Viewport = (props: ViewportProps) => {
           </div>
         </div>
       </div>
-    </section>
+    </main>
   );
 };
 
