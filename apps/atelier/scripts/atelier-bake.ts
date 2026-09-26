@@ -5,13 +5,14 @@
  * free port, bakes through the same function the bake button calls, saves the
  * takes, prints their ids, stops. `--set` overrides the default settings.
  */
+import { relative } from 'node:path';
 import { parseArgs } from 'node:util';
 import { createServer } from 'vite';
 
 import type * as piecesModule from '../art/pieces.ts';
 import { times as allTimes, isTime } from '../art/time.ts';
 import { bake, closeBrowser } from '../server/bake.ts';
-import { appRoot, saveTake } from '../server/takes.ts';
+import { appRoot, saveTake, takeDir } from '../server/takes.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
 
 const { positionals, values } = parseArgs({
@@ -71,7 +72,12 @@ try {
       time,
       ...baked,
     });
-    console.log(`baked ${pieceId} · ${time} → takes/${pieceId}/${take.id}/`);
+    // the dir the take really landed in: a scratch ATELIER_TAKES_DIR prints as its absolute path
+    const dir = takeDir(pieceId, take.id);
+    const shown = relative(process.cwd(), dir);
+    console.log(
+      `baked ${pieceId} · ${time} → ${shown.startsWith('..') ? dir : shown}/`,
+    );
   }
 } finally {
   await closeBrowser();

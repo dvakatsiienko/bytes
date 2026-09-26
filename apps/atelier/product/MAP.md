@@ -127,6 +127,7 @@
 - ✅ bake from the terminal
   - when an agent runs `pnpm atelier:bake <piece> [day|night|both] [--loop [frames]]`
   - then the same take lands as the bake button makes (one code path, `server/bake.ts`)
+  - and it prints the dir each take landed in — under `ATELIER_TAKES_DIR` when that is set
 - ✅ ship
   - when an agent runs `pnpm atelier:ship [piece…]`
   - then it prints the plan; with `--write` it copies each current take into frame, bytes and the profile repo under `assets/atelier/`, and commits nothing
