@@ -44,6 +44,7 @@ export const commandsOf = (
     },
     {
       group: 'bench',
+      inViewer: true,
       keys: 'l',
       label: 'back to the live view',
       run: actions.goLive,
@@ -109,6 +110,8 @@ export const commandGroups = [
 
 export interface StudioCommand {
   group: (typeof commandGroups)[number];
+  /** its bare key also works while the zoom viewer is open */
+  inViewer?: true;
   /** a bare key, pressed outside any text field */
   keys?: string;
   label: string;

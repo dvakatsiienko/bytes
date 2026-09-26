@@ -38,17 +38,18 @@
   - given a piece that moves
   - when dima presses `p` or the play button
   - then the motion plays, and the same key stops it
-- 🐞 motion stops when dima leaves the view
+- ✅ motion stops when dima leaves the view
   - given motion is playing
   - when dima opens another piece, a take or a compare
   - then the motion stops, and coming back shows a still frame
 - ✅ zoom and pan
   - when dima presses `z` or the zoom button
   - then the image opens zoomable: pinch or ⌘-scroll zooms, drag pans, double-click toggles fit and 2×
-- 🐞 back to live from anywhere
-  - given dima is zoomed, or on a take, or on a compare
+- ✅ back to live from anywhere
+  - given dima is zoomed (in the zoom viewer or on the bench), or on a take, or on a compare
   - when dima presses `l` or picks «back to the live view» in ⌘K
   - then the live view of the same piece shows, unzoomed
+  - and `l` is the one bare key the zoom viewer lets through
 - ✅ copy the image
   - when dima presses `c` or the copy button
   - then the current image is on the clipboard as a png and a toast confirms it

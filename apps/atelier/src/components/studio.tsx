@@ -7,7 +7,7 @@ import {
   ResizablePanelGroup,
 } from '@ui/kit/components/resizable';
 import { Toaster } from '@ui/kit/components/sonner';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
@@ -21,8 +21,8 @@ import {
   useResolvedTheme,
   useTabMark,
 } from '../hooks.ts';
-import { navigate, useRoute } from '../route.ts';
-import { themeAtom } from '../state.ts';
+import { navigate, pathOf, useRoute } from '../route.ts';
+import { isPlayingAtom, themeAtom } from '../state.ts';
 import { BuildBadge } from './build-badge';
 import { CommandPalette } from './command-palette';
 import { PieceRail } from './piece-rail';
@@ -68,6 +68,12 @@ const Workbench = (props: WorkbenchProps) => {
   useTabMark(resolvedTheme, useBuild()?.isDev ?? false);
   const isWide = useMediaQuery('(min-width: 1100px)');
   useHotkeys(commands, actions.openPalette);
+  const path = pathOf(useRoute());
+  const setIsPlaying = useSetAtom(isPlayingAtom);
+  // leaving a view stops the motion it played; coming back shows a still frame
+  useEffect(() => {
+    return () => setIsPlaying(false);
+  }, [path, setIsPlaying]);
 
   const railJSX = (
     <aside

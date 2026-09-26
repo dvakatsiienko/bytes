@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { Toolbar, ToolbarButton } from '@ui/kit/components/toolbar';
 import { cn } from 'cn';
@@ -166,6 +166,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
             )}
             data-zoomed={isZoomed}>
             <ZoomBehaviour
+              fitKey={props.fitKey}
               mode={mode}
               ms={ms}
               onFit={(scale) => setRange(rangeOf(scale))}
@@ -232,6 +233,12 @@ const ZoomBehaviour = (props: ZoomBehaviourProps) => {
   // the listeners attach once; reduced motion may change while they live
   const ms = useRef(props.ms);
   ms.current = props.ms;
+  const fittedKey = useRef(props.fitKey);
+  useEffect(() => {
+    if (props.fitKey === fittedKey.current) return;
+    fittedKey.current = props.fitKey;
+    fit({ mode: props.mode, ms: ms.current, zoom: controls });
+  }, [props.fitKey, props.mode, controls]);
   useTransformInit(({ instance }) => {
     const wrapper = instance.wrapperComponent;
     const content = instance.contentComponent;
@@ -490,10 +497,13 @@ const handleDoubleClick = (context: ZoomContext) => (event: MouseEvent) => {
 interface ZoomBoxProps {
   children: ReactNode;
   className?: string;
+  /** a new value fits the art again */
+  fitKey?: number;
   mode: keyof typeof modes;
 }
 
 interface ZoomBehaviourProps {
+  fitKey?: number;
   mode: ZoomMode;
   ms: number;
   /** the viewer's fit, once the image knows its size and on every resize: the range follows it */

@@ -15,7 +15,7 @@ import type { StudioActions } from '../actions.ts';
 import { pathOf, useRoute } from '../route.ts';
 import { defaults } from '../stage/settings.ts';
 import type { ReadmeWidth } from '../state.ts';
-import { compareModeAtom, settingsByPieceAtom } from '../state.ts';
+import { compareModeAtom, settingsByPieceAtom, unzoomAtom } from '../state.ts';
 import { useShownTake } from '../takes.ts';
 import { BakeButton } from './bake-button';
 import { CompareView } from './compare-view';
@@ -47,6 +47,7 @@ export const Viewport = (props: ViewportProps) => {
   const settings =
     useAtomValue(settingsByPieceAtom)[props.piece.id] ?? defaults;
   const [compareMode, setCompareMode] = useAtom(compareModeAtom);
+  const unzoom = useAtomValue(unzoomAtom);
   const { list, take: shownTake } = useShownTake(props.piece.id);
   const { view } = route;
   const takeOf = (id: string) => list?.takes.find((take) => take.id === id);
@@ -158,6 +159,7 @@ export const Viewport = (props: ViewportProps) => {
                       : flatWidth(props.piece, props.actions.readme),
                   }}>
                   <ZoomBox
+                    fitKey={unzoom}
                     // a new piece, take, time or frame starts unzoomed
                     key={`${pathOf(route)}:${props.actions.time}:${props.actions.readme}`}
                     mode='canvas'>

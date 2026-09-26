@@ -20,6 +20,7 @@ import {
   settingsByPieceAtom,
   themeAtom,
   timeAtom,
+  unzoomAtom,
   zoomAtom,
 } from './state.ts';
 import { takeUrl, useBake, useShownTake } from './takes.ts';
@@ -40,6 +41,7 @@ export const useStudioActions = (piece: Piece) => {
   const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
   const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
   const setZoom = useSetAtom(zoomAtom);
+  const [unzoom, setUnzoom] = useAtom(unzoomAtom);
   const setPaletteOpen = useSetAtom(isPaletteOpenAtom);
   const patchSettings = useSetAtom(patchSettingsAtom);
   const settings = useAtomValue(settingsByPieceAtom)[piece.id] ?? defaults;
@@ -159,7 +161,12 @@ export const useStudioActions = (piece: Piece) => {
     copyImage,
     copySettings,
     cycleReadme: () => setReadme(next(readmeWidths, readme)),
-    goLive: () => navigate({ piece: piece.id, view: { kind: 'live' } }),
+    // from anywhere: the viewer closes, and a zoomed live view goes back to fit
+    goLive: () => {
+      setZoom(null);
+      if (view.kind === 'live') setUnzoom(unzoom + 1);
+      else navigate({ piece: piece.id, view: { kind: 'live' } });
+    },
     goPiece: (id: string) => navigate({ piece: id, view: { kind: 'live' } }),
     hasMotion,
     isBaking: bakeMutation.isPending,
