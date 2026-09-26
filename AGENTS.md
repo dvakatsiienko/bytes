@@ -293,6 +293,10 @@ Workspace-level families — role, kind, special, model routing. Project-meaning
 
 Multi-context — root `CONTEXT-MAP.md` points at per-app `CONTEXT.md` files. See `docs/agents/domain.md`.
 
+**An app with `product/MAP.md` keeps its map and its `CONTEXT.md` in step with the code:** a change to what
+the app does updates its map line, and any new domain word its `CONTEXT.md` entry, in the same commit
+(`x:product-docs`).
+
 ## worktrees — one shared checkout, coders branch in their own tree
 
 - the main checkout stays on `main`; a `git switch` there moves every session. a `coder/*` branch lives in `.claude/worktrees/BYT-N-<slug>` — cc's own default, gitignored, the same place `EnterWorktree` puts a tree it makes (`camp .claude/worktrees/BYT-N-<slug> -b coder/BYT-N-<slug> main`).

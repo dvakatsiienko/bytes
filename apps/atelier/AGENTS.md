@@ -9,9 +9,8 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 ## The authorities — read before changing
 
 - **`PRODUCT.md`** — what atelier is for and who uses it. Read before changing what the app does.
-- **`product/MAP.md` + `CONTEXT.md`** — every feature with its check, and the words they use. A
-  change to what the app does updates its map line, and any new word its `CONTEXT.md` entry, in
-  the same commit (`x:product-docs`).
+- **`product/MAP.md` + `CONTEXT.md`** — every feature with its check, and the words they use. Read
+  your section before changing what the app does.
 - **`DESIGN.md`** + `.impeccable/design.json` — the look («the crafter and the lamp»). Read before
   changing how anything renders. Both are `impeccable`'s files: never hand-edit them.
 
