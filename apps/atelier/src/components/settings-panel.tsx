@@ -64,7 +64,8 @@ export const SettingsPanel = (props: SettingsPanelProps) => {
     <section
       aria-label='scene settings'
       className='flex h-full min-h-0 flex-col'>
-      <header className='flex items-center justify-between gap-2 border-border border-b px-4 py-2'>
+      {/* min-h-13 is shared with the bench toolbar, so their two lines meet */}
+      <header className='flex min-h-13 items-center justify-between gap-2 border-border border-b px-4 py-2'>
         <h2 className='truncate font-serif text-lg'>{props.piece.id}</h2>
       </header>
       <ScrollArea className='min-h-0 flex-1'>
@@ -111,7 +112,9 @@ const SettingRow = (props: SettingRowProps) => {
 
   const labelJSX = (
     <label className='min-w-0' htmlFor={id}>
-      <span className='block text-foreground text-sm'>{props.row.label}</span>
+      <span className='block text-foreground text-sm' id={`${id}-label`}>
+        {props.row.label}
+      </span>
       <code className='block font-mono text-[12px] text-muted-foreground'>
         {props.row.key}
       </code>
@@ -144,7 +147,8 @@ const SettingRow = (props: SettingRowProps) => {
         />
         {copyJSX}
         <Slider
-          aria-label={props.row.label}
+          // base-ui hands a root's labelledby to each thumb's range input; a plain label stays on the group
+          aria-labelledby={`${id}-label`}
           className='col-span-3'
           max={props.row.max}
           min={props.row.min}

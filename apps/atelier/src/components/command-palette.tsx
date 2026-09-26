@@ -53,15 +53,16 @@ export const CommandPalette = (props: CommandPaletteProps) => {
 
   return (
     // roomier than the kit's default: a wider panel, 40 px rows, air around the field (DESIGN.md spacing 8 / 12 / 16)
+    // its top edge sits just under the header, level with the bench tools, and stays put while the list filters
     <CommandDialog
-      className='sm:max-w-xl'
+      className='top-[10dvh] sm:max-w-xl'
       description='run a studio command or open a piece'
       onOpenChange={setIsOpen}
       open={isOpen}
       title='commands'>
       <Command className='**:data-[slot=input-group]:h-10! **:data-[slot=command-input-wrapper]:p-2 **:data-[slot=command-input-wrapper]:pb-1'>
         <CommandInput placeholder='type a command or a piece…' />
-        <CommandList className='max-h-[26rem] pb-1.5'>
+        <CommandList className='max-h-[min(26rem,calc(80dvh-4rem))] pb-1.5'>
           <CommandEmpty>nothing matches</CommandEmpty>
           {groupListJSX}
         </CommandList>

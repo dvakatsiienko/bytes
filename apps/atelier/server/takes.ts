@@ -84,7 +84,7 @@ const takeIds = async (piece: string) => {
 };
 
 const readTake = async (piece: string, id: string): Promise<Take> => {
-  const dir = join(takesRoot(), piece, id);
+  const dir = takeDir(piece, id);
   const meta = (await readJson(join(dir, 'take.json'))) as Omit<
     Take,
     'id' | 'settings'
@@ -97,8 +97,12 @@ const readTake = async (piece: string, id: string): Promise<Take> => {
 export const resolveTakeId = async (piece: string, id: string) =>
   TAKE_ID.test(id) && (await takeIds(piece)).includes(id) ? id : null;
 
+/** where a take lives on disk, under `ATELIER_TAKES_DIR` when it is set */
+export const takeDir = (piece: string, id: string) =>
+  join(takesRoot(), piece, id);
+
 export const takeFile = (piece: string, id: string, file: TakeFile) =>
-  join(takesRoot(), piece, id, file);
+  join(takeDir(piece, id), file);
 
 export const listTakes = async (piece: string): Promise<TakeList> => {
   const ids = await takeIds(piece);
@@ -153,7 +157,7 @@ const claimFolder = async (piece: string, time: Time, note: string) => {
 const writeTake = async (input: NewTake): Promise<Take> => {
   const note = input.note.trim();
   const id = await claimFolder(input.piece, input.time, note);
-  const dir = join(takesRoot(), input.piece, id);
+  const dir = takeDir(input.piece, id);
   const meta = {
     bakedAt: new Date().toISOString(),
     files: input.svg ? ['bake.webp', 'piece.svg'] : ['bake.webp'],
@@ -183,7 +187,7 @@ export const updateTake = async (
   id: string,
   patch: TakePatch,
 ) => {
-  const dir = join(takesRoot(), piece, id);
+  const dir = takeDir(piece, id);
   const meta = (await readJson(join(dir, 'take.json'))) as Record<
     string,
     unknown

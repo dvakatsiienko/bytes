@@ -50,7 +50,7 @@ const isTyping = (target: EventTarget | null) =>
       'input, textarea, select, [role="spinbutton"], [role="combobox"]',
     ) !== null);
 
-/** bare keys outside text fields and open dialogs; ⌘K / ctrl+K opens the palette from anywhere */
+/** bare keys outside text fields and open dialogs — the zoom viewer lets its `inViewer` keys through; ⌘K / ctrl+K opens the palette from anywhere */
 export const useHotkeys = (
   commands: readonly StudioCommand[],
   openPalette: () => void,
@@ -73,14 +73,18 @@ export const useHotkeys = (
       if (
         isTyping(event.target) ||
         document.querySelector(
-          '[role="dialog"], [role="listbox"], [role="menu"]',
+          '[role="dialog"]:not([data-viewer]), [role="listbox"], [role="menu"]',
         )
       )
         return;
       const command = commands.find(
         (candidate) => candidate.keys === event.key,
       );
-      if (!command) return;
+      if (
+        !command ||
+        (document.querySelector('[data-viewer]') && !command.inViewer)
+      )
+        return;
       event.preventDefault();
       command.run();
     };

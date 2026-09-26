@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { Kbd } from '@ui/kit/components/kbd';
 import {
@@ -7,11 +7,12 @@ import {
   ResizablePanelGroup,
 } from '@ui/kit/components/resizable';
 import { Toaster } from '@ui/kit/components/sonner';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
 import { findPiece, pieces } from '../../art/pieces.ts';
+import type { StudioActions } from '../actions.ts';
 import { useStudioActions } from '../actions.ts';
 import { useBuild } from '../build.ts';
 import { commandsOf } from '../commands.ts';
@@ -21,10 +22,12 @@ import {
   useResolvedTheme,
   useTabMark,
 } from '../hooks.ts';
-import { navigate, useRoute } from '../route.ts';
-import { themeAtom } from '../state.ts';
+import { navigate, pathOf, useRoute } from '../route.ts';
+import type { Theme } from '../state.ts';
+import { isPlayingAtom, themeAtom } from '../state.ts';
 import { BuildBadge } from './build-badge';
 import { CommandPalette } from './command-palette';
+import { Section } from './error-boundary';
 import { PieceRail } from './piece-rail';
 import { Segmented } from './segmented';
 import { SettingsPanel } from './settings-panel';
@@ -68,23 +71,36 @@ const Workbench = (props: WorkbenchProps) => {
   useTabMark(resolvedTheme, useBuild()?.isDev ?? false);
   const isWide = useMediaQuery('(min-width: 1100px)');
   useHotkeys(commands, actions.openPalette);
+  const path = pathOf(useRoute());
+  const setIsPlaying = useSetAtom(isPlayingAtom);
+  // leaving a view stops the motion it played; coming back shows a still frame
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new path is the leave, so the cleanup runs on it
+  useEffect(() => {
+    return () => setIsPlaying(false);
+  }, [path, setIsPlaying]);
 
   const railJSX = (
     <aside
       aria-label='pieces and takes'
       className='flex h-full min-h-0 flex-col'>
-      <PieceRail piece={props.piece} />
-      <TakesRail piece={props.piece} />
+      <Section name='pieces'>
+        <PieceRail piece={props.piece} />
+      </Section>
+      <Section name='takes'>
+        <TakesRail piece={props.piece} />
+      </Section>
     </aside>
   );
   const viewportJSX = <Viewport actions={actions} piece={props.piece} />;
   const settingsJSX = (
     <div className='flex h-full min-h-0 flex-col'>
-      <TakePanel piece={props.piece} />
-      {/* stacked below the bench width, the settings keep their own height under the take */}
-      <div className='min-h-0 flex-1 max-[1100px]:h-[560px] max-[1100px]:flex-none'>
-        <SettingsPanel actions={actions} piece={props.piece} />
-      </div>
+      <Section name='panel'>
+        <TakePanel piece={props.piece} />
+        {/* stacked below the bench width, the settings keep their own height under the take */}
+        <div className='min-h-0 flex-1 max-[1100px]:h-[560px] max-[1100px]:flex-none'>
+          <SettingsPanel actions={actions} piece={props.piece} />
+        </div>
+      </Section>
     </div>
   );
 
@@ -93,37 +109,10 @@ const Workbench = (props: WorkbenchProps) => {
       className='flex h-dvh flex-col bg-background text-foreground'
       data-time={actions.time}>
       <header className='flex h-12 shrink-0 items-center justify-between gap-4 border-border border-b px-4'>
-        <h1 className='font-serif text-2xl leading-none'>
-          <a
-            className='rounded-sm'
-            href='/'
-            onClick={(event) => {
-              // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
-              if (
-                event.metaKey ||
-                event.ctrlKey ||
-                event.shiftKey ||
-                event.altKey
-              )
-                return;
-              event.preventDefault();
-              navigate({ piece: pieces[0].id, view: { kind: 'live' } });
-            }}>
-            atelier
-          </a>
-        </h1>
-        <div className='flex min-w-0 items-center gap-1'>
-          <BuildBadge />
-          <Button onClick={actions.openPalette} size='sm' variant='ghost'>
-            commands <Kbd>⌘K</Kbd>
-          </Button>
-          <Segmented
-            ariaLabel='theme'
-            onValueChange={actions.setTheme}
-            options={themeOptions}
-            value={theme}
-          />
-        </div>
+        <Wordmark />
+        <Section name='header'>
+          <HeaderContent actions={actions} theme={theme} />
+        </Section>
       </header>
       {isWide ? (
         <ResizablePanelGroup
@@ -132,9 +121,9 @@ const Workbench = (props: WorkbenchProps) => {
           <ResizablePanel defaultSize='20%' maxSize='32%' minSize={220}>
             {railJSX}
           </ResizablePanel>
-          <ResizableHandle />
+          <MouseOnlyHandle />
           <ResizablePanel minSize='40%'>{viewportJSX}</ResizablePanel>
-          <ResizableHandle />
+          <MouseOnlyHandle />
           <ResizablePanel defaultSize='24%' maxSize='36%' minSize={280}>
             {settingsJSX}
           </ResizablePanel>
@@ -156,8 +145,64 @@ const Workbench = (props: WorkbenchProps) => {
   );
 };
 
+/** the way home, outside the header's section: a crashed header keeps it and the page's one h1 */
+const Wordmark = () => {
+  return (
+    <h1 className='font-serif text-2xl leading-none'>
+      <a
+        className='rounded-sm'
+        href='/'
+        onClick={(event) => {
+          // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+            return;
+          event.preventDefault();
+          navigate({ piece: pieces[0].id, view: { kind: 'live' } });
+        }}>
+        atelier
+      </a>
+    </h1>
+  );
+};
+
+/** the build badge, ⌘K and the theme */
+const HeaderContent = (props: HeaderContentProps) => {
+  return (
+    <div className='flex min-w-0 items-center gap-1'>
+      <BuildBadge />
+      <Button onClick={props.actions.openPalette} size='sm' variant='ghost'>
+        commands <Kbd>⌘K</Kbd>
+      </Button>
+      <Segmented
+        ariaLabel='theme'
+        onValueChange={props.actions.setTheme}
+        options={themeOptions}
+        value={props.theme}
+      />
+    </div>
+  );
+};
+
+/**
+ * A panel divider is resized with the mouse only, so Tab skips it. The
+ * library writes `tabIndex={0}` after every prop it is given; the DOM value
+ * is set once it mounts, and react leaves it alone while its own value holds.
+ */
+const MouseOnlyHandle = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (ref.current) ref.current.tabIndex = -1;
+  }, []);
+  return <ResizableHandle elementRef={ref} />;
+};
+
 /* Types */
 
 interface WorkbenchProps {
   piece: Piece;
+}
+
+interface HeaderContentProps {
+  actions: StudioActions;
+  theme: Theme;
 }

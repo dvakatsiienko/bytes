@@ -124,7 +124,8 @@ export const TakesRail = (props: TakesRailProps) => {
   return (
     <section
       aria-labelledby='takes-title'
-      className='flex min-h-0 flex-1 flex-col'>
+      // sized by its takes up to 45 % of the rail, then it scrolls; the pieces list above takes the rest
+      className='flex max-h-[45%] min-h-0 shrink-0 flex-col'>
       <h2
         className='flex items-baseline justify-between px-4 pt-3 pb-1 font-medium text-[12px] text-muted-foreground uppercase tracking-[0.08em]'
         id='takes-title'>
@@ -145,7 +146,7 @@ export const TakesRail = (props: TakesRailProps) => {
           />
         </div>
       ) : null}
-      <ScrollArea className='min-h-0 flex-1'>
+      <ScrollArea className='min-h-0'>
         {list && shownTakes.length === 0 ? (
           <p className='px-4 py-2 text-muted-foreground text-sm'>
             {list.takes.length === 0
@@ -158,7 +159,10 @@ export const TakesRail = (props: TakesRailProps) => {
             takes did not load: {query.error.message}
           </p>
         ) : null}
-        <ul className='flex flex-col gap-1 px-2 pb-3'>{cardListJSX}</ul>
+        {/* pt-1 is the selected row's outline, width + offset, so the scroll box never cuts it; pr-4 also clears the 10 px scrollbar */}
+        <ul className='flex flex-col gap-1 pt-1 pr-4 pb-3 pl-2'>
+          {cardListJSX}
+        </ul>
       </ScrollArea>
     </section>
   );
