@@ -42,12 +42,16 @@ try {
   const started = performance.now();
   const stage = page.locator('[data-testid=stage]');
   await page.goto(new URL(encodeURIComponent(pieceId), origin).href);
-  await stage.waitFor({ timeout: RENDER_TIMEOUT });
+  // no stage at all (the viewport crashed, the page failed) still ends in a report, never a stack
+  const hasStage = await stage
+    .waitFor({ timeout: RENDER_TIMEOUT })
+    .then(() => true)
+    .catch(() => false);
   // the studio sends an unknown piece to the first one: a failed probe, not a render
   const isPiece =
     new URL(page.url()).pathname === `/${encodeURIComponent(pieceId)}`;
-  if (isPiece) {
-    if (time === 'night') await page.keyboard.press('n');
+  if (isPiece || !hasStage) {
+    if (hasStage && time === 'night') await page.keyboard.press('n');
     await page
       .locator(
         `[data-testid=stage][data-rendered="${pieceId}:${time}"], [data-testid=stage][data-error]`,
@@ -55,8 +59,10 @@ try {
       .waitFor({ timeout: RENDER_TIMEOUT })
       .catch(() => undefined);
     const seconds = ((performance.now() - started) / 1000).toFixed(1);
-    const rendered = await stage.getAttribute('data-rendered');
-    const failed = await stage.getAttribute('data-error');
+    const rendered = hasStage
+      ? await stage.getAttribute('data-rendered')
+      : null;
+    const failed = hasStage ? await stage.getAttribute('data-error') : null;
     console.log(
       rendered
         ? `data-rendered: ${rendered} (${seconds} s)`

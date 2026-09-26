@@ -98,7 +98,7 @@ export const compareModeAtom = atom<'side' | 'slider'>('side');
 export const isPaletteOpenAtom = atom(false);
 export const zoomAtom = atom<Zoom | null>(null);
 /** each bump sends the bench's zoom back to fit, without redrawing the piece */
-export const unzoomAtom = atom(0);
+export const fitKeyAtom = atom(0);
 export const takeFilterAtom = atom<TakeFilter>('all');
 /** a bake waiting for its note: how many frames it will bake, or null when none is asked */
 export const bakeAskAtom = atom<number | null>(null);

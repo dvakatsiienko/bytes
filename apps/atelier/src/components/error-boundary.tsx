@@ -65,7 +65,12 @@ const SectionFallback = (props: SectionFallbackProps) => {
           : 'h-full flex-col items-start justify-center',
       )}
       role='alert'>
-      <p className='text-foreground'>{props.what} stopped drawing</p>
+      <p
+        className='text-foreground'
+        // a one-row section has no room for the disclosure: in dev the error is its hover text
+        title={isDev && props.isRow ? errorText(props.error) : undefined}>
+        {props.what} stopped drawing
+      </p>
       <Button onClick={props.resetErrorBoundary} size='sm' variant='outline'>
         try again
       </Button>
