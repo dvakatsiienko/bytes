@@ -96,3 +96,7 @@ _Avoid_: preview, mockup
 **Compare**:
 Two takes of one piece side by side, or under one sliding divider.
 _Avoid_: diff
+
+**Section**:
+One region of the studio screen that fails alone: the header, the pieces list, the takes list, the bench tools (toolbar), the viewport, the side panel.
+_Avoid_: pane, widget

@@ -12,6 +12,7 @@ import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
 import { findPiece, pieces } from '../../art/pieces.ts';
+import type { StudioActions } from '../actions.ts';
 import { useStudioActions } from '../actions.ts';
 import { useBuild } from '../build.ts';
 import { commandsOf } from '../commands.ts';
@@ -22,9 +23,11 @@ import {
   useTabMark,
 } from '../hooks.ts';
 import { navigate, pathOf, useRoute } from '../route.ts';
+import type { Theme } from '../state.ts';
 import { isPlayingAtom, themeAtom } from '../state.ts';
 import { BuildBadge } from './build-badge';
 import { CommandPalette } from './command-palette';
+import { Section } from './error-boundary';
 import { PieceRail } from './piece-rail';
 import { Segmented } from './segmented';
 import { SettingsPanel } from './settings-panel';
@@ -80,18 +83,24 @@ const Workbench = (props: WorkbenchProps) => {
     <aside
       aria-label='pieces and takes'
       className='flex h-full min-h-0 flex-col'>
-      <PieceRail piece={props.piece} />
-      <TakesRail piece={props.piece} />
+      <Section name='pieces'>
+        <PieceRail piece={props.piece} />
+      </Section>
+      <Section name='takes'>
+        <TakesRail piece={props.piece} />
+      </Section>
     </aside>
   );
   const viewportJSX = <Viewport actions={actions} piece={props.piece} />;
   const settingsJSX = (
     <div className='flex h-full min-h-0 flex-col'>
-      <TakePanel piece={props.piece} />
-      {/* stacked below the bench width, the settings keep their own height under the take */}
-      <div className='min-h-0 flex-1 max-[1100px]:h-[560px] max-[1100px]:flex-none'>
-        <SettingsPanel actions={actions} piece={props.piece} />
-      </div>
+      <Section name='panel'>
+        <TakePanel piece={props.piece} />
+        {/* stacked below the bench width, the settings keep their own height under the take */}
+        <div className='min-h-0 flex-1 max-[1100px]:h-[560px] max-[1100px]:flex-none'>
+          <SettingsPanel actions={actions} piece={props.piece} />
+        </div>
+      </Section>
     </div>
   );
 
@@ -100,37 +109,9 @@ const Workbench = (props: WorkbenchProps) => {
       className='flex h-dvh flex-col bg-background text-foreground'
       data-time={actions.time}>
       <header className='flex h-12 shrink-0 items-center justify-between gap-4 border-border border-b px-4'>
-        <h1 className='font-serif text-2xl leading-none'>
-          <a
-            className='rounded-sm'
-            href='/'
-            onClick={(event) => {
-              // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
-              if (
-                event.metaKey ||
-                event.ctrlKey ||
-                event.shiftKey ||
-                event.altKey
-              )
-                return;
-              event.preventDefault();
-              navigate({ piece: pieces[0].id, view: { kind: 'live' } });
-            }}>
-            atelier
-          </a>
-        </h1>
-        <div className='flex min-w-0 items-center gap-1'>
-          <BuildBadge />
-          <Button onClick={actions.openPalette} size='sm' variant='ghost'>
-            commands <Kbd>⌘K</Kbd>
-          </Button>
-          <Segmented
-            ariaLabel='theme'
-            onValueChange={actions.setTheme}
-            options={themeOptions}
-            value={theme}
-          />
-        </div>
+        <Section name='header'>
+          <HeaderContent actions={actions} theme={theme} />
+        </Section>
       </header>
       {isWide ? (
         <ResizablePanelGroup
@@ -163,6 +144,45 @@ const Workbench = (props: WorkbenchProps) => {
   );
 };
 
+/** the wordmark home, the build badge, ⌘K and the theme */
+const HeaderContent = (props: HeaderContentProps) => {
+  return (
+    <>
+      <h1 className='font-serif text-2xl leading-none'>
+        <a
+          className='rounded-sm'
+          href='/'
+          onClick={(event) => {
+            // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
+            if (
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            )
+              return;
+            event.preventDefault();
+            navigate({ piece: pieces[0].id, view: { kind: 'live' } });
+          }}>
+          atelier
+        </a>
+      </h1>
+      <div className='flex min-w-0 items-center gap-1'>
+        <BuildBadge />
+        <Button onClick={props.actions.openPalette} size='sm' variant='ghost'>
+          commands <Kbd>⌘K</Kbd>
+        </Button>
+        <Segmented
+          ariaLabel='theme'
+          onValueChange={props.actions.setTheme}
+          options={themeOptions}
+          value={props.theme}
+        />
+      </div>
+    </>
+  );
+};
+
 /**
  * A panel divider is resized with the mouse only, so Tab skips it. The
  * library writes `tabIndex={0}` after every prop it is given; the DOM value
@@ -180,4 +200,9 @@ const MouseOnlyHandle = () => {
 
 interface WorkbenchProps {
   piece: Piece;
+}
+
+interface HeaderContentProps {
+  actions: StudioActions;
+  theme: Theme;
 }

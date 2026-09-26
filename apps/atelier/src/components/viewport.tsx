@@ -19,6 +19,7 @@ import { compareModeAtom, settingsByPieceAtom, unzoomAtom } from '../state.ts';
 import { useShownTake } from '../takes.ts';
 import { BakeButton } from './bake-button';
 import { CompareView } from './compare-view';
+import { Section } from './error-boundary';
 import { LiveView } from './live-view';
 import { ReadmeFrame, frameChromeHeight } from './readme-frame';
 import { Segmented } from './segmented';
@@ -83,93 +84,99 @@ export const Viewport = (props: ViewportProps) => {
   return (
     <main aria-label='viewport' className='flex h-full min-h-0 flex-col'>
       <div className='flex flex-wrap items-center gap-2 border-border border-b px-4 py-2'>
-        {view.kind === 'live' ? null : (
-          <Button onClick={props.actions.goLive} size='sm' variant='ghost'>
-            <ArrowLeftIcon /> live
-          </Button>
-        )}
-        <Segmented
-          label='time'
-          onValueChange={props.actions.setTime}
-          options={timeOptions}
-          value={props.actions.time}
-        />
-        <Segmented
-          label='readme'
-          onValueChange={props.actions.setReadme}
-          options={readmeOptions}
-          value={props.actions.readme}
-        />
-        {view.kind === 'live' && props.actions.hasMotion ? (
-          <Button
-            aria-pressed={props.actions.isPlaying}
-            onClick={props.actions.togglePlay}
-            size='sm'
-            title='play motion (p)'
-            variant='ghost'>
-            {props.actions.isPlaying ? <PauseIcon /> : <PlayIcon />}
-            {props.actions.isPlaying ? 'stop' : 'play'}
-          </Button>
-        ) : null}
-        <div className='ml-auto flex items-center gap-1'>
-          <Button
-            aria-label='zoom into the image'
-            disabled={Boolean(pair)}
-            onClick={props.actions.zoom}
-            size='icon-sm'
-            title='zoom (z)'
-            variant='ghost'>
-            <MaximizeIcon />
-          </Button>
-          <Button
-            aria-label='copy the image as png'
-            disabled={Boolean(pair)}
-            onClick={() => props.actions.copyImage()}
-            size='icon-sm'
-            title='copy png (c)'
-            variant='ghost'>
-            <CopyIcon />
-          </Button>
-          <BakeButton actions={props.actions} />
-        </div>
+        <Section name='toolbar'>
+          {view.kind === 'live' ? null : (
+            <Button onClick={props.actions.goLive} size='sm' variant='ghost'>
+              <ArrowLeftIcon /> live
+            </Button>
+          )}
+          <Segmented
+            label='time'
+            onValueChange={props.actions.setTime}
+            options={timeOptions}
+            value={props.actions.time}
+          />
+          <Segmented
+            label='readme'
+            onValueChange={props.actions.setReadme}
+            options={readmeOptions}
+            value={props.actions.readme}
+          />
+          {view.kind === 'live' && props.actions.hasMotion ? (
+            <Button
+              aria-pressed={props.actions.isPlaying}
+              onClick={props.actions.togglePlay}
+              size='sm'
+              title='play motion (p)'
+              variant='ghost'>
+              {props.actions.isPlaying ? <PauseIcon /> : <PlayIcon />}
+              {props.actions.isPlaying ? 'stop' : 'play'}
+            </Button>
+          ) : null}
+          <div className='ml-auto flex items-center gap-1'>
+            <Button
+              aria-label='zoom into the image'
+              disabled={Boolean(pair)}
+              onClick={props.actions.zoom}
+              size='icon-sm'
+              title='zoom (z)'
+              variant='ghost'>
+              <MaximizeIcon />
+            </Button>
+            <Button
+              aria-label='copy the image as png'
+              disabled={Boolean(pair)}
+              onClick={() => props.actions.copyImage()}
+              size='icon-sm'
+              title='copy png (c)'
+              variant='ghost'>
+              <CopyIcon />
+            </Button>
+            <BakeButton actions={props.actions} />
+          </div>
+        </Section>
       </div>
       <div className='min-h-0 flex-1 overflow-auto p-6'>
-        <div className='mx-auto flex max-w-[1400px] flex-col gap-6'>
-          {pair ? (
-            <div className='flex justify-end'>
-              <Segmented
-                ariaLabel='compare mode'
-                onValueChange={setCompareMode}
-                options={compareOptions}
-                value={compareMode}
-              />
+        <Section name='viewport'>
+          <div className='mx-auto flex max-w-[1400px] flex-col gap-6'>
+            {pair ? (
+              <div className='flex justify-end'>
+                <Segmented
+                  ariaLabel='compare mode'
+                  onValueChange={setCompareMode}
+                  options={compareOptions}
+                  value={compareMode}
+                />
+              </div>
+            ) : null}
+            <div className='rounded-[10px] bg-surface p-4 shadow-lamp'>
+              <ReadmeFrame width={props.actions.readme}>
+                {pair ? (
+                  contentJSX
+                ) : (
+                  <div
+                    className='mx-auto'
+                    data-testid={
+                      props.actions.isStage ? undefined : 'flat-piece'
+                    }
+                    style={{
+                      width: props.actions.isStage
+                        ? undefined
+                        : flatWidth(props.piece, props.actions.readme),
+                    }}>
+                    <ZoomBox
+                      fitKey={unzoom}
+                      // a new piece, take, time or frame starts unzoomed
+                      key={`${pathOf(route)}:${props.actions.time}:${props.actions.readme}`}
+                      mode='canvas'>
+                      {contentJSX}
+                    </ZoomBox>
+                  </div>
+                )}
+              </ReadmeFrame>
             </div>
-          ) : null}
-          <div className='rounded-[10px] bg-surface p-4 shadow-lamp'>
-            <ReadmeFrame width={props.actions.readme}>
-              {pair ? (
-                contentJSX
-              ) : (
-                <div
-                  className='mx-auto'
-                  data-testid={props.actions.isStage ? undefined : 'flat-piece'}
-                  style={{
-                    width: props.actions.isStage
-                      ? undefined
-                      : flatWidth(props.piece, props.actions.readme),
-                  }}>
-                  <ZoomBox
-                    fitKey={unzoom}
-                    // a new piece, take, time or frame starts unzoomed
-                    key={`${pathOf(route)}:${props.actions.time}:${props.actions.readme}`}
-                    mode='canvas'>
-                    {contentJSX}
-                  </ZoomBox>
-                </div>
-              )}
-            </ReadmeFrame>
           </div>
-        </div>
+        </Section>
       </div>
     </main>
   );

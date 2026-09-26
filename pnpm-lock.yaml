@@ -230,6 +230,9 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
+      react-error-boundary:
+        specifier: 6.1.6
+        version: 6.1.6(@types/react@19.3.0)(react@19.3.0)
       react-zoom-pan-pinch:
         specifier: 4.2.0
         version: 4.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -6675,6 +6678,15 @@ packages:
     resolution: {integrity: sha512-tnjAxG+IkpLephNcePNA7v6F/QpWLH8He65+DmedchDwg162JZqx4NmbXj0mlAYVVEd81OW7aFhmbsScYfiAFQ==}
     peerDependencies:
       react: '>=16.13.1'
+
+  react-error-boundary@6.1.6:
+    resolution: {integrity: sha512-CDXPnXDGyFIbkwaaJ6u+xgsRmJhSi6YdgUDW1vnyKHfXp1a9pfAlM+ZET2CDu80/A+8iRcmXN0NSY9BCCoWP5A==}
+    peerDependencies:
+      '@types/react': 19.3.0
+      react: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   react-hook-form@7.88.0:
     resolution: {integrity: sha512-QRaLOWhX93YCnMiRfnOFRSwWXZNt8qhm2JTZwypoDvKpSffTJHmpzMXt8U6PV5UThvL3IiiLDUWe2nHMtz6Mmw==}
@@ -13510,6 +13522,12 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.29.7
       react: 19.3.0
+
+  react-error-boundary@6.1.6(@types/react@19.3.0)(react@19.3.0):
+    dependencies:
+      react: 19.3.0
+    optionalDependencies:
+      '@types/react': 19.3.0
 
   react-hook-form@7.88.0(react@19.3.0):
     dependencies:

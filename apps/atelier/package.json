@@ -7,6 +7,7 @@
     "dev": "node ../../script/with-port.ts 5180 vite",
     "atelier:bake": "node scripts/atelier-bake.ts",
     "atelier:icons": "node scripts/atelier-icons.ts",
+    "atelier:probe": "node scripts/atelier-probe.ts",
     "atelier:ship": "node scripts/atelier-ship.ts",
     "lint": "biome lint",
     "typecheck": "tsc --noEmit",
@@ -25,6 +26,7 @@
     "react": "19.3.0",
     "react-compare-slider": "4.0.0",
     "react-dom": "19.3.0",
+    "react-error-boundary": "6.1.6",
     "react-zoom-pan-pinch": "4.2.0",
     "sonner": "2.0.8",
     "three": "0.186.1"

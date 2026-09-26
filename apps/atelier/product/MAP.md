@@ -121,9 +121,14 @@
 
 ## errors
 
+- ✅ a crashed section stays in its box
+  - given a dev build, when `?crash=<section>` loads for any of the six sections (header, pieces, takes, toolbar, viewport, panel)
+  - then that section shows «<what> stopped drawing» and «try again» in its own box
+  - and the other five still render and answer a click; «try again» or another view brings it back
 - ⬜ a crashed piece says so
   - given a piece throws while drawing
-  - then «atelier stopped drawing» shows in its place instead of a blank page
+  - then «the piece stopped drawing» shows in the viewport, and the rest of the studio keeps working
+  - and a crash outside every section shows «atelier stopped drawing» with a reload
 
 ## scripts
 
@@ -134,10 +139,10 @@
 - ✅ ship
   - when an agent runs `pnpm atelier:ship [piece…]`
   - then it prints the plan; with `--write` it copies each current take into frame, bytes and the profile repo under `assets/atelier/`, and commits nothing
-- ✅ icon sizes
-  - when an agent runs `pnpm atelier:icons <piece>`
-  - then svg and png at 16–512 px land in `out/icons/<piece>/`
 - ✅ probe a piece
   - when an agent runs `pnpm atelier:probe <piece> [day|night]`
   - then it prints the stage's `data-rendered` value with the seconds it took, and every console error
   - and it exits 1 when the piece did not render or the page logged an error, 2 for an unknown piece
+- ✅ icon sizes
+  - when an agent runs `pnpm atelier:icons <piece>`
+  - then svg and png at 16–512 px land in `out/icons/<piece>/`
