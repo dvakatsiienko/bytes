@@ -135,7 +135,8 @@
 - ✅ a crashed section stays in its box
   - given a dev build, when `?crash=<section>` loads for any of the six sections (header, pieces, takes, toolbar, viewport, panel)
   - then that section shows «<what> stopped drawing» and «try again» in its own box
-  - and the other five still render and answer a click; «try again» or another view brings it back
+  - and the other five still render and answer a click; «try again» brings it back
+  - and a throw in a section's own component, before its hooks run, stays in that section too: each boundary wraps its section from the parent
 - ⬜ a crashed piece says so
   - given a piece throws while drawing
   - then «the piece stopped drawing» shows in the viewport, and the rest of the studio keeps working

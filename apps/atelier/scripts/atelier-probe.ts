@@ -43,9 +43,9 @@ try {
   const stage = page.locator('[data-testid=stage]');
   await page.goto(new URL(encodeURIComponent(pieceId), origin).href);
   // no stage at all (the viewport crashed, the page failed) still ends in a report, never a stack
-  // a crashed viewport shows its fallback at once: stop waiting when either appears
+  // a crashed viewport, bench or studio shows a fallback at once: stop waiting when either appears
   const hasStage = await page
-    .locator('[data-testid=stage], main [role=alert]')
+    .locator('[data-testid=stage], [role=alert]')
     .first()
     .waitFor({ timeout: RENDER_TIMEOUT })
     .then(async () => (await stage.count()) > 0)

@@ -145,7 +145,6 @@ const Workbench = (props: WorkbenchProps) => {
   );
 };
 
-/** the wordmark home, the build badge, ⌘K and the theme */
 /** the way home, outside the header's section: a crashed header keeps it and the page's one h1 */
 const Wordmark = () => {
   return (
