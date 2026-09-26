@@ -64,7 +64,8 @@ export const SettingsPanel = (props: SettingsPanelProps) => {
     <section
       aria-label='scene settings'
       className='flex h-full min-h-0 flex-col'>
-      <header className='flex items-center justify-between gap-2 border-border border-b px-4 py-2'>
+      {/* min-h-13 is shared with the bench toolbar, so their two lines meet */}
+      <header className='flex min-h-13 items-center justify-between gap-2 border-border border-b px-4 py-2'>
         <h2 className='truncate font-serif text-lg'>{props.piece.id}</h2>
       </header>
       <ScrollArea className='min-h-0 flex-1'>

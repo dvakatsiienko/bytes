@@ -83,7 +83,8 @@ export const Viewport = (props: ViewportProps) => {
 
   return (
     <main aria-label='viewport' className='flex h-full min-h-0 flex-col'>
-      <div className='flex flex-wrap items-center gap-2 border-border border-b px-4 py-2'>
+      {/* min-h-13 is shared with the side panel's header, so their two lines meet */}
+      <div className='flex min-h-13 flex-wrap items-center gap-2 border-border border-b px-4 py-2'>
         <Section name='toolbar'>
           {view.kind === 'live' ? null : (
             <Button onClick={props.actions.goLive} size='sm' variant='ghost'>
