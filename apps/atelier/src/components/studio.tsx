@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { Kbd } from '@ui/kit/components/kbd';
 import {
@@ -132,9 +132,9 @@ const Workbench = (props: WorkbenchProps) => {
           <ResizablePanel defaultSize='20%' maxSize='32%' minSize={220}>
             {railJSX}
           </ResizablePanel>
-          <ResizableHandle />
+          <MouseOnlyHandle />
           <ResizablePanel minSize='40%'>{viewportJSX}</ResizablePanel>
-          <ResizableHandle />
+          <MouseOnlyHandle />
           <ResizablePanel defaultSize='24%' maxSize='36%' minSize={280}>
             {settingsJSX}
           </ResizablePanel>
@@ -154,6 +154,19 @@ const Workbench = (props: WorkbenchProps) => {
       <Toaster position='bottom-center' theme={resolvedTheme} />
     </div>
   );
+};
+
+/**
+ * A panel divider is resized with the mouse only, so Tab skips it. The
+ * library writes `tabIndex={0}` after every prop it is given; the DOM value
+ * is set once it mounts, and react leaves it alone while its own value holds.
+ */
+const MouseOnlyHandle = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (ref.current) ref.current.tabIndex = -1;
+  }, []);
+  return <ResizableHandle elementRef={ref} />;
 };
 
 /* Types */
