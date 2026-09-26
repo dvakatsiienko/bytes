@@ -21,6 +21,7 @@
   - when dima presses ⌘K
   - then a palette lists every command by group (bench, takes, view, settings) and «open <piece>» for every piece
   - and running a command does what its bare key does
+  - decision: it opens high, its top edge at 10 % of the window, just under the header and level with the bench tools, and stays put while the list filters (dima, 2026-09-26)
 - ⬜ a worktree build tells itself apart
   - given atelier runs from a worktree
   - then the header shows the branch and sha, and the tab title reads «atelier · dev»
