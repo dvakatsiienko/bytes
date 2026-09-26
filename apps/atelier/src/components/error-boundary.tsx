@@ -140,18 +140,18 @@ const retried = new Set<SectionName>();
 
 /**
  * each section, the words its fallback uses, and the box it keeps: header and
- * toolbar are one row high; the pieces list holds its capped share of the rail
- * so the takes list below it stays in view
+ * toolbar are one row high; the takes list holds at most its capped share of
+ * the rail, the pieces list the rest
  */
 const sections = {
   header: { box: '', isRow: true, what: 'the header tools' },
   panel: { box: 'h-full', isRow: false, what: 'the side panel' },
   pieces: {
-    box: 'max-h-[45%] shrink-0 border-border border-b',
+    box: 'min-h-0 flex-1 border-border border-b',
     isRow: false,
     what: 'the pieces list',
   },
-  takes: { box: 'min-h-0 flex-1', isRow: false, what: 'the takes list' },
+  takes: { box: 'max-h-[45%] shrink-0', isRow: false, what: 'the takes list' },
   toolbar: { box: '', isRow: true, what: 'the bench tools' },
   viewport: { box: 'h-full', isRow: false, what: 'the piece' },
 } as const satisfies Record<

@@ -53,7 +53,7 @@ export const PieceRail = (props: PieceRailProps) => {
   return (
     <nav
       aria-labelledby='pieces-title'
-      className='flex max-h-[45%] min-h-0 shrink-0 flex-col border-border border-b'>
+      className='flex min-h-0 flex-1 flex-col border-border border-b'>
       <h2
         className='flex items-baseline justify-between px-4 pt-3 pb-1 font-medium text-[12px] text-muted-foreground uppercase tracking-[0.08em]'
         id='pieces-title'>
