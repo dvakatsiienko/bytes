@@ -43,21 +43,26 @@ try {
   const stage = page.locator('[data-testid=stage]');
   await page.goto(new URL(encodeURIComponent(pieceId), origin).href);
   // no stage at all (the viewport crashed, the page failed) still ends in a report, never a stack
-  const hasStage = await stage
+  // a crashed viewport shows its fallback at once: stop waiting when either appears
+  const hasStage = await page
+    .locator('[data-testid=stage], main [role=alert]')
+    .first()
     .waitFor({ timeout: RENDER_TIMEOUT })
-    .then(() => true)
+    .then(async () => (await stage.count()) > 0)
     .catch(() => false);
   // the studio sends an unknown piece to the first one: a failed probe, not a render
   const isPiece =
     new URL(page.url()).pathname === `/${encodeURIComponent(pieceId)}`;
   if (isPiece || !hasStage) {
     if (hasStage && time === 'night') await page.keyboard.press('n');
-    await page
-      .locator(
-        `[data-testid=stage][data-rendered="${pieceId}:${time}"], [data-testid=stage][data-error]`,
-      )
-      .waitFor({ timeout: RENDER_TIMEOUT })
-      .catch(() => undefined);
+    // no stage already waited its full timeout once; a second wait only doubles it
+    if (hasStage)
+      await page
+        .locator(
+          `[data-testid=stage][data-rendered="${pieceId}:${time}"], [data-testid=stage][data-error]`,
+        )
+        .waitFor({ timeout: RENDER_TIMEOUT })
+        .catch(() => undefined);
     const seconds = ((performance.now() - started) / 1000).toFixed(1);
     const rendered = hasStage
       ? await stage.getAttribute('data-rendered')
@@ -78,6 +83,8 @@ try {
     console.error(`no piece «${pieceId}» — see art/pieces.ts`);
     process.exitCode = 2;
   }
+  // the page's own api calls finish first, or vite logs them as cut off when it stops
+  await page.waitForLoadState('networkidle').catch(() => undefined);
   await page.close();
 } finally {
   await closeBrowser();
