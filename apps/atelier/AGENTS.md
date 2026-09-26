@@ -66,3 +66,12 @@ Done when the piece shows in the rail and renders by day and by night:
   colour (measured on BYT-103); the two differ only in edge blur and antialiasing.
 - Chromium's first bake on a fresh machine needs `pnpm exec playwright install chromium`; the
   bake error says so. On a mac it renders on the GPU (Metal), elsewhere in software (SwiftShader).
+- `pnpm atelier:probe <piece> [day|night]` answers «does it render» in one line: it prints
+  `data-rendered` and every console error, and exits non-zero when either is wrong.
+- **react-zoom-pan-pinch is patched from outside.** Its animation cancel is not exported, so
+  `stopAnimation` in `src/components/zoom-box.tsx` clears rzpp 4.2's own instance fields
+  (`animationFrame`, `isAnimating`, `animation`). A bump can rename them and nothing fails loudly:
+  a wheel notch during a settle is silently lost. On any rzpp bump, rerun the race probe — a
+  pinch burst, then one wheel notch 100–500 ms later, both through CDP
+  `Input.dispatchMouseEvent` (`mouseWheel`, `modifiers: 2` for the pinch; the recipe is in
+  `x:browser-headless`) — and read the scale after every event: the late notch must land.

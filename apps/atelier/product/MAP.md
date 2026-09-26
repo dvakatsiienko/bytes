@@ -137,3 +137,7 @@
 - ✅ icon sizes
   - when an agent runs `pnpm atelier:icons <piece>`
   - then svg and png at 16–512 px land in `out/icons/<piece>/`
+- ✅ probe a piece
+  - when an agent runs `pnpm atelier:probe <piece> [day|night]`
+  - then it prints the stage's `data-rendered` value with the seconds it took, and every console error
+  - and it exits 1 when the piece did not render or the page logged an error, 2 for an unknown piece
