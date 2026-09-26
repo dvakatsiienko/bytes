@@ -97,7 +97,7 @@
   - then the takes list is only its title and the «no takes yet» line, and the pieces list fills the rail above it
   - given a piece with many takes
   - then the takes list grows up to 45 % of the rail and scrolls inside; the pieces list keeps the rest and scrolls inside
-- ✅ previous and next take
+- 🔎 previous and next take
   - when dima presses `[` or `]`, or picks them in ⌘K
   - then `]` opens the next take down the list (older) and `[` the next one up (newer); from the live view `]` starts at the newest and `[` at the oldest
 
