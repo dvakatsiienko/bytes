@@ -19,14 +19,16 @@ bumping framework versions, update the Stack column below — it drifts stale ot
 | App                  | Purpose                                 | Stack                             | Status     |
 | -------------------- | --------------------------------------- | --------------------------------- | ---------- |
 | `cv`                 | Personal portfolio with tool showcase   | Next.js 16, React 19, Tailwind v4 | Production |
-| `x-com-chat`         | AI chat with customizable alien friends | Next.js 16, Convex, Jotai, Clerk  | Active Dev |
-| `space-explorer-ui`  | GraphQL client demo                     | Vite 8, Apollo Client, React      | Demo       |
-| `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
-| `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, Auth.js       | WIP        |
+| `x-com-chat`         | AI chat with customizable alien friends | Next.js 16, Convex, Jotai, Clerk  | Active Dev, 🐾 pet |
+| `space-explorer-ui`  | GraphQL client demo                     | Vite 8, Apollo Client, React      | Demo, 🐾 pet |
+| `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo, 🐾 pet |
+| `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, Auth.js       | WIP, 🐾 pet |
 | `sketchbook`         | Prototype platform, swappable proto slot | Vite 8, React 19, Tailwind v4, shadcn | Active Dev |
 | `atelier`            | Art studio: scenes as code, lit and baked | Vite 8, React 19.3, three.js + r3f, kit | Active Dev, local only |
 | `figmentation`       | CSS/design experiments                  | Next.js 16, CSS Modules           | Showcase   |
 | `trophy-sys`         | PSN trophy tracker, retro terminal UI   | Vite 8, React 19, TanStack, Upstash | Active Dev |
+
+🐾 **pet** — a basic setup on purpose (dima, 2026-09-27): shared dev data, a tracked db, dev against the hosted db. an agent works inside that setup and never hardens it, flags it or «fixes» it as a defect until dima promotes the app; a test that writes data says so in its report. the app's own AGENTS.md names what is basic.
 
 ## Shared Infrastructure
 

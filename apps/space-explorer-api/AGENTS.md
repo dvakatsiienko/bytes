@@ -3,6 +3,8 @@
 graphql server demo — apollo server over the spacex public api plus sqlite trip bookings.
 paired with `space-explorer-ui`, which needs this server on `:4000` for its codegen.
 
+🐾 **pet project** — basic on purpose (dima, 2026-09-27): `db.sqlite` and `.env` are tracked in git, a minimal db with no setup. keep it; a test that writes goes to a scratch copy — `run-space-explorer-api` shows how.
+
 ## shape
 
 - **schema-first**: `src/graphql/schema.graphql` is the source of truth — after editing it, run
