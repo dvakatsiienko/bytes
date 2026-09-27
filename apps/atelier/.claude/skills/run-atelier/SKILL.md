@@ -24,7 +24,7 @@ timeout 40 bash -c 'until curl -sf localhost:5190/api/build >/dev/null; do sleep
 # {"branch":"coder/<slug>","isDev":true,"sha":"2d09f775"}
 ```
 
-**Leave the server running** and hand dima `http://localhost:5190` — it is his window onto the coder's edits. Stop it only when the worktree is done.
+A `run` pass stops the server when its check is done. A coder serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 
