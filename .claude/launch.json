@@ -26,9 +26,9 @@
       "port": 3003
     },
     {
-      "name": "proto-lab",
+      "name": "sketchbook",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "proto-lab", "dev"],
+      "runtimeArgs": ["--filter", "sketchbook", "dev"],
       "port": 5179,
       "url": "http://localhost:5179",
       "autoPort": false

@@ -12,7 +12,7 @@
     "dev:cv": "turbo run cv#dev",
     "dev:figmentation": "turbo run figmentation#dev",
     "dev:financial": "turbo run financial#dev",
-    "dev:proto-lab": "turbo run proto-lab#dev",
+    "dev:sketchbook": "turbo run sketchbook#dev",
     "dev:trophy-sys": "turbo run trophy-sys#dev",
     "dev:x-com-chat": "turbo run x-com-chat#dev x-com-chat#dev:convex",
     "build": "turbo run build",

@@ -94,5 +94,5 @@ execFileSync('pnpm', ['install'], {
 console.log(`seeded ${target}`);
 console.log(`  copied: ${copied.length ? copied.join(', ') : 'nothing new'}`);
 console.log(
-  `  ports: +${offset} (trophy-sys ${5177 + offset}/${5178 + offset}, proto-lab ${5179 + offset}, atelier ${5180 + offset}, space-explorer ${5173 + offset}/${4000 + offset}, next apps ${3000 + offset})`,
+  `  ports: +${offset} (trophy-sys ${5177 + offset}/${5178 + offset}, sketchbook ${5179 + offset}, atelier ${5180 + offset}, space-explorer ${5173 + offset}/${4000 + offset}, next apps ${3000 + offset})`,
 );

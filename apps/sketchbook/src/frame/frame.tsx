@@ -53,7 +53,7 @@ const ProtoChrome = () => {
               prototype platform
             </p>
             <h1 className='font-display font-semibold text-2xl leading-none tracking-tight'>
-              proto<span className='text-cobalt'>·</span>lab
+              sketch<span className='text-cobalt'>·</span>book
             </h1>
           </div>
 

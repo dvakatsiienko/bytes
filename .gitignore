@@ -54,7 +54,7 @@ pscale.txt
 # impeccable-ignore-start
 # Ephemeral output, runtime state, and per-dev overrides.
 # `**/` on every line: a pattern holding a `/` is anchored to the repo root, so the readme's
-# bare form misses a nested workspace (apps/proto-lab/.impeccable/…) — measured 2026-09-19.
+# bare form misses a nested workspace (apps/sketchbook/.impeccable/…) — measured 2026-09-19.
 # Shared artifacts stay tracked: config.json, live/config.json,
 # design.json, surfaces/*.md, critique/*.md.
 **/.impeccable/config.local.json

@@ -39,7 +39,7 @@ dima also likes and would like to build somthing like:
 - **isolation:** touch only `src/protos/bench-cv-<lane>/` (+ `src/frame/theme.css` ONLY if your
   skill wants theme tokens — then scope them under `[data-bench="<lane>"]`, never globally).
   never open a sibling `bench-cv-*` directory. never read another lane's output.
-- **packages allowed:** install what you want with `pnpm add --filter proto-lab <pkg>` — motion,
+- **packages allowed:** install what you want with `pnpm add --filter sketchbook <pkg>` — motion,
   tailwind plugins, a font, an icon set. exact versions (`npm view <pkg> version` first).
   📌 five lanes share one `package.json` + lockfile: run one `pnpm add` at a time, and if it fails on a lock or a changed file, wait 10 s and retry — never edit `package.json` by hand.
 - **skills:** load `x:guide-code`, `x:guide-typescript`, `x:guide-react`, `x:guide-ui-ux`,

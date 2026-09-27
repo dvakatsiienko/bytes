@@ -1,4 +1,4 @@
-# proto-lab
+# sketchbook
 
 A permanent Vite app used as the prototype surface — instead of throwaway HTML files.
 The **frame** (shell, tokens, fonts, deps) stays. The **proto** is swappable.
@@ -6,8 +6,8 @@ The **frame** (shell, tokens, fonts, deps) stays. The **proto** is swappable.
 ## Run
 
 ```bash
-pnpm dev:proto-lab   # from the repo root
-pnpm dev             # from apps/proto-lab
+pnpm dev:sketchbook   # from the repo root
+pnpm dev             # from apps/sketchbook
 ```
 
 <http://localhost:5179>

@@ -23,7 +23,7 @@ bumping framework versions, update the Stack column below — it drifts stale ot
 | `space-explorer-ui`  | GraphQL client demo                     | Vite 8, Apollo Client, React      | Demo       |
 | `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo       |
 | `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, Auth.js       | WIP        |
-| `proto-lab`          | Prototype platform, swappable proto slot | Vite 8, React 19, Tailwind v4, shadcn | Active Dev |
+| `sketchbook`         | Prototype platform, swappable proto slot | Vite 8, React 19, Tailwind v4, shadcn | Active Dev |
 | `atelier`            | Art studio: scenes as code, lit and baked | Vite 8, React 19.3, three.js + r3f, kit | Active Dev, local only |
 | `figmentation`       | CSS/design experiments                  | Next.js 16, CSS Modules           | Showcase   |
 | `trophy-sys`         | PSN trophy tracker, retro terminal UI   | Vite 8, React 19, TanStack, Upstash | Active Dev |
@@ -130,7 +130,7 @@ the two implementations do NOT travel together. From `@vitejs/plugin-react`'s ow
 
 - **a vite app** needs `vite` + `@vitejs/plugin-react` + **`oxc-transform-react`**. That is what
   `react({ compiler: true })` uses — the Rust port, an optional peer loaded from the plugin's own
-  package location. `proto-lab`, `space-explorer-ui` and `trophy-sys` declare exactly those three
+  package location. `sketchbook`, `space-explorer-ui` and `trophy-sys` declare exactly those three
 - **a next app** needs **`babel-plugin-react-compiler`**, for `reactCompiler: true`. `cv`,
   `figmentation` and `financial` declare it and nothing else of this group
 
@@ -163,7 +163,7 @@ short: one that nothing needs hides the next genuinely undeclared import until t
 Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only settings are invisible
 to agents and to code review, and they silently override the repo — a dashboard edit to
 `trophy-sys`'s Root Directory once broke a deploy that no diff could explain. Six apps have one —
-`cv`, `figmentation`, `financial`, `space-explorer-ui`, `trophy-sys`, `x-com-chat`. `proto-lab`,
+`cv`, `figmentation`, `financial`, `space-explorer-ui`, `trophy-sys`, `x-com-chat`. `sketchbook`,
 `atelier` and `space-explorer-api` do not; `space-explorer-api` deploys on Railway instead, from
 `railway.json`, and `atelier` never deploys — it is a local studio.
 
