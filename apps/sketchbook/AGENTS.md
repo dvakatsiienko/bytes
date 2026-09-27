@@ -27,6 +27,8 @@ Two rules keep that true:
   visible instead of inferred.
 - **Two or more `variants`** put a switcher on screen and sync `?v=`. One take exports
   `Proto`.
+- **An archived page stays openable** at `/pages/<NNN-topic>` — the frame's «pages» row lists
+  every archive, so a shift turns the page and the book flips back to compare.
 - **Archive numbers only count up.** A shifted proto is never renamed again, so a-z order
   in an editor equals shift order, and one shift is one renamed directory in the diff.
 
@@ -37,6 +39,7 @@ pnpm dev          # vite on :5179
 pnpm build        # vite build
 pnpm typecheck    # tsc --noEmit
 pnpm lint         # biome
+pnpm test         # vitest: a shift keeps the old page
 pnpm proto:new <topic>     # start a proto when nothing is live
 pnpm proto:shift <topic>   # archive the live proto as NNN-<old topic>, start a blank one
 pnpm proto:clear           # delete every proto, leave a blank current-scratch

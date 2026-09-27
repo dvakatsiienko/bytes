@@ -12,7 +12,8 @@
     "proto:new": "node scripts/proto.ts new",
     "proto:shift": "node scripts/proto.ts shift",
     "lint": "biome lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource-variable/newsreader": "5.3.0",

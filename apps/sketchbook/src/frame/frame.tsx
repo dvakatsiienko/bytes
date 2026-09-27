@@ -15,7 +15,10 @@ import { VariantBar } from '@/frame/variant-bar';
 
 const Shell = () => {
   const params = useParams({ strict: false });
-  const shown = params.lane ? benchModules[params.lane] : proto;
+  const shown =
+    (params.lane && benchModules[params.lane]) ??
+    (params.page && pageModules[params.page]) ??
+    proto;
 
   if (!shown) {
     return (
@@ -27,8 +30,10 @@ const Shell = () => {
 
   return (
     <div className='min-h-screen'>
-      {laneList.length > 0 ? <BenchNav laneList={laneList} /> : null}
-      {params.lane ? (
+      {laneList.length + pageList.length > 0 ? (
+        <BenchNav laneList={laneList} pageList={pageList} />
+      ) : null}
+      {params.lane || params.page ? (
         <main>
           <Outlet />
         </main>
@@ -125,6 +130,19 @@ const BenchView = () => {
   );
 };
 
+// An archived page renders as it was left: its single take, or its first variant.
+const PageView = () => {
+  const params = useParams({ from: '/pages/$page' });
+  const page = pageModules[params.page];
+  const Page = page?.Proto ?? Object.values(page?.variants ?? {})[0];
+
+  return (
+    <div data-page={params.page}>
+      {Page ? <Page /> : <p className='font-mono text-sm'>no such page</p>}
+    </div>
+  );
+};
+
 /* Router — a variant is a place, so it lives in the path. */
 const rootRoute = createRootRoute({ component: Shell });
 const indexRoute = createRoute({
@@ -143,6 +161,11 @@ const benchRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/bench/$lane',
 });
+const pageRoute = createRoute({
+  component: PageView,
+  getParentRoute: () => rootRoute,
+  path: '/pages/$page',
+});
 const variantRoute = createRoute({
   component: VariantView,
   getParentRoute: () => rootRoute,
@@ -150,7 +173,12 @@ const variantRoute = createRoute({
 });
 
 const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, benchRoute, variantRoute]),
+  routeTree: rootRoute.addChildren([
+    indexRoute,
+    benchRoute,
+    pageRoute,
+    variantRoute,
+  ]),
 });
 
 export const Frame = () => {
@@ -181,6 +209,19 @@ const benchModules = Object.fromEntries(
   }),
 );
 const laneList = Object.keys(benchModules).sort();
+
+// Archived pages are the numbered folders a shift leaves behind (001-<topic>),
+// keyed by folder name so `/pages/<folder>` flips back to any of them.
+const pageModules = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<ProtoModule>('/src/protos/[0-9][0-9][0-9]-*/index.tsx', {
+      eager: true,
+    }),
+  ).map(([path, module]) => {
+    return [path.split('/').at(-2) ?? '', module];
+  }),
+);
+const pageList = Object.keys(pageModules).sort();
 
 /* Types */
 interface ProtoModule {
