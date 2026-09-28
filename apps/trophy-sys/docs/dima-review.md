@@ -1,6 +1,6 @@
 # dima-review — trophy-sys shift, 2026-09-28
 
-everything the shift decided without you, and the four questions it researched. each item has options and one ➡️ recommendation. 📌 this file is for the pr review — delete it before the merge, or say «keep» and it moves to `docs/`.
+everything the shift decided without you, and the four questions it researched. each item has options and one ➡️ recommendation, and a «→ dima» line with his verdict and where it landed. dima accepted every ➡️ on 2026-09-28.
 
 ## built as a default — your eye wanted
 
@@ -13,6 +13,7 @@ everything the shift decided without you, and the four questions it researched. 
   - a. keep it
   - b. the old filled band with the new tally and weekday in it
 - ➡️ a — the rule matches how panel titles sit in their borders
+- → dima: accepted, keep — no pr
 
 ### 2. «now playing» ([BYT-108](https://linear.app/x-com/issue/BYT-108))
 
@@ -25,6 +26,7 @@ everything the shift decided without you, and the four questions it researched. 
   - a. keep 7 days and these three places
   - b. also mark it in /library and /journal
 - ➡️ a — the ticket asked for the charts; b is one more pass once you have lived with it
+- → dima: accepted, keep — no pr
 
 ### 3. the 3-day grant warning ([BYT-85](https://linear.app/x-com/issue/BYT-85)) — 📌 one catch
 
@@ -35,6 +37,7 @@ everything the shift decided without you, and the four questions it researched. 
   - a. keep the warning as built
   - b. at ≤ 3 days the server re-mints early from the npsso. a live npsso gets a fresh 10-day grant and the warning disappears by itself; a dead one is caught 3 days early while the old grant still works, and the console shows it
 - ➡️ b — it turns a weekly nag into a real check. it touches the auth path (`psn.ts`), so it wants its own small pr and your word
+- → dima: accepted, pr [#113](https://github.com/dvakatsiienko/bytes/pull/113)
 
 ### 4. smaller calls
 
@@ -48,6 +51,7 @@ everything the shift decided without you, and the four questions it researched. 
   - options: a. keep 60 s · b. 5 minutes
   - ➡️ a — it only runs while the app is already broken
 - **ignoreBuildErrors** — nothing to remove: #67 took it out of the four next apps and trophy-sys never had it. the build passes. no choice to make
+- → dima: accepted, keep all three — no pr
 
 ## research — the choice is yours
 
@@ -61,6 +65,7 @@ everything the shift decided without you, and the four questions it researched. 
   - b. a 5-minute timer on `games` and `profile`, only while the tab is visible
   - c. both
 - ➡️ c — covers all three cases you listed, at most 12 extra calls an hour per open tab. never poll faster than the 60 s server memo
+- → dima: accepted, pr [#114](https://github.com/dvakatsiienko/bytes/pull/114)
 
 ### 6. journal % vs library % ([BYT-88](https://linear.app/x-com/issue/BYT-88))
 
@@ -70,6 +75,7 @@ everything the shift decided without you, and the four questions it researched. 
   - b. the count is the headline everywhere; psn's figure becomes a small labelled second in the library (`45 % psn`)
   - c. keep both, label both
 - ➡️ b — the count is the one number the app can compute for every day
+- → dima: accepted, pr [#114](https://github.com/dvakatsiienko/bytes/pull/114)
 
 ### 7. MGS5, two skus ([BYT-88](https://linear.app/x-com/issue/BYT-88))
 
@@ -79,6 +85,7 @@ everything the shift decided without you, and the four questions it researched. 
   - b. an admin alias in /console — a new key, a new control, a new write route
   - c. an alias table in `playtime.ts`, one line per case, merged the way platform twins already are (~15 lines and a test)
 - ➡️ c — one known case does not earn an admin screen; promote to b at the third case
+- → dima: accepted, pr [#114](https://github.com/dvakatsiienko/bytes/pull/114)
 
 ### 8. non-game titles ([BYT-88](https://linear.app/x-com/issue/BYT-88))
 
@@ -93,3 +100,4 @@ everything the shift decided without you, and the four questions it researched. 
   - b. a per-title store lookup through the unpublished query, cached in kv — breaks when sony rotates the hash, and unproven to return a type
   - c. more words in the name rule (`demo`, `bonus content`, `companion`) — the string search you called not ok, and `demo` can claim a real title
 - ➡️ a — it adds the one real field the feed has, and one click hides the rest for good
+- → dima: accepted, pr [#114](https://github.com/dvakatsiienko/bytes/pull/114)
