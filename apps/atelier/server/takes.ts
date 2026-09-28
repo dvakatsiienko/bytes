@@ -30,7 +30,7 @@ const listFiles = async (dir: string): Promise<string[]> => {
 };
 
 /** sha-256 over every source file of the art, path and content, first 12 hex */
-export const sourceHash = async () => {
+const sourceHash = async () => {
   const hash = createHash('sha256');
   const files = (
     await Promise.all(sourceRoots.map((dir) => listFiles(join(appRoot, dir))))

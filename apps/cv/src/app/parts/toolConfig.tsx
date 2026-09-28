@@ -178,7 +178,7 @@ export const toolListLLM = [
 ];
 
 // TODO delete if not used
-export const stuff = [
+const stuff = [
   {
     area: 'core',
     toolList: toolListCore,

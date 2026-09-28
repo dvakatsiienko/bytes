@@ -44,7 +44,7 @@ const pooled = async <T>(items: T[], work: (item: T) => Promise<void>) => {
  * every chart and the log simply shows no icon until the next scan. Blanking
  * the route would have been the more disruptive answer, not the safer one.
  */
-export const ARCHIVE_VERSION = 2;
+const ARCHIVE_VERSION = 2;
 
 const EMPTY: TrophyArchive = {
   failed: [],
@@ -113,7 +113,7 @@ type TrophyRows = ReturnType<typeof rowsBuild>;
  * so one curl answers it. It describes the payload, not the HTTP request — a
  * 60s cache hit reports how the body it is serving was built.
  */
-export type ArchiveRefresh = 'none' | 'inline' | 'background';
+type ArchiveRefresh = 'none' | 'inline' | 'background';
 
 export interface ArchiveRead {
   archive: TrophyArchive;

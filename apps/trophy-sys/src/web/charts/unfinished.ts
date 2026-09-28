@@ -24,7 +24,7 @@ const isDormant = (playedAt: string | null) => {
 };
 
 /** "2 bronze, 1 gold" — what is actually left, by grade. */
-export const gradeBreakdown = (left: RemainingTrophy[]) => {
+const gradeBreakdown = (left: RemainingTrophy[]) => {
   const parts = GRADE_ORDER.map((grade) => {
     const count = left.filter((trophy) => trophy.grade === grade).length;
     return count ? `${count} ${grade}` : null;

@@ -49,7 +49,7 @@ export const ThemeSwitcher = (props: ThemeSwitcherProps) => {
 };
 
 /* Helpers */
-export const themeList = [
+const themeList = [
   {
     icon: (
       <Sun className='size-[0.9rem] rotate-0 scale-100 text-current transition-all' />
