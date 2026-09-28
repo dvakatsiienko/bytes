@@ -8,8 +8,9 @@ description: Verify a trophy-sys change against the running web + api pair — d
 ## the handle
 
 - **nothing serves trophy-sys by default.** start the pair with the **start** steps of `trophy-sys-run`, stop it with its **stop** steps (the process group, never one PID) when the pass ends.
-- **main** is web `http://localhost:5177` + api `:5178`, **a worktree** is `5177/5178 + offset` — `.worktree-offset` holds the offset (`:5187`/`:5188` for the first tree). vite proxies `/api` to the api.
-- `curl -s <web>/api/health` must say `"stateBackend":"file"`: the tree reads and writes its own `.trophy-*.json` copies, never the production KV. `"kv"` → stop and report.
+- **main** is web `http://localhost:5177` + api `:5178`, **a worktree** is `5177/5178 + offset` — read the tree's `.worktree-offset`, never guess it. vite proxies `/api` to the api.
+- `kit.sh health <web port>` before any write: it must say `"stateBackend":"file"` (the tree's own `.trophy-*.json` copies, never production kv) and exits 1 otherwise — stop and report.
+- 📌 **a seeded tree holds a fake NPSSO and a fake grant** (`worktree:seed` never copies the live ones). PSN answers `NPSSO_INVALID`, so `/library`, `/journal` and the charts show the dead-token state; `/console` and `/api/stats` work. a check that needs live PSN data asks dima to paste a token into *that tree's* /console — never copy the main checkout's.
 - routes: `/` → `/library` → the first game at `/library/<npCommunicationId>`; `/campaign` (the charts); `/journal`; `/console` (the admin).
 
 ## drive
@@ -30,19 +31,28 @@ description: Verify a trophy-sys change against the running web + api pair — d
 
 a chart change also gets a hover on one mark per touched chart, at 1280 and 390 — the tooltip portals to the body and must sit fully inside the viewport. the heatmap → progression link: click a heatmap day, and the progression panel scrolls into view with a `YYYY-MM` marker. (both read from `AGENTS.md`, not driven when this skill was written. several charts carry clickable marks that open a game — pick the mark by its panel, never «the last `rect`».)
 
-## the console — a write path
+## the kit — `kit.sh` beside this file
 
-signing in follows `trophy-sys-run` → drive (credentials from the tree's `.env`, never echoed). a save there writes the tree's `.trophy-*.json` copy. never paste or change the NPSSO in a worktree unless the brief asks — it fixes only that copy.
+every write refuses the main checkout. the order for a state check:
+
+1. `kit.sh health <port>` — the file store, or stop
+2. `kit.sh backup` — the tree's `.trophy-*.json` to `$TMPDIR`
+3. `kit.sh login <port>` — `POST /api/admin/login` from the page with the tree's `.env` creds, so the cookie lands in the browser session
+4. `kit.sh fake dead-npsso [grant-days]` — a dead fake NPSSO beside a grant with N days left (≤ 3 is the early re-mint window)
+5. read `/api/admin/token` **through the signed-in page** (`agent-browser open <web>/api/admin/token`) before any PSN call. a /console visit fires `/api/games`, which refreshes the fake grant; PSN refuses it, and the note turns red (`isRefused`). so the yellow note cannot be shown live in a tree — `npsso-status.test.ts` covers how each state renders
+6. `kit.sh restore`
+
+📌 an admin view (`/api/games?all=1`, `/api/admin/*`) is read through the signed-in page. `curl` has no cookie: `?all=1` then answers the public list with the hidden rows dropped, and reads as rows vanishing.
 
 ## essentials — against a baseline
 
-run the `x:browser-headless` essentials on every touched route at 1280 and 390. main already fails these; they are the baseline — report only growth or a new rule:
+`kit.sh essentials <port> <route…>` runs the `x:browser-headless` essentials and the tab walk at 1280 and 390, one line per route. main already fails these; report only growth or a new rule.
 
-- every route — axe `color-contrast` ×1 (`.inline-block`), `region` ×3 (×6 on `/console`)
-- `/library` — axe `select-name` ×2 (×4 at 390), `landmark-unique` ×1; tab walk: the game-row rings clipped by 1 px left and right, and the walk caps at 200 stops
-- at 390 — `/journal` cuts trophy names and descriptions with no `title`
-- `/campaign` — tab walk: the heatmap's month row ring clipped by 1 px
-- `/console` — tab walk: the two sign-in inputs show no focus ring
+- **the baseline is measured, not remembered**: a control tree on main's code — `git worktree add --detach .claude/worktrees/<slug>-control origin/main`, `pnpm worktree:seed` it, `pnpm dev` there — then the same `kit.sh essentials` on both ports, and diff the lines. remove the control tree after.
+- known on main (2026-09-28):
+  - every route — axe `region` ×3 (`h1`)
+  - `/console` — axe `region` ×17 (×18 at 390) and `landmark-one-main` ×1: it renders no `<main>`
+  - `/library` — axe `select-name` ×2, `landmark-unique` ×1. with live PSN data the library also carries ~194 tab-walk flags, cut text with no `title`, and a cursor fail at 390; with the fake token there are no rows, so none of those show
 
 ## evidence
 
