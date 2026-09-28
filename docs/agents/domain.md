@@ -8,7 +8,7 @@ This monorepo uses the **multi-context** layout — each app is its own bounded 
 
 ## Before exploring, read these
 
-- **`CONTEXT-MAP.md`** at the repo root — it points at one `CONTEXT.md` per app. Read each one relevant to the topic.
+- **`CONTEXT-FTR.md`** at the repo root — it points at one `CONTEXT.md` per app. Read each one relevant to the topic.
 - **`docs/adr/`** — system-wide decisions. For app-scoped decisions, check `apps/<app>/docs/adr/`.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
@@ -17,7 +17,7 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 
 ```
 /
-├── CONTEXT-MAP.md
+├── CONTEXT-FTR.md
 ├── docs/adr/                          ← system-wide decisions
 ├── apps/
 │   ├── x-com-chat/

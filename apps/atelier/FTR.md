@@ -1,4 +1,4 @@
-# atelier — product map
+# atelier — ftr
 
 - 🧭 asked, not built yet (a new ask, an experiment) · ⬜ built, not checked yet · 🐞 built, its check fails · ✅ passes in the app's verify recipe · 🔎 dima used it and it holds
 - given/when/then lines are the verifier's exit lines

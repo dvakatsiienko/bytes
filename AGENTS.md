@@ -293,11 +293,11 @@ Workspace-level families — role, kind, special, model routing. Project-meaning
 
 ### Domain docs
 
-Multi-context — root `CONTEXT-MAP.md` points at per-app `CONTEXT.md` files. See `docs/agents/domain.md`.
+Multi-context — root `CONTEXT-FTR.md` points at per-app `CONTEXT.md` files. See `docs/agents/domain.md`.
 
-**An app with `product/MAP.md` keeps its map and its `CONTEXT.md` in step with the code:** a change to what
-the app does updates its map line, and any new domain word its `CONTEXT.md` entry, in the same commit
-(`x:product-docs`).
+**An app with `FTR.md` keeps its map and its `CONTEXT.md` in step with the code:** a change to what
+the app does updates its ftr line, and any new domain word its `CONTEXT.md` entry, in the same commit
+(`x:ftr`).
 
 ## worktrees — one shared checkout, coders branch in their own tree
 
