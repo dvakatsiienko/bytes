@@ -127,7 +127,7 @@ test('a dead token says so, and drops the countdown', () => {
   });
   const readout = readoutBuild(status);
 
-  expect(readout.dead).toContain('psn refused this token');
+  expect(readout.dead?.text).toContain('psn refused this token');
   expect(
     readout.rows.find((row) => row.label === 'rough guess'),
     'a token already dead has no days left to guess at',
@@ -311,18 +311,24 @@ const grantLeft = (days: number) => {
   });
 };
 
-test('a grant with three days left warns before the app has to sign in again', () => {
-  expect(readoutBuild(grantLeft(3)).warning).toContain(
-    'the grant ends in 3 days',
-  );
+test('a live token with a short grant raises nothing — the server re-mints it', () => {
+  expect(readoutBuild(grantLeft(1)).dead).toBe(null);
 });
 
-test('a grant with more than three days left says nothing', () => {
-  expect(readoutBuild(grantLeft(3.5)).warning).toBe(null);
+test('a dead token with a live grant says how long the app stays up', () => {
+  const { dead } = readoutBuild({ ...grantLeft(2), diedAt: Date.now() });
+
+  expect(dead).toEqual({
+    text: expect.stringContaining('the grant keeps the app up for 2 days more'),
+    tone: 'warn',
+  });
 });
 
-test('a dead token gets its own note, not the grant warning on top', () => {
-  const status = { ...grantLeft(1), diedAt: Date.now() };
+test('a dead token with no grant left says the app is down', () => {
+  const status = statusMake({ diedAt: Date.now(), savedAt: Date.now() });
 
-  expect(readoutBuild(status).warning).toBe(null);
+  expect(readoutBuild(status).dead).toEqual({
+    text: expect.stringContaining('the app stays down'),
+    tone: 'error',
+  });
 });
