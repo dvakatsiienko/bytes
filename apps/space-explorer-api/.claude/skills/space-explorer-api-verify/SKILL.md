@@ -16,7 +16,7 @@ description: Verify a space-explorer-api change against the running graphql serv
 ## checks
 
 1. **it answers** — `{ launches(pageSize: 5) { hasMore list { id } } }` returns 5 ids, `hasMore: true`, 0 `errors`. print the counts with `jq`, never the payload.
-2. **every operation runs** — `.claude/skills/space-explorer-api-run/smoke.sh <port>` prints `✓ smoke passed on :<port>`.
+2. **every operation runs** — `apps/space-explorer-api/.claude/skills/space-explorer-api-run/smoke.sh <port>` from the repo root prints `✓ smoke passed on :<port>`.
 
 ## evidence
 
