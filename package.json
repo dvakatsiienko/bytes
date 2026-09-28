@@ -22,7 +22,9 @@
     "build:space-explorer/ui": "turbo run @space-explorer/ui#build",
     "build:trophy-sys": "turbo run trophy-sys#build",
     "build:x-com-chat": "turbo run x-com-chat#build",
+    "apps:essentials": "node script/apps-essentials.ts",
     "badges:sync": "node script/badges-sync.ts",
+    "knip": "knip",
     "packages:reinstall": "pnpm dlx rimraf node_modules \"**/node_modules\" \"**/.next\" pnpm-lock.yaml && pnpm install",
     "pretest": "playwright install chromium",
     "prettier-config:publish": "pnpm -F='prettier-config-polished' publish",
@@ -39,8 +41,7 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "check": "turbo run lint typecheck",
-    "format": "biome format --write",
-    "knip": "knip"
+    "format": "biome format --write"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",

@@ -32,6 +32,17 @@ pre-commit:
         - '**/package.json'
       run: if command -v package-json-shape >/dev/null; then package-json-shape . {staged_files}; fi
 
+    # Every app carries its essentials (BYT-111). Only the apps this commit
+    # touches are checked, so one app's gap never blocks work in another; a
+    # new app is checked from its first staged file. ci.yml runs every app.
+    #
+    # 📌 No `glob:` on purpose. lefthook matches a glob against added,
+    # copied, modified and renamed paths only, so a commit that just deletes
+    # an essential would skip the job. The script reads the index itself,
+    # deletions included, in ~0.1 s.
+    - name: apps-essentials
+      run: node script/apps-essentials.ts --staged
+
 pre-push:
   jobs:
     # Links each pushed commit to the ticket its body names, and reverses the

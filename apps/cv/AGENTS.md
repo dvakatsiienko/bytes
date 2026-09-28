@@ -13,6 +13,9 @@ A visit-card site. Two routes:
 - `/` — CV page: name, contact links, photo, tech stack showcase via SVG icons (12 tool categories)
 - `/cover` — Short bio: professional intro with dynamically calculated years of experience and social links
 
+- **`FTR.md` + `CONTEXT.md`** — every feature with its check, and the words they use. Read
+  your section before changing what the app does.
+
 ## Stack
 
 - **Next.js 16** (App Router, Turbopack, React Compiler enabled)
@@ -27,6 +30,5 @@ A visit-card site. Two routes:
 - UI wrapped in a macOS-style browser frame component (`src/components/Browser/`)
 - 41 custom SVG tech icons in `src/app/parts/svg/`
 - Tool categories config in `src/app/parts/toolConfig.tsx`
-- `__DEV__` / `__PROD__` flags in `src/frags.ts` — projects section hidden in production
 - External links centralized in `src/links.ts`
 - `next build` type-checks. `ignoreBuildErrors` was set here once and removed after the app measured clean against it; `pnpm typecheck` still runs the same check on demand
