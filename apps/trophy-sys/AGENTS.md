@@ -151,6 +151,11 @@ in `.env.dev.local`, never by writing production.
   An expired token throws the sentinel `NPSSO_INVALID` (`src/shared/types.ts`) rather than
   psn-api's multi-line prose, and the header renders it as a link to `NPSSO_URL`, where a fresh
   token is minted.
+- 📌 **A renewed NPSSO reaches a warm server on its next request with nothing else done** — the
+  server holds no dead token, only the store does (`psn-hot-swap.test.ts`). The latch was the
+  client's: the layout's `profile` query kept its `NPSSO_INVALID` error across route switches.
+  `queryClientCreate` now refetches every query holding that error on any success, and
+  `useProfile` polls once a minute while it holds it, so an open tab heals with no reload.
 - Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
   guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
   empty library unless checked. And the envelope key is not always `response`:
