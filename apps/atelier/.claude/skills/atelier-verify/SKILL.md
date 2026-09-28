@@ -1,5 +1,5 @@
 ---
-name: verify
+name: atelier-verify
 description: Verify an atelier change against the running studio — drive it in a headless browser, capture evidence. Use after any change under apps/atelier, before its report or commit.
 ---
 

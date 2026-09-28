@@ -1,5 +1,5 @@
 ---
-name: run-financial
+name: financial-run
 description: Run, start or screenshot financial — the invoices dashboard with login, a next dev server for a worktree or a coder's live changes, on a scratch Postgres, driven with agent-browser. Use when asked to run financial, start its dev server, log in to it, show a coder's changes, or screenshot it.
 ---
 
@@ -22,13 +22,13 @@ Process 1 — the scratch database. `colima status` first: start colima only if 
 
 ```bash
 colima start                                       # ~13 s; only if `colima status` says not running
-docker run -d --name run-financial-db -e POSTGRES_PASSWORD=pg -p 55432:5432 postgres:17-alpine
-timeout 90 bash -c 'until docker exec run-financial-db pg_isready -U postgres -q; do sleep 1; done'
+docker run -d --name financial-run-db -e POSTGRES_PASSWORD=pg -p 55432:5432 postgres:17-alpine
+timeout 90 bash -c 'until docker exec financial-run-db pg_isready -U postgres -q; do sleep 1; done'
 cd .claude/worktrees/<slug>/apps/financial
 export DATABASE_URL=postgresql://postgres:pg@localhost:55432/postgres
 pnpm db:push                                       # ~1 s
 pnpm db:seed                                       # ~12 s, «✅ Seed succseeded.»
-docker exec run-financial-db psql -U postgres -tAc 'select (select count(*) from "User"),(select count(*) from "Customer"),(select count(*) from "Invoice"),(select count(*) from "Revenue")'
+docker exec financial-run-db psql -U postgres -tAc 'select (select count(*) from "User"),(select count(*) from "Customer"),(select count(*) from "Invoice"),(select count(*) from "Revenue")'
 # 1|6|13|12
 ```
 
@@ -46,7 +46,7 @@ A `run` pass stops both processes when its check is done. A coder serving the tr
 The seed user is `user@x.com` / `12345`, and the login form comes pre-filled with it.
 
 ```bash
-export AGENT_BROWSER_SESSION=run-financial
+export AGENT_BROWSER_SESSION=financial-run
 agent-browser set viewport 1280 800
 agent-browser open http://localhost:3010/dashboard   # the proxy redirects to /login
 agent-browser wait --load load
@@ -71,7 +71,7 @@ agent-browser close
 Prove a write reached the scratch database, not the hosted one:
 
 ```bash
-docker exec run-financial-db psql -U postgres -tAc 'select amount,status from "Invoice" where amount=4250'   # 4250|paid
+docker exec financial-run-db psql -U postgres -tAc 'select amount,status from "Invoice" where amount=4250'   # 4250|paid
 ```
 
 Look at the screenshots: `/dashboard` shows four cards (collected, pending, 13 invoices, 6 customers), a green revenue bar chart and «Latest invoices»; `/dashboard/invoices` lists the new $42.50 Amy Burns row on top, stamped PAID.
@@ -83,7 +83,7 @@ Stop the background task that ran `pnpm dev` (TaskStop with its task id) — nev
 ```bash
 lsof -nP -iTCP:3010 -sTCP:LISTEN     # prints nothing
 lsof -nP -iTCP:9229 -sTCP:LISTEN     # prints nothing: the --inspect debugger went with it
-docker rm -f run-financial-db
+docker rm -f financial-run-db
 colima stop                          # only if you started it; ~2 s
 lsof -nP -iTCP:55432 -sTCP:LISTEN    # prints nothing
 git -C .claude/worktrees/<slug> status --short    # empty
@@ -109,4 +109,4 @@ cd apps/financial && pnpm test       # vitest, 1 file, 2 tests, ~1 s
 - **the seed prints «[Better Auth] Base URL is not set»** — harmless for a local run; login and redirects worked.
 - **`agent-browser find text '$42.50'` finds nothing** even while the row is on screen — use the `eval` on `innerText` above.
 - the TanStack Query devtools button and the Next.js dev-tools button sit in every dev screenshot — known, not a finding.
-- `run-financial-db` and `:55432` are fixed names: two financial runs at once collide. Give the second one its own container name and port.
+- `financial-run-db` and `:55432` are fixed names: two financial runs at once collide. Give the second one its own container name and port.

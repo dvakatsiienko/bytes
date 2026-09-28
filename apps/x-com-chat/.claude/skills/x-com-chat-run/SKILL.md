@@ -1,5 +1,5 @@
 ---
-name: run-x-com-chat
+name: x-com-chat-run
 description: Run, start or screenshot x-com-chat — its next dev server plus convex dev for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run x-com-chat, start its dev server, send a chat message in it, show a coder's changes, or screenshot it.
 ---
 
@@ -33,7 +33,7 @@ A `run` pass stops what it started when its check is done. A coder serving the t
 ## Drive
 
 ```bash
-export AGENT_BROWSER_SESSION=run-x-com-chat
+export AGENT_BROWSER_SESSION=x-com-chat-run
 agent-browser set viewport 1280 800
 agent-browser open http://localhost:3020          # redirects to /chat/<friendId>/<chatId>, the last chat
 agent-browser wait --load load

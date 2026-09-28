@@ -3,7 +3,7 @@
 Financial dashboard (invoices, customers, revenue) with credentials auth. WIP,
 modeled after the Next.js App Router dashboard course app.
 
-🐾 **pet project** — basic on purpose (dima, 2026-09-27): `.env` points `DATABASE_URL` at the hosted Prisma Postgres, so `pnpm dev` runs against the real data by design. keep that setup; a throwaway test (a probe, a coder's check) uses a scratch postgres — `run-financial` shows how.
+🐾 **pet project** — basic on purpose (dima, 2026-09-27): `.env` points `DATABASE_URL` at the hosted Prisma Postgres, so `pnpm dev` runs against the real data by design. keep that setup; a throwaway test (a probe, a coder's check) uses a scratch postgres — `financial-run` shows how.
 
 ## Stack
 

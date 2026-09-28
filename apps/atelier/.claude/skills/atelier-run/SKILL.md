@@ -1,5 +1,5 @@
 ---
-name: run-atelier
+name: atelier-run
 description: Run, start or screenshot atelier — a dev server for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run atelier, start its dev server, show a coder's changes, or screenshot it.
 ---
 
@@ -29,7 +29,7 @@ A `run` pass stops the server when its check is done. A coder serving the tree f
 ## Drive
 
 ```bash
-export AGENT_BROWSER_SESSION=run-atelier
+export AGENT_BROWSER_SESSION=atelier-run
 agent-browser set viewport 1280 800
 agent-browser open http://localhost:5190
 agent-browser wait --load load

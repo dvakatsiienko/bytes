@@ -3,7 +3,7 @@
 vite react client for `space-explorer-api` — an apollo client demo (pagination, cache type
 policies, optimistic ui). demo status.
 
-🐾 **pet project** — basic on purpose (dima, 2026-09-27): it talks to space-explorer-api's tracked sqlite, and `.env.development` pins the api to `:4000` on purpose; a worktree overrides `VITE_GQL_URL` — `run-space-explorer-ui` shows how.
+🐾 **pet project** — basic on purpose (dima, 2026-09-27): it talks to space-explorer-api's tracked sqlite, and `.env.development` pins the api to `:4000` on purpose; a worktree overrides `VITE_GQL_URL` — `space-explorer-ui-run` shows how.
 
 ## shape
 

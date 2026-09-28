@@ -1,5 +1,5 @@
 ---
-name: run-space-explorer-api
+name: space-explorer-api-run
 description: Run, start or smoke-test space-explorer-api — the graphql server behind space-explorer-ui — in a worktree, driven with curl. Use when asked to run the api, start its server, query it, or check a coder's resolver change against the live server.
 ---
 
@@ -33,7 +33,7 @@ A `run` pass stops the server when its check is done. A coder keeping it up for 
 ## Drive
 
 ```bash
-apps/space-explorer-api/.claude/skills/run-space-explorer-api/smoke.sh 4010
+apps/space-explorer-api/.claude/skills/space-explorer-api-run/smoke.sh 4010
 # ▸ launches ▸ launch(id) ▸ login ▸ bookTrips ▸ userProfile ▸ cancelTrip
 # ✓ smoke passed on :4010
 ```

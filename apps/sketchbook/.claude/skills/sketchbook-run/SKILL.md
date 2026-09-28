@@ -1,5 +1,5 @@
 ---
-name: run-sketchbook
+name: sketchbook-run
 description: Run, start or screenshot sketchbook — the prototype platform's vite dev server in a worktree, driven with agent-browser. Use when asked to run sketchbook, start its dev server, show a proto or an archived page, or check a coder's proto changes.
 ---
 
@@ -36,7 +36,7 @@ A `run` pass stops the server when its check is done. A coder serving the tree f
 Read the tree first — `pnpm proto:list` in `apps/sketchbook` shows the archives and the live proto (or `→ nothing live`).
 
 ```bash
-export AGENT_BROWSER_SESSION=run-sketchbook
+export AGENT_BROWSER_SESSION=sketchbook-run
 agent-browser set viewport 1280 800
 agent-browser open http://localhost:<port>
 agent-browser wait --load load

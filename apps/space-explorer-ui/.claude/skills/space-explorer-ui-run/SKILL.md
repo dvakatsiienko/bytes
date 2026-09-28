@@ -1,5 +1,5 @@
 ---
-name: run-space-explorer-ui
+name: space-explorer-ui-run
 description: Run, start or screenshot space-explorer-ui — the ui plus its own space-explorer-api in a worktree, driven with agent-browser. Use when asked to run space-explorer, start its dev servers, log in, book a launch, show a coder's changes, or screenshot it.
 ---
 
@@ -36,7 +36,7 @@ A `run` pass stops both when its check is done. A coder serving the tree keeps t
 ## Drive
 
 ```bash
-export AGENT_BROWSER_SESSION=run-space-explorer-ui
+export AGENT_BROWSER_SESSION=space-explorer-ui-run
 agent-browser set viewport 1280 800
 agent-browser open http://localhost:5193          # lands on /login, email prefilled test@email.io
 agent-browser wait --load networkidle

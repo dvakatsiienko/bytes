@@ -1,5 +1,5 @@
 ---
-name: run-trophy-sys
+name: trophy-sys-run
 description: Run, start or screenshot trophy-sys — its web + api dev pair for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run trophy-sys, start its dev server, show a coder's changes, or screenshot the library, campaign charts or console.
 ---
 
@@ -37,7 +37,7 @@ A `run` pass stops both processes when its check is done. A coder serving the tr
 ## Drive
 
 ```bash
-export AGENT_BROWSER_SESSION=run-trophy-sys
+export AGENT_BROWSER_SESSION=trophy-sys-run
 agent-browser set viewport 1280 800
 agent-browser open http://localhost:5187        # redirects to /library
 agent-browser wait 5000                         # the PSN calls settle; charts need /api/games

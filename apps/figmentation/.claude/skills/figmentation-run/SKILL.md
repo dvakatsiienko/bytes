@@ -1,5 +1,5 @@
 ---
-name: run-figmentation
+name: figmentation-run
 description: Run, start or screenshot figmentation — a next dev server for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run figmentation, start its dev server, show the tesla-landing or clinique demo, or screenshot it.
 ---
 
@@ -33,7 +33,7 @@ A `run` pass stops the server when its check is done. A coder serving the tree f
 ## Drive
 
 ```bash
-export AGENT_BROWSER_SESSION=run-figmentation
+export AGENT_BROWSER_SESSION=figmentation-run
 agent-browser set viewport 1280 800
 agent-browser open http://localhost:3020
 agent-browser wait --load load
