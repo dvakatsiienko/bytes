@@ -17,10 +17,14 @@ export const countTotal = (counts: TrophyCounts) =>
 export const countShare = (counts: {
   defined: TrophyCounts;
   earned: TrophyCounts;
-}) => {
-  const defined = countTotal(counts.defined);
-  return defined ? Math.floor((countTotal(counts.earned) / defined) * 100) : 0;
-};
+}) => sharePercent(countTotal(counts.earned), countTotal(counts.defined));
+
+/**
+ * The one rounding rule for every «N of M» percent — the journal's before and
+ * after figures use it too, so a title reads the same number on every view.
+ */
+export const sharePercent = (earned: number, defined: number) =>
+  defined ? Math.floor((earned / defined) * 100) : 0;
 /** Rarest grade last, which is the order every stack and legend reads in. */
 export const GRADE_ORDER = [
   'bronze',

@@ -8,6 +8,7 @@ import {
   countTotal,
   gameLookup,
   gamingDayKey,
+  sharePercent,
   trophyOrder,
 } from './helpers/stats.ts';
 import { useGames, useStats } from './hooks/queries.ts';
@@ -205,7 +206,12 @@ const GameDayShare = (props: GameDayShareProps) => {
       {/* text first, bar last: the bar holds the row's right edge, so every
           bar in a day lines up with the one above it */}
       <span className='text-right text-mute'>
-        {Math.round(from * 100)}% → {Math.round(to * 100)}% of trophies
+        {sharePercent(props.gameDay.before, props.gameDay.defined)}% →{' '}
+        {sharePercent(
+          props.gameDay.before + props.gameDay.count,
+          props.gameDay.defined,
+        )}
+        % of trophies
       </span>
       <span
         aria-hidden
