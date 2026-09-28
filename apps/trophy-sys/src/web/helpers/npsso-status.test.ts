@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import type { GrantStatus, NpssoStatus } from '../../shared/types.ts';
 import { readoutBuild } from './npsso-status.ts';
@@ -287,4 +287,42 @@ test('the grant adds exactly one row — this panel has been cut for growing', (
     rows.map((row) => row.label),
     'the three npsso rows, then one grant row — paste first, then text',
   ).toStrictEqual(['age', 'shortest seen', 'rough guess', 'grant']);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+/**
+ * A live grant with this many days of PSN's claim left, read on a frozen clock:
+ * the readout floors the days, so one real millisecond between building the
+ * status and reading it turned «3 days» into «2».
+ */
+const grantLeft = (days: number) => {
+  vi.useFakeTimers();
+  vi.setSystemTime(Date.parse('2026-09-28T12:00:00Z'));
+
+  return statusMake({
+    refresh: grantMake({
+      expiresIn: days * 86_400,
+      mintedAt: Date.now() - (10 - days) * DAY_MS,
+    }),
+    savedAt: Date.now(),
+  });
+};
+
+test('a grant with three days left warns before the app has to sign in again', () => {
+  expect(readoutBuild(grantLeft(3)).warning).toContain(
+    'the grant ends in 3 days',
+  );
+});
+
+test('a grant with more than three days left says nothing', () => {
+  expect(readoutBuild(grantLeft(3.5)).warning).toBe(null);
+});
+
+test('a dead token gets its own note, not the grant warning on top', () => {
+  const status = { ...grantLeft(1), diedAt: Date.now() };
+
+  expect(readoutBuild(status).warning).toBe(null);
 });

@@ -34,6 +34,7 @@ export const BarRows = (props: BarRowsProps) => {
         {(size) =>
           size.width > 0 && size.height > 0 ? (
             <Bars
+              accentId={props.accentId}
               axis={props.axis}
               height={size.height}
               label={props.label}
@@ -92,6 +93,9 @@ const Bars = (props: BarsProps) => {
   const rowListJSX = props.rows.map((row, index) => {
     const y = PAD + index * rowHeight;
     const isActive = row.id === activeId;
+    // The glyph carries the state, the colour only repeats it.
+    const isAccent = row.id === props.accentId;
+    const labelInk = labelInkOf(isAccent, isActive);
 
     return (
       // Pointer-only enhancement: the label, the readout and the navigation are
@@ -118,11 +122,14 @@ const Bars = (props: BarsProps) => {
 
         <text
           dominantBaseline='middle'
-          fill={isActive ? CHART_INK.text : CHART_INK.axis}
+          fill={labelInk}
           fontSize={LABEL_FONT}
           x={LABEL_INSET}
           y={y + rowHeight / 2}>
-          {clip(row.label, gutter)}
+          {clip(
+            isAccent ? `${NOW_PLAYING_MARK} ${row.label}` : row.label,
+            gutter,
+          )}
         </text>
 
         <rect
@@ -244,6 +251,14 @@ const AXIS_PAD = 8;
 const VALUE_GAP = 16;
 
 const LABEL_FONT = 12;
+
+export const NOW_PLAYING_MARK = '▶';
+
+/** The accent outranks the hover: a «now playing» row stays marked under the pointer. */
+const labelInkOf = (isAccent: boolean, isActive: boolean) => {
+  if (isAccent) return CHART_INK.ring;
+  return isActive ? CHART_INK.text : CHART_INK.axis;
+};
 /**
  * JetBrains Mono advances at 0.6em, so the font size *is* the character width.
  * Derived rather than a constant: a hard-coded 5px-per-character was sized for
@@ -290,6 +305,8 @@ export interface BarChart {
 }
 
 interface BarRowsProps {
+  /** The one row marked «now playing», if it is in this chart. */
+  accentId?: string | null;
   /** Given only when the bars run from zero — an offset scale has no axis. */
   axis?: BarAxis;
   /** Shown instead of the chart when there are no rows. */

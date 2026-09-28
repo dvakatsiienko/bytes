@@ -1,4 +1,4 @@
-import { assert, expect, test } from 'vitest';
+import { afterEach, assert, expect, test, vi } from 'vitest';
 
 import {
   ADMIN_COOKIE,
@@ -6,10 +6,10 @@ import {
   cookieRead,
   credentialsMatch,
   loginAttempt,
-  loginGateCreate,
   sessionCookie,
   sessionVerify,
 } from './admin.ts';
+import { type FailureCounter, failureCounterMemory } from './state.ts';
 
 /**
  * The admin session is a signed string handed to a browser and taken back
@@ -116,95 +116,112 @@ test('adminConfig is null unless all three vars are present', () => {
   }
 });
 
-test('five wrong passwords lock the login, and the answer says for how long', () => {
-  const gate = loginGateCreate();
+/** A fresh window per test, on vitest's clock so a test can let a minute pass. */
+const counter = () => failureCounterMemory(60_000);
+const guess = (failures: FailureCounter) =>
+  loginAttempt(CONFIG, CONFIG.email, 'wrong', failures);
+const owner = (failures: FailureCounter) =>
+  loginAttempt(CONFIG, CONFIG.email, CONFIG.password, failures);
+const guesses = async (failures: FailureCounter, count: number) => {
+  for (let attempt = 0; attempt < count; attempt += 1)
+    // biome-ignore lint/performance/noAwaitInLoops: a guess counts in order, one after the other
+    await guess(failures);
+};
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+test('five wrong passwords lock the login, and the answer says for how long', async () => {
+  const failures = counter();
 
   for (let attempt = 1; attempt < 5; attempt += 1)
     expect(
-      loginAttempt(CONFIG, CONFIG.email, 'wrong', gate),
+      // biome-ignore lint/performance/noAwaitInLoops: each attempt is read in order
+      await guess(failures),
       `attempt ${attempt} should still be a plain rejection`,
     ).toStrictEqual({ kind: 'rejected' });
 
-  const locked = loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
+  const locked = await guess(failures);
   assert.ok(locked.kind === 'locked');
   expect(locked.retryAfterSeconds).toBeGreaterThan(0);
   expect(locked.retryAfterSeconds).toBeLessThanOrEqual(60);
 });
 
-test('a locked gate still admits the correct password', () => {
-  const gate = loginGateCreate();
-  for (let attempt = 0; attempt < 5; attempt += 1)
-    loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
-
-  expect(gate.lockedUntil, 'the gate is locked').toBeGreaterThan(Date.now());
+test('a locked login still admits the correct password', async () => {
+  const failures = counter();
+  await guesses(failures, 5);
 
   // The regression this pins: refusing the owner during a cooldown turned the
   // throttle into a denial of service on the one console that renews the token.
-  expect(
-    loginAttempt(CONFIG, CONFIG.email, CONFIG.password, gate),
-  ).toStrictEqual({
-    kind: 'ok',
-  });
-  expect(gate.lockedUntil, 'the owner arriving clears the gate').toBe(0);
+  expect(await owner(failures)).toStrictEqual({ kind: 'ok' });
 });
 
-test('hammering during a cooldown cannot push the deadline back', () => {
-  const gate = loginGateCreate();
-  for (let attempt = 0; attempt < 5; attempt += 1)
-    loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
+test('the owner arriving ends the lockout', async () => {
+  const failures = counter();
+  await guesses(failures, 5);
+  await owner(failures);
 
-  const until = gate.lockedUntil;
-  for (let attempt = 0; attempt < 20; attempt += 1)
-    loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
-
-  expect(gate.lockedUntil).toBe(until);
+  expect(await guess(failures)).toStrictEqual({ kind: 'rejected' });
 });
 
-test('a slow trickle of wrong passwords cannot escalate the wait', () => {
-  const gate = loginGateCreate();
+test('hammering during a cooldown cannot push the deadline back', async () => {
+  vi.useFakeTimers();
+  const failures = counter();
+  await guesses(failures, 5);
+
+  vi.advanceTimersByTime(30_000);
+  await guesses(failures, 20);
+  const last = await guess(failures);
+
+  assert.ok(last.kind === 'locked');
+  expect(last.retryAfterSeconds).toBe(30);
+});
+
+test('a slow trickle of wrong passwords cannot escalate the wait', async () => {
+  vi.useFakeTimers();
+  const failures = counter();
   const waits: number[] = [];
 
-  // One guess, wait out the cooldown, guess again — the shape that used to
-  // ratchet the lockout up a rung every round until it pinned at the cap.
-  for (let round = 0; round < 12; round += 1) {
-    const result = loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
-    if (result.kind === 'locked') {
-      waits.push(result.retryAfterSeconds);
-      gate.lockedUntil = Date.now() - 1;
-    }
+  // Five guesses, wait the minute out, again — the shape that used to ratchet
+  // the lockout up a rung every round until it pinned at the cap.
+  for (let round = 0; round < 3; round += 1) {
+    // biome-ignore lint/performance/noAwaitInLoops: each round waits out the one before
+    await guesses(failures, 4);
+    const result = await guess(failures);
+    if (result.kind === 'locked') waits.push(result.retryAfterSeconds);
+    vi.advanceTimersByTime(60_000);
   }
 
-  expect(waits.length, 'the gate locked more than once').toBeGreaterThan(1);
-  expect([...new Set(waits)], 'every cooldown stays one minute').toStrictEqual([
-    60,
-  ]);
+  expect(waits, 'every cooldown stays one minute').toStrictEqual([60, 60, 60]);
 });
 
-test('the cooldown expires on its own and the owner gets back in', () => {
-  const gate = loginGateCreate();
-  for (let attempt = 0; attempt < 5; attempt += 1)
-    loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
+test('the cooldown expires on its own and the count starts over', async () => {
+  vi.useFakeTimers();
+  const failures = counter();
+  await guesses(failures, 5);
 
   // The lockout is a moment, not a flag, so letting it pass is the whole
   // recovery path — nothing has to clear it.
-  gate.lockedUntil = Date.now() - 1;
+  vi.advanceTimersByTime(60_000);
 
-  expect(
-    loginAttempt(CONFIG, CONFIG.email, CONFIG.password, gate),
-  ).toStrictEqual({
-    kind: 'ok',
-  });
-  expect(gate.failures, 'a success clears the counter').toBe(0);
-  expect(gate.lockedUntil).toBe(0);
+  expect(await guess(failures)).toStrictEqual({ kind: 'rejected' });
 });
 
-test('after a success the next five failures start the count over', () => {
-  const gate = loginGateCreate();
-  for (let attempt = 0; attempt < 4; attempt += 1)
-    loginAttempt(CONFIG, CONFIG.email, 'wrong', gate);
-  loginAttempt(CONFIG, CONFIG.email, CONFIG.password, gate);
+test('after a success the next five failures start the count over', async () => {
+  const failures = counter();
+  await guesses(failures, 4);
+  await owner(failures);
 
-  expect(loginAttempt(CONFIG, CONFIG.email, 'wrong', gate)).toStrictEqual({
-    kind: 'rejected',
-  });
+  expect(await guess(failures)).toStrictEqual({ kind: 'rejected' });
+});
+
+test('a store that cannot clear still lets the owner in', async () => {
+  const failures: FailureCounter = {
+    add: () => Promise.resolve({ count: 0, leftMs: 0 }),
+    clear: () => Promise.reject(new Error('kv down')),
+  };
+  vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+  expect(await owner(failures)).toStrictEqual({ kind: 'ok' });
 });

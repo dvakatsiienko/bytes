@@ -59,7 +59,7 @@ import {
   unfinishedChart,
   unfinishedRows,
 } from './charts/unfinished.ts';
-import { BarRows } from './components/bar-rows.tsx';
+import { BarRows, NOW_PLAYING_MARK } from './components/bar-rows.tsx';
 import {
   type ChartColumn,
   ChartFrame,
@@ -69,6 +69,7 @@ import { EffortLegend } from './components/chart-legend.tsx';
 import { KpiStrip } from './components/kpi-strip.tsx';
 import { SegmentedControl } from './components/segmented-control.tsx';
 import { hoursFormat } from './helpers/format.ts';
+import { nowPlayingId } from './helpers/stats.ts';
 import { useGames, useSettings, useStats } from './hooks/queries.ts';
 
 export const Campaign = () => {
@@ -87,6 +88,7 @@ export const Campaign = () => {
   const archive = stats.data;
   const trophies = useMemo(() => archive?.trophies ?? [], [archive]);
   const remaining = useMemo(() => archive?.remaining ?? [], [archive]);
+  const nowPlaying = nowPlayingId(archive);
 
   const hideUntouched =
     settings.data?.effortHideUntouched ?? SETTINGS_DEFAULT.effortHideUntouched;
@@ -135,6 +137,9 @@ export const Campaign = () => {
   );
   const platinumBars = useMemo(() => platinumChart(platinums), [platinums]);
   const streakBars = useMemo(() => streakChart(streaks), [streaks]);
+
+  const nowPlayingName =
+    gameList.find((game) => game.id === nowPlaying)?.name ?? null;
 
   const gameOpen = (gameId: string) =>
     navigate({ params: { gameId }, to: '/library/$gameId' });
@@ -237,7 +242,14 @@ export const Campaign = () => {
             falls off the bottom edge. */}
         <div className='flex h-full min-h-0 flex-col'>
           <EffortLegend />
-          {gate(<EffortScatter onSelect={gameOpen} points={points} />, false)}
+          {gate(
+            <EffortScatter
+              accentId={nowPlaying}
+              onSelect={gameOpen}
+              points={points}
+            />,
+            false,
+          )}
         </div>
       </ChartFrame>
     ),
@@ -279,6 +291,7 @@ export const Campaign = () => {
         title='time to platinum'>
         {gate(
           <BarRows
+            accentId={nowPlaying}
             axis={platinumBars.axis}
             empty='no platinum has a matched playtime yet'
             label='Hours played to reach each platinum'
@@ -385,6 +398,7 @@ export const Campaign = () => {
         title='unfinished'>
         {gate(
           <BarRows
+            accentId={nowPlaying}
             axis={unfinishedBars.axis}
             empty='nothing left over — every title is finished'
             label='Titles with work left, ranked by how little is left'
@@ -451,6 +465,11 @@ export const Campaign = () => {
       <main className='flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto'>
         <div className='flex flex-wrap items-center gap-3'>
           <span className='text-[12px] text-dim'>{archiveStatus(archive)}</span>
+          {nowPlayingName ? (
+            <span className='select-text text-[12px] text-orange'>
+              {NOW_PLAYING_MARK} now playing · {nowPlayingName}
+            </span>
+          ) : null}
 
           {focusMonth && (
             <button

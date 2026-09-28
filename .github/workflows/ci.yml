@@ -162,7 +162,8 @@ jobs:
         run: pnpm knip
 
       # 📌 Whether chromium is needed is turbo's question, not a path pattern's.
-      # `@ui/kit` is the only package that tests in a real browser, and `test`
+      # `@ui/kit` and `trophy-sys` are the packages that test in a real browser
+      # (trophy-sys: the /campaign chart-layout test), and `test`
       # runs under the same `--affected` as the step below — so the task graph
       # already knows the answer exactly, including the case a path list would
       # miss: a new package depending on kit. `<NONEXISTENT>` is how turbo spells
@@ -178,18 +179,18 @@ jobs:
           # 📌 A COUNT, not `jq -e`. `jq -e` answers 1 for «false» and 5 for «I
           # could not parse that», and the `if` reads both as «no browser tests»
           # — a gate whose broken state is indistinguishable from its negative
-          # state. An unparseable plan leaves `kit` empty here, and the
+          # state. An unparseable plan leaves `browser` empty here, and the
           # comparison below then fails the step out loud.
-          kit=$(jq '[.tasks[] | select(.task == "test" and .package == "@ui/kit" and .command != "<NONEXISTENT>")] | length' <<<"$plan")
-          if [ "$kit" -gt 0 ]; then
+          browser=$(jq '[.tasks[] | select(.task == "test" and (.package == "@ui/kit" or .package == "trophy-sys") and .command != "<NONEXISTENT>")] | length' <<<"$plan")
+          if [ "$browser" -gt 0 ]; then
             echo "needed=true" >> "$GITHUB_OUTPUT"
-            echo "@ui/kit tests are in the plan — chromium is needed"
+            echo "browser tests are in the plan — chromium is needed"
           else
             echo "needed=false" >> "$GITHUB_OUTPUT"
             echo "no browser tests in the plan — skipping chromium"
           fi
 
-      # `@ui/kit` tests in a real browser, so the runner needs chromium. The
+      # Browser tests need chromium on the runner. The
       # download is ~90 MB and the only part of this job that would be slow, so
       # it is cached on the lockfile hash — the playwright version lives there,
       # and a bump is exactly when a fresh browser is required.
