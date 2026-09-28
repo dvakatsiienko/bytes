@@ -68,6 +68,25 @@ const UNWRITABLE = {
   status: 501,
 };
 
+/**
+ * The error boundary's report. Logged, never stored: the function log is where
+ * a production render error becomes visible, and nothing here earns a KV key.
+ * The route is public, so every field is clipped — the body is attacker-shaped.
+ */
+const clientErrorLog = (body: unknown) => {
+  const fields: Record<string, unknown> =
+    typeof body === 'object' && body !== null ? { ...body } : {};
+
+  console.error('client render error', {
+    message: clip(fields.message, 500),
+    path: clip(fields.path, 200),
+    stack: clip(fields.stack, 4000),
+  });
+};
+
+const clip = (value: unknown, max: number) =>
+  typeof value === 'string' ? value.slice(0, max) : null;
+
 /** Null when the admin is unconfigured — never a reason to grant access. */
 const adminAuthed = (request: RouteRequest) => {
   const config = adminConfig();
@@ -190,6 +209,10 @@ export const routeResolve = async (
   }
 
   if (path === '/api/health') return ok({ ok: true, stateBackend });
+  if (path === '/api/client-error' && method === 'POST') {
+    clientErrorLog(request.body);
+    return ok({ ok: true });
+  }
   // Read without the cookie: the charts need these, and nothing here is a
   // secret — the write side is what the admin session guards.
   if (path === '/api/settings')

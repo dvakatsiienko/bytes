@@ -68,7 +68,8 @@ Three paths, same JSON:
 - Anywhere → `curl -s https://trophy-sys.vercel.app/api/games`
 
 Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommunicationId`,
-`/api/news`, `/api/settings`, `POST /api/snapshot`.
+`/api/news`, `/api/settings`, `POST /api/snapshot`, `POST /api/client-error` (the route error
+screen reports a render error there; it only logs, so `vercel logs` is where a production one shows).
 
 📌 **Shapes that bit `cw` (2026-09-17)** — `games` and `steam-games` return bare arrays, not
 `{games: […]}`. `progress` is base + DLC combined and is not a platinum flag: a platinumed game

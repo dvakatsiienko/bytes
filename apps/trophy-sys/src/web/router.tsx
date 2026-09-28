@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import {
   type ErrorComponentProps,
   Link,
@@ -10,6 +10,7 @@ import {
 } from '@tanstack/react-router';
 
 import { ConsoleView } from './console.tsx';
+import { errorReport } from './helpers/error-report.ts';
 import { Journal } from './journal.tsx';
 import { Layout } from './layout.tsx';
 import { Library, LibraryEmpty, LibraryGame } from './library.tsx';
@@ -29,6 +30,8 @@ const Campaign = lazy(() =>
  * Declared before the routes because they reference it at module init.
  */
 const RouteError = (props: ErrorComponentProps) => {
+  useEffect(() => errorReport(props.error), [props.error]);
+
   const message =
     props.error instanceof Error ? props.error.message : String(props.error);
 
