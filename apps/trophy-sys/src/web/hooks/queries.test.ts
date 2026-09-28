@@ -30,3 +30,39 @@ test('a success elsewhere refetches a query stuck on the dead-token error', asyn
   );
   unsubscribe();
 });
+
+test('a dead-token error is not retried', async () => {
+  const client = queryClientCreate();
+  let calls = 0;
+
+  await client
+    .fetchQuery({
+      queryFn: () => {
+        calls += 1;
+        return Promise.reject(new Error(NPSSO_INVALID));
+      },
+      queryKey: ['profile'],
+      retryDelay: 0,
+    })
+    .catch(() => undefined);
+
+  expect(calls).toBe(1);
+});
+
+test('any other failure is retried once', async () => {
+  const client = queryClientCreate();
+  let calls = 0;
+
+  await client
+    .fetchQuery({
+      queryFn: () => {
+        calls += 1;
+        return Promise.reject(new Error('psn timed out'));
+      },
+      queryKey: ['games'],
+      retryDelay: 0,
+    })
+    .catch(() => undefined);
+
+  expect(calls).toBe(2);
+});

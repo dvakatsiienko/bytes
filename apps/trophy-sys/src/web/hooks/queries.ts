@@ -37,7 +37,13 @@ import {
 export const queryClientCreate = () => {
   const client: QueryClient = new QueryClient({
     defaultOptions: {
-      queries: { refetchOnWindowFocus: true, retry: 1, staleTime: 10_000 },
+      queries: {
+        refetchOnWindowFocus: true,
+        // A dead token is not a blip: retrying it only spends a second PSN call.
+        retry: (failures, error) =>
+          failures < 1 && error.message !== NPSSO_INVALID,
+        staleTime: 10_000,
+      },
     },
     queryCache: new QueryCache({
       onSuccess: () => client.invalidateQueries({ predicate: isNpssoDead }),
