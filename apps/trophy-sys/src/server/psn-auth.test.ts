@@ -1,10 +1,12 @@
-import { expect, test, vi } from 'vitest';
+import { beforeEach, expect, test, vi } from 'vitest';
 
 import { NPSSO_INVALID } from '../shared/types.ts';
 
 const store = vi.hoisted(() => ({
+  dead: 'D'.repeat(64),
   live: 'L'.repeat(64),
-  npsso: 'D'.repeat(64),
+  npsso: '',
+  writeSafe: false,
 }));
 
 vi.mock('psn-api', () => ({
@@ -29,7 +31,9 @@ vi.mock('psn-api', () => ({
 }));
 
 vi.mock('./state.ts', () => ({
-  isAutoWriteSafe: false,
+  get isAutoWriteSafe() {
+    return store.writeSafe;
+  },
   npssoDeathRecord: vi.fn(),
   npssoLoad: () => Promise.resolve(store.npsso),
   refreshGrantDeathRecord: vi.fn(),
@@ -37,7 +41,15 @@ vi.mock('./state.ts', () => ({
   refreshGrantSave: vi.fn(),
 }));
 
-const { authGet } = await import('./psn.ts');
+const { authGet, sessionReset } = await import('./psn.ts');
+const { npssoDeathRecord } = await import('./state.ts');
+
+beforeEach(() => {
+  sessionReset();
+  vi.mocked(npssoDeathRecord).mockClear();
+  store.npsso = store.dead;
+  store.writeSafe = false;
+});
 
 test('a token renewed in the store reaches a warm process on its next call', async () => {
   await expect(authGet()).rejects.toThrow(NPSSO_INVALID);
@@ -46,4 +58,18 @@ test('a token renewed in the store reaches a warm process on its next call', asy
   store.npsso = store.live;
 
   await expect(authGet()).resolves.toEqual({ accessToken: 'access' });
+});
+
+test('a refused token is recorded when the process owns its store', async () => {
+  store.writeSafe = true;
+
+  await expect(authGet()).rejects.toThrow(NPSSO_INVALID);
+
+  expect(npssoDeathRecord).toHaveBeenCalledWith(store.dead);
+});
+
+test("a refused token writes no death when the store is not this process's own", async () => {
+  await expect(authGet()).rejects.toThrow(NPSSO_INVALID);
+
+  expect(npssoDeathRecord).not.toHaveBeenCalled();
 });

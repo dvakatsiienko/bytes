@@ -147,7 +147,9 @@ const sessionMint = async (): Promise<Session> => {
     // Names the token that failed, so a rejection racing a fresh paste cannot
     // write the dead one back. Stamps the death once, so the next token's age
     // can be compared against a measured lifetime rather than folklore.
-    await npssoDeathRecord(npsso);
+    // Behind `isAutoWriteSafe` like the grant deaths: a local run on production
+    // KV must not stamp its own refusal into the live lifetime history.
+    if (isAutoWriteSafe) await npssoDeathRecord(npsso);
     throw new Error(NPSSO_INVALID, { cause });
   }
 

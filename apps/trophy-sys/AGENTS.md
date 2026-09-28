@@ -137,6 +137,8 @@ along on whatever route ran. The tempting exemption is that a grant is the sessi
 that holds for the token and fails for `mintedAt`, which a local run pointed at production KV would
 stamp over with its own. So a local run verifies against the file backend or the local redis recipe
 in `.env.dev.local`, never by writing production.
+The grant deaths and the NPSSO deaths sit behind the same guard: a death is the measurement, and a
+local run must not add its own refusal to the live history.
 
 - Pasting a fresh NPSSO clears the stored grant (`refreshGrantClear` in `npssoSet`). Keeping it
   would let a paste change nothing for up to ten days, and the owner pastes exactly when something
@@ -152,7 +154,7 @@ in `.env.dev.local`, never by writing production.
   psn-api's multi-line prose, and the header renders it as a link to `NPSSO_URL`, where a fresh
   token is minted.
 - 📌 **A renewed NPSSO reaches a warm server on its next request with nothing else done** — the
-  server holds no dead token, only the store does (`psn-hot-swap.test.ts`). The latch was the
+  server holds no dead token, only the store does (`psn-auth.test.ts`). The latch was the
   client's: the layout's `profile` query kept its `NPSSO_INVALID` error across route switches.
   `queryClientCreate` now refetches every query holding that error on any success, and
   `useProfile` polls once a minute while it holds it, so an open tab heals with no reload.
