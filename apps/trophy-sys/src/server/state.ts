@@ -473,9 +473,10 @@ export const failureCounterMemory = (windowMs: number): FailureCounter => {
  * burst spread over cold starts and parallel instances outrun it.
  *
  * `INCR` is atomic, so parallel failures never lose a count. The expiry is set
- * with `NX` — only when the key has none — so hammering inside a window cannot
- * push its end out, and a key that somehow lost its expiry gets one back on the
- * next failure instead of locking forever.
+ * only by the failure that opens the window, so hammering inside it cannot push
+ * its end out, and a key found with no expiry gets one instead of locking
+ * forever. Plain `PEXPIRE`, never its `NX` flag: that needs Redis 7 semantics,
+ * and nothing here proves Upstash honours it.
  */
 const failureCounterKv = (
   client: Redis,
@@ -483,13 +484,15 @@ const failureCounterKv = (
   windowMs: number,
 ): FailureCounter => ({
   add: async () => {
-    const [count, , leftMs] = await client
+    const [count, ttl] = await client
       .pipeline()
       .incr(key)
-      .pexpire(key, windowMs, 'NX')
       .pttl(key)
-      .exec<[number, number, number]>();
-    return { count, leftMs };
+      .exec<[number, number]>();
+    if (ttl >= 0) return { count, leftMs: ttl };
+
+    await client.pexpire(key, windowMs);
+    return { count, leftMs: windowMs };
   },
   clear: async () => {
     await client.del(key);

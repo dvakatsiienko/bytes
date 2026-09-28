@@ -39,5 +39,6 @@ export default defineConfig({
         },
       },
     ],
+    restoreMocks: true,
   },
 });

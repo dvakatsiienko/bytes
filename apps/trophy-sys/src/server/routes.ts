@@ -15,6 +15,7 @@ import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, profileFetch } from './psn.ts';
 import {
+  failureCounterMemory,
   hiddenLoad,
   isStateWritable,
   npssoStatusLoad,
@@ -73,7 +74,11 @@ const UNWRITABLE = {
  * a production render error becomes visible, and nothing here earns a KV key.
  * The route is public, so every field is clipped — the body is attacker-shaped.
  */
-const clientErrorLog = (body: unknown) => {
+const clientErrorLog = async (body: unknown) => {
+  // Capped, because the route is public: a loop of posts would otherwise fill
+  // the function log. Per instance and in memory — a log is not worth KV.
+  if ((await clientErrors.add()).count > CLIENT_ERRORS_PER_MINUTE) return;
+
   const fields: Record<string, unknown> =
     typeof body === 'object' && body !== null ? { ...body } : {};
 
@@ -83,6 +88,9 @@ const clientErrorLog = (body: unknown) => {
     stack: clip(fields.stack, 4000),
   });
 };
+
+const CLIENT_ERRORS_PER_MINUTE = 20;
+const clientErrors = failureCounterMemory(60_000);
 
 const clip = (value: unknown, max: number) =>
   typeof value === 'string' ? value.slice(0, max) : null;
@@ -210,7 +218,7 @@ export const routeResolve = async (
 
   if (path === '/api/health') return ok({ ok: true, stateBackend });
   if (path === '/api/client-error' && method === 'POST') {
-    clientErrorLog(request.body);
+    await clientErrorLog(request.body);
     return ok({ ok: true });
   }
   // Read without the cookie: the charts need these, and nothing here is a

@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import { routeResolve } from './routes.ts';
 
@@ -30,4 +30,21 @@ test('an oversized report is clipped before it reaches the log', async () => {
     path: null,
     stack: 's'.repeat(4000),
   });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+test('past twenty reports a minute, the log stays quiet', async () => {
+  // A fresh window: the tests above already spent part of this one.
+  vi.useFakeTimers();
+  vi.setSystemTime(Date.now() + 120_000);
+  const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+  for (let post = 0; post < 30; post += 1)
+    // biome-ignore lint/performance/noAwaitInLoops: each post counts in order
+    await report({ message: `flood ${post}` });
+
+  expect(log).toHaveBeenCalledTimes(20);
 });

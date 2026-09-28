@@ -157,7 +157,8 @@ local run must not add its own refusal to the live history.
 - 📌 **A renewed NPSSO reaches a warm server on its next request with nothing else done** — the
   server holds no dead token, only the store does (`psn-auth.test.ts`). The latch was the
   client's: the layout's `profile` query kept its `NPSSO_INVALID` error across route switches.
-  `queryClientCreate` now refetches every query holding that error on any success, and
+  `queryClientCreate` now refetches every query holding that error when a PSN-backed query
+  (`profile`, `games`, `game`) succeeds — `/stats` and `/settings` answer with PSN down — and
   `useProfile` polls once a minute while it holds it, so an open tab heals with no reload.
 - Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
   guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
@@ -194,9 +195,9 @@ Everything else the app persists rides the same `state.ts` store, one key each:
 `trophy-sys:stats`, `trophy-sys:hidden` (`string[]`), `trophy-sys:npsso` (`string`),
 `trophy-sys:psn-grant` (a `RefreshGrant`), `trophy-sys:psn-grant-deaths` (one entry per grant PSN
 refused), `trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`),
-`trophy-sys:login-failures` (the console's login throttle: an `INCR` counter whose one-minute
-window is set with `PEXPIRE … NX`, so every instance shares it and hammering cannot stretch it; the
-file backend keeps it in memory).
+`trophy-sys:login-failures` (the console's login throttle: an `INCR` counter shared by every
+instance; the failure that opens the one-minute window sets its expiry, so hammering cannot stretch
+it, and a key found without one gets it back; the file backend keeps it in memory).
 
 📌 A **death goes under its own key, never into the live record** — the pattern the NPSSO uses
 and the grant now copies. A refusal is followed immediately by a fresh mint that overwrites the

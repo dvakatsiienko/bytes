@@ -38,10 +38,16 @@ everything the shift decided without you, and the four questions it researched. 
 
 ### 4. smaller calls
 
-- **ci**: the chromium install step in `.github/workflows/ci.yml` now also fires for trophy-sys, because the new chart-layout test runs in a real browser. one jq line; worth your eye because it is ci
-- **error reports**: a render error now posts to `POST /api/client-error`, which only logs (every field clipped). it is public, so anyone can write to the vercel log; nothing is stored. the log is `vercel logs`
-- **a dead token polls**: while psn refuses the npsso, an open tab asks once a minute (paused in a hidden tab), so a paste made anywhere heals it with no reload. that is one psn call a minute per visible tab, only while dead
-- **ignoreBuildErrors**: nothing to remove — #67 took it out of the four next apps; trophy-sys never had it. the build passes
+- **ci gate** — the chromium install step in `.github/workflows/ci.yml` now also fires for trophy-sys, because the chart-layout test runs in a real browser. one jq line
+  - options: a. keep the two-name list · b. derive the list from which packages hold a `*.browser.test.*` file
+  - ➡️ a — two packages; derive it when a third arrives
+- **error reports** — a render error posts to `POST /api/client-error`, which only logs: every field clipped, at most 20 logs a minute per instance, nothing stored. read them with `vercel logs`
+  - options: a. keep it · b. drop the server half and log to the browser console only
+  - ➡️ a — a console log never reaches you from a production tab
+- **a dead token polls** — while psn refuses the npsso, an open tab asks once a minute (paused in a hidden tab), and only a psn-backed success heals the rest, so a paste made anywhere lands with no reload. one psn call a minute per visible tab, only while dead
+  - options: a. keep 60 s · b. 5 minutes
+  - ➡️ a — it only runs while the app is already broken
+- **ignoreBuildErrors** — nothing to remove: #67 took it out of the four next apps and trophy-sys never had it. the build passes. no choice to make
 
 ## research — the choice is yours
 

@@ -46,12 +46,21 @@ export const queryClientCreate = () => {
       },
     },
     queryCache: new QueryCache({
-      onSuccess: () => client.invalidateQueries({ predicate: isNpssoDead }),
+      // Only a PSN-backed success proves the token works again: /stats and
+      // /settings answer from the store with PSN down, and healing on them
+      // spent a refused NPSSO exchange per stuck query on every such fetch.
+      onSuccess: (_data, query) => {
+        if (PSN_KEYS.has(String(query.queryKey[0])))
+          client.invalidateQueries({ predicate: isNpssoDead });
+      },
     }),
   });
 
   return client;
 };
+
+/** The queries whose answer comes from PSN itself. */
+const PSN_KEYS = new Set(['game', 'games', 'profile']);
 
 const isNpssoDead = (query: { state: { error: Error | null } }) =>
   query.state.error?.message === NPSSO_INVALID;

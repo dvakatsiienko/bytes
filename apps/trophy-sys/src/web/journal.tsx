@@ -155,7 +155,7 @@ const GameDayRow = (props: GameDayRowProps) => {
           width={32}
         />
         <Link
-          className='min-w-0 flex-1 basis-32 cursor-pointer select-text truncate py-1 text-fg-soft hover:text-orange focus-visible:outline focus-visible:outline-orange'
+          className='min-w-0 flex-1 basis-32 cursor-pointer select-text truncate py-1 text-fg-soft hover:text-orange focus-visible:outline focus-visible:outline-orange focus-visible:-outline-offset-2'
           params={{ gameId: props.gameDay.gameId }}
           to='/library/$gameId'>
           {props.gameDay.name}
