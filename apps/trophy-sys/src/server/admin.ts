@@ -5,8 +5,10 @@ import { isNonGame } from '../shared/types.ts';
 import { cached } from './cache.ts';
 import { gamesFetch, sessionReset } from './psn.ts';
 import {
+  type FailureCounter,
   hiddenLoad,
   hiddenSave,
+  loginFailuresCreate,
   npssoSave,
   refreshGrantClear,
   shownLoad,
@@ -133,45 +135,21 @@ const LOGIN_FAILURE_LIMIT = 5;
 const LOCKOUT_MS = 60_000;
 
 /**
- * The login throttle's whole state. Exported as a factory rather than a reset
- * verb so a test can hold its own gate instead of reaching into the module's.
- */
-export interface LoginGate {
-  failures: number;
-  lockedUntil: number;
-}
-
-export const loginGateCreate = (): LoginGate => ({
-  failures: 0,
-  lockedUntil: 0,
-});
-
-/**
- * One counter for the whole process, not one per IP: this deployment has
+ * One counter for the whole deployment, not one per IP: this deployment has
  * exactly one legitimate user, so a global count is the complete truth, while
  * an IP key is attacker-chosen — `x-forwarded-for` is a request header, so
  * per-IP buckets hand out a free quota reset per forged value.
  *
- * ⚠️ Best-effort, and deliberately so. On Vercel this lives in one warm
- * instance's memory: it does not survive a cold start and is not shared across
- * concurrent instances, so a spread-out burst can outrun it. The honest version
- * is a counter in the shared KV store, but `state.ts` exposes only fixed typed
- * keys, and a KV round-trip on every attempt costs more than the compare it is
- * guarding. What this buys is real but bounded — a guessing run against a warm
- * instance goes from free to minutes per five tries. It is not a distributed
- * rate limit, and should become one if `state.ts` ever grows a generic counter.
+ * It lives in KV (`loginFailuresCreate`), shared by every instance: the
+ * in-process counter it replaced reset on every cold start and was not shared
+ * across concurrent instances, so a spread-out burst could outrun it.
  */
-const loginGate = loginGateCreate();
+const loginFailures = loginFailuresCreate(LOCKOUT_MS);
 
 export type LoginResult =
   | { kind: 'locked'; retryAfterSeconds: number }
   | { kind: 'ok' }
   | { kind: 'rejected' };
-
-const locked = (until: number, now: number): LoginResult => ({
-  kind: 'locked',
-  retryAfterSeconds: Math.ceil((until - now) / 1000),
-});
 
 /**
  * The whole login decision: compare first, then throttle.
@@ -183,40 +161,34 @@ const locked = (until: number, now: number): LoginResult => ({
  * locked-out owner needs. A correct password is not a guess, so it is always
  * honoured — an attacker holding it has already won, and throttling them buys
  * nothing. What the cooldown throttles is guessing, which is all it ever did.
+ *
+ * The window is fixed from its first failure and never extended, so hammering
+ * cannot push the owner's wait out, and a slow trickle of guesses never climbs
+ * a ladder — each window starts from zero.
  */
-export const loginAttempt = (
+export const loginAttempt = async (
   config: AdminConfig,
   email: unknown,
   password: unknown,
-  gate: LoginGate = loginGate,
-): LoginResult => {
-  const now = Date.now();
-
+  failures: FailureCounter = loginFailures,
+): Promise<LoginResult> => {
   if (credentialsMatch(config, email, password)) {
-    gate.failures = 0;
-    gate.lockedUntil = 0;
+    // A store hiccup must not refuse the one password that is right.
+    await failures
+      .clear()
+      .catch((cause) => console.error('login failures not cleared', cause));
     return { kind: 'ok' };
   }
 
-  // An expired cooldown ends the window it belonged to. The cooldown is a flat
-  // minute rather than a doubling ladder: carrying failures across windows was
-  // what let a slow trickle of wrong passwords escalate the owner's own wait
-  // without bound, and resetting the count leaves the ladder unreachable.
-  if (gate.lockedUntil && gate.lockedUntil <= now) {
-    gate.failures = 0;
-    gate.lockedUntil = 0;
-  }
-
-  // Already locked: refuse without counting, so hammering cannot extend it.
-  if (gate.lockedUntil > now) return locked(gate.lockedUntil, now);
-
-  gate.failures += 1;
-  if (gate.failures < LOGIN_FAILURE_LIMIT) return { kind: 'rejected' };
+  const window = await failures.add();
+  if (window.count < LOGIN_FAILURE_LIMIT) return { kind: 'rejected' };
 
   // Answered on the failure that trips it, not the one after — being told to
   // wait is more use than a sixth "bad credentials".
-  gate.lockedUntil = now + LOCKOUT_MS;
-  return locked(gate.lockedUntil, now);
+  return {
+    kind: 'locked',
+    retryAfterSeconds: Math.max(1, Math.ceil(window.leftMs / 1000)),
+  };
 };
 
 const stringList = (value: unknown): string[] | null =>

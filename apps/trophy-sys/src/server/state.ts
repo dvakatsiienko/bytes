@@ -429,3 +429,76 @@ export const steamNamesLoad = async (): Promise<SteamNames> =>
 
 export const steamNamesSave = (names: SteamNames) =>
   storeWrite(STEAM_NAMES_KEY, STEAM_NAMES_FILE, names);
+
+/** How many failures landed in the current window, and how long it has left. */
+export interface FailureWindow {
+  count: number;
+  leftMs: number;
+}
+
+/**
+ * A fixed-window failure counter: the first failure opens a window, and every
+ * failure inside it counts. Clearing ends the window at once.
+ */
+export interface FailureCounter {
+  add: () => Promise<FailureWindow>;
+  clear: () => Promise<void>;
+}
+
+/** The file backend's counter, and a test's: one process, so memory is the truth. */
+export const failureCounterMemory = (windowMs: number): FailureCounter => {
+  let count = 0;
+  let endsAt = 0;
+
+  return {
+    add: () => {
+      const now = Date.now();
+      if (endsAt <= now) {
+        count = 0;
+        endsAt = now + windowMs;
+      }
+      count += 1;
+      return Promise.resolve({ count, leftMs: endsAt - now });
+    },
+    clear: () => {
+      count = 0;
+      endsAt = 0;
+      return Promise.resolve();
+    },
+  };
+};
+
+/**
+ * Shared by every instance, which is the point: an in-process counter let a
+ * burst spread over cold starts and parallel instances outrun it.
+ *
+ * `INCR` is atomic, so parallel failures never lose a count. The expiry is set
+ * with `NX` — only when the key has none — so hammering inside a window cannot
+ * push its end out, and a key that somehow lost its expiry gets one back on the
+ * next failure instead of locking forever.
+ */
+const failureCounterKv = (
+  client: Redis,
+  key: string,
+  windowMs: number,
+): FailureCounter => ({
+  add: async () => {
+    const [count, , leftMs] = await client
+      .pipeline()
+      .incr(key)
+      .pexpire(key, windowMs, 'NX')
+      .pttl(key)
+      .exec<[number, number, number]>();
+    return { count, leftMs };
+  },
+  clear: async () => {
+    await client.del(key);
+  },
+});
+
+const LOGIN_FAILURES_KEY = 'trophy-sys:login-failures';
+
+export const loginFailuresCreate = (windowMs: number): FailureCounter =>
+  redis
+    ? failureCounterKv(redis, LOGIN_FAILURES_KEY, windowMs)
+    : failureCounterMemory(windowMs);

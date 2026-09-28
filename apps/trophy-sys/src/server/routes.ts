@@ -102,7 +102,7 @@ export const routeResolve = async (
     if (path === '/api/admin/session') return ok({ authed });
 
     if (path === '/api/admin/login' && method === 'POST') {
-      const attempt = loginAttempt(config, body.email, body.password);
+      const attempt = await loginAttempt(config, body.email, body.password);
 
       if (attempt.kind === 'locked')
         return {

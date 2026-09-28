@@ -192,7 +192,10 @@ would let the loser's trophies resurface as "new".
 Everything else the app persists rides the same `state.ts` store, one key each:
 `trophy-sys:stats`, `trophy-sys:hidden` (`string[]`), `trophy-sys:npsso` (`string`),
 `trophy-sys:psn-grant` (a `RefreshGrant`), `trophy-sys:psn-grant-deaths` (one entry per grant PSN
-refused), `trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`).
+refused), `trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`),
+`trophy-sys:login-failures` (the console's login throttle: an `INCR` counter whose one-minute
+window is set with `PEXPIRE … NX`, so every instance shares it and hammering cannot stretch it; the
+file backend keeps it in memory).
 
 📌 A **death goes under its own key, never into the live record** — the pattern the NPSSO uses
 and the grant now copies. A refusal is followed immediately by a fresh mint that overwrites the
