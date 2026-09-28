@@ -178,18 +178,6 @@ export const toolListLLM = [
 ];
 
 // TODO delete if not used
-export const toolListCodeQuality = [
-  {
-    icon: svg.ESNextSVG,
-    name: 'ESLint',
-  },
-  {
-    icon: svg.PrettierSVG,
-    name: 'Prettier',
-  },
-];
-
-// TODO delete if not used
 export const stuff = [
   {
     area: 'core',
