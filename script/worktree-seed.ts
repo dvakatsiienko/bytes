@@ -7,8 +7,10 @@
  * lefthook cannot rewrite the shared hooks, and writes `.worktree-offset` so
  * `script/with-port.ts` moves every dev port clear of every other tree.
  *
- * ⚠️ The live PSN credentials never reach a tree: `STAND_INS` writes fakes in
- * their place. A verify run on a copied NPSSO drove PSN with dima's own token.
+ * ⚠️ Production kv never reaches a tree: `STAND_INS` blanks trophy-sys's
+ * Vercel-pulled `.env.local`. The live NPSSO and grant are still copied, so a
+ * tree's library works (dima's call, 2026-09-28, «until we find out the optimal
+ * way» — a verify run drives PSN with his own token).
  *
  * Callers: cc's EnterWorktree hook (`~/.claude/shelf/hooks/worktree-seed.sh`)
  * and a human after `camp`: `pnpm worktree:seed ../bytes-<slug>`.
@@ -67,39 +69,14 @@ function ignored(file: string): boolean {
   }
 }
 
-/** 64 characters, like a real NPSSO, and unmistakably not one. */
-const FAKE_TOKEN = 'F'.repeat(64);
-const NPSSO_LINE = /^NPSSO=.*$/m;
+const ENV_LINE = /^([A-Z0-9_]+)=.*$/gm;
 
-/** Rewrites every `KEY=value` line to `KEY=` (or to the stand-in given). */
-const envScrub =
-  (values: Record<string, string> = {}) =>
-  (text: string) =>
-    text.replace(
-      /^([A-Z0-9_]+)=.*$/gm,
-      (_line, key: string) => `${key}=${values[key] ?? ''}`,
-    );
-
-/**
- * Files written as fakes instead of copied. PSN refuses the fake token, so a
- * tree's trophy-sys shows the archive (`/api/stats`) and the console, but no
- * live library until a real NPSSO is pasted into that tree's /console.
- */
+/** Files written transformed instead of copied. */
 const STAND_INS: Record<string, (text: string) => string> = {
-  'apps/trophy-sys/.env': (text) =>
-    text.replace(NPSSO_LINE, `NPSSO=${FAKE_TOKEN}`),
-  // Vercel-pulled production credentials only: prod kv and its oidc token.
-  'apps/trophy-sys/.env.local': envScrub(),
-  'apps/trophy-sys/.trophy-npsso.json': () =>
-    JSON.stringify({ savedAt: Date.now(), token: FAKE_TOKEN }),
-  'apps/trophy-sys/.trophy-psn-grant.json': () =>
-    JSON.stringify({
-      expiresIn: 863_999,
-      mintedAt: Date.now(),
-      mintedExpiresIn: 863_999,
-      refreshedAt: Date.now(),
-      token: FAKE_TOKEN,
-    }),
+  // Vercel-pulled production credentials only: prod kv and its oidc token,
+  // every value blanked, every key kept.
+  'apps/trophy-sys/.env.local': (text) =>
+    text.replace(ENV_LINE, (_line, key: string) => `${key}=`),
 };
 
 const copied: string[] = [];
