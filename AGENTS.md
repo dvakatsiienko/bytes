@@ -20,7 +20,7 @@ versions, update the Stack column below — it drifts stale otherwise.
 | `cv`                 | Personal portfolio with tool showcase   | Next.js 16, React 19, Tailwind v4 | Production |
 | `x-com-chat`         | AI chat with customizable alien friends | Next.js 16, Convex, Jotai, Clerk  | Active Dev, 🐾 pet |
 | `space-explorer-ui`  | GraphQL client demo                     | Vite 8, Apollo Client, React      | Demo, 🐾 pet |
-| `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, SpaceX API | Demo, 🐾 pet |
+| `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, pipeworx   | Demo, 🐾 pet |
 | `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, better-auth   | WIP, 🐾 pet |
 | `sketchbook`         | Prototype platform, swappable proto slot | Vite 8, React 19, Tailwind v4, shadcn | Active Dev |
 | `atelier`            | Art studio: scenes as code, lit and baked | Vite 8, React 19.3, three.js + r3f, kit | Active Dev, local only |
