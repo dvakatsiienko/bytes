@@ -63,6 +63,16 @@
 
 <br clear="all">
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/figmentation-dark.svg"><img align="right" width="110" src="assets/avatars/figmentation-light.svg" alt="figmentation: its jar"></picture>
+
+**figmentation** — design studies: a figma file, rebuilt in code.
+
+[live](https://figmentation.vercel.app) | [source](apps/figmentation)
+
+<details><summary>peek</summary><img src="assets/apps/figmentation.webp" width="100%" alt="figmentation: the clinique study, a foundation bottle beside its product details"></details>
+
+<br clear="all">
+
 ## 🧰 libraries
 
 - [`biome-config-polished`](packages/biome-config-polished) — the lint and format rules every app extends

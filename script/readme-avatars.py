@@ -83,6 +83,18 @@ def coins(p, k):
             f'<path transform="translate(45 66) scale(.9)" d="{SPARK}" fill="#fff3c4"/>')
 
 
+def swatches(p, k):
+    paper = '#fbf9fe' if k == 'light' else '#e6e2d4'
+    fan = ''
+    for angle, chips in ((-38, ('#fb4934', '#cc241d', '#9d0006')), (-13, ('#fabd2f', '#d79921', '#b57614')),
+                         (12, ('#8ec07c', '#689d6a', '#427b58')), (37, ('#83a598', '#458588', '#076678'))):
+        bands = ''.join(f'<rect x="55" y="{34 + n * 14}" width="10" height="12" rx="1" fill="{c}"/>' for n, c in enumerate(chips))
+        fan += (f'<g transform="rotate({angle} 60 88)"><g filter="url(#{p}paper)"><rect x="53" y="30" width="14" height="62" rx="3" fill="{paper}"/></g>'
+                f'{bands}<path d="M56 80h8" stroke="#8a7a68" stroke-width="1.4" stroke-linecap="round"/></g>')
+    return (f'<ellipse cx="60" cy="101" rx="30" ry="3.5" fill="#000" opacity=".18"/>{fan}'
+            f'<circle cx="60" cy="88" r="4.5" fill="url(#{p}brass)"/><circle cx="59" cy="87" r="1.4" fill="#fff" opacity=".8"/>')
+
+
 # the last pair is each drawing's bbox centre in its own 120-unit space, shadow left out, measured in a browser;
 # a redrawn prop is re-measured, or it drifts off the glass centre
 AVATARS = dict(
@@ -91,6 +103,7 @@ AVATARS = dict(
     space_explorer=('space explorer: a glass jar holding a paper rocket, blue label', rocket, '#83a598', '#34457a', (60, 62)),
     cv=('cv: a glass jar holding a pinned paper id card, paper label', card, '#efe2c4', '#8a6a3a', (60, 57.1)),
     financial=('financial: a glass jar holding brass coins and a ledger sheet, orange label', coins, '#fe8019', '#9c4430', (66.3, 64.3)),
+    figmentation=('figmentation: a glass jar holding a fan of paint swatches, purple label', swatches, '#d3869b', '#8f3f71', (59.6, 62.6)),
 )
 SCALE = .56
 GLASS_CENTRE = (60, 59.5)  # the clear glass between the lid (y 31) and the label (y 88)
