@@ -709,6 +709,9 @@ importers:
       oxc-transform-react:
         specifier: 0.150.0
         version: 0.150.0
+      shadcn:
+        specifier: 4.21.0
+        version: 4.21.0(supports-color@7.2.0)(typescript@7.0.2)
       undici:
         specifier: 8.10.2
         version: 8.10.2
