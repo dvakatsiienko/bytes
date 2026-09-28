@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
 
-import type { ArchivedTrophy, Game } from '../shared/types.ts';
+import type { ArchivedTrophy, Game, TrophyGrade } from '../shared/types.ts';
 import { GRADE_COLOR, GRADE_MARK } from './helpers/format.ts';
 import {
   DAY_ROLLOVER_HOURS,
+  GRADE_ORDER,
   countTotal,
   gameLookup,
   gamingDayKey,
@@ -42,15 +43,29 @@ export const Journal = () => {
       return <GameDayRow gameDay={gameDay} key={gameDay.id} />;
     });
 
+    const tallyListJSX = gradeTally(day).map((tally) => {
+      return (
+        <span className={GRADE_COLOR[tally.grade]} key={tally.grade}>
+          {GRADE_MARK[tally.grade]}
+          <span className='ml-0.5 text-mute'>{tally.count}</span>
+        </span>
+      );
+    });
+
     return (
       <section key={day.date}>
-        <header className='sticky top-0 z-10 flex items-baseline gap-3 border-line border-y bg-bg-lift px-4 py-1.5 text-[12px]'>
+        {/* A rule with the day set into it, the way a panel title sits in its
+            border: the terminal's own separator, not a filled band. */}
+        <header className='sticky top-0 z-10 flex items-center gap-3 bg-[color-mix(in_srgb,var(--color-bg-soft)_70%,var(--color-bg))] px-4 pt-3 pb-1.5 text-[12px] tabular-nums'>
           {/* Printed, not parsed. `date` is already a local gaming-day key, and
               sending it back through a Date would read it as UTC midnight. */}
           <span className='text-orange tracking-[0.15em]'>
             {day.date.replace(/-/g, '.')}
           </span>
-          <span className='text-mute'>
+          <span className='text-dim'>{weekdayOf(day.date)}</span>
+          <span aria-hidden='true' className='h-px min-w-4 flex-1 bg-line' />
+          <span className='flex shrink-0 gap-2'>{tallyListJSX}</span>
+          <span className='shrink-0 whitespace-nowrap text-mute'>
             {day.count} {day.count === 1 ? 'trophy' : 'trophies'}
           </span>
         </header>
@@ -128,7 +143,9 @@ const GameDayRow = (props: GameDayRowProps) => {
 
   return (
     <li className='border-line/60 border-b px-4 py-2 last:border-b-0'>
-      <div className='flex items-center gap-3'>
+      {/* Wraps: at 390 the progress block took the whole row and squeezed the
+          title to nothing, so it drops under the title instead. */}
+      <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
         <img
           alt=''
           className='size-8 shrink-0 border border-line bg-bg-soft object-contain'
@@ -138,7 +155,7 @@ const GameDayRow = (props: GameDayRowProps) => {
           width={32}
         />
         <Link
-          className='min-w-0 flex-1 cursor-pointer select-text truncate py-1 text-fg-soft hover:text-orange focus-visible:outline focus-visible:outline-orange'
+          className='min-w-0 flex-1 basis-32 cursor-pointer select-text truncate py-1 text-fg-soft hover:text-orange focus-visible:outline focus-visible:outline-orange focus-visible:-outline-offset-2'
           params={{ gameId: props.gameDay.gameId }}
           to='/library/$gameId'>
           {props.gameDay.name}
@@ -171,7 +188,12 @@ const GameDayShare = (props: GameDayShareProps) => {
     (props.gameDay.before + props.gameDay.count) / props.gameDay.defined;
 
   return (
-    <span className='flex shrink-0 items-center gap-2 text-[12px] tabular-nums'>
+    <span className='ml-auto flex shrink-0 items-center gap-3 text-[12px] tabular-nums'>
+      {/* text first, bar last: the bar holds the row's right edge, so every
+          bar in a day lines up with the one above it */}
+      <span className='text-right text-mute'>
+        {Math.round(from * 100)}% → {Math.round(to * 100)}% of trophies
+      </span>
       <span
         aria-hidden
         className='relative h-1.5 w-24 overflow-hidden bg-line/40'>
@@ -186,10 +208,6 @@ const GameDayShare = (props: GameDayShareProps) => {
           style={{ left: `${from * 100}%`, width: `${(to - from) * 100}%` }}
         />
       </span>
-      {/* fixed width keeps the bars aligned down the day */}
-      <span className='w-40 text-right text-mute'>
-        {Math.round(from * 100)}% → {Math.round(to * 100)}% of trophies
-      </span>
     </span>
   );
 };
@@ -203,6 +221,27 @@ const Note = ({ children }: { children: string }) => (
 );
 
 /* Helpers */
+/** The house grade order, rarest last, and only the grades the day holds. */
+const gradeTally = (day: LogDay) => {
+  const counts = new Map<TrophyGrade, number>();
+  for (const gameDay of day.games)
+    for (const trophy of gameDay.trophies)
+      counts.set(trophy.grade, (counts.get(trophy.grade) ?? 0) + 1);
+
+  return GRADE_ORDER.flatMap((grade) => {
+    const count = counts.get(grade);
+    return count ? [{ count, grade }] : [];
+  });
+};
+
+/** `sat` for `2026-09-26`, read as a calendar date so no time zone can shift it. */
+const weekdayOf = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(Date.UTC(year ?? 0, (month ?? 1) - 1, day ?? 1))
+    .toLocaleDateString('en', { timeZone: 'UTC', weekday: 'short' })
+    .toLowerCase();
+};
+
 /** How many trophies the log holds. No pagination — this is the whole list. */
 const LIMIT = 200;
 

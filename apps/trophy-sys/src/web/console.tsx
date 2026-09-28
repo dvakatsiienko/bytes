@@ -287,6 +287,7 @@ const TokenReadout = () => {
   return (
     <div className='flex flex-col gap-2'>
       {readout.dead ? <Note tone='error'>{readout.dead}</Note> : null}
+      {readout.warning ? <Note tone='warn'>{readout.warning}</Note> : null}
 
       <dl className='flex flex-col divide-y divide-line/60 border border-line'>
         {rowListJSX}
@@ -710,11 +711,13 @@ const Note = (props: NoteProps) => {
 const NOTE_TONE = {
   error: 'border-red/40 bg-red/5 text-red',
   ok: 'border-green/40 bg-green/5 text-green',
+  warn: 'border-yellow/40 bg-yellow/5 text-yellow',
 } as const satisfies Record<NoteTone, string>;
 
 const NOTE_GLYPH = {
   error: '[!]',
   ok: '[✓]',
+  warn: '[~]',
 } as const satisfies Record<NoteTone, string>;
 
 /* Helpers */
@@ -817,7 +820,7 @@ const FILTER_PRESETS = [
 
 type GameSort = 'hidden' | 'plain';
 
-type NoteTone = 'error' | 'ok';
+type NoteTone = 'error' | 'ok' | 'warn';
 
 interface AdminHeaderProps {
   authed: boolean;

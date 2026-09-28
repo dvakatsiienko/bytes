@@ -15,6 +15,7 @@ import { cacheClear, cached } from './cache.ts';
 import { newsFetch } from './news.ts';
 import { gameDetailFetch, profileFetch } from './psn.ts';
 import {
+  failureCounterMemory,
   hiddenLoad,
   isStateWritable,
   npssoStatusLoad,
@@ -68,6 +69,32 @@ const UNWRITABLE = {
   status: 501,
 };
 
+/**
+ * The error boundary's report. Logged, never stored: the function log is where
+ * a production render error becomes visible, and nothing here earns a KV key.
+ * The route is public, so every field is clipped — the body is attacker-shaped.
+ */
+const clientErrorLog = async (body: unknown) => {
+  // Capped, because the route is public: a loop of posts would otherwise fill
+  // the function log. Per instance and in memory — a log is not worth KV.
+  if ((await clientErrors.add()).count > CLIENT_ERRORS_PER_MINUTE) return;
+
+  const fields: Record<string, unknown> =
+    typeof body === 'object' && body !== null ? { ...body } : {};
+
+  console.error('client render error', {
+    message: clip(fields.message, 500),
+    path: clip(fields.path, 200),
+    stack: clip(fields.stack, 4000),
+  });
+};
+
+const CLIENT_ERRORS_PER_MINUTE = 20;
+const clientErrors = failureCounterMemory(60_000);
+
+const clip = (value: unknown, max: number) =>
+  typeof value === 'string' ? value.slice(0, max) : null;
+
 /** Null when the admin is unconfigured — never a reason to grant access. */
 const adminAuthed = (request: RouteRequest) => {
   const config = adminConfig();
@@ -102,7 +129,7 @@ export const routeResolve = async (
     if (path === '/api/admin/session') return ok({ authed });
 
     if (path === '/api/admin/login' && method === 'POST') {
-      const attempt = loginAttempt(config, body.email, body.password);
+      const attempt = await loginAttempt(config, body.email, body.password);
 
       if (attempt.kind === 'locked')
         return {
@@ -190,6 +217,10 @@ export const routeResolve = async (
   }
 
   if (path === '/api/health') return ok({ ok: true, stateBackend });
+  if (path === '/api/client-error' && method === 'POST') {
+    await clientErrorLog(request.body);
+    return ok({ ok: true });
+  }
   // Read without the cookie: the charts need these, and nothing here is a
   // secret — the write side is what the admin session guards.
   if (path === '/api/settings')

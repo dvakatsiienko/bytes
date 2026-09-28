@@ -1,18 +1,72 @@
 import {
-  type QueryClient,
+  QueryCache,
+  QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 
-import type {
-  Game,
-  GameDetail,
-  NpssoStatus,
-  Profile,
-  Settings,
-  TrophyArchive,
+import {
+  type Game,
+  type GameDetail,
+  NPSSO_INVALID,
+  type NpssoStatus,
+  type Profile,
+  type Settings,
+  type TrophyArchive,
 } from '../../shared/types.ts';
+
+/**
+ * A renewed NPSSO has to reach a tab that stayed open through the dead one.
+ * The paste may happen anywhere — another tab, the phone — so this tab hears
+ * about it only from its own next request. Two things make that request happen
+ * and make it count:
+ *
+ * - a PSN-backed success heals every query still holding the dead-token error. Without
+ *   it the header kept «PSN sign-in expired» after /campaign had already
+ *   refetched the library fine: the profile query sits in the always-mounted
+ *   layout, so a route switch never refetched it (reproduced 2026-09-28).
+ * - `useProfile` polls once a minute while the token is dead, so an idle tab
+ *   recovers with no click at all.
+ *
+ * staleTime is well under the API's 60s memo so returning to the tab actually
+ * refetches; inside that window it answers from our own cache, never PSN.
+ * retry is deliberately low: the server cache stores successes only, so every
+ * retry replays the full PSN scan against a rate-limited API.
+ */
+export const queryClientCreate = () => {
+  const client: QueryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: true,
+        // A dead token is not a blip: retrying it only spends a second PSN call.
+        retry: (failures, error) =>
+          failures < 1 && error.message !== NPSSO_INVALID,
+        staleTime: 10_000,
+      },
+    },
+    queryCache: new QueryCache({
+      // Only a PSN-backed success proves the token works again: /stats and
+      // /settings answer from the store with PSN down, and healing on them
+      // spent a refused NPSSO exchange per stuck query on every such fetch.
+      onSuccess: (_data, query) => {
+        if (PSN_KEYS.has(String(query.queryKey[0])))
+          client.invalidateQueries({ predicate: isNpssoDead });
+      },
+    }),
+  });
+
+  return client;
+};
+
+/** The queries whose answer comes from PSN itself. */
+const PSN_KEYS = new Set(['game', 'games', 'profile']);
+
+const isNpssoDead = (query: { state: { error: Error | null } }) =>
+  query.state.error?.message === NPSSO_INVALID;
+
+/** One PSN call a minute while the token is dead; paused in a hidden tab. */
+const DEAD_POLL_MS = 60_000;
 
 /**
  * Read as text first, parse second. Our own errors answer in JSON, but a
@@ -68,6 +122,7 @@ export const useProfile = () =>
   useQuery({
     queryFn: () => apiGet<Profile>('/profile'),
     queryKey: ['profile'],
+    refetchInterval: (query) => (isNpssoDead(query) ? DEAD_POLL_MS : false),
   });
 
 export const useGames = () =>

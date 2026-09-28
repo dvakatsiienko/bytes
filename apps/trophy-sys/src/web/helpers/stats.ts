@@ -1,6 +1,7 @@
 import type {
   ArchivedTrophy,
   Game,
+  TrophyArchive,
   TrophyCounts,
   TrophyGrade,
 } from '../../shared/types.ts';
@@ -13,6 +14,25 @@ export const GRADE_ORDER = [
   'gold',
   'platinum',
 ] as const satisfies readonly TrophyGrade[];
+/**
+ * The title of the newest trophy, when it popped within a week of the
+ * archive's last sync; null when nothing is that recent.
+ *
+ * Measured against `syncedAt`, never the clock: «now playing» means as of the
+ * last sync, so the answer moves only when the archive does, and the same
+ * archive always names the same title. A stale archive therefore still names
+ * one — the daily cron keeps `syncedAt` within a day of today.
+ */
+export const nowPlayingId = (archive: TrophyArchive | undefined) => {
+  const newest = archive?.trophies.at(-1);
+  if (!(newest && archive?.syncedAt)) return null;
+
+  const age = Date.parse(archive.syncedAt) - Date.parse(newest.at);
+  return age <= NOW_PLAYING_DAYS * 86_400_000 ? newest.gameId : null;
+};
+
+const NOW_PLAYING_DAYS = 7;
+
 export const gameLookup = (games: Game[]) =>
   new Map(games.map((game) => [game.id, game]));
 /**
