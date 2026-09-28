@@ -18,8 +18,10 @@ export const GRADE_ORDER = [
  * The title of the newest trophy, when it popped within a week of the
  * archive's last sync; null when nothing is that recent.
  *
- * Measured against `syncedAt`, never the clock: the archive is a snapshot, and
- * a week-old sync must not report a game as current because today moved on.
+ * Measured against `syncedAt`, never the clock: «now playing» means as of the
+ * last sync, so the answer moves only when the archive does, and the same
+ * archive always names the same title. A stale archive therefore still names
+ * one — the daily cron keeps `syncedAt` within a day of today.
  */
 export const nowPlayingId = (archive: TrophyArchive | undefined) => {
   const newest = archive?.trophies.at(-1);

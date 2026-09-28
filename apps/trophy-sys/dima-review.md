@@ -16,7 +16,7 @@ everything the shift decided without you, and the four questions it researched. 
 
 ### 2. «now playing» ([BYT-108](https://linear.app/x-com/issue/BYT-108))
 
-- the rule: the title of the newest trophy, when it popped within **7 days** of the archive's last sync (the sync, not the clock, so an old archive never claims a game is current)
+- the rule: the title of the newest trophy, when it popped within **7 days** of the archive's last sync (the sync, not the clock: «as of the last sync», so the same archive always names the same title; the daily cron keeps the sync within a day of today)
 - where it shows:
   - `▶ <name>` in the accent colour on «unfinished» and «time to platinum»
   - a dashed ring around its effort mark
