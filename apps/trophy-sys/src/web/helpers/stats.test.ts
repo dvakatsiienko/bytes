@@ -107,3 +107,12 @@ test('nothing is now playing when the newest trophy is over a week older than th
 
   expect(nowPlayingId(archiveAt('2026-09-28T12:00:00Z', newest))).toBe(null);
 });
+
+test('now playing is measured against the sync, never the clock', () => {
+  // Years before today: a clock-based rule would call this long finished.
+  const newest = trophy('2020-01-05T20:00:00Z', 'gold');
+
+  expect(nowPlayingId(archiveAt('2020-01-08T12:00:00Z', newest))).toBe(
+    'NPWR00000_00',
+  );
+});
