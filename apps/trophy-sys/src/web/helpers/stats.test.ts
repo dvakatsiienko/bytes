@@ -1,7 +1,11 @@
 import { expect, test } from 'vitest';
 
-import type { ArchivedTrophy, TrophyGrade } from '../../shared/types.ts';
-import { gamingDayKey, trophyOrder } from './stats.ts';
+import type {
+  ArchivedTrophy,
+  TrophyArchive,
+  TrophyGrade,
+} from '../../shared/types.ts';
+import { gamingDayKey, nowPlayingId, trophyOrder } from './stats.ts';
 
 const zoneUse = (zone: string) => {
   process.env.TZ = zone;
@@ -73,4 +77,33 @@ test('trophies tied on instant and grade keep the order they arrived in', () => 
   expect(
     [first, second].sort(trophyOrder).map((row) => row.name),
   ).toStrictEqual(['first', 'second']);
+});
+
+const archiveAt = (
+  syncedAt: string,
+  newest: ArchivedTrophy,
+): TrophyArchive => ({
+  failed: [],
+  games: 2,
+  remaining: [],
+  syncedAt,
+  trophies: [
+    { ...trophy('2026-01-01T20:00:00Z', 'bronze'), gameId: 'NPWR11111_00' },
+    newest,
+  ],
+  version: 2,
+});
+
+test('the newest trophy names the title now playing, within a week of the sync', () => {
+  const newest = trophy('2026-09-21T23:00:00Z', 'gold');
+
+  expect(nowPlayingId(archiveAt('2026-09-28T12:00:00Z', newest))).toBe(
+    'NPWR00000_00',
+  );
+});
+
+test('nothing is now playing when the newest trophy is over a week older than the sync', () => {
+  const newest = trophy('2026-09-20T23:00:00Z', 'gold');
+
+  expect(nowPlayingId(archiveAt('2026-09-28T12:00:00Z', newest))).toBe(null);
 });

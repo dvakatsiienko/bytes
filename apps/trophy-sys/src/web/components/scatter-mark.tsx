@@ -32,6 +32,17 @@ export const ScatterMark = (props: ScatterMarkProps) => {
 
   return (
     <g transform={`translate(${props.cx} ${props.cy})`}>
+      {/* «now playing»: a dashed ring outside the mark, so the state is a
+          shape and survives the colour being removed */}
+      {props.isNowPlaying ? (
+        <circle
+          fill='none'
+          r={props.radius + 4}
+          stroke={CHART_INK.ring}
+          strokeDasharray='2 2'
+          strokeWidth={1.5}
+        />
+      ) : null}
       <motion.g
         animate={{ opacity: 1, scale: props.isActive ? 1.45 : 1 }}
         initial={{ opacity: 0, scale: 1 }}
@@ -55,5 +66,6 @@ interface ScatterMarkProps {
   delay: number;
   hasPlatinum: boolean;
   isActive: boolean;
+  isNowPlaying: boolean;
   radius: number;
 }

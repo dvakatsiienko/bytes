@@ -28,6 +28,7 @@ export const EffortScatter = (props: EffortScatterProps) => (
       {(size) =>
         size.width > 0 ? (
           <Plot
+            accentId={props.accentId}
             height={size.height}
             onSelect={props.onSelect}
             points={props.points}
@@ -76,6 +77,7 @@ const Plot = (props: PlotProps) => {
         delay={index * 0.008}
         hasPlatinum={point.hasPlatinum}
         isActive={point.gameId === activeId}
+        isNowPlaying={point.gameId === props.accentId}
         key={point.gameId}
         radius={markRadius(point.trophies, peak)}
       />
@@ -305,6 +307,8 @@ export interface EffortPoint {
 }
 
 interface EffortScatterProps {
+  /** The title marked «now playing», if any. */
+  accentId: string | null;
   onSelect: (gameId: string) => void;
   points: EffortPoint[];
 }

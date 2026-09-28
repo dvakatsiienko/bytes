@@ -4,6 +4,7 @@ import type { ArchivedTrophy, Game, TrophyGrade } from '../shared/types.ts';
 import { GRADE_COLOR, GRADE_MARK } from './helpers/format.ts';
 import {
   DAY_ROLLOVER_HOURS,
+  GRADE_ORDER,
   countTotal,
   gameLookup,
   gamingDayKey,
@@ -220,7 +221,7 @@ const Note = ({ children }: { children: string }) => (
 );
 
 /* Helpers */
-/** Rarest grade first, and only the grades the day actually holds. */
+/** The house grade order, rarest last, and only the grades the day holds. */
 const gradeTally = (day: LogDay) => {
   const counts = new Map<TrophyGrade, number>();
   for (const gameDay of day.games)
@@ -232,8 +233,6 @@ const gradeTally = (day: LogDay) => {
     return count ? [{ count, grade }] : [];
   });
 };
-
-const GRADE_ORDER: TrophyGrade[] = ['platinum', 'gold', 'silver', 'bronze'];
 
 /** `sat` for `2026-09-26`, read as a calendar date so no time zone can shift it. */
 const weekdayOf = (date: string) => {
