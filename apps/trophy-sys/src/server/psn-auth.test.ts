@@ -120,6 +120,15 @@ test('a grant with more than three days left is refreshed and the npsso is not s
   expect(exchangeNpssoForAccessCode).not.toHaveBeenCalled();
 });
 
+test('a refresh that reports no expiry is not read as zero days left', async () => {
+  grantStore(1, 9);
+  store.refreshLeft = Number.NaN;
+  store.npsso = store.live;
+
+  await expect(authGet()).resolves.toEqual({ accessToken: 'refreshed' });
+  expect(exchangeNpssoForAccessCode).not.toHaveBeenCalled();
+});
+
 test('a grant with three days left is re-minted early from a live npsso', async () => {
   grantStore(7, 3);
   store.npsso = store.live;

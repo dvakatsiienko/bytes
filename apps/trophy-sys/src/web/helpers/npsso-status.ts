@@ -94,7 +94,7 @@ const deadBuild = (status: NpssoStatus) => {
   const refused = `psn refused this token on ${dateFormat(new Date(status.diedAt).toISOString())}`;
   const read = grantRead(status.refresh);
 
-  if (!read || read.leftMs <= 0)
+  if (!read || read.leftMs <= 0 || status.refresh.isRefused)
     return {
       text: `${refused} — the app stays down until a new one is pasted.`,
       tone: 'error',

@@ -393,6 +393,7 @@ const grantStatusLoad = async (): Promise<GrantStatus> => {
 
   return {
     expiresIn: grant?.expiresIn ?? 0,
+    isRefused: deaths.some((death) => death.token === grant?.token),
     // A grant minted before this was measured has no start, so its span is not
     // a lifetime — same rule the NPSSO lifetimes follow.
     lifetimes: deaths

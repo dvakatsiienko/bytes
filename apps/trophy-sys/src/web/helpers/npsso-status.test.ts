@@ -14,6 +14,7 @@ const DAY_MS = 86_400_000;
 
 const GRANT_NONE: GrantStatus = {
   expiresIn: 0,
+  isRefused: false,
   lifetimes: [],
   mintedAt: null,
   refreshedAt: null,
@@ -322,6 +323,14 @@ test('a dead token with a live grant says how long the app stays up', () => {
     text: expect.stringContaining('the grant keeps the app up for 2 days more'),
     tone: 'warn',
   });
+});
+
+test('a dead token beside a grant psn has refused says the app is down', () => {
+  const status = grantLeft(2);
+  status.diedAt = Date.now();
+  status.refresh.isRefused = true;
+
+  expect(readoutBuild(status).dead?.tone).toBe('error');
 });
 
 test('a dead token with no grant left says the app is down', () => {

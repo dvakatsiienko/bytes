@@ -219,7 +219,10 @@ const sessionRefreshOrMint = async (): Promise<Session> => {
  * until the old grant ends: at most ~72 extra PSN calls, each one refused.
  */
 const sessionRenewEarly = async (refreshed: Session): Promise<Session> => {
-  if (refreshed.grant.expiresIn * 1000 > GRANT_RENEW_MS) return refreshed;
+  const leftMs = refreshed.grant.expiresIn * 1000;
+  // 0 is `sessionBuild`'s stand-in for an expiry PSN did not report — unknown,
+  // not ending. Read as ending, every access-token expiry would spend the NPSSO.
+  if (leftMs === 0 || leftMs > GRANT_RENEW_MS) return refreshed;
 
   try {
     return await sessionMint();
