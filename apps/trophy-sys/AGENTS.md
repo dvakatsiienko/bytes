@@ -118,6 +118,12 @@ and the number **counts down** — 863999 → 863830 while the grant aged 172s. 
 *before* the NPSSO's observed ~25 days, and this path does not make the token renew itself; it only
 stops every cold start from spending one.
 
+📌 **At ≤ 3 days left, `sessionRenewEarly` re-mints the grant from the NPSSO while the old one still
+works.** A live NPSSO gets a fresh ten-day grant. A dead one is recorded as a death and the refreshed
+old session answers, so /console shows the dead token as a yellow note («the grant keeps the app up
+for N days») instead of the app going down when the grant ends. Every failure there falls back to the
+refreshed session. `psn-auth.test.ts` holds both branches.
+
 ⚠️ **The panel prints the grant's age and its remaining days as two separate numbers, and that
 separation is the instrument — never fold them into one.** A window derived from the live
 `expiresIn` is constant by construction and answers nothing: under a countdown

@@ -286,8 +286,9 @@ const TokenReadout = () => {
 
   return (
     <div className='flex flex-col gap-2'>
-      {readout.dead ? <Note tone='error'>{readout.dead}</Note> : null}
-      {readout.warning ? <Note tone='warn'>{readout.warning}</Note> : null}
+      {readout.dead ? (
+        <Note tone={readout.dead.tone}>{readout.dead.text}</Note>
+      ) : null}
 
       <dl className='flex flex-col divide-y divide-line/60 border border-line'>
         {rowListJSX}

@@ -313,6 +313,12 @@ export const SETTINGS_DEFAULT: Settings = { effortHideUntouched: true };
 export interface GrantStatus {
   /** How much of the grant PSN said was left at `refreshedAt`, in seconds. */
   expiresIn: number;
+  /**
+   * PSN has already refused the stored grant. Its record stays until a mint
+   * replaces it, still claiming days left — so without this flag a dead NPSSO
+   * beside it would read as «the grant keeps the app up».
+   */
+  isRefused: boolean;
   /** Measured lifetimes in ms, oldest first — one per grant PSN has refused. */
   lifetimes: number[];
   /** When an NPSSO bought the live grant, or null when none is stored. */

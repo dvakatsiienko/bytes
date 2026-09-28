@@ -80,32 +80,33 @@ export const readoutBuild = (status: NpssoStatus) => {
   const grantNote = grantNoteBuild(status.refresh);
   if (grantNote) notes.push(grantNote);
 
-  const dead =
-    status.diedAt === null
-      ? null
-      : `psn refused this token on ${dateFormat(new Date(status.diedAt).toISOString())} — the app stays down until a new one is pasted.`;
-
-  return { dead, notes, rows, warning: grantWarningBuild(status) };
+  return { dead: deadBuild(status), notes, rows };
 };
 
 /**
- * Said while the grant has three days or less. When it ends, the next PSN call
- * signs in again with the stored NPSSO — and that is the first moment a token
- * that died quietly (a logout anywhere on playstation web kills it) gets found
- * out. Three days is the room to paste a fresh one before that moment.
- *
- * 📌 A healthy NPSSO survives the grant's end on its own, so this also shows on
- * a token that is fine: the grant is ten days, so roughly three days in ten.
+ * The server re-mints the grant from the NPSSO once it has three days left, so a
+ * dead token is usually found while the old grant still works — and then the
+ * app is up, and the note says for how long.
  */
-const grantWarningBuild = (status: NpssoStatus) => {
+const deadBuild = (status: NpssoStatus) => {
+  if (status.diedAt === null) return null;
+
+  const refused = `psn refused this token on ${dateFormat(new Date(status.diedAt).toISOString())}`;
   const read = grantRead(status.refresh);
-  if (status.diedAt !== null || !read) return null;
-  if (read.leftMs <= 0 || read.leftMs > GRANT_WARN_MS) return null;
+
+  if (!read || read.leftMs <= 0 || status.refresh.isRefused)
+    return {
+      text: `${refused} — the app stays down until a new one is pasted.`,
+      tone: 'error',
+    } as const;
 
   const left =
     read.leftMs < DAY_MS ? 'under a day' : dayLabel(daysOf(read.leftMs));
 
-  return `the grant ends in ${left}. then the app signs in with this npsso again, and if it has died by then the app goes down — a fresh paste now is the safe move.`;
+  return {
+    text: `${refused}. the grant keeps the app up for ${left} more — paste a fresh one before then.`,
+    tone: 'warn',
+  } as const;
 };
 
 /**
@@ -188,7 +189,6 @@ const grantNoteBuild = (grant: GrantStatus) => {
 };
 
 const DAY_MS = 86_400_000;
-const GRANT_WARN_MS = 3 * DAY_MS;
 
 const daysSince = (epoch: number) =>
   Math.max(0, Math.floor((Date.now() - epoch) / DAY_MS));
