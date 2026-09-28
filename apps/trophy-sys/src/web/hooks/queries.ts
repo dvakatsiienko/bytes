@@ -22,7 +22,7 @@ import {
  * about it only from its own next request. Two things make that request happen
  * and make it count:
  *
- * - any success heals every query still holding the dead-token error. Without
+ * - a PSN-backed success heals every query still holding the dead-token error. Without
  *   it the header kept «PSN sign-in expired» after /campaign had already
  *   refetched the library fine: the profile query sits in the always-mounted
  *   layout, so a route switch never refetched it (reproduced 2026-09-28).
