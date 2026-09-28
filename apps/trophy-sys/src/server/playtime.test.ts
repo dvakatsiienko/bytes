@@ -22,7 +22,14 @@ vi.mock('psn-api', () => ({
     }),
 }));
 
-const { playtimeFetch, playtimeMatch } = await import('./playtime.ts');
+const { nameKey, nameKeyLoose, playtimeFetch, playtimeMatch } = await import(
+  './playtime.ts'
+);
+
+test('a title named like a built-in object key is not aliased to it', () => {
+  expect(nameKey('Constructor')).toBe('constructor');
+  expect(nameKeyLoose('Constructor')).toBe('constructor');
+});
 
 test('a bundle in the alias table adds its hours to the trophy row it contains', async () => {
   const played = await playtimeFetch();

@@ -73,7 +73,7 @@ const Plot = (props: PlotProps) => {
     return (
       <ScatterMark
         cx={xScale(point.hours)}
-        cy={yScale(point.progress)}
+        cy={yScale(point.completion)}
         delay={index * 0.008}
         hasPlatinum={point.hasPlatinum}
         isActive={point.gameId === activeId}
@@ -105,7 +105,7 @@ const Plot = (props: PlotProps) => {
 
     for (const point of props.points) {
       const dx = xScale(point.hours) - pointerX;
-      const dy = yScale(point.progress) - pointerY;
+      const dy = yScale(point.completion) - pointerY;
       const distance = Math.hypot(dx, dy);
       const reach = markRadius(point.trophies, peak) + TOLERANCE;
 
@@ -191,7 +191,7 @@ const Plot = (props: PlotProps) => {
               tooltip.showTooltip({
                 tooltipData: point,
                 tooltipLeft: MARGIN.left + xScale(point.hours),
-                tooltipTop: MARGIN.top + yScale(point.progress),
+                tooltipTop: MARGIN.top + yScale(point.completion),
               });
             }}
             // The catcher spans the whole plot but only acts over a mark, so
@@ -235,6 +235,7 @@ export const effortPoints = (
       const hours = (game.playSeconds ?? 0) / 3600;
 
       return {
+        completion: countShare(game),
         earned,
         gameId: game.id,
         hasPlatinum: game.earned.platinum > 0,
@@ -242,7 +243,6 @@ export const effortPoints = (
         iconUrl: game.iconUrl,
         name: game.name,
         perTrophy: earned ? hours / earned : 0,
-        progress: countShare(game),
         trophies: countTotal(game.defined),
       };
     })
@@ -284,7 +284,7 @@ const markRadius = (trophies: number, peak: number) =>
 const effortRows = (point: EffortPoint): TooltipRow[] => [
   { label: 'played', value: hoursFormat(point.hours) },
   { label: 'trophies', value: `${point.earned}/${point.trophies}` },
-  { label: 'progress', value: `${point.progress}%` },
+  { label: 'completion', value: `${point.completion}%` },
   {
     label: 'per trophy',
     value: point.perTrophy ? hoursFormat(point.perTrophy) : '—',
@@ -293,6 +293,8 @@ const effortRows = (point: EffortPoint): TooltipRow[] => [
 
 /* Types */
 export interface EffortPoint {
+  /** Trophies earned of trophies defined — see `countShare`. */
+  completion: number;
   earned: number;
   gameId: string;
   hasPlatinum: boolean;
@@ -301,7 +303,6 @@ export interface EffortPoint {
   name: string;
   /** Hours spent per trophy actually earned — the grind rate. */
   perTrophy: number;
-  progress: number;
   /** Trophies the title defines, which is what the dot size encodes. */
   trophies: number;
 }

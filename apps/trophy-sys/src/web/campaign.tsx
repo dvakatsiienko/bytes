@@ -542,7 +542,11 @@ const EFFORT_COLUMNS: ChartColumn<EffortPoint>[] = [
     head: 'trophies',
     isNumeric: true,
   },
-  { cell: (point) => `${point.progress}%`, head: 'progress', isNumeric: true },
+  {
+    cell: (point) => `${point.completion}%`,
+    head: 'completion',
+    isNumeric: true,
+  },
   {
     cell: (point) => (point.perTrophy ? hoursFormat(point.perTrophy) : '—'),
     head: 'per trophy',

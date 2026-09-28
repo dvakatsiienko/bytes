@@ -25,7 +25,7 @@ const platformKey = (category: string) =>
 // characters to one side of the join and cost 8 matches when measured.
 export const nameKey = (name: string) => {
   const key = name.toLowerCase().replace(NON_ALNUM, '');
-  return ALIASES[key] ?? key;
+  return ALIASES.get(key) ?? key;
 };
 
 /**
@@ -35,11 +35,14 @@ export const nameKey = (name: string) => {
  * and merge the way regional twins do: the trophy row takes the bundle's hours,
  * and the bundle's owned row folds into it. A third case is the moment to move
  * this to an admin control instead.
+ *
+ * ⚠️ A `Map`, never an object literal: a lookup on `{}` answers inherited keys,
+ * and the real PS4 title «Constructor» came back as a function.
  */
-const ALIASES: Record<string, string> = {
+const ALIASES = new Map([
   // 49 m on the trophy sku, 714 h on the bundle (measured 2026-09-28).
-  metalgearsolidvthedefinitiveexperience: 'metalgearsolidvthephantompain',
-};
+  ['metalgearsolidvthedefinitiveexperience', 'metalgearsolidvthephantompain'],
+]);
 
 const ROMAN = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'];
 const NON_ALNUM = /[^a-z0-9]/g;
