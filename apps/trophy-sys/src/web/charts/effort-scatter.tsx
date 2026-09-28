@@ -17,7 +17,7 @@ import {
   CHART_INK,
 } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
-import { countTotal } from '../helpers/stats.ts';
+import { countShare, countTotal } from '../helpers/stats.ts';
 
 export const EffortScatter = (props: EffortScatterProps) => (
   // flex-1 rather than h-full: this chart sits under a legend inside the frame
@@ -242,7 +242,7 @@ export const effortPoints = (
         iconUrl: game.iconUrl,
         name: game.name,
         perTrophy: earned ? hours / earned : 0,
-        progress: game.progress,
+        progress: countShare(game),
         trophies: countTotal(game.defined),
       };
     })

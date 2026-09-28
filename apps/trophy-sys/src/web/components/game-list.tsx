@@ -19,6 +19,7 @@ import {
   PLATINUM_MODE_ORDER,
   type PlatinumMode,
 } from '../helpers/game-sort.ts';
+import { countShare } from '../helpers/stats.ts';
 import { PlatformBadge } from './platform-badge.tsx';
 import { SelectControl } from './select-control.tsx';
 
@@ -41,6 +42,7 @@ export const GameList = (props: GameListProps) => {
     // enough for the tooltip to sit inside the list's overflow-auto column,
     // and it is already focusable, so the hint reaches the keyboard too.
     const missingPlaytime = game.playSeconds === null;
+    const share = countShare(game);
 
     return (
       <button
@@ -102,10 +104,18 @@ export const GameList = (props: GameListProps) => {
         </span>
 
         <span className='shrink-0 text-right text-[12px]'>
-          <span className={progressTone(game.progress)}>
-            {barRender(game.progress, 10)}
+          <span className={progressTone(share)}>{barRender(share, 10)}</span>
+          <span className='block text-dim'>
+            {share}%
+            {/* PSN's grade-weighted figure, only where it says something else.
+                Under 640 it squeezed the date line; the panel still shows it. */}
+            {game.progress !== share && (
+              <span className='hidden text-mute sm:inline'>
+                {' '}
+                · {game.progress}% psn
+              </span>
+            )}
           </span>
-          <span className='block text-dim'>{game.progress}%</span>
         </span>
       </button>
     );

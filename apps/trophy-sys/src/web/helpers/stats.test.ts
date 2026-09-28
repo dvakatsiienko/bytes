@@ -5,7 +5,27 @@ import type {
   TrophyArchive,
   TrophyGrade,
 } from '../../shared/types.ts';
-import { gamingDayKey, nowPlayingId, trophyOrder } from './stats.ts';
+import {
+  countShare,
+  gamingDayKey,
+  nowPlayingId,
+  trophyOrder,
+} from './stats.ts';
+
+const counts = (bronze: number) => ({
+  bronze,
+  gold: 0,
+  platinum: 0,
+  silver: 0,
+});
+
+test('the count share never rounds an unfinished title up to 100', () => {
+  expect(countShare({ defined: counts(200), earned: counts(199) })).toBe(99);
+});
+
+test('a title that defines no trophies shares 0, not NaN', () => {
+  expect(countShare({ defined: counts(0), earned: counts(0) })).toBe(0);
+});
 
 const zoneUse = (zone: string) => {
   process.env.TZ = zone;

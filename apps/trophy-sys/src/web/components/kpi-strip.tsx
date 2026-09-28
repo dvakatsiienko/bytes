@@ -1,6 +1,6 @@
 import type { ArchivedTrophy, Game, TrophyGrade } from '../../shared/types.ts';
 import { GRADE_TONE } from '../helpers/chart-theme.ts';
-import { countTotal } from '../helpers/stats.ts';
+import { countShare, countTotal } from '../helpers/stats.ts';
 
 /** PSN's own flat points per grade — the number every trophy site shows. */
 const FLAT_POINTS: Record<TrophyGrade, number> = {
@@ -35,7 +35,8 @@ export const KpiStrip = (props: KpiStripProps) => {
 
   const played = props.games.filter((game) => countTotal(game.earned) > 0);
   const completion = played.length
-    ? played.reduce((total, game) => total + game.progress, 0) / played.length
+    ? played.reduce((total, game) => total + countShare(game), 0) /
+      played.length
     : 0;
 
   const flat = flatScore(props.trophies);
