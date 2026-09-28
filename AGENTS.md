@@ -30,6 +30,8 @@ bumping framework versions, update the Stack column below — it drifts stale ot
 
 🐾 **pet** — a basic setup on purpose (dima, 2026-09-27): shared dev data, a tracked db, dev against the hosted db. an agent works inside that setup and never hardens it, flags it or «fixes» it as a defect until dima promotes the app; a test that writes data says so in its report. the app's own AGENTS.md names what is basic.
 
+**Every app passes `pnpm apps:essentials`.** The essentials list lives in `script/apps-essentials.ts`, as data, with its waivers — read it there, never copy it. The pre-commit hook checks the apps a commit touches, ci checks every app, so a new app is red from its first commit until it carries them all. 🟡 lines (a doc gone stale, a verify skill calling a missing script) never fail.
+
 ## Shared Infrastructure
 
 ### Core Packages
@@ -293,7 +295,7 @@ Workspace-level families — role, kind, special, model routing. Project-meaning
 
 ### Domain docs
 
-Multi-context — root `CONTEXT-FTR.md` points at per-app `CONTEXT.md` files. See `docs/agents/domain.md`.
+Multi-context — root `CONTEXT-MAP.md` points at per-app `CONTEXT.md` files. See `docs/agents/domain.md`.
 
 **An app with `FTR.md` keeps its map and its `CONTEXT.md` in step with the code:** a change to what
 the app does updates its ftr line, and any new domain word its `CONTEXT.md` entry, in the same commit
