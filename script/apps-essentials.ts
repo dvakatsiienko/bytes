@@ -11,7 +11,7 @@
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 
 const root = resolve(import.meta.dirname, '..');
@@ -41,15 +41,17 @@ const pnpmVerbs = new Set([
   'why',
 ]);
 
-const waivers: Record<string, { rows: RowId[] | '*'; why: string }> = {
+const waivers: Record<string, Waiver> = {
   atelier: {
     rows: ['launch-entry'],
-    why: 'launchd serves it (x-atelier-live, :5180)',
+    ticket: 'BYT-111',
+    why: 'launchd serves the main checkout (x-atelier-live, :5180); a desktop entry would start a second server',
   },
-  cv: { rows: '*', why: 'redesign pending' },
+  cv: { rows: '*', ticket: 'BYT-111', why: 'redesign pending' },
   'trophy-sys': {
     rows: ['FTR.md', 'PRODUCT.md', 'DESIGN.md'],
-    why: 'BYT-86 owns them, granular with dima',
+    ticket: 'BYT-86',
+    why: 'the redesign owns them, granular with dima',
   },
 };
 
@@ -106,7 +108,6 @@ const rows = [
   },
   {
     bytes: true,
-    deployed: true,
     gap: (app) =>
       read(join(root, 'README.md')).includes(`](apps/${app.name})`)
         ? undefined
@@ -180,6 +181,11 @@ const { values } = parseArgs({
   },
 });
 
+/** In pre-commit the index is the truth: a file on disk that is not staged is not committed. */
+const index = values.staged
+  ? new Set(git(root, 'ls-files').split('\n'))
+  : undefined;
+
 const apps = (
   values.app ?? (values.staged ? stagedAppDirs() : trackedAppDirs())
 ).map(toApp);
@@ -217,9 +223,7 @@ function gapsOf(app: App): Gap[] {
     .filter((row) => !isWaived(row.id))
     .filter((row) => !('ui' in row) || app.isUi)
     .filter((row) => !('bytes' in row) || app.isInBytes)
-    .filter(
-      (row) => !('deployed' in row) || matchesDeploy(row.deployed, app.deploy),
-    )
+    .filter((row) => !('deployed' in row) || row.deployed === app.deploy)
     .flatMap((row) => {
       const detail = row.gap(app);
       return detail ? [{ detail, level: 'red' as const, row: row.id }] : [];
@@ -250,15 +254,8 @@ function gapsOf(app: App): Gap[] {
   return [...red, ...yellow];
 }
 
-function matchesDeploy(
-  wanted: true | 'vercel',
-  deploy: App['deploy'],
-): boolean {
-  return wanted === true ? deploy !== undefined : deploy === wanted;
-}
-
 function fileGap(app: App, file: string, fix: string): string | undefined {
-  return existsSync(join(app.dir, file)) ? undefined : `missing — ${fix}`;
+  return exists(join(app.dir, file)) ? undefined : `missing — ${fix}`;
 }
 
 function skillGap(
@@ -267,12 +264,12 @@ function skillGap(
   fix: string,
 ): string | undefined {
   const skill = `.claude/skills/${app.name}-${kind}/SKILL.md`;
-  return existsSync(join(app.dir, skill)) ? undefined : `no ${skill} — ${fix}`;
+  return exists(join(app.dir, skill)) ? undefined : `no ${skill} — ${fix}`;
 }
 
 /** App commits (docs and skills aside) since `doc` last moved; 0 while it is uncommitted. */
 function commitsSince(app: App, doc: string): number {
-  if (!existsSync(join(app.dir, doc))) return 0;
+  if (!exists(join(app.dir, doc))) return 0;
   const last = git(app.dir, 'log', '-1', '--format=%H', '--', doc);
   if (!last) return 0;
   const count = git(
@@ -327,7 +324,7 @@ function toApp(arg: string): App {
     arg.includes('/') || arg.startsWith('.')
       ? resolve(arg)
       : join(root, 'apps', arg);
-  if (!existsSync(dir)) {
+  if (!exists(dir)) {
     console.error(`apps-essentials: no app at ${dir}`);
     process.exit(2);
   }
@@ -335,7 +332,7 @@ function toApp(arg: string): App {
   const deps = { ...pkg.dependencies, ...pkg.devDependencies };
   return {
     deploy: (['vercel', 'railway'] as const).find((host) =>
-      existsSync(join(dir, `${host}.json`)),
+      exists(join(dir, `${host}.json`)),
     ),
     dir,
     isInBytes: dirname(dir) === join(root, 'apps'),
@@ -359,7 +356,7 @@ function appDirsOf(paths: string): string[] {
   const names = paths
     .split('\n')
     .map((path) => path.split('/')[1])
-    .filter((name) => name && existsSync(join(root, 'apps', name)));
+    .filter((name) => name && exists(join(root, 'apps', name)));
   return [...new Set(names)].sort();
 }
 
@@ -374,12 +371,24 @@ function git(cwd: string, ...args: string[]): string {
   }
 }
 
+function exists(path: string): boolean {
+  if (!index) return existsSync(path);
+  const rel = relative(root, path);
+  return index.has(rel) || [...index].some((p) => p.startsWith(`${rel}/`));
+}
+
 function read(path: string): string {
-  return existsSync(path) ? readFileSync(path, 'utf8') : '';
+  if (!index) return existsSync(path) ? readFileSync(path, 'utf8') : '';
+  const rel = relative(root, path);
+  return index.has(rel) ? git(root, 'show', `:${rel}`) : '';
 }
 
 function list(dir: string): string[] {
-  return existsSync(dir) ? readdirSync(dir) : [];
+  if (!index) return existsSync(dir) ? readdirSync(dir) : [];
+  const rel = `${relative(root, dir)}/`;
+  return [...index]
+    .filter((p) => p.startsWith(rel) && !p.slice(rel.length).includes('/'))
+    .map((p) => p.slice(rel.length));
 }
 
 function readPackage(dir: string): Package {
@@ -402,10 +411,12 @@ type Row = {
   gap: (app: App) => string | undefined;
   ui?: true;
   bytes?: true;
-  deployed?: true | 'vercel';
+  deployed?: 'vercel';
 };
 
 type RowId = (typeof rows)[number]['id'];
+
+type Waiver = { rows: RowId[] | '*'; ticket: string; why: string };
 
 type Gap = { level: 'red' | 'yellow'; row: RowId; detail: string };
 

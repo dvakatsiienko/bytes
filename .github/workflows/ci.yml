@@ -492,7 +492,7 @@ jobs:
   #
   # 📌 The `needs:` edge here is safe where `check`'s header forbids one: this job is not a
   # required context and gates nothing, it only reports. A skipped leg (an app the push did not
-  # touch) is not a failure; only a `failure` among the three turns the badge red. It runs on a
+  # touch) is not a failure; only a `failure` among the four turns the badge red. It runs on a
   # push to `main` only, so the write token never meets branch or pull-request code.
   #
   # ⚠️ Vercel builds every branch push unless the app's own `vercel.json` says
@@ -502,7 +502,7 @@ jobs:
   # copied from this checkout: derived, never a hand list.
   badge:
     name: ci badge
-    needs: [check, financial, vercel-install]
+    needs: [check, financial, vercel-install, essentials]
     if: >-
       always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       !contains(needs.*.result, 'cancelled')
