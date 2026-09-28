@@ -53,7 +53,6 @@ const waivers: Record<string, Waiver> = {
     ticket: 'BYT-111',
     why: 'launchd serves it (x-atelier-live, :5180)',
   },
-  cv: { rows: '*', ticket: 'BYT-111', why: 'redesign pending' },
   'trophy-sys': {
     rows: ['FTR.md', 'PRODUCT.md', 'DESIGN.md'],
     ticket: 'BYT-86',
@@ -158,9 +157,10 @@ const rows = [
     bytes: true,
     deployed: 'vercel',
     gap: (app) => {
-      const vercel: { git?: { deploymentEnabled?: unknown } } = JSON.parse(
-        read(join(app.dir, 'vercel.json')),
-      );
+      const file = read(join(app.dir, 'vercel.json'));
+      if (!file) return 'no vercel.json, but the Deploy dropdown lists the app';
+      const vercel: { git?: { deploymentEnabled?: unknown } } =
+        JSON.parse(file);
       return vercel.git?.deploymentEnabled === false
         ? undefined
         : 'vercel.json lacks git.deploymentEnabled: false';
@@ -171,9 +171,7 @@ const rows = [
     bytes: true,
     deployed: 'vercel',
     gap: (app) =>
-      new RegExp(`^\\s*- ${app.name}$`, 'm').test(
-        read(join(root, '.github/workflows/deploy.yml')),
-      )
+      isInDeployDropdown(app.name)
         ? undefined
         : 'not an option in the Deploy workflow dropdown',
     id: 'deploy.yml',
@@ -336,12 +334,16 @@ function toApp(arg: string): App {
   }
   const pkg = readPackage(dir);
   const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+  // Two sources for «vercel», so deleting vercel.json alone cannot make an app look local.
+  const isVercel =
+    exists(join(dir, 'vercel.json')) ||
+    (isInBytes(dir) && isInDeployDropdown(basename(dir)));
   return {
     deploy: (['vercel', 'railway'] as const).find((host) =>
-      exists(join(dir, `${host}.json`)),
+      host === 'vercel' ? isVercel : exists(join(dir, 'railway.json')),
     ),
     dir,
-    isInBytes: dirname(dir) === join(root, 'apps'),
+    isInBytes: isInBytes(dir),
     isUi: 'react-dom' in deps,
     name: basename(dir),
     pkg,
@@ -375,6 +377,16 @@ function git(cwd: string, ...args: string[]): string {
   } catch {
     return '';
   }
+}
+
+function isInBytes(dir: string): boolean {
+  return dirname(dir) === join(root, 'apps');
+}
+
+function isInDeployDropdown(name: string): boolean {
+  return new RegExp(`^\\s*- ${name}$`, 'm').test(
+    read(join(root, '.github/workflows/deploy.yml')),
+  );
 }
 
 function exists(path: string): boolean {
