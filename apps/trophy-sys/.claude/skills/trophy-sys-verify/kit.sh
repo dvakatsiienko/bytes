@@ -50,7 +50,10 @@ case "${1:-}" in
     jq --arg t "${token}" --argjson d "${now}" --argjson s "${saved}" \
       '[.[] | select(.token != $t)] + [{diedAt: $d, savedAt: $s, token: $t}]' \
       .trophy-npsso-deaths.json > .kit.tmp && mv .kit.tmp .trophy-npsso-deaths.json
-    jq -n --arg t "grant-${token}" --argjson r "${now}" --argjson e $((days * 86400)) \
+    # The tree's real grant token stays, so a psn refresh still succeeds and the
+    # old grant keeps the app up — the state this recipe exists to show.
+    grant=$(jq -r '.token // empty' .trophy-psn-grant.json 2>/dev/null || true)
+    jq -n --arg t "${grant:-grant-${token}}" --argjson r "${now}" --argjson e $((days * 86400)) \
       '{expiresIn: $e, mintedAt: ($r - (10 * 86400000) + ($e * 1000)), mintedExpiresIn: 863999, refreshedAt: $r, token: $t}' \
       > .trophy-psn-grant.json
     echo "faked: npsso dead, grant ${days} days left — read it at /api/admin/token before any psn call"
