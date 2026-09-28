@@ -50,6 +50,15 @@ test('a purchased title already in the trophy list is not added again', () => {
   expect(names(merged)).toStrictEqual([]);
 });
 
+test('a bundle in the alias table joins the trophy row it contains', () => {
+  const merged = unplayedBuild(
+    [purchased('METAL GEAR SOLID V: THE DEFINITIVE EXPERIENCE', 'PS4')],
+    [trophied('METAL GEAR SOLID V: THE PHANTOM PAIN')],
+    NO_PLAY,
+  );
+  expect(names(merged)).toStrictEqual([]);
+});
+
 test('a purchased title with no trophy record is added', () => {
   const merged = unplayedBuild(
     [purchased('Rogue Legacy 2')],
