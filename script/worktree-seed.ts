@@ -5,7 +5,10 @@
  * dev server needs — every app's `.env*`, `.claude/settings.local.json`,
  * trophy-sys's local caches — from the main checkout, installs with `CI=1` so
  * lefthook cannot rewrite the shared hooks, and writes `.worktree-offset` so
- * `script/with-port.ts` moves every dev port clear of the main tree.
+ * `script/with-port.ts` moves every dev port clear of every other tree.
+ *
+ * ⚠️ The live PSN credentials never reach a tree: `STAND_INS` writes fakes in
+ * their place. A verify run on a copied NPSSO drove PSN with dima's own token.
  *
  * Callers: cc's EnterWorktree hook (`~/.claude/shelf/hooks/worktree-seed.sh`)
  * and a human after `camp`: `pnpm worktree:seed ../bytes-<slug>`.
@@ -15,6 +18,7 @@ import {
   copyFileSync,
   existsSync,
   mkdirSync,
+  readFileSync,
   readdirSync,
   writeFileSync,
 } from 'node:fs';
@@ -63,14 +67,78 @@ function ignored(file: string): boolean {
   }
 }
 
+/** 64 characters, like a real NPSSO, and unmistakably not one. */
+const FAKE_TOKEN = 'F'.repeat(64);
+const NPSSO_LINE = /^NPSSO=.*$/m;
+
+/** Rewrites every `KEY=value` line to `KEY=` (or to the stand-in given). */
+const envScrub =
+  (values: Record<string, string> = {}) =>
+  (text: string) =>
+    text.replace(
+      /^([A-Z0-9_]+)=.*$/gm,
+      (_line, key: string) => `${key}=${values[key] ?? ''}`,
+    );
+
+/**
+ * Files written as fakes instead of copied. PSN refuses the fake token, so a
+ * tree's trophy-sys shows the archive (`/api/stats`) and the console, but no
+ * live library until a real NPSSO is pasted into that tree's /console.
+ */
+const STAND_INS: Record<string, (text: string) => string> = {
+  'apps/trophy-sys/.env': (text) =>
+    text.replace(NPSSO_LINE, `NPSSO=${FAKE_TOKEN}`),
+  // Vercel-pulled production credentials only: prod kv and its oidc token.
+  'apps/trophy-sys/.env.local': envScrub(),
+  'apps/trophy-sys/.trophy-npsso.json': () =>
+    JSON.stringify({ savedAt: Date.now(), token: FAKE_TOKEN }),
+  'apps/trophy-sys/.trophy-psn-grant.json': () =>
+    JSON.stringify({
+      expiresIn: 863_999,
+      mintedAt: Date.now(),
+      mintedExpiresIn: 863_999,
+      refreshedAt: Date.now(),
+      token: FAKE_TOKEN,
+    }),
+};
+
 const copied: string[] = [];
 function seed(rel: string) {
   const from = join(main, rel);
   const to = join(target, rel);
   if (!existsSync(from) || existsSync(to) || !ignored(rel)) return;
   mkdirSync(dirname(to), { recursive: true });
-  copyFileSync(from, to);
-  copied.push(rel);
+
+  const standIn = STAND_INS[rel];
+  if (standIn) writeFileSync(to, standIn(readFileSync(from, 'utf8')));
+  else copyFileSync(from, to);
+  copied.push(standIn ? `${rel} (stand-in)` : rel);
+}
+
+/**
+ * The lowest multiple of 10 no other tree's `.worktree-offset` holds. The old
+ * `10 × list index` shifted when a tree sorted in before another, and a new
+ * tree took a live tree's ports (both got 20, 2026-09-28). A re-seed keeps the
+ * tree's own offset while nobody else holds it.
+ */
+function offsetPick(): number {
+  const read = (tree: string) => {
+    const file = join(tree, '.worktree-offset');
+    return existsSync(file) ? Number(readFileSync(file, 'utf8').trim()) : null;
+  };
+  const held = new Set(
+    trees
+      .filter((tree) => tree !== target && tree !== main)
+      .map(read)
+      .filter((found) => found !== null),
+  );
+
+  const own = read(target);
+  if (own && !held.has(own)) return own;
+
+  let free = 10;
+  while (held.has(free)) free += 10;
+  return free;
 }
 
 for (const rel of SEEDS) seed(rel);
@@ -83,7 +151,7 @@ for (const app of readdirSync(join(main, 'apps'), { withFileTypes: true })) {
   seed(relative(main, join(dir, '.claude/settings.local.json')));
 }
 
-const offset = index * 10;
+const offset = offsetPick();
 writeFileSync(join(target, '.worktree-offset'), `${offset}\n`);
 execFileSync('pnpm', ['install'], {
   cwd: target,
