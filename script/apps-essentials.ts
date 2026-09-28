@@ -350,18 +350,9 @@ function trackedAppDirs(): string[] {
   return appDirsOf(git(root, 'ls-files', '--', 'apps'));
 }
 
+/** Deletions count too: removing an essential is the gap this gate exists for. */
 function stagedAppDirs(): string[] {
-  return appDirsOf(
-    git(
-      root,
-      'diff',
-      '--cached',
-      '--name-only',
-      '--diff-filter=ACMR',
-      '--',
-      'apps',
-    ),
-  );
+  return appDirsOf(git(root, 'diff', '--cached', '--name-only', '--', 'apps'));
 }
 
 function appDirsOf(paths: string): string[] {

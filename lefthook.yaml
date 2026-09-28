@@ -35,8 +35,12 @@ pre-commit:
     # Every app carries its essentials (BYT-111). Only the apps this commit
     # touches are checked, so one app's gap never blocks work in another; a
     # new app is checked from its first staged file. ci.yml runs every app.
+    #
+    # 📌 No `glob:` on purpose. lefthook matches a glob against added,
+    # copied, modified and renamed paths only, so a commit that just deletes
+    # an essential would skip the job. The script reads the index itself,
+    # deletions included, in ~0.1 s.
     - name: apps-essentials
-      glob: 'apps/**'
       run: node script/apps-essentials.ts --staged
 
 pre-push:
