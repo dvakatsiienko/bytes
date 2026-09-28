@@ -39,7 +39,8 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "check": "turbo run lint typecheck",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "knip": "knip"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
@@ -52,6 +53,7 @@
     "@vitest/coverage-v8": "5.0.1",
     "@vitest/ui": "5.0.1",
     "biome-config-polished": "workspace:*",
+    "knip": "6.38.0",
     "lefthook": "2.1.14",
     "npm-run-all2": "9.0.3",
     "playwright": "1.63.0",
