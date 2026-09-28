@@ -7,7 +7,7 @@ export const ThemeScope = (props: ThemeScopeProps) => {
 
   return (
     <div
-      className='-mx-6 rounded-xl px-6 py-8 transition-colors'
+      className='rounded-xl px-6 py-8 transition-colors'
       data-mode={mode}
       data-proto-theme={props.theme ?? 'memory-viz'}>
       <div className='mb-6 flex justify-end'>

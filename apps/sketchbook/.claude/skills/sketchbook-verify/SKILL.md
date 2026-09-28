@@ -23,7 +23,7 @@ description: Verify a sketchbook change against the running prototype platform �
 1. **`/` lands right** — with a live proto, `get url` stays `/` and the header shows `sketch·book`, «answering» and the proto's question, then the ticket strip. with nothing live it redirects to `/bench/cv-design`.
 2. **the nav matches the folders** — the nav's links equal the bench lanes plus the archives on disk. main: 5 lanes (`cv-design`, `cv-frontend-design`, `cv-impeccable`, `cv-taste`, `cv-theme-designer`) and 2 pages. a folder with no link, or a link with no folder, is a finding.
 3. **every route renders** — open each lane and page at 1280 and 390: zero console errors, zero broken images, and a page height over one screen (main: 1600–5300 at 1280). a blank `main` or «no live proto» on a lane is a finding.
-4. **no sideways scroll on a lane** — `scrollWidth - innerWidth` is `0` on every bench lane at both widths.
+4. **no sideways scroll** — `scrollWidth - innerWidth` is `0` on every bench lane and every page at both widths.
 5. **the theme button flips `data-theme`** — `<html data-theme>` starts from the OS (`prefers-color-scheme`), the button («switch to dark theme») flips it, and it survives a nav link click. a full `open` resets it to the OS value: nothing is stored, by design. `agent-browser set media dark` tests the dark start.
 6. **a live proto with variants** — the variant bar shows only when the proto has 2+ variants; each button sets `?v=<key>` and swaps the view. drive every variant and screenshot each. (read from `src/frame/variant-bar.tsx` — main had no live proto to drive it on.)
 
@@ -34,7 +34,7 @@ run the `x:browser-headless` essentials on every touched route at 1280 and 390. 
 these archive fails are on main already. an archive is frozen, so they are the baseline — report only growth:
 
 - `/pages/001-session-progress-board` — axe `color-contrast` ×74, `page-has-heading-one` ×1
-- `/pages/002-memory-visualization` — `scrollWidth - innerWidth` is `24` at both widths (the stat grid runs edge to edge), and the page draws its own «light» chip under the frame's theme button
+- `/pages/002-memory-visualization` — axe ×3, `cursor` ×1, and the page draws its own «light» chip under the frame's theme button
 
 ## evidence
 
