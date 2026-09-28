@@ -11,7 +11,7 @@ The 64-character token the owner copies from Sony while signed in, and the one s
 _Avoid_: token (alone), cookie, sso code
 
 **Grant**:
-The refresh grant one NPSSO exchange buys: ten days of sessions without spending the NPSSO again.
+The refresh grant one NPSSO exchange buys: ten days of sessions without spending the NPSSO again. At three days left it is re-minted from the NPSSO while it still works, so a dead NPSSO is found early.
 _Avoid_: refresh token, session (for the grant)
 
 **Session**:
