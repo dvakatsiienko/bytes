@@ -81,3 +81,5 @@
   - makes: a blank `current-scratch`, every other proto deleted
 - ⬜ `pnpm proto:list` prints the book
   - then every archive and the live proto print in order, each with its question
+- 🐞 the README's `src/protos/` example names the book's real folders
+  - fails: it shows `002-ledger-view` and `current-alien-roster`; the book holds `002-memory-visualization` and no live proto

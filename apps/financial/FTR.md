@@ -97,7 +97,8 @@
 
 ## /dashboard/customers — customer list
 
-- ⬜ the customer table: «Name», «Email», «Invoices», «Pending», «Paid», one card per customer on narrow screens
+- 🐞 the customer table: «Name», «Email», «Invoices», «Pending», «Paid», one card per customer on narrow screens
+  - fails: the «Invoices», «Pending» and «Paid» totals read fields that sit behind six `@ts-expect-error` in `CustomerTable`, so they likely render empty (inferred from the code, not run)
 - ⬜ search customers by name
   - when the user types in «Search customers...»
   - then only customers whose name contains the text stay

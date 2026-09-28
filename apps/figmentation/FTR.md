@@ -27,7 +27,8 @@
   - then the header stays on top over a blurred paper band
   - and below 640 px only the logo shows, centred
 - ⬜ a nav label underlines on hover
-- ⬜ the ticker: «allergy tested · 100% fragrance free · dermatologist developed» slides in a loop under the header
+- 🐞 the ticker: «allergy tested · 100% fragrance free · dermatologist developed» slides in a loop under the header
+  - fails: the loop repaints forever, even while nobody watches it
 - ⬜ the hero: the foundation bottle on a halo and a grain grid, beside breadcrumbs and the product copy
   - given a window 640 px or wider
   - then the image sits left and the copy right

@@ -14,10 +14,11 @@
   - given a chat with a friend is open
   - then the header centre reads «💬 Chat with <Friend>» (hidden below the `sm` width)
   - and the «💬 Chat with …» link and the logo take you back to the open chat
-- ⬜ sign in with the 🔑 button
+- 🐞 sign in with the 🔑 button
   - given nobody is signed in
   - when the user presses 🔑 in the header
   - then Clerk's sign-in opens as a modal; once signed in, the button becomes the user's avatar menu
+  - fails: the sign-in ring spins forever
 - ⬜ the sidebar, «X-COM Chat» over «💬 Chat» and «⚙️ Settings»
   - when the user presses ⌘B
   - then the sidebar opens or closes
@@ -26,6 +27,11 @@
   - then the whole app switches; ⌘P steps through the three
 
 ## /chat/<chat>/<friend> — the chat
+
+- 🐞 each user sees only their own chats
+  - given two users are signed in on two browsers
+  - then each sees only the chats they started
+  - fails: chats are not kept per user — everyone sees every chat
 
 - ⬜ a bare chat address settles on a real one
   - given the user opens `/chat` or an address with an unknown friend
