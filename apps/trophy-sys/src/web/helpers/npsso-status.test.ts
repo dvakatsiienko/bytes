@@ -288,3 +288,29 @@ test('the grant adds exactly one row — this panel has been cut for growing', (
     'the three npsso rows, then one grant row — paste first, then text',
   ).toStrictEqual(['age', 'shortest seen', 'rough guess', 'grant']);
 });
+
+/** A live grant with this many days of PSN's claim left, read just now. */
+const grantLeft = (days: number) =>
+  statusMake({
+    refresh: grantMake({
+      expiresIn: days * 86_400,
+      mintedAt: Date.now() - (10 - days) * DAY_MS,
+    }),
+    savedAt: Date.now(),
+  });
+
+test('a grant with three days left warns before the app has to sign in again', () => {
+  expect(readoutBuild(grantLeft(3)).warning).toContain(
+    'the grant ends in 3 days',
+  );
+});
+
+test('a grant with more than three days left says nothing', () => {
+  expect(readoutBuild(grantLeft(3.5)).warning).toBe(null);
+});
+
+test('a dead token gets its own note, not the grant warning on top', () => {
+  const status = { ...grantLeft(1), diedAt: Date.now() };
+
+  expect(readoutBuild(status).warning).toBe(null);
+});

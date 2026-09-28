@@ -431,7 +431,7 @@ export const steamNamesSave = (names: SteamNames) =>
   storeWrite(STEAM_NAMES_KEY, STEAM_NAMES_FILE, names);
 
 /** How many failures landed in the current window, and how long it has left. */
-export interface FailureWindow {
+interface FailureWindow {
   count: number;
   leftMs: number;
 }
