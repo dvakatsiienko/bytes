@@ -3,7 +3,7 @@
  * whatever is on screen — the live canvas, a webp take, a flat svg — goes
  * through a canvas and out as png. `scale` draws an svg at 2× its own size.
  */
-export const toPngBlob = async (
+const toPngBlob = async (
   source: HTMLCanvasElement | string,
   scale = 1,
 ): Promise<Blob> => {

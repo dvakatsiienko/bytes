@@ -4,8 +4,8 @@ import type { Palette } from '../../art/palette.ts';
 import type { Layer } from '../../art/paper.ts';
 import { defs, svg } from '../../art/paper.ts';
 
-export const texW = 3200;
-export const texH = 1200;
+const texW = 3200;
+const texH = 1200;
 
 /** one scene layer as a texture: the same svg the node generator writes, drawn at 2× */
 export const loadSheet = (p: Palette, layer: Layer) =>

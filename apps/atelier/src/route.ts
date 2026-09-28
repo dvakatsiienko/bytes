@@ -50,7 +50,7 @@ export const useRoute = () =>
 
 /* Types */
 
-export type View =
+type View =
   | { kind: 'live' }
   | { kind: 'take'; take: string }
   | { kind: 'compare'; a: string; b: string };

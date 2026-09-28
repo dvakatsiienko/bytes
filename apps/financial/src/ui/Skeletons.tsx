@@ -1,4 +1,4 @@
-export const CardSkeleton = () => {
+const CardSkeleton = () => {
   return (
     <div className={`${shimmer} relative overflow-hidden bg-bar p-2 shadow-sm`}>
       <div className='flex p-4'>
@@ -38,7 +38,7 @@ export const RevenueChartSkeleton = () => {
   );
 };
 
-export const InvoiceSkeleton = () => {
+const InvoiceSkeleton = () => {
   return (
     <div className='flex flex-row items-center justify-between border-rule border-b py-4'>
       <div className='flex items-center'>
@@ -95,7 +95,7 @@ export const DashboardSkeleton = () => {
   );
 };
 
-export const TableRowSkeleton = () => {
+const TableRowSkeleton = () => {
   return (
     <tr className='w-full border-rule border-b last-of-type:border-none [&:first-child>td:first-child]:[&:first-child>td:last-child]:[&:last-child>td:first-child]:[&:last-child>td:last-child]:rounded-br-lg'>
       {/* Customer Name and Image */}
@@ -132,7 +132,7 @@ export const TableRowSkeleton = () => {
   );
 };
 
-export const InvoicesMobileSkeleton = () => {
+const InvoicesMobileSkeleton = () => {
   return (
     <div className='mb-2 w-full bg-white p-4'>
       <div className='flex items-center justify-between border-rule border-b pb-8'>

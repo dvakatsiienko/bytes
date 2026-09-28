@@ -29,7 +29,6 @@
     "@visx/scale": "4.0.0",
     "@visx/shape": "4.0.0",
     "@visx/tooltip": "4.0.0",
-    "lucide-react": "1.47.0",
     "motion": "13.4.2",
     "psn-api": "2.18.1",
     "react": "19.3.0",
@@ -41,6 +40,7 @@
     "@vitejs/plugin-react": "6.1.1",
     "esbuild": "0.28.2",
     "oxc-transform-react": "0.150.0",
+    "shadcn": "4.21.0",
     "undici": "8.10.2",
     "vite": "8.3.0"
   }

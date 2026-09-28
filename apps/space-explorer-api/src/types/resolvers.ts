@@ -7,14 +7,14 @@ export type Resolver<
   TSource = undefined,
 > = GraphQLFieldResolver<TSource, ResolverCtx, TArgs>;
 
-export interface ApolloCtx {
+interface ApolloCtx {
   userEmail: string | null;
 }
 
-export interface ResolverCtx extends ApolloCtx {
-  userEmail: string | null;
+interface ResolverCtx extends ApolloCtx {
   dataSources: {
     spaceXAPI: SpaceXAPI;
     userAPI: UserAPI;
   };
+  userEmail: string | null;
 }

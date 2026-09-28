@@ -367,9 +367,6 @@ importers:
       masonic:
         specifier: 4.1.0
         version: 4.1.0(react@19.3.0)
-      mosaic:
-        specifier: 1.1.0
-        version: 1.1.0
       tailwind-scrollbar:
         specifier: 4.0.2
         version: 4.0.2(react@19.3.0)(tailwindcss@4.3.3)
@@ -422,9 +419,6 @@ importers:
       better-auth:
         specifier: 1.7.5
         version: 1.7.5(@prisma/client@7.10.0(prisma@7.10.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(better-sqlite3@12.11.1)(magicast@0.5.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(typescript@7.0.2))(mysql2@3.15.3)(next@16.3.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.6.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(pg@8.23.0)(prisma@7.10.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(better-sqlite3@12.11.1)(magicast@0.5.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(solid-js@1.9.15)(vitest@5.0.1)
-      consola:
-        specifier: 3.4.2
-        version: 3.4.2
       dotenv:
         specifier: 17.4.2
         version: 17.4.2
@@ -687,9 +681,6 @@ importers:
       '@visx/tooltip':
         specifier: 4.0.0
         version: 4.0.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      lucide-react:
-        specifier: 1.47.0
-        version: 1.47.0(react@19.3.0)
       motion:
         specifier: 13.4.2
         version: 13.4.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -718,6 +709,9 @@ importers:
       oxc-transform-react:
         specifier: 0.150.0
         version: 0.150.0
+      shadcn:
+        specifier: 4.21.0
+        version: 4.21.0(supports-color@7.2.0)(typescript@7.0.2)
       undici:
         specifier: 8.10.2
         version: 8.10.2
@@ -4751,10 +4745,6 @@ packages:
   confbox@0.2.4:
     resolution: {integrity: sha512-ysOGlgTFbN2/Y6Cg3Iye8YKulHw+R2fNXHrgSmXISQdMnomY6eNDprVdW9R5xBguEqI954+S6709UyiO7B+6OQ==}
 
-  consola@3.4.2:
-    resolution: {integrity: sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA==}
-    engines: {node: ^14.18.0 || >=16.10.0}
-
   content-disposition@1.1.0:
     resolution: {integrity: sha512-5jRCH9Z/+DRP7rkvY83B+yGIGX96OYdJmzngqnw2SBSxqCFPd0w2km3s5iawpGX8krnwSGmF0FW5Nhr0Hfai3g==}
     engines: {node: '>=18'}
@@ -6399,9 +6389,6 @@ packages:
 
   mlly@1.8.2:
     resolution: {integrity: sha512-d+ObxMQFmbt10sretNDytwt85VrbkhhUA/JBGm1MPaWJ65Cl4wOgLaB1NYvJSZ0Ef03MMEU/0xpPMXUIQ29UfA==}
-
-  mosaic@1.1.0:
-    resolution: {integrity: sha512-4NPMyHQMAOfqr83aBhq/XpKXWgICeB1LzA3qHTYGr+GNw3chigB4yzHb137984TdlXhYgvx9X/2RRKM0bUM9XA==}
 
   motion-dom@13.4.2:
     resolution: {integrity: sha512-mY293Iyj4rOQo5sDxUwPYLOKiveLQrJoK1tKfG8V1H3MMGMfan3s2i7NBW18WnD39DD79ogyiL/1fmy22GLG5w==}
@@ -9107,7 +9094,7 @@ snapshots:
       string-env-interpolation: 1.0.1
       ts-log: 3.0.3
       tslib: 2.8.1
-      yaml: 2.9.0
+      yaml: 2.9.1
       yargs: 18.1.0
     transitivePeerDependencies:
       - '@fastify/websocket'
@@ -11762,8 +11749,6 @@ snapshots:
 
   confbox@0.2.4: {}
 
-  consola@3.4.2: {}
-
   content-disposition@1.1.0: {}
 
   content-type@1.0.5: {}
@@ -12348,7 +12333,7 @@ snapshots:
     dependencies:
       fast-glob: 3.3.3
       pkg-types: 1.3.1
-      yaml: 2.9.0
+      yaml: 2.9.1
 
   flatted@3.4.4: {}
 
@@ -13483,8 +13468,6 @@ snapshots:
       pathe: 2.0.3
       pkg-types: 1.3.1
       ufo: 1.6.4
-
-  mosaic@1.1.0: {}
 
   motion-dom@13.4.2:
     dependencies:
@@ -14944,7 +14927,7 @@ snapshots:
       resolve.exports: 2.0.3
       semver: 7.8.5
       string-width: 8.2.2
-      yaml: 2.9.0
+      yaml: 2.9.1
       zod: 4.6.5
     optionalDependencies:
       '@biomejs/biome': 2.5.14
@@ -15258,7 +15241,8 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  yaml@2.9.0: {}
+  yaml@2.9.0:
+    optional: true
 
   yaml@2.9.1: {}
 

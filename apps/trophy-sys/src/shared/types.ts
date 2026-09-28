@@ -28,7 +28,7 @@ export interface Profile {
  * is empty because there is no such moment. `source` is the discriminator for
  * that: a reader showing trophy numbers must check it first.
  */
-export type GameSource = 'psn' | 'psn-purchased' | 'steam';
+type GameSource = 'psn' | 'psn-purchased' | 'steam';
 
 export interface Game {
   defined: TrophyCounts;
@@ -125,7 +125,7 @@ export interface ArchivedTrophy {
 }
 
 /** Where an incremental trophy's counter stands — "47 of 100 flags". */
-export interface TrophyCounter {
+interface TrophyCounter {
   current: number;
   target: number;
 }

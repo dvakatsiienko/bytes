@@ -6,9 +6,7 @@ export * from './ClerkSVG';
 export * from './CodeRabbitSVG';
 export * from './ConvexSVG';
 export * from './CssSVG';
-export * from './CursorLightSVG';
 export * from './ESBuildSVG';
-export * from './ESLintSVG';
 export * from './ESNextSVG';
 export * from './FigmaSVG';
 /* networks */
@@ -29,8 +27,6 @@ export * from './OpenRouterAaSVG';
 /* ai */
 export * from './PerplexityAiSVG';
 export * from './PostgreSVG';
-/* code quality */
-export * from './PrettierSVG';
 /* db */
 export * from './PrismaSVG';
 export * from './RadixUiSVG';

@@ -5,7 +5,7 @@ import * as THREE from 'three';
 const tau = Math.PI * 2;
 
 /** svg pixels (1600 × 600) to world units on the plane at z = 0 */
-export const toWorld = (x: number, y: number) =>
+const toWorld = (x: number, y: number) =>
   new THREE.Vector2((x / 1600 - 0.5) * 16, (0.5 - y / 600) * 6);
 
 const glowSprite = (inner: string, outer: string) => {

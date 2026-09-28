@@ -154,6 +154,13 @@ jobs:
       - name: Lint
         run: pnpm turbo run lint ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
+      # Unused files, exports and dependencies, over the whole workspace: an
+      # unused export is a cross-package question, so `--affected` would miss
+      # the package that stopped importing it. Every kept finding is taught in
+      # knip.json, so any report here is new.
+      - name: Knip
+        run: pnpm knip
+
       # 📌 Whether chromium is needed is turbo's question, not a path pattern's.
       # `@ui/kit` is the only package that tests in a real browser, and `test`
       # runs under the same `--affected` as the step below — so the task graph

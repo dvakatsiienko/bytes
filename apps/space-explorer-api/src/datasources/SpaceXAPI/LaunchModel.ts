@@ -82,7 +82,7 @@ const slug = (value: string) =>
  * against the dead API point at launches this one cannot resolve. `UserAPI`
  * already drops unresolvable trips rather than failing the profile.
  */
-export const launchId = (launch: GatewayLaunch) =>
+const launchId = (launch: GatewayLaunch) =>
   `${launch.date_utc.slice(0, 10)}-${slug(launch.name)}`;
 
 /** `/rockets` keyed by name, which is how a launch refers to its rocket now. */
@@ -90,7 +90,7 @@ export const rocketFamilies = (rockets: GatewayRocket[]) =>
   new Map(rockets.map((rocket) => [rocket.name, rocket.family]));
 
 /* Types */
-export interface TLaunchModel {
+interface TLaunchModel {
   flightNumber: number;
   id: string;
   mission: TMission;

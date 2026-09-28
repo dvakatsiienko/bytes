@@ -5,4 +5,3 @@ export { LaunchTile } from './LaunchTile';
 export { Layout } from './Layout';
 export { Loading } from './Loading';
 export { LoginForm } from './LoginForm';
-export { ThemeToggle } from './ThemeToggle';

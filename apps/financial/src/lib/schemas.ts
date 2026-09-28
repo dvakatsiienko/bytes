@@ -48,8 +48,6 @@ export type InvoiceFormValues = z.input<typeof InvoiceInputSchema>;
 
 export type InvoiceRecord = z.infer<typeof InvoiceRecordSchema>;
 
-export type InvoiceStatus = InvoiceRecord['status'];
-
 export type LoginValues = z.infer<typeof LoginSchema>;
 
 export type SignupValues = z.infer<typeof SignupSchema>;
