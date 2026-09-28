@@ -45,6 +45,8 @@ export interface Game {
   playedAt: string | null;
   /** Total seconds played, or null when the playtime join missed. */
   playSeconds: number | null;
+  /** PSN's store product id — only the owned list carries one. */
+  productId?: string;
   progress: number;
   source: GameSource;
 }
@@ -262,11 +264,21 @@ export const NPSSO_URL = 'https://ca.account.sony.com/api/v1/ssocookie';
  * admin row says «auto» rather than just «hidden»: the rule is a default the
  * owner can always see and always overrule, never a verdict.
  */
-export const isNonGame = (name: string) => {
+export const isNonGame = (name: string, productId?: string) => {
+  if (productId?.startsWith(SONY_APPS_PUBLISHER)) return true;
+
   const lower = name.toLowerCase();
 
   return NON_GAME_PARTS.some((part) => lower.includes(part));
 };
+
+/**
+ * The publisher prefix of Sony's own system apps. Of the 318 owned entitlements
+ * probed on 2026-09-28 it marked exactly SHAREfactory and Media Player — the one
+ * field in the feed that tells a non-game apart. The rest (a headset companion,
+ * a demo, bonus content) carry nothing that does, and the hide list covers them.
+ */
+const SONY_APPS_PUBLISHER = 'IP9100-';
 
 /**
  * `ost` is deliberately absent: as a substring it claims Ghost of Tsushima.

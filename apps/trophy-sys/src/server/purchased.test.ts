@@ -22,7 +22,13 @@ const purchased = (
   name: string,
   platform = 'PS5',
   titleId = `PPSA${name.length}_00`,
-): PurchasedTitle => ({ iconUrl: 'icon.png', name, platform, titleId });
+): PurchasedTitle => ({
+  iconUrl: 'icon.png',
+  name,
+  platform,
+  productId: `EP0000-${titleId}-0000000000000000`,
+  titleId,
+});
 
 const trophied = (name: string, platform = 'PS4'): Game =>
   ({
@@ -45,6 +51,15 @@ test('a purchased title already in the trophy list is not added again', () => {
   const merged = unplayedBuild(
     [purchased('Hollow Knight')],
     [trophied('Hollow Knight')],
+    NO_PLAY,
+  );
+  expect(names(merged)).toStrictEqual([]);
+});
+
+test('a bundle in the alias table joins the trophy row it contains', () => {
+  const merged = unplayedBuild(
+    [purchased('METAL GEAR SOLID V: THE DEFINITIVE EXPERIENCE', 'PS4')],
+    [trophied('METAL GEAR SOLID V: THE PHANTOM PAIN')],
     NO_PLAY,
   );
   expect(names(merged)).toStrictEqual([]);

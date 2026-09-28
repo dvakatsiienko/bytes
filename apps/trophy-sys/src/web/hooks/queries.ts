@@ -1,6 +1,7 @@
 import {
   QueryCache,
   QueryClient,
+  focusManager,
   useMutation,
   useQuery,
   useQueryClient,
@@ -58,6 +59,37 @@ export const queryClientCreate = () => {
 
   return client;
 };
+
+/**
+ * Refetch on window `focus` as well as on `visibilitychange`, which is all
+ * react-query v5 listens to. A tab left visible on a second monitor never fires
+ * that one — not on a desktop app switch, not on a url-bar click — so a trophy
+ * earned while the tab sat there never showed. Both events can land together;
+ * the second finds the first's fetch in flight and joins it.
+ */
+export const focusListen = (target: EventTarget) => {
+  focusManager.setEventListener((handleFocus) => {
+    const handleEvent = () => handleFocus();
+
+    for (const type of FOCUS_EVENTS) target.addEventListener(type, handleEvent);
+
+    return () => {
+      for (const type of FOCUS_EVENTS)
+        target.removeEventListener(type, handleEvent);
+    };
+  });
+
+  return () => focusManager.setEventListener(() => undefined);
+};
+
+const FOCUS_EVENTS = ['focus', 'visibilitychange'] as const;
+
+/**
+ * A visible tab re-asks PSN this often with no event at all — a tab parked on a
+ * second monitor gets no focus either. Never under the server's 60s memo: a
+ * faster poll would only read the same cached answer back.
+ */
+const VISIBLE_POLL_MS = 5 * 60_000;
 
 /** The queries whose answer comes from PSN itself. */
 const PSN_KEYS = new Set(['game', 'games', 'profile']);
@@ -122,13 +154,16 @@ export const useProfile = () =>
   useQuery({
     queryFn: () => apiGet<Profile>('/profile'),
     queryKey: ['profile'],
-    refetchInterval: (query) => (isNpssoDead(query) ? DEAD_POLL_MS : false),
+    // Both paused in a hidden tab: `refetchIntervalInBackground` stays false.
+    refetchInterval: (query) =>
+      isNpssoDead(query) ? DEAD_POLL_MS : VISIBLE_POLL_MS,
   });
 
 export const useGames = () =>
   useQuery({
     queryFn: () => apiGet<Game[]>('/games'),
     queryKey: ['games'],
+    refetchInterval: VISIBLE_POLL_MS,
   });
 
 export const useGame = (gameId: string | null) =>

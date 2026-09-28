@@ -83,8 +83,10 @@ entries (soundtracks, demos and companion apps count) and ~342 Steam games.
 `hidden: boolean` per game (that is the admin's view). `GET /api/settings` is public on purpose —
 the charts read it — and only the write is gated.
 
-📌 **Hidden is a rule plus two override lists, never one stored set.** `isNonGame(name)` in
-`shared/types.ts` hides soundtracks and artbooks by name, so a title bought tomorrow arrives hidden
+📌 **Hidden is a rule plus two override lists, never one stored set.** `isNonGame(name, productId)` in
+`shared/types.ts` hides soundtracks and artbooks by name, and Sony's own system apps by the
+`IP9100-` publisher prefix of the owned list's product id (SHAREfactory, Media Player — the only
+field in the feed that tells a non-game apart), so a title bought tomorrow arrives hidden
 with nothing written for it — that is the whole point. The stores hold only *deviations*:
 `trophy-sys:hidden` the ids the rule would show, `trophy-sys:shown` the ids it would hide. So
 `hidden = isNonGame(name) ? !shown.has(id) : hidden.has(id)`, and an unhide survives every later

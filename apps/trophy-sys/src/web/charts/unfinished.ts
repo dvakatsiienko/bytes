@@ -3,7 +3,7 @@ import type { BarChart } from '../components/bar-rows.tsx';
 import type { ChartColumn } from '../components/chart-frame.tsx';
 import { BAR_TONE } from '../helpers/chart-theme.ts';
 import { hoursFormat } from '../helpers/format.ts';
-import { GRADE_ORDER, gameLookup } from '../helpers/stats.ts';
+import { GRADE_ORDER, countShare, gameLookup } from '../helpers/stats.ts';
 
 /** Titles shown before the list stops being a weekly-open view. */
 const LIMIT = 15;
@@ -55,7 +55,7 @@ const distanceOf = (left: RemainingTrophy[]) =>
  */
 export const UNFINISHED_SORTS = [
   { label: 'left', value: 'left' },
-  { label: 'progress', value: 'progress' },
+  { label: 'completion', value: 'completion' },
   { label: 'hours', value: 'hours' },
 ] as const satisfies readonly { label: string; value: UnfinishedSort }[];
 
@@ -63,9 +63,9 @@ const UNFINISHED_ORDER: Record<
   UnfinishedSort,
   (a: UnfinishedRow, b: UnfinishedRow) => number
 > = {
+  completion: (a, b) => b.completion - a.completion,
   hours: (a, b) => b.hours - a.hours,
   left: (a, b) => a.distance - b.distance,
-  progress: (a, b) => b.progress - a.progress,
 };
 
 export const unfinishedRows = (
@@ -96,6 +96,7 @@ export const unfinishedRows = (
     const playedAt = game.playedAt ?? game.lastPlayedAt;
 
     rows.push({
+      completion: countShare(game),
       counters,
       distance: distanceOf(left),
       dormant: isDormant(playedAt),
@@ -105,7 +106,6 @@ export const unfinishedRows = (
       left: sorted,
       name: game.name,
       playedAt,
-      progress: game.progress,
       rarest: sorted[0] ?? null,
     });
   }
@@ -124,13 +124,13 @@ export const unfinishedChart = (rows: UnfinishedRow[]): BarChart => ({
       .join(', ');
 
     return {
-      fraction: row.progress / 100,
+      fraction: row.completion / 100,
       iconUrl: row.iconUrl,
       id: row.gameId,
       label: row.name,
       note: `still open: ${namedLeft}${row.left.length > 3 ? ` +${row.left.length - 3} more` : ''}`,
       rows: [
-        { label: 'progress', value: `${row.progress}%` },
+        { label: 'completion', value: `${row.completion}%` },
         { label: 'left by grade', value: gradeBreakdown(row.left) },
         {
           label: 'left',
@@ -162,7 +162,11 @@ const counterFormat = (counters: UnfinishedRow['counters']) => {
 export const UNFINISHED_COLUMNS: ChartColumn<UnfinishedRow>[] = [
   { cell: (row) => row.name, head: 'title' },
   { cell: (row) => (row.dormant ? 'dormant' : 'active'), head: 'state' },
-  { cell: (row) => `${row.progress}%`, head: 'progress', isNumeric: true },
+  {
+    cell: (row) => `${row.completion}%`,
+    head: 'completion',
+    isNumeric: true,
+  },
   {
     cell: (row) => row.distance.toFixed(1),
     head: 'trophies left',
@@ -183,9 +187,11 @@ export const UNFINISHED_COLUMNS: ChartColumn<UnfinishedRow>[] = [
 ];
 
 /* Types */
-export type UnfinishedSort = 'hours' | 'left' | 'progress';
+export type UnfinishedSort = 'completion' | 'hours' | 'left';
 
 export interface UnfinishedRow {
+  /** Trophies earned of trophies defined — see `countShare`. */
+  completion: number;
   /** The unearned trophies that carry a live counter. */
   counters: RemainingTrophy[];
   /** Trophies still owed, counting a part-done one as its remaining slice. */
@@ -199,6 +205,5 @@ export interface UnfinishedRow {
   left: RemainingTrophy[];
   name: string;
   playedAt: string | null;
-  progress: number;
   rarest: RemainingTrophy | null;
 }

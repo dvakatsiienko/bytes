@@ -7,6 +7,24 @@ import type {
 } from '../../shared/types.ts';
 export const countTotal = (counts: TrophyCounts) =>
   counts.bronze + counts.silver + counts.gold + counts.platinum;
+
+/**
+ * Trophies earned of trophies defined, as a whole percent — the completion
+ * figure the app shows everywhere. PSN's own `progress` weights by grade in a
+ * way nothing here can rebuild, and keeps no history, so the journal could never
+ * show it for a past day. Floored: 199 of 200 is not done.
+ */
+export const countShare = (counts: {
+  defined: TrophyCounts;
+  earned: TrophyCounts;
+}) => sharePercent(countTotal(counts.earned), countTotal(counts.defined));
+
+/**
+ * The one rounding rule for every «N of M» percent — the journal's before and
+ * after figures use it too, so a title reads the same number on every view.
+ */
+export const sharePercent = (earned: number, defined: number) =>
+  defined ? Math.floor((earned / defined) * 100) : 0;
 /** Rarest grade last, which is the order every stack and legend reads in. */
 export const GRADE_ORDER = [
   'bronze',

@@ -49,7 +49,7 @@ A purchase record from PSN; the source of the unplayed half of the library.
 _Avoid_: purchase, license
 
 **Non-game**:
-A title the auto-hide rule claims by its name, such as a soundtrack or an artbook.
+A title the auto-hide rule claims by its name, such as a soundtrack or an artbook, or by Sony's system-app publisher prefix (`IP9100-`), such as SHAREfactory.
 _Avoid_: junk, DLC
 
 **Hidden**:
@@ -83,8 +83,12 @@ A day that ends at 05:00, not at midnight, so a late session counts as the eveni
 _Avoid_: calendar day (the heatmap's day), date
 
 **Progress**:
-PSN's own figure for a title, weighted by trophy grade — not the share of trophies earned.
+PSN's own figure for a title, weighted by trophy grade — not the share of trophies earned. Shown only as a small second in /library, labelled `psn`.
 _Avoid_: completion, percent done
+
+**Completion**:
+Trophies earned of trophies defined, floored to a whole percent — the figure every view leads with.
+_Avoid_: progress (that is PSN's weighted figure), percent done
 
 **Now playing**:
 The title of the newest trophy inside the sync window.

@@ -2,6 +2,7 @@ import { type ReactNode, useMemo, useState } from 'react';
 
 import type { GameDetail, Trophy, TrophyGroup } from '../../shared/types.ts';
 import { GRADE_MARK, barRender, progressTone } from '../helpers/format.ts';
+import { countShare, countTotal } from '../helpers/stats.ts';
 import {
   EARNED_MODE_HINT,
   EARNED_MODE_LABEL,
@@ -51,6 +52,7 @@ export const GamePanel = (props: GamePanelProps) => {
   if (!props.game) return <Shell>loading trophy set…</Shell>;
 
   const hasPlatinum = props.game.earned.platinum > 0;
+  const share = countShare(props.game);
 
   return (
     <section className='panel flex min-h-0 min-w-0 flex-col'>
@@ -84,25 +86,18 @@ export const GamePanel = (props: GamePanelProps) => {
               </span>
             )}
             <span>
-              {props.game.earned.bronze +
-                props.game.earned.silver +
-                props.game.earned.gold +
-                props.game.earned.platinum}
-              /
-              {props.game.defined.bronze +
-                props.game.defined.silver +
-                props.game.defined.gold +
-                props.game.defined.platinum}{' '}
+              {countTotal(props.game.earned)}/{countTotal(props.game.defined)}{' '}
               trophies
             </span>
           </p>
         </div>
 
         <div className='ml-auto shrink-0 text-right text-[12px]'>
-          <span className={progressTone(props.game.progress)}>
-            {barRender(props.game.progress, 18)}
-          </span>
-          <span className='block text-dim'>{props.game.progress}%</span>
+          <span className={progressTone(share)}>{barRender(share, 18)}</span>
+          <span className='block text-dim'>{share}%</span>
+          {props.game.progress !== share && (
+            <span className='block text-mute'>{props.game.progress}% psn</span>
+          )}
         </div>
       </div>
 
@@ -170,13 +165,11 @@ const GroupSection = ({
   group: TrophyGroup;
   trophies: Trophy[];
 }) => {
-  const countOf = (counts: TrophyGroup['earned']) =>
-    counts.bronze + counts.silver + counts.gold + counts.platinum;
-
   // Counts come from the group, not the rendered rows — a search filters the
   // rows but must not rewrite the group's completion figure.
-  const earned = countOf(group.earned);
-  const defined = countOf(group.defined);
+  const earned = countTotal(group.earned);
+  const defined = countTotal(group.defined);
+  const groupShare = countShare(group);
 
   return (
     <>
@@ -189,11 +182,10 @@ const GroupSection = ({
         </span>
 
         <span className='ml-auto flex shrink-0 items-center gap-2'>
-          <span
-            className={group.progress === 100 ? 'text-green' : 'text-yellow'}>
-            {barRender(group.progress, 10)}
+          <span className={groupShare === 100 ? 'text-green' : 'text-yellow'}>
+            {barRender(groupShare, 10)}
           </span>
-          <span className='w-8 text-right text-dim'>{group.progress}%</span>
+          <span className='w-8 text-right text-dim'>{groupShare}%</span>
         </span>
       </header>
 
