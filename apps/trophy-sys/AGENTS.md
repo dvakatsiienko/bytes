@@ -356,7 +356,8 @@ things about **this** page waste a run otherwise:
   theme tokens in `src/web/theme.css` (`text-orange`, `bg-bg-lift`, `text-gold`…) — no hex in
   components. Progress bars are `█`/`░` runs from `barRender`, not DOM elements.
 - **`@ui/kit` is wired in** — `components.json`, the `@ui/kit: workspace:*` dependency,
-  `lucide-react`, and `resolve.dedupe` in `vite.config.ts`. Import as `@ui/kit/components/button`;
+  and `resolve.dedupe` in `vite.config.ts`. Kit components resolve `lucide-react` from kit's own
+  manifest; the app lists it only once its own code imports an icon. Import as `@ui/kit/components/button`;
   the monorepo's kit rules in the root `AGENTS.md` apply here now. `theme.css` maps the shadcn L2
   token vocabulary onto the existing gruvbox `--p-*` palette, with `--radius: 0px` — a kit component
   lands retro without per-component overrides, and the raw `--p-*` variables stay the only thing
