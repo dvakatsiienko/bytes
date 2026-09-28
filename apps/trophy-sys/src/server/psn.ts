@@ -186,7 +186,7 @@ const sessionRefreshOrMint = async (): Promise<Session> => {
     await exchangeRefreshTokenForAuthTokens(held.token),
     held,
   );
-  if (refreshed) return refreshed;
+  if (refreshed) return await sessionRenewEarly(refreshed);
 
   // ⚠️ A weaker sample than the NPSSO's. psn-api maps seven token fields and
   // drops the error body, so a genuine `invalid_grant` and a PSN `server_error`
@@ -202,6 +202,36 @@ const sessionRefreshOrMint = async (): Promise<Session> => {
 
   return await sessionMint();
 };
+
+/**
+ * Swaps a grant with three days or less left for a fresh one from the NPSSO,
+ * while the old grant still works.
+ *
+ * The grant's end is where a quietly dead NPSSO (a logout anywhere on
+ * playstation web kills it) is first found out. Moving that moment three days
+ * early turns it into a check with room: a live NPSSO gets a fresh ten-day
+ * grant, and a dead one is recorded — /console shows it — while the old grant
+ * keeps every route up. Any failure here answers with the refreshed session,
+ * because the call that asked for a token must not pay for a check it never
+ * asked for.
+ *
+ * 📌 While the NPSSO is dead this runs once per access-token expiry (an hour)
+ * until the old grant ends: at most ~72 extra PSN calls, each one refused.
+ */
+const sessionRenewEarly = async (refreshed: Session): Promise<Session> => {
+  if (refreshed.grant.expiresIn * 1000 > GRANT_RENEW_MS) return refreshed;
+
+  try {
+    return await sessionMint();
+  } catch (cause) {
+    if (!(cause instanceof Error && cause.message === NPSSO_INVALID))
+      console.error('psn early re-mint failed', cause);
+
+    return refreshed;
+  }
+};
+
+const GRANT_RENEW_MS = 3 * 86_400_000;
 
 /**
  * The memoised half of `authGet`: one session, and one write of the grant it
