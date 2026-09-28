@@ -338,7 +338,8 @@
    * A sitting's trophies hang off a spine, file-tree style — real borders, not
    * box-drawing characters, so the rules sit on the pixel grid and take the
    * palette's line colour in both themes. The last child's spine stops at its
-   * own tick, which is what turns ├ into └.
+   * own tick, which is what turns ├ into └. The tick sits at half the row, the
+   * same line the row centres its icon on, so no row height can pull them apart.
    */
   .tree > li {
     position: relative;
@@ -356,12 +357,12 @@
 
   .tree > li:last-child::before {
     bottom: auto;
-    height: 1.15rem;
+    height: 50%;
   }
 
   .tree > li::after {
     position: absolute;
-    top: 1.15rem;
+    top: 50%;
     left: 0;
     width: 0.7rem;
     content: "";

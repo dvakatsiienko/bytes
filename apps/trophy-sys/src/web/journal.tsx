@@ -45,9 +45,12 @@ export const Journal = () => {
 
     const tallyListJSX = gradeTally(day).map((tally) => {
       return (
-        <span className={GRADE_COLOR[tally.grade]} key={tally.grade}>
-          {GRADE_MARK[tally.grade]}
-          <span className='ml-0.5 text-mute'>{tally.count}</span>
+        <span className='flex gap-1' key={tally.grade}>
+          {/* The mark's ink centres 1.3px below a digit's in this font. */}
+          <span className={`${GRADE_COLOR[tally.grade]} relative -top-px`}>
+            {GRADE_MARK[tally.grade]}
+          </span>
+          <span className='text-mute'>{tally.count}</span>
         </span>
       );
     });
@@ -56,7 +59,7 @@ export const Journal = () => {
       <section key={day.date}>
         {/* A rule with the day set into it, the way a panel title sits in its
             border: the terminal's own separator, not a filled band. */}
-        <header className='sticky top-0 z-10 flex items-center gap-3 bg-[color-mix(in_srgb,var(--color-bg-soft)_70%,var(--color-bg))] px-4 pt-3 pb-1.5 text-[12px] tabular-nums'>
+        <header className='sticky top-0 z-10 flex items-center gap-3 bg-[color-mix(in_srgb,var(--color-bg-soft)_70%,var(--color-bg))] px-4 py-3 text-[12px] tabular-nums'>
           {/* Printed, not parsed. `date` is already a local gaming-day key, and
               sending it back through a Date would read it as UTC midnight. */}
           <span className='text-orange tracking-[0.15em]'>
@@ -64,7 +67,10 @@ export const Journal = () => {
           </span>
           <span className='text-dim'>{weekdayOf(day.date)}</span>
           <span aria-hidden='true' className='h-px min-w-4 flex-1 bg-line' />
-          <span className='flex shrink-0 gap-2'>{tallyListJSX}</span>
+          <span className='flex shrink-0 gap-3'>{tallyListJSX}</span>
+          <span aria-hidden='true' className='text-dim'>
+            ·
+          </span>
           <span className='shrink-0 whitespace-nowrap text-mute'>
             {day.count} {day.count === 1 ? 'trophy' : 'trophies'}
           </span>
@@ -94,22 +100,24 @@ const GameDayRow = (props: GameDayRowProps) => {
   const trophyListJSX = props.gameDay.trophies.map((trophy) => {
     return (
       <li
-        className='flex items-center gap-2 py-1'
+        className='flex items-center gap-2 py-2 leading-4'
         key={`${trophy.gameId}-${trophy.name}-${trophy.at}`}>
+        {/* 32px, the height of the two 16px text lines beside it, so the icon
+            and the name-plus-detail block share their top and bottom edges. */}
         {trophy.iconUrl ? (
           <img
             alt=''
-            className='size-7 shrink-0 border border-line bg-bg-soft object-contain'
-            height={28}
+            className='size-8 shrink-0 border border-line bg-bg-soft object-contain'
+            height={32}
             loading='lazy'
             src={trophy.iconUrl}
-            width={28}
+            width={32}
           />
         ) : (
           // An archive written before the log route carries no icons; the grade
           // mark holds the column so the rows stay aligned either way.
           <span
-            className={`${GRADE_COLOR[trophy.grade]} grid size-7 shrink-0 place-items-center`}>
+            className={`${GRADE_COLOR[trophy.grade]} grid size-8 shrink-0 place-items-center`}>
             {GRADE_MARK[trophy.grade]}
           </span>
         )}
@@ -120,12 +128,16 @@ const GameDayRow = (props: GameDayRowProps) => {
               className={`${GRADE_COLOR[trophy.grade]} shrink-0 text-[12px]`}>
               {GRADE_MARK[trophy.grade]}
             </span>
-            <span className='select-text truncate text-[12px] text-fg-soft'>
+            <span
+              className='select-text truncate text-[12px] text-fg-soft'
+              title={trophy.name}>
               {trophy.name}
             </span>
           </span>
           {trophy.detail && (
-            <span className='block select-text truncate text-[12px] text-mute'>
+            <span
+              className='block select-text truncate text-[12px] text-mute'
+              title={trophy.detail}>
               {trophy.detail}
             </span>
           )}
@@ -142,7 +154,7 @@ const GameDayRow = (props: GameDayRowProps) => {
   });
 
   return (
-    <li className='border-line/60 border-b px-4 py-2 last:border-b-0'>
+    <li className='border-line/60 border-b px-4 py-3 last:border-b-0'>
       {/* Wraps: at 390 the progress block took the whole row and squeezed the
           title to nothing, so it drops under the title instead. */}
       <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
@@ -157,6 +169,7 @@ const GameDayRow = (props: GameDayRowProps) => {
         <Link
           className='min-w-0 flex-1 basis-32 cursor-pointer select-text truncate py-1 text-fg-soft hover:text-orange focus-visible:outline focus-visible:outline-orange focus-visible:-outline-offset-2'
           params={{ gameId: props.gameDay.gameId }}
+          title={props.gameDay.name}
           to='/library/$gameId'>
           {props.gameDay.name}
         </Link>
@@ -167,7 +180,7 @@ const GameDayRow = (props: GameDayRowProps) => {
           nothing to gain by folding them away. */}
       {/* ml-4 lands the spine under the game icon above it, so the branch
           reads as descending from the title rather than from the row edge. */}
-      <ul className='tree mt-1.5 ml-4'>{trophyListJSX}</ul>
+      <ul className='tree mt-2 ml-4'>{trophyListJSX}</ul>
     </li>
   );
 };
