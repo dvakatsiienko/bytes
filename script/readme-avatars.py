@@ -127,7 +127,7 @@ AVATARS = dict(
     cv=('cv: a glass jar holding a pinned paper id card, paper label', card, '#efe2c4', '#8a6a3a', (60, 57.1)),
     financial=('financial: a glass jar holding brass coins and a ledger sheet, orange label', coins, '#fe8019', '#9c4430', (66.3, 64.3)),
     figmentation=('figmentation: a glass jar holding a fan of paint swatches, purple label', swatches, '#d3869b', '#8f3f71', (59.6, 62.6)),
-    atelier=('atelier: a glass jar holding a brass pot of paintbrushes, red label', brushes, '#fb4934', '#9d0006', (60, 60.5)),
+    atelier=('atelier: a glass jar holding a brass pot of paintbrushes, red label', brushes, '#fb4934', '#9d0006', (60, 54.5)),
     sketchbook=('sketchbook: a glass jar holding a spiral sketchbook and a pencil, yellow label', sketch, '#fabd2f', '#b57614', (65, 60)),
 )
 SCALE = .56

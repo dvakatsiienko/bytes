@@ -8,6 +8,12 @@
  * One line per gap, stable for other tools to read: `<🔴|🟡> <app> <row> — <detail>`, then one
  * summary line. A 🔴 row exits 1; a 🟡 (a doc gone stale) never fails. An app outside this repo
  * (chords, from frame's hook) gets the app-local rows only; the root registrations are bytes'.
+ * An `--app` path counts as a bytes app only under THIS checkout's apps/ — a worktree path handed
+ * to the main checkout's script loses its root rows, so call the script of the tree you check.
+ *
+ * Made by a sync script, so not checked here: the cursor project (`projects:sync`), the readme
+ * badges (`badges:sync`), a worktree's port offset (`worktree:seed`), and the vercel deploy hook
+ * (the `VERCEL_DEPLOY_HOOKS` repo secret, unreadable from a checkout).
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -45,7 +51,7 @@ const waivers: Record<string, Waiver> = {
   atelier: {
     rows: ['launch-entry'],
     ticket: 'BYT-111',
-    why: 'launchd serves the main checkout (x-atelier-live, :5180); a desktop entry would start a second server',
+    why: 'launchd serves it (x-atelier-live, :5180)',
   },
   cv: { rows: '*', ticket: 'BYT-111', why: 'redesign pending' },
   'trophy-sys': {
@@ -189,6 +195,7 @@ const index = values.staged
 const apps = (
   values.app ?? (values.staged ? stagedAppDirs() : trackedAppDirs())
 ).map(toApp);
+if (apps.length === 0) process.exit(0);
 
 const gaps = apps.flatMap((app) =>
   gapsOf(app).map((gap) => ({ ...gap, app: app.name })),
@@ -204,10 +211,9 @@ const yellowCount = gaps.length - redCount;
 const waived = apps
   .filter((app) => waivers[app.name])
   .map((app) => {
-    const { rows: waivedRows } = waivers[app.name];
-    return waivedRows === '*'
-      ? app.name
-      : `${app.name} (${waivedRows.join(', ')})`;
+    const { rows: waivedRows, ticket, why } = waivers[app.name];
+    const scope = waivedRows === '*' ? 'whole app' : waivedRows.join(', ');
+    return `${app.name} (${scope} — ${ticket}: ${why})`;
   });
 console.log(
   `${redCount ? '🔴' : '✅'} apps-essentials: ${apps.length} apps, ${redCount} red, ${yellowCount} yellow${waived.length ? `, waived: ${waived.join('; ')}` : ''}`,
