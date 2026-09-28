@@ -95,5 +95,3 @@ export const createRenderer = (
     },
   };
 };
-
-export type StageRenderer = ReturnType<typeof createRenderer>;
