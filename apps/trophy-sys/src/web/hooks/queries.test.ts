@@ -2,7 +2,35 @@ import { QueryObserver } from '@tanstack/react-query';
 import { expect, test, vi } from 'vitest';
 
 import { NPSSO_INVALID } from '../../shared/types.ts';
-import { queryClientCreate } from './queries.ts';
+import { focusListen, queryClientCreate } from './queries.ts';
+
+test('a window focus refetches a stale query, with no visibility change', async () => {
+  const client = queryClientCreate();
+  // What QueryClientProvider does: only a mounted client hears the focus manager.
+  client.mount();
+  const target = new EventTarget();
+  const stop = focusListen(target);
+  let calls = 0;
+
+  const games = new QueryObserver(client, {
+    queryFn: () => {
+      calls += 1;
+      return Promise.resolve([]);
+    },
+    queryKey: ['games'],
+    staleTime: 0,
+  });
+  const unsubscribe = games.subscribe(() => undefined);
+  await vi.waitFor(() => expect(calls).toBe(1));
+
+  // A desktop app switch or a url-bar click: the tab never stopped being visible.
+  target.dispatchEvent(new Event('focus'));
+
+  await vi.waitFor(() => expect(calls).toBe(2));
+  unsubscribe();
+  stop();
+  client.unmount();
+});
 
 test('a success elsewhere refetches a query stuck on the dead-token error', async () => {
   const client = queryClientCreate();
