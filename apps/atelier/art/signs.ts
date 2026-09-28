@@ -80,6 +80,7 @@ export const signGroup = (p: Palette, app: AppName) => {
 export const appSign = (app: AppName) => (p: Palette) =>
   `${defs(p)}${signGroup(p, app)}<clipPath id="board"><rect x="16" y="36" width="168" height="152" rx="18"/></clipPath><rect x="16" y="36" width="168" height="152" filter="url(#grain)" clip-path="url(#board)"/>`;
 
+/** @public kept for future scenes, called by none yet */
 export const appIcon = (p: Palette, app: AppName) => apps[app].icon(p);
 export const appAccent = (p: Palette, app: AppName) =>
   p.flora[apps[app].accent];

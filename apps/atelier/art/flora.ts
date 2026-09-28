@@ -106,7 +106,10 @@ export const berries = (
   return out;
 };
 
-/** the petrykivka feather leaf: a curved stem with small commas along both sides */
+/**
+ * the petrykivka feather leaf: a curved stem with small commas along both sides
+ * @public kept for future scenes, drawn by none yet
+ */
 export const featherLeaf = (
   x: number,
   y: number,
