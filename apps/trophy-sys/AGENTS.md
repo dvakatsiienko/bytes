@@ -288,6 +288,11 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   that had drifted: bottom ran 36/26/22, left ran 38/42/38 — and 38 was too small for the
   progression's widest tick, so `2,000` drew as `,000` for months. `MONTH_AXIS_RIGHT` holds the
   half of a `YYYY-MM` label that hangs past the last tick.
+  `campaign-layout.browser.test.tsx` holds the rule: it draws `/campaign` from
+  `campaign.fixture.ts` in chromium at 1280 and 390, and goes red when an x-axis chart ends at a
+  different distance above its panel edge, or a tick label on any axis leaves its chart's svg.
+  📌 visx wraps each tick label in its own `<svg style="overflow: visible">` — measure against the
+  chart's outer svg, never `closest('svg')`. A new x-axis chart bumps its `X_AXIS_CHARTS`.
 - **A tick count is derived from the width, never asked for flat.** `monthTicks(innerWidth, n)`
   for the two month axes — both asked for 6 at every width and printed over each other at 390px.
   `decadeTicks` in `effort-scatter.tsx` pins one tick per power of ten: 📌 **d3 abandons the count

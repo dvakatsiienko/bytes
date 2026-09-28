@@ -78,7 +78,7 @@ git worktree remove .claude/worktrees/<slug> && git branch -D coder/<slug>
 ## Test
 
 ```bash
-cd apps/trophy-sys && pnpm test        # vitest, 9 files, 74 tests, <1 s
+cd apps/trophy-sys && pnpm test        # vitest: a node project, and a chromium one for *.browser.test.tsx at 1280 + 390
 cd apps/trophy-sys && pnpm typecheck   # both tsconfigs, exit 0
 ```
 
