@@ -381,6 +381,7 @@ export const unplayedBuild = (
       platform: title.platform,
       playSeconds: play?.seconds ?? null,
       playedAt: play?.playedAt ?? null,
+      productId: title.productId,
       progress: 0,
       source: 'psn-purchased',
     });

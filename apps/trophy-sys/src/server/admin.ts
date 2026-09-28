@@ -204,7 +204,9 @@ const stringList = (value: unknown): string[] | null =>
  * and a title unhidden today stays unhidden through every later sync.
  */
 const hiddenIs = (game: Game, hidden: Set<string>, shown: Set<string>) =>
-  isNonGame(game.name) ? !shown.has(game.id) : hidden.has(game.id);
+  isNonGame(game.name, game.productId)
+    ? !shown.has(game.id)
+    : hidden.has(game.id);
 
 /**
  * The body says what to do — hide or show these ids — rather than carrying a
@@ -226,7 +228,9 @@ export const hiddenFlip = async (
   ]);
 
   const ruled = new Set(
-    games.filter((game) => isNonGame(game.name)).map((game) => game.id),
+    games
+      .filter((game) => isNonGame(game.name, game.productId))
+      .map((game) => game.id),
   );
   const nextHidden = new Set(hidden);
   const nextShown = new Set(shown);

@@ -33,6 +33,18 @@ test('a real game keeps its place', () => {
   expect(isNonGame('ELDEN RING')).toBe(false);
 });
 
+test('a sony system app is claimed by its publisher prefix, whatever its name', () => {
+  expect(
+    isNonGame('SHAREfactory™', 'IP9100-CUSA00572_00-EURELE0000000100'),
+  ).toBe(true);
+});
+
+test('a product from any other publisher is left to the name rule', () => {
+  expect(
+    isNonGame('Rogue Legacy 2', 'EP4040-PPSA02839_00-ROGUELEGACY20000'),
+  ).toBe(false);
+});
+
 test('«ost» is not a pattern, because it lives inside Ghost', () => {
   expect(
     isNonGame('Ghost of Tsushima'),

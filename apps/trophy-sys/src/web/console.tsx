@@ -582,9 +582,9 @@ const GameList = () => {
  */
 const GameRow = (props: GameRowProps) => {
   const isHidden = Boolean(props.game.hidden);
-  // Derived from the name, not carried in the payload: the rule is shared code,
-  // so both sides reach the same answer without a field that could drift.
-  const byRule = isNonGame(props.game.name);
+  // Derived here, not carried as a flag: the rule is shared code, so both sides
+  // reach the same answer from the same two fields.
+  const byRule = isNonGame(props.game.name, props.game.productId);
 
   return (
     <tr

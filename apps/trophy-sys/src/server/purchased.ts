@@ -27,6 +27,8 @@ export interface PurchasedTitle {
   name: string;
   /** `PS4` / `PS5`, the same vocabulary as `trophyTitlePlatform`. */
   platform: string;
+  /** `IP9100-CUSA00572_00-…` — the prefix names the publisher. */
+  productId: string;
   /** PSN's title id (`PPSA16033_00`) — never an `npCommunicationId`. */
   titleId: string;
 }
@@ -82,6 +84,7 @@ export const purchasedFetch = async (): Promise<PurchasedTitle[]> => {
         iconUrl: game.image.url,
         name: game.name,
         platform: game.platform,
+        productId: game.productId,
         titleId: game.titleId,
       });
 

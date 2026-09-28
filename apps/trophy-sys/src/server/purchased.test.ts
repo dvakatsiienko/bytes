@@ -22,7 +22,13 @@ const purchased = (
   name: string,
   platform = 'PS5',
   titleId = `PPSA${name.length}_00`,
-): PurchasedTitle => ({ iconUrl: 'icon.png', name, platform, titleId });
+): PurchasedTitle => ({
+  iconUrl: 'icon.png',
+  name,
+  platform,
+  productId: `EP0000-${titleId}-0000000000000000`,
+  titleId,
+});
 
 const trophied = (name: string, platform = 'PS4'): Game =>
   ({
