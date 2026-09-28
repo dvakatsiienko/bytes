@@ -1,0 +1,3 @@
+# A Next.js app over Prisma and Postgres, logins through better-auth
+
+financial is a Next.js 16 App Router app on React 19: pages are server components that read through Prisma 7 (`@prisma/adapter-pg`) from a hosted Prisma Postgres database, and the invoice writes go through route handlers under `api/invoices`, called from client forms (react-hook-form + zod) through React Query. Logins are better-auth with email and password, and a `proxy.ts` guard keeps `/dashboard` for users with a session. It was chosen because the app began as the Next.js App Router dashboard course and keeps that shape: server-rendered reads over a relational ledger of customers, invoices and monthly revenue. Money is stored as integer cents, so no amount is ever a float.

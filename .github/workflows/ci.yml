@@ -469,13 +469,31 @@ jobs:
           echo "$BUILD"
           eval "$BUILD"
 
+  # Every app carries its essentials (BYT-111): every app, every run, ~10 s.
+  # No install — the script is node builtins only. Full history, because a
+  # stale-doc warning counts commits since a doc last moved.
+  essentials:
+    name: apps essentials
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+      - run: node script/apps-essentials.ts
+
   # The readme's ci badge in the repo's own style, redrawn after every main run. It lives on an
   # orphan `badges` branch, one commit force-replaced each time, so a status never lands in main's
   # history. A cancelled run is skipped: superseded is not failed.
   #
   # 📌 The `needs:` edge here is safe where `check`'s header forbids one: this job is not a
   # required context and gates nothing, it only reports. A skipped leg (an app the push did not
-  # touch) is not a failure; only a `failure` among the three turns the badge red. It runs on a
+  # touch) is not a failure; only a `failure` among the four turns the badge red. It runs on a
   # push to `main` only, so the write token never meets branch or pull-request code.
   #
   # ⚠️ Vercel builds every branch push unless the app's own `vercel.json` says
@@ -485,7 +503,7 @@ jobs:
   # copied from this checkout: derived, never a hand list.
   badge:
     name: ci badge
-    needs: [check, financial, vercel-install]
+    needs: [check, financial, vercel-install, essentials]
     if: >-
       always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       !contains(needs.*.result, 'cancelled')

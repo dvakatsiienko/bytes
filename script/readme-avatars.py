@@ -83,6 +83,41 @@ def coins(p, k):
             f'<path transform="translate(45 66) scale(.9)" d="{SPARK}" fill="#fff3c4"/>')
 
 
+def swatches(p, k):
+    paper = '#fbf9fe' if k == 'light' else '#e6e2d4'
+    fan = ''
+    for angle, chips in ((-38, ('#fb4934', '#cc241d', '#9d0006')), (-13, ('#fabd2f', '#d79921', '#b57614')),
+                         (12, ('#8ec07c', '#689d6a', '#427b58')), (37, ('#83a598', '#458588', '#076678'))):
+        bands = ''.join(f'<rect x="55" y="{34 + n * 14}" width="10" height="12" rx="1" fill="{c}"/>' for n, c in enumerate(chips))
+        fan += (f'<g transform="rotate({angle} 60 88)"><g filter="url(#{p}paper)"><rect x="53" y="30" width="14" height="62" rx="3" fill="{paper}"/></g>'
+                f'{bands}<path d="M56 80h8" stroke="#8a7a68" stroke-width="1.4" stroke-linecap="round"/></g>')
+    return (f'<ellipse cx="60" cy="101" rx="30" ry="3.5" fill="#000" opacity=".18"/>{fan}'
+            f'<circle cx="60" cy="88" r="4.5" fill="url(#{p}brass)"/><circle cx="59" cy="87" r="1.4" fill="#fff" opacity=".8"/>')
+
+
+def brushes(p, k):
+    handles = ''
+    for (x0, y0, x1, y1), wood, tip in (((50, 72, 34, 28), '#c0573a', '#fb4934'), ((60, 72, 60, 20), '#83a598', '#fabd2f'),
+                                         ((70, 72, 86, 30), '#efe2c4', '#458588')):
+        handles += (f'<path d="M{x0} {y0}L{x1} {y1}" stroke="{wood}" stroke-width="6" stroke-linecap="round"/>'
+                    f'<ellipse cx="{x1}" cy="{y1}" rx="4.6" ry="8" fill="{tip}" transform="rotate({(x1 - x0) * 1.6:.0f} {x1} {y1})"/>')
+    return (f'<ellipse cx="60" cy="101" rx="24" ry="3.5" fill="#000" opacity=".18"/>{handles}'
+            f'<g filter="url(#{p}paper)"><path d="M38 60h44l-4 34q0 3-3 3h-30q-3 0-3-3z" fill="url(#{p}brassv)"/></g>'
+            f'<ellipse cx="60" cy="60" rx="22" ry="3.4" fill="#f8e3a0"/><path d="M45 66v24" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" stroke-linecap="round"/>')
+
+
+def sketch(p, k):
+    paper = '#fbf9fe' if k == 'light' else '#e6e2d4'
+    rings = ''.join(f'<rect x="{x}" y="26" width="3" height="9" rx="1.5" fill="url(#{p}brass)"/>' for x in range(40, 82, 7))
+    return (f'<ellipse cx="60" cy="101" rx="30" ry="3.5" fill="#000" opacity=".18"/>'
+            f'<g filter="url(#{p}paper)"><rect x="34" y="30" width="52" height="64" rx="3" fill="{paper}"/></g>{rings}'
+            f'<path d="M42 70q8-16 16-6t16-10" stroke="#8a7a68" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+            f'<circle cx="68" cy="46" r="6" fill="none" stroke="#fe8019" stroke-width="1.8"/>'
+            f'<path d="M42 82h30" stroke="#d9cfb8" stroke-width="1.6"/>'
+            f'<g transform="rotate(-38 74 74)"><rect x="58" y="71" width="34" height="6" fill="#fabd2f"/><path fill="#efe2c4" d="M92 71l7 3-7 3z"/>'
+            f'<path fill="#3c3836" d="M97 73l2 1-2 1z"/><rect x="54" y="71" width="4" height="6" fill="#d3869b"/></g>')
+
+
 # the last pair is each drawing's bbox centre in its own 120-unit space, shadow left out, measured in a browser;
 # a redrawn prop is re-measured, or it drifts off the glass centre
 AVATARS = dict(
@@ -91,6 +126,9 @@ AVATARS = dict(
     space_explorer=('space explorer: a glass jar holding a paper rocket, blue label', rocket, '#83a598', '#34457a', (60, 62)),
     cv=('cv: a glass jar holding a pinned paper id card, paper label', card, '#efe2c4', '#8a6a3a', (60, 57.1)),
     financial=('financial: a glass jar holding brass coins and a ledger sheet, orange label', coins, '#fe8019', '#9c4430', (66.3, 64.3)),
+    figmentation=('figmentation: a glass jar holding a fan of paint swatches, purple label', swatches, '#d3869b', '#8f3f71', (59.6, 62.6)),
+    atelier=('atelier: a glass jar holding a brass pot of paintbrushes, red label', brushes, '#fb4934', '#9d0006', (60, 54.5)),
+    sketchbook=('sketchbook: a glass jar holding a spiral sketchbook and a pencil, yellow label', sketch, '#fabd2f', '#b57614', (65, 60)),
 )
 SCALE = .56
 GLASS_CENTRE = (60, 59.5)  # the clear glass between the lid (y 31) and the label (y 88)

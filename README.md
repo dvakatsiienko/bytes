@@ -63,6 +63,36 @@
 
 <br clear="all">
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/figmentation-dark.svg"><img align="right" width="110" src="assets/avatars/figmentation-light.svg" alt="figmentation: its jar"></picture>
+
+**figmentation** — design studies: a figma file, rebuilt in code.
+
+[live](https://figmentation.vercel.app) | [source](apps/figmentation)
+
+<details><summary>peek</summary><img src="assets/apps/figmentation.webp" width="100%" alt="figmentation: the clinique study, a foundation bottle beside its product details"></details>
+
+<br clear="all">
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/sketchbook-dark.svg"><img align="right" width="110" src="assets/avatars/sketchbook-light.svg" alt="sketchbook: its jar"></picture>
+
+**sketchbook** — the prototype bench: one live proto, old pages kept to flip back to.
+
+local only | [source](apps/sketchbook)
+
+<details><summary>peek</summary><img src="assets/apps/sketchbook.webp" width="100%" alt="sketchbook: an archived page, the memory map with its counts, link graph and roster"></details>
+
+<br clear="all">
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/avatars/atelier-dark.svg"><img align="right" width="110" src="assets/avatars/atelier-light.svg" alt="atelier: its jar"></picture>
+
+**atelier** — the art studio: every picture drawn as code, lit, and kept as takes.
+
+local only | [source](apps/atelier)
+
+<details><summary>peek</summary><img src="assets/apps/atelier.webp" width="100%" alt="atelier: the homestead scene on the stage, the pieces list on the left and its light settings on the right"></details>
+
+<br clear="all">
+
 ## 🧰 libraries
 
 - [`biome-config-polished`](packages/biome-config-polished) — the lint and format rules every app extends

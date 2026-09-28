@@ -3,6 +3,9 @@
 AI chat app with customizable alien 👽 friends. Each friend is a persona (a name +
 a system prompt); chats stream from an LLM and persist in real time.
 
+- **`FTR.md` + `CONTEXT.md`** — every feature with its check, and the words they use. Read
+  your section before changing what the app does.
+
 🐾 **pet project** — basic on purpose (dima, 2026-09-27): every tree shares one Convex dev deployment and dima's own chat history. keep it; a test that sends a message, or runs `convex dev` from a worktree, says so in its report.
 
 ## Stack
