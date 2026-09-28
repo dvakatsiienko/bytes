@@ -1,4 +1,42 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreWorkspaces": ["apps/sketchbook"]
+  "ignoreWorkspaces": ["apps/sketchbook"],
+  "ignoreBinaries": ["vercel"],
+  "ignoreIssues": {
+    "apps/atelier/art/templates/scene.ts": ["exports"],
+    "apps/trophy-sys/src/web/components/{bar-rows,chart-legend}.tsx": ["types"],
+    "apps/x-com-chat/src/components/ui/sidebar.tsx": ["exports"]
+  },
+  "workspaces": {
+    "apps/cv": {
+      "ignoreDependencies": ["@tailwindcss/typography", "tailwind-scrollbar"]
+    },
+    "apps/figmentation": {
+      "ignoreDependencies": ["@tailwindcss/typography"]
+    },
+    "apps/financial": {
+      "ignoreDependencies": ["@tailwindcss/forms"]
+    },
+    "apps/space-explorer-api": {
+      "ignoreDependencies": ["@prisma/client"]
+    },
+    "apps/space-explorer-ui": {
+      "ignore": ["src/graphql/generated/**"],
+      "ignoreDependencies": ["@graphql-codegen/client-preset"]
+    },
+    "apps/trophy-sys": {
+      "ignoreDependencies": ["@ui/kit"]
+    },
+    "apps/x-com-chat": {
+      "ignoreDependencies": [
+        "@tailwindcss/forms",
+        "@tailwindcss/typography",
+        "tailwind-scrollbar",
+        "tw-animate-css"
+      ]
+    },
+    "packages/kit": {
+      "ignoreDependencies": ["postcss-load-config"]
+    }
+  }
 }
