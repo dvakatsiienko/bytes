@@ -26,7 +26,7 @@ description: Verify a trophy-sys change against the running web + api pair — d
 3. **the charts draw** — `/campaign` has 12 `.panel`s, `svg` count ~60 at 1280 (58 at 390), and body text holds 0 «could not read». one `TABLE` radio click turns one chart into one `main table`.
 4. **the journal** — 2 panels, 48 game links (`a[href^="/library/"]`), 0 broken images.
 5. **the theme sticks** — the L / D / S radios («Light palette, pinned.», «Dark palette, pinned.», «Follows your OS appearance.»): «D» sets `data-theme="dark"` on `<html>` and stores it in `localStorage` key `theme`, so it survives a full `open`. click «S» at the end — it removes both.
-6. **nothing scrolls sideways** — `scrollWidth - innerWidth` is `0` at 1280. at 390 main is 11 px over (baseline, below); any growth is a finding. a hidden `::after` counts toward that width and no element walk sees it — `AGENTS.md` → «Six things measured the hard way» has the `.hint` case and the chart rules (`min-w-0`, tick counts, overlays) a chart change must keep.
+6. **nothing scrolls sideways** — `scrollWidth - innerWidth` is `0` at 1280 and at 390; any growth is a finding. at 390 the tab nav wraps to two rows (60 px tall) — that is the fit, not a bug. a hidden `::after` counts toward that width and no element walk sees it — `AGENTS.md` → «Six things measured the hard way» has the `.hint` case and the chart rules (`min-w-0`, tick counts, overlays) a chart change must keep.
 
 a chart change also gets a hover on one mark per touched chart, at 1280 and 390 — the tooltip portals to the body and must sit fully inside the viewport. the heatmap → progression link: click a heatmap day, and the progression panel scrolls into view with a `YYYY-MM` marker. (both read from `AGENTS.md`, not driven when this skill was written. several charts carry clickable marks that open a game — pick the mark by its panel, never «the last `rect`».)
 
@@ -40,7 +40,7 @@ run the `x:browser-headless` essentials on every touched route at 1280 and 390. 
 
 - every route — axe `color-contrast` ×1 (`.inline-block`), `region` ×3 (×6 on `/console`)
 - `/library` — axe `select-name` ×2 (×4 at 390), `landmark-unique` ×1; tab walk: the game-row rings clipped by 1 px left and right, and the walk caps at 200 stops
-- at 390 — the page scrolls sideways, `401 > 390`: the tab nav's «CONSOLE» link ends at x 401. `/journal` cuts trophy names and descriptions with no `title`
+- at 390 — `/journal` cuts trophy names and descriptions with no `title`
 - `/campaign` — tab walk: the heatmap's month row ring clipped by 1 px
 - `/console` — tab walk: the two sign-in inputs show no focus ring
 

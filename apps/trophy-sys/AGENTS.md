@@ -149,7 +149,8 @@ in `.env.dev.local`, never by writing production.
   clear the stored token: two live sources confused more than they protected (measured with both
   built, 2026-09-10). The panel says which of the two is in use in one row and stops there.
   An expired token throws the sentinel `NPSSO_INVALID` (`src/shared/types.ts`) rather than
-  psn-api's multi-line prose, and the header renders it as a link to the admin.
+  psn-api's multi-line prose, and the header renders it as a link to `NPSSO_URL`, where a fresh
+  token is minted.
 - Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
   guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
   empty library unless checked. And the envelope key is not always `response`:
@@ -196,9 +197,9 @@ and nobody else — the live value has to be flipped through `/console`, or the 
 on `effortHideUntouched`: the default moved to `true` and production kept answering `false`,
 because a stored `false` was already sitting there.
 
-## The admin area
+## The console
 
-`/admin` is the owner's console — hide games, paste a fresh NPSSO, flip a setting. `src/server/admin.ts`
+`/console` is the owner's admin page — hide games, paste a fresh NPSSO, flip a setting. `src/server/admin.ts`
 holds the auth: an HMAC-SHA256 signed `sys_admin` cookie, `timingSafeEqual` on both the password and
 the signature, 30-day expiry, `Secure` dropped only on localhost.
 
@@ -252,10 +253,9 @@ routes behind it. `newsFetch` scans only `SCAN_LIMIT` (15) recent titles because
 two PSN round-trips; the library list itself is one call regardless of limit.
 
 📌 `cache.ts` memoizes **successes only**, so a client retry replays the entire scan. That is why
-`retry` is 1 globally and 0 for the news query — react-query's default of 3 turns one failed news
-load into ~120 PSN round-trips.
+`retry` is 1 globally — react-query's default of 3 would replay a failed scan three more times.
 
-## The /stats charts
+## The /campaign charts
 
 Eleven charts and a KPI strip, all visx, all reading one payload — `GET /api/stats`, the trophy
 fan-out cached in Upstash under `trophy-sys:stats`.
@@ -271,7 +271,7 @@ fan-out cached in Upstash under `trophy-sys:stats`.
   toggle and the accessibility floor; `ChartTooltip` + `TooltipLayer` give the one tooltip, which
   renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the eleven are one
   call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
-  `*_COLUMNS`, so `stats.tsx` only wires.
+  `*_COLUMNS`, so `campaign.tsx` only wires.
 - **A margin that holds axis text is a token in `chart-theme.ts`, never a literal.** `AXIS_BOTTOM`
   (26), `AXIS_LEFT` (52), `MONTH_AXIS_RIGHT` (26). Each one replaced a set of hand-typed numbers
   that had drifted: bottom ran 36/26/22, left ran 38/42/38 — and 38 was too small for the
@@ -339,12 +339,13 @@ things about **this** page waste a run otherwise:
 - Naming is subject-first: `gamesFetch`, `stateLoad`, `dateFormat`, `game-list.tsx`. Never
   `fetchGames`.
 - Server state is TanStack Query (`hooks/queries.ts`); routing is TanStack Router with real
-  paths — `/library`, `/library/$gameId`, `/news` — not search params, because the tabs are
-  navigation and a game is a resource. `router.tsx` holds the tree; `layout.tsx`, `library.tsx`
-  and `news.tsx` are the route components. Deep links work because `vercel.json` rewrites every
-  non-`/api` path to `index.html`.
+  paths — `/library`, `/library/$gameId`, `/campaign`, `/journal`, `/console` — not search
+  params, because the tabs are navigation and a game is a resource. `router.tsx` holds the tree;
+  `layout.tsx`, `library.tsx`, `campaign.tsx`, `journal.tsx` and `console.tsx` are the route
+  components. Deep links work because `vercel.json` rewrites every non-`/api` path to
+  `index.html`.
 - **The root route is a bare `<Outlet />`.** The app's routes hang off a pathless `_shell` layout
-  route rendering `Layout`, and `/admin` is a *sibling* of `_shell`, not a child — so the admin
+  route rendering `Layout`, and `/console` is a *sibling* of `_shell`, not a child — so the console
   still renders when every PSN call is failing, which is exactly when a dead NPSSO needs replacing.
   A `defaultErrorComponent` catches the rest. 📌 `useParams({ from })` takes a route **id**, and
   those ids now carry the segment: `'/_shell/library/$gameId'`.

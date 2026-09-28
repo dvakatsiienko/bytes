@@ -37,7 +37,7 @@ export const Layout = () => {
   return (
     <div className='flex h-full flex-col gap-5 p-6'>
       {/* Wrapping, because the row is a fixed set of controls plus a status
-          string and there is no width at which truncating "news" is better than
+          string and there is no width at which truncating a tab is better than
           a second line. */}
       <div className='flex flex-wrap items-center gap-x-4 gap-y-2'>
         <h1 className='text-lg'>
@@ -48,7 +48,7 @@ export const Layout = () => {
           </Link>
         </h1>
 
-        <nav className='flex gap-1'>
+        <nav className='flex flex-wrap gap-1'>
           {TABS.map((tab) => {
             return (
               <Link

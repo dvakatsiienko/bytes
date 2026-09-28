@@ -70,7 +70,7 @@ const AdminHeader = (props: AdminHeaderProps) => {
         </Link>
       </h1>
 
-      <nav className='flex gap-1'>{tabListJSX}</nav>
+      <nav className='flex flex-wrap gap-1'>{tabListJSX}</nav>
 
       <ThemeToggle />
 
