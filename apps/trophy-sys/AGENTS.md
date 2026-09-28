@@ -100,6 +100,8 @@ not a pattern: as a substring it claims Ghost of Tsushima.
 
 ## Auth and state
 
+⚠️ **`.env.local` holds the PRODUCTION kv credentials.** one wrong env-file order in a local run writes to prod — prove the store is local first (`kit.sh health` → `stateBackend: file`); `worktree:seed` blanks `.env.local` in every tree. and `dev:api` reads `API_PORT` / `PORT_OFFSET`, never `PORT` (a verifier's api landed on the main checkout's :5178, 2026-09-28).
+
 Env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,
 `STEAM_API_KEY`, `STEAM_ID64`, and the admin trio `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SECRET`. Locally
 they come from three files, loaded in order and last one wins (via `node --env-file`, never
