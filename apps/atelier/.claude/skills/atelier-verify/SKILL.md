@@ -11,6 +11,16 @@ description: Verify an atelier change against the running studio — drive it in
 - **a worktree** runs at `:5190` (its header shows a build badge, the tab title says «atelier · dev»).
 - the lan reaches both: `http://afgrundsvisioner.local:5180` or the mac's ip — phone checks go there.
 
+## walk the map — the exit lines of every change
+
+`FTR.md` is the list of what to drive. From the tree under test:
+
+1. **scope** — the touched lines are every line `git diff origin/main... -- apps/atelier/FTR.md` adds or edits, plus every line whose feature the source diff (`git diff origin/main... --name-only -- apps/atelier`) changes: find it by the ui words and the `?crash=` names the changed files print.
+2. **drive** each touched line's given/when/then on the tree's own server, and keep one piece of evidence per line (a probe line, a screenshot).
+3. **flip** in the pr's last commit (`x:ftr`): passed → ✅, failed → 🐞, not drivable here → stays ⬜ with the reason in the report. 🔎 is dima's alone.
+
+Done when every touched line carries the status its drive earned, and the report says `ftr: <n> ✅ · <m> 🐞 · <k> ⬜` with the ⬜ reasons.
+
 ## drive
 
 - `agent-browser`, always with a named session: `export AGENT_BROWSER_SESSION=verify-atelier-<topic>`; `close` it at the end.
@@ -37,3 +47,9 @@ description: Verify an atelier change against the running studio — drive it in
 - ⌘K: open it, run a command, confirm the command acted
 - «still renders and answers a click» is proven with `elementFromPoint` at the control's centre and **no** `scrollIntoView` — scrolling first hides a covered or pushed-out section
 - time day ↔ night, theme `t`, readme frame fit / phone / desktop
+- the crash lines (`## errors` in `FTR.md`), dev build only — `src/dev-crash.ts` holds the names:
+  - `?crash=<section>` (header, pieces, takes, toolbar, viewport, panel) → that section's fallback
+  - `?crash=piece` on a flat piece → the viewport's fallback; on a lit piece → `[data-testid=stage][data-error]` and «the scene did not build»
+  - `?crash=root` → «atelier stopped drawing»; prove the reload with a `window` marker set before the click and gone after (the url still carries the crash, so the fallback comes back)
+  - the crash lives in the url: a rail click drops it, and a fallback's «try again» ends it for the page's life. the lit crash has no «try again»: a day ↔ night toggle rebuilds and throws again, only a rail click leaves it
+  - production: `vite build --outDir <scratch>`, grep the bundle for «a test crash» (0 hits, with «stopped drawing» as the control), then `vite preview --outDir <scratch> --port <free>` and load each `?crash=` — the studio draws
