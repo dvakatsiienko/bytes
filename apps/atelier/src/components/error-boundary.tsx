@@ -42,10 +42,8 @@ export const Section = (props: SectionProps) => {
 /** the last net, when a render fails outside every section */
 export const RootFallback = (props: FallbackProps) => {
   return (
-    <div
-      className='grid h-dvh place-items-center bg-background p-6 text-foreground'
-      role='alert'>
-      <div className='flex max-w-lg flex-col gap-3'>
+    <main className='grid h-dvh place-items-center bg-background p-6 text-foreground'>
+      <div className='flex max-w-lg flex-col gap-3' role='alert'>
         <h1 className='font-serif text-2xl'>atelier stopped drawing</h1>
         <p className='select-all font-mono text-[12px] text-muted-foreground'>
           {errorText(props.error)}
@@ -58,7 +56,7 @@ export const RootFallback = (props: FallbackProps) => {
           reload the studio
         </Button>
       </div>
-    </div>
+    </main>
   );
 };
 
