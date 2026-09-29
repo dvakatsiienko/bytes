@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import type { Palette } from '../../art/palette.ts';
+import { devCrash } from '../dev-crash.ts';
 import type { SceneSpec } from './scenes.ts';
 import type { Settings } from './settings.ts';
 import { fibreNormals, loadSheet, paperTexture } from './sheets.ts';
@@ -39,6 +40,7 @@ export const buildScene = async (
   seed: number,
   onProgress: (done: number, total: number) => void,
 ) => {
+  devCrash('piece');
   const scene = new THREE.Scene();
   const sun = new THREE.DirectionalLight(
     p.isNight ? 0xc9_d3_ff : 0xff_ff_ff,

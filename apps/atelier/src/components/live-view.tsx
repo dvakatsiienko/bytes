@@ -5,6 +5,7 @@ import { useAtomValue } from 'jotai';
 import type { Piece } from '../../art/pieces.ts';
 import { pieceSvg } from '../../art/pieces.ts';
 import type { Time } from '../../art/time.ts';
+import { devCrash } from '../dev-crash.ts';
 import { svgDataUrl } from '../image.ts';
 import { stageScenes } from '../stage/scenes.ts';
 import type { Settings } from '../stage/settings.ts';
@@ -28,6 +29,7 @@ export const LiveView = (props: LiveViewProps) => {
   const aspectRatio = `${props.piece.size.w} / ${props.piece.size.h}`;
 
   if (!spec) {
+    devCrash('piece');
     const label = `${props.piece.id}:${props.time}`;
     return (
       <div

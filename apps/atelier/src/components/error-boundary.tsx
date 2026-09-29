@@ -5,6 +5,7 @@ import { LampDeskIcon, RotateCcwIcon } from 'lucide-react';
 import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary } from 'react-error-boundary';
 
+import { devCrash, endDevCrash, isDev } from '../dev-crash.ts';
 import { errorText } from '../error-text.ts';
 import { pathOf, useRoute } from '../route.ts';
 
@@ -28,7 +29,7 @@ export const Section = (props: SectionProps) => {
       }}
       // only the button ends a test crash; a new route (resetKeys) keeps it throwing
       onReset={(details) => {
-        if (details.reason === 'imperative-api') retried.add(props.name);
+        if (details.reason === 'imperative-api') endDevCrash();
       }}
       resetKeys={[path]}>
       {/* keyed by the path: the compiler keeps an element whose props never change, so only a remount reads the new url */}
@@ -115,28 +116,13 @@ const SectionFallback = (props: SectionFallbackProps) => {
   );
 };
 
-/**
- * Dev only: `?crash=<section>` throws in that section until «try again», so
- * its fallback shows, the others can be clicked, and the retry brings it back.
- * It must keep throwing: react retries a failed render once before a boundary
- * catches it.
- */
+/** `?crash=<section>` lands in the section's own box: the others can be clicked, the retry brings it back */
 const DevCrash = (props: { section: SectionName }) => {
-  if (
-    isDev &&
-    !retried.has(props.section) &&
-    new URLSearchParams(location.search).get('crash') === props.section
-  )
-    throw new Error(`?crash=${props.section}: a test crash`);
+  devCrash(props.section);
   return null;
 };
 
 /* Helpers */
-
-// biome-ignore lint/suspicious/noUndeclaredEnvVars: vite's own build flag, never read from the shell
-const isDev = import.meta.env.DEV;
-
-const retried = new Set<SectionName>();
 
 /**
  * each section, the words its fallback uses, and the box it keeps: header and
@@ -161,7 +147,7 @@ const sections = {
 
 /* Types */
 
-type SectionName = keyof typeof sections;
+export type SectionName = keyof typeof sections;
 
 interface SectionProps {
   children: ReactNode;

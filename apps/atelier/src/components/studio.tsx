@@ -16,6 +16,7 @@ import type { StudioActions } from '../actions.ts';
 import { useStudioActions } from '../actions.ts';
 import { useBuild } from '../build.ts';
 import { commandsOf } from '../commands.ts';
+import { devCrash } from '../dev-crash.ts';
 import {
   useHotkeys,
   useMediaQuery,
@@ -48,6 +49,7 @@ const themeOptions = [
 ] as const;
 
 export const Studio = () => {
+  devCrash('root');
   const route = useRoute();
   const piece = findPiece(route.piece);
 
