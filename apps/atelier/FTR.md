@@ -24,8 +24,9 @@
   - and running a command does what its bare key does
   - decision: it opens high, its top edge at 10 % of the window, just under the header and level with the bench tools, and stays put while the list filters (dima, 2026-09-26)
 - ⬜ a worktree build tells itself apart
-  - given atelier runs from a worktree
-  - then the header shows the branch and sha, and the tab title reads «atelier · dev»
+  - given atelier runs from a seeded worktree (`pnpm worktree:seed` gave it a port offset)
+  - then the tab title reads «atelier · dev» and the favicon carries a dot
+  - and on main the title stays «atelier»; the header shows the branch and sha on both
 - ✅ the three panels stack below 1100 px wide
 
 ## /<piece> — the live view
@@ -79,7 +80,7 @@
   - makes: the piece's settings as json on the clipboard (copy all); reset leaves nothing
   - when dima presses «copy all» or «reset» at the panel's foot
   - then the settings are on the clipboard as json, or back to the piece's defaults, and a toast says which
-- ⬜ a saved drawing redraws by itself
+- ✅ a saved drawing redraws by itself
   - when a file under `art/` is saved
   - then the viewport redraws the piece with no reload
 
@@ -137,10 +138,14 @@
   - then that section shows «<what> stopped drawing» and «try again» in its own box
   - and the other five still render and answer a click; «try again» brings it back
   - and a throw in a section's own component, before its hooks run, stays in that section too: each boundary wraps its section from the parent
-- ⬜ a crashed piece says so
-  - given a piece throws while drawing
+- ⬜ a crashed flat piece says so
+  - given a flat piece throws while drawing
   - then «the piece stopped drawing» shows in the viewport, and the rest of the studio keeps working
-  - and a crash outside every section shows «atelier stopped drawing» with a reload
+- ⬜ a lit piece that fails to build says so
+  - given a lit piece's scene throws while it builds
+  - then «the scene did not build: <error>» shows in the viewport, and the rest of the studio keeps working
+- ⬜ a crash outside every section offers a reload
+  - then «atelier stopped drawing» shows with «reload the studio»
 
 ## scripts
 
