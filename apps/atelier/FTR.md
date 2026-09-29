@@ -4,8 +4,12 @@
 - given/when/then lines are the verifier's exit lines
 - makes: lines name what a feature leaves behind — a file, a take, a clipboard item
 - decision: lines record a choice and its reason
+- `> purpose:` and `> states:` under a view heading say what the view is for and which states a designer draws
 
 ## every screen — header and pieces
+
+> purpose: the studio frame: pick a piece, switch time and theme, reach any command from one palette
+> states: narrow (<1100 px, stacked)
 
 - 🔎 the pieces list, grouped by where each piece ships
   - given any screen
@@ -30,6 +34,9 @@
 - 🔎 the three panels stack below 1100 px wide
 
 ## /<piece> — the live view
+
+> purpose: the piece under the lamp: look at it, tune its settings, bake it into a take
+> states: day · night · motion playing · zoomed · baking (progress) · a flat piece (seed only)
 
 - 🔎 day and night
   - when dima presses `n` or clicks day / night
@@ -86,6 +93,9 @@
 
 ## takes list
 
+> purpose: every bake of this piece, to compare, keep or park
+> states: none yet · many (scrolls) · stashed filter
+
 - 🔎 filter all, current, stashed
   - when dima picks a filter
   - then the list shows only those takes, or a line saying there are none
@@ -103,6 +113,9 @@
   - then `]` opens the next take down the list (older) and `[` the next one up (newer); from the live view `]` starts at the newest and `[` at the oldest
 
 ## /<piece>/take/<id> — one take
+
+> purpose: one bake's record: its facts, its note, and the promote or stash decision
+> states: current · stashed (with its two reasons)
 
 - 🔎 the take's facts
   - then the side panel shows time, seed, frames, source hash and when it was baked
@@ -127,11 +140,17 @@
 
 ## /<piece>/compare/<a>/<b> — two takes
 
+> purpose: two takes side by side, to pick the better one
+> states: slider · side by side
+
 - 🔎 compare as a slider or side by side
   - when dima switches the compare mode
   - then the two takes show under one sliding divider, or next to each other with their notes
 
 ## errors
+
+> purpose: a broken piece or section says so in its own box, the studio keeps working
+> states: flat crash · lit build fail · root fallback
 
 - ✅ a crashed section stays in its box
   - given a dev build, when `?crash=<section>` loads for any of the six sections (header, pieces, takes, toolbar, viewport, panel)
