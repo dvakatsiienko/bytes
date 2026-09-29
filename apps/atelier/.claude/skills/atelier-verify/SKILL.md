@@ -51,5 +51,5 @@ Done when every touched line carries the status its drive earned, and the report
   - `?crash=<section>` (header, pieces, takes, toolbar, viewport, panel) → that section's fallback
   - `?crash=piece` on a flat piece → the viewport's fallback; on a lit piece → `[data-testid=stage][data-error]` and «the scene did not build»
   - `?crash=root` → «atelier stopped drawing»; prove the reload with a `window` marker set before the click and gone after (the url still carries the crash, so the fallback comes back)
-  - the crash lives in the url: a rail click drops it, «try again» ends it for the page's life
+  - the crash lives in the url: a rail click drops it, and a fallback's «try again» ends it for the page's life. the lit crash has no «try again»: a day ↔ night toggle rebuilds and throws again, only a rail click leaves it
   - production: `vite build --outDir <scratch>`, grep the bundle for «a test crash» (0 hits, with «stopped drawing» as the control), then `vite preview --outDir <scratch> --port <free>` and load each `?crash=` — the studio draws
