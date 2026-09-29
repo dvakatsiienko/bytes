@@ -138,17 +138,17 @@
   - then that section shows «<what> stopped drawing» and «try again» in its own box
   - and the other five still render and answer a click; «try again» brings it back
   - and a throw in a section's own component, before its hooks run, stays in that section too: each boundary wraps its section from the parent
-- ⬜ a crashed flat piece says so
+- ✅ a crashed flat piece says so
   - given a dev build, when `?crash=piece` loads on a flat piece
   - then «the piece stopped drawing» shows in the viewport, and the rail still answers a click
   - and «try again» brings the piece back
-- ⬜ a lit piece that fails to build says so
+- ✅ a lit piece that fails to build says so
   - given a dev build, when `?crash=piece` loads on a lit piece
   - then «the scene did not build: <error>» shows in the viewport, and the rest of the studio keeps working
-- ⬜ a crash outside every section offers a reload
+- ✅ a crash outside every section offers a reload
   - given a dev build, when `?crash=root` loads
   - then «atelier stopped drawing» shows with «reload the studio», and the button reloads the page
-- ⬜ a production build ignores `?crash=`
+- ✅ a production build ignores `?crash=`
   - given a production build, when any `?crash=` loads
   - then the studio draws as it does without it
 
