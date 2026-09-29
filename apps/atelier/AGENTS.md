@@ -52,7 +52,9 @@ Done when the piece shows in the rail and renders by day and by night:
 - **Ship**: `pnpm atelier:ship [piece…]` prints the plan; `--write` copies each current take to
   `<repo>/assets/atelier/<name>-light|dark.<svg|webp>`. It writes into three repos (frame, bytes,
   the profile) and never commits. `assets/atelier/` is atelier's own folder, so v1 art is never
-  overwritten; the readmes switch to it on dima's `brand:use` call.
+  overwritten; the readmes switch to it on dima's `brand:use` call. A favicon ships beside its
+  page instead (`speak` → frame `speak/admin/speak`), and its `ship.icons` sizes land as
+  `<path>-<size>.png`, rendered from the day svg.
 - **Icons**: `pnpm atelier:icons <piece>` → svg + png at 16–512 in `out/icons/<piece>/`.
 
 ## Gotchas

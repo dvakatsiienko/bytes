@@ -4,6 +4,7 @@ import type { Palette } from './palette.ts';
 import { palettes } from './palette.ts';
 import { svg } from './paper.ts';
 import { appNames, appSign, signSize } from './signs.ts';
+import { speak } from './speak.ts';
 import { tileSize, tourBytes, tourFrame } from './tiles.ts';
 import type { Time } from './time.ts';
 import { homestead, valley } from './valley.ts';
@@ -81,6 +82,15 @@ export const pieces = [
     size: { h: 512, w: 512 },
     title: 'atelier: a hanging lamp lighting a paper card on the bench',
   },
+  {
+    draw: speak,
+    group: 'icons',
+    id: 'speak',
+    kind: 'favicon',
+    ship: { icons: [32, 180], path: 'speak/admin/speak', repo: 'frame' },
+    size: { h: 512, w: 512 },
+    title: 'speak: a paper speech bubble with two sound arcs',
+  },
   ...appNames.map((app) => {
     return {
       draw: appSign(app),
@@ -130,9 +140,10 @@ export interface Piece {
   group: Group;
   id: string;
   kind: AssetKind;
-  /** where `atelier:ship` copies the current takes: `<repo>/<path>-light|dark.<ext>`, always under
-   *  `assets/atelier/` so no v1 file is ever overwritten */
-  ship?: { repo: Repo; path: string };
+  /** where `atelier:ship` copies the current takes: `<repo>/<path>-light|dark.<ext>`, under
+   *  `assets/atelier/` for readme art so no v1 file is ever overwritten; a favicon ships beside its
+   *  page. `icons` also writes the day svg as `<path>-<size>.png` */
+  ship?: { repo: Repo; path: string; icons?: readonly number[] };
   size: { w: number; h: number };
   /** the image's alt text, and the svg `<title>` */
   title: string;

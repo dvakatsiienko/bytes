@@ -4,14 +4,16 @@
  * Copies each piece's current day and night take into the repo its readme
  * lives in: `<repo>/<ship path>-light|dark.<svg|webp>`. A flat piece ships its
  * svg, a lit one its webp. Without `--write` it prints the plan and touches
- * nothing; `--to` puts every repo under one scratch folder instead.
+ * nothing; `--to` puts every repo under one scratch folder instead. A ship
+ * target with `icons` also renders the day svg to `<path>-<size>.png`.
  * It never commits — the target repo's own flow does that.
  */
 import { execFileSync } from 'node:child_process';
-import { copyFile, mkdir } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { parseArgs } from 'node:util';
+import { Resvg } from '@resvg/resvg-js';
 
 import type { Piece, Repo } from '../art/pieces.ts';
 import { pieces } from '../art/pieces.ts';
@@ -68,18 +70,35 @@ const plan = lists.flatMap(({ piece, list }) => {
       rootOf(ship.repo),
       `${ship.path}-${suffix}.${file === 'piece.svg' ? 'svg' : 'webp'}`,
     );
-    console.log(
-      `${values.write ? '→' : '·'} ${piece.id} ${time} ${take.id} → ${target}`,
-    );
-    return [{ source: takeFile(piece.id, take.id, file), target }];
+    const source = takeFile(piece.id, take.id, file);
+    const pngs =
+      time === 'day' && file === 'piece.svg'
+        ? (ship.icons ?? []).map((size) => ({
+            size,
+            source,
+            target: join(rootOf(ship.repo), `${ship.path}-${size}.png`),
+          }))
+        : [];
+    return [{ source, target }, ...pngs].map((step) => {
+      console.log(
+        `${values.write ? '→' : '·'} ${piece.id} ${time} ${take.id} → ${step.target}`,
+      );
+      return step;
+    });
   });
 });
 
 if (values.write) {
   await Promise.all(
-    plan.map(async ({ source, target }) => {
-      await mkdir(dirname(target), { recursive: true });
-      await copyFile(source, target);
+    plan.map(async (step) => {
+      await mkdir(dirname(step.target), { recursive: true });
+      if (!('size' in step)) return copyFile(step.source, step.target);
+      const png = new Resvg(await readFile(step.source, 'utf8'), {
+        fitTo: { mode: 'width', value: step.size },
+      })
+        .render()
+        .asPng();
+      await writeFile(step.target, png);
     }),
   );
 }
