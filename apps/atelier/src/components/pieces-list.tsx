@@ -6,7 +6,7 @@ import { groups, pieces } from '../../art/pieces.ts';
 import { navigate, pathOf } from '../route.ts';
 
 /** every piece, grouped by where it ships: the profile, frame, bytes, then spots and icons */
-export const PieceRail = (props: PieceRailProps) => {
+export const PiecesList = (props: PiecesListProps) => {
   const groupListJSX = groups.map((group) => {
     const itemListJSX = pieces
       .filter((piece) => piece.group === group)
@@ -79,7 +79,7 @@ export const PieceRail = (props: PieceRailProps) => {
 
 /* Types */
 
-interface PieceRailProps {
+interface PiecesListProps {
   onPick?: () => void;
   piece: Piece;
 }

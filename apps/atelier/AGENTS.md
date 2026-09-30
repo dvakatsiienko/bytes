@@ -30,18 +30,18 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 
 1. Copy the template for the kind from `art/templates/` (scene, spot, icon, avatar, badge,
    favicon) to `art/<name>.ts` and rename its exports.
-2. Register it in `art/pieces.ts`: an id, a rail `group`, its `kind`, the alt-text `title`, the
+2. Register it in `art/pieces.ts`: an id, a `group` (the pieces list sorts by it), its `kind`, the alt-text `title`, the
    `size`, `draw`, and `ship` when a readme will show it.
 3. A lit scene also joins `stageScenes` in `src/stage/scenes.ts`: its sheets (`layers`), which
    sheets the wind moves, and its lights and moving parts (`extras`).
 4. Draw. The studio hot-reloads a saved `art/` file into the viewport — no reload, no rebuild.
 
-Done when the piece shows in the rail and renders by day and by night:
+Done when the piece shows in the pieces list and renders by day and by night:
 `[data-testid=stage][data-rendered="<piece>:<time>"]` is the signal a headless check waits for.
 
 ## Bake, compare, ship
 
-- **Bake** writes a take: the bench button, `b`, or `pnpm atelier:bake <piece> [day|night|both]`.
+- **Bake** writes a take: the bake button, `b`, or `pnpm atelier:bake <piece> [day|night|both]`.
   `--loop [frames]` (or «bake a motion loop» in ⌘K) bakes the stage's six-second motion into a
   looping animated webp at 1×, 72 frames by default; `take.json` records `frames`.
   One code path for all three (`server/bake.ts`): a lit scene renders in headless chromium at

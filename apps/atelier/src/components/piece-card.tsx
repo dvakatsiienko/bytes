@@ -21,7 +21,7 @@ import type { StudioActions } from '../actions.ts';
 import { defaults, looks } from '../stage/settings.ts';
 import { patchSettingsAtom, settingsByPieceAtom } from '../state.ts';
 import { Key } from './key';
-import { PieceRail } from './piece-rail';
+import { PiecesList } from './pieces-list';
 
 /**
  * The top-left corner: which piece is under the lamp, the way to any other,
@@ -118,7 +118,7 @@ export const PiecesButton = (props: { piece: Piece }) => {
       <PopoverContent
         align='end'
         className='max-h-[min(560px,var(--available-height))] w-72 overflow-hidden p-0'>
-        <PieceRail onPick={() => setIsOpen(false)} piece={props.piece} />
+        <PiecesList onPick={() => setIsOpen(false)} piece={props.piece} />
       </PopoverContent>
     </Popover>
   );

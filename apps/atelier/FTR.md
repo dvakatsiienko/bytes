@@ -197,7 +197,7 @@
   - and a throw in a section's own component, before its hooks run, stays in that section too: each boundary wraps its section from the parent
 - ✅ a crashed flat piece says so
   - given a dev build, when `?crash=piece` loads on a flat piece
-  - then «the piece stopped drawing» shows in the viewport, and the rail still answers a click
+  - then «the piece stopped drawing» shows in the viewport, and the pieces list still answers a click
   - and «try again» brings the piece back
 - ✅ a lit piece that fails to build says so
   - given a dev build, when `?crash=piece` loads on a lit piece

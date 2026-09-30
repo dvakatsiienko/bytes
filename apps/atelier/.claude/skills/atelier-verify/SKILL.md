@@ -31,7 +31,9 @@ Done when every touched line carries the status its drive earned, and the report
 
 ## look — after every drive
 
-- **essentials first**: `x:browser-headless` → its essentials on every touched view, at 1280 and 390. the tab walk runs with atelier's opt-out: `tab-walk.sh --deny '[role=separator]'` — dima wants the panel dividers out of Tab (resizing is mouse-only here).
+- **essentials first**: `x:browser-headless` → its essentials on every touched view, at 1280 and 390, with atelier's two allows:
+  - `--allow 'tab=painted over by (main|canvas|img|figure|button)'` — the ring's glass floats over the art, so the point under a ring's outer pixels is the art (a take's image is a button); a keyboard-focused chip's ring was shot and draws whole (BYT-113)
+  - `--allow 'tab=«atelier»: jumps back up and left from'` — the art is the first stop, so the walk wraps once from the art's last control to the wordmark
 - then screenshot every state the change touched (selected, hovered, focused, empty, loading) and read a 2× crop of each region. a clipped ring, cut text, an overflow or a misaligned row is a FAIL finding, even when the behaviour passed.
 
 ## destructive paths
@@ -43,13 +45,14 @@ Done when every touched line carries the status its drive earned, and the report
 
 ## flows worth driving
 
-- the rail → a piece → its takes list → the viewer (zoom, pan, `l` back to live)
+- «pieces» → a piece → its takes (the stack, `g` for the film strip) → the viewer (zoom, pan, `l` back to live)
+- the ring: `1`–`4` open one edge and fold the rest, `esc` folds, `/` finds any setting and types a slash inside a text field
 - ⌘K: open it, run a command, confirm the command acted
 - «still renders and answers a click» is proven with `elementFromPoint` at the control's centre and **no** `scrollIntoView` — scrolling first hides a covered or pushed-out section
 - time day ↔ night, theme `t`, readme frame fit / phone / desktop
 - the crash lines (`## errors` in `FTR.md`), dev build only — `src/dev-crash.ts` holds the names:
-  - `?crash=<section>` (header, pieces, takes, toolbar, viewport, panel) → that section's fallback
+  - `?crash=<section>` (header = the view card, pieces = the piece card, takes, toolbar = the tools, viewport = the piece, panel = the ring) → that section's fallback
   - `?crash=piece` on a flat piece → the viewport's fallback; on a lit piece → `[data-testid=stage][data-error]` and «the scene did not build»
   - `?crash=root` → «atelier stopped drawing»; prove the reload with a `window` marker set before the click and gone after (the url still carries the crash, so the fallback comes back)
-  - the crash lives in the url: a rail click drops it, and a fallback's «try again» ends it for the page's life. the lit crash has no «try again»: a day ↔ night toggle rebuilds and throws again, only a rail click leaves it
+  - the crash lives in the url: a click in the pieces list drops it, and a fallback's «try again» ends it for the page's life. the lit crash has no «try again»: a day ↔ night toggle rebuilds and throws again, only a pieces-list click leaves it
   - production: `vite build --outDir <scratch>`, grep the bundle for «a test crash» (0 hits, with «stopped drawing» as the control), then `vite preview --outDir <scratch> --port <free>` and load each `?crash=` — the studio draws

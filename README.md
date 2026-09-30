@@ -89,7 +89,7 @@ local only | [source](apps/sketchbook)
 
 local only | [source](apps/atelier)
 
-<details><summary>peek</summary><img src="assets/apps/atelier.webp" width="100%" alt="atelier: the homestead scene on the stage, the pieces list on the left and its light settings on the right"></details>
+<details><summary>peek</summary><img src="assets/apps/atelier.webp" width="100%" alt="atelier: the homestead scene fitted whole, smoked-glass edges around it, the lens edge open with its settings"></details>
 
 <br clear="all">
 

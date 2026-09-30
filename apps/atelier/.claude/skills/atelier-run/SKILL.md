@@ -31,16 +31,15 @@ A `run` pass stops the server when its check is done. A coder serving the tree f
 ```bash
 export AGENT_BROWSER_SESSION=atelier-run
 agent-browser set viewport 1280 800
-agent-browser open http://localhost:5190
-agent-browser wait --load load
-agent-browser snapshot -i          # the rail: pieces as links, «commands ⌘K», theme buttons
-agent-browser click @e148          # a piece link (ref from the snapshot) → /workshop
+agent-browser open http://localhost:5190/workshop   # a piece opens by its path
+agent-browser wait '[data-testid=stage][data-rendered]'
+agent-browser press 2              # the ring's keys: 1–4 open an edge, esc folds it, g opens the film strip
 agent-browser screenshot <path>.png
 agent-browser console              # healthy: «[vite] connected.»
 agent-browser close
 ```
 
-Look at the screenshot: a piece shows its scene in the centre and its controls on the right.
+Look at the screenshot: the piece fills the window as large as it fits whole, four glass edges around it, a card in each corner (`docs/adr/0002-the-lens-ring.md`).
 
 ## Stop
 
