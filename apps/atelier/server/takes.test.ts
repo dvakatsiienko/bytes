@@ -74,6 +74,17 @@ test('a take saved before bake became shot lists with its image', async () => {
   expect(await readFile(join(dir, 'shot.webp'))).toEqual(webp);
 });
 
+test('an old take with no image is skipped and left as it was', async () => {
+  const dir = join(process.env.ATELIER_TAKES_DIR ?? '', 'market', '01-day');
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, 'settings.json'), JSON.stringify(defaults));
+  const record = JSON.stringify({ bakedAt: 'then', files: ['bake.webp'] });
+  await writeFile(join(dir, 'take.json'), record);
+
+  expect((await listTakes('market')).takes).toEqual([]);
+  expect(await readFile(join(dir, 'take.json'), 'utf8')).toBe(record);
+});
+
 test('the first take of a time becomes its current take', async () => {
   const first = await shoot('day');
   await shoot('day');
