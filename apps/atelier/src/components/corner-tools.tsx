@@ -16,7 +16,7 @@ import { Segmented } from './segmented';
  * The bottom-right corner: the ways of looking at the piece, each with its
  * key, and under them the bake.
  */
-export const ToolsCorner = (props: ToolsCornerProps) => {
+export const CornerTools = (props: CornerToolsProps) => {
   const { view } = useRoute();
   const isCompare = view.kind === 'compare';
   const isPlaying = view.kind === 'live' && props.actions.isPlaying;
@@ -188,6 +188,6 @@ interface Tool {
   short: string;
 }
 
-interface ToolsCornerProps {
+interface CornerToolsProps {
   actions: StudioActions;
 }

@@ -32,7 +32,7 @@ import { PiecesList } from './pieces-list';
  * and the two settings that belong to the piece itself, its seed and its look.
  * The wordmark sits over its first row, outside the card's section.
  */
-export const PieceCard = (props: PieceCardProps) => {
+export const CornerPiece = (props: CornerPieceProps) => {
   const settings =
     useAtomValue(settingsByPieceAtom)[props.piece.id] ?? defaults;
   const patchSettings = useSetAtom(patchSettingsAtom);
@@ -133,7 +133,7 @@ export const PiecesButton = (props: { piece: Piece }) => {
 
 /* Types */
 
-interface PieceCardProps {
+interface CornerPieceProps {
   actions: StudioActions;
   piece: Piece;
 }

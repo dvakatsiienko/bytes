@@ -98,7 +98,7 @@ One side of the ring and its group: light on top, lens on the right, atmosphere 
 _Avoid_: tab (except in the narrow layout, where the edges become tabs), drawer
 
 **Corner**:
-One of the four cards at the screen's corners: the piece card, the view card, the takes, the tools with the bake.
+One of the four cards at the screen's corners: the piece corner (top left), the view corner (top right), the takes corner (bottom left), the tools corner with the bake (bottom right).
 _Avoid_: widget, panel
 
 **Ground**:
@@ -126,5 +126,5 @@ Two takes of one piece side by side, or under one sliding divider.
 _Avoid_: diff
 
 **Section**:
-One region of the studio screen that fails alone: the view card (header), the piece card (pieces), the takes, the tools (toolbar), the piece (viewport), the ring (panel).
+One region of the studio screen that fails alone: the view corner (header), the piece corner (pieces), the takes corner (takes), the tools corner (toolbar), the piece (viewport), the ring (panel).
 _Avoid_: pane, widget

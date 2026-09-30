@@ -140,7 +140,7 @@ export const FlatView = (props: FlatViewProps) => {
       {isFavicon ? (
         <section
           aria-label='as it lands'
-          className='flex flex-col items-center gap-2'>
+          className='flex max-w-full flex-col items-center gap-2'>
           <h2 className='text-ground-muted text-sm'>
             as it lands, at true size
           </h2>

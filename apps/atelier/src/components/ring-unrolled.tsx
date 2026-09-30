@@ -8,16 +8,16 @@ import { useRoute } from '../route.ts';
 import type { Settings } from '../stage/settings.ts';
 import { defaults } from '../stage/settings.ts';
 import { patchSettingsAtom, ringAtom, settingsByPieceAtom } from '../state.ts';
+import { PiecesButton } from './corner-piece';
+import { CornerTakes } from './corner-takes';
+import { CornerTools } from './corner-tools';
+import { timeOptions } from './corner-view';
 import { Section } from './error-boundary';
 import { Key } from './key';
-import { PiecesButton } from './piece-card';
 import { PieceView } from './piece-view';
 import { EdgePanel, FlatCard } from './ring-edges';
 import { Segmented } from './segmented';
 import { CompareCard, TakePanel } from './take-view';
-import { TakesCorner } from './takes-corner';
-import { ToolsCorner } from './tools-corner';
-import { timeOptions } from './view-card';
 
 /**
  * Below 1100 px the ring unrolls: a bar on top, the art, the four edges as
@@ -54,10 +54,12 @@ export const RingUnrolled = (props: RingUnrolledProps) => {
       </header>
       <div
         className='relative max-h-[62dvh] w-full shrink-0 overflow-hidden rounded-xl border border-border'
-        // as tall as the piece at this width, never taller than most of the screen
-        style={{
-          aspectRatio: `${props.piece.size.w} / ${props.piece.size.h}`,
-        }}>
+        // a lit piece: as tall as it is at this width; a flat one also needs the room its caption and lands take
+        style={
+          props.actions.isStage
+            ? { aspectRatio: `${props.piece.size.w} / ${props.piece.size.h}` }
+            : { height: '36rem' }
+        }>
         <Section name='viewport'>
           <PieceView actions={props.actions} piece={props.piece} />
         </Section>
@@ -66,14 +68,14 @@ export const RingUnrolled = (props: RingUnrolledProps) => {
         <UnrolledEdges actions={props.actions} piece={props.piece} />
       </Section>
       <Section name='takes'>
-        <TakesCorner
+        <CornerTakes
           actions={props.actions}
           isStrip={true}
           piece={props.piece}
         />
       </Section>
       <Section name='toolbar'>
-        <ToolsCorner actions={props.actions} />
+        <CornerTools actions={props.actions} />
       </Section>
     </div>
   );

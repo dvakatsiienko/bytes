@@ -10,8 +10,8 @@ import { svgDataUrl } from '../image.ts';
 import { stageScenes } from '../stage/scenes.ts';
 import type { Settings } from '../stage/settings.ts';
 import { isPlayingAtom, motionFrameAtom } from '../state.ts';
+import { LOOP_FRAMES } from './corner-tools';
 import { StageCanvas } from './stage-canvas';
-import { LOOP_FRAMES } from './tools-corner';
 
 /**
  * The piece as it is now: lit on the stage when it has one, else its flat svg.

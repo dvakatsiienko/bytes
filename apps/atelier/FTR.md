@@ -14,7 +14,7 @@
 - ⬜ the lens ring
   - given a lit piece is open, 1100 px wide or more
   - then the piece shows as large as it fits whole, and four glass edges hug it: light on top and atmosphere at the bottom, both on the piece's rim, lens on the right, toggles on the left
-  - and the corners hold the piece card (top left), the view card (top right), the takes (bottom left) and the tools with the bake (bottom right)
+  - and the corners hold the piece corner (top left), the view corner (top right), the takes corner (bottom left) and the tools corner with the bake (bottom right)
   - decision: the piece is fitted whole, never cropped, so a wide piece leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»)
 - ⬜ one edge open at a time
   - when dima presses `1`–`4` or clicks a folded edge
@@ -22,11 +22,11 @@
   - and `esc`, the same key again or its fold button folds it
 - ⬜ find any setting
   - when dima presses `/`
-  - then the open edge's find field takes focus (a folded ring opens light first), and typing lists every matching setting of all four edges and the piece card, each with its edge's name
+  - then the open edge's find field takes focus (a folded ring opens light first), and typing lists every matching setting of all four edges and the piece corner, each with its edge's name
   - and `/` typed inside a text field types a slash
 - ⬜ the pieces list, grouped by where each piece ships
   - given any screen
-  - when dima opens «pieces» in the piece card and clicks a piece
+  - when dima opens «pieces» in the piece corner and clicks a piece
   - then its live view opens at `/<piece>` and the row is marked selected
 - ⬜ a «pieces» title over the pieces list, with the piece count
 - 🔎 the «atelier» wordmark goes home
@@ -36,7 +36,7 @@
   - when dima presses `t`
   - then the ground behind a day piece switches between light and dark; the glass stays one smoke
   - and a night piece always sits on the dark ground
-  - and the theme button in the view card steps through system, light and dark
+  - and the theme button in the view corner steps through system, light and dark
 - 🔎 the command palette
   - when dima presses ⌘K
   - then a palette lists every command by group (bench, takes, view, settings) and «open <piece>» for every piece
@@ -45,10 +45,10 @@
 - ⬜ a worktree build tells itself apart
   - given atelier runs from a seeded worktree (`pnpm worktree:seed` gave it a port offset)
   - then the tab title reads «atelier · dev» and the favicon carries a dot
-  - and on main the title stays «atelier»; the view card shows the branch and sha on both
+  - and on main the title stays «atelier»; the view corner shows the branch and sha on both
 - ⬜ the ring unrolls below 1100 px wide
   - given a window narrower than 1100 px
-  - then a bar holds the wordmark, the piece, «pieces», day and night and the commands; the piece follows, then the four edges as tabs, the film strip, and the tools with the bake
+  - then a bar holds the wordmark, the piece, «pieces», day and night and the commands; the piece follows, then the four edges as tabs, the film strip, and the tools corner with the bake
 
 ## /<piece> — the live view
 
@@ -100,7 +100,7 @@
   - then a looping animated webp take lands, 72 frames by default
 - ⬜ the settings on the ring
   - given a lit piece
-  - then its seed and look sit in the piece card, and every other setting on one of the four edges: light, lens, atmosphere, toggles
+  - then its seed and look sit in the piece corner, and every other setting on one of the four edges: light, lens, atmosphere, toggles
   - and each shows its exact value, typed or copied (the copy button shows on hover), with a slider, a switch, a colour or a choice; a long name wraps to a second line
   - and on an open edge ↑ ↓ move between the rows and ← → change the value
   - and a flat piece shows only its seed, in one card at the top with a line saying why
@@ -120,7 +120,7 @@
   - given a favicon is open
   - then «as it lands» shows it at true size in a browser tab (16 px), a retina tab (32 px), a dark bookmarks bar (16 px) and on a home screen (64 px)
   - when dima picks one of those
-  - then the favicon shows drawn at that size, one square per pixel at a whole zoom, with a grid between the pixels from 8×, and the piece card names the size
+  - then the favicon shows drawn at that size, one square per pixel at a whole zoom, with a grid between the pixels from 8×, and the piece corner names the size
   - and the tools corner holds its zoom (fit and the 1×, 8×, 24× that fit) and the grid, which `x` shows or hides
   - and pointing at a pixel names its place and colour; the same tile again, or `l`, goes back to the whole piece
 - ✅ a saved drawing redraws by itself

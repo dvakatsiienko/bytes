@@ -8,7 +8,7 @@ import { Key } from './key';
 import { Segmented } from './segmented';
 
 /** the top-right corner: day or night, every command, the theme, and which checkout runs */
-export const ViewCard = (props: ViewCardProps) => {
+export const CornerView = (props: CornerViewProps) => {
   const themeIcon = themeIcons[props.theme];
   const nextTheme =
     themes[(themes.indexOf(props.theme) + 1) % themes.length] ?? 'system';
@@ -63,7 +63,7 @@ const themeIcons = {
 
 /* Types */
 
-interface ViewCardProps {
+interface CornerViewProps {
   actions: StudioActions;
   theme: Theme;
 }

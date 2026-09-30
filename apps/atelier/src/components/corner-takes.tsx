@@ -25,7 +25,7 @@ import { Segmented } from './segmented';
  * opens the stack into the film strip along the bottom edge, and folds it
  * again.
  */
-export const TakesCorner = (props: TakesCornerProps) => {
+export const CornerTakes = (props: CornerTakesProps) => {
   const query = useTakes(props.piece.id);
   const list = query.data;
   if (query.isError)
@@ -374,7 +374,7 @@ const emptyText = {
 
 /* Types */
 
-interface TakesCornerProps {
+interface CornerTakesProps {
   actions: StudioActions;
   /** the narrow bench shows the strip always: there is no corner to stack in */
   isStrip?: boolean;

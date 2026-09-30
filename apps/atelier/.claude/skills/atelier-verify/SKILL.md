@@ -51,7 +51,7 @@ Done when every touched line carries the status its drive earned, and the report
 - «still renders and answers a click» is proven with `elementFromPoint` at the control's centre and **no** `scrollIntoView` — scrolling first hides a covered or pushed-out section
 - time day ↔ night, theme `t`, readme frame fit / phone / desktop
 - the crash lines (`## errors` in `FTR.md`), dev build only — `src/dev-crash.ts` holds the names:
-  - `?crash=<section>` (header = the view card, pieces = the piece card, takes, toolbar = the tools, viewport = the piece, panel = the ring) → that section's fallback
+  - `?crash=<section>` (header = the view corner, pieces = the piece corner, takes = the takes corner, toolbar = the tools corner, viewport = the piece, panel = the ring) → that section's fallback
   - `?crash=piece` on a flat piece → the viewport's fallback; on a lit piece → `[data-testid=stage][data-error]` and «the scene did not build»
   - `?crash=root` → «atelier stopped drawing»; prove the reload with a `window` marker set before the click and gone after (the url still carries the crash, so the fallback comes back)
   - the crash lives in the url: a click in the pieces list drops it, and a fallback's «try again» ends it for the page's life. the lit crash has no «try again»: a day ↔ night toggle rebuilds and throws again, only a pieces-list click leaves it

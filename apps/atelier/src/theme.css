@@ -65,9 +65,9 @@
   color-scheme: dark;
 }
 
-/* each corner writes its height here (components/lens-ring.tsx); 0 until it has */
+/* each corner writes its height here (components/ring-wide.tsx); 0 until it has */
 [data-ring] {
-  /* the top and bottom edges sit on the piece's rim (lens-ring.tsx sets --art-top) */
+  /* the top and bottom edges sit on the piece's rim (ring-wide.tsx sets --art-top) */
   --rim: max(16px, calc(var(--art-top, 0px) - 24px));
   --tl: 0px;
   --tr: 0px;

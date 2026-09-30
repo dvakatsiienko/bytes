@@ -23,7 +23,7 @@ import { isHex, looks } from '../stage/settings.ts';
  * away from home.
  */
 export const SettingRow = (props: SettingRowProps) => {
-  // `ring-`: a search on the ring can list the seed and look the piece card also shows
+  // `ring-`: a search on the ring can list the seed and look the piece corner also shows
   const id = `ring-${props.row.key}`;
   const value = props.settings[props.row.key];
 

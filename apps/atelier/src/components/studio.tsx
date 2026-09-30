@@ -17,8 +17,8 @@ import {
 import { navigate, opensInPlace, pathOf, useRoute } from '../route.ts';
 import { isPlayingAtom, themeAtom } from '../state.ts';
 import { CommandPalette } from './command-palette';
-import { LensRing } from './lens-ring';
 import { RingUnrolled } from './ring-unrolled';
+import { RingWide } from './ring-wide';
 import { ZoomDialog } from './zoom-dialog';
 
 export const Studio = () => {
@@ -60,7 +60,7 @@ const Workbench = (props: WorkbenchProps) => {
       className='relative h-dvh overflow-hidden bg-ground text-ink'
       data-time={actions.time}>
       {isWide ? (
-        <LensRing
+        <RingWide
           actions={actions}
           piece={props.piece}
           theme={theme}
