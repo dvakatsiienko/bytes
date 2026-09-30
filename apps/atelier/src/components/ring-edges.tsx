@@ -112,6 +112,8 @@ const EdgeChip = (props: EdgeChipProps) => {
       aria-label={`${name}, ${rowsOf(props.edge.id).length} settings: ${props.summary.map((part) => part.text).join(' ')}`}
       className={cn(
         'glass absolute flex items-center justify-between',
+        // a side chip squeezed by a short window keeps its name and key, and drops its summary
+        isSide && '[container-type:size]',
         chipPlace[props.edge.side],
       )}
       data-ring-opener={props.edge.id}
@@ -119,7 +121,7 @@ const EdgeChip = (props: EdgeChipProps) => {
       type='button'>
       <span
         className={cn(
-          'font-semibold text-sm',
+          'whitespace-nowrap font-semibold text-sm',
           isSide && '[writing-mode:vertical-rl]',
           props.edge.side === 'left' && 'rotate-180',
         )}>
@@ -127,8 +129,9 @@ const EdgeChip = (props: EdgeChipProps) => {
       </span>
       <span
         className={cn(
-          'flex items-baseline gap-1.5 text-sm',
-          isSide && '[writing-mode:vertical-rl]',
+          'flex items-baseline gap-1.5 whitespace-nowrap text-sm',
+          isSide &&
+            '[writing-mode:vertical-rl] [@container(max-height:220px)]:hidden',
           props.edge.side === 'left' && 'rotate-180',
         )}>
         {props.summary.map((part) => {
@@ -346,13 +349,14 @@ const tabRow = ['top', 'left', 'right', 'bottom'] as const;
 /**
  * where each folded edge sits: every chrome piece shares one frame, the
  * window's 16 px inset, so the top and bottom chips keep the corner cards'
- * line (dima, 2026-09-30); the side ones sit between the corners
+ * line (dima, 2026-09-30); the side ones sit between the corners, never
+ * taller than the room those leave (12 px clear of each)
  */
 const chipPlace = {
   bottom: 'bottom-4 left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
-  left: 'top-[calc(50%+(var(--tl)-var(--bl))/2)] left-4 h-60 w-12 -translate-y-1/2 flex-col py-3',
+  left: 'top-[calc(50%+(var(--tl)-var(--bl))/2)] left-4 h-[min(240px,calc(100%-56px-var(--tl)-var(--bl)))] w-12 -translate-y-1/2 flex-col overflow-hidden py-3',
   right:
-    'top-[calc(50%+(var(--tr)-var(--br))/2)] right-4 h-60 w-12 -translate-y-1/2 flex-col py-3',
+    'top-[calc(50%+(var(--tr)-var(--br))/2)] right-4 h-[min(240px,calc(100%-56px-var(--tr)-var(--br)))] w-12 -translate-y-1/2 flex-col overflow-hidden py-3',
   top: 'top-4 left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
 } as const;
 
