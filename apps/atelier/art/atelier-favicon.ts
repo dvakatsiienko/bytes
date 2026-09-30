@@ -1,21 +1,22 @@
 /**
- * atelier's own mark — «the crafter and the lamp»: a hanging shade, the bulb, and its light
- * falling on a paper card, the piece on the bench. Drawn at 512 × 512; it reads at 16 px as
- * three blocks (shade, glow, card). Colours are atelier's DESIGN.md tokens, not the story's.
+ * atelier's own mark — «the lens ring»: a small piece of art in the middle, and
+ * four glass pills hugging its four sides, the way the studio frames every piece.
+ * Drawn at 512 × 512 on a 32-unit grid, so at 16 px every part lands on whole
+ * pixels: a 10 × 8 px coloured piece inside four 1 px bars.
+ * The tile is the ground (light by day, the smoke at night) and the pills are the
+ * glass; only the art carries colour, as in the studio (DESIGN.md).
  */
 import type { Palette } from './palette.ts';
 import type { Pt } from './paper.ts';
 import { n, seeded } from './paper.ts';
 
-const ink = { day: '#22324a', night: '#3a4270' };
-/** the shade: navy by day; terracotta at night, so the brand colour carries the mark on indigo */
-const shadeFill = { day: '#22324a', night: '#c8553d' };
-/** a warmer gold for the night cone: plain lamp gold at low alpha on indigo reads olive */
-const coneGold = { day: '#ffd978', night: '#ffb85c' };
-const tile = { day: '#c8553d', night: '#121629' };
-const lampGold = '#ffd978';
-const bulbCore = '#fff6d0';
-const paper = '#fff8ea';
+const tile = { day: '#d3d9dc', night: '#0e1216' };
+/** the glass: smoke on the light ground, ink on the dark one */
+const pill = { day: '#2b3236', night: '#f2f5f7' };
+const sky = { day: '#9cc9df', night: '#2c4474' };
+const farHill = { day: '#7fb08a', night: '#4a7a62' };
+const nearHill = { day: '#3f7a4e', night: '#23443a' };
+const light = { day: '#ffd978', night: '#f2f5f7' };
 
 /** split every edge into ~`step` px pieces and nudge each point sideways: the hand-cut edge */
 const cut = (
@@ -43,43 +44,61 @@ const cut = (
   return `M${out.map(([x, y]) => `${n(x)} ${n(y)}`).join('L')}Z`;
 };
 
+/**
+ * the four pills, one per edge: top and bottom lie across, the sides stand up
+ * (x, y, w, h). Every edge sits on a 32-unit grid, one pixel at 16 px, so each
+ * pill is a crisp pixel thick with a pixel of gap to the art.
+ */
+const pills = [
+  [160, 64, 192, 32],
+  [448, 160, 32, 192],
+  [160, 416, 192, 32],
+  [32, 160, 32, 192],
+] as const;
+
 export const atelierFavicon = (p: Palette, seed: number) => {
   const rand = seeded(seed || 1847);
   const time = p.isNight ? 'night' : 'day';
-  const shade: Pt[] = [
-    [214, 112],
-    [298, 112],
-    [390, 236],
-    [122, 236],
+  // the piece: 320 × 256 (10 × 8 px at 16), filling the tile inside its pills
+  const art: Pt[] = [
+    [96, 128],
+    [416, 128],
+    [416, 384],
+    [96, 384],
   ];
-  const cone: Pt[] = [
-    [150, 236],
-    [362, 236],
-    [436, 404],
-    [76, 404],
+  const far: Pt[] = [
+    [96, 300],
+    [170, 256],
+    [246, 282],
+    [320, 244],
+    [416, 284],
+    [416, 384],
+    [96, 384],
   ];
-  const card: Pt[] = [
-    [150, 372],
-    [362, 360],
-    [366, 432],
-    [154, 444],
+  const near: Pt[] = [
+    [96, 330],
+    [200, 304],
+    [300, 336],
+    [416, 312],
+    [416, 384],
+    [96, 384],
   ];
-  const hill: Pt[] = [
-    [176, 426],
-    [226, 392],
-    [262, 410],
-    [300, 384],
-    [342, 420],
-    [342, 426],
-  ];
+  const pillListSvg = pills
+    .map(([x, y, w, h]) => {
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="${pill[time]}"/>`;
+    })
+    .join('');
   return [
-    `<defs><radialGradient id="favGlow-${time}" cx=".5" cy=".3" r=".75"><stop offset="0" stop-color="${coneGold[time]}" stop-opacity="${p.isNight ? 0.7 : 0.55}"/><stop offset="1" stop-color="${coneGold[time]}" stop-opacity="0"/></radialGradient>`,
-    `<filter id="favLift-${time}" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0a0e1e" flood-opacity="${p.isNight ? 0.55 : 0.35}"/></filter></defs>`,
+    `<defs><clipPath id="favArt-${time}"><path d="${cut(art, rand, 16, 1.4)}"/></clipPath>`,
+    '</defs>',
     `<rect width="512" height="512" rx="112" fill="${tile[time]}"/>`,
-    `<path d="${cut(cone, rand, 18, 1.2)}" fill="url(#favGlow-${time})"/>`,
-    `<rect x="248" y="0" width="16" height="118" fill="${ink[time]}"/>`,
-    `<g filter="url(#favLift-${time})"><path d="${cut(card, rand)}" fill="${paper}"/><path d="${cut(hill, rand, 10, 1.4)}" fill="${ink.day}"/><circle cx="300" cy="386" r="12" fill="${lampGold}"/></g>`,
-    `<g filter="url(#favLift-${time})"><path d="${cut(shade, rand)}" fill="${shadeFill[time]}"/><path d="M126 234L386 234" stroke="${lampGold}" stroke-opacity="${p.isNight ? 0.9 : 0}" stroke-width="6" stroke-linecap="round"/></g>`,
-    `<path d="M214 236A42 42 0 0 0 298 236Z" fill="${lampGold}"/><path d="M234 236A22 22 0 0 0 278 236Z" fill="${bulbCore}"/>`,
+    // flat, no lift: at 16 px a shadow only smears the pixel between the art and a pill
+    `<g clip-path="url(#favArt-${time})">`,
+    `<rect x="88" y="120" width="336" height="272" fill="${sky[time]}"/>`,
+    `<circle cx="352" cy="192" r="32" fill="${light[time]}"/>`,
+    `<path d="${cut(far, rand, 12, 1.6)}" fill="${farHill[time]}"/>`,
+    `<path d="${cut(near, rand, 12, 1.6)}" fill="${nearHill[time]}"/>`,
+    '</g>',
+    pillListSvg,
   ].join('');
 };

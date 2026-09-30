@@ -11,11 +11,11 @@ const schemeQuery = /\(\s*prefers-color-scheme\s*:\s*dark\s*\)/g;
 export const pinColorScheme = (svg: string, scheme: 'light' | 'dark') =>
   svg.replace(schemeQuery, scheme === 'dark' ? 'all' : 'not all');
 
-/** DESIGN.md lamp gold, ringed in lamp ink so it reads on the terracotta tile and on the night one */
+/** DESIGN.md ink, ringed in the smoke, so it reads on the light ground tile and on the dark one */
 const devDot =
-  '<circle cx="432" cy="80" r="64" fill="#ffd978" stroke="#1a1f3a" stroke-width="16"/>';
+  '<circle cx="432" cy="80" r="64" fill="#f2f5f7" stroke="#0e1216" stroke-width="16"/>';
 
-/** a dev studio's icon carries a small lamp-gold dot in its top-right corner */
+/** a dev studio's icon carries a small ink dot in its top-right corner */
 export const markDev = (svg: string) =>
   svg.replace('</svg>', `${devDot}</svg>`);
 

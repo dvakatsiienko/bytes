@@ -18,6 +18,7 @@
   - decision: one frame for every chrome piece, as the comp draws it — edges on the piece's rim «read off» and broke the pills' horizontal rhythm (dima's review, 2026-09-30)
   - and the corners hold the piece corner (top left), the view corner (top right), the takes corner (bottom left) and the tools corner with the bake (bottom right)
   - decision: the piece is fitted whole, never cropped, so a wide piece leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»)
+  - decision: the minimum supported window is 560 px tall — below it the folded toggles chip may cut its name (dima, 2026-09-30: not supported, no fix)
 - ✅ one edge open at a time
   - when dima presses `1`–`4` or clicks a folded edge
   - then that edge opens with every setting of its group, and any other open edge or the film strip folds
