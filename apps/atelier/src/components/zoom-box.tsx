@@ -306,7 +306,7 @@ const ZoomBehaviour = (props: ZoomBehaviourProps) => {
 
 /** DESIGN.md «float»: raised over whatever it floats on — the white mat by day, the indigo mat or the night ground by night */
 const floatingClass =
-  'bg-popover shadow-float ring-1 ring-foreground/15 dark:bg-segment-on';
+  'bg-popover shadow-glass ring-1 ring-foreground/15 backdrop-blur-[28px]';
 
 /* Helpers */
 

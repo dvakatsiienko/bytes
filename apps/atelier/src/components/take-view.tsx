@@ -201,7 +201,7 @@ const TakeRecord = (props: TakeRecordProps) => {
             <GitCompareIcon /> compare…
           </PopoverTrigger>
           <PopoverContent align='start' className='w-56 p-1'>
-            <PopoverTitle className='px-2 py-1 text-muted-foreground text-xs'>
+            <PopoverTitle className='px-2 py-1 text-muted-foreground text-sm'>
               compare {props.take.id} with
             </PopoverTitle>
             <ul className='max-h-64 overflow-y-auto'>{compareListJSX}</ul>

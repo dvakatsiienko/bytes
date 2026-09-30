@@ -88,7 +88,7 @@ export const LiveView = (props: LiveViewProps) => {
       ) : null}
       {error ? (
         <p
-          className='absolute inset-x-4 bottom-4 rounded-md bg-popover p-3 text-destructive text-sm shadow-float'
+          className='absolute inset-x-4 bottom-4 rounded-md bg-popover p-3 text-destructive text-sm shadow-glass'
           role='alert'>
           the scene did not build: {error}
         </p>
