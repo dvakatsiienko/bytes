@@ -10,7 +10,7 @@ const adaptive = readFileSync(
 const schemeQuery = /prefers-color-scheme/g;
 const alwaysOn = /@media all\b/g;
 const alwaysOff = /@media not all\b/g;
-const lampGold = /#ffd978"/g;
+const dotInk = /#f2f5f7"/g;
 const devDot = /<circle cx="432"[^>]*\/>/;
 
 describe('pinColorScheme', () => {
@@ -56,12 +56,12 @@ describe('showFavicon', () => {
 });
 
 describe('markDev', () => {
-  it('adds exactly one lamp-gold dot, in either theme, and leaves the rest of the icon as it was', () => {
+  it('adds exactly one ink dot, in either theme, and leaves the rest of the icon as it was', () => {
     for (const scheme of ['light', 'dark'] as const) {
       const pinned = pinColorScheme(adaptive, scheme);
       const marked = markDev(pinned);
-      expect(marked.match(lampGold)?.length ?? 0).toBe(
-        (pinned.match(lampGold)?.length ?? 0) + 1,
+      expect(marked.match(dotInk)?.length ?? 0).toBe(
+        (pinned.match(dotInk)?.length ?? 0) + 1,
       );
       expect(marked.replace(devDot, '')).toBe(pinned);
     }

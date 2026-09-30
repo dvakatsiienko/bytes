@@ -80,7 +80,7 @@ export const pieces = [
     id: 'atelier-favicon',
     kind: 'favicon',
     size: { h: 512, w: 512 },
-    title: 'atelier: a hanging lamp lighting a paper card on the bench',
+    title: 'atelier: a small piece of art framed by four glass edges',
   },
   {
     draw: speak,
