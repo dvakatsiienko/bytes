@@ -20,6 +20,7 @@ import {
   isPaletteOpenAtom,
   isPlayingAtom,
   patchSettingsAtom,
+  piecesOpenAtom,
   pixelGridAtom,
   pixelViewAtom,
   pixelZoomAtom,
@@ -61,6 +62,7 @@ export const useStudioActions = (piece: Piece) => {
   const setBakeStep = useSetAtom(bakeStepAtom);
   const [ring, setRing] = useAtom(ringAtom);
   const setFindFocus = useSetAtom(findFocusAtom);
+  const setPiecesOpen = useSetAtom(piecesOpenAtom);
   const [pixelView, setPixelView] = useAtom(pixelViewAtom);
   const setPixelZoom = useSetAtom(pixelZoomAtom);
   const setPixelGrid = useSetAtom(pixelGridAtom);
@@ -248,6 +250,7 @@ export const useStudioActions = (piece: Piece) => {
       patchSettings(piece.id, { seed: 1 + Math.floor(Math.random() * 9999) }),
     nextTake: () => stepTake(1),
     openPalette: () => setPaletteOpen(true),
+    openPieces: () => setPiecesOpen(true),
     pieces,
     previousTake: () => stepTake(-1),
     readme,

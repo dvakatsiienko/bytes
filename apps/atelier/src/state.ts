@@ -101,6 +101,8 @@ export const zoomAtom = atom<Zoom | null>(null);
 /** each bump sends the bench's zoom back to fit, without redrawing the piece */
 export const fitKeyAtom = atom(0);
 export const takeFilterAtom = atom<TakeFilter>('all');
+/** the pieces list's popover, open from its button or `p` */
+export const piecesOpenAtom = atom(false);
 /** the one open edge of the ring, or the film strip; null when all are folded */
 export const ringAtom = atom<RingOpen>(null);
 /** the words typed into «find a setting» */

@@ -99,7 +99,7 @@ export const commandsOf = (
       ? [
           {
             group: 'view',
-            keys: 'p',
+            keys: 'm',
             label: actions.isPlaying ? 'stop motion' : 'play motion',
             run: actions.togglePlay,
           } as const,
@@ -140,6 +140,12 @@ export const commandsOf = (
       keys: 'r',
       label: 'reset settings to defaults',
       run: actions.resetSettings,
+    },
+    {
+      group: 'pieces',
+      keys: 'p',
+      label: 'open the pieces list',
+      run: actions.openPieces,
     },
     ...pieceCommands,
   ];

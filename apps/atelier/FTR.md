@@ -26,7 +26,7 @@
   - and `/` typed inside a text field types a slash
 - 🔎 the pieces list, grouped by where each piece ships
   - given any screen
-  - when dima opens «pieces» in the piece corner and clicks a piece
+  - when dima presses `p` or opens «pieces» in the piece corner, and clicks a piece
   - then its live view opens at `/<piece>` and the row is marked selected
 - 🔎 a «pieces» title over the pieces list, with the piece count
 - 🔎 the «atelier» wordmark goes home
@@ -63,7 +63,8 @@
   - then the piece shows bare, or inside github's page at 358 px (phone) or 830 px (desktop)
 - 🔎 motion plays and stops
   - given a piece that moves
-  - when dima presses `p` or the motion tool
+  - when dima presses `m` or the motion tool
+  - decision: `m` for motion and `p` for the pieces list, as the comp has them (dima, 2026-09-30)
   - then the motion plays, and the same key stops it
   - and while it plays the tools corner says «motion playing» with the frame of 72 it shows
 - 🔎 motion stops when dima leaves the view

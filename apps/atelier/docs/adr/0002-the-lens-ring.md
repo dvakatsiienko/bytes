@@ -14,8 +14,8 @@ The design source is the studio job `jobs/atelier/` (`contract.md`, `decision.md
 ## Consequences
 
 - one open edge is the rule, and the film strip counts as the bottom edge: opening one folds the other.
-- the keys stay the ones dima already uses (`n` day and night, `t` theme, `p` motion, `w` the readme frame) over the comp's labels; the ring adds `1`–`4`, `esc`, `g`, `/`, `e` (new seed), `y` (copy json) and `r` (reset, with a 5 s undo).
-- the piece is fitted whole, never cropped: an 8:3 scene on a 16:10 screen leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»).
+- the keys stay the ones dima already uses (`n` day and night, `t` theme, `w` the readme frame) over the comp's labels, except the comp's `p` for the pieces list and `m` for motion (dima's review, 2026-09-30); the ring adds `1`–`4`, `esc`, `g`, `/`, `e` (new seed), `y` (copy json) and `r` (reset, with a 5 s undo).
+- the piece is fitted whole, never cropped: an 8:3 scene on a 16:10 screen leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»). An open edge sits in that ground when it has room, and reaches into the art only as far as its own height forces.
 - the glass is one smoke in both themes; the theme picks the ground behind a day piece, and a night piece always sits on the dark ground.
 - the top and bottom edges sit on the piece's rim, not the window's edge, so the glass always overlaps the art.
 - the direction came from the studio's three design rounds (`decision.md`), not from impeccable's concept roll, so it carries no seed key.

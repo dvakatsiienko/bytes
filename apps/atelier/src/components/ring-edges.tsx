@@ -377,14 +377,15 @@ const panelPlace = {
 } as const;
 
 /**
- * An open top or bottom edge sits in a slot from the window's edge to the
- * piece's rim, against the rim side, so it keeps the 24 px overlap and grows
- * outward over the ground. A band taller than the slot stretches the slot
- * (min-content) and grows inward from the window's edge instead.
+ * An open top or bottom edge sits in a slot from the window's edge to 12 px
+ * short of the piece's rim, against the rim side: when the ground beside the
+ * art has room for it, the panel covers none of the art. A panel taller than
+ * the slot stretches it (min-content) from the window's edge, so it reaches
+ * into the art only as far as its own height forces.
  */
 const bandSlots: Partial<Record<Side, string>> = {
-  bottom: 'bottom-4 justify-start h-[max(0px,calc(var(--art-top,0px)+8px))]',
-  top: 'top-4 justify-end h-[max(0px,calc(var(--art-top,0px)+8px))]',
+  bottom: 'bottom-4 justify-start h-[max(0px,calc(var(--art-top,0px)-28px))]',
+  top: 'top-4 justify-end h-[max(0px,calc(var(--art-top,0px)-28px))]',
 };
 
 /** a band never reaches the corners across from it */

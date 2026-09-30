@@ -64,7 +64,7 @@ export const CornerTools = (props: CornerToolsProps) => {
       ? [
           {
             isPressed: props.actions.isPlaying,
-            keys: 'p',
+            keys: 'm',
             label: props.actions.isPlaying ? 'stop motion' : 'play motion',
             run: props.actions.togglePlay,
             short: props.actions.isPlaying ? 'stop' : 'motion',

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { NumberField } from '@ui/kit/components/number-field';
 import {
   Popover,
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/kit/components/select';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { ChevronDownIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
@@ -21,6 +20,7 @@ import type { StudioActions } from '../actions.ts';
 import { defaults, looks } from '../stage/settings.ts';
 import {
   patchSettingsAtom,
+  piecesOpenAtom,
   pixelViewAtom,
   settingsByPieceAtom,
 } from '../state.ts';
@@ -112,7 +112,7 @@ export const CornerPiece = (props: CornerPieceProps) => {
 
 /** every piece, one click away; picking one closes the list */
 export const PiecesButton = (props: { piece: Piece }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useAtom(piecesOpenAtom);
   return (
     <Popover onOpenChange={setIsOpen} open={isOpen}>
       <PopoverTrigger className='flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-ink-muted text-sm hover:bg-fill-on hover:text-ink'>
@@ -121,6 +121,7 @@ export const PiecesButton = (props: { piece: Piece }) => {
           {pieces.length}
         </span>
         <ChevronDownIcon className='size-3.5' />
+        <Key keys='p' />
       </PopoverTrigger>
       <PopoverContent
         align='end'
