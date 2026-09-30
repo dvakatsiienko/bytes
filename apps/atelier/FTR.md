@@ -24,15 +24,15 @@
   - when dima presses `/`
   - then the open edge's find field takes focus (a folded ring opens light first), and typing lists every matching setting of all four edges and the piece corner, each with its edge's name
   - and `/` typed inside a text field types a slash
-- ✅ the pieces list, grouped by where each piece ships
+- 🔎 the pieces list, grouped by where each piece ships
   - given any screen
   - when dima opens «pieces» in the piece corner and clicks a piece
   - then its live view opens at `/<piece>` and the row is marked selected
-- ✅ a «pieces» title over the pieces list, with the piece count
+- 🔎 a «pieces» title over the pieces list, with the piece count
 - 🔎 the «atelier» wordmark goes home
   - when dima clicks the wordmark
   - then the first piece's live view opens; ⌘-click opens it in a new tab
-- ✅ theme: system, light, dark
+- 🔎 theme: system, light, dark
   - when dima presses `t`
   - then the ground behind a day piece switches between light and dark; the glass stays one smoke
   - and a night piece always sits on the dark ground
@@ -46,7 +46,7 @@
   - given atelier runs from a seeded worktree (`pnpm worktree:seed` gave it a port offset)
   - then the tab title reads «atelier · dev» and the favicon carries a dot
   - and on main the title stays «atelier»; the view corner shows the branch and sha on both
-- ✅ the ring unrolls below 1100 px wide
+- 🔎 the ring unrolls below 1100 px wide
   - given a window narrower than 1100 px
   - then a bar holds the wordmark, the piece, «pieces», day and night and the commands; the piece follows, then the four edges as tabs, the film strip, and the tools corner with the bake
 
@@ -58,10 +58,10 @@
 - 🔎 day and night
   - when dima presses `n` or clicks day / night
   - then the piece is drawn for that time of day
-- ✅ the readme frame
+- 🔎 the readme frame
   - when dima presses `w` or the frame tool, which names the width it shows
   - then the piece shows bare, or inside github's page at 358 px (phone) or 830 px (desktop)
-- ✅ motion plays and stops
+- 🔎 motion plays and stops
   - given a piece that moves
   - when dima presses `p` or the motion tool
   - then the motion plays, and the same key stops it
@@ -70,7 +70,7 @@
   - given motion is playing
   - when dima opens another piece, a take or a compare
   - then the motion stops, and coming back shows a still frame
-- ✅ zoom and pan
+- 🔎 zoom and pan
   - when dima presses `z` or the zoom tool
   - then the image opens zoomable: pinch or ⌘-scroll zooms, drag pans, double-click toggles fit and 2×
 - 🔎 back to live from anywhere
@@ -78,7 +78,7 @@
   - when dima presses `l` or picks «back to the live view» in ⌘K
   - then the live view of the same piece shows, unzoomed
   - and `l` is the one bare key the zoom viewer lets through
-- ✅ copy the image
+- 🔎 copy the image
   - makes: a png of the image on the clipboard
   - when dima presses `c` or the copy tool
   - then the current image is on the clipboard as a png and a toast confirms it
@@ -87,7 +87,7 @@
   - when dima presses `b` or the bake button, which asks «bake the first take» on a piece with none
   - then a note field opens with the piece's last note selected
   - and Enter bakes: a «baking <piece> · <time>…» toast, then «baked take <id>» with an «open» action, and the take tops the takes list
-- ✅ bake shows progress
+- 🔎 bake shows progress
   - given a bake is running
   - then its toast names the step it is on (the browser, the stage, `frame n of 72`, the webp, saving) and the seconds so far
   - and the bake button says «baking…» with the step, and fills from the left as a loop's frames land
@@ -98,7 +98,7 @@
   - given a piece that moves
   - when dima runs «bake a motion loop» from ⌘K
   - then a looping animated webp take lands, 72 frames by default
-- ✅ the settings on the ring
+- 🔎 the settings on the ring
   - given a lit piece
   - then its seed and look sit in the piece corner, and every other setting on one of the four edges: light, lens, atmosphere, toggles
   - and each shows its exact value, typed or copied (the copy button shows on hover), with a slider, a switch, a colour or a choice; a long name wraps to a second line
@@ -107,7 +107,7 @@
 - ✅ new seed
   - when dima presses `e` or «new» beside the seed
   - then the piece draws with a new random seed
-- ✅ copy all settings, reset to defaults
+- 🔎 copy all settings, reset to defaults
   - makes: the piece's settings as json on the clipboard (copy json); reset leaves nothing
   - when dima presses `y` or «copy json», `r` or «reset»
   - then the settings are on the clipboard as json, or back to the piece's defaults, and a toast says which
@@ -132,7 +132,7 @@
 > purpose: every bake of this piece, to compare, keep or park
 > states: none yet · the stack · the film strip (many scroll) · stashed filter · baking
 
-- ✅ the takes stack
+- 🔎 the takes stack
   - given a piece with takes
   - then its newest takes stack in the bottom-left corner, the shown one in front, over a line with its id, «● current» when it ships, and how many there are and how many are stashed
   - given a piece with 0 takes
@@ -141,13 +141,13 @@
   - when dima presses `g` or clicks the stack
   - then the takes open in a row along the bottom edge, with the shown take's facts, and `g` or «fold» folds them back
   - and while a bake runs its tile leads the row with the step it is on
-- ✅ filter all, current, stashed
+- 🔎 filter all, current, stashed
   - when dima picks a filter in the film strip
   - then the strip shows only those takes, or a line saying there are none
-- ✅ a take tile
+- 🔎 a take tile
   - then each tile shows the thumbnail, the id (which names the time of day), the note or «no note», «● current» when it ships and «stashed» with a dashed edge when stashed
   - and a right-click offers open (⏎), compare with the shown take (v), stash or unstash (s), promote (⇧⏎), use its settings (u), copy png (c); each key works while the menu is open
-- ✅ the shown take's ring shows whole, first and last tile included
+- 🔎 the shown take's ring shows whole, first and last tile included
 - 🔎 previous and next take
   - when dima presses `[` or `]`, or picks them in ⌘K
   - then `]` opens the next take down the list (older) and `[` the next one up (newer); from the live view `]` starts at the newest and `[` at the oldest
@@ -157,7 +157,7 @@
 > purpose: one bake's record: its facts, its note, and the promote or stash decision
 > states: current · stashed (with its two reasons)
 
-- ✅ the take's facts
+- 🔎 the take's facts
   - then the take card, beside the lens edge, shows time, seed, frames, source hash and when it was baked
   - and opening the lens edge folds the take card until the edge folds again
 - 🔎 edit the note
@@ -184,7 +184,7 @@
 > purpose: two takes side by side, to pick the better one
 > states: slider · side by side
 
-- ✅ compare as a slider or side by side
+- 🔎 compare as a slider or side by side
   - when dima switches the compare mode in the compare card, beside the lens edge
   - then the two takes show under one sliding divider, or next to each other with their notes
 
