@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -90,8 +91,11 @@ const upgradeTake = async (dir: string, meta: Record<string, unknown>) => {
   try {
     await rename(join(dir, 'bake.webp'), join(dir, 'shot.webp'));
   } catch (error) {
-    // a second reader got here first
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+    // a second reader got here first; a take with neither file stays broken
+    const movedAlready =
+      (error as NodeJS.ErrnoException).code === 'ENOENT' &&
+      existsSync(join(dir, 'shot.webp'));
+    if (!movedAlready) throw error;
   }
   const files = (rest.files as string[]).map((file) =>
     file === 'bake.webp' ? 'shot.webp' : file,
