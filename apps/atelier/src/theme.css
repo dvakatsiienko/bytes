@@ -102,6 +102,11 @@
   --width: 300px !important;
 }
 
+/* a toast says its step in words; its loader stays still instead of repainting every frame */
+[data-sonner-toast] .animate-spin {
+  animation: none;
+}
+
 /* the kit's floating surfaces are glass too: without the blur their smoke reads as grey paint */
 [data-slot="popover-content"],
 [data-slot="context-menu-content"],
