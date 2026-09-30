@@ -143,7 +143,7 @@ const EdgeChip = (props: EdgeChipProps) => {
 /** the open edge: every setting of its group, or every setting the find words hit */
 export const EdgePanel = (props: EdgePanelProps) => {
   const [query, setQuery] = useAtom(findAtom);
-  const findFocus = useAtomValue(findFocusAtom);
+  const [findFocus, setFindFocus] = useAtom(findFocusAtom);
   const field = useRef<HTMLInputElement>(null);
   const isBand =
     props.isBand ?? (props.edge.side === 'top' || props.edge.side === 'bottom');
@@ -151,10 +151,12 @@ export const EdgePanel = (props: EdgePanelProps) => {
   const found = findSettings(query);
   const isFinding = query.trim() !== '';
 
-  // `/` from anywhere lands here; the first press also opens the edge
+  // `/` from anywhere lands here once; the first press also opens the edge
   useEffect(() => {
-    if (findFocus > 0) field.current?.select();
-  }, [findFocus]);
+    if (findFocus === 0) return;
+    field.current?.select();
+    setFindFocus(0);
+  }, [findFocus, setFindFocus]);
 
   const rowListJSX = isFinding
     ? found.map((hit) => {

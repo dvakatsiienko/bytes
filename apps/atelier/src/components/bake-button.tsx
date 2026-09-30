@@ -56,7 +56,10 @@ export const BakeButton = (props: BakeButtonProps) => {
 const BakeProgress = (props: { step: string | null }) => {
   const frames = FRAME_STEP.exec(props.step ?? '');
   const share = frames ? Number(frames[1]) / Number(frames[2]) : 0;
-  const percent = Math.round(share * 100);
+  // the frames' share holds through the steps after them, so the long webp step never reads as a restart
+  const [held, setHeld] = useState(0);
+  if (frames && share !== held) setHeld(share);
+  const percent = Math.round((frames ? share : held) * 100);
   const labelJSX = (
     <span className='flex w-full items-center justify-between px-4'>
       <span className='font-semibold text-base'>

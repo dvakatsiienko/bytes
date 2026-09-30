@@ -79,8 +79,8 @@ export const PieceView = (props: PieceViewProps) => {
       // a new piece, take, time or frame starts unzoomed
       key={`${pathOf(route)}:${props.actions.time}:${props.actions.readme}`}
       mode='canvas'
-      // the art's corners are under the ring's corners; its bottom centre is clear
-      toolbarAt='bottom'>
+      // the art's corners are under the ring's corners
+      toolbarAt='top-centre'>
       {contentJSX}
     </ZoomBox>
   );

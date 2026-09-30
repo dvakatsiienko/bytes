@@ -220,8 +220,15 @@ const PixelView = (props: PixelViewProps) => {
         onPointerLeave={() => setPicked(null)}
         onPointerMove={(event) => {
           if (!pixels) return;
-          const x = Math.floor(event.nativeEvent.offsetX / shown);
-          const y = Math.floor(event.nativeEvent.offsetY / shown);
+          const last = props.size - 1;
+          const x = Math.min(
+            last,
+            Math.floor(event.nativeEvent.offsetX / shown),
+          );
+          const y = Math.min(
+            last,
+            Math.floor(event.nativeEvent.offsetY / shown),
+          );
           const at = (y * props.size + x) * 4;
           const hex = [...pixels.data.slice(at, at + 3)]
             .map((channel) => channel.toString(16).padStart(2, '0'))
@@ -245,7 +252,7 @@ const PixelView = (props: PixelViewProps) => {
             setZoom(next === 'fit' ? zooms.fit : Number(next))
           }
           options={zoomOptions}
-          value={zoom === zooms.fit ? 'fit' : String(zoom)}
+          value={shown === zooms.fit ? 'fit' : String(shown)}
         />
       </div>
     </figure>
