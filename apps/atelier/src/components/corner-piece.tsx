@@ -125,12 +125,26 @@ export const PiecesButton = (props: { piece: Piece }) => {
       </PopoverTrigger>
       <PopoverContent
         align='end'
-        className='max-h-[min(560px,var(--available-height))] w-72 overflow-hidden p-0'>
+        className='max-h-[min(560px,var(--available-height))] w-72 overflow-hidden p-0'
+        // focus sits in the list while it is open, where the bare keys do not reach: `p` folds it from here
+        onKeyDown={(event) => {
+          if (event.key !== 'p' || event.repeat || isModified(event)) return;
+          event.preventDefault();
+          setIsOpen(false);
+        }}>
         <PiecesList onPick={() => setIsOpen(false)} piece={props.piece} />
       </PopoverContent>
     </Popover>
   );
 };
+
+/* Helpers */
+
+const isModified = (event: {
+  metaKey: boolean;
+  ctrlKey: boolean;
+  altKey: boolean;
+}) => event.metaKey || event.ctrlKey || event.altKey;
 
 /* Types */
 

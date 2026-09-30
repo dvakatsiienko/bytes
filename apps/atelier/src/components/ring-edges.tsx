@@ -357,23 +357,24 @@ export const FlatCard = (props: FlatCardProps) => {
 
 const tabRow = ['top', 'left', 'right', 'bottom'] as const;
 
-/** where each folded edge sits: the top and bottom ones on the piece's rim, the side ones between the corners */
+/** where each folded edge sits: the top and bottom ones in the ground beside the art, the side ones between the corners */
 const chipPlace = {
-  bottom: 'bottom-[var(--rim)] left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
+  bottom:
+    'bottom-[var(--chip-inset)] left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
   left: 'top-[calc(50%+(var(--tl)-var(--bl))/2)] left-4 h-60 w-12 -translate-y-1/2 flex-col py-3',
   right:
     'top-[calc(50%+(var(--tr)-var(--br))/2)] right-4 h-60 w-12 -translate-y-1/2 flex-col py-3',
-  top: 'top-[var(--rim)] left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
+  top: 'top-[var(--chip-inset)] left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
 } as const;
 
 /** where each open edge sits: a band between the top or bottom corners, a column under a side corner */
 const panelPlace = {
   bottom:
-    'bottom-[var(--rim)] left-[332px] right-[332px] max-h-[calc(100%-28px-var(--rim)-max(var(--tl),var(--tr)))]',
+    'bottom-[var(--chip-inset)] left-[332px] right-[332px] max-h-[calc(100%-28px-var(--chip-inset)-max(var(--tl),var(--tr)))]',
   left: 'top-[calc(28px+var(--tl))] left-4 w-[300px] max-h-[calc(100%-56px-var(--tl)-var(--bl))]',
   right:
     'top-[calc(28px+var(--tr))] right-4 w-[300px] max-h-[calc(100%-56px-var(--tr)-var(--br))]',
-  top: 'top-[var(--rim)] left-[332px] right-[332px] max-h-[calc(100%-28px-var(--rim)-max(var(--bl),var(--br)))]',
+  top: 'top-[var(--chip-inset)] left-[332px] right-[332px] max-h-[calc(100%-28px-var(--chip-inset)-max(var(--bl),var(--br)))]',
 } as const;
 
 /**

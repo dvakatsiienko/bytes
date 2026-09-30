@@ -13,7 +13,9 @@
 
 - ✅ the lens ring
   - given a lit piece is open, 1100 px wide or more
-  - then the piece shows as large as it fits whole, and four glass edges hug it: light on top and atmosphere at the bottom, both on the piece's rim, lens on the right, toggles on the left
+  - then the piece shows as large as it fits whole, and four glass edges hug it: light on top, lens on the right, atmosphere at the bottom, toggles on the left
+  - and the top and bottom ones, folded or open, sit in the ground beside the art, 12 px clear of it, whenever the ground holds them; only where it does not do they reach into the art, as little as their height forces
+  - decision: the glass never covers art it has room to avoid (dima's review, 2026-09-30, over the comp's glass on the rim)
   - and the corners hold the piece corner (top left), the view corner (top right), the takes corner (bottom left) and the tools corner with the bake (bottom right)
   - decision: the piece is fitted whole, never cropped, so a wide piece leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»)
 - ✅ one edge open at a time
@@ -26,7 +28,7 @@
   - and `/` typed inside a text field types a slash
 - 🔎 the pieces list, grouped by where each piece ships
   - given any screen
-  - when dima presses `p` or opens «pieces» in the piece corner, and clicks a piece
+  - when dima presses `p` or opens «pieces» in the piece corner, and clicks a piece; `p` again folds the list
   - then its live view opens at `/<piece>` and the row is marked selected
 - 🔎 a «pieces» title over the pieces list, with the piece count
 - 🔎 the «atelier» wordmark goes home

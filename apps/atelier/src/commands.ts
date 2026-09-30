@@ -144,8 +144,8 @@ export const commandsOf = (
     {
       group: 'pieces',
       keys: 'p',
-      label: 'open the pieces list',
-      run: actions.openPieces,
+      label: 'open or fold the pieces list',
+      run: actions.togglePieces,
     },
     ...pieceCommands,
   ];
