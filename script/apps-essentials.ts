@@ -248,6 +248,18 @@ function gapsOf(app: App): Gap[] {
             ]
           : [];
       }),
+    ...(app.isUi &&
+    !isWaived('branch-badge') &&
+    !git(app.dir, 'grep', '-l', 'BuildBadge', '--', '.')
+      ? [
+          {
+            detail:
+              'no branch switcher — copy ~/projects/bytes/apps/atelier/src/components/build-badge.tsx (dima wants it in every app, add it when the app is next touched)',
+            level: 'yellow' as const,
+            row: 'branch-badge' as const,
+          },
+        ]
+      : []),
     ...unknownVerifyScripts(app).map((script) => ({
       detail: `names «pnpm ${script}», no package.json here has that script`,
       level: 'yellow' as const,
@@ -436,7 +448,7 @@ type Row = {
   deployed?: 'vercel';
 };
 
-type RowId = (typeof rows)[number]['id'];
+type RowId = (typeof rows)[number]['id'] | 'branch-badge';
 
 type Waiver = { rows: RowId[] | '*'; ticket: string; why: string };
 
