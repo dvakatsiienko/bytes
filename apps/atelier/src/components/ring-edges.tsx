@@ -237,12 +237,16 @@ export const EdgePanel = (props: EdgePanelProps) => {
     </>
   );
 
-  return (
+  // on the ring an open top or bottom edge grows away from the piece, into the ground
+  const slot = props.className || !isBand ? null : bandSlots[props.edge.side];
+  const panelJSX = (
     <section
       aria-label={`${name} settings`}
       className={cn(
-        'glass absolute flex flex-col gap-3.5 px-4 pt-3 pb-3.5',
-        panelPlace[props.edge.side],
+        'glass flex flex-col gap-3.5 px-4 pt-3 pb-3.5',
+        slot
+          ? bandHeights[props.edge.side]
+          : `absolute ${panelPlace[props.edge.side]}`,
         props.className,
       )}
       data-ring-panel={props.edge.id}
@@ -292,6 +296,16 @@ export const EdgePanel = (props: EdgePanelProps) => {
         </footer>
       )}
     </section>
+  );
+  if (!slot) return panelJSX;
+  return (
+    <div
+      className={cn(
+        'absolute right-[332px] left-[332px] flex min-h-min flex-col',
+        slot,
+      )}>
+      {panelJSX}
+    </div>
   );
 };
 
@@ -362,7 +376,26 @@ const panelPlace = {
   top: 'top-[var(--rim)] left-[332px] right-[332px] max-h-[calc(100%-28px-var(--rim)-max(var(--bl),var(--br)))]',
 } as const;
 
+/**
+ * An open top or bottom edge sits in a slot from the window's edge to the
+ * piece's rim, against the rim side, so it keeps the 24 px overlap and grows
+ * outward over the ground. A band taller than the slot stretches the slot
+ * (min-content) and grows inward from the window's edge instead.
+ */
+const bandSlots: Partial<Record<Side, string>> = {
+  bottom: 'bottom-4 justify-start h-[max(0px,calc(var(--art-top,0px)+8px))]',
+  top: 'top-4 justify-end h-[max(0px,calc(var(--art-top,0px)+8px))]',
+};
+
+/** a band never reaches the corners across from it */
+const bandHeights: Partial<Record<Side, string>> = {
+  bottom: 'max-h-[calc(100cqh-44px-max(var(--tl),var(--tr)))]',
+  top: 'max-h-[calc(100cqh-44px-max(var(--bl),var(--br)))]',
+};
+
 /* Types */
+
+type Side = (typeof edges)[number]['side'];
 
 interface RingEdgesProps {
   actions: StudioActions;

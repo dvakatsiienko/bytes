@@ -103,8 +103,8 @@ export const useStudioActions = (piece: Piece) => {
     // one toast for the whole bake: its title stays, the line under it says the step and the seconds so far
     const title =
       frames > 1
-        ? `baking a ${frames}-frame loop of ${piece.id} · ${time}`
-        : `baking ${piece.id} · ${time}`;
+        ? `baking a ${frames}-frame loop of ${piece.id}\u00a0·\u00a0${time}`
+        : `baking ${piece.id}\u00a0·\u00a0${time}`;
     const started = Date.now();
     const seconds = () => `${Math.round((Date.now() - started) / 1000)} s`;
     let step = 'starting';
