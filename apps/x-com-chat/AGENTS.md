@@ -93,16 +93,6 @@ Authorized auth origins are set in `src/proxy.ts` (`localhost:3000`,
 - Convex: before backend work, read `convex/_generated/ai/guidelines.md` (overrides
   training-data assumptions). Convex agent skills live under `.agents/skills/`.
 
-<!-- BEGIN:nextjs-agent-rules -->
-
-# Next.js: ALWAYS read docs before coding
-
-Before any Next.js work, find and read the relevant doc in
-`node_modules/next/dist/docs/`. Your training data is outdated — the docs are
-the source of truth.
-
-<!-- END:nextjs-agent-rules -->
-
 <!-- convex-ai-start -->
 
 This project uses [Convex](https://convex.dev) as its backend.
