@@ -87,6 +87,12 @@
   --gh-muted: #9198a1;
 }
 
+/* a toast sits over the bake, as wide as the tools column: an open film strip keeps its right end clear.
+   sonner writes --width inline, so only !important reaches it */
+[data-sonner-toaster] {
+  --width: 300px !important;
+}
+
 /* the kit's floating surfaces are glass too: without the blur their smoke reads as grey paint */
 [data-slot="popover-content"],
 [data-slot="context-menu-content"],

@@ -159,6 +159,9 @@ const PixelView = (props: PixelViewProps) => {
   );
   const [zoom, setZoom] = useState(zooms.fit);
   const shown = Math.min(zoom, zooms.fit);
+  // one square is `shown` css px; the canvas draws it in whole device pixels, so a 2× screen stays sharp
+  const [ratio] = useState(() => Math.max(1, Math.round(devicePixelRatio)));
+  const cell = shown * ratio;
 
   // the browser draws the svg at the size it lands at; that small image is what we enlarge
   useEffect(() => {
@@ -185,22 +188,22 @@ const PixelView = (props: PixelViewProps) => {
   useEffect(() => {
     const context = canvas.current?.getContext('2d');
     if (!(context && pixels)) return;
-    const side = props.size * shown;
+    const side = props.size * cell;
     context.clearRect(0, 0, side, side);
     for (let y = 0; y < props.size; y += 1)
       for (let x = 0; x < props.size; x += 1) {
         const at = (y * props.size + x) * 4;
         const [r, g, b, a] = pixels.data.slice(at, at + 4);
         context.fillStyle = `rgb(${r} ${g} ${b} / ${(a ?? 255) / 255})`;
-        context.fillRect(x * shown, y * shown, shown, shown);
+        context.fillRect(x * cell, y * cell, cell, cell);
       }
     if (shown < 8) return;
     context.fillStyle = 'rgb(128 138 144 / 0.55)';
     for (let line = 1; line < props.size; line += 1) {
-      context.fillRect(line * shown, 0, 1, side);
-      context.fillRect(0, line * shown, side, 1);
+      context.fillRect(line * cell, 0, ratio, side);
+      context.fillRect(0, line * cell, side, ratio);
     }
-  }, [pixels, shown, props.size]);
+  }, [pixels, cell, ratio, shown, props.size]);
 
   const zoomOptions = [
     { label: `fit ${zooms.fit}×`, value: 'fit' },
@@ -216,7 +219,7 @@ const PixelView = (props: PixelViewProps) => {
         className='cursor-crosshair shadow-[0_18px_48px_-18px_rgb(0_0_0/0.35)]'
         data-testid='pixel-view'
         data-zoom={shown}
-        height={props.size * shown}
+        height={props.size * cell}
         onPointerLeave={() => setPicked(null)}
         onPointerMove={(event) => {
           if (!pixels) return;
@@ -237,7 +240,8 @@ const PixelView = (props: PixelViewProps) => {
         }}
         ref={canvas}
         role='img'
-        width={props.size * shown}
+        style={{ height: props.size * shown, width: props.size * shown }}
+        width={props.size * cell}
       />
       <figcaption className='flex w-full items-center justify-between gap-6 font-mono text-[12px] text-ground-ink tabular-nums'>
         <span>
