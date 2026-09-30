@@ -61,6 +61,7 @@ const modes = {
  */
 export const ZoomBox = (props: ZoomBoxProps) => {
   const mode = modes[props.mode];
+  const toolbarAt = props.toolbarAt ?? 'top';
   const ms = useMediaQuery('(prefers-reduced-motion: reduce)') ? 0 : MOTION_MS;
   // booleans, so a transform frame only re-renders the box when one flips
   const [isZoomed, setIsZoomed] = useState(false);
@@ -157,6 +158,19 @@ export const ZoomBox = (props: ZoomBoxProps) => {
         const quietClass = mode.isInline
           ? 'opacity-0 transition-opacity duration-150 group-hover/zoom:opacity-100 group-focus-within/zoom:opacity-100 group-data-[zoomed=true]/zoom:opacity-100'
           : '';
+        // the tools come before the art in the tab order when they float above it, after it when below
+        const toolbarJSX = (
+          <Toolbar
+            aria-label='zoom'
+            className={cn(
+              'absolute z-10 rounded-lg p-1',
+              toolbarPlaces[toolbarAt],
+              floatingClass,
+              quietClass,
+            )}>
+            {toolListJSX}
+          </Toolbar>
+        );
 
         return (
           <div
@@ -171,15 +185,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
               ms={ms}
               onFit={(scale) => setRange(rangeOf(scale))}
             />
-            <Toolbar
-              aria-label='zoom'
-              className={cn(
-                'absolute top-3 left-3 z-10 rounded-lg p-1',
-                floatingClass,
-                quietClass,
-              )}>
-              {toolListJSX}
-            </Toolbar>
+            {toolbarAt === 'top' ? toolbarJSX : null}
             <TransformComponent
               contentClass={cn(
                 mode.isInline ? '!w-full' : '',
@@ -198,6 +204,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
               }}>
               {props.children}
             </TransformComponent>
+            {toolbarAt === 'bottom' ? toolbarJSX : null}
             <ScaleBadge className={quietClass} />
           </div>
         );
@@ -306,6 +313,11 @@ const floatingClass =
 const scaleOf = (context: ReactZoomPanPinchContextState) => context.state.scale;
 
 const preventDefault = (event: Event) => event.preventDefault();
+
+const toolbarPlaces = {
+  bottom: 'bottom-3 left-1/2 -translate-x-1/2',
+  top: 'top-3 left-3',
+} as const;
 
 /** the library's own cancel is not exported; these are the public fields it clears */
 const stopAnimation = (zoom: Zoom) => {
@@ -500,6 +512,8 @@ interface ZoomBoxProps {
   /** a new value fits the art again */
   fitKey?: number;
   mode: keyof typeof modes;
+  /** where the zoom tools float: the top-left corner, or the bottom centre */
+  toolbarAt?: keyof typeof toolbarPlaces;
 }
 
 interface ZoomBehaviourProps {

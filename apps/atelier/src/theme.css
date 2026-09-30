@@ -139,6 +139,12 @@
   translate: 14px 0;
 }
 
+/* the piece reaches the window's edges, so what covers it draws its ring inside */
+[data-inset-ring]:focus-visible,
+[role="group"][aria-label^="zoom box"]:focus-visible {
+  outline-offset: -4px;
+}
+
 /* Unlayered, so it wins over `outline-none` in the kit's utilities: a 2px ink
    ring, offset 2px, on every control. */
 :focus-visible {
@@ -170,8 +176,6 @@
   .glass,
   button.glass {
     color: var(--ink);
-    /* the ring's overlay lets clicks through to the art; glass catches its own */
-    pointer-events: auto;
     background-color: var(--smoke);
     border: 1px solid var(--border);
     border-radius: 12px;

@@ -8,10 +8,6 @@ const widths = { desktop: 830, phone: 358 } as const;
 const pads = { desktop: 24, phone: 16 } as const;
 const BAR_HEIGHT = 32;
 
-/** the height the frame adds around a piece: the bar (its rule inside), the padding and the two borders */
-export const frameChromeHeight = (width: ReadmeWidth) =>
-  width === 'fit' ? 0 : BAR_HEIGHT + pads[width] * 2 + 2;
-
 /**
  * The piece as a readme shows it. `fit` is the bare piece at the bench's width;
  * `phone` and `desktop` wrap it in github's page chrome at the real content

@@ -6,6 +6,7 @@ import { XIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
+import type { RingOpen } from '../ring.ts';
 import {
   edgeSummary,
   edges,
@@ -37,22 +38,22 @@ export const RingEdges = (props: RingEdgesProps) => {
   const patchSettings = useSetAtom(patchSettingsAtom);
   const update = (patch: Partial<Settings>) =>
     patchSettings(props.piece.id, patch);
-  const { view } = useRoute();
   const open = props.actions.ring;
 
   if (!props.actions.isStage)
     return (
-      <>
+      <section aria-label='settings ring'>
         <FlatCard
           actions={props.actions}
           onChange={update}
           settings={settings}
         />
-        <SideCard isHidden={false} kind={view.kind} piece={props.piece} />
-      </>
+      </section>
     );
 
-  const chipListJSX = edges
+  const chipListJSX = [...edges]
+    // the tab order reads the ring row by row: top, left, right, bottom
+    .sort((a, b) => tabRow.indexOf(a.side) - tabRow.indexOf(b.side))
     .filter((edge) => edge.id !== open)
     // the film strip takes the bottom edge's place
     .filter((edge) => !(edge.side === 'bottom' && open === 'takes'))
@@ -69,7 +70,7 @@ export const RingEdges = (props: RingEdgesProps) => {
   const openEdge = edges.find((edge) => edge.id === open);
 
   return (
-    <>
+    <section aria-label='settings ring'>
       {chipListJSX}
       {openEdge ? (
         <EdgePanel
@@ -80,21 +81,20 @@ export const RingEdges = (props: RingEdgesProps) => {
           settings={settings}
         />
       ) : null}
-      <SideCard
-        isHidden={open === 'lens'}
-        kind={view.kind}
-        piece={props.piece}
-      />
-    </>
+    </section>
   );
 };
 
-/** a take's record or a compare's switch, beside the lens chip; the open lens edge takes its place */
-const SideCard = (props: SideCardProps) => {
-  if (props.isHidden || props.kind === 'live') return null;
+/**
+ * A take's record or a compare's switch, under the top-right corner and
+ * beside the lens chip; the open lens edge takes its place.
+ */
+export const SideCard = (props: SideCardProps) => {
+  const { view } = useRoute();
+  if (props.ring === 'lens' || view.kind === 'live') return null;
   return (
-    <div className='glass absolute top-[calc(28px+var(--tr))] right-[76px] flex max-h-[calc(100%-68px-var(--tr)-var(--br))] w-[300px] flex-col overflow-y-auto'>
-      {props.kind === 'take' ? (
+    <div className='glass absolute top-[calc(100%+12px)] right-[60px] flex max-h-[calc(100dvh-68px-var(--tr)-var(--br))] w-[300px] flex-col overflow-y-auto'>
+      {view.kind === 'take' ? (
         <TakePanel piece={props.piece} />
       ) : (
         <CompareCard />
@@ -258,7 +258,8 @@ export const EdgePanel = (props: EdgePanelProps) => {
       {isBand ? null : findJSX}
       <div
         className={cn(
-          '-mx-2 min-h-0 overflow-y-auto px-2 py-0.5',
+          // the padding holds the rows' focus rings, width + offset, so the scroll box never cuts one
+          '-mx-2 -mt-2 -mb-3 min-h-0 overflow-y-auto px-2 pt-2 pb-3',
           isBand
             ? 'grid grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-x-6 gap-y-4'
             : 'flex flex-col gap-3',
@@ -328,6 +329,8 @@ export const FlatCard = (props: FlatCardProps) => {
 
 /* Helpers */
 
+const tabRow = ['top', 'left', 'right', 'bottom'] as const;
+
 /** where each folded edge sits: centred on its side, the side ones between the corners */
 const chipPlace = {
   bottom: 'bottom-4 left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
@@ -355,9 +358,8 @@ interface RingEdgesProps {
 }
 
 interface SideCardProps {
-  isHidden: boolean;
-  kind: 'live' | 'take' | 'compare';
   piece: Piece;
+  ring: RingOpen;
 }
 
 interface EdgeChipProps {

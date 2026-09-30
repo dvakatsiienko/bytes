@@ -123,7 +123,7 @@ export const FlatView = (props: FlatViewProps) => {
   return (
     <main
       aria-label='the piece'
-      className='absolute inset-0 flex flex-col items-center gap-4 px-4 pt-[calc(28px+max(var(--tl,0px),var(--tr,0px)))] pb-[calc(28px+max(var(--bl,0px),var(--br,0px)))] text-ground-ink'>
+      className='absolute inset-0 isolate flex flex-col items-center gap-4 px-4 pt-[calc(28px+max(var(--tl,0px),var(--tr,0px)))] pb-[calc(28px+max(var(--bl,0px),var(--br,0px)))] text-ground-ink'>
       <div className='grid min-h-0 w-full flex-1 place-items-center' ref={well}>
         {wellJSX}
       </div>

@@ -26,7 +26,7 @@ import { ToolDock } from './tool-dock';
  */
 export const NarrowBench = (props: NarrowBenchProps) => {
   return (
-    <div className='flex h-dvh flex-col gap-4 overflow-y-auto p-4'>
+    <div className='flex h-dvh scroll-py-3 flex-col gap-4 overflow-y-auto p-4'>
       <header className='glass flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5'>
         {props.wordmark}
         <span aria-hidden='true' className='h-5 w-px bg-border' />
@@ -68,11 +68,9 @@ export const NarrowBench = (props: NarrowBenchProps) => {
       <Section name='takes'>
         <TakesDock actions={props.actions} isStrip={true} piece={props.piece} />
       </Section>
-      <div className='sticky bottom-0 shrink-0'>
-        <Section name='toolbar'>
-          <ToolDock actions={props.actions} />
-        </Section>
-      </div>
+      <Section name='toolbar'>
+        <ToolDock actions={props.actions} />
+      </Section>
     </div>
   );
 };
@@ -94,7 +92,9 @@ const NarrowRing = (props: NarrowRingProps) => {
   if (view.kind === 'compare') recordJSX = <CompareCard />;
 
   return (
-    <div className='flex shrink-0 flex-col gap-3'>
+    <section
+      aria-label='settings ring'
+      className='flex shrink-0 flex-col gap-3'>
       {recordJSX ? <div className='glass'>{recordJSX}</div> : null}
       {props.actions.isStage ? (
         <>
@@ -125,7 +125,7 @@ const NarrowRing = (props: NarrowRingProps) => {
           settings={settings}
         />
       )}
-    </div>
+    </section>
   );
 };
 

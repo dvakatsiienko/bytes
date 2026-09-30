@@ -45,6 +45,7 @@ export const TakeImage = (props: TakeImageProps) => {
     <button
       aria-label={`zoom into take ${props.take.id}`}
       className='block w-full cursor-zoom-in'
+      data-inset-ring
       onClick={(event) => {
         clearTimeout(pendingClick.current);
         // a zoomed canvas is already the zoom; its drags end in a click

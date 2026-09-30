@@ -78,7 +78,9 @@ export const PieceView = (props: PieceViewProps) => {
       fitKey={fitKey}
       // a new piece, take, time or frame starts unzoomed
       key={`${pathOf(route)}:${props.actions.time}:${props.actions.readme}`}
-      mode='canvas'>
+      mode='canvas'
+      // the art's corners are under the ring's corners; its bottom centre is clear
+      toolbarAt='bottom'>
       {contentJSX}
     </ZoomBox>
   );
@@ -101,7 +103,8 @@ const StageBox = (props: { children: ReactNode }) => {
   return (
     <main
       aria-label='the piece'
-      className='absolute inset-0 grid place-items-center overflow-hidden [container-type:size]'>
+      // isolate: the zoom box's own layers stay under the ring's glass
+      className='absolute inset-0 isolate grid place-items-center overflow-hidden [container-type:size]'>
       {props.children}
     </main>
   );

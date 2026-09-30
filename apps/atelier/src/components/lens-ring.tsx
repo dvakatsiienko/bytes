@@ -7,7 +7,7 @@ import type { Theme } from '../state.ts';
 import { Section } from './error-boundary';
 import { PieceCard } from './piece-card';
 import { PieceView } from './piece-view';
-import { RingEdges } from './ring-edges';
+import { RingEdges, SideCard } from './ring-edges';
 import { TakesDock } from './takes-dock';
 import { ToolDock } from './tool-dock';
 import { ViewCard } from './view-card';
@@ -20,52 +20,57 @@ import { ViewCard } from './view-card';
  */
 export const LensRing = (props: LensRingProps) => {
   return (
+    // the order is the tab order: the piece, then the ring row by row — top left, the edges, top right, the bottom corners
     <div className='absolute inset-0' data-ring>
       <Section name='viewport'>
         <PieceView actions={props.actions} piece={props.piece} />
       </Section>
-      <div className='pointer-events-none absolute inset-0'>
-        <Corner className='top-4 left-4 w-[300px]' name='tl'>
-          <Section name='pieces'>
-            <PieceCard actions={props.actions} piece={props.piece} />
-          </Section>
-          <div className='absolute top-3 left-3.5'>{props.wordmark}</div>
-        </Corner>
-        <Corner className='top-4 right-4 w-[300px]' name='tr'>
-          <Section name='header'>
-            <ViewCard actions={props.actions} theme={props.theme} />
-          </Section>
-        </Corner>
-        <Section name='panel'>
-          <RingEdges actions={props.actions} piece={props.piece} />
+      <Corner className='top-4 left-4 w-[300px]' label='the piece' name='tl'>
+        <div className='absolute top-3 left-3.5 z-10'>{props.wordmark}</div>
+        <Section name='pieces'>
+          <PieceCard actions={props.actions} piece={props.piece} />
         </Section>
-        <Corner
-          className={cn(
-            'bottom-4 left-4',
-            props.actions.ring === 'takes' ? 'right-[332px]' : 'w-[300px]',
-          )}
-          name='bl'>
-          <Section name='takes'>
-            <TakesDock actions={props.actions} piece={props.piece} />
-          </Section>
-        </Corner>
-        <Corner className='right-4 bottom-4 w-[300px]' name='br'>
-          <Section name='toolbar'>
-            <ToolDock actions={props.actions} />
-          </Section>
-        </Corner>
-      </div>
+      </Corner>
+      <Section name='panel'>
+        <RingEdges actions={props.actions} piece={props.piece} />
+      </Section>
+      <Corner className='top-4 right-4 w-[300px]' label='the view' name='tr'>
+        <Section name='header'>
+          <ViewCard actions={props.actions} theme={props.theme} />
+          <SideCard piece={props.piece} ring={props.actions.ring} />
+        </Section>
+      </Corner>
+      <Corner
+        className={cn(
+          'bottom-4 left-4',
+          props.actions.ring === 'takes' ? 'right-[332px]' : 'w-[300px]',
+        )}
+        label='the takes'
+        name='bl'>
+        <Section name='takes'>
+          <TakesDock actions={props.actions} piece={props.piece} />
+        </Section>
+      </Corner>
+      <Corner
+        className='right-4 bottom-4 w-[300px]'
+        label='the tools'
+        name='br'>
+        <Section name='toolbar'>
+          <ToolDock actions={props.actions} />
+        </Section>
+      </Corner>
     </div>
   );
 };
 
 const Corner = (props: CornerProps) => {
   return (
-    <div
-      className={cn('pointer-events-auto absolute', props.className)}
+    <section
+      aria-label={props.label}
+      className={cn('absolute', props.className)}
       ref={measures[props.name]}>
       {props.children}
-    </div>
+    </section>
   );
 };
 
@@ -107,5 +112,6 @@ interface LensRingProps {
 interface CornerProps {
   children: ReactNode;
   className: string;
+  label: string;
   name: CornerName;
 }

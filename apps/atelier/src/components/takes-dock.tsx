@@ -167,10 +167,10 @@ const FilmStrip = (props: FilmStripProps) => {
           </div>
         ) : null}
         {shown ? (
-          <p className='min-w-0 truncate font-mono text-[12px] text-ink-muted tabular-nums'>
-            {shown.id} · seed {shown.seed} ·{' '}
-            {shown.frames > 1 ? `${shown.frames} frames` : 'still'} · baked{' '}
-            {new Date(shown.bakedAt).toLocaleString()}
+          <p
+            className='min-w-0 truncate font-mono text-[12px] text-ink-muted tabular-nums'
+            title={factsOf(shown)}>
+            {factsOf(shown)}
           </p>
         ) : null}
         <span className='flex-1' />
@@ -308,6 +308,9 @@ const TakeMenu = (props: TakeMenuProps) => {
 };
 
 /* Helpers */
+
+const factsOf = (take: Take) =>
+  `${take.id} · seed ${take.seed} · ${take.frames > 1 ? `${take.frames} frames` : 'still'} · baked ${new Date(take.bakedAt).toLocaleString()}`;
 
 const emptyText = {
   all: '',

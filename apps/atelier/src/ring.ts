@@ -49,7 +49,7 @@ export const edgeSummary = (edge: Edge, settings: Settings) => {
   return first ? `${first.label} ${formatValue(first, settings)}` : '';
 };
 
-export const formatValue = (row: ControlRow, settings: Settings) => {
+const formatValue = (row: ControlRow, settings: Settings) => {
   const value = settings[row.key];
   if (typeof value === 'boolean') return value ? 'on' : 'off';
   if (typeof value === 'number' && row.kind === 'number')
