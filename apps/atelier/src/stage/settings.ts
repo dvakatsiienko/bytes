@@ -36,11 +36,27 @@ export const defaults = {
 
 export const looks = ['exact', 'agx', 'aces', 'neutral'] as const;
 
-/** the settings panel, top to bottom; a key missing here has no control */
+/**
+ * Every setting, grouped the way the ring shows it: the piece's own seed and
+ * look, then one group per edge. A key missing here has no control.
+ */
 export const controls = [
   {
     rows: [
-      { key: 'look', kind: 'choice', label: 'tone mapping', options: looks },
+      {
+        key: 'seed',
+        kind: 'number',
+        label: 'seed',
+        max: 9999,
+        min: 1,
+        step: 1,
+      },
+      { key: 'look', kind: 'choice', label: 'look', options: looks },
+    ],
+    title: 'piece',
+  },
+  {
+    rows: [
       {
         key: 'exposure',
         kind: 'number',
@@ -49,11 +65,6 @@ export const controls = [
         min: 0.5,
         step: 0.01,
       },
-    ],
-    title: 'look',
-  },
-  {
-    rows: [
       {
         key: 'sunAzimuth',
         kind: 'number',
@@ -87,28 +98,27 @@ export const controls = [
         min: 1,
         step: 1,
       },
+      {
+        key: 'windowLight',
+        kind: 'number',
+        label: 'window light',
+        max: 3,
+        min: 0,
+        step: 0.05,
+      },
+      {
+        key: 'fireLight',
+        kind: 'number',
+        label: 'fire light',
+        max: 3,
+        min: 0,
+        step: 0.05,
+      },
     ],
     title: 'light',
   },
   {
     rows: [
-      {
-        key: 'depthStep',
-        kind: 'number',
-        label: 'sheet spacing',
-        max: 0.4,
-        min: 0,
-        step: 0.005,
-      },
-      {
-        key: 'tilt',
-        kind: 'number',
-        label: 'camera tilt',
-        max: 1,
-        min: -1,
-        step: 0.01,
-      },
-      { key: 'hasLens', kind: 'toggle', label: 'lens blur' },
       {
         key: 'focus',
         kind: 'number',
@@ -125,12 +135,27 @@ export const controls = [
         min: 0,
         step: 0.05,
       },
+      {
+        key: 'depthStep',
+        kind: 'number',
+        label: 'sheet spacing',
+        max: 0.4,
+        min: 0,
+        step: 0.005,
+      },
+      {
+        key: 'tilt',
+        kind: 'number',
+        label: 'camera tilt',
+        max: 1,
+        min: -1,
+        step: 0.01,
+      },
     ],
-    title: 'depth and lens',
+    title: 'lens',
   },
   {
     rows: [
-      { key: 'hasHaze', kind: 'toggle', label: 'haze between sheets' },
       {
         key: 'haze',
         kind: 'number',
@@ -139,58 +164,6 @@ export const controls = [
         min: 0,
         step: 0.01,
       },
-      {
-        key: 'fireLight',
-        kind: 'number',
-        label: 'fire light',
-        max: 3,
-        min: 0,
-        step: 0.05,
-      },
-      {
-        key: 'windowLight',
-        kind: 'number',
-        label: 'window light',
-        max: 3,
-        min: 0,
-        step: 0.05,
-      },
-    ],
-    title: 'atmosphere',
-  },
-  {
-    rows: [
-      { key: 'hasThickness', kind: 'toggle', label: 'card thickness' },
-      {
-        key: 'thickness',
-        kind: 'number',
-        label: 'edge depth',
-        max: 1,
-        min: 0,
-        step: 0.01,
-      },
-      { key: 'hasFibre', kind: 'toggle', label: 'paper fibre' },
-      {
-        key: 'fibre',
-        kind: 'number',
-        label: 'fibre relief',
-        max: 1.5,
-        min: 0,
-        step: 0.01,
-      },
-      {
-        key: 'grain',
-        kind: 'number',
-        label: 'grain',
-        max: 1,
-        min: 0,
-        step: 0.01,
-      },
-    ],
-    title: 'paper',
-  },
-  {
-    rows: [
       {
         key: 'bloom',
         kind: 'number',
@@ -207,12 +180,30 @@ export const controls = [
         min: 0,
         step: 0.01,
       },
-    ],
-    title: 'glow',
-  },
-  {
-    rows: [
-      { key: 'hasWind', kind: 'toggle', label: 'wind in the ferns and pines' },
+      {
+        key: 'grain',
+        kind: 'number',
+        label: 'grain',
+        max: 1,
+        min: 0,
+        step: 0.01,
+      },
+      {
+        key: 'fibre',
+        kind: 'number',
+        label: 'fibre relief',
+        max: 1.5,
+        min: 0,
+        step: 0.01,
+      },
+      {
+        key: 'thickness',
+        kind: 'number',
+        label: 'edge depth',
+        max: 1,
+        min: 0,
+        step: 0.01,
+      },
       {
         key: 'wind',
         kind: 'number',
@@ -221,6 +212,16 @@ export const controls = [
         min: 0,
         step: 0.01,
       },
+    ],
+    title: 'atmosphere',
+  },
+  {
+    rows: [
+      { key: 'hasLens', kind: 'toggle', label: 'lens blur' },
+      { key: 'hasHaze', kind: 'toggle', label: 'haze between sheets' },
+      { key: 'hasThickness', kind: 'toggle', label: 'card thickness' },
+      { key: 'hasFibre', kind: 'toggle', label: 'paper fibre' },
+      { key: 'hasWind', kind: 'toggle', label: 'wind in the ferns and pines' },
       { key: 'hasCloudDrift', kind: 'toggle', label: 'drifting clouds' },
       { key: 'hasSmoke', kind: 'toggle', label: 'chimney smoke' },
       { key: 'hasBirds', kind: 'toggle', label: 'birds (day)' },
@@ -228,20 +229,7 @@ export const controls = [
       { key: 'hasEmbers', kind: 'toggle', label: 'embers (night)' },
       { key: 'hasCameraDrift', kind: 'toggle', label: 'camera drift' },
     ],
-    title: 'motion',
-  },
-  {
-    rows: [
-      {
-        key: 'seed',
-        kind: 'number',
-        label: 'scatter seed',
-        max: 9999,
-        min: 1,
-        step: 1,
-      },
-    ],
-    title: 'seed',
+    title: 'toggles',
   },
 ] as const satisfies readonly ControlGroup[];
 

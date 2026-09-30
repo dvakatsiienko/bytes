@@ -27,6 +27,14 @@ export const parseRoute = (pathname: string): Route => {
   return { piece, view: { kind: 'live' } };
 };
 
+/** a plain click opens a link here; ⌘, ctrl, ⇧ or ⌥ keep the browser's own new tab or window */
+export const opensInPlace = (event: {
+  metaKey: boolean;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+}) => !(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey);
+
 export const pathOf = (route: Route) => {
   const base = `/${encodeURIComponent(route.piece)}`;
   if (route.view.kind === 'take')

@@ -35,7 +35,7 @@ One paper layer of a lit piece, set at its own depth on the stage.
 _Avoid_: layer (in talk with dima), plane
 
 **Settings**:
-The values that shape how a piece looks right now: light, lens, paper, atmosphere, motion, seed.
+The values that shape how a piece looks right now: its seed and look, and the light, lens, atmosphere and toggles on the ring.
 _Avoid_: params, config, controls
 
 **Seed**:
@@ -89,6 +89,34 @@ _Avoid_: publish, deploy, export
 The piece as it looks now, redrawn as settings or the drawing change.
 _Avoid_: editor, preview, canvas
 
+**Ring**:
+The four edges around the piece, each holding one group of settings; one edge is open at a time.
+_Avoid_: sidebar, panel, drawer
+
+**Edge**:
+One side of the ring and its group: light on top, lens on the right, atmosphere at the bottom, toggles on the left. Folded it is a chip; open it holds every setting of its group.
+_Avoid_: tab (except in the narrow layout, where the edges become tabs), drawer
+
+**Corner**:
+One of the four cards at the screen's corners: the piece corner (top left), the view corner (top right), the takes corner (bottom left), the tools corner with the bake (bottom right).
+_Avoid_: widget, panel
+
+**Ground**:
+What the piece sits on: by day light or dark by the studio theme, at night always dark. A flat piece sits on the plain ground at a whole zoom.
+_Avoid_: stage (the lit room), background, canvas
+
+**Takes stack**:
+The newest takes stacked in the bottom-left corner, the shown one in front.
+_Avoid_: pile, deck
+
+**Film strip**:
+The takes in a row along the bottom edge, opened from the takes stack; it counts as the bottom edge, so it and an open edge never show together.
+_Avoid_: gallery, carousel, takes list
+
+**Pixel view**:
+A favicon drawn at the size it lands at (16, 32 or 64 px), enlarged by a whole zoom, one square per pixel, with a grid from 8×.
+_Avoid_: magnifier, loupe
+
 **Readme frame**:
 The live view wrapped in github's page at phone or desktop width, so a piece is judged where it will be seen.
 _Avoid_: preview, mockup
@@ -98,5 +126,5 @@ Two takes of one piece side by side, or under one sliding divider.
 _Avoid_: diff
 
 **Section**:
-One region of the studio screen that fails alone: the header, the pieces list, the takes list, the bench tools (toolbar), the viewport, the side panel.
+One region of the studio screen that fails alone: the view corner (header), the piece corner (pieces), the takes corner (takes), the tools corner (toolbar), the piece (viewport), the ring (panel).
 _Avoid_: pane, widget

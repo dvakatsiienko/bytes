@@ -61,6 +61,7 @@ const modes = {
  */
 export const ZoomBox = (props: ZoomBoxProps) => {
   const mode = modes[props.mode];
+  const toolbarAt = props.toolbarAt ?? 'top-left';
   const ms = useMediaQuery('(prefers-reduced-motion: reduce)') ? 0 : MOTION_MS;
   // booleans, so a transform frame only re-renders the box when one flips
   const [isZoomed, setIsZoomed] = useState(false);
@@ -157,6 +158,19 @@ export const ZoomBox = (props: ZoomBoxProps) => {
         const quietClass = mode.isInline
           ? 'opacity-0 transition-opacity duration-150 group-hover/zoom:opacity-100 group-focus-within/zoom:opacity-100 group-data-[zoomed=true]/zoom:opacity-100'
           : '';
+        // in the tab order the tools come right beside the art's own stop, never a jump back to its far side
+        const toolbarJSX = (
+          <Toolbar
+            aria-label='zoom'
+            className={cn(
+              'absolute z-10 rounded-lg p-1',
+              toolbarPlaces[toolbarAt],
+              floatingClass,
+              quietClass,
+            )}>
+            {toolListJSX}
+          </Toolbar>
+        );
 
         return (
           <div
@@ -171,15 +185,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
               ms={ms}
               onFit={(scale) => setRange(rangeOf(scale))}
             />
-            <Toolbar
-              aria-label='zoom'
-              className={cn(
-                'absolute top-3 left-3 z-10 rounded-lg p-1',
-                floatingClass,
-                quietClass,
-              )}>
-              {toolListJSX}
-            </Toolbar>
+            {toolbarAt === 'top-left' ? toolbarJSX : null}
             <TransformComponent
               contentClass={cn(
                 mode.isInline ? '!w-full' : '',
@@ -198,6 +204,7 @@ export const ZoomBox = (props: ZoomBoxProps) => {
               }}>
               {props.children}
             </TransformComponent>
+            {toolbarAt === 'top-centre' ? toolbarJSX : null}
             <ScaleBadge className={quietClass} />
           </div>
         );
@@ -299,13 +306,26 @@ const ZoomBehaviour = (props: ZoomBehaviourProps) => {
 
 /** DESIGN.md «float»: raised over whatever it floats on — the white mat by day, the indigo mat or the night ground by night */
 const floatingClass =
-  'bg-popover shadow-float ring-1 ring-foreground/15 dark:bg-segment-on';
+  'bg-popover shadow-glass ring-1 ring-foreground/15 backdrop-blur-[28px]';
 
 /* Helpers */
 
 const scaleOf = (context: ReactZoomPanPinchContextState) => context.state.scale;
 
 const preventDefault = (event: Event) => event.preventDefault();
+
+/**
+ * `top-centre` keeps the tools clear of the folded light edge, which sits on
+ * the window's 16 px inset: 12 px into the art, and at least 76 px from the
+ * window's top (the edge's 64 px and a gap). The box sits
+ * centred in the stage, so its top is half the stage's spare height,
+ * (100cqh − 100%) / 2.
+ */
+const toolbarPlaces = {
+  'top-centre':
+    'top-[max(12px,calc(76px_-_(100cqh_-_100%)_/_2))] left-1/2 -translate-x-1/2',
+  'top-left': 'top-3 left-3',
+} as const;
 
 /** the library's own cancel is not exported; these are the public fields it clears */
 const stopAnimation = (zoom: Zoom) => {
@@ -500,6 +520,8 @@ interface ZoomBoxProps {
   /** a new value fits the art again */
   fitKey?: number;
   mode: keyof typeof modes;
+  /** where the zoom tools float: the top-left corner, or the top centre clear of the ring's light edge */
+  toolbarAt?: keyof typeof toolbarPlaces;
 }
 
 interface ZoomBehaviourProps {

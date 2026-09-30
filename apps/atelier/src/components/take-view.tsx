@@ -20,9 +20,11 @@ import {
 
 import type { Piece } from '../../art/pieces.ts';
 import type { Take, TakeList } from '../../server/takes.ts';
-import { stashFormAtom, zoomAtom } from '../state.ts';
+import { useRoute } from '../route.ts';
+import { compareModeAtom, stashFormAtom, zoomAtom } from '../state.ts';
 import { useTakeActions } from '../take-actions.ts';
 import { takeUrl, useShownTake } from '../takes.ts';
+import { Segmented } from './segmented';
 
 /** a second click within this long makes a double-click, which zooms the canvas; macOS's default is about as long */
 const DOUBLE_CLICK_MS = 300;
@@ -43,6 +45,7 @@ export const TakeImage = (props: TakeImageProps) => {
     <button
       aria-label={`zoom into take ${props.take.id}`}
       className='block w-full cursor-zoom-in'
+      data-inset-ring
       onClick={(event) => {
         clearTimeout(pendingClick.current);
         // a zoomed canvas is already the zoom; its drags end in a click
@@ -63,6 +66,27 @@ export const TakeImage = (props: TakeImageProps) => {
         width={props.piece.size.w}
       />
     </button>
+  );
+};
+
+/** the compare on screen: which two takes, side by side or under one slider, and the way back */
+export const CompareCard = () => {
+  const { view } = useRoute();
+  const [mode, setMode] = useAtom(compareModeAtom);
+  if (view.kind !== 'compare') return null;
+  return (
+    <section aria-label='compare' className='flex flex-col gap-3 px-4 py-3.5'>
+      <h2 className='font-semibold text-base'>
+        take {view.a} <span className='font-normal text-ink-muted'>with</span>{' '}
+        take {view.b}
+      </h2>
+      <Segmented
+        ariaLabel='compare mode'
+        onValueChange={setMode}
+        options={compareOptions}
+        value={mode}
+      />
+    </section>
   );
 };
 
@@ -91,7 +115,7 @@ const TakeRecord = (props: TakeRecordProps) => {
   const factListJSX = facts.map(([label, value]) => {
     return (
       <div className='flex flex-col last:col-span-2' key={label}>
-        <dt className='text-[12px] text-muted-foreground'>{label}</dt>
+        <dt className='text-ink-muted text-sm'>{label}</dt>
         <dd className='select-all break-all font-mono text-[12px]'>{value}</dd>
       </div>
     );
@@ -113,12 +137,17 @@ const TakeRecord = (props: TakeRecordProps) => {
   return (
     <section
       aria-label={`take ${props.take.id}`}
-      className='flex shrink-0 flex-col gap-3 border-border border-b px-4 py-3'>
+      className='flex flex-col gap-3 px-4 py-3.5'>
       <header className='flex flex-wrap items-baseline gap-x-2 gap-y-1'>
-        <h2 className='font-serif text-lg'>{props.take.id}</h2>
+        <h2 className='font-semibold text-base'>take {props.take.id}</h2>
         {isCurrent ? (
-          <span className='text-muted-foreground text-sm'>
-            the current {props.take.time} take
+          <span className='text-ink-muted text-sm'>
+            ● the current {props.take.time} take
+          </span>
+        ) : null}
+        {props.take.stash ? (
+          <span className='rounded-sm border border-ink-muted border-dashed px-1.5 text-ink-muted text-sm'>
+            stashed
           </span>
         ) : null}
       </header>
@@ -129,7 +158,7 @@ const TakeRecord = (props: TakeRecordProps) => {
         value={props.take.note}
       />
       {props.take.stash ? (
-        <div className='flex flex-col gap-1 rounded-md bg-chip p-3 text-sm'>
+        <div className='flex flex-col gap-1 rounded-md bg-fill p-3 text-sm'>
           <p>
             <span className='text-muted-foreground'>good: </span>
             {props.take.stash.good}
@@ -142,6 +171,7 @@ const TakeRecord = (props: TakeRecordProps) => {
       ) : null}
       <div className='flex flex-wrap gap-1.5'>
         <Button
+          className='border-key-line bg-fill hover:bg-fill-on'
           disabled={isCurrent}
           onClick={() => actions.promote(props.take)}
           size='sm'
@@ -161,23 +191,31 @@ const TakeRecord = (props: TakeRecordProps) => {
         <Popover>
           <PopoverTrigger
             disabled={others.length === 0}
-            render={<Button size='sm' variant='outline' />}>
+            render={
+              <Button
+                className='border-key-line bg-fill hover:bg-fill-on'
+                size='sm'
+                variant='outline'
+              />
+            }>
             <GitCompareIcon /> compare…
           </PopoverTrigger>
           <PopoverContent align='start' className='w-56 p-1'>
-            <PopoverTitle className='px-2 py-1 text-muted-foreground text-xs'>
+            <PopoverTitle className='px-2 py-1 text-muted-foreground text-sm'>
               compare {props.take.id} with
             </PopoverTitle>
             <ul className='max-h-64 overflow-y-auto'>{compareListJSX}</ul>
           </PopoverContent>
         </Popover>
         <Button
+          className='border-key-line bg-fill hover:bg-fill-on'
           onClick={() => actions.loadSettings(props.take)}
           size='sm'
           variant='outline'>
           <SlidersHorizontalIcon /> use its settings
         </Button>
         <Button
+          className='border-key-line bg-fill hover:bg-fill-on'
           onClick={() => actions.copyImage(props.take)}
           size='sm'
           variant='outline'>
@@ -185,7 +223,7 @@ const TakeRecord = (props: TakeRecordProps) => {
         </Button>
       </div>
       <div className='flex items-center gap-1'>
-        <span className='mr-1 text-[12px] text-muted-foreground'>download</span>
+        <span className='mr-1 text-ink-muted text-sm'>download</span>
         <a
           className={buttonVariants({ size: 'sm', variant: 'ghost' })}
           download={`${props.take.piece}-${props.take.id}.webp`}
@@ -220,7 +258,7 @@ const NoteField = (props: {
   };
   return (
     <div className='flex flex-col gap-1'>
-      <label className='text-[12px] text-muted-foreground' htmlFor='take-note'>
+      <label className='text-ink-muted text-sm' htmlFor='take-note'>
         note
       </label>
       <Input
@@ -250,7 +288,14 @@ const StashForm = (props: { take: Take }) => {
     <Popover
       onOpenChange={(open) => setOpenFor(open ? props.take.id : null)}
       open={isOpen}>
-      <PopoverTrigger render={<Button size='sm' variant='outline' />}>
+      <PopoverTrigger
+        render={
+          <Button
+            className='border-key-line bg-fill hover:bg-fill-on'
+            size='sm'
+            variant='outline'
+          />
+        }>
         <ArchiveIcon /> stash…
       </PopoverTrigger>
       <PopoverContent align='start' className='w-80'>
@@ -290,6 +335,13 @@ const StashForm = (props: { take: Take }) => {
     </Popover>
   );
 };
+
+/* Helpers */
+
+const compareOptions = [
+  { label: 'side by side', value: 'side' },
+  { label: 'slider', value: 'slider' },
+] as const;
 
 /* Types */
 

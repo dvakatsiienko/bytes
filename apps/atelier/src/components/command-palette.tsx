@@ -12,7 +12,7 @@ import { Kbd } from '@ui/kit/components/kbd';
 import { useAtom } from 'jotai';
 
 import type { StudioCommand } from '../commands.ts';
-import { commandGroups } from '../commands.ts';
+import { commandGroups, keyLabel } from '../commands.ts';
 import { isPaletteOpenAtom } from '../state.ts';
 
 /** ⌘K: every command, each bare-key shortcut shown beside it */
@@ -35,7 +35,7 @@ export const CommandPalette = (props: CommandPaletteProps) => {
             {command.label}
             {command.keys ? (
               <CommandShortcut>
-                <Kbd>{command.keys}</Kbd>
+                <Kbd>{keyLabel(command.keys)}</Kbd>
               </CommandShortcut>
             ) : null}
           </CommandItem>

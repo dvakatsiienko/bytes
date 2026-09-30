@@ -22,7 +22,7 @@ export const ZoomDialog = () => {
         </DialogTitle>
         {zoom ? (
           <ZoomBox
-            className='min-h-0 flex-1 rounded-lg border border-foreground/15 bg-chip dark:bg-background'
+            className='min-h-0 flex-1 rounded-lg border border-foreground/15 bg-ground'
             mode='viewer'>
             {/* biome-ignore lint/correctness/useImageSize: any image can be zoomed; it draws at its own natural size on purpose */}
             <img

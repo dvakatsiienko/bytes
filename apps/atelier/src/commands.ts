@@ -1,4 +1,5 @@
 import type { StudioActions } from './actions.ts';
+import { edges } from './ring.ts';
 
 /**
  * The one list of commands: the palette shows it, the bare hotkeys read their
@@ -14,6 +15,16 @@ export const commandsOf = (
       run: () => actions.goPiece(piece.id),
     } as const;
   });
+  const edgeCommands = actions.isStage
+    ? edges.map((edge) => {
+        return {
+          group: 'settings',
+          keys: edge.key,
+          label: `open or fold the ${edge.id} edge`,
+          run: () => actions.toggleEdge(edge.id),
+        } as const;
+      })
+    : [];
   return [
     {
       group: 'bench',
@@ -57,11 +68,27 @@ export const commandsOf = (
     },
     { group: 'takes', keys: ']', label: 'next take', run: actions.nextTake },
     {
+      group: 'takes',
+      keys: 'g',
+      label: 'open or fold the film strip',
+      run: actions.toggleStrip,
+    },
+    {
       group: 'view',
       keys: 'n',
       label: 'switch day and night',
       run: actions.toggleTime,
     },
+    ...(actions.isPixelView
+      ? [
+          {
+            group: 'view',
+            keys: 'x',
+            label: 'show or hide the pixel grid',
+            run: actions.toggleGrid,
+          } as const,
+        ]
+      : []),
     {
       group: 'view',
       keys: 'w',
@@ -72,7 +99,7 @@ export const commandsOf = (
       ? [
           {
             group: 'view',
-            keys: 'p',
+            keys: 'm',
             label: actions.isPlaying ? 'stop motion' : 'play motion',
             run: actions.togglePlay,
           } as const,
@@ -84,19 +111,48 @@ export const commandsOf = (
       label: `switch light and dark (now ${actions.theme})`,
       run: actions.toggleTheme,
     },
+    ...edgeCommands,
     {
       group: 'settings',
+      keys: 'Escape',
+      label: 'fold the ring',
+      run: actions.foldRing,
+    },
+    ...(actions.isStage
+      ? [
+          {
+            group: 'settings',
+            keys: '/',
+            label: 'find a setting',
+            run: actions.findSetting,
+          } as const,
+        ]
+      : []),
+    { group: 'settings', keys: 'e', label: 'new seed', run: actions.newSeed },
+    {
+      group: 'settings',
+      keys: 'y',
       label: 'copy all settings',
       run: actions.copySettings,
     },
     {
       group: 'settings',
+      keys: 'r',
       label: 'reset settings to defaults',
       run: actions.resetSettings,
+    },
+    {
+      group: 'pieces',
+      keys: 'p',
+      label: 'open or fold the pieces list',
+      run: actions.togglePieces,
     },
     ...pieceCommands,
   ];
 };
+
+/** a key as its chip prints it */
+export const keyLabel = (keys: string) => (keys === 'Escape' ? 'esc' : keys);
 
 export const commandGroups = [
   'bench',

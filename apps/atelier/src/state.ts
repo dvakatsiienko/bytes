@@ -2,6 +2,7 @@ import type { WritableAtom } from 'jotai';
 import { atom } from 'jotai';
 
 import type { Time } from '../art/time.ts';
+import type { RingOpen } from './ring.ts';
 import type { Settings } from './stage/settings.ts';
 import { defaults, toSettings } from './stage/settings.ts';
 import type { TakeFilter } from './takes.ts';
@@ -100,8 +101,28 @@ export const zoomAtom = atom<Zoom | null>(null);
 /** each bump sends the bench's zoom back to fit, without redrawing the piece */
 export const fitKeyAtom = atom(0);
 export const takeFilterAtom = atom<TakeFilter>('all');
+/** the pieces list's popover, open from its button or `p` */
+export const piecesOpenAtom = atom(false);
+/** the one open edge of the ring, or the film strip; null when all are folded */
+export const ringAtom = atom<RingOpen>(null);
+/** the words typed into «find a setting» */
+export const findAtom = atom('');
+/** each bump focuses the find field: `/` from anywhere */
+export const findFocusAtom = atom(0);
+/** a favicon's pixel view: the piece, where it lands and the size it is drawn at; null for the whole piece */
+export const pixelViewAtom = atom<PixelView | null>(null);
+/** the pixel view's zoom: a whole number, or null for the largest that fits */
+export const pixelZoomAtom = atom<number | null>(null);
+/** the largest whole zoom the pixel view fits at, measured by the view */
+export const pixelFitAtom = atom(1);
+/** the grid between the pixels, from 8× */
+export const pixelGridAtom = atom(true);
+/** the frame of the six-second loop the playing motion shows, of 72 */
+export const motionFrameAtom = atom(0);
 /** a bake waiting for its note: how many frames it will bake, or null when none is asked */
 export const bakeAskAtom = atom<number | null>(null);
+/** the step a running bake is on, for the bake button; null when none runs */
+export const bakeStepAtom = atom<string | null>(null);
 /** the take whose stash form is open, wherever it was asked for */
 export const stashFormAtom = atom<string | null>(null);
 
@@ -109,6 +130,12 @@ export const stashFormAtom = atom<string | null>(null);
 
 export type Theme = (typeof themes)[number];
 export type ReadmeWidth = (typeof readmeWidths)[number];
+
+export interface PixelView {
+  land: string;
+  piece: string;
+  size: number;
+}
 
 export interface Zoom {
   alt: string;

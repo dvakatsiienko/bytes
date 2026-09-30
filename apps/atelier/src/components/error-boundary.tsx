@@ -42,10 +42,10 @@ export const Section = (props: SectionProps) => {
 /** the last net, when a render fails outside every section */
 export const RootFallback = (props: FallbackProps) => {
   return (
-    <main className='grid h-dvh place-items-center bg-background p-6 text-foreground'>
-      <div className='flex max-w-lg flex-col gap-3' role='alert'>
-        <h1 className='font-serif text-2xl'>atelier stopped drawing</h1>
-        <p className='select-all font-mono text-[12px] text-muted-foreground'>
+    <main className='grid h-dvh place-items-center bg-ground p-6 text-ink'>
+      <div className='glass flex max-w-lg flex-col gap-3 p-6' role='alert'>
+        <h1 className='font-semibold text-2xl'>atelier stopped drawing</h1>
+        <p className='select-all font-mono text-[12px] text-ink-muted'>
           {errorText(props.error)}
         </p>
         <Button
@@ -64,7 +64,10 @@ const SectionFallback = (props: SectionFallbackProps) => {
   if (props.isRow)
     return (
       <div
-        className='flex h-full min-h-0 min-w-0 items-center gap-2 text-muted-foreground text-sm'
+        className={cn(
+          'glass flex min-h-0 min-w-0 items-center gap-2 p-2 text-ink-muted text-sm',
+          props.box,
+        )}
         role='alert'>
         <LampDeskIcon aria-hidden className='size-4 shrink-0' />
         <p
@@ -82,18 +85,18 @@ const SectionFallback = (props: SectionFallbackProps) => {
   return (
     <div
       className={cn(
-        'flex min-h-40 flex-col items-center justify-center gap-3 overflow-auto p-6 text-center',
+        'glass flex min-h-40 flex-col items-center justify-center gap-3 overflow-auto p-6 text-center',
         props.box,
       )}
       role='alert'>
-      <span className='grid size-10 place-items-center rounded-full bg-chip text-muted-foreground'>
+      <span className='grid size-10 place-items-center rounded-full bg-fill text-ink-muted'>
         <LampDeskIcon aria-hidden className='size-5' />
       </span>
       <div className='flex flex-col gap-1'>
-        <p className='font-serif text-foreground text-lg leading-tight'>
+        <p className='font-semibold text-base text-ink leading-tight'>
           {props.what} stopped drawing
         </p>
-        <p className='text-muted-foreground text-sm'>
+        <p className='text-ink-muted text-sm'>
           the rest of the studio still works
         </p>
       </div>
@@ -101,11 +104,11 @@ const SectionFallback = (props: SectionFallbackProps) => {
         <RotateCcwIcon /> try again
       </Button>
       {isDev ? (
-        <details className='w-full max-w-md text-left text-muted-foreground'>
-          <summary className='cursor-pointer text-center text-[12px]'>
+        <details className='w-full max-w-md text-left text-ink-muted'>
+          <summary className='cursor-pointer text-center text-sm'>
             what broke
           </summary>
-          <pre className='mt-2 max-h-40 select-all overflow-auto whitespace-pre-wrap rounded-lg bg-chip p-3 font-mono text-[12px] text-foreground'>
+          <pre className='mt-2 max-h-40 select-all overflow-auto whitespace-pre-wrap rounded-lg bg-fill p-3 font-mono text-[12px] text-ink'>
             {errorText(props.error)}
           </pre>
         </details>
@@ -123,21 +126,26 @@ const DevCrash = (props: { section: SectionName }) => {
 /* Helpers */
 
 /**
- * each section, the words its fallback uses, and the box it keeps: header and
- * toolbar are one row high; the takes list holds at most its capped share of
- * the rail, the pieces list the rest
+ * each section, the words its fallback uses, and the box it keeps on the ring:
+ * the corners are one row inside their card's place (the pieces card leaves
+ * the wordmark its first row), the edges fall back to one card at the top
+ * centre, the piece to the whole screen
  */
 const sections = {
-  header: { box: '', isRow: true, what: 'the header tools' },
-  panel: { box: 'h-full', isRow: false, what: 'the side panel' },
-  pieces: {
-    box: 'min-h-0 flex-1 border-border border-b',
+  header: { box: '', isRow: true, what: 'the view tools' },
+  panel: {
+    box: 'pointer-events-auto mx-auto mt-4 w-[300px] max-w-full',
     isRow: false,
-    what: 'the pieces list',
+    what: 'the ring',
   },
-  takes: { box: 'max-h-[45%] shrink-0', isRow: false, what: 'the takes list' },
+  pieces: { box: 'px-3.5 pt-11 pb-3', isRow: true, what: 'the pieces list' },
+  takes: { box: 'w-[300px] max-w-full', isRow: false, what: 'the takes' },
   toolbar: { box: '', isRow: true, what: 'the bench tools' },
-  viewport: { box: 'h-full', isRow: false, what: 'the piece' },
+  viewport: {
+    box: 'absolute inset-0 m-auto h-fit w-fit',
+    isRow: false,
+    what: 'the piece',
+  },
 } as const satisfies Record<
   string,
   { box: string; isRow: boolean; what: string }
