@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -10,11 +10,11 @@ export const appRoot = fileURLToPath(new URL('..', import.meta.url));
 /** `ATELIER_TAKES_DIR` points a test or a verifier round at a scratch folder, never at the real takes */
 const takesRoot = () => process.env.ATELIER_TAKES_DIR ?? join(appRoot, 'takes');
 
-/** the art a bake reads: a change to any of these files changes the hash */
+/** the art a shot reads: a change to any of these files changes the hash */
 const sourceRoots = ['art', 'src/stage'];
 
 const TAKE_ID = /^\d{2,}-[a-z0-9-]+$/;
-export const TAKE_FILES = ['bake.webp', 'piece.svg'] as const;
+export const TAKE_FILES = ['shot.webp', 'piece.svg'] as const;
 
 const readJson = async (path: string): Promise<unknown> =>
   JSON.parse(await readFile(path, 'utf8'));
@@ -83,12 +83,34 @@ const takeIds = async (piece: string) => {
   }
 };
 
+/** a take saved while a shot was still called a bake is renamed in place on its first read */
+const upgradeTake = async (dir: string, meta: Record<string, unknown>) => {
+  if (!('bakedAt' in meta)) return meta;
+  const { bakedAt, ...rest } = meta;
+  try {
+    await rename(join(dir, 'bake.webp'), join(dir, 'shot.webp'));
+  } catch (error) {
+    // a second reader got here first
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+  }
+  const files = (rest.files as string[]).map((file) =>
+    file === 'bake.webp' ? 'shot.webp' : file,
+  );
+  const upgraded = Object.fromEntries(
+    Object.entries({ ...rest, files, shotAt: bakedAt }).sort(([a], [b]) =>
+      a.localeCompare(b),
+    ),
+  );
+  await writeJson(join(dir, 'take.json'), upgraded);
+  return upgraded;
+};
+
 const readTake = async (piece: string, id: string): Promise<Take> => {
   const dir = takeDir(piece, id);
-  const meta = (await readJson(join(dir, 'take.json'))) as Omit<
-    Take,
-    'id' | 'settings'
-  >;
+  const meta = (await upgradeTake(
+    dir,
+    (await readJson(join(dir, 'take.json'))) as Record<string, unknown>,
+  )) as Omit<Take, 'id' | 'settings'>;
   const settings = (await readJson(join(dir, 'settings.json'))) as Settings;
   return { ...meta, id, settings };
 };
@@ -123,7 +145,7 @@ export const listTakes = async (piece: string): Promise<TakeList> => {
 /** writes `takes/<piece>/<nn>-<time>[-note]/`; the first take of a time becomes current */
 let saving: Promise<unknown> = Promise.resolve();
 
-/** saves run one after another, so two bakes landing together never read the same next number */
+/** saves run one after another, so two shots landing together never read the same next number */
 export const saveTake = (input: NewTake): Promise<Take> => {
   const run = saving.then(() => writeTake(input));
   saving = run.catch(() => undefined);
@@ -132,7 +154,7 @@ export const saveTake = (input: NewTake): Promise<Take> => {
 
 /**
  * Claims the next free number with a plain mkdir, which fails when the folder
- * exists: a take is never written over, even by a second process baking at
+ * exists: a take is never written over, even by a second process shooting at
  * the same moment.
  */
 const claimFolder = async (piece: string, time: Time, note: string) => {
@@ -159,17 +181,17 @@ const writeTake = async (input: NewTake): Promise<Take> => {
   const id = await claimFolder(input.piece, input.time, note);
   const dir = takeDir(input.piece, id);
   const meta = {
-    bakedAt: new Date().toISOString(),
-    files: input.svg ? ['bake.webp', 'piece.svg'] : ['bake.webp'],
+    files: input.svg ? ['shot.webp', 'piece.svg'] : ['shot.webp'],
     frames: input.frames,
     note,
     piece: input.piece,
     seed: input.settings.seed,
+    shotAt: new Date().toISOString(),
     sourceHash: await sourceHash(),
     stash: null,
     time: input.time,
   } satisfies Omit<Take, 'id' | 'settings'>;
-  await writeFile(join(dir, 'bake.webp'), input.webp);
+  await writeFile(join(dir, 'shot.webp'), input.webp);
   if (input.svg) await writeFile(join(dir, 'piece.svg'), input.svg);
   await writeJson(join(dir, 'settings.json'), input.settings);
   await writeJson(join(dir, 'take.json'), meta);
@@ -218,15 +240,15 @@ export interface Stash {
 }
 
 export interface Take {
-  bakedAt: string;
   files: TakeFile[];
-  /** 1 for a still; more for a motion loop baked as an animated webp */
+  /** 1 for a still; more for a motion loop shot as an animated webp */
   frames: number;
   id: string;
   note: string;
   piece: string;
   seed: number;
   settings: Settings;
+  shotAt: string;
   sourceHash: string;
   stash: Stash | null;
   time: Time;

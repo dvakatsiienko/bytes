@@ -23,9 +23,9 @@ vi.mock('playwright', () => ({
   },
 }));
 
-const { getBrowser } = await import('./bake.ts');
+const { getBrowser } = await import('./shot.ts');
 
-test('a bake after chromium died gets a live browser, not the dead one', async () => {
+test('a shot after chromium died gets a live browser, not the dead one', async () => {
   const first = await getBrowser();
   await first.close();
 
@@ -34,11 +34,11 @@ test('a bake after chromium died gets a live browser, not the dead one', async (
   expect(next.isConnected()).toBe(true);
 });
 
-const { bake } = await import('./bake.ts');
+const { shoot } = await import('./shot.ts');
 
 const NO_MOTION = /no motion/;
 
-test('a loop of a scene with no motion is refused, not baked as a still', async () => {
+test('a loop of a scene with no motion is refused, not shot as a still', async () => {
   const load = (path: string) =>
     Promise.resolve(
       path === '/art/pieces.ts'
@@ -47,7 +47,7 @@ test('a loop of a scene with no motion is refused, not baked as a still', async 
     );
 
   await expect(
-    bake({
+    shoot({
       frames: 24,
       load,
       origin: 'http://localhost',

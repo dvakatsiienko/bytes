@@ -2,7 +2,7 @@
  * `pnpm atelier:probe <piece> [day|night]`
  *
  * Does a piece render? Starts atelier's own vite server on a free port, opens
- * `/<piece>` in the bake's headless chromium, waits for the stage's
+ * `/<piece>` in the shot's headless chromium, waits for the stage's
  * `data-rendered` (or `data-error`), and prints it with every console error.
  * Exits 1 when the piece did not render or the page logged an error, 2 when
  * there is no such piece.
@@ -10,7 +10,7 @@
 import { createServer } from 'vite';
 
 import { isTime } from '../art/time.ts';
-import { closeBrowser, getBrowser } from '../server/bake.ts';
+import { closeBrowser, getBrowser } from '../server/shot.ts';
 import { appRoot } from '../server/takes.ts';
 
 const RENDER_TIMEOUT = 60_000;

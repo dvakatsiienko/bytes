@@ -61,10 +61,10 @@ const plan = lists.flatMap(({ piece, list }) => {
       (candidate) => candidate.id === list.current[time],
     );
     if (!take) {
-      console.log(`· ${piece.id} ${time}: no current take — bake one`);
+      console.log(`· ${piece.id} ${time}: no current take — shoot one`);
       return [];
     }
-    const file = take.files.includes('piece.svg') ? 'piece.svg' : 'bake.webp';
+    const file = take.files.includes('piece.svg') ? 'piece.svg' : 'shot.webp';
     const suffix = time === 'day' ? 'light' : 'dark';
     const target = join(
       rootOf(ship.repo),

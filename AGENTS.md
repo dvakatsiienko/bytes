@@ -23,7 +23,7 @@ versions, update the Stack column below — it drifts stale otherwise.
 | `space-explorer-api` | GraphQL server demo                     | Apollo Server, Prisma, pipeworx   | Demo, 🐾 pet |
 | `financial`          | Financial dashboard with auth           | Next.js 16, Prisma, better-auth   | WIP, 🐾 pet |
 | `sketchbook`         | Prototype platform, swappable proto slot | Vite 8, React 19, Tailwind v4, shadcn | Active Dev |
-| `atelier`            | Art studio: scenes as code, lit and baked | Vite 8, React 19.3, three.js + r3f, kit | Active Dev, local only |
+| `atelier`            | Art studio: scenes as code, lit and shot | Vite 8, React 19.3, three.js + r3f, kit | Active Dev, local only |
 | `figmentation`       | CSS/design experiments                  | Next.js 16, Tailwind v4, kit      | Showcase   |
 | `trophy-sys`         | PSN trophy tracker, retro terminal UI   | Vite 8, React 19, TanStack, Upstash | Active Dev |
 

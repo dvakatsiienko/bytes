@@ -145,7 +145,7 @@ const StageDriver = (props: StageCanvasProps) => {
 /* Types */
 
 interface StageCanvasProps {
-  /** a fixed pixel ratio for a bake; live, r3f picks 1–2 from the display */
+  /** a fixed pixel ratio for a shot; live, r3f picks 1–2 from the display */
   dpr?: number;
   isPlaying: boolean;
   onError?: (message: string) => void;
@@ -156,7 +156,7 @@ interface StageCanvasProps {
   pieceId: string;
   settings: Settings;
   spec: SceneSpec;
-  /** a fixed loop time in [0, 1) instead of the clock: a loop bake draws frame i of n at t = i / n */
+  /** a fixed loop time in [0, 1) instead of the clock: a loop shot draws frame i of n at t = i / n */
   t?: number;
   time: Time;
 }

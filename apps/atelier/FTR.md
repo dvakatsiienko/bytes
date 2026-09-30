@@ -16,7 +16,7 @@
   - then the piece shows as large as it fits whole, and four glass edges hug it: light on top, lens on the right, atmosphere at the bottom, toggles on the left
   - and all the glass shares one frame, the window's 16 px inset: the top and bottom edges, folded or open, sit on the corner cards' line, over the art only where the art reaches the window's edge
   - decision: one frame for every chrome piece, as the comp draws it — edges on the piece's rim «read off» and broke the pills' horizontal rhythm (dima's review, 2026-09-30)
-  - and the corners hold the piece corner (top left), the view corner (top right), the takes corner (bottom left) and the tools corner with the bake (bottom right)
+  - and the corners hold the piece corner (top left), the view corner (top right), the takes corner (bottom left) and the tools corner with the shot (bottom right)
   - decision: the piece is fitted whole, never cropped, so a wide piece leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»)
   - decision: the minimum supported window is 560 px tall — below it the folded toggles chip may cut its name (dima, 2026-09-30: not supported, no fix)
 - ✅ one edge open at a time
@@ -51,12 +51,12 @@
   - and on main the title stays «atelier»; the view corner shows the branch and sha on both
 - 🔎 the ring unrolls below 1100 px wide
   - given a window narrower than 1100 px
-  - then a bar holds the wordmark, the piece, «pieces», day and night and the commands; the piece follows, then the four edges as tabs, the film strip, and the tools corner with the bake
+  - then a bar holds the wordmark, the piece, «pieces», day and night and the commands; the piece follows, then the four edges as tabs, the film strip, and the tools corner with the shot
 
 ## /<piece> — the live view
 
-> purpose: the piece under the lamp: look at it, tune its settings, bake it into a take
-> states: day · night · motion playing · zoomed · baking (progress) · a flat piece (seed only)
+> purpose: the piece under the lamp: look at it, tune its settings, shoot it into a take
+> states: day · night · motion playing · zoomed · shooting (progress) · a flat piece (seed only)
 
 - 🔎 day and night
   - when dima presses `n` or clicks day / night
@@ -86,21 +86,21 @@
   - makes: a png of the image on the clipboard
   - when dima presses `c` or the copy tool
   - then the current image is on the clipboard as a png and a toast confirms it
-- 🔎 bake a take
-  - makes: a take — the image (`bake.webp`, plus `piece.svg` for a flat piece), `settings.json` and `take.json` (seed, note, frames, source hash) — in `takes/<piece>/<nn>-<time>[-<note>]/`
-  - when dima presses `b` or the bake button, which asks «bake the first take» on a piece with none
+- 🔎 shoot a take
+  - makes: a take — the image (`shot.webp`, plus `piece.svg` for a flat piece), `settings.json` and `take.json` (seed, note, frames, source hash) — in `takes/<piece>/<nn>-<time>[-<note>]/`
+  - when dima presses `b` or the shot button, which asks «shoot the first take» on a piece with none
   - then a note field opens with the piece's last note selected
-  - and Enter bakes: a «baking <piece> · <time>…» toast, then «baked take <id>» with an «open» action, and the take tops the takes list
-- 🔎 bake shows progress
-  - given a bake is running
+  - and Enter shoots: a «shooting <piece> · <time>…» toast, then «shot take <id>» with an «open» action, and the take tops the takes list
+- 🔎 shot shows progress
+  - given a shot is running
   - then its toast names the step it is on (the browser, the stage, `frame n of 72`, the webp, saving) and the seconds so far
-  - and the bake button says «baking…» with the step, and fills from the left as a loop's frames land
+  - and the shot button says «shooting…» with the step, and fills from the left as a loop's frames land
   - and a motion loop's webp step, the long one, says about how many seconds it takes
   - decision: the estimate learns from the last loop the server encoded — an animated webp costs ~1 µs per frame pixel (70 of homestead's 76 s)
-- 🔎 bake a motion loop
-  - makes: a take whose `bake.webp` is a looping animated webp, 72 frames by default
+- 🔎 shoot a motion loop
+  - makes: a take whose `shot.webp` is a looping animated webp, 72 frames by default
   - given a piece that moves
-  - when dima runs «bake a motion loop» from ⌘K
+  - when dima runs «shoot a motion loop» from ⌘K
   - then a looping animated webp take lands, 72 frames by default
 - 🔎 the settings on the ring
   - given a lit piece
@@ -133,18 +133,18 @@
 
 ## takes — the stack and the film strip
 
-> purpose: every bake of this piece, to compare, keep or park
-> states: none yet · the stack · the film strip (many scroll) · stashed filter · baking
+> purpose: every shot of this piece, to compare, keep or park
+> states: none yet · the stack · the film strip (many scroll) · stashed filter · shooting
 
 - 🔎 the takes stack
   - given a piece with takes
   - then its newest takes stack in the bottom-left corner, the shown one in front, over a line with its id, «● current» when it ships, and how many there are and how many are stashed
   - given a piece with 0 takes
-  - then the corner says «no takes yet» and how to bake the first
+  - then the corner says «no takes yet» and how to shoot the first
 - ✅ the film strip
   - when dima presses `g` or clicks the stack
   - then the takes open in a row along the bottom edge, with the shown take's facts, and `g` or «fold» folds them back
-  - and while a bake runs its tile leads the row with the step it is on
+  - and while a shot runs its tile leads the row with the step it is on
 - 🔎 filter all, current, stashed
   - when dima picks a filter in the film strip
   - then the strip shows only those takes, or a line saying there are none
@@ -158,11 +158,11 @@
 
 ## /<piece>/take/<id> — one take
 
-> purpose: one bake's record: its facts, its note, and the promote or stash decision
+> purpose: one shot's record: its facts, its note, and the promote or stash decision
 > states: current · stashed (with its two reasons)
 
 - 🔎 the take's facts
-  - then the take card, beside the lens edge, shows time, seed, frames, source hash and when it was baked
+  - then the take card, beside the lens edge, shows time, seed, frames, source hash and when it was shot
   - and opening the lens edge folds the take card until the edge folds again
 - 🔎 edit the note
   - when dima edits the note and leaves the field
@@ -218,10 +218,10 @@
 
 ## scripts
 
-- ✅ bake from the terminal
-  - makes: the same take folder the bake button makes
-  - when an agent runs `pnpm atelier:bake <piece> [day|night|both] [--loop [frames]]`
-  - then the same take lands as the bake button makes (one code path, `server/bake.ts`)
+- ✅ shoot from the terminal
+  - makes: the same take folder the shot button makes
+  - when an agent runs `pnpm atelier:shot <piece> [day|night|both] [--loop [frames]]`
+  - then the same take lands as the shot button makes (one code path, `server/shot.ts`)
   - and it prints the dir each take landed in — under `ATELIER_TAKES_DIR` when that is set
 - ✅ ship
   - makes: with `--write`, each current take copied into the one repo its piece ships to (frame, bytes or the profile, per `art/pieces.ts`) as `<repo>/<ship path>-light|dark.<svg|webp>`; `--to <dir>` writes under that dir instead

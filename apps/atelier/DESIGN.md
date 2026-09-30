@@ -54,7 +54,7 @@ rounded:
   key: "4px"
   control: "9.6px"
   glass: "12px"
-  bake: "16.8px"
+  shot: "16.8px"
 spacing:
   inner: "8px"
   stack: "12px"
@@ -76,14 +76,14 @@ components:
     width: "300px"
   edge-chip-hover:
     backgroundColor: "{colors.smoke-hover}"
-  bake-button:
+  shot-button:
     backgroundColor: "{colors.lamp}"
     textColor: "{colors.lamp-ink}"
     typography: "{typography.action}"
-    rounded: "{rounded.bake}"
+    rounded: "{rounded.shot}"
     padding: "0 16px"
     height: "52px"
-  bake-button-hover:
+  shot-button-hover:
     backgroundColor: "{colors.lamp-hover}"
   segment:
     textColor: "{colors.ink-muted}"
@@ -125,7 +125,7 @@ components:
 
 The piece is the room. It is fitted whole, as large as the window allows, and everything else is smoked glass laid over its edges: dark, blurred, a little saturated, so the art reads through the controls instead of beside them. One smoke serves both themes. The theme only picks the ground a day piece sits on; a night piece always sits on the dark ground, because a pale surround reads its darks darker.
 
-The ui is quiet and exact. Text is one grotesk at 14 px, numbers and keys are one mono at 12 px, and every control prints the key it answers to. There is exactly one loud surface on screen: the bake, opaque ink on the smoke. State is carried by shape and weight (a dashed edge, a filled segment, a word), never by a hue, and the palette has no hue to spend anyway: it is ink on smoke over the art's own colour.
+The ui is quiet and exact. Text is one grotesk at 14 px, numbers and keys are one mono at 12 px, and every control prints the key it answers to. There is exactly one loud surface on screen: the shot, opaque ink on the smoke. State is carried by shape and weight (a dashed edge, a filled segment, a word), never by a hue, and the palette has no hue to spend anyway: it is ink on smoke over the art's own colour.
 
 Density is low by rule. Four folded edges and four corner cards are all that cover the piece at rest; one edge opens at a time.
 
@@ -133,7 +133,7 @@ Density is low by rule. Four folded edges and four corner cards are all that cov
 - the piece fitted whole and biggest; all the glass shares one frame, the window's 16 px inset
 - one smoked glass (blur 28 px, saturate 1.3) in both themes
 - achromatic: ink, muted ink and ink-alpha fills; colour belongs to the art
-- the bake is the single opaque control
+- the shot is the single opaque control
 - every control shows its key in a 4 px mono key cap
 - state by shape and weight, never by colour alone
 
@@ -141,7 +141,7 @@ Density is low by rule. Four folded edges and four corner cards are all that cov
 
 The world was picked by dima on 2026-09-30 after three studio design rounds (`docs/adr/0002-the-lens-ring.md`, studio job `jobs/atelier/`).
 
-**Thesis.** The piece is as large as it fits whole. Four smoked-glass edges hug it, one per setting group: light on top, lens on the right, atmosphere at the bottom, toggles on the left. Every glass piece shares one frame, the window's 16 px inset: the top and bottom edges sit on the corner cards' line, over the art wherever it reaches the window's edge. One edge is open at a time (`1`–`4` open, `esc` folds), and the film strip (`g`, the takes stack opened) counts as the bottom edge: opening one folds the other. The four corners hold actions: the piece and its seed top-left, time and commands top-right, the takes bottom-left, the view tools and the bake bottom-right.
+**Thesis.** The piece is as large as it fits whole. Four smoked-glass edges hug it, one per setting group: light on top, lens on the right, atmosphere at the bottom, toggles on the left. Every glass piece shares one frame, the window's 16 px inset: the top and bottom edges sit on the corner cards' line, over the art wherever it reaches the window's edge. One edge is open at a time (`1`–`4` open, `esc` folds), and the film strip (`g`, the takes stack opened) counts as the bottom edge: opening one folds the other. The four corners hold actions: the piece and its seed top-left, time and commands top-right, the takes bottom-left, the view tools and the shot bottom-right.
 
 **The don'ts.**
 - two edges open at once
@@ -154,7 +154,7 @@ The world was picked by dima on 2026-09-30 after three studio design rounds (`do
 An achromatic system of ink on smoke: every ui colour is one cool near-white or a translucency of it over a near-black glass, so the only hue on screen is the art's.
 
 ### Primary
-- **Bake Ink** (`lamp`, hover `lamp-hover`): the bake button and its note form's submit, filled opaque with `lamp-ink` text. It is the only opaque ink surface at control size; while a bake runs it drains to smoke and refills from the left as progress.
+- **Shot Ink** (`lamp`, hover `lamp-hover`): the shot button and its note form's submit, filled opaque with `lamp-ink` text. It is the only opaque ink surface at control size; while a shot runs it drains to smoke and refills from the left as progress.
 
 ### Neutral
 - **Smoke** (`smoke`): the glass. Every corner card, edge chip, open edge, the takes strip, and through the kit's L2 names every menu, dialog, select and toast. Hover lifts it to **Lifted Smoke** (`smoke-hover`); floating popovers use the denser **Popover Smoke** (`smoke-popover`).
@@ -169,7 +169,7 @@ An achromatic system of ink on smoke: every ui colour is one cool near-white or 
 ### Named Rules
 **The One Smoke Rule.** The glass is the same smoke in light and dark. A theme changes the ground, never the glass.
 
-**The One Loud Moment Rule.** Opaque ink fills exactly one control on screen: the bake. Everything else in the glass is ink text on smoke or an ink wash.
+**The One Loud Moment Rule.** Opaque ink fills exactly one control on screen: the shot. Everything else in the glass is ink text on smoke or an ink wash.
 
 **The Night Ground Rule.** A night piece sits on the dark ground whatever the theme.
 
@@ -182,7 +182,7 @@ An achromatic system of ink on smoke: every ui colour is one cool near-white or 
 
 ### Hierarchy
 - **Title** (600, 18 px, 1.56, −0.01em): the piece's name in the top-left corner. One per screen.
-- **Action** (600, 16 px, 1.5): the bake button's label; the piece name in the unrolled bar.
+- **Action** (600, 16 px, 1.5): the shot button's label; the piece name in the unrolled bar.
 - **Label** (600, 14 px, 1.43): edge names, open-edge and takes headings, a pressed segment.
 - **Body** (400, 14 px, 1.43): every other word: row labels, hints, buttons, captions on the ground.
 - **Value** (Azeret Mono 400, 12 px, tabular): setting values, seeds, take ids, sizes, the build badge. A folded edge chip shows its one value at 13 px.
@@ -203,7 +203,7 @@ The piece is fitted whole into the window (`min(100cqh, 100cqw × ratio)`), cent
 - **Stacking:** cards under a corner sit 12 px below it. Inside glass, rows breathe at 12–16 px, controls at 8 px.
 - **The takes:** `g` turns the bottom-left stack into a film strip that runs from the left gutter to the tools column (332 px from the right) and takes the bottom edge's place.
 - **Flat pieces:** a flat piece sits on the plain ground at a whole zoom, with a seed-only card centred on top in place of the ring; a favicon shows a row of «as it lands, at true size» previews (16, 32, 64 px) under it, and a pixel grid from 8×.
-- **Below 1100 px** the ring unrolls into a scrolling column: a glass bar, the art in a 12 px-rounded frame (≤62 dvh), the four edges as segmented tabs, the takes, then the tools and the bake. Below 520 px the tab keys hide.
+- **Below 1100 px** the ring unrolls into a scrolling column: a glass bar, the art in a 12 px-rounded frame (≤62 dvh), the four edges as segmented tabs, the takes, then the tools and the shot. Below 520 px the tab keys hide.
 
 ### Named Rules
 **The Biggest Thing Rule.** At every width the piece is the largest element on screen. A panel that would shrink it overlaps it or unrolls below it instead.
@@ -215,7 +215,7 @@ The piece is fitted whole into the window (`min(100cqh, 100cqw × ratio)`), cent
 Depth is glass, not stacking: every surface over the art is the same smoke, lifted by one ambient shadow and a backdrop blur. There is one level. A popover, a dialog or a toast is the same glass, denser, with the same blur.
 
 ### Shadow Vocabulary
-- **Glass** (`box-shadow: 0 12px 32px rgb(0 0 0 / 0.28)`, with `backdrop-filter: blur(28px) saturate(1.3)`): every glass surface and the bake.
+- **Glass** (`box-shadow: 0 12px 32px rgb(0 0 0 / 0.28)`, with `backdrop-filter: blur(28px) saturate(1.3)`): every glass surface and the shot.
 - **Flat-piece lift** (`box-shadow: 0 18px 48px -18px rgb(0 0 0 / 0.35)`): a flat piece on the ground, so the sheet reads as set down.
 - **Blade halo** (`box-shadow: 0 0 0 3px rgb(242 245 247 / 0.25)`): a slider blade on hover.
 
@@ -226,16 +226,16 @@ Depth is glass, not stacking: every surface over the art is the same smoke, lift
 
 ## Shapes
 
-Soft, even rounding, three steps from the glass down: 12 px on every glass surface, field and select; ~10 px (9.6 px, the kit's scale) on in-glass buttons and segments; 4 px on key caps. The bake rounds a step further (16.8 px). The slider is a 2 px line with a 3 × 14 px blade (1 px radius); a switch is a 32 × 18 px ink outline. A stashed take's thumbnail wears a dashed muted-ink edge, the one dashed line in the system.
+Soft, even rounding, three steps from the glass down: 12 px on every glass surface, field and select; ~10 px (9.6 px, the kit's scale) on in-glass buttons and segments; 4 px on key caps. The shot rounds a step further (16.8 px). The slider is a 2 px line with a 3 × 14 px blade (1 px radius); a switch is a 32 × 18 px ink outline. A stashed take's thumbnail wears a dashed muted-ink edge, the one dashed line in the system.
 
 ## Components
 
 ### Buttons
-Quiet ink-wash buttons inside the glass, one loud ink button for the bake.
+Quiet ink-wash buttons inside the glass, one loud ink button for the shot.
 - **Shape:** 9.6 px in-glass, 12 px for the corner's larger fill buttons.
 - **Fill button:** `fill` with ink text, 32 px tall, 8 px sides; hover `fill-on`. Carries its key cap after the label («new», «commands»).
 - **Text button:** no fill, muted ink, 1 px × 4 px padding; hover `fill-on` and ink («copy json», «reset»).
-- **Bake:** full corner width, 52 px, `lamp` with `lamp-ink`, action type, key cap outlined in 35 % lamp-ink; hover pure white. Pressing asks for a one-line note first («note, optional — what this take tries»). While baking, the button is its progress: smoke, with an ink fill growing from the left and the label drawn twice so it reads on both.
+- **Shot:** full corner width, 52 px, `lamp` with `lamp-ink`, action type, key cap outlined in 35 % lamp-ink; hover pure white. Pressing asks for a one-line note first («note, optional — what this take tries»). While shooting, the button is its progress: smoke, with an ink fill growing from the left and the label drawn twice so it reads on both.
 
 ### Segmented control
 A `fill` trough with 3 px inset; segments 28 px tall, muted ink; the pressed one gets `fill-on`, ink and semibold, so it differs in weight as well as fill. Used for day/night, the view tools (each with its key under the label) and the unrolled edge tabs.
@@ -272,7 +272,7 @@ A stack of 136 px-tall fanned thumbnails over a glass caption card («01-day ●
 - **Don't** signal state by colour alone.
 - **Don't** place the piece anywhere but biggest, or crop it to make room.
 - **Don't** let `/` (or any single-key command) fire inside a text field.
-- **Don't** give a second control the opaque ink of the bake.
+- **Don't** give a second control the opaque ink of the shot.
 - **Don't** introduce a hue into the ui; colour belongs to the art.
 - **Don't** set text below 14 px or a value or key below 12 px.
 - **Don't** make the smoke differ between themes, or float glass without its blur.

@@ -9,12 +9,12 @@ import {
   pixelGridAtom,
   pixelZoomAtom,
 } from '../state.ts';
-import { BakeButton } from './bake-button';
 import { Segmented } from './segmented';
+import { ShotButton } from './shot-button';
 
 /**
  * The bottom-right corner: the ways of looking at the piece, each with its
- * key, and under them the bake.
+ * key, and under them the shot.
  */
 export const CornerTools = (props: CornerToolsProps) => {
   const { view } = useRoute();
@@ -157,14 +157,14 @@ export const CornerTools = (props: CornerToolsProps) => {
       <nav aria-label='view' className='glass flex gap-0.5 p-1'>
         {toolListJSX}
       </nav>
-      <BakeButton actions={props.actions} />
+      <ShotButton actions={props.actions} />
     </div>
   );
 };
 
 /* Helpers */
 
-/** a loop plays and bakes at 12 frames a second over six seconds */
+/** a loop plays and shoots at 12 frames a second over six seconds */
 export const LOOP_FRAMES = 72;
 
 /** the largest whole zoom that fits, and the fixed steps below it */

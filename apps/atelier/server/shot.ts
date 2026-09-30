@@ -10,25 +10,25 @@ import { errorText } from '../src/error-text.ts';
 import type * as scenesModule from '../src/stage/scenes.ts';
 import type { Settings } from '../src/stage/settings.ts';
 
-/** a still bakes at 2× the piece's own size; a loop at 1×, or 72 frames would weigh tens of MB */
+/** a still shoots at 2× the piece's own size; a loop at 1×, or 72 frames would weigh tens of MB */
 const STILL_SCALE = 2;
 const LOOP_SCALE = 1;
 /** one loop of the stage's motion, as `LOOP_SECONDS` in the stage canvas */
 const LOOP_MS = 6000;
-const BAKE_TIMEOUT = 90_000;
+const SHOT_TIMEOUT = 90_000;
 /**
  * An animated webp encodes at ~1 µs per frame pixel on dima's mac (homestead,
- * 72 frames of 1600×600: ~71 s of a 76 s bake). The first loop's estimate
+ * 72 frames of 1600×600: ~71 s of a 76 s shot). The first loop's estimate
  * starts there; each loop encoded after it sets the pace for the next.
  */
 let encodeMsPerPixel = 0.001;
 
 /**
- * One bake, for the dev server's button and for `atelier:bake` alike. `load`
- * is vite's module loader, so a bake always draws the art as it is on disk
+ * One shot, for the dev server's button and for `atelier:shot` alike. `load`
+ * is vite's module loader, so a shot always draws the art as it is on disk
  * now, never a copy cached when the server started.
  */
-export const bake = async (input: BakeInput): Promise<BakeOutput> => {
+export const shoot = async (input: ShotInput): Promise<ShotOutput> => {
   const { findPiece, pieceSvg } = (await input.load(
     '/art/pieces.ts',
   )) as typeof piecesModule;
@@ -83,7 +83,7 @@ const toWebp = (png: Buffer) =>
 
 let browser: Promise<Browser> | null = null;
 
-// On a mac, headless chromium renders on the GPU through Metal: a still bakes
+// On a mac, headless chromium renders on the GPU through Metal: a still shoots
 // in ~2.8 s instead of ~8.3 s, and the two renders differ by 1.4/255 on
 // average (edges only, measured on BYT-103). Elsewhere SwiftShader, the
 // software WebGL every headless chromium has, which newer builds hide behind
@@ -95,12 +95,12 @@ const gpuArgs =
 
 const launch = () => chromium.launch({ args: gpuArgs });
 
-/** one browser for the server's life: launching per bake costs a second each time */
+/** one browser for the server's life: launching per shot costs a second each time */
 export const getBrowser = () => {
   if (browser) return browser;
   const launching: Promise<Browser> = launch()
     .then((launched) => {
-      // a crashed or closed chromium must not be handed to the next bake; a
+      // a crashed or closed chromium must not be handed to the next shot; a
       // late event from an old browser must not clear a newer one
       launched.on('disconnected', () => {
         if (browser === launching) browser = null;
@@ -127,7 +127,7 @@ export const closeBrowser = async () => {
 };
 
 const renderInBrowser = async (
-  input: BakeInput,
+  input: ShotInput,
   size: { w: number; h: number },
 ) => {
   const isLoop = input.frames > 1;
@@ -138,37 +138,37 @@ const renderInBrowser = async (
   });
   try {
     const url = new URL(input.origin);
-    url.searchParams.set('bake', input.piece);
+    url.searchParams.set('shot', input.piece);
     url.searchParams.set('time', input.time);
     url.searchParams.set('set', JSON.stringify(input.settings));
     url.searchParams.set('frames', String(input.frames));
     url.searchParams.set('dpr', String(isLoop ? LOOP_SCALE : STILL_SCALE));
     input.onStep?.('drawing the stage');
     await page.goto(url.href);
-    // the bake view sets `data-baked` on <html>: «ok» after the first frame, or the error
+    // the shot view sets `data-shot` on <html>: «ok» after the first frame, or the error
     const handle = await page.waitForFunction(
-      () => document.documentElement.dataset.baked,
+      () => document.documentElement.dataset.shot,
       null,
       {
-        timeout: BAKE_TIMEOUT,
+        timeout: SHOT_TIMEOUT,
       },
     );
     const state = await handle.jsonValue();
-    if (state !== 'ok') throw new Error(`bake failed in the browser: ${state}`);
+    if (state !== 'ok') throw new Error(`shot failed in the browser: ${state}`);
     /** draws frame `index` of the loop (a still has only frame 0, already drawn) and reads it back */
     const grab = async (index: number) => {
       const dataUrl = await page.evaluate(
         async ([i, isFrame]) => {
-          const bakeWindow = window as unknown as {
+          const shotWindow = window as unknown as {
             atelierFrame: (i: number) => Promise<void>;
           };
-          if (isFrame) await bakeWindow.atelierFrame(i);
+          if (isFrame) await shotWindow.atelierFrame(i);
           return document.querySelector('canvas')?.toDataURL('image/png') ?? '';
         },
         [index, isLoop] as const,
       );
       if (!dataUrl.startsWith('data:image/png;base64,'))
-        throw new Error('bake produced no image');
+        throw new Error('shot produced no image');
       return Buffer.from(
         dataUrl.slice('data:image/png;base64,'.length),
         'base64',
@@ -188,20 +188,20 @@ const renderInBrowser = async (
 
 /* Types */
 
-interface BakeInput {
-  /** 1 bakes a still; more bakes that many frames of the motion loop into an animated webp */
+interface ShotInput {
+  /** 1 shoots a still; more shoots that many frames of the motion loop into an animated webp */
   frames: number;
   load: (url: string) => Promise<Record<string, unknown>>;
-  /** what the bake does now, in words dima reads while it runs */
+  /** what the shot does now, in words dima reads while it runs */
   onStep?: (step: string) => void;
-  /** the dev server's own url, which serves the bake view */
+  /** the dev server's own url, which serves the shot view */
   origin: string;
   piece: string;
   settings: Settings;
   time: Time;
 }
 
-interface BakeOutput {
+interface ShotOutput {
   /** the optimised svg, for a flat piece only */
   svg?: string;
   webp: Buffer;

@@ -29,7 +29,7 @@ import { Segmented } from './segmented';
 /** a second click within this long makes a double-click, which zooms the canvas; macOS's default is about as long */
 const DOUBLE_CLICK_MS = 300;
 
-/** the webp a take baked; a click opens it in the zoom */
+/** the webp a shot made; a click opens it in the zoom */
 export const TakeImage = (props: TakeImageProps) => {
   const setZoom = useSetAtom(zoomAtom);
   const pendingClick = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -109,7 +109,7 @@ const TakeRecord = (props: TakeRecordProps) => {
       props.take.frames > 1 ? `${props.take.frames}, looping` : 'still',
     ],
     ['source', props.take.sourceHash],
-    ['baked', new Date(props.take.bakedAt).toLocaleString()],
+    ['shot', new Date(props.take.shotAt).toLocaleString()],
   ] as const;
 
   const factListJSX = facts.map(([label, value]) => {
@@ -232,7 +232,7 @@ const TakeRecord = (props: TakeRecordProps) => {
         </a>
         <a
           className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-          href={takeUrl(props.take, 'bake.avif')}>
+          href={takeUrl(props.take, 'shot.avif')}>
           <DownloadIcon /> avif
         </a>
         {props.take.files.includes('piece.svg') ? (

@@ -21,7 +21,7 @@ export default defineConfig({
     host: true,
     port: Number(process.env.PORT ?? 5180),
     strictPort: true,
-    // bakes and exports land here while the server runs; none of it is a module
+    // shots and exports land here while the server runs; none of it is a module
     watch: { ignored: ['**/takes/**', '**/out/**'] },
   },
 });

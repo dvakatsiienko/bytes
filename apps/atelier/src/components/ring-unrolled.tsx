@@ -21,7 +21,7 @@ import { CompareCard, TakePanel } from './take-view';
 
 /**
  * Below 1100 px the ring unrolls: a bar on top, the art, the four edges as
- * tabs under it, the takes, then the tools and the bake. The page scrolls;
+ * tabs under it, the takes, then the tools and the shot. The page scrolls;
  * the piece stays the biggest thing on it.
  */
 export const RingUnrolled = (props: RingUnrolledProps) => {

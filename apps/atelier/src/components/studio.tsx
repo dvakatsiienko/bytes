@@ -76,7 +76,7 @@ const Workbench = (props: WorkbenchProps) => {
       <CommandPalette commands={commands} />
       <ZoomDialog />
       <Toaster
-        // over the bake button, where a bake shows its progress
+        // over the shot button, where a shot shows its progress
         offset={{ bottom: 144, right: 16 }}
         position='bottom-right'
         theme='dark'

@@ -34,7 +34,7 @@
   --fill: rgb(242 245 247 / 0.06);
   --fill-on: rgb(242 245 247 / 0.16);
   --key-line: rgb(185 195 201 / 0.4);
-  /* the bake: opaque ink, the one loud moment */
+  /* the shot: opaque ink, the one loud moment */
   --lamp: #f2f5f7;
   --lamp-ink: #0e1216;
   /* the kit paints a field or an outline button on this: dark under the glass, never the ground */
@@ -87,14 +87,14 @@
 }
 
 /* the readme chrome follows the time of day, not the studio theme: a night
-   bake is judged on github's dark page */
+   shot is judged on github's dark page */
 [data-time="night"] {
   --gh: #0d1117;
   --gh-line: #30363d;
   --gh-muted: #9198a1;
 }
 
-/* a toast sits over the bake, as wide as the tools column: an open film strip keeps its right end clear.
+/* a toast sits over the shot, as wide as the tools column: an open film strip keeps its right end clear.
    sonner writes --width inline, so only !important reaches it */
 [data-sonner-toaster] {
   --width: 300px !important;

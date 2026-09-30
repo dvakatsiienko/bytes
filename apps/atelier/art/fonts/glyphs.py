@@ -1,4 +1,4 @@
-# bakes Young Serif outlines into glyphs.json so the .ts generators letter text as plain paths
+# turns Young Serif outlines into glyphs.json so the .ts generators letter text as plain paths
 import json, pathlib, string
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen

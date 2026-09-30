@@ -29,15 +29,15 @@ export const commandsOf = (
     {
       group: 'bench',
       keys: 'b',
-      label: 'bake this view',
-      run: actions.askBake,
+      label: 'shoot this view',
+      run: actions.askShot,
     },
     ...(actions.hasMotion
       ? [
           {
             group: 'bench',
-            label: 'bake a motion loop (animated webp)',
-            run: actions.askBakeLoop,
+            label: 'shoot a motion loop (animated webp)',
+            run: actions.askShotLoop,
           } as const,
         ]
       : []),

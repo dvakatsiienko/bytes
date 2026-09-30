@@ -1,8 +1,8 @@
 /**
- * `pnpm atelier:bake <piece> [day|night|both] [--note "<one line>"] [--set '<json>']`
+ * `pnpm atelier:shot <piece> [day|night|both] [--note "<one line>"] [--set '<json>']`
  *
- * The studio's bake without the studio: starts atelier's own vite server on a
- * free port, bakes through the same function the bake button calls, saves the
+ * The studio's shot without the studio: starts atelier's own vite server on a
+ * free port, shoots through the same function the shot button calls, saves the
  * takes, prints their ids, stops. `--set` overrides the default settings.
  */
 import { relative } from 'node:path';
@@ -11,7 +11,7 @@ import { createServer } from 'vite';
 
 import type * as piecesModule from '../art/pieces.ts';
 import { times as allTimes, isTime } from '../art/time.ts';
-import { bake, closeBrowser } from '../server/bake.ts';
+import { closeBrowser, shoot } from '../server/shot.ts';
 import { appRoot, saveTake, takeDir } from '../server/takes.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
 
@@ -26,7 +26,7 @@ const { positionals, values } = parseArgs({
 const [pieceId, when = 'both'] = positionals;
 if (!(pieceId && (when === 'both' || isTime(when)))) {
   console.error(
-    'usage: pnpm atelier:bake <piece> [day|night|both] [--loop <frames>] [--note "…"] [--set \'{"look":"agx"}\']',
+    'usage: pnpm atelier:shot <piece> [day|night|both] [--loop <frames>] [--note "…"] [--set \'{"look":"agx"}\']',
   );
   process.exit(2);
 }
@@ -56,7 +56,7 @@ try {
   const times = isTime(when) ? [when] : allTimes;
   for (const time of times) {
     // biome-ignore lint/performance/noAwaitInLoops: one at a time — they share one headless browser, and a take's number is the next free one
-    const baked = await bake({
+    const shot = await shoot({
       frames,
       load,
       origin,
@@ -70,13 +70,13 @@ try {
       piece: pieceId,
       settings,
       time,
-      ...baked,
+      ...shot,
     });
     // the dir the take really landed in: a scratch ATELIER_TAKES_DIR prints as its absolute path
     const dir = takeDir(pieceId, take.id);
     const shown = relative(process.cwd(), dir);
     console.log(
-      `baked ${pieceId} · ${time} → ${shown.startsWith('..') ? dir : shown}/`,
+      `shot ${pieceId} · ${time} → ${shown.startsWith('..') ? dir : shown}/`,
     );
   }
 } finally {
