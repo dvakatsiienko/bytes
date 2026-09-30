@@ -6,18 +6,24 @@ import { pieceSvg, pieces } from '../art/pieces.ts';
 import { errorText } from './error-text.ts';
 import { resolveTheme, toggledTheme, useMediaQuery } from './hooks.ts';
 import { copyPng, stageCanvas, svgDataUrl } from './image.ts';
+import type { Edge, Openable } from './ring.ts';
+import { toggleRing } from './ring.ts';
 import { navigate, useRoute } from './route.ts';
 import { stageScenes } from './stage/scenes.ts';
 import { defaults } from './stage/settings.ts';
 import {
   bakeAskAtom,
   bakeNotesAtom,
+  bakeStepAtom,
+  findFocusAtom,
   fitKeyAtom,
   isPaletteOpenAtom,
   isPlayingAtom,
   patchSettingsAtom,
+  pixelSizeAtom,
   readmeAtom,
   readmeWidths,
+  ringAtom,
   settingsByPieceAtom,
   themeAtom,
   timeAtom,
@@ -50,6 +56,10 @@ export const useStudioActions = (piece: Piece) => {
   const bakeMutation = useBake();
   const [bakeAsk, setBakeAsk] = useAtom(bakeAskAtom);
   const [bakeNotes, setBakeNotes] = useAtom(bakeNotesAtom);
+  const setBakeStep = useSetAtom(bakeStepAtom);
+  const [ring, setRing] = useAtom(ringAtom);
+  const setFindFocus = useSetAtom(findFocusAtom);
+  const setPixel = useSetAtom(pixelSizeAtom);
   const isStage = Boolean(stageScenes[piece.id]);
   const hasMotion = isStage && !stageScenes[piece.id]?.isStill;
   const { view } = route;
@@ -94,6 +104,7 @@ export const useStudioActions = (piece: Piece) => {
     const started = Date.now();
     const seconds = () => `${Math.round((Date.now() - started) / 1000)} s`;
     let step = 'starting';
+    setBakeStep(step);
     const id = toast.loading(title, { description: step });
     const show = () =>
       toast.loading(title, { description: `${step} · ${seconds()}`, id });
@@ -104,6 +115,7 @@ export const useStudioActions = (piece: Piece) => {
         note,
         onStep: (current) => {
           step = current;
+          setBakeStep(current);
           show();
         },
         piece: piece.id,
@@ -132,7 +144,10 @@ export const useStudioActions = (piece: Piece) => {
           id,
         }),
       )
-      .finally(() => clearInterval(tick));
+      .finally(() => {
+        clearInterval(tick);
+        setBakeStep(null);
+      });
   };
 
   const copyImage = async () => {
@@ -172,6 +187,28 @@ export const useStudioActions = (piece: Piece) => {
     }
   };
 
+  /** opening one thing on the ring folds the other; a fold hands focus back to what opened it */
+  const turnRing = (target: Openable | null) => {
+    const panel = document.activeElement?.closest('[data-ring-panel]');
+    const closing = ring;
+    setRing(target === null ? null : toggleRing(ring, target));
+    if (panel && closing)
+      requestAnimationFrame(() =>
+        document
+          .querySelector<HTMLElement>(`[data-ring-opener="${closing}"]`)
+          ?.focus(),
+      );
+  };
+
+  const resetSettings = () => {
+    const before = settings;
+    patchSettings(piece.id, null);
+    toast(`reset the ${piece.id} settings`, {
+      action: { label: 'undo', onClick: () => patchSettings(piece.id, before) },
+      duration: 5000,
+    });
+  };
+
   return {
     askBake: () => askBake(),
     // 72 frames: 12 a second over the six-second loop, the rate the stage plays at
@@ -183,9 +220,16 @@ export const useStudioActions = (piece: Piece) => {
     copyImage,
     copySettings,
     cycleReadme: () => setReadme(next(readmeWidths, readme)),
-    // from anywhere: the viewer closes, and a zoomed live view goes back to fit
+    // `/` from anywhere: the field lives in an open edge, so a folded ring opens its first one
+    findSetting: () => {
+      if (ring === null || ring === 'takes') setRing('light');
+      setFindFocus((count) => count + 1);
+    },
+    foldRing: () => turnRing(null),
+    // from anywhere: the viewer and a pixel view close, and a zoomed live view goes back to fit
     goLive: () => {
       setZoom(null);
+      setPixel(null);
       if (view.kind === 'live') setFitKey((key) => key + 1);
       else navigate({ piece: piece.id, view: { kind: 'live' } });
     },
@@ -194,21 +238,23 @@ export const useStudioActions = (piece: Piece) => {
     isBaking: bakeMutation.isPending,
     isPlaying,
     isStage,
+    newSeed: () =>
+      patchSettings(piece.id, { seed: 1 + Math.floor(Math.random() * 9999) }),
     nextTake: () => stepTake(1),
     openPalette: () => setPaletteOpen(true),
     pieces,
     previousTake: () => stepTake(-1),
     readme,
-    resetSettings: () => {
-      patchSettings(piece.id, null);
-      toast(`reset the ${piece.id} settings`);
-    },
+    resetSettings,
+    ring,
     setReadme,
     setTheme,
     setTime,
     theme: resolveTheme(theme, prefersDark),
     time,
+    toggleEdge: (edge: Edge) => turnRing(edge),
     togglePlay: () => setIsPlaying(!isPlaying),
+    toggleStrip: () => turnRing('takes'),
     toggleTheme: () => setTheme(toggledTheme(theme, prefersDark)),
     toggleTime: () => setTime(time === 'day' ? 'night' : 'day'),
     zoom,

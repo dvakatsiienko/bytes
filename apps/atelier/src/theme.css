@@ -1,86 +1,82 @@
 @import "@ui/kit/globals.css";
 @import "tw-animate-css";
-@import "@fontsource/young-serif";
-@import "@fontsource-variable/figtree";
-@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/hanken-grotesk";
+@import "@fontsource-variable/azeret-mono";
 
 @theme inline {
-  --font-sans: "Figtree Variable", "Helvetica Neue", Arial, sans-serif;
-  --font-serif: "Young Serif", Georgia, serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, Menlo, monospace;
+  --font-sans: "Hanken Grotesk Variable", system-ui, sans-serif;
+  --font-mono: "Azeret Mono Variable", ui-monospace, Menlo, monospace;
+  --color-smoke: var(--smoke);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-fill: var(--fill);
+  --color-fill-on: var(--fill-on);
+  --color-key-line: var(--key-line);
+  --color-ground: var(--ground);
+  --color-ground-ink: var(--ground-ink);
+  --color-ground-muted: var(--ground-muted);
   --color-lamp: var(--lamp);
   --color-lamp-ink: var(--lamp-ink);
-  --color-lamp-edge: var(--lamp-edge);
-  --color-surface: var(--surface);
-  --color-chip: var(--chip);
-  --color-segment-on: var(--segment-on);
   --color-gh: var(--gh);
   --color-gh-line: var(--gh-line);
   --color-gh-muted: var(--gh-muted);
-  --shadow-lamp: 0 18px 48px -18px rgb(10 14 30 / 0.45);
-  --shadow-float: 0 6px 18px -6px rgb(10 14 30 / 0.35);
-  --shadow-hairline: 0 1px 2px rgb(0 0 0 / 0.12);
+  --shadow-glass: 0 12px 32px rgb(0 0 0 / 0.28);
 }
 
-/* DESIGN.md «day»: the kit's L2 names carry the neutrals; the accent is its
-   own token, so a slider or a switch never borrows the lamp. */
+/* the lens ring (docs/adr/0002): one smoked glass over the art in both themes.
+   the kit's L2 names read the smoke, so a menu, a dialog or the palette is the
+   same glass as the ring. */
 :root {
-  --radius: 10px;
-  --background: #eaf2f7;
-  --foreground: #22324a;
-  --surface: #ffffff;
-  --card: #ffffff;
-  --card-foreground: #22324a;
-  --popover: #ffffff;
-  --popover-foreground: #22324a;
-  --primary: #22324a;
-  --primary-foreground: #ffffff;
-  --secondary: #dde8f0;
-  --secondary-foreground: #22324a;
-  --chip: #dde8f0;
-  --segment-on: #ffffff;
-  --muted: #dde8f0;
-  --muted-foreground: #56667c;
-  --accent: #dde8f0;
-  --accent-foreground: #22324a;
-  --border: #cfdbe5;
-  --input: #cfdbe5;
-  --ring: #3f6fb0;
-  /* DESIGN.md terracotta #c8553d, one step darker: white on it reads 4.67:1, not 4.35 */
-  --lamp: #c25039;
-  --lamp-ink: #ffffff;
-  --lamp-edge: #963b29;
+  --radius: 12px;
+  --smoke: rgb(14 18 22 / 0.76);
+  --ink: #f2f5f7;
+  --ink-muted: #b9c3c9;
+  --fill: rgb(242 245 247 / 0.06);
+  --fill-on: rgb(242 245 247 / 0.16);
+  --key-line: rgb(185 195 201 / 0.4);
+  /* the bake: opaque ink, the one loud moment */
+  --lamp: #f2f5f7;
+  --lamp-ink: #0e1216;
+  /* the kit paints a field or an outline button on this: dark under the glass, never the ground */
+  --background: #0e1216;
+  --foreground: #f2f5f7;
+  --card: rgb(14 18 22 / 0.76);
+  --card-foreground: #f2f5f7;
+  --popover: rgb(20 25 30 / 0.9);
+  --popover-foreground: #f2f5f7;
+  --primary: #f2f5f7;
+  --primary-foreground: #0e1216;
+  --secondary: rgb(242 245 247 / 0.06);
+  --secondary-foreground: #f2f5f7;
+  --muted: rgb(242 245 247 / 0.06);
+  --muted-foreground: #b9c3c9;
+  --accent: rgb(242 245 247 / 0.1);
+  --accent-foreground: #f2f5f7;
+  --border: rgb(242 245 247 / 0.1);
+  --input: rgb(185 195 201 / 0.4);
+  --ring: #f2f5f7;
+  /* the theme picks the ground: what a fitted piece sits on, and all a flat one sits on */
+  --ground: #d3d9dc;
+  --ground-ink: #2b3236;
+  --ground-muted: #4a5358;
   --gh: #ffffff;
   --gh-line: #d1d9e0;
   --gh-muted: #59636e;
+  color-scheme: dark;
 }
 
-/* DESIGN.md «night» */
+/* each corner writes its height here (components/lens-ring.tsx); 0 until it has */
+[data-ring] {
+  --tl: 0px;
+  --tr: 0px;
+  --bl: 0px;
+  --br: 0px;
+}
+
 .dark {
-  --background: #121629;
-  --foreground: #e8ecf6;
-  --surface: #1a2040;
-  --card: #1a2040;
-  --card-foreground: #e8ecf6;
-  --popover: #222a50;
-  --popover-foreground: #e8ecf6;
-  --primary: #e8ecf6;
-  --primary-foreground: #1a1f3a;
-  --secondary: #252c52;
-  --secondary-foreground: #e8ecf6;
-  --chip: #252c52;
-  /* the studio artifact's pressed tone: a pressed segment must be lighter than its trough */
-  --segment-on: #3a4378;
-  --muted: #252c52;
-  --muted-foreground: #9aa3c8;
-  --accent: #252c52;
-  --accent-foreground: #e8ecf6;
-  --border: #2c3460;
-  --input: #2c3460;
-  --ring: #b3a6ee;
-  --lamp: #ffd978;
-  --lamp-ink: #1a1f3a;
-  --lamp-edge: #c9a64a;
+  --ground: #0e1216;
+  --ground-ink: #f2f5f7;
+  --ground-muted: #b9c3c9;
 }
 
 /* the readme chrome follows the time of day, not the studio theme: a night
@@ -91,12 +87,60 @@
   --gh-muted: #9198a1;
 }
 
-.dark {
-  color-scheme: dark;
+/* the kit's floating surfaces are glass too: without the blur their smoke reads as grey paint */
+[data-slot="popover-content"],
+[data-slot="context-menu-content"],
+[data-slot="select-content"],
+[data-slot="dialog-content"],
+[data-sonner-toast] {
+  -webkit-backdrop-filter: blur(28px) saturate(1.3);
+  backdrop-filter: blur(28px) saturate(1.3);
 }
 
-/* Unlayered, so it wins over `outline-none` in the kit's utilities: DESIGN.md
-   asks for a 2px ring, offset 2px, on every control. */
+/* the ring's controls, unlayered so they win over the kit's utilities: a
+   slider is a 2px ink line with a 3 × 14 blade, a switch an ink outline */
+.ring-slider [data-slot="slider-track"] {
+  height: 2px;
+  background: var(--key-line);
+  border-radius: 1px;
+}
+.ring-slider [data-slot="slider-range"] {
+  background: var(--ink);
+}
+.ring-slider [data-slot="slider-thumb"] {
+  width: 3px;
+  height: 14px;
+  background: var(--ink);
+  border: 0;
+  border-radius: 1px;
+}
+.ring-slider [data-slot="slider-thumb"]:hover {
+  box-shadow: 0 0 0 3px rgb(242 245 247 / 0.25);
+}
+.ring-switch {
+  width: 32px;
+  height: 18px;
+  background: transparent;
+  border: 1px solid var(--ink-muted);
+}
+.ring-switch[data-checked] {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.ring-switch [data-slot="switch-thumb"] {
+  width: 12px;
+  height: 12px;
+  margin-left: 2px;
+  background: var(--ink-muted);
+  translate: 0 0;
+}
+.ring-switch[data-checked] [data-slot="switch-thumb"] {
+  background: #0e1216;
+  translate: 14px 0;
+}
+
+/* Unlayered, so it wins over `outline-none` in the kit's utilities: a 2px ink
+   ring, offset 2px, on every control. */
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
@@ -117,13 +161,42 @@
 }
 
 ::selection {
-  color: var(--foreground);
-  background: color-mix(in srgb, var(--ring) 35%, var(--background));
+  color: #0e1216;
+  background: #f2f5f7;
+}
+
+@layer components {
+  /* specificity over the kit's button reset, which would strip the smoke (contract) */
+  .glass,
+  button.glass {
+    color: var(--ink);
+    /* the ring's overlay lets clicks through to the art; glass catches its own */
+    pointer-events: auto;
+    background-color: var(--smoke);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-glass);
+    -webkit-backdrop-filter: blur(28px) saturate(1.3);
+    backdrop-filter: blur(28px) saturate(1.3);
+  }
+  button.glass:hover {
+    background-color: rgb(38 45 51 / 0.84);
+  }
+  /* a key a command answers to: shown on every control that has one */
+  .key {
+    padding: 3px 5px;
+    font: 500 12px / 1 var(--font-mono);
+    color: var(--ink-muted);
+    white-space: nowrap;
+    user-select: none;
+    border: 1px solid var(--key-line);
+    border-radius: 4px;
+  }
 }
 
 @layer base {
   body {
-    @apply font-sans text-sm antialiased;
+    @apply bg-ground font-sans text-ink text-sm antialiased;
   }
   button:not(:disabled),
   a[href],

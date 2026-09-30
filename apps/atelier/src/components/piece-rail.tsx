@@ -18,17 +18,25 @@ export const PieceRail = (props: PieceRailProps) => {
             <a
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'flex items-baseline justify-between gap-2 rounded-md px-2 py-1.5 text-muted-foreground transition-colors duration-150 hover:bg-surface/70 hover:text-foreground',
-                isActive &&
-                  'bg-surface font-medium text-foreground shadow-hairline',
+                'flex items-baseline justify-between gap-2 rounded-md px-2 py-1.5 text-ink-muted transition-colors duration-150 hover:bg-fill-on/60 hover:text-ink',
+                isActive && 'bg-fill-on font-semibold text-ink',
               )}
               href={pathOf(route)}
               onClick={(event) => {
+                // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
+                if (
+                  event.metaKey ||
+                  event.ctrlKey ||
+                  event.shiftKey ||
+                  event.altKey
+                )
+                  return;
                 event.preventDefault();
                 navigate(route);
+                props.onPick?.();
               }}>
               <span className='truncate'>{piece.id}</span>
-              <span className='font-mono text-[12px] text-muted-foreground'>
+              <span className='font-mono text-[12px] text-ink-muted'>
                 {piece.kind}
               </span>
             </a>
@@ -41,7 +49,7 @@ export const PieceRail = (props: PieceRailProps) => {
         className='px-2 pb-3'
         key={group}>
         <h3
-          className='px-2 pb-1 font-mono text-[12px] text-muted-foreground'
+          className='px-2 pb-1 font-mono text-[12px] text-ink-muted'
           id={`group-${group}`}>
           {group}
         </h3>
@@ -53,9 +61,9 @@ export const PieceRail = (props: PieceRailProps) => {
   return (
     <nav
       aria-labelledby='pieces-title'
-      className='flex min-h-0 flex-1 flex-col border-border border-b'>
+      className='flex max-h-[inherit] min-h-0 flex-1 flex-col'>
       <h2
-        className='flex items-baseline justify-between px-4 pt-3 pb-1 font-medium text-[12px] text-muted-foreground uppercase tracking-[0.08em]'
+        className='flex items-baseline justify-between px-4 pt-3 pb-1 font-semibold text-ink text-sm'
         id='pieces-title'>
         pieces
         <span className='font-mono normal-case tracking-normal'>
@@ -72,5 +80,6 @@ export const PieceRail = (props: PieceRailProps) => {
 /* Types */
 
 interface PieceRailProps {
+  onPick?: () => void;
   piece: Piece;
 }
