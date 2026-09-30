@@ -48,7 +48,8 @@
 - ✅ a worktree build tells itself apart
   - given atelier runs from a seeded worktree (`pnpm worktree:seed` gave it a port offset)
   - then the tab title reads «atelier · dev» and the favicon carries a dot
-  - and on main the title stays «atelier»; the view corner shows the branch and sha on both
+  - and on main the title stays «atelier»; the view corner shows the branch on both, never a commit sha
+  - decision: the sha is noise to dima — «do not print commit, i dont need it» (2026-09-30)
 - 🔎 the ring unrolls below 1100 px wide
   - given a window narrower than 1100 px
   - then a bar holds the wordmark, the piece, «pieces», day and night and the commands; the piece follows, then the four edges as tabs, the film strip, and the tools corner with the shot

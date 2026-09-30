@@ -254,7 +254,7 @@ function gapsOf(app: App): Gap[] {
       ? [
           {
             detail:
-              'no branch switcher — copy ~/projects/bytes/apps/atelier/src/components/build-badge.tsx (dima wants it in every app, add it when the app is next touched)',
+              'no branch switcher (the branch name + a ⇆ jump between main and live worktrees, no commit sha) — a freebie on any branch, or main once the pr is closed; copy ~/projects/bytes/apps/atelier/src/components/build-badge.tsx',
             level: 'yellow' as const,
             row: 'branch-badge' as const,
           },
