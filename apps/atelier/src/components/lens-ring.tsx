@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { cn } from 'cn';
 
 import type { Piece } from '../../art/pieces.ts';
@@ -21,7 +21,10 @@ import { ViewCard } from './view-card';
 export const LensRing = (props: LensRingProps) => {
   return (
     // the order is the tab order: the piece, then the ring row by row — top left, the edges, top right, the bottom corners
-    <div className='absolute inset-0' data-ring>
+    <div
+      className='absolute inset-0 [container-type:size]'
+      data-ring
+      style={{ '--art-top': artTopOf(props) } as CSSProperties}>
       <Section name='viewport'>
         <PieceView actions={props.actions} piece={props.piece} />
       </Section>
@@ -61,6 +64,18 @@ export const LensRing = (props: LensRingProps) => {
       </Corner>
     </div>
   );
+};
+
+/**
+ * How far the fitted piece's top edge sits below the window's: half the
+ * height the piece leaves free. A readme frame or a compare is not the fitted
+ * piece, so the ring keeps to the window's edge there.
+ */
+const artTopOf = (props: LensRingProps) => {
+  const ratio = props.piece.size.h / props.piece.size.w;
+  return props.actions.readme === 'fit' && props.view !== 'compare'
+    ? `calc((100cqh - min(100cqh, 100cqw * ${ratio})) / 2)`
+    : '0px';
 };
 
 const Corner = (props: CornerProps) => {
@@ -105,6 +120,7 @@ interface LensRingProps {
   actions: StudioActions;
   piece: Piece;
   theme: Theme;
+  view: 'live' | 'take' | 'compare';
   /** the way home, outside every section: a crashed corner keeps it */
   wordmark: ReactNode;
 }

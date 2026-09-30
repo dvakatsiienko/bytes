@@ -46,7 +46,8 @@ const Workbench = (props: WorkbenchProps) => {
   useTabMark(resolvedTheme, useBuild()?.isDev ?? false);
   const isWide = useMediaQuery('(min-width: 1100px)');
   useHotkeys(commands, actions.openPalette);
-  const path = pathOf(useRoute());
+  const route = useRoute();
+  const path = pathOf(route);
   const setIsPlaying = useSetAtom(isPlayingAtom);
   // leaving a view stops the motion it played; coming back shows a still frame
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new path is the leave, so the cleanup runs on it
@@ -63,6 +64,7 @@ const Workbench = (props: WorkbenchProps) => {
           actions={actions}
           piece={props.piece}
           theme={theme}
+          view={route.view.kind}
           wordmark={<Wordmark />}
         />
       ) : (

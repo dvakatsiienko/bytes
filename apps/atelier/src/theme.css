@@ -67,6 +67,8 @@
 
 /* each corner writes its height here (components/lens-ring.tsx); 0 until it has */
 [data-ring] {
+  /* the top and bottom edges sit on the piece's rim (lens-ring.tsx sets --art-top) */
+  --rim: max(16px, calc(var(--art-top, 0px) - 24px));
   --tl: 0px;
   --tr: 0px;
   --bl: 0px;
@@ -74,6 +76,13 @@
 }
 
 .dark {
+  --ground: #0e1216;
+  --ground-ink: #f2f5f7;
+  --ground-muted: #b9c3c9;
+}
+
+/* a night piece sits on a dark ground whatever the theme: a pale surround reads its darks darker */
+[data-time="night"] {
   --ground: #0e1216;
   --ground-ink: #f2f5f7;
   --ground-muted: #b9c3c9;

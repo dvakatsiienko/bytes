@@ -29,7 +29,7 @@ export const BakeButton = (props: BakeButtonProps) => {
       }
       open={props.actions.bakeAsk !== null}>
       <PopoverTrigger
-        className='relative flex h-13 w-full items-center overflow-hidden rounded-xl bg-lamp text-lamp-ink shadow-glass hover:bg-white disabled:cursor-progress disabled:bg-fill-on disabled:text-ink'
+        className='relative flex h-13 w-full items-center overflow-hidden rounded-xl bg-lamp text-lamp-ink shadow-glass hover:bg-white disabled:cursor-progress disabled:bg-smoke disabled:text-ink disabled:backdrop-blur-[28px]'
         disabled={props.actions.isBaking}
         title={`bake ${props.actions.time} (b)`}>
         {props.actions.isBaking ? (

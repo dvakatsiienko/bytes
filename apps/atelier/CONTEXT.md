@@ -102,7 +102,7 @@ One of the four cards at the screen's corners: the piece card, the view card, th
 _Avoid_: widget, panel
 
 **Ground**:
-What the piece sits on, light or dark by the studio theme. A flat piece sits on the plain ground at a whole zoom.
+What the piece sits on: by day light or dark by the studio theme, at night always dark. A flat piece sits on the plain ground at a whole zoom.
 _Avoid_: stage (the lit room), background, canvas
 
 **Takes stack**:

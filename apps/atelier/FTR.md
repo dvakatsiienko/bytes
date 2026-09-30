@@ -13,7 +13,7 @@
 
 - ⬜ the lens ring
   - given a lit piece is open, 1100 px wide or more
-  - then the piece shows as large as it fits whole, and four glass edges hug it: light on top, lens on the right, atmosphere at the bottom, toggles on the left
+  - then the piece shows as large as it fits whole, and four glass edges hug it: light on top and atmosphere at the bottom, both on the piece's rim, lens on the right, toggles on the left
   - and the corners hold the piece card (top left), the view card (top right), the takes (bottom left) and the tools with the bake (bottom right)
   - decision: the piece is fitted whole, never cropped, so a wide piece leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»)
 - ⬜ one edge open at a time
@@ -34,7 +34,8 @@
   - then the first piece's live view opens; ⌘-click opens it in a new tab
 - ⬜ theme: system, light, dark
   - when dima presses `t`
-  - then the ground behind the piece switches between light and dark; the glass stays one smoke
+  - then the ground behind a day piece switches between light and dark; the glass stays one smoke
+  - and a night piece always sits on the dark ground
   - and the theme button in the view card steps through system, light and dark
 - 🔎 the command palette
   - when dima presses ⌘K

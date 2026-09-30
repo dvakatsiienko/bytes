@@ -35,7 +35,10 @@ export const PieceView = (props: PieceViewProps) => {
     const b = takeOf(view.b);
     // two side by side want twice the width; under the slider, one
     const across = compareMode === 'side' ? 2 : 1;
-    const widths = ['100cqw', `calc((100cqh - 80px) * ${ratio * across})`];
+    // the tallest corner, above and below, and the captions' line
+    const room =
+      '(100cqh - 2 * max(var(--tl, 0px), var(--tr, 0px), var(--bl, 0px), var(--br, 0px)) - 88px)';
+    const widths = ['100cqw', `calc(${room} * ${ratio * across})`];
     // a flat piece compares at its own size at most, as it sits on the plain ground
     if (!props.actions.isStage)
       widths.push(`${across * props.piece.size.w + 48}px`);

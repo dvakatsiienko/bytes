@@ -315,13 +315,14 @@ const scaleOf = (context: ReactZoomPanPinchContextState) => context.state.scale;
 const preventDefault = (event: Event) => event.preventDefault();
 
 /**
- * `top-centre` keeps the tools 76 px from the window's top (the folded light
- * edge's 64 px and a gap): the box sits centred in the stage, so its top is
- * half the stage's spare height, (100cqh − 100%) / 2.
+ * `top-centre` keeps the tools under the folded light edge: 36 px into the
+ * art where the edge sits on its rim (24 px in, and a gap), 76 px from the
+ * window's top where the art reaches it. The box sits centred in the stage,
+ * so its top is half the stage's spare height, (100cqh − 100%) / 2.
  */
 const toolbarPlaces = {
   'top-centre':
-    'top-[max(12px,calc(76px_-_(100cqh_-_100%)_/_2))] left-1/2 -translate-x-1/2',
+    'top-[max(36px,calc(76px_-_(100cqh_-_100%)_/_2))] left-1/2 -translate-x-1/2',
   'top-left': 'top-3 left-3',
 } as const;
 
