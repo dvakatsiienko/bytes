@@ -59,7 +59,7 @@ spacing:
   inner: "8px"
   stack: "12px"
   gutter: "16px"
-  rim: "24px"
+  art-clear: "12px"
 components:
   glass-card:
     backgroundColor: "{colors.smoke}"
@@ -131,7 +131,7 @@ The ui is quiet and exact. Text is one grotesk at 14 px, numbers and keys are on
 Density is low by rule. Four folded edges and four corner cards are all that cover the piece at rest; one edge opens at a time, and it opens away from the art where it can.
 
 **Key Characteristics:**
-- the piece fitted whole and biggest; the glass overlaps its rim, never pushes it
+- the piece fitted whole and biggest; the glass stays off the art wherever the ground has room for it
 - one smoked glass (blur 28 px, saturate 1.3) in both themes
 - achromatic: ink, muted ink and ink-alpha fills; colour belongs to the art
 - the bake is the single opaque control
@@ -142,7 +142,7 @@ Density is low by rule. Four folded edges and four corner cards are all that cov
 
 The world was picked by dima on 2026-09-30 after three studio design rounds (`docs/adr/0002-the-lens-ring.md`, studio job `jobs/atelier/`).
 
-**Thesis.** The piece is as large as it fits whole. Four smoked-glass edges hug it, one per setting group: light on top, lens on the right, atmosphere at the bottom, toggles on the left. The top and bottom edges sit on the piece's rim, not the window's edge. One edge is open at a time (`1`–`4` open, `esc` folds), and the film strip (`g`, the takes stack opened) counts as the bottom edge: opening one folds the other. The four corners hold actions: the piece and its seed top-left, time and commands top-right, the takes bottom-left, the view tools and the bake bottom-right.
+**Thesis.** The piece is as large as it fits whole. Four smoked-glass edges hug it, one per setting group: light on top, lens on the right, atmosphere at the bottom, toggles on the left. The top and bottom edges sit in the ground beside the art, 12 px clear of it, and reach into the art only where the ground is too short to hold them. One edge is open at a time (`1`–`4` open, `esc` folds), and the film strip (`g`, the takes stack opened) counts as the bottom edge: opening one folds the other. The four corners hold actions: the piece and its seed top-left, time and commands top-right, the takes bottom-left, the view tools and the bake bottom-right.
 
 **The don'ts.**
 - two edges open at once
@@ -199,8 +199,8 @@ An achromatic system of ink on smoke: every ui colour is one cool near-white or 
 The piece is fitted whole into the window (`min(100cqh, 100cqw × ratio)`), centred, with the ground above and below a wide scene. The ring floats over it on a **16 px gutter**.
 
 - **Corners:** four 300 px cards pinned 16 px from each window corner. Each reports its height, so the edges open in the room the corners leave.
-- **Folded edges:** the top and bottom chips are 300 × 48 px, centred on the piece's rim (the rim sits 24 px inside the art's top or bottom edge, never closer than 16 px to the window). The side chips are 48 × 240 px, vertical text, centred between their corners.
-- **Open edges:** a side edge becomes a 300 px column under its corner; the top or bottom edge becomes a band between the corners (332 px in from each side), grows away from the piece into the ground, and lays its rows in auto-fill columns of ≥13 rem. A band never reaches the corners across from it.
+- **Folded edges:** the top and bottom chips are 300 × 48 px, centred, in the ground 12 px clear of the art (`--chip-inset: max(16px, calc(var(--art-top) - 60px))`). Where the ground is too short, a chip keeps 16 px from the window and reaches into the art by the difference. The side chips are 48 × 240 px, vertical text, centred between their corners.
+- **Open edges:** a side edge becomes a 300 px column under its corner; the top or bottom edge becomes a band between the corners (332 px in from each side), in a slot from the window's 16 px gutter to 12 px short of the art, pinned to the art side. A band taller than that slot starts at the gutter and reaches into the art only as far as its height forces. It lays its rows in auto-fill columns of ≥13 rem. A band never reaches the corners across from it.
 - **Stacking:** cards under a corner sit 12 px below it. Inside glass, rows breathe at 12–16 px, controls at 8 px.
 - **The takes:** `g` turns the bottom-left stack into a film strip that runs from the left gutter to the tools column (332 px from the right) and takes the bottom edge's place.
 - **Flat pieces:** a flat piece sits on the plain ground at a whole zoom, with a seed-only card centred on top in place of the ring; a favicon shows a row of «as it lands, at true size» previews (16, 32, 64 px) under it, and a pixel grid from 8×.
@@ -209,7 +209,7 @@ The piece is fitted whole into the window (`min(100cqh, 100cqw × ratio)`), cent
 ### Named Rules
 **The Biggest Thing Rule.** At every width the piece is the largest element on screen. A panel that would shrink it overlaps it or unrolls below it instead.
 
-**The Rim Rule.** The top and bottom edges sit on the piece's rim, so the glass always overlaps the art and never floats on bare ground.
+**The Clear Art Rule.** The glass never covers art it has room to avoid: a top or bottom edge sits in the ground 12 px clear of the piece, and reaches into it only when the ground is too short.
 
 ## Elevation & Depth
 
