@@ -68,10 +68,10 @@ pre-push:
 
 commit-msg:
   jobs:
-    # an app's code lands with its FTR.md, or the body says «ftr: none». the script is frame's (plugin-x bin, on
-    # PATH); a mac without the plugin skips, never blocks
+    # an app's code lands with its FTR.md, or the body says «ftr: none». the script is frame's, run by path so
+    # every terminal on this mac runs it; a machine without frame (a cloud session) skips, never blocks
     - name: ftr-gate
-      run: if command -v ftr-gate >/dev/null; then ftr-gate {1}; fi
+      run: g="$HOME/frame/home/.claude/plugin-x/bin/ftr-gate"; if [ -x "$g" ]; then "$g" {1}; fi
     # Strips the `Claude-Session:` trailer the desktop harness asks agents to
     # append; the `Agent:` trailer is the fingerprint, this one is noise.
     - name: session-trailer
