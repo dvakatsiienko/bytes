@@ -63,9 +63,9 @@ export const settingsByPieceAtom = persisted<Record<string, Settings>>(
   },
 );
 
-/** the last bake note per piece, offered again on its next bake */
-export const bakeNotesAtom = persisted<Record<string, string>>(
-  'atelier:bake-notes',
+/** the last shot note per piece, offered again on its next shot */
+export const shotNotesAtom = persisted<Record<string, string>>(
+  'atelier:shot-notes',
   {},
   (raw) =>
     Object.fromEntries(
@@ -119,10 +119,10 @@ export const pixelFitAtom = atom(1);
 export const pixelGridAtom = atom(true);
 /** the frame of the six-second loop the playing motion shows, of 72 */
 export const motionFrameAtom = atom(0);
-/** a bake waiting for its note: how many frames it will bake, or null when none is asked */
-export const bakeAskAtom = atom<number | null>(null);
-/** the step a running bake is on, for the bake button; null when none runs */
-export const bakeStepAtom = atom<string | null>(null);
+/** a shot waiting for its note: how many frames it will shoot, or null when none is asked */
+export const shotAskAtom = atom<number | null>(null);
+/** the step a running shot is on, for the shot button; null when none runs */
+export const shotStepAtom = atom<string | null>(null);
 /** the take whose stash form is open, wherever it was asked for */
 export const stashFormAtom = atom<string | null>(null);
 

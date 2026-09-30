@@ -7,13 +7,13 @@ import { toSettings } from '../stage/settings.ts';
 import { StageCanvas } from './stage-canvas';
 
 /**
- * The page a bake screenshots: `?bake=<piece>&time=<day|night>&set=<json>`,
+ * The page a shot screenshots: `?shot=<piece>&time=<day|night>&set=<json>`,
  * plus `&frames=<n>` for a motion loop. Only the canvas, at the piece's own
- * size; the bake's browser supplies the scale. `data-baked` on <html> says «ok»
- * or why not. A loop bake then calls `window.atelierFrame(i)`, which resolves
+ * size; the shot's browser supplies the scale. `data-shot` on <html> says «ok»
+ * or why not. A loop shot then calls `window.atelierFrame(i)`, which resolves
  * once frame i of n is on the canvas.
  */
-export const BakeView = (props: BakeViewProps) => {
+export const ShotView = (props: ShotViewProps) => {
   const params = new URLSearchParams(location.search);
   const piece = findPiece(props.pieceId);
   const spec = piece ? stageScenes[piece.id] : undefined;
@@ -29,7 +29,7 @@ export const BakeView = (props: BakeViewProps) => {
   const problem =
     piece && spec && isTime(time)
       ? null
-      : `error: nothing to bake for «${props.pieceId}» at «${time}»`;
+      : `error: nothing to shoot for «${props.pieceId}» at «${time}»`;
 
   useEffect(() => {
     if (problem) report(problem);
@@ -75,7 +75,7 @@ export const BakeView = (props: BakeViewProps) => {
 /* Helpers */
 
 const report = (state: string) => {
-  document.documentElement.dataset.baked = state;
+  document.documentElement.dataset.shot = state;
 };
 
 const readJson = (text: string | null): unknown => {
@@ -88,6 +88,6 @@ const readJson = (text: string | null): unknown => {
 
 /* Types */
 
-interface BakeViewProps {
+interface ShotViewProps {
   pieceId: string;
 }

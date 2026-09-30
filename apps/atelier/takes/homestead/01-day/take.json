@@ -1,10 +1,10 @@
 {
-  "bakedAt": "2026-09-25T19:32:02.924Z",
-  "files": ["bake.webp"],
+  "files": ["shot.webp"],
   "frames": 72,
   "note": "",
   "piece": "homestead",
   "seed": 1,
+  "shotAt": "2026-09-25T19:32:02.924Z",
   "sourceHash": "4708e7157269",
   "stash": null,
   "time": "day"

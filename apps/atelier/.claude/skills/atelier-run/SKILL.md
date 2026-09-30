@@ -63,4 +63,4 @@ cd apps/atelier && pnpm test       # vitest, 13 files, ~2 s
 - the header badge and `/api/build` name the worktree's branch (`coder/<slug>`); a `--detach` tree reports `HEAD`.
 - `TAKES 0` on a piece is real, not a seeding bug — `takes/` is tracked and only a few pieces have takes.
 - the console warns `THREE.Clock … deprecated` on every load — known noise, not a finding.
-- bake and ship write to `takes/` — drive them only with `ATELIER_TAKES_DIR=<scratch copy>` set on the worktree server (see the `verify` skill, which owns what to check once the app runs).
+- shot and ship write to `takes/` — drive them only with `ATELIER_TAKES_DIR=<scratch copy>` set on the worktree server (see the `verify` skill, which owns what to check once the app runs).

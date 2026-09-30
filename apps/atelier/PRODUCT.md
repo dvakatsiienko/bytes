@@ -13,12 +13,12 @@ vite + react 19.3 + tailwind + typescript, three.js through `@react-three/fiber`
 ## Users
 
 - **dima** — the art director. he steers, compares takes, picks, and tweaks scene settings. he uses it alone for now; a portfolio showing may come later, only after it works.
-- **the fleet's agents** (cclio first, any cc session that is asked for art) — the hands. they write scene code, bake, save takes and ship assets. every fleet member knows atelier exists and routes art work to it.
+- **the fleet's agents** (cclio first, any cc session that is asked for art) — the hands. they write scene code, shoot, save takes and ship assets. every fleet member knows atelier exists and routes art work to it.
 - **the products** — any game, app or website we build takes its art from atelier; a product's needs decide which asset kinds atelier grows next.
 
 ## Product Purpose
 
-atelier is our one home for making art and assets — for dima, for the fleet, and for every product we build. a readme hero, an icon, a favicon, an avatar, and just as much the art of a product: sprites, items and tiles for a crafting game or an rpg, illustrations and backgrounds for a web app or a website. any visual ask lands here, the agent makes it here, and atelier is always ready for it. there is no image model yet: every picture is written as code, lit, and baked.
+atelier is our one home for making art and assets — for dima, for the fleet, and for every product we build. a readme hero, an icon, a favicon, an avatar, and just as much the art of a product: sprites, items and tiles for a crafting game or an rpg, illustrations and backgrounds for a web app or a website. any visual ask lands here, the agent makes it here, and atelier is always ready for it. there is no image model yet: every picture is written as code, lit, and shot.
 
 success: dima sees each change live, compares takes side by side, and ships an asset he would put his name on — with less of his time per asset every month.
 
@@ -31,7 +31,7 @@ art as code, directed by a human. every picture is a seeded, reproducible scene:
 - local only: runs with vite dev on dima's mac, no deploy, no auth
 - outputs ship into any repo of ours — frame, bytes, the github profile repo today, each new product's repo tomorrow (`atelier:ship`)
 - takes and stashed scratches are git-tracked folders, readable by the agent in the next session
-- repeating operations are scripts (bake, ship, icon export sizes), so no session re-types them
+- repeating operations are scripts (shot, ship, icon export sizes), so no session re-types them
 - the `x:art-kit` skill routes every art job; its illustration branch points here
 - the gifs pipeline (`~/frame/gifs/`) and terminal clips (vhs) stay outside for now; the imagegen room ([BYT-70](https://linear.app/x-com/issue/BYT-70)) joins later; video is a distant maybe
 
@@ -40,7 +40,7 @@ art as code, directed by a human. every picture is a seeded, reproducible scene:
 - rooms, in order: art (scenes, spots, icons, avatars, badges, favicons) → imagegen later → video maybe
 - every asset kind has a ready starting point (a scene template or an icon template), so a new ask starts drawing, not setting up
 - asset kinds grow with the products: a game brings sprite sheets and tilesets, a website brings illustrations and backgrounds — each kind gets its template the first time a product needs it
-- self-documented: an `AGENTS.md` that tells any agent how to add a scene, bake, and ship
+- self-documented: an `AGENTS.md` that tells any agent how to add a scene, shoot, and ship
 - undecided: the story world is a first draft by cclio (Oles the t-rex, Pinefold, Lanternhill), not yet reviewed by dima
 - undecided: which motion reaches the readmes (foliage wind and fireflies are liked) and the night tone mapping — both explored inside atelier once its tools are connected
 
@@ -48,13 +48,13 @@ art as code, directed by a human. every picture is a seeded, reproducible scene:
 
 - the name **atelier**
 - lowercase voice in ui copy
-- Young Serif is the scene lettering (baked to paths so github renders it exactly)
+- Young Serif is the scene lettering (turned into paths so github renders it exactly)
 - good ux is a top priority: dima's own iteration speed is the product
 - atelier's identity is its own. the dino story (Oles, Pinefold, Lanternhill) is the first art made in it, not atelier's brand; the starting theme borrows the story's palette as a shortcut only
 
 ## Evidence on Hand
 
-- the diorama scenes and stage: `~/frame/brand/diorama/` (svg generators, the three.js stage, first bakes)
+- the diorama scenes and stage: `~/frame/brand/diorama/` (svg generators, the three.js stage, first shots)
 - v1 art: `~/frame/brand/profile/`, bytes `script/readme-*.py`
 - the studio artifact: https://claude.ai/artifact/4YAEdDqeH5SrSCUWnkB13h (the starting light and dark theme)
 - no users beyond dima, no testimonials, no metrics — none may be invented

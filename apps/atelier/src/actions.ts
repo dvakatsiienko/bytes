@@ -12,9 +12,6 @@ import { navigate, useRoute } from './route.ts';
 import { stageScenes } from './stage/scenes.ts';
 import { defaults } from './stage/settings.ts';
 import {
-  bakeAskAtom,
-  bakeNotesAtom,
-  bakeStepAtom,
   findFocusAtom,
   fitKeyAtom,
   isPaletteOpenAtom,
@@ -28,11 +25,14 @@ import {
   readmeWidths,
   ringAtom,
   settingsByPieceAtom,
+  shotAskAtom,
+  shotNotesAtom,
+  shotStepAtom,
   themeAtom,
   timeAtom,
   zoomAtom,
 } from './state.ts';
-import { takeUrl, useBake, useShownTake } from './takes.ts';
+import { takeUrl, useShot, useShownTake } from './takes.ts';
 
 const next = <T>(list: readonly T[], value: T) =>
   list[(list.indexOf(value) + 1) % list.length] as T;
@@ -56,10 +56,10 @@ export const useStudioActions = (piece: Piece) => {
   const settings = useAtomValue(settingsByPieceAtom)[piece.id] ?? defaults;
   const { list, take: shownTake } = useShownTake(piece.id);
   const takes = list?.takes ?? [];
-  const bakeMutation = useBake();
-  const [bakeAsk, setBakeAsk] = useAtom(bakeAskAtom);
-  const [bakeNotes, setBakeNotes] = useAtom(bakeNotesAtom);
-  const setBakeStep = useSetAtom(bakeStepAtom);
+  const shotMutation = useShot();
+  const [shotAsk, setShotAsk] = useAtom(shotAskAtom);
+  const [shotNotes, setShotNotes] = useAtom(shotNotesAtom);
+  const setShotStep = useSetAtom(shotStepAtom);
   const [ring, setRing] = useAtom(ringAtom);
   const setFindFocus = useSetAtom(findFocusAtom);
   const setPiecesOpen = useSetAtom(piecesOpenAtom);
@@ -91,37 +91,37 @@ export const useStudioActions = (piece: Piece) => {
       : null;
   };
 
-  /** every bake asks for its note first: a still, or with `frames` a motion loop */
-  const askBake = (frames = 1) => {
-    if (!bakeMutation.isPending) setBakeAsk(frames);
+  /** every shot asks for its note first: a still, or with `frames` a motion loop */
+  const askShot = (frames = 1) => {
+    if (!shotMutation.isPending) setShotAsk(frames);
   };
 
-  /** the asked bake, with its note; the note is kept for this piece's next bake */
-  const bake = (note: string) => {
-    const frames = bakeAsk ?? 1;
-    setBakeAsk(null);
-    if (bakeMutation.isPending) return;
-    setBakeNotes({ ...bakeNotes, [piece.id]: note });
-    // one toast for the whole bake: its title stays, the line under it says the step and the seconds so far
+  /** the asked shot, with its note; the note is kept for this piece's next shot */
+  const shoot = (note: string) => {
+    const frames = shotAsk ?? 1;
+    setShotAsk(null);
+    if (shotMutation.isPending) return;
+    setShotNotes({ ...shotNotes, [piece.id]: note });
+    // one toast for the whole shot: its title stays, the line under it says the step and the seconds so far
     const title =
       frames > 1
-        ? `baking a ${frames}-frame loop of ${piece.id}\u00a0·\u00a0${time}`
-        : `baking ${piece.id}\u00a0·\u00a0${time}`;
+        ? `shooting a ${frames}-frame loop of ${piece.id}\u00a0·\u00a0${time}`
+        : `shooting ${piece.id}\u00a0·\u00a0${time}`;
     const started = Date.now();
     const seconds = () => `${Math.round((Date.now() - started) / 1000)} s`;
     let step = 'starting';
-    setBakeStep(step);
+    setShotStep(step);
     const id = toast.loading(title, { description: step });
     const show = () =>
       toast.loading(title, { description: `${step} · ${seconds()}`, id });
     const tick = setInterval(show, 1000);
-    bakeMutation
+    shotMutation
       .mutateAsync({
         frames,
         note,
         onStep: (current) => {
           step = current;
-          setBakeStep(current);
+          setShotStep(current);
           show();
         },
         piece: piece.id,
@@ -129,7 +129,7 @@ export const useStudioActions = (piece: Piece) => {
         time,
       })
       .then((take) =>
-        toast.success(`baked take ${take.id}`, {
+        toast.success(`shot take ${take.id}`, {
           action: {
             label: 'open',
             onClick: () =>
@@ -144,7 +144,7 @@ export const useStudioActions = (piece: Piece) => {
         }),
       )
       .catch((error: unknown) =>
-        toast.error(`bake failed: ${errorText(error)}`, {
+        toast.error(`shot failed: ${errorText(error)}`, {
           description: `at «${step}» after ${seconds()}`,
           duration: 8000,
           id,
@@ -152,7 +152,7 @@ export const useStudioActions = (piece: Piece) => {
       )
       .finally(() => {
         clearInterval(tick);
-        setBakeStep(null);
+        setShotStep(null);
       });
   };
 
@@ -216,13 +216,10 @@ export const useStudioActions = (piece: Piece) => {
   };
 
   return {
-    askBake: () => askBake(),
+    askShot: () => askShot(),
     // 72 frames: 12 a second over the six-second loop, the rate the stage plays at
-    askBakeLoop: () => askBake(72),
-    bake,
-    bakeAsk,
-    bakeNote: bakeNotes[piece.id] ?? '',
-    cancelBake: () => setBakeAsk(null),
+    askShotLoop: () => askShot(72),
+    cancelShot: () => setShotAsk(null),
     copyImage,
     copySettings,
     cycleReadme: () => setReadme(next(readmeWidths, readme)),
@@ -242,9 +239,9 @@ export const useStudioActions = (piece: Piece) => {
     },
     goPiece: (id: string) => navigate({ piece: id, view: { kind: 'live' } }),
     hasMotion,
-    isBaking: bakeMutation.isPending,
     isPixelView: pixelView?.piece === piece.id,
     isPlaying,
+    isShooting: shotMutation.isPending,
     isStage,
     newSeed: () =>
       patchSettings(piece.id, { seed: 1 + Math.floor(Math.random() * 9999) }),
@@ -259,6 +256,9 @@ export const useStudioActions = (piece: Piece) => {
     setReadme,
     setTheme,
     setTime,
+    shoot,
+    shotAsk,
+    shotNote: shotNotes[piece.id] ?? '',
     takeCount: takes.length,
     theme: resolveTheme(theme, prefersDark),
     time,

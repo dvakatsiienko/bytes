@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "node ../../script/with-port.ts 5180 vite",
-    "atelier:bake": "node scripts/atelier-bake.ts",
     "atelier:icons": "node scripts/atelier-icons.ts",
     "atelier:probe": "node scripts/atelier-probe.ts",
     "atelier:ship": "node scripts/atelier-ship.ts",
+    "atelier:shot": "node scripts/atelier-shot.ts",
     "lint": "biome lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

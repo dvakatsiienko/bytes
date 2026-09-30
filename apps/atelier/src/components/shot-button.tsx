@@ -11,35 +11,35 @@ import { cn } from 'cn';
 import { useAtomValue } from 'jotai';
 
 import type { StudioActions } from '../actions.ts';
-import { bakeStepAtom } from '../state.ts';
+import { shotStepAtom } from '../state.ts';
 import { Key } from './key';
 
 /**
  * The one loud control: opaque ink on the smoke. A press — or `b`, or the
- * palette — asks for a one-line note before baking, so two takes can be told
- * apart later; the piece's last note comes back selected, and Enter bakes
- * with it. While a bake runs the button is its progress.
+ * palette — asks for a one-line note before shooting, so two takes can be told
+ * apart later; the piece's last note comes back selected, and Enter shoots
+ * with it. While a shot runs the button is its progress.
  */
-export const BakeButton = (props: BakeButtonProps) => {
-  const step = useAtomValue(bakeStepAtom);
+export const ShotButton = (props: ShotButtonProps) => {
+  const step = useAtomValue(shotStepAtom);
   return (
     <Popover
       onOpenChange={(open) =>
-        open ? props.actions.askBake() : props.actions.cancelBake()
+        open ? props.actions.askShot() : props.actions.cancelShot()
       }
-      open={props.actions.bakeAsk !== null}>
+      open={props.actions.shotAsk !== null}>
       <PopoverTrigger
         className='relative flex h-13 w-full items-center overflow-hidden rounded-xl bg-lamp text-lamp-ink shadow-glass hover:bg-white disabled:cursor-progress disabled:bg-smoke disabled:text-ink disabled:backdrop-blur-[28px]'
-        disabled={props.actions.isBaking}
-        title={`bake ${props.actions.time} (b)`}>
-        {props.actions.isBaking ? (
-          <BakeProgress step={step} />
+        disabled={props.actions.isShooting}
+        title={`shoot ${props.actions.time} (b)`}>
+        {props.actions.isShooting ? (
+          <ShotProgress step={step} />
         ) : (
           <span className='flex w-full items-center justify-between px-4'>
             <span className='font-semibold text-base'>
               {props.actions.takeCount === 0
-                ? 'bake the first take'
-                : 'bake take'}
+                ? 'shoot the first take'
+                : 'shot take'}
             </span>
             <kbd className='rounded border border-lamp-ink/35 px-1.5 py-0.5 font-mono text-[12px]'>
               b
@@ -58,7 +58,7 @@ export const BakeButton = (props: BakeButtonProps) => {
  * A loop's frames fill the button from the left; the label is drawn twice and
  * clipped at the fill's edge, so it reads dark on the ink and light on the smoke.
  */
-const BakeProgress = (props: { step: string | null }) => {
+const ShotProgress = (props: { step: string | null }) => {
   const frames = FRAME_STEP.exec(props.step ?? '');
   const share = frames ? Number(frames[1]) / Number(frames[2]) : 0;
   // the frames' share holds through the steps after them, so the long webp step never reads as a restart
@@ -68,7 +68,7 @@ const BakeProgress = (props: { step: string | null }) => {
   const labelJSX = (
     <span className='flex w-full items-center justify-between px-4'>
       <span className='font-semibold text-base'>
-        baking…{frames ? ` ${percent} %` : ''}
+        shooting…{frames ? ` ${percent} %` : ''}
       </span>
       <span
         className={cn(
@@ -98,9 +98,9 @@ const BakeProgress = (props: { step: string | null }) => {
 };
 
 /** mounted per ask, so every ask starts from the piece's last note; the popup focuses its field */
-const NoteForm = (props: BakeButtonProps) => {
-  const [note, setNote] = useState(props.actions.bakeNote);
-  const frames = props.actions.bakeAsk ?? 1;
+const NoteForm = (props: ShotButtonProps) => {
+  const [note, setNote] = useState(props.actions.shotNote);
+  const frames = props.actions.shotAsk ?? 1;
   const what =
     frames > 1
       ? `a ${frames}-frame loop · ${props.actions.time}`
@@ -111,15 +111,15 @@ const NoteForm = (props: BakeButtonProps) => {
       className='flex flex-col gap-3'
       onSubmit={(event) => {
         event.preventDefault();
-        props.actions.bake(note.trim());
+        props.actions.shoot(note.trim());
       }}>
-      <PopoverTitle className='font-semibold'>bake {what}</PopoverTitle>
+      <PopoverTitle className='font-semibold'>shoot {what}</PopoverTitle>
       <div className='flex flex-col gap-1'>
-        <label className='text-ink-muted text-sm' htmlFor='bake-note'>
+        <label className='text-ink-muted text-sm' htmlFor='shot-note'>
           note, optional — what this take tries
         </label>
         <Input
-          id='bake-note'
+          id='shot-note'
           maxLength={200}
           onChange={(event) => setNote(event.currentTarget.value)}
           onFocus={(event) => event.currentTarget.select()}
@@ -129,12 +129,12 @@ const NoteForm = (props: BakeButtonProps) => {
       </div>
       <div className='flex items-center justify-end gap-2'>
         <span className='text-ink-muted text-sm'>
-          <Kbd>↵</Kbd> bake · <Key keys='Escape' /> cancel
+          <Kbd>↵</Kbd> shoot · <Key keys='Escape' /> cancel
         </span>
         <button
           className='h-8 rounded-lg bg-lamp px-3 font-semibold text-lamp-ink hover:bg-white'
           type='submit'>
-          bake
+          shoot
         </button>
       </div>
     </form>
@@ -143,11 +143,11 @@ const NoteForm = (props: BakeButtonProps) => {
 
 /* Helpers */
 
-/** the bake's long step, as the server names it: «frame 31 of 72» */
+/** the shot's long step, as the server names it: «frame 31 of 72» */
 const FRAME_STEP = /frame (\d+) of (\d+)/;
 
 /* Types */
 
-interface BakeButtonProps {
+interface ShotButtonProps {
   actions: StudioActions;
 }

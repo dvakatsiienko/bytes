@@ -6,8 +6,8 @@ import type * as piecesModule from '../art/pieces.ts';
 import { isTime } from '../art/time.ts';
 import { errorText } from '../src/error-text.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
-import { bake, closeBrowser } from './bake.ts';
 import { readBuild, readOthers } from './build.ts';
+import { closeBrowser, shoot } from './shot.ts';
 import type { Stash, Take, TakePatch } from './takes.ts';
 import {
   TAKE_FILES,
@@ -86,7 +86,7 @@ const route = async (
   if (req.method === 'GET' && parts[0] === 'ateliers' && parts.length === 1)
     return send(res, 200, await readOthers());
 
-  if (req.method === 'POST' && parts[0] === 'bake' && parts.length === 1) {
+  if (req.method === 'POST' && parts[0] === 'shot' && parts.length === 1) {
     const body = await readBody(req);
     const piece =
       typeof body.piece === 'string' ? findPiece(body.piece) : undefined;
@@ -99,13 +99,13 @@ const route = async (
     if (!origin)
       return send(res, 500, { error: 'the dev server has no local url' });
     const note = typeof body.note === 'string' ? body.note.slice(0, 200) : '';
-    // a bake runs for seconds: the answer is one json line per step, the take (or the error) last
+    // a shot runs for seconds: the answer is one json line per step, the take (or the error) last
     res.statusCode = 200;
     res.setHeader('content-type', 'application/x-ndjson');
     res.setHeader('cache-control', 'no-cache');
-    const line = (event: BakeEvent) => res.write(`${JSON.stringify(event)}\n`);
+    const line = (event: ShotEvent) => res.write(`${JSON.stringify(event)}\n`);
     try {
-      const baked = await bake({
+      const shot = await shoot({
         frames,
         load: (path) => server.ssrLoadModule(path),
         onStep: (step) => line({ step }),
@@ -121,7 +121,7 @@ const route = async (
         piece: piece.id,
         settings,
         time: body.time,
-        ...baked,
+        ...shot,
       });
       line({ take });
     } catch (error) {
@@ -154,8 +154,8 @@ const route = async (
   }
   if (parts.length === 4 && req.method === 'GET') {
     // avif is made on request from the webp: a download format, never stored
-    if (file === 'bake.avif') {
-      const avif = await sharp(await readFile(takeFile(piece, id, 'bake.webp')))
+    if (file === 'shot.avif') {
+      const avif = await sharp(await readFile(takeFile(piece, id, 'shot.webp')))
         .avif({ quality: 70 })
         .toBuffer();
       return sendFile(res, avif, 'image/avif', `${piece}-${id}.avif`);
@@ -176,10 +176,10 @@ const route = async (
   return send(res, 404, { error: 'not found' });
 };
 
-/** one line of a bake's answer: a step while it runs, then the take or the error */
-export type BakeEvent = { step: string } | { take: Take } | { error: string };
+/** one line of a shot's answer: a step while it runs, then the take or the error */
+export type ShotEvent = { step: string } | { take: Take } | { error: string };
 
-/** a loop is 2–240 frames; anything else bakes a still */
+/** a loop is 2–240 frames; anything else shoots a still */
 const loopFrames = (value: unknown) =>
   typeof value === 'number' &&
   Number.isInteger(value) &&

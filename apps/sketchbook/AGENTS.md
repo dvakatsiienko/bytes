@@ -60,7 +60,7 @@ Three faces: Bricolage Grotesque (display), Inter (body), JetBrains Mono (data a
 
 ## Neighbours — prototypes that live elsewhere
 
-- **atelier** — readme art (frame, the github profile, bytes) is drawn, lit and baked in
+- **atelier** — readme art (frame, the github profile, bytes) is drawn, lit and shot in
   `apps/atelier`: takes, compare, readme widths, zoom. Its `AGENTS.md` has the recipes.
 - the split: a question about app state or interaction is a proto here; a question about how an
   image looks is atelier's.

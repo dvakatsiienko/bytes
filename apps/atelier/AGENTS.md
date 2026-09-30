@@ -1,7 +1,7 @@
 # AGENTS.md — atelier, the fleet's art studio
 
 Every picture the fleet makes — a readme hero, a spot, an icon, an avatar, a badge, a favicon —
-is drawn here as code, lit, baked and shipped. There is no image model: a piece is a seeded,
+is drawn here as code, lit, shot and shipped. There is no image model: a piece is a seeded,
 reproducible drawing, and the quality comes from the loop: render, look, critique, revise.
 
 Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
@@ -20,8 +20,8 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
   scripts import it, so nothing here touches the DOM.
 - `art/pieces.ts` — the one registry. A piece missing here does not exist to the studio or the scripts.
 - `src/stage/` — three.js: paper sheets lit by a sun, the passes, `scenes.ts` (which pieces are lit).
-- `server/` — the take store and the bake, mounted on the dev server under `/api`.
-- `takes/<piece>/<nn>-<time>[-note]/` — every bake, git-tracked: `bake.webp`, `settings.json`,
+- `server/` — the take store and the shot, mounted on the dev server under `/api`.
+- `takes/<piece>/<nn>-<time>[-note]/` — every shot, git-tracked: `shot.webp`, `settings.json`,
   `take.json` (seed, source hash, note, stash), `piece.svg` for a flat piece. `current.json` names
   the take that ships, per time of day.
 - `out/` — script output (icon sizes), git-ignored.
@@ -39,12 +39,12 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 Done when the piece shows in the pieces list and renders by day and by night:
 `[data-testid=stage][data-rendered="<piece>:<time>"]` is the signal a headless check waits for.
 
-## Bake, compare, ship
+## Shoot, compare, ship
 
-- **Bake** writes a take: the bake button, `b`, or `pnpm atelier:bake <piece> [day|night|both]`.
-  `--loop [frames]` (or «bake a motion loop» in ⌘K) bakes the stage's six-second motion into a
+- **Shot** writes a take: the shot button, `b`, or `pnpm atelier:shot <piece> [day|night|both]`.
+  `--loop [frames]` (or «shoot a motion loop» in ⌘K) shoots the stage's six-second motion into a
   looping animated webp at 1×, 72 frames by default; `take.json` records `frames`.
-  One code path for all three (`server/bake.ts`): a lit scene renders in headless chromium at
+  One code path for all three (`server/shot.ts`): a lit scene renders in headless chromium at
   2×, a flat piece goes svgo → resvg; sharp writes the webp. The first take of a time becomes
   current; `promote` changes it.
 - **Stash** a take that is good but wrong for now, with both reasons. A take is never deleted —
@@ -59,15 +59,15 @@ Done when the piece shows in the pieces list and renders by day and by night:
 
 ## Gotchas
 
-- A bake loads `art/` through vite's module loader, so it always draws the code on disk now. A
+- A shot loads `art/` through vite's module loader, so it always draws the code on disk now. A
   node script that imports `art/` directly is fine too — nothing there needs a bundler.
 - `ATELIER_TAKES_DIR` points the take store at a scratch folder: tests and verifier rounds use
   it, so they never write into the real takes. It is declared in the root `turbo.jsonc`.
 - The stage's «exact» look is no tone mapping on sRGB maps: a lit spot shows its map's colour.
   The passes are three's own (`src/stage/renderer.ts`). They match pmndrs `postprocessing` in
   colour (measured on BYT-103); the two differ only in edge blur and antialiasing.
-- Chromium's first bake on a fresh machine needs `pnpm exec playwright install chromium`; the
-  bake error says so. On a mac it renders on the GPU (Metal), elsewhere in software (SwiftShader).
+- Chromium's first shot on a fresh machine needs `pnpm exec playwright install chromium`; the
+  shot error says so. On a mac it renders on the GPU (Metal), elsewhere in software (SwiftShader).
 - `pnpm atelier:probe <piece> [day|night]` answers «does it render» in one line: it prints
   `data-rendered` and every console error, and exits non-zero when either is wrong.
 - **react-zoom-pan-pinch is patched from outside.** Its animation cancel is not exported, so

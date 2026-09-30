@@ -1,10 +1,10 @@
 {
-  "bakedAt": "2026-09-25T14:29:12.813Z",
-  "files": ["bake.webp", "piece.svg"],
+  "files": ["shot.webp", "piece.svg"],
   "frames": 1,
   "note": "duplicate bake",
   "piece": "atelier-favicon",
   "seed": 1,
+  "shotAt": "2026-09-25T14:29:12.813Z",
   "sourceHash": "27911a08b6ca",
   "stash": {
     "good": "the final mark, same pixels as 01/02",

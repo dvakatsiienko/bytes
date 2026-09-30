@@ -1,10 +1,10 @@
 {
-  "bakedAt": "2026-09-29T13:04:15.207Z",
-  "files": ["bake.webp", "piece.svg"],
+  "files": ["shot.webp", "piece.svg"],
   "frames": 1,
   "note": "",
   "piece": "speak",
   "seed": 1,
+  "shotAt": "2026-09-29T13:04:15.207Z",
   "sourceHash": "18a48512a88b",
   "stash": null,
   "time": "day"

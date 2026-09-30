@@ -11,7 +11,7 @@ import { homestead, valley } from './valley.ts';
 import { workshop } from './workshop.ts';
 
 /**
- * Every piece atelier can draw, in the pieces list's order. Node-safe on purpose: the bake,
+ * Every piece atelier can draw, in the pieces list's order. Node-safe on purpose: the shot,
  * ship and icon scripts import this list too, so nothing here may touch the
  * DOM. A piece that also has a stage entry (`src/stage/scenes.ts`) is lit in
  * three.js; every other piece is its flat svg.

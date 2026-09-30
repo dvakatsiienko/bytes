@@ -1,10 +1,10 @@
 {
-  "bakedAt": "2026-09-30T16:25:57.969Z",
-  "files": ["bake.webp", "piece.svg"],
+  "files": ["shot.webp", "piece.svg"],
   "frames": 1,
   "note": "",
   "piece": "atelier-favicon",
   "seed": 1,
+  "shotAt": "2026-09-30T16:25:57.969Z",
   "sourceHash": "ebebd2e4bd27",
   "stash": null,
   "time": "night"

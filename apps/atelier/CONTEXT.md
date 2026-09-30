@@ -42,7 +42,7 @@ _Avoid_: params, config, controls
 The number that makes a piece's scatter reproducible: the same seed draws the same piece.
 
 **Time**:
-Day or night; a piece is drawn, baked and shipped for each.
+Day or night; a piece is drawn, shot and shipped for each.
 _Avoid_: mode, theme (theme is the studio's own light or dark)
 
 **Motion**:
@@ -51,12 +51,12 @@ _Avoid_: animation, autoplay
 
 ### what gets kept
 
-**Bake**:
+**Shot**:
 To render the piece as it looks now, at one time of day, into a new take.
 _Avoid_: export, render, snapshot, build
 
 **Take**:
-One kept result of a bake: the image, the settings and seed that made it, and a note.
+One kept result of a shot: the image, the settings and seed that made it, and a note.
 _Avoid_: version, render, snapshot, variant
 
 **Motion loop**:
@@ -98,7 +98,7 @@ One side of the ring and its group: light on top, lens on the right, atmosphere 
 _Avoid_: tab (except in the narrow layout, where the edges become tabs), drawer
 
 **Corner**:
-One of the four cards at the screen's corners: the piece corner (top left), the view corner (top right), the takes corner (bottom left), the tools corner with the bake (bottom right).
+One of the four cards at the screen's corners: the piece corner (top left), the view corner (top right), the takes corner (bottom left), the tools corner with the shot (bottom right).
 _Avoid_: widget, panel
 
 **Ground**:

@@ -13,7 +13,7 @@ import type { Piece } from '../../art/pieces.ts';
 import type { Take, TakeList } from '../../server/takes.ts';
 import type { StudioActions } from '../actions.ts';
 import { navigate, opensInPlace, pathOf, useRoute } from '../route.ts';
-import { bakeStepAtom, takeFilterAtom } from '../state.ts';
+import { shotStepAtom, takeFilterAtom } from '../state.ts';
 import { useTakeActions } from '../take-actions.ts';
 import type { TakeFilter } from '../takes.ts';
 import { filterTakes, takeFilters, takeUrl, useTakes } from '../takes.ts';
@@ -55,7 +55,7 @@ const TakeStack = (props: { actions: StudioActions; list: TakeList }) => {
         className='glass flex w-[300px] flex-col gap-1.5 px-4 py-3.5'>
         <h2 className='font-semibold text-sm'>no takes yet</h2>
         <p className='text-ink-muted text-sm'>
-          bake the first one with <Key keys='b' />. takes stack here, newest on
+          shoot the first one with <Key keys='b' />. takes stack here, newest on
           top.
         </p>
       </section>
@@ -124,7 +124,7 @@ const TakeStack = (props: { actions: StudioActions; list: TakeList }) => {
 const FilmStrip = (props: FilmStripProps) => {
   const { view } = useRoute();
   const [filter, setFilter] = useAtom(takeFilterAtom);
-  const step = useAtomValue(bakeStepAtom);
+  const step = useAtomValue(shotStepAtom);
   const shownId = view.kind === 'take' ? view.take : null;
   const shown = props.list.takes.find((take) => take.id === shownId);
   const shownTakes = filterTakes(props.list, filter);
@@ -189,10 +189,10 @@ const FilmStrip = (props: FilmStripProps) => {
         ) : null}
       </header>
       <ul className='-mx-1 flex gap-3 overflow-x-auto px-1 pt-1 pb-1.5'>
-        {props.actions.isBaking ? (
+        {props.actions.isShooting ? (
           <li className='flex w-34 shrink-0 flex-col gap-1.5'>
             <span className='grid h-21 place-items-center rounded-md border border-ink/70 border-dashed bg-smoke text-sm'>
-              baking
+              shooting
             </span>
             <span className='truncate text-ink-muted text-sm'>
               {step ?? 'starting'}
@@ -203,7 +203,7 @@ const FilmStrip = (props: FilmStripProps) => {
         {shownTakes.length === 0 ? (
           <li className='py-6 text-ink-muted text-sm'>
             {props.list.takes.length === 0
-              ? 'no takes yet — bake one with b'
+              ? 'no takes yet — shoot one with b'
               : emptyText[filter]}
           </li>
         ) : null}
@@ -364,7 +364,7 @@ const keyOf = (event: { key: string; shiftKey: boolean }) => {
 };
 
 const factsOf = (take: Take) =>
-  `${take.id} · seed ${take.seed} · ${take.frames > 1 ? `${take.frames} frames` : 'still'} · baked ${new Date(take.bakedAt).toLocaleString()}`;
+  `${take.id} · seed ${take.seed} · ${take.frames > 1 ? `${take.frames} frames` : 'still'} · shot ${new Date(take.shotAt).toLocaleString()}`;
 
 const emptyText = {
   all: '',

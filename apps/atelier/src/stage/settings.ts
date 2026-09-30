@@ -1,4 +1,4 @@
-/** the light, lens and effects a bake uses; every take saves the full set it was baked with */
+/** the light, lens and effects a shot uses; every take saves the full set it was shot with */
 export const defaults = {
   ambient: 0.6,
   aperture: 0.35,

@@ -38,10 +38,10 @@ Done when every touched line carries the status its drive earned, and the report
 
 ## destructive paths
 
-- bake and ship write take folders. drive them only against a scratch dir: a worktree server started with `ATELIER_TAKES_DIR=<scratch>`, never `:5180`'s real `takes/`. the scratch dir is a **copy** of `takes/` (`cp -R takes/<piece> <scratch>/`), never empty — the take views need takes, and the many-takes state needs copies up to ~12.
+- shot and ship write take folders. drive them only against a scratch dir: a worktree server started with `ATELIER_TAKES_DIR=<scratch>`, never `:5180`'s real `takes/`. the scratch dir is a **copy** of `takes/` (`cp -R takes/<piece> <scratch>/`), never empty — the take views need takes, and the many-takes state needs copies up to ~12.
 - a planted fault (a throw, a broken import) goes in a copy **outside the pnpm workspace**, run with node directly — inside `apps/` pnpm rewrites the lockfile, and in the served tree dima sees the throw.
 - a long-lived browser session can hold a stale hmr module and show a fake error after a dev-server restart — open a fresh `agent-browser` session before calling it a bug.
-- a motion-loop bake holds one full cpu core for ~70 s while sharp writes the animated webp — expected, not a runaway.
+- a motion-loop shot holds one full cpu core for ~70 s while sharp writes the animated webp — expected, not a runaway.
 
 ## flows worth driving
 

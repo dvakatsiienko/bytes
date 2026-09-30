@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { Time } from '../art/time.ts';
-import type { BakeEvent } from '../server/plugin.ts';
+import type { ShotEvent } from '../server/plugin.ts';
 import type { Stash, Take, TakeList } from '../server/takes.ts';
 import { useRoute } from './route.ts';
 import type { Settings } from './stage/settings.ts';
@@ -34,12 +34,12 @@ export const api = async <T>(
   return (await response.json()) as T;
 };
 
-/** a bake answers one json line per step as it runs; the last line is the take or the error */
-const postBake = async (
-  input: BakeRequest,
+/** a shot answers one json line per step as it runs; the last line is the take or the error */
+const postShot = async (
+  input: ShotRequest,
   onStep: (step: string) => void,
 ): Promise<Take> => {
-  const response = await request('/api/bake', { body: input, method: 'POST' });
+  const response = await request('/api/shot', { body: input, method: 'POST' });
   if (!(response.ok && response.body)) throw await failure(response);
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
   let rest = '';
@@ -51,13 +51,13 @@ const postBake = async (
     rest = lines.pop() ?? '';
     for (const line of lines) {
       if (!line) continue;
-      const event = JSON.parse(line) as BakeEvent;
+      const event = JSON.parse(line) as ShotEvent;
       if ('step' in event) onStep(event.step);
       else if ('take' in event) return event.take;
       else throw new Error(event.error);
     }
   }
-  throw new Error('the bake ended without a take');
+  throw new Error('the shot ended without a take');
 };
 
 const takesKey = (piece: string) => ['takes', piece] as const;
@@ -74,7 +74,7 @@ export const filterTakes = (list: TakeList, filter: TakeFilter) => {
 
 export const takeUrl = (
   take: Pick<Take, 'piece' | 'id'>,
-  file: 'bake.webp' | 'bake.avif' | 'piece.svg' = 'bake.webp',
+  file: 'shot.webp' | 'shot.avif' | 'piece.svg' = 'shot.webp',
 ) =>
   `/api/takes/${encodeURIComponent(take.piece)}/${encodeURIComponent(take.id)}/${file}`;
 
@@ -95,14 +95,14 @@ export const useShownTake = (piece: string) => {
   return { list, take };
 };
 
-export const useBake = () => {
+export const useShot = () => {
   const client = useQueryClient();
   return useMutation({
     mutationFn: ({
       onStep,
       ...input
-    }: BakeRequest & { onStep: (step: string) => void }) =>
-      postBake(input, onStep),
+    }: ShotRequest & { onStep: (step: string) => void }) =>
+      postShot(input, onStep),
     onSuccess: (take) =>
       client.invalidateQueries({ queryKey: takesKey(take.piece) }),
   });
@@ -140,7 +140,7 @@ export const usePromote = () => {
 
 /* Types */
 
-interface BakeRequest {
+interface ShotRequest {
   frames: number;
   note: string;
   piece: string;
