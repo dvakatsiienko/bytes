@@ -67,9 +67,6 @@
 
 /* each corner writes its height here (components/ring-wide.tsx); 0 until it has */
 [data-ring] {
-  /* a folded top or bottom chip (48 px) sits in the ground beside the art, 12 px clear of it,
-     never nearer the window than 16 px (ring-wide.tsx sets --art-top) */
-  --chip-inset: max(16px, calc(var(--art-top, 0px) - 60px));
   --tl: 0px;
   --tr: 0px;
   --bl: 0px;

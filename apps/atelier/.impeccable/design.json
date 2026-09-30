@@ -326,7 +326,7 @@
       "name": "Edge Chip",
       "kind": "custom",
       "refersTo": "edge-chip",
-      "description": "a folded edge in the ground beside the piece, 12 px clear of it: its group, one live value, its number key.",
+      "description": "a folded edge on the corners' 16 px line: its group, one live value, its number key.",
       "html": "<button class=\"ds-edge-chip\"><span class=\"ds-edge-name\">light</span><span>exposure <span class=\"ds-value\">1.00</span></span><kbd class=\"ds-key\">1</kbd></button>",
       "css": ".ds-edge-chip { background: var(--smoke, rgb(14 18 22 / 0.76)); color: var(--ink, #f2f5f7); border: 1px solid rgb(242 245 247 / 0.1); border-radius: 12px; box-shadow: 0 12px 32px rgb(0 0 0 / 0.28); -webkit-backdrop-filter: blur(28px) saturate(1.3); backdrop-filter: blur(28px) saturate(1.3); font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; width: 300px; height: 48px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; cursor: pointer; } .ds-edge-chip:hover { background: rgb(38 45 51 / 0.84); } .ds-edge-chip:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; } .ds-edge-name { font-weight: 600; } .ds-value { font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 13px; font-variant-numeric: tabular-nums; } .ds-key { padding: 3px 5px; font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500; line-height: 1; color: #b9c3c9; border: 1px solid rgb(185 195 201 / 0.4); border-radius: 4px; }"
     },
@@ -397,9 +397,9 @@
   ],
   "narrative": {
     "northStar": "The Lens Ring",
-    "overview": "The piece is the room. It is fitted whole, as large as the window allows, and everything else is smoked glass laid over its edges: dark, blurred, a little saturated, so the art reads through the controls instead of beside them. One smoke serves both themes. The theme only picks the ground a day piece sits on; a night piece always sits on the dark ground, because a pale surround reads its darks darker.\n\nThe ui is quiet and exact. Text is one grotesk at 14 px, numbers and keys are one mono at 12 px, and every control prints the key it answers to. There is exactly one loud surface on screen: the bake, opaque ink on the smoke. State is carried by shape and weight (a dashed edge, a filled segment, a word), never by a hue, and the palette has no hue to spend anyway: it is ink on smoke over the art's own colour.\n\nDensity is low by rule. Four folded edges and four corner cards are all that cover the piece at rest; one edge opens at a time, and it opens away from the art where it can.",
+    "overview": "The piece is the room. It is fitted whole, as large as the window allows, and everything else is smoked glass laid over its edges: dark, blurred, a little saturated, so the art reads through the controls instead of beside them. One smoke serves both themes. The theme only picks the ground a day piece sits on; a night piece always sits on the dark ground, because a pale surround reads its darks darker.\n\nThe ui is quiet and exact. Text is one grotesk at 14 px, numbers and keys are one mono at 12 px, and every control prints the key it answers to. There is exactly one loud surface on screen: the bake, opaque ink on the smoke. State is carried by shape and weight (a dashed edge, a filled segment, a word), never by a hue, and the palette has no hue to spend anyway: it is ink on smoke over the art's own colour.\n\nDensity is low by rule. Four folded edges and four corner cards are all that cover the piece at rest; one edge opens at a time.",
     "keyCharacteristics": [
-      "the piece fitted whole and biggest; the glass stays off the art wherever the ground has room for it",
+      "the piece fitted whole and biggest; all the glass shares one frame, the window's 16 px inset",
       "one smoked glass (blur 28 px, saturate 1.3) in both themes",
       "achromatic: ink, muted ink and ink-alpha fills; colour belongs to the art",
       "the bake is the single opaque control",
@@ -438,8 +438,8 @@
         "section": "layout"
       },
       {
-        "name": "The Clear Art Rule",
-        "body": "The glass never covers art it has room to avoid: a top or bottom edge sits in the ground 12 px clear of the piece, and reaches into it only when the ground is too short.",
+        "name": "The One Frame Rule",
+        "body": "Every glass piece sits on one frame, the window's 16 px inset. The top and bottom pills keep the corner cards' line, so the chrome reads as one horizontal rhythm; where the art reaches the window's edge, they sit over it exactly as the corners do.",
         "section": "layout"
       },
       {

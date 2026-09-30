@@ -315,9 +315,9 @@ const scaleOf = (context: ReactZoomPanPinchContextState) => context.state.scale;
 const preventDefault = (event: Event) => event.preventDefault();
 
 /**
- * `top-centre` keeps the tools clear of the folded light edge: 12 px into
- * the art when the edge sits in the ground above it, 76 px from the window's
- * top (the edge's 64 px and a gap) when the art reaches it. The box sits
+ * `top-centre` keeps the tools clear of the folded light edge, which sits on
+ * the window's 16 px inset: 12 px into the art, and at least 76 px from the
+ * window's top (the edge's 64 px and a gap). The box sits
  * centred in the stage, so its top is half the stage's spare height,
  * (100cqh − 100%) / 2.
  */

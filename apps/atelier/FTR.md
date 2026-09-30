@@ -14,8 +14,8 @@
 - ✅ the lens ring
   - given a lit piece is open, 1100 px wide or more
   - then the piece shows as large as it fits whole, and four glass edges hug it: light on top, lens on the right, atmosphere at the bottom, toggles on the left
-  - and the top and bottom ones, folded or open, sit in the ground beside the art, 12 px clear of it, whenever the ground holds them; only where it does not do they reach into the art, as little as their height forces
-  - decision: the glass never covers art it has room to avoid (dima's review, 2026-09-30, over the comp's glass on the rim)
+  - and all the glass shares one frame, the window's 16 px inset: the top and bottom edges, folded or open, sit on the corner cards' line, over the art only where the art reaches the window's edge
+  - decision: one frame for every chrome piece, as the comp draws it — edges on the piece's rim «read off» and broke the pills' horizontal rhythm (dima's review, 2026-09-30)
   - and the corners hold the piece corner (top left), the view corner (top right), the takes corner (bottom left) and the tools corner with the bake (bottom right)
   - decision: the piece is fitted whole, never cropped, so a wide piece leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»)
 - ✅ one edge open at a time

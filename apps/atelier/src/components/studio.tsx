@@ -64,7 +64,6 @@ const Workbench = (props: WorkbenchProps) => {
           actions={actions}
           piece={props.piece}
           theme={theme}
-          view={route.view.kind}
           wordmark={<Wordmark />}
         />
       ) : (

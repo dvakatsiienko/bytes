@@ -15,8 +15,8 @@ The design source is the studio job `jobs/atelier/` (`contract.md`, `decision.md
 
 - one open edge is the rule, and the film strip counts as the bottom edge: opening one folds the other.
 - the keys stay the ones dima already uses (`n` day and night, `t` theme, `w` the readme frame) over the comp's labels, except the comp's `p` for the pieces list and `m` for motion (dima's review, 2026-09-30); the ring adds `1`–`4`, `esc`, `g`, `/`, `e` (new seed), `y` (copy json) and `r` (reset, with a 5 s undo).
-- the piece is fitted whole, never cropped: an 8:3 scene on a 16:10 screen leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»). An open edge sits in that ground when it has room, and reaches into the art only as far as its own height forces.
+- the piece is fitted whole, never cropped: an 8:3 scene on a 16:10 screen leaves the ground above and below it (dima, 2026-09-30: «an art tool should never hide the art»).
 - the glass is one smoke in both themes; the theme picks the ground behind a day piece, and a night piece always sits on the dark ground.
-- the top and bottom edges, folded or open, sit in the ground beside the piece, 12 px clear of it, whenever the ground holds them; they reach into the art only where it does not, and only as far as their height forces (dima's review, over the comp's glass on the rim).
+- all the glass shares one frame, the window's 16 px inset: the top and bottom edges sit on the corner cards' line, as the comp draws them, and over the art only where it reaches the window's edge. edges placed on the piece's rim, or in the ground beside it, «read off» and broke the pills' horizontal rhythm (dima's review, 2026-09-30).
 - the direction came from the studio's three design rounds (`decision.md`), not from impeccable's concept roll, so it carries no seed key.
 - revisit when a piece needs two groups open at once in daily use, when a group passes ~10 settings (a side edge holds about 10 rows before it scrolls), or when glass text is hard to read over a bright flat piece (the smoke may need raising).

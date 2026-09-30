@@ -59,7 +59,6 @@ spacing:
   inner: "8px"
   stack: "12px"
   gutter: "16px"
-  art-clear: "12px"
 components:
   glass-card:
     backgroundColor: "{colors.smoke}"
@@ -128,10 +127,10 @@ The piece is the room. It is fitted whole, as large as the window allows, and ev
 
 The ui is quiet and exact. Text is one grotesk at 14 px, numbers and keys are one mono at 12 px, and every control prints the key it answers to. There is exactly one loud surface on screen: the bake, opaque ink on the smoke. State is carried by shape and weight (a dashed edge, a filled segment, a word), never by a hue, and the palette has no hue to spend anyway: it is ink on smoke over the art's own colour.
 
-Density is low by rule. Four folded edges and four corner cards are all that cover the piece at rest; one edge opens at a time, and it opens away from the art where it can.
+Density is low by rule. Four folded edges and four corner cards are all that cover the piece at rest; one edge opens at a time.
 
 **Key Characteristics:**
-- the piece fitted whole and biggest; the glass stays off the art wherever the ground has room for it
+- the piece fitted whole and biggest; all the glass shares one frame, the window's 16 px inset
 - one smoked glass (blur 28 px, saturate 1.3) in both themes
 - achromatic: ink, muted ink and ink-alpha fills; colour belongs to the art
 - the bake is the single opaque control
@@ -142,7 +141,7 @@ Density is low by rule. Four folded edges and four corner cards are all that cov
 
 The world was picked by dima on 2026-09-30 after three studio design rounds (`docs/adr/0002-the-lens-ring.md`, studio job `jobs/atelier/`).
 
-**Thesis.** The piece is as large as it fits whole. Four smoked-glass edges hug it, one per setting group: light on top, lens on the right, atmosphere at the bottom, toggles on the left. The top and bottom edges sit in the ground beside the art, 12 px clear of it, and reach into the art only where the ground is too short to hold them. One edge is open at a time (`1`–`4` open, `esc` folds), and the film strip (`g`, the takes stack opened) counts as the bottom edge: opening one folds the other. The four corners hold actions: the piece and its seed top-left, time and commands top-right, the takes bottom-left, the view tools and the bake bottom-right.
+**Thesis.** The piece is as large as it fits whole. Four smoked-glass edges hug it, one per setting group: light on top, lens on the right, atmosphere at the bottom, toggles on the left. Every glass piece shares one frame, the window's 16 px inset: the top and bottom edges sit on the corner cards' line, over the art wherever it reaches the window's edge. One edge is open at a time (`1`–`4` open, `esc` folds), and the film strip (`g`, the takes stack opened) counts as the bottom edge: opening one folds the other. The four corners hold actions: the piece and its seed top-left, time and commands top-right, the takes bottom-left, the view tools and the bake bottom-right.
 
 **The don'ts.**
 - two edges open at once
@@ -199,8 +198,8 @@ An achromatic system of ink on smoke: every ui colour is one cool near-white or 
 The piece is fitted whole into the window (`min(100cqh, 100cqw × ratio)`), centred, with the ground above and below a wide scene. The ring floats over it on a **16 px gutter**.
 
 - **Corners:** four 300 px cards pinned 16 px from each window corner. Each reports its height, so the edges open in the room the corners leave.
-- **Folded edges:** the top and bottom chips are 300 × 48 px, centred, in the ground 12 px clear of the art (`--chip-inset: max(16px, calc(var(--art-top) - 60px))`). Where the ground is too short, a chip keeps 16 px from the window and reaches into the art by the difference. The side chips are 48 × 240 px, vertical text, centred between their corners.
-- **Open edges:** a side edge becomes a 300 px column under its corner; the top or bottom edge becomes a band between the corners (332 px in from each side), in a slot from the window's 16 px gutter to 12 px short of the art, pinned to the art side. A band taller than that slot starts at the gutter and reaches into the art only as far as its height forces. It lays its rows in auto-fill columns of ≥13 rem. A band never reaches the corners across from it.
+- **Folded edges:** the top and bottom chips are 300 × 48 px, centred, 16 px from the window's top or bottom edge, on the same line as the corner cards; they sit over the art wherever it reaches that edge. The side chips are 48 × 240 px, vertical text, centred between their corners.
+- **Open edges:** a side edge becomes a 300 px column under its corner; the top or bottom edge becomes a band between the corners (332 px in from each side), pinned 16 px from the window's top or bottom edge on the corners' line and growing toward the piece. It lays its rows in auto-fill columns of ≥13 rem. A band never reaches the corners across from it.
 - **Stacking:** cards under a corner sit 12 px below it. Inside glass, rows breathe at 12–16 px, controls at 8 px.
 - **The takes:** `g` turns the bottom-left stack into a film strip that runs from the left gutter to the tools column (332 px from the right) and takes the bottom edge's place.
 - **Flat pieces:** a flat piece sits on the plain ground at a whole zoom, with a seed-only card centred on top in place of the ring; a favicon shows a row of «as it lands, at true size» previews (16, 32, 64 px) under it, and a pixel grid from 8×.
@@ -209,7 +208,7 @@ The piece is fitted whole into the window (`min(100cqh, 100cqw × ratio)`), cent
 ### Named Rules
 **The Biggest Thing Rule.** At every width the piece is the largest element on screen. A panel that would shrink it overlaps it or unrolls below it instead.
 
-**The Clear Art Rule.** The glass never covers art it has room to avoid: a top or bottom edge sits in the ground 12 px clear of the piece, and reaches into it only when the ground is too short.
+**The One Frame Rule.** Every glass piece sits on one frame, the window's 16 px inset. The top and bottom pills keep the corner cards' line, so the chrome reads as one horizontal rhythm; where the art reaches the window's edge, they sit over it exactly as the corners do.
 
 ## Elevation & Depth
 

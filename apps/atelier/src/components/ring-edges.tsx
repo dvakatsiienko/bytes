@@ -237,16 +237,12 @@ export const EdgePanel = (props: EdgePanelProps) => {
     </>
   );
 
-  // on the ring an open top or bottom edge grows away from the piece, into the ground
-  const slot = props.className || !isBand ? null : bandSlots[props.edge.side];
-  const panelJSX = (
+  return (
     <section
       aria-label={`${name} settings`}
       className={cn(
-        'glass flex flex-col gap-3.5 px-4 pt-3 pb-3.5',
-        slot
-          ? bandHeights[props.edge.side]
-          : `absolute ${panelPlace[props.edge.side]}`,
+        'glass absolute flex flex-col gap-3.5 px-4 pt-3 pb-3.5',
+        panelPlace[props.edge.side],
         props.className,
       )}
       data-ring-panel={props.edge.id}
@@ -296,16 +292,6 @@ export const EdgePanel = (props: EdgePanelProps) => {
         </footer>
       )}
     </section>
-  );
-  if (!slot) return panelJSX;
-  return (
-    <div
-      className={cn(
-        'absolute right-[332px] left-[332px] flex min-h-min flex-col',
-        slot,
-      )}>
-      {panelJSX}
-    </div>
   );
 };
 
@@ -357,47 +343,30 @@ export const FlatCard = (props: FlatCardProps) => {
 
 const tabRow = ['top', 'left', 'right', 'bottom'] as const;
 
-/** where each folded edge sits: the top and bottom ones in the ground beside the art, the side ones between the corners */
+/**
+ * where each folded edge sits: every chrome piece shares one frame, the
+ * window's 16 px inset, so the top and bottom chips keep the corner cards'
+ * line (dima, 2026-09-30); the side ones sit between the corners
+ */
 const chipPlace = {
-  bottom:
-    'bottom-[var(--chip-inset)] left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
+  bottom: 'bottom-4 left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
   left: 'top-[calc(50%+(var(--tl)-var(--bl))/2)] left-4 h-60 w-12 -translate-y-1/2 flex-col py-3',
   right:
     'top-[calc(50%+(var(--tr)-var(--br))/2)] right-4 h-60 w-12 -translate-y-1/2 flex-col py-3',
-  top: 'top-[var(--chip-inset)] left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
+  top: 'top-4 left-1/2 h-12 w-[300px] -translate-x-1/2 px-3.5',
 } as const;
 
 /** where each open edge sits: a band between the top or bottom corners, a column under a side corner */
 const panelPlace = {
   bottom:
-    'bottom-[var(--chip-inset)] left-[332px] right-[332px] max-h-[calc(100%-28px-var(--chip-inset)-max(var(--tl),var(--tr)))]',
+    'bottom-4 left-[332px] right-[332px] max-h-[calc(100%-44px-max(var(--tl),var(--tr)))]',
   left: 'top-[calc(28px+var(--tl))] left-4 w-[300px] max-h-[calc(100%-56px-var(--tl)-var(--bl))]',
   right:
     'top-[calc(28px+var(--tr))] right-4 w-[300px] max-h-[calc(100%-56px-var(--tr)-var(--br))]',
-  top: 'top-[var(--chip-inset)] left-[332px] right-[332px] max-h-[calc(100%-28px-var(--chip-inset)-max(var(--bl),var(--br)))]',
+  top: 'top-4 left-[332px] right-[332px] max-h-[calc(100%-44px-max(var(--bl),var(--br)))]',
 } as const;
 
-/**
- * An open top or bottom edge sits in a slot from the window's edge to 12 px
- * short of the piece's rim, against the rim side: when the ground beside the
- * art has room for it, the panel covers none of the art. A panel taller than
- * the slot stretches it (min-content) from the window's edge, so it reaches
- * into the art only as far as its own height forces.
- */
-const bandSlots: Partial<Record<Side, string>> = {
-  bottom: 'bottom-4 justify-start h-[max(0px,calc(var(--art-top,0px)-28px))]',
-  top: 'top-4 justify-end h-[max(0px,calc(var(--art-top,0px)-28px))]',
-};
-
-/** a band never reaches the corners across from it */
-const bandHeights: Partial<Record<Side, string>> = {
-  bottom: 'max-h-[calc(100cqh-44px-max(var(--tl),var(--tr)))]',
-  top: 'max-h-[calc(100cqh-44px-max(var(--bl),var(--br)))]',
-};
-
 /* Types */
-
-type Side = (typeof edges)[number]['side'];
 
 interface RingEdgesProps {
   actions: StudioActions;
