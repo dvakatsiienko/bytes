@@ -1,86 +1,475 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-25T00:00:00Z",
+  "generatedAt": "2026-09-30T00:00:00Z",
   "title": "Design System: atelier",
   "extensions": {
     "colorMeta": {
-      "terracotta": {
+      "lamp": {
         "role": "primary",
-        "displayName": "Terracotta",
-        "canonical": "#c8553d"
+        "displayName": "Bake Ink",
+        "canonical": "#f2f5f7",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
       },
-      "lamp-gold": {
+      "lamp-ink": {
         "role": "primary",
-        "displayName": "Lamp Gold",
-        "canonical": "#ffd978"
+        "displayName": "Bake Ink Text",
+        "canonical": "#0e1216",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
       },
-      "day-ground": {
-        "role": "neutral",
-        "displayName": "Sky Wash",
-        "canonical": "#eaf2f7"
+      "lamp-hover": {
+        "role": "primary",
+        "displayName": "Bake Ink, Hover",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
       },
-      "night-ground": {
+      "smoke": {
         "role": "neutral",
-        "displayName": "Night Indigo",
-        "canonical": "#121629"
+        "displayName": "Smoke",
+        "canonical": "rgb(14 18 22 / 0.76)",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "smoke-hover": {
+        "role": "neutral",
+        "displayName": "Lifted Smoke",
+        "canonical": "rgb(38 45 51 / 0.84)",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "smoke-popover": {
+        "role": "neutral",
+        "displayName": "Popover Smoke",
+        "canonical": "rgb(20 25 30 / 0.9)",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#f2f5f7",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#b9c3c9",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "fill": {
+        "role": "neutral",
+        "displayName": "Ink Wash",
+        "canonical": "rgb(242 245 247 / 0.06)",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "fill-on": {
+        "role": "neutral",
+        "displayName": "Ink Wash, On",
+        "canonical": "rgb(242 245 247 / 0.16)",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "glass-edge": {
+        "role": "neutral",
+        "displayName": "Glass Edge",
+        "canonical": "rgb(242 245 247 / 0.1)",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "key-line": {
+        "role": "neutral",
+        "displayName": "Key Line",
+        "canonical": "rgb(185 195 201 / 0.4)",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "ground-day": {
+        "role": "neutral",
+        "displayName": "Day Ground",
+        "canonical": "#d3d9dc",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "ground-ink-day": {
+        "role": "neutral",
+        "displayName": "Ground Ink",
+        "canonical": "#2b3236",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "ground-muted-day": {
+        "role": "neutral",
+        "displayName": "Ground Muted",
+        "canonical": "#4a5358",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
+      },
+      "ground-dark": {
+        "role": "neutral",
+        "displayName": "Dark Ground",
+        "canonical": "#0e1216",
+        "tonalRamp": [
+          "#0e1216",
+          "#1d2429",
+          "#2b3236",
+          "#4a5358",
+          "#6f7a80",
+          "#b9c3c9",
+          "#d3d9dc",
+          "#f2f5f7"
+        ]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Display",
-        "purpose": "app name and scene titles"
+      "title": {
+        "displayName": "Title",
+        "purpose": "the piece's name in the top-left corner; one per screen."
       },
-      "mono": {
-        "displayName": "Mono",
-        "purpose": "every exact value: settings keys, numbers, seeds, paths"
+      "action": {
+        "displayName": "Action",
+        "purpose": "the bake button's label; the piece name in the unrolled bar."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "edge names, panel headings, a pressed segment."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "every other word: row labels, hints, buttons, captions on the ground."
+      },
+      "value": {
+        "displayName": "Value",
+        "purpose": "setting values, seeds, take ids, sizes; a folded chip's value at 13 px."
+      },
+      "key": {
+        "displayName": "Key",
+        "purpose": "the key cap beside every control that has a key."
       }
     },
     "shadows": [
       {
-        "name": "lamp",
-        "value": "0 18px 48px -18px rgb(10 14 30 / .45)",
-        "purpose": "the canvas only — the one lifted thing"
+        "name": "glass",
+        "value": "0 12px 32px rgb(0 0 0 / 0.28)",
+        "purpose": "every glass surface and the bake; always with backdrop-filter: blur(28px) saturate(1.3)."
       },
       {
-        "name": "float",
-        "value": "0 6px 18px -6px rgb(10 14 30 / .35)",
-        "purpose": "popovers, command palette, toasts"
+        "name": "flat-piece-lift",
+        "value": "0 18px 48px -18px rgb(0 0 0 / 0.35)",
+        "purpose": "a flat piece set down on the ground."
       },
       {
-        "name": "hairline",
-        "value": "0 1px 2px rgb(0 0 0 / .12)",
-        "purpose": "the active segment"
+        "name": "blade-halo",
+        "value": "0 0 0 3px rgb(242 245 247 / 0.25)",
+        "purpose": "a slider blade on hover."
       }
     ],
     "motion": [
       {
-        "name": "chrome",
-        "value": "150ms cubic-bezier(0.2, 0, 0, 1)",
-        "purpose": "fades and slides in the chrome, 120–180 ms, never looping"
+        "name": "quiet-fade",
+        "value": "150ms",
+        "purpose": "opacity and border-colour changes: a row's copy button, a take's edge, the zoom box tools."
       },
       {
-        "name": "key-press",
-        "value": "80ms ease-out",
-        "purpose": "the bench action's 2px press"
+        "name": "still-loader",
+        "value": "animation: none",
+        "purpose": "a toast's loader stays still; a bake shows progress as a fill growing from the left."
       }
     ],
-    "focus": {
-      "value": "2px solid, offset 2px",
-      "day": "#3f6fb0",
-      "night": "#b3a6ee",
-      "rule": "tab / shift+tab reach every control in reading order"
-    },
-    "northStar": "the crafter and the lamp",
-    "antiReferences": ["generic saas dashboard", "neobrutalism"]
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "520px",
+        "purpose": "the unrolled edge tabs drop their keys."
+      },
+      {
+        "name": "ring",
+        "value": "1100px",
+        "purpose": "below it the ring unrolls into a scrolling column under the art."
+      }
+    ]
   },
   "components": [
     {
-      "name": "Bench Action",
+      "name": "Glass Card",
+      "kind": "card",
+      "refersTo": "glass-card",
+      "description": "a corner card: the piece, its seed and look; every surface over the art is this glass.",
+      "html": "<div class=\"ds-glass-card\"><strong class=\"ds-title\">homestead</strong><span class=\"ds-muted\">profile, scene</span></div>",
+      "css": ".ds-glass-card { background: var(--smoke, rgb(14 18 22 / 0.76)); color: var(--ink, #f2f5f7); border: 1px solid rgb(242 245 247 / 0.1); border-radius: 12px; box-shadow: 0 12px 32px rgb(0 0 0 / 0.28); -webkit-backdrop-filter: blur(28px) saturate(1.3); backdrop-filter: blur(28px) saturate(1.3); font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; width: 300px; padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 2px; } .ds-title { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; } .ds-muted { font-size: 14px; color: #b9c3c9; }"
+    },
+    {
+      "name": "Edge Chip",
+      "kind": "custom",
+      "refersTo": "edge-chip",
+      "description": "a folded edge on the piece's rim: its group, one live value, its number key.",
+      "html": "<button class=\"ds-edge-chip\"><span class=\"ds-edge-name\">light</span><span>exposure <span class=\"ds-value\">1.00</span></span><kbd class=\"ds-key\">1</kbd></button>",
+      "css": ".ds-edge-chip { background: var(--smoke, rgb(14 18 22 / 0.76)); color: var(--ink, #f2f5f7); border: 1px solid rgb(242 245 247 / 0.1); border-radius: 12px; box-shadow: 0 12px 32px rgb(0 0 0 / 0.28); -webkit-backdrop-filter: blur(28px) saturate(1.3); backdrop-filter: blur(28px) saturate(1.3); font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; width: 300px; height: 48px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; cursor: pointer; } .ds-edge-chip:hover { background: rgb(38 45 51 / 0.84); } .ds-edge-chip:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; } .ds-edge-name { font-weight: 600; } .ds-value { font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 13px; font-variant-numeric: tabular-nums; } .ds-key { padding: 3px 5px; font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500; line-height: 1; color: #b9c3c9; border: 1px solid rgb(185 195 201 / 0.4); border-radius: 4px; }"
+    },
+    {
+      "name": "Bake Button",
       "kind": "button",
-      "refersTo": "bench-action",
-      "description": "the one accent action per region (bake, ship); the tactile control",
-      "html": "<button class=\"ds-bench\">bake</button>",
-      "css": ".ds-bench { background:#c8553d; color:#fff; border:0; border-radius:6px; padding:6px 12px; box-shadow:0 2px 0 #9c3f2c; cursor:pointer; transition:transform 80ms ease-out, box-shadow 80ms ease-out; } .ds-bench:active { transform:translateY(2px); box-shadow:0 0 0 #9c3f2c; } .ds-bench:focus-visible { outline:2px solid #3f6fb0; outline-offset:2px; }"
+      "refersTo": "bake-button",
+      "description": "the one loud control: opaque ink on the smoke.",
+      "html": "<button class=\"ds-bake\"><span>bake take</span><kbd class=\"ds-bake-key\">b</kbd></button>",
+      "css": ".ds-bake { font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; display: flex; align-items: center; justify-content: space-between; width: 300px; height: 52px; padding: 0 16px; background: #f2f5f7; color: #0e1216; font-size: 16px; font-weight: 600; border: 0; border-radius: 16.8px; box-shadow: 0 12px 32px rgb(0 0 0 / 0.28); cursor: pointer; } .ds-bake:hover { background: #ffffff; } .ds-bake:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; } .ds-bake-key { font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; padding: 2px 6px; border: 1px solid rgb(14 18 22 / 0.35); border-radius: 4px; }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "chip",
+      "refersTo": "segment",
+      "description": "day or night, the view tools, the unrolled edge tabs; the pressed segment differs in fill and weight.",
+      "html": "<div class=\"ds-seg\"><button class=\"ds-seg-item\" aria-pressed=\"true\">day</button><button class=\"ds-seg-item\" aria-pressed=\"false\">night</button></div>",
+      "css": ".ds-seg { display: flex; padding: 3px; gap: 4px; background: rgb(242 245 247 / 0.06); border-radius: 12px; width: 240px; } .ds-seg-item { font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; flex: 1; height: 28px; padding: 0 10px; border: 0; border-radius: 9.6px; background: transparent; color: #b9c3c9; font-size: 14px; font-weight: 500; cursor: pointer; } .ds-seg-item:hover { background: rgb(242 245 247 / 0.1); color: #f2f5f7; } .ds-seg-item[aria-pressed=\"true\"] { background: rgb(242 245 247 / 0.16); color: #f2f5f7; font-weight: 600; } .ds-seg-item:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Fill Button",
+      "kind": "button",
+      "refersTo": "fill-button",
+      "description": "a quiet in-glass action, its key after the label.",
+      "html": "<button class=\"ds-fill-btn\">new <kbd class=\"ds-key\">e</kbd></button>",
+      "css": ".ds-fill-btn { font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 8px; background: rgb(242 245 247 / 0.06); color: #f2f5f7; font-size: 14px; border: 0; border-radius: 9.6px; cursor: pointer; } .ds-fill-btn:hover { background: rgb(242 245 247 / 0.16); } .ds-fill-btn:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; } .ds-key { padding: 3px 5px; font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500; line-height: 1; color: #b9c3c9; border: 1px solid rgb(185 195 201 / 0.4); border-radius: 4px; }"
+    },
+    {
+      "name": "Find Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "type to find any setting on an open edge; / lands here from anywhere but a text field.",
+      "html": "<label class=\"ds-find\"><input class=\"ds-field\" type=\"search\" placeholder=\"find any of n settings\"><kbd class=\"ds-key\">/</kbd></label>",
+      "css": ".ds-find { display: flex; align-items: center; gap: 8px; width: 260px; } .ds-field { font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; flex: 1; min-width: 0; height: 32px; padding: 0 10px; background: rgb(242 245 247 / 0.06); color: #f2f5f7; font-size: 14px; border: 1px solid rgb(185 195 201 / 0.4); border-radius: 9.6px; } .ds-field::placeholder { color: #b9c3c9; } .ds-field:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; } .ds-key { padding: 3px 5px; font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500; line-height: 1; color: #b9c3c9; border: 1px solid rgb(185 195 201 / 0.4); border-radius: 4px; }"
+    },
+    {
+      "name": "Setting Row",
+      "kind": "custom",
+      "refersTo": "glass-card",
+      "description": "one setting on an open edge: muted label, exact mono value, a 2 px ink slider with a 3 × 14 blade.",
+      "html": "<div class=\"ds-row\"><div class=\"ds-row-head\"><span class=\"ds-row-label\">exposure</span><span class=\"ds-row-value\">1.00</span></div><div class=\"ds-track\"><div class=\"ds-range\"></div><div class=\"ds-blade\" tabindex=\"0\"></div></div></div>",
+      "css": ".ds-row { font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; width: 268px; display: flex; flex-direction: column; gap: 6px; } .ds-row-head { display: flex; justify-content: space-between; align-items: center; } .ds-row-label { font-size: 14px; color: #b9c3c9; } .ds-row-value { font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; color: #f2f5f7; font-variant-numeric: tabular-nums; } .ds-track { position: relative; height: 2px; background: rgb(185 195 201 / 0.4); border-radius: 1px; margin: 6px 0; } .ds-range { position: absolute; inset: 0 60% 0 0; background: #f2f5f7; border-radius: 1px; } .ds-blade { position: absolute; left: 40%; top: -6px; width: 3px; height: 14px; background: #f2f5f7; border-radius: 1px; cursor: grab; } .ds-blade:hover { box-shadow: 0 0 0 3px rgb(242 245 247 / 0.25); } .ds-blade:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ring Switch",
+      "kind": "custom",
+      "refersTo": "glass-card",
+      "description": "a toggle as an ink outline; on, it fills with ink and the knob turns dark.",
+      "html": "<button class=\"ds-switch\" role=\"switch\" aria-checked=\"true\"><span class=\"ds-knob\"></span></button>",
+      "css": ".ds-switch { position: relative; width: 32px; height: 18px; padding: 0; background: transparent; border: 1px solid #b9c3c9; border-radius: 999px; cursor: pointer; } .ds-knob { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 999px; background: #b9c3c9; transition: translate 150ms; } .ds-switch[aria-checked=\"true\"] { background: #f2f5f7; border-color: #f2f5f7; } .ds-switch[aria-checked=\"true\"] .ds-knob { background: #0e1216; translate: 14px 0; } .ds-switch:focus-visible { outline: 2px solid #f2f5f7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Stashed Take",
+      "kind": "card",
+      "refersTo": "glass-card",
+      "description": "a take in the film strip; a stashed one is told apart by its dashed edge and the word, never by colour.",
+      "html": "<div class=\"ds-take\"><span class=\"ds-thumb\"></span><span class=\"ds-take-cap\"><span class=\"ds-value\">04-night</span> stashed</span></div>",
+      "css": ".ds-take { font-family: 'Hanken Grotesk Variable', system-ui, sans-serif; display: flex; flex-direction: column; gap: 6px; width: 136px; } .ds-thumb { display: block; height: 84px; border-radius: 9.6px; border: 1px dashed #b9c3c9; background: #1d2429; } .ds-take-cap { font-size: 14px; color: #b9c3c9; } .ds-value { font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; color: #f2f5f7; }"
+    },
+    {
+      "name": "Key Cap",
+      "kind": "chip",
+      "refersTo": "key",
+      "description": "the key a command answers to, printed beside every control that has one.",
+      "html": "<kbd class=\"ds-key\">⌘K</kbd>",
+      "css": ".ds-key { padding: 3px 5px; font-family: 'Azeret Mono Variable', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500; line-height: 1; color: #b9c3c9; border: 1px solid rgb(185 195 201 / 0.4); border-radius: 4px; }"
     }
-  ]
+  ],
+  "narrative": {
+    "northStar": "The Lens Ring",
+    "overview": "The piece is the room. It is fitted whole, as large as the window allows, and everything else is smoked glass laid over its edges: dark, blurred, a little saturated, so the art reads through the controls instead of beside them. One smoke serves both themes. The theme only picks the ground a day piece sits on; a night piece always sits on the dark ground, because a pale surround reads its darks darker.\n\nThe ui is quiet and exact. Text is one grotesk at 14 px, numbers and keys are one mono at 12 px, and every control prints the key it answers to. There is exactly one loud surface on screen: the bake, opaque ink on the smoke. State is carried by shape and weight (a dashed edge, a filled segment, a word), never by a hue, and the palette has no hue to spend anyway: it is ink on smoke over the art's own colour.\n\nDensity is low by rule. Four folded edges and four corner cards are all that cover the piece at rest; one edge opens at a time, and it opens away from the art where it can.",
+    "keyCharacteristics": [
+      "the piece fitted whole and biggest; the glass overlaps its rim, never pushes it",
+      "one smoked glass (blur 28 px, saturate 1.3) in both themes",
+      "achromatic: ink, muted ink and ink-alpha fills; colour belongs to the art",
+      "the bake is the single opaque control",
+      "every control shows its key in a 4 px mono key cap",
+      "state by shape and weight, never by colour alone"
+    ],
+    "rules": [
+      {
+        "name": "The One Smoke Rule",
+        "body": "The glass is the same smoke in light and dark. A theme changes the ground, never the glass.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Loud Moment Rule",
+        "body": "Opaque ink fills exactly one control on screen: the bake. Everything else in the glass is ink text on smoke or an ink wash.",
+        "section": "colors"
+      },
+      {
+        "name": "The Night Ground Rule",
+        "body": "A night piece sits on the dark ground whatever the theme.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Is Data Rule",
+        "body": "Azeret Mono holds values and keys only. A word, a label or a heading in mono is a defect.",
+        "section": "typography"
+      },
+      {
+        "name": "The Floor Rule",
+        "body": "Text is never below 14 px; values and keys never below 12 px. No uppercase, no tracking-wide labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Biggest Thing Rule",
+        "body": "At every width the piece is the largest element on screen. A panel that would shrink it overlaps it or unrolls below it instead.",
+        "section": "layout"
+      },
+      {
+        "name": "The Rim Rule",
+        "body": "The top and bottom edges sit on the piece's rim, so the glass always overlaps the art and never floats on bare ground.",
+        "section": "layout"
+      },
+      {
+        "name": "The Blur Is The Glass Rule",
+        "body": "Smoke without its blur reads as grey paint; any new floating surface takes the full blur.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Keyboard Ring Rule",
+        "body": "Focus is a 2 px ink outline, offset 2 px, shown only after keyboard input. Anything that covers the art draws it inset (−4 px), because the piece reaches the window's edges.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do fit the piece whole and keep it the biggest thing on screen, at every width.",
+      "Do build every new surface over the art from the glass: `smoke`, the glass edge, the glass shadow, blur 28 px, saturate 1.3, 12 px radius.",
+      "Do print the key a control answers to, in a key cap, on the control.",
+      "Do carry state in shape, weight or words (a dashed edge, a semibold pressed segment, «current», «stashed») with any fill change.",
+      "Do keep Azeret Mono for values and keys, Hanken Grotesk for every word, in the app's lowercase voice.",
+      "Do keep loaders still; a long step shows its progress as a fill and a word, not a spin."
+    ],
+    "donts": [
+      "Don't open two edges at once; the film strip is the bottom edge.",
+      "Don't signal state by colour alone.",
+      "Don't place the piece anywhere but biggest, or crop it to make room.",
+      "Don't let `/` (or any single-key command) fire inside a text field.",
+      "Don't give a second control the opaque ink of the bake.",
+      "Don't introduce a hue into the ui; colour belongs to the art.",
+      "Don't set text below 14 px or a value or key below 12 px.",
+      "Don't make the smoke differ between themes, or float glass without its blur."
+    ]
+  }
 }
