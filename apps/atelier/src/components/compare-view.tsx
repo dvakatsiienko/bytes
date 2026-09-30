@@ -32,7 +32,7 @@ export const CompareView = (props: CompareViewProps) => {
             />
           }
         />
-        <figcaption className='flex justify-between font-mono text-[12px] text-ground-ink'>
+        <figcaption className='flex justify-between text-ground-ink text-sm'>
           <span>{props.a.id}</span>
           <span>{props.b.id}</span>
         </figcaption>
@@ -51,7 +51,7 @@ export const CompareView = (props: CompareViewProps) => {
           style={{ aspectRatio }}
           width={props.piece.size.w}
         />
-        <figcaption className='font-mono text-[12px] text-ground-ink'>
+        <figcaption className='text-ground-ink text-sm'>
           {take.id}
           {take.note ? ` — ${take.note}` : ''}
         </figcaption>

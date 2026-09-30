@@ -6,7 +6,7 @@ import { XIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
-import type { RingOpen } from '../ring.ts';
+import type { RingOpen, SummaryPart } from '../ring.ts';
 import {
   edgeSummary,
   edges,
@@ -109,7 +109,7 @@ const EdgeChip = (props: EdgeChipProps) => {
   return (
     <button
       aria-expanded={false}
-      aria-label={`${name}, ${rowsOf(props.edge.id).length} settings: ${props.summary}`}
+      aria-label={`${name}, ${rowsOf(props.edge.id).length} settings: ${props.summary.map((part) => part.text).join(' ')}`}
       className={cn(
         'glass absolute flex items-center justify-between',
         chipPlace[props.edge.side],
@@ -127,11 +127,21 @@ const EdgeChip = (props: EdgeChipProps) => {
       </span>
       <span
         className={cn(
-          'font-mono text-[13px] tabular-nums',
+          'flex items-baseline gap-1.5 text-sm',
           isSide && '[writing-mode:vertical-rl]',
           props.edge.side === 'left' && 'rotate-180',
         )}>
-        {props.summary}
+        {props.summary.map((part) => {
+          return part.isValue ? (
+            <span
+              className='font-mono text-[13px] tabular-nums'
+              key={part.text}>
+              {part.text}
+            </span>
+          ) : (
+            <span key={part.text}>{part.text}</span>
+          );
+        })}
       </span>
       <span className={cn(isSide && '-order-1')}>
         <Key keys={props.edge.key} />
@@ -240,7 +250,7 @@ export const EdgePanel = (props: EdgePanelProps) => {
       <header className='flex flex-wrap items-center gap-2.5'>
         <h2 className='font-semibold text-sm'>{name}</h2>
         <Key keys={props.edge.key} />
-        <span className='whitespace-nowrap font-mono text-[12px] text-ink-muted'>
+        <span className='whitespace-nowrap text-ink-muted text-sm'>
           {isFinding
             ? `${found.length} found`
             : `${rowsOf(props.edge.id).length} settings`}
@@ -367,7 +377,7 @@ interface SideCardProps {
 interface EdgeChipProps {
   edge: (typeof edges)[number];
   onPress: () => void;
-  summary: string;
+  summary: readonly SummaryPart[];
 }
 
 interface EdgePanelProps {

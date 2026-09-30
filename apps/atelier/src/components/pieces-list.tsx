@@ -3,7 +3,7 @@ import { cn } from 'cn';
 
 import type { Piece } from '../../art/pieces.ts';
 import { groups, pieces } from '../../art/pieces.ts';
-import { navigate, pathOf } from '../route.ts';
+import { navigate, opensInPlace, pathOf } from '../route.ts';
 
 /** every piece, grouped by where it ships: the profile, frame, bytes, then spots and icons */
 export const PiecesList = (props: PiecesListProps) => {
@@ -23,22 +23,13 @@ export const PiecesList = (props: PiecesListProps) => {
               )}
               href={pathOf(route)}
               onClick={(event) => {
-                // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
-                if (
-                  event.metaKey ||
-                  event.ctrlKey ||
-                  event.shiftKey ||
-                  event.altKey
-                )
-                  return;
+                if (!opensInPlace(event)) return;
                 event.preventDefault();
                 navigate(route);
                 props.onPick?.();
               }}>
               <span className='truncate'>{piece.id}</span>
-              <span className='font-mono text-[12px] text-ink-muted'>
-                {piece.kind}
-              </span>
+              <span className='text-ink-muted text-sm'>{piece.kind}</span>
             </a>
           </li>
         );
@@ -48,9 +39,7 @@ export const PiecesList = (props: PiecesListProps) => {
         aria-labelledby={`group-${group}`}
         className='px-2 pb-3'
         key={group}>
-        <h3
-          className='px-2 pb-1 font-mono text-[12px] text-ink-muted'
-          id={`group-${group}`}>
+        <h3 className='px-2 pb-1 text-ink-muted text-sm' id={`group-${group}`}>
           {group}
         </h3>
         <ul>{itemListJSX}</ul>

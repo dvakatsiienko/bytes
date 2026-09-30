@@ -14,11 +14,11 @@ import {
   useResolvedTheme,
   useTabMark,
 } from '../hooks.ts';
-import { navigate, pathOf, useRoute } from '../route.ts';
+import { navigate, opensInPlace, pathOf, useRoute } from '../route.ts';
 import { isPlayingAtom, themeAtom } from '../state.ts';
 import { CommandPalette } from './command-palette';
 import { LensRing } from './lens-ring';
-import { NarrowBench } from './narrow-bench';
+import { RingUnrolled } from './ring-unrolled';
 import { ZoomDialog } from './zoom-dialog';
 
 export const Studio = () => {
@@ -66,7 +66,7 @@ const Workbench = (props: WorkbenchProps) => {
           wordmark={<Wordmark />}
         />
       ) : (
-        <NarrowBench
+        <RingUnrolled
           actions={actions}
           piece={props.piece}
           wordmark={<Wordmark />}
@@ -92,9 +92,7 @@ const Wordmark = () => {
         className='rounded-sm'
         href='/'
         onClick={(event) => {
-          // ⌘, ctrl, ⇧ or ⌥ keep the browser's own link behaviour, a new tab or window
-          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
-            return;
+          if (!opensInPlace(event)) return;
           event.preventDefault();
           navigate({ piece: pieces[0].id, view: { kind: 'live' } });
         }}>

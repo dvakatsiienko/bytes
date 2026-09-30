@@ -8,7 +8,7 @@ import { BakeButton } from './bake-button';
  * The bottom-right corner: the ways of looking at the piece, each with its
  * key, and under them the bake.
  */
-export const ToolDock = (props: ToolDockProps) => {
+export const ToolsCorner = (props: ToolsCornerProps) => {
   const { view } = useRoute();
   const isCompare = view.kind === 'compare';
   const tools = [
@@ -65,7 +65,7 @@ export const ToolDock = (props: ToolDockProps) => {
           'flex h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg text-sm hover:bg-fill-on/60 disabled:cursor-not-allowed disabled:text-ink-muted disabled:hover:bg-transparent',
           'isPressed' in tool &&
             tool.isPressed &&
-            'bg-fill-on hover:bg-fill-on',
+            'bg-fill-on font-semibold hover:bg-fill-on',
         )}
         disabled={'isDisabled' in tool && tool.isDisabled}
         key={tool.keys}
@@ -92,6 +92,6 @@ export const ToolDock = (props: ToolDockProps) => {
 
 /* Types */
 
-interface ToolDockProps {
+interface ToolsCornerProps {
   actions: StudioActions;
 }

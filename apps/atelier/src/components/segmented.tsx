@@ -22,7 +22,7 @@ export const Segmented = <T extends string>(props: SegmentedProps<T>) => {
     return (
       <ToggleGroupItem
         aria-label={option.label}
-        className='h-7 min-w-0 flex-1 gap-1.5 rounded-md px-2.5 text-ink-muted text-sm hover:bg-fill-on/60 hover:text-ink aria-pressed:bg-fill-on aria-pressed:text-ink'
+        className='h-7 min-w-0 flex-1 gap-1.5 rounded-md px-2.5 text-ink-muted text-sm hover:bg-fill-on/60 hover:text-ink aria-pressed:bg-fill-on aria-pressed:font-semibold aria-pressed:text-ink'
         key={option.value}
         title={option.isIconOnly ? option.label : undefined}
         value={option.value}>

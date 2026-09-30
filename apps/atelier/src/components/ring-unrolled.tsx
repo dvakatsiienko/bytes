@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { MoonIcon, SunIcon } from 'lucide-react';
 
 import type { Piece } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
@@ -16,15 +15,16 @@ import { PieceView } from './piece-view';
 import { EdgePanel, FlatCard } from './ring-edges';
 import { Segmented } from './segmented';
 import { CompareCard, TakePanel } from './take-view';
-import { TakesDock } from './takes-dock';
-import { ToolDock } from './tool-dock';
+import { TakesCorner } from './takes-corner';
+import { ToolsCorner } from './tools-corner';
+import { timeOptions } from './view-card';
 
 /**
  * Below 1100 px the ring unrolls: a bar on top, the art, the four edges as
  * tabs under it, the takes, then the tools and the bake. The page scrolls;
  * the piece stays the biggest thing on it.
  */
-export const NarrowBench = (props: NarrowBenchProps) => {
+export const RingUnrolled = (props: RingUnrolledProps) => {
   return (
     <div className='flex h-dvh scroll-py-3 flex-col gap-4 overflow-y-auto p-4'>
       <header className='glass flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5'>
@@ -63,20 +63,24 @@ export const NarrowBench = (props: NarrowBenchProps) => {
         </Section>
       </div>
       <Section name='panel'>
-        <NarrowRing actions={props.actions} piece={props.piece} />
+        <UnrolledEdges actions={props.actions} piece={props.piece} />
       </Section>
       <Section name='takes'>
-        <TakesDock actions={props.actions} isStrip={true} piece={props.piece} />
+        <TakesCorner
+          actions={props.actions}
+          isStrip={true}
+          piece={props.piece}
+        />
       </Section>
       <Section name='toolbar'>
-        <ToolDock actions={props.actions} />
+        <ToolsCorner actions={props.actions} />
       </Section>
     </div>
   );
 };
 
 /** the four edges as tabs; one always shows, the first until another is picked */
-const NarrowRing = (props: NarrowRingProps) => {
+const UnrolledEdges = (props: UnrolledEdgesProps) => {
   const ring = useAtomValue(ringAtom);
   const setRing = useSetAtom(ringAtom);
   const settings =
@@ -131,25 +135,20 @@ const NarrowRing = (props: NarrowRingProps) => {
 
 /* Helpers */
 
-const timeOptions = [
-  { icon: <SunIcon />, label: 'day', value: 'day' },
-  { icon: <MoonIcon />, label: 'night', value: 'night' },
-] as const;
-
 const edgeOptions = edges.map((edge) => {
   return { icon: <Key keys={edge.key} />, label: edge.id, value: edge.id };
 });
 
 /* Types */
 
-interface NarrowBenchProps {
+interface RingUnrolledProps {
   actions: StudioActions;
   piece: Piece;
   /** the way home, outside every section */
   wordmark: ReactNode;
 }
 
-interface NarrowRingProps {
+interface UnrolledEdgesProps {
   actions: StudioActions;
   piece: Piece;
 }

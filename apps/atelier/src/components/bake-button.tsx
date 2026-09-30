@@ -7,6 +7,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from '@ui/kit/components/popover';
+import { cn } from 'cn';
 import { useAtomValue } from 'jotai';
 
 import type { StudioActions } from '../actions.ts';
@@ -65,7 +66,11 @@ const BakeProgress = (props: { step: string | null }) => {
       <span className='font-semibold text-base'>
         baking…{frames ? ` ${percent} %` : ''}
       </span>
-      <span className='truncate pl-3 font-mono text-[12px]'>
+      <span
+        className={cn(
+          'truncate pl-3',
+          frames ? 'font-mono text-[12px] tabular-nums' : 'text-sm',
+        )}>
         {frames ? `${frames[1]} / ${frames[2]}` : (props.step ?? 'starting')}
       </span>
     </span>

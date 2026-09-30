@@ -1,9 +1,9 @@
-import type { ReactElement } from 'react';
+import type { ComponentProps, ReactElement } from 'react';
+import { useState } from 'react';
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@ui/kit/components/context-menu';
 import { cn } from 'cn';
@@ -12,7 +12,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import type { Piece } from '../../art/pieces.ts';
 import type { Take, TakeList } from '../../server/takes.ts';
 import type { StudioActions } from '../actions.ts';
-import { navigate, pathOf, useRoute } from '../route.ts';
+import { navigate, opensInPlace, pathOf, useRoute } from '../route.ts';
 import { bakeStepAtom, takeFilterAtom } from '../state.ts';
 import { useTakeActions } from '../take-actions.ts';
 import type { TakeFilter } from '../takes.ts';
@@ -25,7 +25,7 @@ import { Segmented } from './segmented';
  * opens the stack into the film strip along the bottom edge, and folds it
  * again.
  */
-export const TakesDock = (props: TakesDockProps) => {
+export const TakesCorner = (props: TakesCornerProps) => {
   const query = useTakes(props.piece.id);
   const list = query.data;
   if (query.isError)
@@ -168,7 +168,7 @@ const FilmStrip = (props: FilmStripProps) => {
         ) : null}
         {shown ? (
           <p
-            className='min-w-0 truncate font-mono text-[12px] text-ink-muted tabular-nums'
+            className='min-w-0 truncate text-ink-muted text-sm tabular-nums'
             title={factsOf(shown)}>
             {factsOf(shown)}
           </p>
@@ -194,7 +194,7 @@ const FilmStrip = (props: FilmStripProps) => {
             <span className='grid h-21 place-items-center rounded-md border border-ink/70 border-dashed bg-smoke text-sm'>
               baking
             </span>
-            <span className='truncate font-mono text-[12px] text-ink-muted'>
+            <span className='truncate text-ink-muted text-sm'>
               {step ?? 'starting'}
             </span>
           </li>
@@ -212,31 +212,35 @@ const FilmStrip = (props: FilmStripProps) => {
   );
 };
 
+/** a take in the strip; the context menu's trigger renders it, so the trigger's own props land on the link */
 const TakeTile = (props: TakeTileProps) => {
+  // the three are the tile's own; the rest is the menu trigger's (its handlers, its ref)
+  const { isCurrent, isShown, take, ...trigger } = props;
   const route = {
-    piece: props.take.piece,
-    view: { kind: 'take', take: props.take.id },
+    piece: take.piece,
+    view: { kind: 'take', take: take.id },
   } as const;
   return (
     <a
-      aria-current={props.isShown ? 'page' : undefined}
+      {...trigger}
+      aria-current={isShown ? 'page' : undefined}
       className='group flex w-34 flex-col gap-1.5 rounded-md outline-offset-2'
       href={pathOf(route)}
       onClick={(event) => {
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
-          return;
+        trigger.onClick?.(event);
+        if (!opensInPlace(event)) return;
         event.preventDefault();
         navigate(route);
       }}
-      title={props.take.note || undefined}>
+      title={take.note || undefined}>
       <img
         alt=''
         className={cn(
           'h-21 w-34 rounded-md border object-cover transition-[border-color] duration-150',
-          props.take.stash
+          take.stash
             ? 'border-ink-muted border-dashed'
             : 'border-ink/15 group-hover:border-ink/50',
-          props.isShown && 'border-2 border-ink border-solid',
+          isShown && 'border-2 border-ink border-solid',
         )}
         decoding='async'
         height={84}
@@ -247,67 +251,117 @@ const TakeTile = (props: TakeTileProps) => {
       {/* the id carries the time of day: 03-night-warmer-lamp */}
       <span className='flex min-w-0 items-baseline gap-1.5 text-sm'>
         <span className='truncate font-mono text-[12px] tabular-nums'>
-          {props.take.id}
+          {take.id}
         </span>
-        {props.isCurrent ? (
+        {isCurrent ? (
           <span className='shrink-0 font-semibold'>● current</span>
         ) : null}
-        {props.take.stash ? (
+        {take.stash ? (
           <span className='shrink-0 text-ink-muted'>stashed</span>
         ) : null}
       </span>
       <span className='truncate text-ink-muted text-sm'>
-        {props.take.note || 'no note'}
+        {take.note || 'no note'}
       </span>
     </a>
   );
 };
 
 /** a right-click on a take: everything that can be done to it */
+/**
+ * A right-click on a take: everything that can be done to it, each with the
+ * key that does it while the menu is open.
+ */
 const TakeMenu = (props: TakeMenuProps) => {
   const actions = useTakeActions();
+  const [isOpen, setIsOpen] = useState(false);
   const { take, shown } = props;
   const isCurrent = props.list.current[take.time] === take.id;
+  const items: readonly TakeMenuItem[] = [
+    { keys: '⏎', label: 'open', run: () => actions.open(take) },
+    ...(shown && shown.id !== take.id
+      ? [
+          {
+            keys: 'v',
+            label: `compare with ${shown.id}`,
+            run: () => actions.compare(shown, take),
+          },
+        ]
+      : []),
+    take.stash
+      ? {
+          keys: 's',
+          label: 'take out of the stash',
+          run: () => actions.unstash(take),
+        }
+      : {
+          keys: 's',
+          label: 'stash with a reason…',
+          run: () => actions.askStash(take),
+        },
+    {
+      isDisabled: isCurrent,
+      keys: '⇧⏎',
+      label: `promote to the ${take.time} take`,
+      run: () => actions.promote(take),
+    },
+    {
+      keys: 'u',
+      label: 'use its settings',
+      run: () => actions.loadSettings(take),
+    },
+    {
+      keys: 'c',
+      label: 'copy image as png',
+      run: () => actions.copyImage(take),
+    },
+  ];
+
+  const itemListJSX = items.map((item) => {
+    return (
+      <ContextMenuItem
+        className='justify-between gap-6'
+        disabled={item.isDisabled}
+        key={item.keys}
+        onClick={item.run}>
+        {item.label}
+        <Key keys={item.keys} />
+      </ContextMenuItem>
+    );
+  });
+
   return (
-    <ContextMenu>
+    <ContextMenu onOpenChange={setIsOpen} open={isOpen}>
       <ContextMenuTrigger render={props.children} />
-      <ContextMenuContent>
-        <ContextMenuItem onClick={() => actions.open(take)}>
-          open
-        </ContextMenuItem>
-        {shown && shown.id !== take.id ? (
-          <ContextMenuItem onClick={() => actions.compare(shown, take)}>
-            compare with {shown.id}
-          </ContextMenuItem>
-        ) : null}
-        <ContextMenuSeparator />
-        <ContextMenuItem
-          disabled={isCurrent}
-          onClick={() => actions.promote(take)}>
-          promote to the {take.time} take
-        </ContextMenuItem>
-        {take.stash ? (
-          <ContextMenuItem onClick={() => actions.unstash(take)}>
-            take out of the stash
-          </ContextMenuItem>
-        ) : (
-          <ContextMenuItem onClick={() => actions.askStash(take)}>
-            stash with a reason…
-          </ContextMenuItem>
-        )}
-        <ContextMenuItem onClick={() => actions.loadSettings(take)}>
-          use its settings
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem onClick={() => actions.copyImage(take)}>
-          copy image as png
-        </ContextMenuItem>
+      <ContextMenuContent
+        className='min-w-60'
+        onKeyDown={(event) => {
+          // a highlighted item keeps Enter for itself; with none, Enter opens the take
+          const isHighlighted =
+            event.currentTarget.querySelector('[data-highlighted]') !== null;
+          const item = items.find(
+            (candidate) =>
+              candidate.keys === keyOf(event) &&
+              !(candidate.keys === '⏎' && isHighlighted),
+          );
+          if (!item || item.isDisabled) return;
+          event.preventDefault();
+          setIsOpen(false);
+          item.run();
+        }}>
+        {itemListJSX}
       </ContextMenuContent>
     </ContextMenu>
   );
 };
 
 /* Helpers */
+
+/** a key press as the menu prints its key */
+const keyOf = (event: { key: string; shiftKey: boolean }) => {
+  if (event.key === 'Enter') return event.shiftKey ? '⇧⏎' : '⏎';
+  return event.key;
+};
 
 const factsOf = (take: Take) =>
   `${take.id} · seed ${take.seed} · ${take.frames > 1 ? `${take.frames} frames` : 'still'} · baked ${new Date(take.bakedAt).toLocaleString()}`;
@@ -320,7 +374,7 @@ const emptyText = {
 
 /* Types */
 
-interface TakesDockProps {
+interface TakesCornerProps {
   actions: StudioActions;
   /** the narrow bench shows the strip always: there is no corner to stack in */
   isStrip?: boolean;
@@ -333,10 +387,17 @@ interface FilmStripProps {
   piece: Piece;
 }
 
-interface TakeTileProps {
+interface TakeTileProps extends ComponentProps<'a'> {
   isCurrent: boolean;
   isShown: boolean;
   take: Take;
+}
+
+interface TakeMenuItem {
+  isDisabled?: boolean;
+  keys: string;
+  label: string;
+  run: () => void;
 }
 
 interface TakeMenuProps {

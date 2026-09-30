@@ -38,15 +38,29 @@ export const settingCount = controls.reduce(
   0,
 );
 
-/** what a folded edge says about itself: how many toggles are on, or its first value */
-export const edgeSummary = (edge: Edge, settings: Settings) => {
+/**
+ * What a folded edge says about itself, in reading order: how many toggles
+ * are on, or its first setting and value. A value is set in mono, a word in sans.
+ */
+export const edgeSummary = (
+  edge: Edge,
+  settings: Settings,
+): readonly SummaryPart[] => {
   const rows = rowsOf(edge);
   if (edge === 'toggles') {
     const on = rows.filter((row) => settings[row.key] === true).length;
-    return `${on} of ${rows.length} on`;
+    return [
+      { isValue: true, text: `${on} of ${rows.length}` },
+      { isValue: false, text: 'on' },
+    ];
   }
   const [first] = rows;
-  return first ? `${first.label} ${formatValue(first, settings)}` : '';
+  return first
+    ? [
+        { isValue: false, text: first.label },
+        { isValue: true, text: formatValue(first, settings) },
+      ]
+    : [];
 };
 
 const formatValue = (row: ControlRow, settings: Settings) => {
@@ -69,6 +83,11 @@ const decimalsOf = (step: number) =>
 export type Edge = (typeof edges)[number]['id'];
 export type Openable = Edge | 'takes';
 export type RingOpen = Openable | null;
+
+export interface SummaryPart {
+  isValue: boolean;
+  text: string;
+}
 
 export interface FoundRow {
   group: (typeof controls)[number]['title'];

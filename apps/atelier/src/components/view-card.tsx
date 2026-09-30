@@ -50,7 +50,7 @@ export const ViewCard = (props: ViewCardProps) => {
 
 /* Helpers */
 
-const timeOptions = [
+export const timeOptions = [
   { icon: <SunIcon />, label: 'day', value: 'day' },
   { icon: <MoonIcon />, label: 'night', value: 'night' },
 ] as const;

@@ -44,7 +44,6 @@ test('one thing is open at a time: a press opens it, the same press folds it', (
 });
 
 test('the folded toggles edge says how many toggles are on', () => {
-  expect(edgeSummary('toggles', { ...defaults, hasLens: false })).toBe(
-    '9 of 11 on',
-  );
+  const parts = edgeSummary('toggles', { ...defaults, hasLens: false });
+  expect(parts.map((part) => part.text).join(' ')).toBe('9 of 11 on');
 });

@@ -68,7 +68,7 @@ export const FlatView = (props: FlatViewProps) => {
           }}>
           {props.children}
         </div>
-        <figcaption className='font-mono text-[12px] text-ground-muted tabular-nums'>
+        <figcaption className='text-ground-muted text-sm tabular-nums'>
           {props.piece.size.w} × {props.piece.size.h} px, shown{' '}
           {Number.isInteger(scale)
             ? `${scale}×`
@@ -112,7 +112,7 @@ export const FlatView = (props: FlatViewProps) => {
               {land.chrome === 'tab' ? <span>{props.piece.id}</span> : null}
             </span>
           </span>
-          <span className='font-mono text-[12px] text-ground-ink'>
+          <span className='text-ground-ink text-sm'>
             {land.label}, {land.size}
           </span>
         </button>
@@ -243,7 +243,7 @@ const PixelView = (props: PixelViewProps) => {
         style={{ height: props.size * shown, width: props.size * shown }}
         width={props.size * cell}
       />
-      <figcaption className='flex w-full items-center justify-between gap-6 font-mono text-[12px] text-ground-ink tabular-nums'>
+      <figcaption className='flex w-full items-center justify-between gap-6 text-ground-ink text-sm tabular-nums'>
         <span>
           {props.size} × {props.size} px, shown {shown}×
         </span>

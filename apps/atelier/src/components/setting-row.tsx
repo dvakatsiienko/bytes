@@ -34,9 +34,7 @@ export const SettingRow = (props: SettingRowProps) => {
       id={`${id}-label`}
       title={props.row.key}>
       {props.group ? (
-        <span className='font-mono text-[12px] text-ink-muted/80'>
-          {props.group}
-        </span>
+        <span className='shrink-0 text-ink-muted text-sm'>{props.group}</span>
       ) : null}
       <span className='truncate'>{props.row.label}</span>
     </label>
@@ -100,9 +98,6 @@ export const SettingRow = (props: SettingRowProps) => {
         {labelJSX}
         <span className='flex items-center gap-2'>
           {copyJSX}
-          <span className='w-6 text-right font-mono text-[12px] text-ink'>
-            {isOn ? 'on' : 'off'}
-          </span>
           <Switch
             checked={isOn}
             className='ring-switch'

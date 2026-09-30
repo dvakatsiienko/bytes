@@ -8,8 +8,8 @@ import { Section } from './error-boundary';
 import { PieceCard } from './piece-card';
 import { PieceView } from './piece-view';
 import { RingEdges, SideCard } from './ring-edges';
-import { TakesDock } from './takes-dock';
-import { ToolDock } from './tool-dock';
+import { TakesCorner } from './takes-corner';
+import { ToolsCorner } from './tools-corner';
 import { ViewCard } from './view-card';
 
 /**
@@ -48,7 +48,7 @@ export const LensRing = (props: LensRingProps) => {
         label='the takes'
         name='bl'>
         <Section name='takes'>
-          <TakesDock actions={props.actions} piece={props.piece} />
+          <TakesCorner actions={props.actions} piece={props.piece} />
         </Section>
       </Corner>
       <Corner
@@ -56,7 +56,7 @@ export const LensRing = (props: LensRingProps) => {
         label='the tools'
         name='br'>
         <Section name='toolbar'>
-          <ToolDock actions={props.actions} />
+          <ToolsCorner actions={props.actions} />
         </Section>
       </Corner>
     </div>
