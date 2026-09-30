@@ -324,10 +324,12 @@ function scriptOf(argv: string[]): string | undefined {
 }
 
 function toApp(arg: string): App {
+  // a bare name is a bytes app first; one bytes lacks resolves from the cwd (frame's `speak`)
+  const bytesApp = join(root, 'apps', arg);
   const dir =
-    arg.includes('/') || arg.startsWith('.')
+    arg.includes('/') || arg.startsWith('.') || !exists(bytesApp)
       ? resolve(arg)
-      : join(root, 'apps', arg);
+      : bytesApp;
   if (!exists(dir)) {
     console.error(`apps-essentials: no app at ${dir}`);
     process.exit(2);
