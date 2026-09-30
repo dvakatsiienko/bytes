@@ -271,7 +271,7 @@ export const EdgePanel = (props: EdgePanelProps) => {
       <div
         className={cn(
           // the padding holds the rows' focus rings, width + offset, so the scroll box never cuts one
-          '-mx-2 -mt-2 -mb-3 min-h-0 overflow-y-auto px-2 pt-2 pb-3',
+          '-mx-2 -mt-2 -mb-3 min-h-0 overflow-y-auto px-2 pt-2 pb-5 [mask-image:linear-gradient(to_bottom,black_calc(100%-20px),transparent)]',
           isBand
             ? 'grid grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-x-6 gap-y-4'
             : 'flex flex-col gap-3',

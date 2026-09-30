@@ -107,8 +107,16 @@ export const ringAtom = atom<RingOpen>(null);
 export const findAtom = atom('');
 /** each bump focuses the find field: `/` from anywhere */
 export const findFocusAtom = atom(0);
-/** a favicon's pixel view: the piece and the size it is drawn at, or null for the plain stage */
-export const pixelSizeAtom = atom<{ piece: string; size: number } | null>(null);
+/** a favicon's pixel view: the piece, where it lands and the size it is drawn at; null for the whole piece */
+export const pixelViewAtom = atom<PixelView | null>(null);
+/** the pixel view's zoom: a whole number, or null for the largest that fits */
+export const pixelZoomAtom = atom<number | null>(null);
+/** the largest whole zoom the pixel view fits at, measured by the view */
+export const pixelFitAtom = atom(1);
+/** the grid between the pixels, from 8× */
+export const pixelGridAtom = atom(true);
+/** the frame of the six-second loop the playing motion shows, of 72 */
+export const motionFrameAtom = atom(0);
 /** a bake waiting for its note: how many frames it will bake, or null when none is asked */
 export const bakeAskAtom = atom<number | null>(null);
 /** the step a running bake is on, for the bake button; null when none runs */
@@ -120,6 +128,12 @@ export const stashFormAtom = atom<string | null>(null);
 
 export type Theme = (typeof themes)[number];
 export type ReadmeWidth = (typeof readmeWidths)[number];
+
+export interface PixelView {
+  land: string;
+  piece: string;
+  size: number;
+}
 
 export interface Zoom {
   alt: string;

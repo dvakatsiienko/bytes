@@ -20,7 +20,9 @@ import {
   isPaletteOpenAtom,
   isPlayingAtom,
   patchSettingsAtom,
-  pixelSizeAtom,
+  pixelGridAtom,
+  pixelViewAtom,
+  pixelZoomAtom,
   readmeAtom,
   readmeWidths,
   ringAtom,
@@ -59,7 +61,9 @@ export const useStudioActions = (piece: Piece) => {
   const setBakeStep = useSetAtom(bakeStepAtom);
   const [ring, setRing] = useAtom(ringAtom);
   const setFindFocus = useSetAtom(findFocusAtom);
-  const setPixel = useSetAtom(pixelSizeAtom);
+  const [pixelView, setPixelView] = useAtom(pixelViewAtom);
+  const setPixelZoom = useSetAtom(pixelZoomAtom);
+  const setPixelGrid = useSetAtom(pixelGridAtom);
   const isStage = Boolean(stageScenes[piece.id]);
   const hasMotion = isStage && !stageScenes[piece.id]?.isStill;
   const { view } = route;
@@ -229,13 +233,15 @@ export const useStudioActions = (piece: Piece) => {
     // from anywhere: the viewer and a pixel view close, and a zoomed live view goes back to fit
     goLive: () => {
       setZoom(null);
-      setPixel(null);
+      setPixelView(null);
+      setPixelZoom(null);
       if (view.kind === 'live') setFitKey((key) => key + 1);
       else navigate({ piece: piece.id, view: { kind: 'live' } });
     },
     goPiece: (id: string) => navigate({ piece: id, view: { kind: 'live' } }),
     hasMotion,
     isBaking: bakeMutation.isPending,
+    isPixelView: pixelView?.piece === piece.id,
     isPlaying,
     isStage,
     newSeed: () =>
@@ -247,12 +253,15 @@ export const useStudioActions = (piece: Piece) => {
     readme,
     resetSettings,
     ring,
+    setPixelZoom,
     setReadme,
     setTheme,
     setTime,
+    takeCount: takes.length,
     theme: resolveTheme(theme, prefersDark),
     time,
     toggleEdge: (edge: Edge) => turnRing(edge),
+    toggleGrid: () => setPixelGrid((isOn) => !isOn),
     togglePlay: () => setIsPlaying(!isPlaying),
     toggleStrip: () => turnRing('takes'),
     toggleTheme: () => setTheme(toggledTheme(theme, prefersDark)),

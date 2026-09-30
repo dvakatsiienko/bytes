@@ -65,6 +65,7 @@
   - given a piece that moves
   - when dima presses `p` or the motion tool
   - then the motion plays, and the same key stops it
+  - and while it plays the tools corner says «motion playing» with the frame of 72 it shows
 - 🔎 motion stops when dima leaves the view
   - given motion is playing
   - when dima opens another piece, a take or a compare
@@ -83,7 +84,7 @@
   - then the current image is on the clipboard as a png and a toast confirms it
 - 🔎 bake a take
   - makes: a take — the image (`bake.webp`, plus `piece.svg` for a flat piece), `settings.json` and `take.json` (seed, note, frames, source hash) — in `takes/<piece>/<nn>-<time>[-<note>]/`
-  - when dima presses `b` or the bake button
+  - when dima presses `b` or the bake button, which asks «bake the first take» on a piece with none
   - then a note field opens with the piece's last note selected
   - and Enter bakes: a «baking <piece> · <time>…» toast, then «baked take <id>» with an «open» action, and the take tops the takes list
 - ⬜ bake shows progress
@@ -100,7 +101,7 @@
 - ⬜ the settings on the ring
   - given a lit piece
   - then its seed and look sit in the piece card, and every other setting on one of the four edges: light, lens, atmosphere, toggles
-  - and each shows its exact value, typed or copied (the copy button shows on hover), with a slider, a switch, a colour or a choice
+  - and each shows its exact value, typed or copied (the copy button shows on hover), with a slider, a switch, a colour or a choice; a long name wraps to a second line
   - and on an open edge ↑ ↓ move between the rows and ← → change the value
   - and a flat piece shows only its seed, in one card at the top with a line saying why
 - ⬜ new seed
@@ -117,10 +118,11 @@
   - then it sits on the plain ground at the largest whole zoom that fits, or scaled down to fit when it is bigger, with its size and zoom under it
 - ⬜ a favicon's pixel view
   - given a favicon is open
-  - then «as it lands» shows it at true size in a browser tab (16 px), a retina tab (32 px) and on a home screen (64 px)
-  - when dima picks one of those sizes
-  - then the favicon shows drawn at that size, one square per pixel at a whole zoom, with a grid between the pixels from 8×
-  - and pointing at a pixel names its place and colour; the same size again, or `l`, goes back to the whole piece
+  - then «as it lands» shows it at true size in a browser tab (16 px), a retina tab (32 px), a dark bookmarks bar (16 px) and on a home screen (64 px)
+  - when dima picks one of those
+  - then the favicon shows drawn at that size, one square per pixel at a whole zoom, with a grid between the pixels from 8×, and the piece card names the size
+  - and the tools corner holds its zoom (fit and the 1×, 8×, 24× that fit) and the grid, which `x` shows or hides
+  - and pointing at a pixel names its place and colour; the same tile again, or `l`, goes back to the whole piece
 - ✅ a saved drawing redraws by itself
   - when a file under `art/` is saved
   - then the viewport redraws the piece with no reload
@@ -144,7 +146,7 @@
   - then the strip shows only those takes, or a line saying there are none
 - ⬜ a take tile
   - then each tile shows the thumbnail, the id (which names the time of day), the note or «no note», «● current» when it ships and «stashed» with a dashed edge when stashed
-  - and a right-click offers open, compare with the shown take, promote, stash or unstash, use its settings, copy png
+  - and a right-click offers open (⏎), compare with the shown take (v), stash or unstash (s), promote (⇧⏎), use its settings (u), copy png (c); each key works while the menu is open
 - ⬜ the shown take's ring shows whole, first and last tile included
 - 🔎 previous and next take
   - when dima presses `[` or `]`, or picks them in ⌘K

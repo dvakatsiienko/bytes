@@ -36,7 +36,11 @@ export const BakeButton = (props: BakeButtonProps) => {
           <BakeProgress step={step} />
         ) : (
           <span className='flex w-full items-center justify-between px-4'>
-            <span className='font-semibold text-base'>bake take</span>
+            <span className='font-semibold text-base'>
+              {props.actions.takeCount === 0
+                ? 'bake the first take'
+                : 'bake take'}
+            </span>
             <kbd className='rounded border border-lamp-ink/35 px-1.5 py-0.5 font-mono text-[12px]'>
               b
             </kbd>

@@ -1,7 +1,7 @@
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from 'cn';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
 import type { Piece } from '../../art/pieces.ts';
 import { pieceSvg } from '../../art/pieces.ts';
@@ -9,9 +9,15 @@ import { svgDataUrl } from '../image.ts';
 import { integerScale, pixelZooms } from '../pixels.ts';
 import { defaults } from '../stage/settings.ts';
 import type { ReadmeWidth } from '../state.ts';
-import { pixelSizeAtom, settingsByPieceAtom, timeAtom } from '../state.ts';
+import {
+  pixelFitAtom,
+  pixelGridAtom,
+  pixelViewAtom,
+  pixelZoomAtom,
+  settingsByPieceAtom,
+  timeAtom,
+} from '../state.ts';
 import { ReadmeFrame } from './readme-frame';
-import { Segmented } from './segmented';
 
 /**
  * A flat piece on the plain ground: at a whole multiple of its own size when it
@@ -21,13 +27,14 @@ import { Segmented } from './segmented';
 export const FlatView = (props: FlatViewProps) => {
   const well = useRef<HTMLDivElement>(null);
   const room = useRoom(well);
-  const [pixel, setPixel] = useAtom(pixelSizeAtom);
+  const [pixel, setPixel] = useAtom(pixelViewAtom);
   const time = useAtomValue(timeAtom);
   const { seed } =
     useAtomValue(settingsByPieceAtom)[props.piece.id] ?? defaults;
   const isFavicon = props.piece.kind === 'favicon';
-  const pixelSize =
-    isFavicon && pixel?.piece === props.piece.id ? pixel.size : null;
+  const shownPixel =
+    isFavicon && pixel?.piece === props.piece.id ? pixel : null;
+  const pixelSize = shownPixel?.size ?? null;
   const src = svgDataUrl(pieceSvg(props.piece, time, seed));
   // the caption under the piece takes its line of the well
   const scale = room
@@ -78,7 +85,7 @@ export const FlatView = (props: FlatViewProps) => {
     );
 
   const landListJSX = lands.map((land) => {
-    const isPressed = pixelSize === land.size;
+    const isPressed = shownPixel?.land === land.label;
     return (
       <li key={land.label}>
         <button
@@ -90,7 +97,9 @@ export const FlatView = (props: FlatViewProps) => {
           )}
           onClick={() =>
             setPixel(
-              isPressed ? null : { piece: props.piece.id, size: land.size },
+              isPressed
+                ? null
+                : { land: land.label, piece: props.piece.id, size: land.size },
             )
           }
           type='button'>
@@ -98,9 +107,10 @@ export const FlatView = (props: FlatViewProps) => {
             <span
               className={cn(
                 'flex items-center gap-2',
-                // a browser tab: the icon beside the page's title, as a tab strip shows it
-                land.chrome === 'tab' &&
-                  'h-8 rounded-md bg-white px-3 text-[#2b3236] text-sm',
+                // a tab or a bookmarks bar: the icon beside the page's title, as the browser shows it
+                land.chrome !== 'none' && 'h-8 rounded-md px-3 text-sm',
+                land.chrome === 'tab' && 'bg-white text-[#2b3236]',
+                land.chrome === 'bar' && 'bg-[#1f2428] text-[#f2f5f7]',
               )}>
               <img
                 alt=''
@@ -109,7 +119,7 @@ export const FlatView = (props: FlatViewProps) => {
                 style={{ height: land.size, width: land.size }}
                 width={land.size}
               />
-              {land.chrome === 'tab' ? <span>{props.piece.id}</span> : null}
+              {land.chrome === 'none' ? null : <span>{props.piece.id}</span>}
             </span>
           </span>
           <span className='text-ground-ink text-sm'>
@@ -151,14 +161,15 @@ const PixelView = (props: PixelViewProps) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [pixels, setPixels] = useState<ImageData | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
-  // the caption and the zoom switch sit under the pixels
-  const zooms = pixelZooms(
-    props.size,
-    props.width,
-    props.height - CAPTION_PX - 48,
-  );
-  const [zoom, setZoom] = useState(zooms.fit);
-  const shown = Math.min(zoom, zooms.fit);
+  // the caption sits under the pixels; the zoom switch lives in the tools corner
+  const zooms = pixelZooms(props.size, props.width, props.height - CAPTION_PX);
+  const zoom = useAtomValue(pixelZoomAtom);
+  const isGrid = useAtomValue(pixelGridAtom);
+  const setFit = useSetAtom(pixelFitAtom);
+  const shown = Math.min(zoom ?? zooms.fit, zooms.fit);
+  useEffect(() => {
+    setFit(zooms.fit);
+  }, [zooms.fit, setFit]);
   // one square is `shown` css px; the canvas draws it in whole device pixels, so a 2× screen stays sharp
   const [ratio] = useState(() => Math.max(1, Math.round(devicePixelRatio)));
   const cell = shown * ratio;
@@ -197,20 +208,13 @@ const PixelView = (props: PixelViewProps) => {
         context.fillStyle = `rgb(${r} ${g} ${b} / ${(a ?? 255) / 255})`;
         context.fillRect(x * cell, y * cell, cell, cell);
       }
-    if (shown < 8) return;
+    if (!isGrid || shown < 8) return;
     context.fillStyle = 'rgb(128 138 144 / 0.55)';
     for (let line = 1; line < props.size; line += 1) {
       context.fillRect(line * cell, 0, ratio, side);
       context.fillRect(0, line * cell, side, ratio);
     }
-  }, [pixels, cell, ratio, shown, props.size]);
-
-  const zoomOptions = [
-    { label: `fit ${zooms.fit}×`, value: 'fit' },
-    ...zooms.steps.map((step) => {
-      return { label: `${step}×`, value: String(step) };
-    }),
-  ];
+  }, [pixels, cell, ratio, shown, isGrid, props.size]);
 
   return (
     <figure className='flex flex-col items-center gap-2'>
@@ -249,16 +253,6 @@ const PixelView = (props: PixelViewProps) => {
         </span>
         <span>{picked ?? 'point at a pixel'}</span>
       </figcaption>
-      <div className='glass w-72'>
-        <Segmented
-          ariaLabel='pixel zoom'
-          onValueChange={(next) =>
-            setZoom(next === 'fit' ? zooms.fit : Number(next))
-          }
-          options={zoomOptions}
-          value={shown === zooms.fit ? 'fit' : String(shown)}
-        />
-      </div>
     </figure>
   );
 };
@@ -293,6 +287,7 @@ const CAPTION_PX = 32;
 const lands = [
   { chrome: 'tab', label: 'browser tab', size: 16 },
   { chrome: 'none', label: 'tab on retina', size: 32 },
+  { chrome: 'bar', label: 'dark bookmarks bar', size: 16 },
   { chrome: 'none', label: 'home screen', size: 64 },
 ] as const;
 

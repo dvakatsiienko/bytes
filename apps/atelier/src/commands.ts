@@ -79,6 +79,16 @@ export const commandsOf = (
       label: 'switch day and night',
       run: actions.toggleTime,
     },
+    ...(actions.isPixelView
+      ? [
+          {
+            group: 'view',
+            keys: 'x',
+            label: 'show or hide the pixel grid',
+            run: actions.toggleGrid,
+          } as const,
+        ]
+      : []),
     {
       group: 'view',
       keys: 'w',

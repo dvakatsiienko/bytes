@@ -36,7 +36,7 @@ export const SettingRow = (props: SettingRowProps) => {
       {props.group ? (
         <span className='shrink-0 text-ink-muted text-sm'>{props.group}</span>
       ) : null}
-      <span className='truncate'>{props.row.label}</span>
+      <span className='line-clamp-2'>{props.row.label}</span>
     </label>
   );
   const copyJSX = (

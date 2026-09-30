@@ -19,7 +19,11 @@ import type { Piece } from '../../art/pieces.ts';
 import { pieces } from '../../art/pieces.ts';
 import type { StudioActions } from '../actions.ts';
 import { defaults, looks } from '../stage/settings.ts';
-import { patchSettingsAtom, settingsByPieceAtom } from '../state.ts';
+import {
+  patchSettingsAtom,
+  pixelViewAtom,
+  settingsByPieceAtom,
+} from '../state.ts';
 import { Key } from './key';
 import { PiecesList } from './pieces-list';
 
@@ -32,6 +36,7 @@ export const PieceCard = (props: PieceCardProps) => {
   const settings =
     useAtomValue(settingsByPieceAtom)[props.piece.id] ?? defaults;
   const patchSettings = useSetAtom(patchSettingsAtom);
+  const pixel = useAtomValue(pixelViewAtom);
 
   return (
     <div className='glass flex flex-col gap-2.5 px-3.5 pt-3 pb-3.5'>
@@ -49,7 +54,9 @@ export const PieceCard = (props: PieceCardProps) => {
         </div>
         {props.actions.isStage ? null : (
           <span className='shrink-0 font-mono text-[12px] tabular-nums'>
-            {props.piece.size.w} × {props.piece.size.h} px
+            {pixel?.piece === props.piece.id
+              ? `${pixel.size} × ${pixel.size} px`
+              : `${props.piece.size.w} × ${props.piece.size.h} px`}
           </span>
         )}
       </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Progress } from '@ui/kit/components/progress';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 import type { Piece } from '../../art/pieces.ts';
 import { pieceSvg } from '../../art/pieces.ts';
@@ -9,8 +9,9 @@ import { devCrash } from '../dev-crash.ts';
 import { svgDataUrl } from '../image.ts';
 import { stageScenes } from '../stage/scenes.ts';
 import type { Settings } from '../stage/settings.ts';
-import { isPlayingAtom } from '../state.ts';
+import { isPlayingAtom, motionFrameAtom } from '../state.ts';
 import { StageCanvas } from './stage-canvas';
+import { LOOP_FRAMES } from './tools-corner';
 
 /**
  * The piece as it is now: lit on the stage when it has one, else its flat svg.
@@ -19,6 +20,7 @@ import { StageCanvas } from './stage-canvas';
  */
 export const LiveView = (props: LiveViewProps) => {
   const isPlaying = useAtomValue(isPlayingAtom);
+  const setMotionFrame = useSetAtom(motionFrameAtom);
   const [rendered, setRendered] = useState<string | null>(null);
   const [progress, setProgress] = useState<{
     done: number;
@@ -63,6 +65,7 @@ export const LiveView = (props: LiveViewProps) => {
       <StageCanvas
         isPlaying={isPlaying}
         onError={setError}
+        onFrame={(t) => setMotionFrame(Math.floor(t * LOOP_FRAMES))}
         onProgress={(done, total) => {
           setProgress({ done, total });
           if (done < total) setRendered(null);
