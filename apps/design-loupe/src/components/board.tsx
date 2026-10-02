@@ -25,7 +25,8 @@ export const Board = (props: BoardProps) => {
     if (!frame) return;
     // the frame's own Element: a node inside the board is never an instance of this page's Element
     const block = (event: Event) => {
-      const view = frame.contentWindow;
+      // a window carries its realm's constructors; the dom typings list them on globalThis only
+      const view = frame.contentWindow as (Window & typeof globalThis) | null;
       if (
         view &&
         event.target instanceof view.Element &&
