@@ -29,6 +29,39 @@ $K stop <pid> <job>
 
 Done when every line the change touched prints `✅`, and the report quotes the `ftr:` line.
 
+- 📌 a fresh tree needs no hand step: `pnpm worktree:seed` copies `.runtime/dc-runtime.js` from the
+  main checkout, and `start` builds the fixture boards when they are missing.
+
+## the edge checks — on the same server, after the walk
+
+Each prints one `✅` or `🐞` line and exits 1 on any 🐞. Each `red:` line is the planted defect that
+turned it red once — swap that line, run the check, put the line back. A change to a check is
+proven the same way. `broken` and `parallel` write to the job, so `walk` runs first; a walk after
+them needs a fresh `start`.
+
+- `$K broken 5291 <job>` — **a broken asks.json**: plants invalid json, waits for «loupe cannot read
+  the job», restores the file byte for byte (`cmp`) and waits for the asks to come back.
+  - red: `loupe.tsx` `if (job.isError)` → `if (job.isError && !job.data)` — the page keeps the old
+    job → `🐞 … no alert · asks · the file same`
+- `$K parallel 5291 <job> [n]` — **parallel POSTs**: n notes (default 8) posted to `ask-1` at once;
+  every one must answer 200 and land in `answers.json`.
+  - red: `server/job.ts` `inTurn(() => writeAnswerNow(jobDir, input))` → `writeAnswerNow(jobDir,
+    input)` — vite restarts the server on the swap, or `start` one after it → `🐞 … <n> of 8 in
+    answers.json`, n below 8 (1 and 2 seen)
+- `$K loads 5291 [/path…]` — **the iframe load counter**: opens the first path cold, moves in page
+  to each next one (default `/speak /speak/ask/1`), and counts each board revision's iframe loads
+  from resource timing (`probes/loads.js`); one loaded twice prints as `<file>?rev=<rev>×<n>`. A new
+  revision of a board is a new load, never a double. A check mid-walk reads the same probe with
+  `js loads`. Chrome keeps 250 entries; a full buffer fails the check, since it can hide a second
+  load (a view fills 46–65 today).
+  - red: `surface.tsx` `key={board.file}` → ``key={`${board.file}-${pinId}`}`` — a board remounts
+    when the open ask changes → `🐞 … Main.dc.html?rev=<rev>×2`
+- `$K boards 5291` — **the variant path list**: visits every board path the job holds
+  (`/speak/board/<name>`, 25 in the fixture — every board, not only the ones `walk` opens) in page,
+  one line each, `✅` when that board is framed whole.
+  - red: `route.ts` `board: decodeURIComponent(rest)` → `.toLowerCase()` on it →
+    `🐞 /speak/board/Main — framed 0 boards`
+
 ## look — after the walk
 
 - **essentials**: `x:browser-headless` → `$K essentials 5291 /speak /speak/ask/2 /speak/ask/3` — the essentials

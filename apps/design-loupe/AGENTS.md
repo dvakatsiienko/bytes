@@ -36,7 +36,8 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
   `answers.json`. Tests and verifier rounds use a copy of it, never the studio job.
 - **the runtime**: every board loads `./support.js`, the Claude Design runtime. It lives at
   `.runtime/dc-runtime.js` (gitignored, ~190 kB), read from the canvas with `Artifact read <canvas
-  url>` and `path: artifact-type/dc-runtime.js`. It is pinned per Design release; refresh it when
+  url>` and `path: artifact-type/dc-runtime.js`; `pnpm worktree:seed` copies the main checkout's into a
+  new worktree. It is pinned per Design release; refresh it when
   boards render wrong. Without it the boards are blank and `/boards/support.js` answers 404.
 
 ## The designer's loop
