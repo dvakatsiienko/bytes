@@ -166,10 +166,11 @@ case "${1:-}" in
     clicked=$(js board-link)
     sleep 1.5
     frames=$(js board-page)
+    kept=$(js board-kept)
     agent-browser eval "$(cat "${kit}/probes/esc-in-board.js")" >/dev/null
-    [ "${frames}" = 'every frame on its board' ] && [[ "${clicked}" == clicked* ]] \
-      && pass "a board's own links stay inside it: ${clicked}, the frame stays on its board" \
-      || fail "a board's own links stay inside it" "${clicked} → ${frames}"
+    [ "${frames}" = 'every frame on its board' ] && [ "${kept}" = kept ] && [[ "${clicked}" == clicked* ]] \
+      && pass "a board's own links stay inside it: ${clicked}, the frame never left or reloaded" \
+      || fail "a board's own links stay inside it" "${clicked} → ${frames}, the board ${kept}"
 
     # 🧭 a deep link opens an ask at its pin — moving between asks and boards never reloads the page
     [ "$(js kept)" = kept ] \

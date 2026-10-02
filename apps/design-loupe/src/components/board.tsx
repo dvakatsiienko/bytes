@@ -23,9 +23,12 @@ export const Board = (props: BoardProps) => {
   // itself, and a live board that followed it showed a second loupe inside the canvas
   useEffect(() => {
     if (!frame) return;
+    // the frame's own Element: a node inside the board is never an instance of this page's Element
     const block = (event: Event) => {
+      const view = frame.contentWindow;
       if (
-        event.target instanceof Element &&
+        view &&
+        event.target instanceof view.Element &&
         event.target.closest('a[href], form')
       )
         event.preventDefault();
