@@ -12,9 +12,15 @@ import {
 
 import type { AskView, BoardView, JobView } from '../../server/job.ts';
 import { useAnswer, useReopen } from '@/api.ts';
-import { reframe } from '@/hash.ts';
-import type { Target } from '@/view.ts';
-import { askIdOf, boardHash, stepAsk } from '@/view.ts';
+import type { Route } from '@/route.ts';
+import {
+  askIdOf,
+  askPath,
+  boardPath,
+  handleLinkClick,
+  navigate,
+} from '@/route.ts';
+import { stepAsk } from '@/view.ts';
 
 /**
  * The round's asks, one open at a time. Keys: `1`–`9` pick an option, Enter
@@ -30,8 +36,13 @@ export const AskPanel = (props: AskPanelProps) => {
     if (index < ask.options.length)
       answer.mutate({ id: ask.id, pick: index, text: '' });
   };
-  const keysRef = useRef({ active, asks: props.job.asks, pick });
-  keysRef.current = { active, asks: props.job.asks, pick };
+  const keysRef = useRef({
+    active,
+    asks: props.job.asks,
+    job: props.job.name,
+    pick,
+  });
+  keysRef.current = { active, asks: props.job.asks, job: props.job.name, pick };
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -46,7 +57,7 @@ export const AskPanel = (props: AskPanelProps) => {
           keys.active?.id,
           event.key === 'j' ? 1 : -1,
         );
-        if (next) location.hash = next;
+        if (next) navigate(askPath(keys.job, next));
         return;
       }
       if (!keys.active) return;
@@ -75,11 +86,11 @@ export const AskPanel = (props: AskPanelProps) => {
             'flex flex-col gap-1 border-l-2 px-5 py-3 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
             isActive ? 'border-loupe bg-muted/40' : 'border-transparent',
           )}
-          href={`#${ask.id}`}
+          href={askPath(props.job.name, ask.id)}
           // the open ask clicked again frames its board again, after a pan; a pointer click lets go
           // of the focus, so the next Enter answers the ask instead of following the link again
           onClick={(event) => {
-            if (location.hash === `#${ask.id}`) reframe();
+            handleLinkClick(event);
             if (event.detail > 0) event.currentTarget.blur();
           }}>
           <span className='flex items-center gap-2 text-muted-foreground text-xs'>
@@ -101,6 +112,7 @@ export const AskPanel = (props: AskPanelProps) => {
             // a failed save shows on the ask it was for, never on the next one
             error={answer.variables?.id === ask.id ? answer.error : null}
             isSaving={answer.isPending}
+            job={props.job.name}
             onPick={(index) => pick(ask, index)}
             onText={(text) => answer.mutate({ id: ask.id, pick: null, text })}
           />
@@ -114,7 +126,8 @@ export const AskPanel = (props: AskPanelProps) => {
       <header className='flex items-center gap-3 border-b px-5 py-3'>
         <a
           className='flex items-center gap-1.5 rounded-md font-semibold text-base hover:text-loupe'
-          href='/'>
+          href='/'
+          onClick={handleLinkClick}>
           <SearchIcon
             aria-hidden
             className='size-4 text-loupe'
@@ -208,7 +221,10 @@ const AskDetail = (props: AskDetailProps) => {
             applied in{' '}
             <a
               className='font-medium text-foreground underline'
-              href={props.board ? boardHash(props.board) : undefined}>
+              href={
+                props.board ? boardPath(props.job, props.board.name) : undefined
+              }
+              onClick={handleLinkClick}>
               {props.ask.applied?.in}
             </a>
           </span>
@@ -353,7 +369,7 @@ const isTyping = (target: EventTarget | null) =>
 interface AskPanelProps {
   job: JobView;
   openCount: number;
-  target: Target;
+  target: Route;
 }
 
 interface AskDetailProps {
@@ -361,6 +377,8 @@ interface AskDetailProps {
   board: BoardView | undefined;
   error: Error | null;
   isSaving: boolean;
+  /** the job's name, the first segment of every link */
+  job: string;
   onPick: (index: number) => void;
   onText: (text: string) => void;
 }

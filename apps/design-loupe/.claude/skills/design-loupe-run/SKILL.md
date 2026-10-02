@@ -1,6 +1,6 @@
 ---
 name: design-loupe-run
-description: Load BEFORE you run, start, screenshot or verify design-loupe — «run loupe», «open /#ask-2», «does the ring show», «answer an ask in the browser», «loupe round», «loupe wait», a check of `answers.json`.
+description: Load BEFORE you run, start, screenshot or verify design-loupe — «run loupe», «open /speak/ask/2», «does the ring show», «answer an ask in the browser», «loupe round», «loupe wait», a check of `answers.json`.
 ---
 
 # design-loupe-run — start it, drive it, stop it
@@ -47,7 +47,7 @@ done when the last line prints `"title":"speak — merge v1.19"` and three `open
 ```bash
 export AGENT_BROWSER_SESSION=loupe-run
 agent-browser set viewport 1440 900
-agent-browser open "http://localhost:$P/#ask-2"
+agent-browser open "http://localhost:$P/speak/ask/2"
 agent-browser wait '[data-ring="ask-2"]'
 agent-browser get title
 agent-browser screenshot "$S/ask-2.png"
@@ -68,7 +68,8 @@ sleep 1; jq -c '."ask-2"' "$S/speak/answers.json"
 
 the panel listens on `window`, so a dispatched event is the real path. `Enter` takes the
 recommendation, `"1"`–`"9"` pick an option, `"j"` / `"k"` step between asks. move to another ask with
-`agent-browser eval 'location.hash = "#ask-1"'`.
+`agent-browser eval '(() => { history.pushState(null, "", "/speak/ask/1"); dispatchEvent(new PopStateEvent("popstate")); })()'`
+— an in-page move, the way a link makes one; `open` on a new path reloads the page.
 
 ## 4. drive the api and the designer's side
 
@@ -106,8 +107,8 @@ done when `lsof -nP -iTCP:$P -sTCP:LISTEN` prints nothing. kill only the listene
   `timeout`, then a fresh `open` starts a new browser.
 - the first deep-link load after `pnpm dev` starts can miss the ring at a fixed 2.5 s wait; it showed
   3 of 3 times after that. wait on `[data-ring=…]`, never on a sleep.
-- `agent-browser open` to the same url with a new hash does not reload the page — listeners and
-  globals from an earlier `eval` are still there.
+- an in-page move (pushState + popstate) keeps the page: listeners and globals from an earlier `eval`
+  are still there. `agent-browser open` on any path is a fresh load.
 - `agent-browser wait 'text=…'` is not a text wait; it hangs. use `wait --text "…"`.
 - pnpm 12 has no `-s`: `pnpm -s loupe …` fails with «unexpected argument '-s'». use plain `pnpm loupe`.
 - `pnpm test` exits 1 with «No test files found» until the app has `*.test.ts` files under `server`,

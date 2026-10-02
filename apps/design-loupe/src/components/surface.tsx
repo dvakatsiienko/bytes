@@ -9,14 +9,15 @@ import {
 import { Board } from '@/components/board';
 
 import type { JobView } from '../../server/job.ts';
-import { REFRAME_EVENT } from '@/hash.ts';
-import type { Rect, Target } from '@/view.ts';
+import type { Route } from '@/route.ts';
+import { REFRAME_EVENT, askIdOf } from '@/route.ts';
+import type { Rect } from '@/view.ts';
 import {
   MAX_SCALE,
   MIN_SCALE,
-  askIdOf,
   boundsOf,
   frameRect,
+  revealRect,
   wheelView,
 } from '@/view.ts';
 
@@ -56,6 +57,19 @@ export const Surface = (props: SurfaceProps) => {
     });
     zoom.setTransform(view.x, view.y, view.scale, 420, 'easeOut');
   };
+  const revealBoard = (name: string) => {
+    const zoom = zoomRef.current;
+    const wrapper = zoom?.instance.wrapperComponent;
+    const board = props.job.boards.find((candidate) => candidate.name === name);
+    if (!(zoom && wrapper && board)) return;
+    const { positionX, positionY, scale } = zoom.instance.state;
+    const view = revealRect(
+      { h: board.h, w: board.w, x: board.x - bounds.x, y: board.y - bounds.y },
+      { scale, x: positionX, y: positionY },
+      { h: wrapper.clientHeight, w: wrapper.clientWidth },
+    );
+    if (view) zoom.setTransform(view.x, view.y, view.scale, 300, 'easeOut');
+  };
   const frameRef = useRef(frameNow);
   frameRef.current = frameNow;
   // biome-ignore lint/correctness/useExhaustiveDependencies: frameKey is the trigger; the frame reads the latest props through the ref
@@ -87,8 +101,15 @@ export const Surface = (props: SurfaceProps) => {
       );
       zoom.setTransform(view.x, view.y, view.scale, 0);
     };
+    // a focused cover makes the browser scroll the clipped wrapper to it, which shifts every
+    // board off its transform; the pan is ours (revealBoard), so the wrapper never scrolls
+    const handleScroll = () => wrapper.scrollTo(0, 0);
     wrapper.addEventListener('wheel', handleWheel, { passive: false });
-    return () => wrapper.removeEventListener('wheel', handleWheel);
+    wrapper.addEventListener('scroll', handleScroll);
+    return () => {
+      wrapper.removeEventListener('wheel', handleWheel);
+      wrapper.removeEventListener('scroll', handleScroll);
+    };
   }, [wrapper]);
 
   useEffect(() => {
@@ -118,6 +139,7 @@ export const Surface = (props: SurfaceProps) => {
         key={board.file}
         left={board.x - bounds.x}
         onLive={setLiveBoard}
+        onReveal={revealBoard}
         pinId={pinId}
         top={board.y - bounds.y}
       />
@@ -198,5 +220,5 @@ export const Surface = (props: SurfaceProps) => {
 
 interface SurfaceProps {
   job: JobView;
-  target: Target;
+  target: Route;
 }

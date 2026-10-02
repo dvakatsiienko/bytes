@@ -35,5 +35,5 @@ the canvas stays where dima explores and comments natively; design-loupe is wher
 
 ## The cut — v1
 
-- in: one job (speak) · live boards on pan/zoom · a deep link `/#ask-N` that zooms and rings · a moved target says so · the ask panel (question, outcome buttons, the recommendation and why, `1`–`4`, Enter, `j`/`k`, a text line) · `answers.json` · open → answered → seen → applied · the open count in the tab title and favicon · one push per round, sent by the designer
+- in: one job (speak) · live boards on pan/zoom · a deep link `/<job>/ask/N` that zooms and rings · a moved target says so · the ask panel (question, outcome buttons, the recommendation and why, `1`–`4`, Enter, `j`/`k`, a text line) · `answers.json` · open → answered → seen → applied · the open count in the tab title and favicon · one push per round, sent by the designer
 - out: several jobs, tabs or filters · dima's own canvas threads · asks from cclio or coders · any cloud store · mobile · editing boards · a pill or menubar presence

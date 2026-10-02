@@ -31,16 +31,16 @@ Done when every line the change touched prints `✅`, and the report quotes the 
 
 ## look — after the walk
 
-- **essentials**: `x:browser-headless` → `essentials/run.sh http://localhost:5291/#ask-2 --wait '[data-ring]'`
-  at 1280 and 390, and the same at `/#ask-3` (a moved target), with design-loupe's two allows:
+- **essentials**: `x:browser-headless` → `$K essentials 5291 /speak/ask/2 /speak/ask/3` — the essentials
+  at 1280 and 390 on an ask and a moved target, with design-loupe's three allows:
   - `--allow 'covered=use T1 .* covered by'` — the surface is a canvas: a board that runs past the
     surface edge sits under the panel, and its cover's centre is the panel
   - `--allow 'tab=«loupe»: jumps back up and left from'` — the boards come first, so the walk wraps
     once from the last board cover to the panel's wordmark
   - `--allow 'axe=target-size'` — axe counts those clipped covers as overlapping the ask rows; the
-    pointer lands in the row (`$K probe 5191 target '#ask-2'` prints `inLink: true`). An ask row
+    pointer lands in the row (`$K probe 5291 target /speak/ask/2` prints `inLink: true`). An ask row
     under 24 px tall would be a real finding: read the probe's box.
-- **shots**: `$K probe 5291 ring '#ask-2'` prints one probe and shoots the page. Read a 2× crop of the
+- **shots**: `$K probe 5291 ring /speak/ask/2` prints one probe and shoots the page. Read a 2× crop of the
   ring and the panel at wide 1728×1117, standard 1440×900 and narrow 900×1200. A clipped ring, a
   title over another board or cut panel text is a finding even when the walk is green.
 - **dark**: `agent-browser set media dark`, then the same shots.

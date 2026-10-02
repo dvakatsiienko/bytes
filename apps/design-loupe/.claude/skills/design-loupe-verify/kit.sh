@@ -4,8 +4,8 @@
 #                       prints `job=<dir> port=<port> pid=<pid>` — keep them for walk and stop
 #   walk <port> <job>   drives every FTR.md line on that server and job: `✅ <line>` or `🐞 <line> — why`;
 #                       exit 1 on any 🐞
-#   essentials <port> [#hash…]    x:browser-headless essentials at 1280 and 390, with the app's allows
-#   probe <port> <name> [#hash]   opens the page at the hash, prints probes/<name>.js, shoots it
+#   essentials <port> [/path…]    x:browser-headless essentials at 1280 and 390, with the app's allows
+#   probe <port> <name> [/path]   opens the page at the path, prints probes/<name>.js, shoots it
 #   stop <pid> <job>    stops that server and trashes the copy
 # Run from anywhere inside a checkout. Nothing here writes the studio job or fixtures/speak itself.
 set -uo pipefail
@@ -15,11 +15,13 @@ kit=$(cd "$(dirname "$0")" && pwd)
 export AGENT_BROWSER_SESSION="${AGENT_BROWSER_SESSION:-verify-design-loupe}"
 fails=0
 
-pass() { echo "✅ $1"; }
-fail() { echo "🐞 $1 — $2"; fails=$((fails + 1)); }
+checks=0
+pass() { echo "✅ $1"; checks=$((checks + 1)); }
+fail() { echo "🐞 $1 — $2"; fails=$((fails + 1)); checks=$((checks + 1)); }
 js() { agent-browser eval "$(cat "${kit}/probes/$1.js")" | tr -d '\\' | sed -e 's/^"//' -e 's/"$//'; }
 key() { agent-browser eval "(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: '$1' })); return 1; })()" >/dev/null; }
-go() { agent-browser eval "(() => { location.hash = '$1'; return 1; })()" >/dev/null; sleep 1; }
+# an in-page move, the way a link click makes one: pushState, then the popstate the route store hears
+go() { agent-browser eval "(() => { history.pushState(null, '', '$1'); dispatchEvent(new PopStateEvent('popstate')); return 1; })()" >/dev/null; sleep 1; }
 api() { curl -s "localhost:${port}/api/job" | jq -r "$1"; }
 title() { agent-browser get title; }
 
@@ -47,9 +49,11 @@ case "${1:-}" in
     agent-browser set viewport 1440 900 >/dev/null
 
     # 🧭 the open count — before anything is answered
-    agent-browser open "${url}/#ask-2" >/dev/null
+    # a cold load of the ask path: a fresh tab straight onto /speak/ask/2
+    agent-browser open "${url}/speak/ask/2" >/dev/null
     agent-browser wait '[data-ring="ask-2"]' >/dev/null
     sleep 1.5
+    js kept >/dev/null
     [ "$(title)" = '(3) speak · loupe' ] && [ "$(js favicon)" = 3 ] \
       && pass 'the open count: 3 open → (3) speak · loupe, favicon 3' \
       || fail 'the open count' "title «$(title)», favicon «$(js favicon)»"
@@ -58,7 +62,7 @@ case "${1:-}" in
     first=$(cd "${app}" && PORT="${port}" node scripts/loupe.ts round "${job}" 2>&1)
     second=$(cd "${app}" && PORT="${port}" node scripts/loupe.ts round "${job}" 2>&1)
     code=$?
-    [ "$(printf '%s\n' "${first}" | wc -l | tr -d ' ')" = 1 ] && [[ "${first}" == *'3 asks'* ]] && [ "${code}" = 1 ] \
+    [ "$(printf '%s\n' "${first}" | wc -l | tr -d ' ')" = 1 ] && [[ "${first}" == *"3 asks → http://localhost:${port}/speak/ask/1"* ]] && [ "${code}" = 1 ] \
       && pass "one push per round: «${first}», a second call refused" \
       || fail 'one push per round' "first «${first}», second «${second}» (exit ${code})"
 
@@ -76,7 +80,7 @@ case "${1:-}" in
       || fail 'a deep link opens an ask at its pin' "${ring}"
 
     # 🧭 a moved target says so
-    go '#ask-3'
+    go '/speak/ask/3'
     sleep 0.6
     moved=$(js framed)
     agent-browser get text aside | grep -q 'target moved' && [ "${moved}" = 'whole admin-900 no-ring' ] \
@@ -84,21 +88,21 @@ case "${1:-}" in
       || fail 'a moved target says so' "${moved}"
 
     # 🧭 answering an ask — Enter takes the recommendation, 2 picks option 2
-    go '#ask-1'
+    go '/speak/ask/1'
     # Enter on a focused link follows the link and answers nothing
-    js enter-on-link >/dev/null
+    sent=$(js enter-on-link)
     sleep 1
     early=$(jq -c 'keys' "${job}/answers.json" 2>/dev/null || echo '[]')
     agent-browser eval '(() => { document.activeElement?.blur(); return 1; })()' >/dev/null
     key Enter
     sleep 1
-    go '#ask-2'
+    go '/speak/ask/2'
     key 2
     sleep 1
     picks=$(jq -c '[."ask-1".pick, ."ask-2".pick, (."ask-1".rev | length)]' "${job}/answers.json")
-    [ "${early}" = '[]' ] && [ "${picks}" = '[0,1,8]' ] && agent-browser get text aside | grep -q 'answered' \
+    [ "${sent}" = 'sent from the ask-2 link' ] && [ "${early}" = '[]' ] && [ "${picks}" = '[0,1,8]' ] && agent-browser get text aside | grep -q 'answered' \
       && pass 'answering an ask: Enter → option 1, 2 → option 2, each with a board revision; Enter on a link answers nothing' \
-      || fail 'answering an ask' "after Enter on a link ${early}, answers ${picks}"
+      || fail 'answering an ask' "Enter on a link: «${sent}» → ${early}, answers ${picks}"
 
     # 🧭 an ask's life is visible
     (cd "${app}" && node scripts/loupe.ts mark "${job}" ask-2 seen >/dev/null)
@@ -107,12 +111,12 @@ case "${1:-}" in
     (cd "${app}" && node scripts/loupe.ts mark "${job}" ask-2 applied v1.20 >/dev/null)
     sleep 1
     href=$(js applied)
-    [ "${seen}" = 1 ] && [ "${href}" = '#board-admin-1728' ] \
+    [ "${seen}" = 1 ] && [ "${href}" = '/speak/board/admin-1728' ] \
       && pass "an ask's life is visible: seen, then applied in v1.20 → ${href}" \
       || fail "an ask's life is visible" "seen ${seen}, applied link «${href}»"
 
     # 🧭 the open count — gone once every ask is answered
-    go '#ask-3'
+    go '/speak/ask/3'
     key 1
     sleep 1.2
     [ "$(title)" = 'speak · loupe' ] && [ "$(js favicon)" = 0 ] \
@@ -120,7 +124,7 @@ case "${1:-}" in
       || fail 'the open count, all answered' "title «$(title)», favicon «$(js favicon)»"
 
     # 🧭 only nearby boards are live
-    go '#board-admin-chain-of-one'
+    go '/speak/board/admin-chain-of-one'
     sleep 0.8
     near=$(js frames)
     live=$(printf '%s' "${near}" | cut -d' ' -f1)
@@ -138,6 +142,24 @@ case "${1:-}" in
     [ "${on}" = 'auto' ] && [ "${off}" = 'none' ] \
       && pass 'a board made interactive: a click → it takes the pointer; Esc inside it → panning' \
       || fail 'a board made interactive' "after click «${on}», after Esc «${off}»"
+
+    # 🧭 a deep link opens an ask at its pin — moving between asks and boards never reloads the page
+    [ "$(js kept)" = kept ] \
+      && pass 'moving between asks and boards: one page marker held across every move of the walk' \
+      || fail 'moving between asks and boards' 'the page reloaded'
+
+    # 🧭 a board reached by Tab comes into view — admin · 900 sits half under the panel at 1280
+    agent-browser set viewport 1280 800 >/dev/null
+    agent-browser open "${url}/speak/ask/2" >/dev/null
+    agent-browser wait '[data-ring="ask-2"]' >/dev/null
+    sleep 1
+    tabs=$(node "${kit}/probes/tab.mjs" "$(agent-browser get cdp-url)" "${port}" '[data-board="admin-900"] button')
+    sleep 0.6
+    seen=$(js onscreen)
+    agent-browser set viewport 1440 900 >/dev/null
+    [ "${seen}" = 'whole admin-900' ] \
+      && pass "a board reached by Tab comes into view: admin · 900 whole on screen after ${tabs} Tabs at 1280" \
+      || fail 'a board reached by Tab comes into view' "after ${tabs} Tabs: ${seen}"
 
     # 🧭 the designer wakes on an answer
     log=$(mktemp)
@@ -161,7 +183,7 @@ case "${1:-}" in
       || fail 'the designer wakes on an answer' "$(tr '\n' ' ' < "${log}" | cut -c1-200)"
 
     agent-browser close >/dev/null 2>&1
-    echo "ftr: $((10 - fails)) ✅ · ${fails} 🐞"
+    echo "ftr: $((checks - fails)) ✅ · ${fails} 🐞"
     exit $((fails > 0))
     ;;
 
@@ -171,11 +193,11 @@ case "${1:-}" in
     run="${HOME}/frame/home/.claude/plugin-x/skills/browser-headless/essentials/run.sh"
     status=0
     n=0
-    for hash in "${@:-#ask-2}"; do
+    for path in "${@:-/speak/ask/2}"; do
       # a fresh browser per view: the second view in a reused session carries the first one's focus and frames
       n=$((n + 1))
       # the allows and their reasons: SKILL.md, «look»
-      AGENT_BROWSER_SESSION="${AGENT_BROWSER_SESSION}-essentials-${n}" "${run}" "http://localhost:${port}/${hash}" --wait 'aside li' \
+      AGENT_BROWSER_SESSION="${AGENT_BROWSER_SESSION}-essentials-${n}" "${run}" "http://localhost:${port}${path}" --wait 'aside li' \
         --allow 'covered=use T1 .* covered by' \
         --allow 'tab=«loupe»: jumps back up and left from' \
         --allow 'axe=target-size' 2>&1 | tail -1 || status=1
@@ -186,7 +208,7 @@ case "${1:-}" in
   probe)
     port=${2:?port}
     agent-browser set viewport 1440 900 >/dev/null
-    agent-browser open "http://localhost:${port}/${4:-}" >/dev/null
+    agent-browser open "http://localhost:${port}${4:-/}" >/dev/null
     sleep 2.5
     js "${3:?probe name}"
     agent-browser screenshot "${TMPDIR:-/tmp}/design-loupe-probe.png" >/dev/null

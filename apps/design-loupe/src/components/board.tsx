@@ -115,6 +115,11 @@ export const Board = (props: BoardProps) => {
               return;
             props.onLive(props.board.name);
           }}
+          // Tab onto a board half under the panel brings it on screen; a pointer press is not a reveal
+          onFocus={(event) => {
+            if (event.currentTarget.matches(':focus-visible'))
+              props.onReveal(props.board.name);
+          }}
           onPointerDown={(event) => {
             downAt.current = { x: event.clientX, y: event.clientY };
           }}
@@ -202,6 +207,8 @@ interface BoardProps {
   left: number;
   /** a board name makes it live, null makes every board a cover again */
   onLive: (board: string | null) => void;
+  /** keyboard focus landed on the board's cover */
+  onReveal: (board: string) => void;
   /** the open ask's pin on this board, ringed */
   pinId: string | undefined;
   top: number;

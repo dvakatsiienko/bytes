@@ -6,13 +6,13 @@ import { Section, errorText } from '@/components/section';
 import { Surface } from '@/components/surface';
 
 import { useJob } from '@/api.ts';
-import { useHash } from '@/hash.ts';
-import { faviconSvg, openCountOf, parseHash, tabTitle } from '@/view.ts';
+import { parseRoute, usePath } from '@/route.ts';
+import { faviconSvg, openCountOf, tabTitle } from '@/view.ts';
 
-/** the boards on the left, the asks on the right; the url hash says which ask is open */
+/** the boards on the left, the asks on the right; the path says which ask is open */
 export const Loupe = () => {
   const job = useJob();
-  const target = parseHash(useHash());
+  const target = parseRoute(usePath());
   const openCount = job.data ? openCountOf(job.data.asks) : 0;
 
   useEffect(() => {

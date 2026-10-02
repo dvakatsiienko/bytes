@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   faviconSvg,
   frameRect,
-  parseHash,
+  revealRect,
   stepAsk,
   tabTitle,
   wheelView,
@@ -57,23 +57,6 @@ describe('wheelView', () => {
   });
 });
 
-describe('parseHash', () => {
-  it('reads an ask link', () => {
-    expect(parseHash('#ask-12')).toEqual({ ask: 'ask-12', kind: 'ask' });
-  });
-
-  it('reads a board link', () => {
-    expect(parseHash('#board-admin-900')).toEqual({
-      board: 'admin-900',
-      kind: 'board',
-    });
-  });
-
-  it('reads anything else as the overview', () => {
-    expect(parseHash('#nonsense')).toEqual({ kind: 'overview' });
-  });
-});
-
 describe('stepAsk', () => {
   const asks = [
     { id: 'ask-1', state: 'answered' },
@@ -105,5 +88,40 @@ describe('the open count', () => {
 
   it('is absent from the favicon when nothing is open', () => {
     expect(faviconSvg(0)).not.toContain('<text');
+  });
+});
+
+describe('revealRect', () => {
+  const viewport = { h: 800, w: 1000 };
+
+  it('leaves a board already on screen where it is', () => {
+    expect(
+      revealRect(
+        { h: 100, w: 100, x: 100, y: 100 },
+        { scale: 1, x: 0, y: 0 },
+        viewport,
+        20,
+      ),
+    ).toBeNull();
+  });
+
+  it('pans a board half past the right edge just far enough to show it whole', () => {
+    const view = revealRect(
+      { h: 100, w: 200, x: 900, y: 100 },
+      { scale: 1, x: 0, y: 0 },
+      viewport,
+      20,
+    );
+    expect(view).toEqual({ scale: 1, x: -120, y: 0 });
+  });
+
+  it('frames a board too big for the screen at this zoom', () => {
+    const view = revealRect(
+      { h: 2000, w: 2000, x: 0, y: 0 },
+      { scale: 1, x: 0, y: 0 },
+      viewport,
+      20,
+    );
+    expect(view?.scale).toBeCloseTo(760 / 2000);
   });
 });

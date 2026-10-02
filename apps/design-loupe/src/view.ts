@@ -1,4 +1,4 @@
-import type { AskView, BoardView } from '../server/job.ts';
+import type { AskView } from '../server/job.ts';
 
 /** air around a framed board, in screen px */
 const FRAME_PAD = 48;
@@ -74,23 +74,36 @@ export const wheelView = (view: View, wheel: Wheel): View => {
   };
 };
 
-const ASK_HASH = /^#(ask-\d+)$/;
-const BOARD_HASH = /^#board-(.+)$/;
-
-/** `#ask-2` opens an ask, `#board-Main` frames a board; anything else is the overview */
-export const parseHash = (hash: string): Target => {
-  const ask = ASK_HASH.exec(hash);
-  if (ask?.[1]) return { ask: ask[1], kind: 'ask' };
-  const board = BOARD_HASH.exec(hash);
-  if (board?.[1]) return { board: decodeURIComponent(board[1]), kind: 'board' };
-  return { kind: 'overview' };
+/**
+ * A board reached by Tab must be on screen whole. Already whole → null, the
+ * view stays. It fits at this zoom → the smallest pan that brings it in. It
+ * cannot fit → it is framed.
+ */
+export const revealRect = (
+  rect: Rect,
+  view: View,
+  viewport: Size,
+  pad = FRAME_PAD,
+): View | null => {
+  const left = view.x + rect.x * view.scale;
+  const top = view.y + rect.y * view.scale;
+  const right = left + rect.w * view.scale;
+  const bottom = top + rect.h * view.scale;
+  const fits =
+    rect.w * view.scale <= viewport.w - 2 * pad &&
+    rect.h * view.scale <= viewport.h - 2 * pad;
+  if (!fits) return frameRect(rect, viewport, pad);
+  const shift = (start: number, end: number, size: number) => {
+    if (start < pad) return pad - start;
+    if (end > size - pad) return size - pad - end;
+    return 0;
+  };
+  const dx = shift(left, right, viewport.w);
+  const dy = shift(top, bottom, viewport.h);
+  return dx === 0 && dy === 0
+    ? null
+    : { scale: view.scale, x: view.x + dx, y: view.y + dy };
 };
-
-export const askIdOf = (target: Target) =>
-  target.kind === 'ask' ? target.ask : undefined;
-
-export const boardHash = (board: Pick<BoardView, 'name'>) =>
-  `#board-${encodeURIComponent(board.name)}`;
 
 /** `j` / `k`: the next or previous ask, wrapping; from no ask, the first open one */
 export const stepAsk = (
@@ -152,8 +165,3 @@ export interface Wheel {
   pointX: number;
   pointY: number;
 }
-
-export type Target =
-  | { kind: 'ask'; ask: string }
-  | { kind: 'board'; board: string }
-  | { kind: 'overview' };

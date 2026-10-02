@@ -1,6 +1,6 @@
 // the ask-1 row link's box and what the pointer hits at its centre and corners
 (() => {
-  const link = document.querySelector('a[href$="#ask-1"]');
+  const link = document.querySelector('a[href$="/ask/1"]');
   const r = link.getBoundingClientRect();
   const hit = (x, y) => {
     const el = document.elementFromPoint(x, y);

@@ -12,10 +12,10 @@
 
 - ✅ a deep link opens an ask at its pin
   - given a job's boards and asks.json with 3 asks
-  - when dima opens `/#ask-2`
+  - when dima opens `/speak/ask/2`, cold or from another ask
   - then the view zooms to its board and a ring frames the pin within 2 px, at zoom 0.37 and 2.0, in Chrome
   - decision: the ring is drawn by the app over the board, never injected into the comp — the board stays the comp
-  - decision: the link is a hash (`/#ask-N`, `/#board-<name>`), not a path segment — one page, one dev server, and a hash change never reloads the boards
+  - decision: the link is a path (`/speak/ask/2`, `/speak/board/<name>`), the job in its first segment — an ask is a place (bytes AGENTS.md, url shape); moves are client-side, so the boards never reload (dima, 2026-10-02)
 - ✅ a moved target says so
   - given an ask whose pin is gone from its board
   - when design-loupe loads
@@ -38,6 +38,10 @@
   - given 20 boards
   - when dima pans
   - then only the boards in view, plus one ring of neighbours, are live frames; the rest are placeholders
+- ✅ a board reached by Tab comes into view
+  - given a board that sits half under the panel
+  - when dima tabs onto it
+  - then the view pans until the whole board is on screen; focus is never hidden (dima, 2026-10-02)
 - ✅ a board made interactive
   - when dima clicks a board
   - then it takes hover and play; Esc returns to panning

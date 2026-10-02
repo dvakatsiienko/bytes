@@ -8,6 +8,7 @@ import {
   readAnswers,
   readJob,
 } from '../server/job.ts';
+import { askPath } from '../src/route.ts';
 
 const usage = `loupe <verb> <job dir> — the designer's side of design-loupe
 
@@ -63,7 +64,7 @@ async function round() {
     );
   const asks = await claimPush(jobDir);
   console.log(
-    `${job.name} · round ${asks.round}: ${open.length} ${open.length === 1 ? 'ask' : 'asks'} → ${origin}/#${first?.id ?? ''}`,
+    `${job.name} · round ${asks.round}: ${open.length} ${open.length === 1 ? 'ask' : 'asks'} → ${origin}${askPath(job.name, first.id)}`,
   );
 }
 
