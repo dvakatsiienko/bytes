@@ -54,8 +54,8 @@ case "${1:-}" in
     agent-browser wait '[data-ring="ask-2"]' >/dev/null
     sleep 1.5
     js kept >/dev/null
-    [ "$(title)" = '(3) speak · loupe' ] && [ "$(js favicon)" = 3 ] \
-      && pass 'the open count: 3 open → (3) speak · loupe, favicon 3' \
+    [ "$(title)" = '(3) speak · design loupe' ] && [ "$(js favicon)" = 3 ] \
+      && pass 'the open count: 3 open → (3) speak · design loupe, favicon 3' \
       || fail 'the open count' "title «$(title)», favicon «$(js favicon)»"
 
     # 🧭 one push per round — first, while every ask is open
@@ -119,8 +119,8 @@ case "${1:-}" in
     go '/speak/ask/3'
     key 1
     sleep 1.2
-    [ "$(title)" = 'speak · loupe' ] && [ "$(js favicon)" = 0 ] \
-      && pass 'the open count: all answered → speak · loupe, no favicon count' \
+    [ "$(title)" = 'speak · design loupe' ] && [ "$(js favicon)" = 0 ] \
+      && pass 'the open count: all answered → speak · design loupe, no favicon count' \
       || fail 'the open count, all answered' "title «$(title)», favicon «$(js favicon)»"
 
     # 🧭 only nearby boards are live

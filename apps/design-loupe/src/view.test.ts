@@ -83,11 +83,11 @@ describe('stepAsk', () => {
 
 describe('the open count', () => {
   it('leads the tab title', () => {
-    expect(tabTitle('speak', 3)).toBe('(3) speak · loupe');
+    expect(tabTitle('speak', 3)).toBe('(3) speak · design loupe');
   });
 
   it('leaves the title when nothing is open', () => {
-    expect(tabTitle('speak', 0)).toBe('speak · loupe');
+    expect(tabTitle('speak', 0)).toBe('speak · design loupe');
   });
 
   it('is drawn on the favicon', () => {

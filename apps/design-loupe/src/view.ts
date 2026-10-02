@@ -123,7 +123,7 @@ export const openCountOf = (asks: readonly Pick<AskView, 'state'>[]) =>
   asks.filter((ask) => ask.state === 'open').length;
 
 export const tabTitle = (job: string, open: number) =>
-  open > 0 ? `(${open}) ${job} · loupe` : `${job} · loupe`;
+  open > 0 ? `(${open}) ${job} · design loupe` : `${job} · design loupe`;
 
 /** the lens mark; with open asks a count badge sits on it, «9+» past nine */
 export const faviconSvg = (open: number) => {

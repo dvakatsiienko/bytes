@@ -32,7 +32,7 @@
   - then the ask shows «seen», then «applied in vN» with a link to its board
 - ✅ the open count
   - given 3 open asks
-  - then the tab reads `(3) speak · loupe` and the favicon carries 3
+  - then the tab reads `(3) speak · design loupe` and the favicon carries 3
   - when all are answered, then the count is gone
 - ✅ only nearby boards are live
   - given 20 boards

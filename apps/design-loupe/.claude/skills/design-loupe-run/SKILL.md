@@ -55,7 +55,7 @@ agent-browser screenshot "$S/ask-2.png"
 
 - the ring is `[data-ring="<ask id>"]`, drawn by the app over the iframe. read its box with
   `agent-browser eval '(() => document.querySelector("[data-ring]")?.getBoundingClientRect().toJSON())()'`.
-- the title carries the open count: `(3) speak · loupe`, then `speak · loupe` once all are answered.
+- the title carries the open count: `(3) speak · design loupe`, then `speak · design loupe` once all are answered.
 - a moved target has no ring; the panel shows «target moved». wait on it with
   `agent-browser wait --text "target moved"`.
 
