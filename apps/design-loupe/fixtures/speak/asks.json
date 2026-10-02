@@ -1,0 +1,37 @@
+{
+  "round": 1,
+  "boards": "boards",
+  "asks": [
+    {
+      "id": "ask-1",
+      "board": "Main.dc.html",
+      "kind": "pick",
+      "question": "the stats strip sits in a dark chrome footer. keep it dark, or let it sit on the page?",
+      "options": ["keep the dark footer", "put the strip on the page"],
+      "recommend": 0,
+      "why": "the dark chrome ties the footer to the header, so the page reads as one frame"
+    },
+    {
+      "id": "ask-2",
+      "board": "admin-1728.dc.html",
+      "kind": "compare",
+      "question": "at 1728 the header stretches the full width. hold it at the content width instead?",
+      "options": [
+        "hold the header at the content width",
+        "stretch the header full width",
+        "stretch it, but keep the tabs centred"
+      ],
+      "recommend": 0,
+      "why": "a full-width bar on a wide screen puts the tabs far from the content they switch"
+    },
+    {
+      "id": "ask-3",
+      "board": "admin-900.dc.html",
+      "kind": "confirm",
+      "question": "at 900 the save button moved under the list. is that the right place?",
+      "options": ["yes, keep it there", "no, put it back in the header"],
+      "recommend": 0,
+      "why": "under the list it sits where the edit ends"
+    }
+  ]
+}

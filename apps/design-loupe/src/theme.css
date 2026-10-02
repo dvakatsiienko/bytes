@@ -1,0 +1,79 @@
+@import "@ui/kit/globals.css";
+@import "@fontsource-variable/hanken-grotesk";
+
+@theme inline {
+  --font-sans: "Hanken Grotesk Variable", system-ui, sans-serif;
+  --color-desk: var(--desk);
+  --color-desk-ink: var(--desk-ink);
+  --color-loupe: var(--loupe);
+  --color-loupe-ink: var(--loupe-ink);
+}
+
+/* the desk is the surface the boards lie on; the loupe colour is the ring and
+   the one accent, loud enough to read over any board */
+:root {
+  --desk: #e9e7e2;
+  /* 5.4:1 on the desk: board titles are 14px */
+  --desk-ink: #5f5c56;
+  /* 5.2:1 against white both ways: the open chip and the recommended tag are 12px text */
+  --loupe: #c2410c;
+  --loupe-ink: #ffffff;
+}
+
+.dark {
+  --desk: #121212;
+  --desk-ink: #8d8a84;
+  --loupe: #ff7a4d;
+  --loupe-ink: #1b0d07;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+  button,
+  [role="button"],
+  a[href] {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  ::selection {
+    color: var(--loupe-ink);
+    background: var(--loupe);
+  }
+}
+
+/* the surface pans: a grab cursor, and the board covers stay grabbable */
+.loupe-surface {
+  cursor: grab;
+}
+.loupe-surface:active {
+  cursor: grabbing;
+}
+
+/* zoom-independent lines: the content element carries --zoom, set on every transform */
+.loupe-ring {
+  outline: calc(2.5px / var(--zoom, 1)) solid var(--loupe);
+  outline-offset: calc(2px / var(--zoom, 1));
+  box-shadow: 0 0 0 calc(6px / var(--zoom, 1))
+    color-mix(in srgb, var(--loupe) 22%, transparent);
+}
+.loupe-board-live {
+  outline: calc(2px / var(--zoom, 1)) solid var(--ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

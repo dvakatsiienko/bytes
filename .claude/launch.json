@@ -44,6 +44,14 @@
       "url": "http://localhost:5173"
     },
     {
+      "name": "design-loupe",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "design-loupe", "dev"],
+      "port": 5181,
+      "url": "http://localhost:5181",
+      "autoPort": false
+    },
+    {
       "name": "trophy-sys",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "trophy-sys", "dev"],
