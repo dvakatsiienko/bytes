@@ -3,7 +3,7 @@
  *
  * A worktree carries only what git tracks. This copies what git ignores and a
  * dev server needs — every app's `.env*`, `.claude/settings.local.json`,
- * trophy-sys's local caches — from the main checkout, installs with `CI=1` so
+ * trophy-sys's local caches, design-loupe's canvas runtime — from the main checkout, installs with `CI=1` so
  * lefthook cannot rewrite the shared hooks, and writes `.worktree-offset` so
  * `script/with-port.ts` moves every dev port clear of every other tree.
  *
@@ -51,11 +51,8 @@ if (index === 0) {
 }
 
 const SEEDS = ['.claude/settings.local.json'];
-const APP_SEEDS = [
-  /^\.env(\..+)?$/,
-  /^\.trophy-.*\.json$/,
-  /^\.claude\/settings\.local\.json$/,
-];
+const APP_SEEDS = [/^\.env(\..+)?$/, /^\.trophy-.*\.json$/];
+const APP_FILES = ['.claude/settings.local.json', '.runtime/dc-runtime.js'];
 
 function ignored(file: string): boolean {
   try {
@@ -125,7 +122,7 @@ for (const app of readdirSync(join(main, 'apps'), { withFileTypes: true })) {
   for (const entry of readdirSync(dir))
     if (APP_SEEDS.some((re) => re.test(entry)))
       seed(relative(main, join(dir, entry)));
-  seed(relative(main, join(dir, '.claude/settings.local.json')));
+  for (const file of APP_FILES) seed(relative(main, join(dir, file)));
 }
 
 const offset = offsetPick();

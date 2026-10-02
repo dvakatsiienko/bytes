@@ -6,8 +6,13 @@
 #                       exit 1 on any 🐞
 #   essentials <port> [/path…]    x:browser-headless essentials at 1280 and 390, with the app's allows
 #   probe <port> <name> [/path]   opens the page at the path, prints probes/<name>.js, shoots it
+#   broken <port> <job>         plants invalid json in asks.json, waits for «loupe cannot read the job»,
+#                               restores the file byte for byte and waits for the asks to come back
+#   parallel <port> <job> [n]   posts n notes (default 8) to ask-1 at once; each must land in answers.json
+#   loads <port> [/path]        opens the path, counts each board iframe's loads; exit 1 when one loaded twice
+#   boards <port>               visits every board variant path, one `✅ /speak/board/<name>` line each
 #   stop <pid> <job>    stops that server and trashes the copy
-# Run from anywhere inside a checkout. Nothing here writes the studio job or fixtures/speak itself.
+# The checks print `✅` or `🐞` and exit 1 on any 🐞. Run from anywhere inside a checkout. Nothing here writes the studio job or fixtures/speak itself.
 set -uo pipefail
 
 app=$(git rev-parse --show-toplevel)/apps/design-loupe
@@ -32,7 +37,7 @@ case "${1:-}" in
   start)
     port=${2:-5291}
     if lsof -nP -iTCP:"${port}" -sTCP:LISTEN >/dev/null; then echo "kit: port ${port} is taken" >&2; exit 2; fi
-    [ -f "${app}/.runtime/dc-runtime.js" ] || { echo "kit: no .runtime/dc-runtime.js — AGENTS.md: the runtime" >&2; exit 2; }
+    [ -f "${app}/.runtime/dc-runtime.js" ] || { echo "kit: no .runtime/dc-runtime.js — pnpm worktree:seed copies it from the main checkout; AGENTS.md: the runtime" >&2; exit 2; }
     [ -d "${app}/fixtures/speak/boards" ] || (cd "${app}" && node scripts/loupe-fixture.ts >/dev/null)
     job=$(mktemp -d)/speak
     rsync -a --exclude answers.json "${app}/fixtures/speak/" "${job}/"
@@ -295,6 +300,72 @@ case "${1:-}" in
     echo "shot: ${TMPDIR:-/tmp}/design-loupe-probe.png"
     ;;
 
+  broken)
+    port=${2:?port}
+    job=${3:?job}
+    keep="$(dirname "${job}")/asks.keep"
+    cp -p "${job}/asks.json" "${keep}"
+    # whatever happens below, the job gets its own asks.json back
+    trap 'cat "${keep}" > "${job}/asks.json"' EXIT
+    agent-browser set viewport 1440 900 >/dev/null
+    agent-browser open "http://localhost:${port}/$(basename "${job}")" >/dev/null
+    agent-browser wait 'aside li' >/dev/null
+    printf '{broken' > "${job}/asks.json"
+    shown=$(agent-browser wait --text 'loupe cannot read the job' --timeout 8000 >/dev/null 2>&1 && echo alert || echo 'no alert')
+    cat "${keep}" > "${job}/asks.json"
+    back=$(agent-browser wait 'aside li' --timeout 8000 >/dev/null 2>&1 && echo asks || echo 'no asks')
+    same=$(cmp -s "${keep}" "${job}/asks.json" && echo same || echo differs)
+    [ "${shown} · ${back} · ${same}" = 'alert · asks · same' ] \
+      && pass 'a broken asks.json: the page says «loupe cannot read the job», and the asks come back once the file is restored byte for byte' \
+      || fail 'a broken asks.json' "${shown} · ${back} · the file ${same}"
+    exit $((fails > 0))
+    ;;
+
+  parallel)
+    port=${2:?port}
+    job=${3:?job}
+    n=${4:-8}
+    tag="parallel-$$"
+    codes=$(for i in $(seq 1 "${n}"); do
+      curl -s -o /dev/null -w '%{http_code}\n' -X POST "localhost:${port}/api/answer" -H 'content-type: application/json' \
+        -d "{\"id\":\"ask-1\",\"pick\":null,\"note\":\"${tag} ${i}\"}" &
+    done; wait)
+    ok=$(printf '%s\n' "${codes}" | grep -c '^200$')
+    landed=$(jq --arg tag "${tag}" '[.answers."ask-1".notes[].text | select(startswith($tag))] | unique | length' "${job}/answers.json")
+    [ "${ok}" = "${n}" ] && [ "${landed}" = "${n}" ] \
+      && pass "parallel POSTs: ${n} notes posted at once, all ${n} in answers.json" \
+      || fail 'parallel POSTs' "${ok} of ${n} answered 200, ${landed} of ${n} in answers.json"
+    exit $((fails > 0))
+    ;;
+
+  loads)
+    port=${2:?port}
+    agent-browser set viewport 1440 900 >/dev/null
+    agent-browser open "http://localhost:${port}${3:-/speak}" >/dev/null
+    agent-browser wait 'aside li' >/dev/null
+    # a board that reloads does it after the first render: give the page time to settle
+    sleep 2
+    counts=$(js loads)
+    [[ "${counts}" != *×* && "${counts}" != '0 boards' ]] \
+      && pass "iframe loads: ${counts}, each loaded once" \
+      || fail 'iframe loads' "${counts}"
+    exit $((fails > 0))
+    ;;
+
+  boards)
+    port=${2:?port}
+    agent-browser set viewport 1440 900 >/dev/null
+    agent-browser open "http://localhost:${port}/$(api .name)" >/dev/null
+    agent-browser wait 'aside li' >/dev/null
+    while read -r path name; do
+      go "${path}"
+      framed=$(js framed)
+      [[ "${framed}" == "whole ${name} "* ]] && pass "${path}" || fail "${path}" "${framed}"
+    done < <(api '.name as $job | .boards[] | "/\($job)/board/\(.name | @uri) \(.name)"')
+    echo "boards: $((checks - fails)) ✅ · ${fails} 🐞"
+    exit $((fails > 0))
+    ;;
+
   stop)
     kill "${2:?pid}" 2>/dev/null
     trash "$(dirname "${3:?job}")"
@@ -302,7 +373,7 @@ case "${1:-}" in
     ;;
 
   *)
-    sed -n '2,8p' "$0"
+    awk 'NR > 1 && !/^#/ { exit } NR > 1' "$0"
     exit 2
     ;;
 esac

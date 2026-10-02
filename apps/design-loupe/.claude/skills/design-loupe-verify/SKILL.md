@@ -29,6 +29,27 @@ $K stop <pid> <job>
 
 Done when every line the change touched prints `✅`, and the report quotes the `ftr:` line.
 
+- 📌 a fresh tree needs no hand step: `pnpm worktree:seed` copies `.runtime/dc-runtime.js` from the
+  main checkout, and `start` builds the fixture boards when they are missing.
+
+## the edge checks — on the same server, after the walk
+
+Each prints one `✅` or `🐞` line and exits 1 on any 🐞. Each was proven red once against a planted
+defect (BYT-117).
+
+- `$K broken 5291 <job>` — **a broken asks.json**: plants invalid json, waits for «loupe cannot read
+  the job», restores the file byte for byte (`cmp`) and waits for the asks to come back. Red when the
+  page keeps the old job on screen instead of saying so.
+- `$K parallel 5291 <job> [n]` — **parallel POSTs**: n notes (default 8) posted to `ask-1` at once,
+  every one must answer 200 and land in `answers.json`. Red when the server's writes stop running one
+  at a time and one note overwrites another.
+- `$K loads 5291 [/path]` — **the iframe load counter**: opens the path and counts each board
+  iframe's loads from resource timing (`probes/loads.js`). Red when a board loaded twice, named as
+  `<file>×<n>`. A check mid-walk reads the same probe with `js loads`.
+- `$K boards 5291` — **the variant path list**: visits every board path the job holds
+  (`/speak/board/<name>`, 25 in the fixture) in page, one line each, `✅` when that board is framed
+  whole. Red when a path frames another board or none.
+
 ## look — after the walk
 
 - **essentials**: `x:browser-headless` → `$K essentials 5291 /speak /speak/ask/2 /speak/ask/3` — the essentials
