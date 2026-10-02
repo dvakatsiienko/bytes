@@ -44,5 +44,5 @@ The highlight design-loupe draws over a pinned element when a deep link opens it
 _Avoid_: focus ring, outline
 
 **Target moved**:
-The state of an ask whose pin is gone from its board's current revision.
+The state of an ask whose pin is gone from its board's current revision. The ask is locked until the designer pins it again: it takes no answer and is left out of every count and handover.
 _Avoid_: broken, stale (alone)

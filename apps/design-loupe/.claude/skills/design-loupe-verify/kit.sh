@@ -57,15 +57,16 @@ case "${1:-}" in
     agent-browser wait '[data-ring="ask-2"]' >/dev/null
     sleep 1.5
     js kept >/dev/null
-    [ "$(title)" = '(3) speak · design loupe' ] && [ "$(js favicon)" = 3 ] \
-      && pass 'the open count: 3 open → (3) speak · design loupe, favicon 3' \
+    # the fixture holds 3 asks; ask-3's target moved, so it is locked and left out of every count
+    [ "$(title)" = '(2) speak · design loupe' ] && [ "$(js favicon)" = 2 ] \
+      && pass 'the open count: 2 live open asks (the moved one locked) → (2) speak · design loupe, favicon 2' \
       || fail 'the open count' "title «$(title)», favicon «$(js favicon)»"
 
     # 🧭 one push per round — first, while every ask is open
     first=$(cd "${app}" && PORT="${port}" node scripts/loupe.ts round "${job}" 2>&1)
     second=$(cd "${app}" && PORT="${port}" node scripts/loupe.ts round "${job}" 2>&1)
     code=$?
-    [ "$(printf '%s\n' "${first}" | wc -l | tr -d ' ')" = 1 ] && [[ "${first}" == *"3 asks → http://localhost:${port}/speak/ask/1"* ]] && [ "${code}" = 1 ] \
+    [ "$(printf '%s\n' "${first}" | wc -l | tr -d ' ')" = 1 ] && [[ "${first}" == *"2 asks → http://localhost:${port}/speak/ask/1"* ]] && [ "${code}" = 1 ] \
       && pass "one push per round: «${first}», a second call refused" \
       || fail 'one push per round' "first «${first}», second «${second}» (exit ${code})"
 
@@ -133,12 +134,20 @@ case "${1:-}" in
       && pass "an ask's life is visible: seen, then applied in v1.20 → ${href}" \
       || fail "an ask's life is visible" "seen ${seen}, applied link «${href}»"
 
-    # 🧭 the open count — gone once every ask is answered
+    # 🧭 a moved target says so — the moved ask is locked: a key picks nothing, its options are off, no note line
     go '/speak/ask/3'
     key 1
     sleep 1.2
+    locked=$(agent-browser eval "(() => { const row = document.querySelector('aside li.border-loupe'); const options = [...row.querySelectorAll('button[aria-pressed]')]; return [options.length > 0 && options.every((b) => b.disabled), !row.querySelector('input'), !row.textContent.includes('reopen')].join(' '); })()" | tr -d '"')
+    picked=$(jq -c '.answers."ask-3" // null' "${job}/answers.json")
+    status=$(curl -s -o /dev/null -w '%{http_code}' -X POST "${url}/api/answer" -H 'content-type: application/json' -d '{"id":"ask-3","pick":0,"note":""}')
+    [ "${locked}" = 'true true true' ] && [ "${picked}" = null ] && [ "${status}" = 400 ] \
+      && pass 'a moved ask is locked: 1 picks nothing, the options are off, no note line or reopen, and the api answers 400' \
+      || fail 'a moved ask is locked' "ui «${locked}», on file ${picked}, api ${status}"
+
+    # 🧭 the open count — gone once every live ask is answered
     [ "$(title)" = 'speak · design loupe' ] && [ "$(js favicon)" = 0 ] \
-      && pass 'the open count: all answered → speak · design loupe, no favicon count' \
+      && pass 'the open count: every live ask answered → speak · design loupe, no favicon count' \
       || fail 'the open count, all answered' "title «$(title)», favicon «$(js favicon)»"
 
     # 🧭 only nearby boards are live
@@ -230,7 +239,7 @@ case "${1:-}" in
     sleep 0.6
     after=$(agent-browser get text 'aside [role=status]' | tr '\n' ' ')
     [ "${waited}" = 1 ] && [[ "${bar}" == *'1 of 2 answers staged'* ]] && grep -q 'handed over (send to designer): 1 answer' "${log}" && [[ "${after}" == *'sent to the designer at '* ]] \
-      && pass 'send to designer: a note after the handover waits («1 of 2 answers staged»); the button hands it over as one block, and the bar says «sent to the designer at …»' \
+      && pass 'send to designer: a note after the handover waits («1 of 2 answers staged», the locked ask left out); the button hands it over as one block, and the bar says «sent to the designer at …»' \
       || fail 'send to designer' "handovers before the press ${waited}, bar «${bar}», log $(tr '\n' ' ' < "${log}" | cut -c1-200)"
 
     # 🧭 the designer wakes once per round — a handover that lands while asks.json is half-written prints once the file mends

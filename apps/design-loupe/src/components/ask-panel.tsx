@@ -63,7 +63,8 @@ export const AskPanel = (props: AskPanelProps) => {
         if (next) navigate(askPath(keys.job, next));
         return;
       }
-      if (!keys.active) return;
+      // a moved ask is locked: no key answers it
+      if (!keys.active || keys.active.isMoved) return;
       if (OPTION_KEY.test(event.key)) {
         keys.pick(keys.active, Number(event.key) - 1);
         return;
@@ -149,10 +150,8 @@ export const AskPanel = (props: AskPanelProps) => {
       )}
       <ol className='min-h-0 flex-1 overflow-y-auto py-1'>{askListJSX}</ol>
       <RoundBar
-        answerable={props.job.asks
-          .filter((ask) => !ask.isMoved)
-          .map((ask) => ask.id)}
         sent={props.job.sent}
+        total={props.job.asks.filter((ask) => !ask.isMoved).length}
         unsent={props.job.unsent}
       />
       <footer className='flex flex-wrap items-center gap-x-3 gap-y-1 border-t px-5 py-2.5 text-muted-foreground text-xs [&_kbd]:text-foreground'>
@@ -188,7 +187,7 @@ const AskDetail = (props: AskDetailProps) => {
         <Button
           aria-pressed={isPicked}
           className='h-auto w-full justify-start gap-2.5 whitespace-normal py-2 text-left'
-          disabled={props.isSaving}
+          disabled={props.isSaving || props.ask.isMoved}
           onClick={() => props.onPick(index)}
           variant={isPicked ? 'default' : 'outline'}>
           <Kbd
@@ -268,8 +267,8 @@ const AskDetail = (props: AskDetailProps) => {
           <MapPinOffIcon aria-hidden className='mt-0.5 size-4 shrink-0' />
           <span>
             <span className='font-medium'>target moved</span> — the pinned
-            element is gone from this board's current version, so the view shows
-            the whole board
+            element is gone from this board's current version. The ask is locked
+            until the designer pins it again; the view shows the whole board
           </span>
         </p>
       ) : null}
@@ -287,34 +286,36 @@ const AskDetail = (props: AskDetailProps) => {
           {noteListJSX}
         </ol>
       ) : null}
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (line.trim() === '') return;
-          props.onNote(line);
-          setLine('');
-        }}>
-        <Input
-          aria-label={`add a note to ${props.ask.id}`}
-          disabled={props.isSaving}
-          onChange={(event) => setLine(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') event.currentTarget.blur();
-          }}
-          placeholder={
-            props.ask.options.length > 0
-              ? 'add a note — Enter sends, the pick stays'
-              : 'your answer — Enter sends'
-          }
-          value={line}
-        />
-      </form>
+      {props.ask.isMoved ? null : (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (line.trim() === '') return;
+            props.onNote(line);
+            setLine('');
+          }}>
+          <Input
+            aria-label={`add a note to ${props.ask.id}`}
+            disabled={props.isSaving}
+            onChange={(event) => setLine(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') event.currentTarget.blur();
+            }}
+            placeholder={
+              props.ask.options.length > 0
+                ? 'add a note — Enter sends, the pick stays'
+                : 'your answer — Enter sends'
+            }
+            value={line}
+          />
+        </form>
+      )}
       {props.error ? (
         <p className='text-destructive text-sm' role='alert'>
           {props.error.message}
         </p>
       ) : null}
-      {statusJSX ? (
+      {statusJSX && !props.ask.isMoved ? (
         <div className='flex items-center gap-2 text-muted-foreground text-sm'>
           {statusJSX}
           <Button
@@ -365,12 +366,9 @@ const RoundBar = (props: RoundBarProps) => {
       className='flex items-center gap-3 border-t px-5 py-2.5 text-muted-foreground text-sm'
       role='status'>
       <RoundStatus
-        answerable={props.answerable.length}
         last={last}
-        // staged among the asks he can answer, so N never runs past M
-        staged={
-          props.unsent.filter((id) => props.answerable.includes(id)).length
-        }
+        staged={props.unsent.length}
+        total={props.total}
       />
       <Button
         className='ml-auto'
@@ -395,7 +393,7 @@ const RoundStatus = (props: RoundStatusProps) => {
   return (
     <span className='tabular-nums'>
       <span className='font-medium text-foreground'>{props.staged}</span> of{' '}
-      {props.answerable} {props.answerable === 1 ? 'answer' : 'answers'} staged
+      {props.total} {props.total === 1 ? 'answer' : 'answers'} staged
     </span>
   );
 };
@@ -481,16 +479,16 @@ interface AskDetailProps {
 }
 
 interface RoundBarProps {
-  /** the asks he can answer: every ask but a moved target */
-  answerable: string[];
   sent: JobView['sent'];
+  /** the live asks: a moved target is locked and left out */
+  total: number;
   unsent: string[];
 }
 
 interface RoundStatusProps {
-  answerable: number;
   last: JobView['sent'][number] | undefined;
   staged: number;
+  total: number;
 }
 
 interface AskLinkProps {

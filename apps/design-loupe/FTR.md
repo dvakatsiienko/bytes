@@ -20,6 +20,8 @@
   - given an ask whose pin is gone from its board
   - when design-loupe loads
   - then the ask says «target moved» and the view frames the whole board, never an empty zoom
+  - and the ask is locked until the designer pins it again: no pick, no note, no reopen; it is left out of the open count, the bar, «send to designer» and «all answered», and an answer it already had stays on file, unsent
+  - decision: a moved ask is locked, not answered blind (dima, 2026-10-02)
 - ✅ answering an ask
   - makes: an answer in `studio/jobs/<job>/answers.json`: the ask id, the pick, its notes and the board revision
   - given an open pick ask
@@ -72,7 +74,7 @@
 - ✅ send to designer
   - given every ask was handed over, and dima adds a note after it
   - when he presses «send to designer» in the panel
-  - then the bar reads «1 of 2 answers staged» until the press (a moved target is not counted), the press hands it over as one block, and the bar says «sent to the designer at HH:MM»; each answer still shows «answered» at once
+  - then the bar reads «1 of 2 answers staged» until the press (a moved ask is locked and left out), the press hands it over as one block, and the bar says «sent to the designer at HH:MM»; each answer still shows «answered» at once
 - ✅ one push per round
   - given the designer writes a round of 4 asks
   - then exactly one push arrives

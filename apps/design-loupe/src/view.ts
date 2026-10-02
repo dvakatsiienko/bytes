@@ -119,8 +119,10 @@ export const stepAsk = (
   return asks[(index + direction + asks.length) % asks.length]?.id;
 };
 
-export const openCountOf = (asks: readonly Pick<AskView, 'state'>[]) =>
-  asks.filter((ask) => ask.state === 'open').length;
+/** a locked moved ask is not dima's to answer, so it is left out */
+export const openCountOf = (
+  asks: readonly Pick<AskView, 'isMoved' | 'state'>[],
+) => asks.filter((ask) => ask.state === 'open' && !ask.isMoved).length;
 
 export const tabTitle = (job: string, open: number) =>
   open > 0 ? `(${open}) ${job} · design loupe` : `${job} · design loupe`;

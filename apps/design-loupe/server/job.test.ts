@@ -34,7 +34,7 @@ beforeEach(() => {
   );
   writeFileSync(
     join(job, 'boards/b.dc.html'),
-    '<header>nothing pinned</header>',
+    '<header id="ask-2">pinned</header><footer>ask-3 is not pinned</footer>',
   );
   writeFileSync(
     join(job, 'asks.json'),
@@ -54,6 +54,13 @@ beforeEach(() => {
           kind: 'open',
           question: 'what now?',
         },
+        {
+          board: 'b.dc.html',
+          id: 'ask-3',
+          kind: 'confirm',
+          options: ['yes', 'no'],
+          question: 'and this?',
+        },
       ],
       boards: 'boards',
       round: 1,
@@ -71,7 +78,7 @@ describe('readJob', () => {
 
   it('marks an ask whose pin is gone from its board as moved', async () => {
     const { asks } = await readJob(job);
-    expect(asks.map((ask) => ask.isMoved)).toEqual([false, true]);
+    expect(asks.map((ask) => ask.isMoved)).toEqual([false, false, true]);
   });
 
   it('names a board canvas.json lacks', async () => {
@@ -106,7 +113,8 @@ describe('writeAnswer', () => {
       writeAnswer(job, { id: 'ask-1', note: '', pick: 0 }),
       writeAnswer(job, { id: 'ask-2', note: 'ship it', pick: null }),
     ]);
-    expect((await readJob(job)).asks.map((ask) => ask.state)).toEqual([
+    const { asks } = await readJob(job);
+    expect(asks.slice(0, 2).map((ask) => ask.state)).toEqual([
       'answered',
       'answered',
     ]);
@@ -229,6 +237,45 @@ describe('handovers', () => {
 
   it('refuse «send to designer» with nothing new', async () => {
     await expect(sendToDesigner(job)).rejects.toThrow('nothing new to send');
+  });
+});
+
+describe('a moved ask', () => {
+  it('takes no answer', async () => {
+    await expect(
+      writeAnswer(job, { id: 'ask-3', note: '', pick: 0 }),
+    ).rejects.toThrow('locked');
+  });
+
+  it('holds no round back: every live ask answered hands over', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
+    await writeAnswer(job, { id: 'ask-2', note: 'go', pick: null });
+    expect((await readJob(job)).sent.map((handover) => handover.by)).toEqual([
+      'all answered',
+    ]);
+  });
+
+  it('keeps an answer it had on file, out of the next send', async () => {
+    writeFileSync(
+      join(job, 'answers.json'),
+      JSON.stringify({
+        answers: {
+          'ask-3': {
+            at: '2026-10-02T12:00:00.000Z',
+            notes: [],
+            pick: 0,
+            rev: 'abcdef12',
+          },
+        },
+        sent: [],
+      }),
+    );
+    const view = await readJob(job);
+    expect([view.asks[2]?.answer?.pick, view.unsent]).toEqual([0, []]);
+  });
+
+  it('cannot be reopened', async () => {
+    await expect(reopenAsk(job, 'ask-3')).rejects.toThrow('locked');
   });
 });
 

@@ -126,11 +126,55 @@ export const readAnswers = async (jobDir: string) =>
   answersSchema.parse(await readJson(join(jobDir, 'answers.json'), {}));
 
 /** the asks whose answer changed after the last handover: what the next one will carry */
-const unsentOf = (file: AnswersFile) => {
+/**
+ * The asks whose answer changed after the last handover: what the next one
+ * will carry. A moved ask is locked — its answer stays on file but never
+ * counts or goes out until the designer re-pins it.
+ */
+const unsentOf = (file: AnswersFile, moved: ReadonlySet<string>) => {
   const since = file.sent.at(-1)?.at ?? '';
   return Object.entries(file.answers)
-    .filter(([, answer]) => answer.at !== undefined && answer.at > since)
+    .filter(
+      ([id, answer]) =>
+        !moved.has(id) && answer.at !== undefined && answer.at > since,
+    )
     .map(([id]) => id);
+};
+
+/**
+ * Moved: the pin is gone from its board's current file. An applied ask loses
+ * its pin on purpose, so it is never moved. A moved ask is locked until the
+ * designer marks the element again.
+ */
+const movedOf = (
+  asks: readonly Ask[],
+  pinsByFile: ReadonlyMap<string, readonly string[]>,
+) =>
+  new Set(
+    asks
+      .filter(
+        (ask) =>
+          !(ask.applied || (pinsByFile.get(ask.board) ?? []).includes(ask.id)),
+      )
+      .map((ask) => ask.id),
+  );
+
+/** the same check from the files on disk, for the write paths */
+const movedOnDisk = async (jobDir: string, asks: Asks) => {
+  const files = [...new Set(asks.asks.map((ask) => ask.board))];
+  const entries = await Promise.all(
+    files.map(async (file) => {
+      const html = await readFile(
+        join(boardsDirOf(jobDir, asks), file),
+        'utf8',
+      ).catch(() => '');
+      return [
+        file,
+        [...html.matchAll(pinId)].map((match) => match[1] ?? ''),
+      ] as const;
+    }),
+  );
+  return movedOf(asks.asks, new Map(entries));
 };
 
 export const boardsDirOf = (jobDir: string, asks: Asks) =>
@@ -162,6 +206,10 @@ export const readJob = async (jobDir: string): Promise<JobView> => {
     }),
   );
 
+  const moved = movedOf(
+    asks.asks,
+    new Map(boards.map((board) => [board.file, board.pins])),
+  );
   const askViews = asks.asks.map((ask): AskView => {
     const board = boards.find((candidate) => candidate.file === ask.board);
     if (!board)
@@ -173,8 +221,7 @@ export const readJob = async (jobDir: string): Promise<JobView> => {
     return {
       ...ask,
       answer,
-      // an applied ask's pin comes off on purpose; only a live ask can lose its target
-      isMoved: state !== 'applied' && !board.pins.includes(ask.id),
+      isMoved: moved.has(ask.id),
       state,
     };
   });
@@ -186,7 +233,7 @@ export const readJob = async (jobDir: string): Promise<JobView> => {
     round: asks.round,
     sent: answersFile.sent,
     title: canvas.title ?? basename(jobDir),
-    unsent: unsentOf(answersFile),
+    unsent: unsentOf(answersFile, moved),
   };
 };
 
@@ -203,6 +250,11 @@ const writeAnswerNow = async (jobDir: string, input: AnswerInput) => {
   const note = input.note.trim();
   if (input.pick === null && note === '')
     throw new InputError('an answer is an option, a note, or both');
+  const moved = await movedOnDisk(jobDir, asks);
+  if (moved.has(input.id))
+    throw new InputError(
+      `${input.id}'s target moved — it is locked until the designer re-pins it`,
+    );
 
   const html = await readFile(
     join(boardsDirOf(jobDir, asks), ask.board),
@@ -221,8 +273,12 @@ const writeAnswerNow = async (jobDir: string, input: AnswerInput) => {
     rev: revisionOf(html),
   };
   // the answer that closes the last open ask hands the round over; later changes wait for the next one
+  // «all answered» means every live ask; a locked moved ask neither holds the round back nor joins it
   const isLastOpen =
-    !before?.at && asks.asks.every((candidate) => answers[candidate.id]?.at);
+    !before?.at &&
+    asks.asks.every(
+      (candidate) => moved.has(candidate.id) || answers[candidate.id]?.at,
+    );
   if (isLastOpen) file.sent.push({ at, by: 'all answered', round: asks.round });
   await writeJson(join(jobDir, 'answers.json'), file);
 };
@@ -234,7 +290,7 @@ export const sendToDesigner = (jobDir: string) =>
       readAsks(jobDir),
       readAnswers(jobDir),
     ]);
-    if (unsentOf(file).length === 0)
+    if (unsentOf(file, await movedOnDisk(jobDir, asks)).length === 0)
       throw new InputError('nothing new to send since the last handover');
     file.sent.push({
       at: stamp(),
@@ -247,7 +303,14 @@ export const sendToDesigner = (jobDir: string) =>
 /** reopening drops the pick and the answer's time, so the ask is open again and the designer's seen / applied no longer match; its notes stay */
 export const reopenAsk = (jobDir: string, id: string) =>
   inTurn(async () => {
-    const file = await readAnswers(jobDir);
+    const [asks, file] = await Promise.all([
+      readAsks(jobDir),
+      readAnswers(jobDir),
+    ]);
+    if ((await movedOnDisk(jobDir, asks)).has(id))
+      throw new InputError(
+        `${id}'s target moved — it is locked until the designer re-pins it`,
+      );
     const answer = file.answers[id];
     if (!answer?.at) throw new InputError(`${id} has no answer to reopen`);
     file.answers[id] = { notes: answer.notes, pick: null, rev: answer.rev };

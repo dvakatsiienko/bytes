@@ -58,7 +58,8 @@ try {
 async function round() {
   // readJob first: a bad board name or a broken file fails here, before anything is stamped
   const job = await readJob(jobDir);
-  const open = job.asks.filter((ask) => ask.state === 'open');
+  // a moved ask is locked until it is re-pinned, so it is not one to push
+  const open = job.asks.filter((ask) => ask.state === 'open' && !ask.isMoved);
   const [first] = open;
   if (!first)
     throw new InputError(
@@ -84,9 +85,12 @@ async function wait() {
     const blocks = file.sent.slice(handled).map((handover, index) => {
       const since = file.sent[handled + index - 1]?.at ?? '';
       const lineList = fresh.asks
+        // a moved ask is locked: its answer stays on file and never goes out
         .filter((ask) => {
           const at = ask.answer?.at;
-          return at !== undefined && at > since && at <= handover.at;
+          return (
+            !ask.isMoved && at !== undefined && at > since && at <= handover.at
+          );
         })
         .map((ask) => `  ${ask.id}: ${describe(ask)}`);
       return [
