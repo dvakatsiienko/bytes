@@ -123,7 +123,7 @@ export const readAnswers = async (jobDir: string) =>
   answersSchema.parse(await readJson(join(jobDir, 'answers.json'), {}));
 
 /** the asks whose answer changed after the last handover: what the next one will carry */
-export const unsentOf = (file: AnswersFile) => {
+const unsentOf = (file: AnswersFile) => {
   const since = file.sent.at(-1)?.at ?? '';
   return Object.entries(file.answers)
     .filter(([, answer]) => answer.at !== undefined && answer.at > since)
@@ -331,7 +331,7 @@ type Asks = z.infer<typeof asksSchema>;
 type Ask = z.infer<typeof askSchema>;
 type Answer = z.infer<typeof answerSchema>;
 type AnswersFile = z.infer<typeof answersSchema>;
-export type Handover = z.infer<typeof handoverSchema>;
+type Handover = z.infer<typeof handoverSchema>;
 
 type AskState = 'open' | 'answered' | 'seen' | 'applied';
 
