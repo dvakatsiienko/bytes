@@ -347,22 +347,24 @@ case "${1:-}" in
     [ $# -gt 0 ] || set -- /speak /speak/ask/1
     visited="$*"
     agent-browser set viewport 1440 900 >/dev/null
+    # the page holds still — the loads and the mounted frames read the same twice, 1 s apart, 15 s at most —
+    # before each move and before the count: boards mount in waves, and a reload comes after the first render
+    steady() {
+      local before="" now
+      for _ in $(seq 1 15); do
+        sleep 1
+        now="$(js loads) | $(js frames)"
+        [ "${now}" = "${before}" ] && [[ "${now}" != *'| 0 frames'* ]] && break
+        before=${now}
+      done
+      counts=${now%% | *}
+    }
     agent-browser open "http://localhost:${port}$1" >/dev/null
-    # every live frame's load is on record before the next move, or a move outruns the boards it should count
-    loaded="(() => document.querySelectorAll('[data-board] iframe').length > 0 && performance.getEntriesByType('resource').filter((r) => r.initiatorType === 'iframe').length >= document.querySelectorAll('[data-board] iframe').length)()"
-    agent-browser wait --fn "${loaded}" --timeout 15000 >/dev/null
+    steady
     shift
     for path in "$@"; do
       go "${path}"
-      agent-browser wait --fn "${loaded}" --timeout 15000 >/dev/null
-    done
-    # a board that reloads does it after the first render: read until two reads 1 s apart agree, 10 s at most
-    counts=$(js loads)
-    for _ in $(seq 1 10); do
-      sleep 1
-      again=$(js loads)
-      [ "${again}" = "${counts}" ] && break
-      counts=${again}
+      steady
     done
     [[ "${counts}" == *' boards' && "${counts}" != '0 boards' ]] \
       && pass "iframe loads: ${counts} over ${visited}, each loaded once" \
