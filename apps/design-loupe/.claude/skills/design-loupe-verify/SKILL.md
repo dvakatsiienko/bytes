@@ -11,6 +11,8 @@ prints one `✅` or `🐞` line per check. How to start, drive and stop the app 
 
 ## the walk — every change
 
+📌 call `kit.sh` by its literal path and keep probes in scratch files: a worktree-isolated session refuses a computed command name (`$K walk`) and an inline `agent-browser eval` (BYT-117 coder, ~6 refused calls).
+
 From the tree under test (paths relative to `apps/design-loupe`):
 
 ```bash
