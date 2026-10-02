@@ -9,7 +9,8 @@
 #   broken <port> <job>         plants invalid json in asks.json, waits for «loupe cannot read the job»,
 #                               restores the file byte for byte and waits for the asks to come back
 #   parallel <port> <job> [n]   posts n notes (default 8) to ask-1 at once; each must land in answers.json
-#   loads <port> [/path]        opens the path, counts each board iframe's loads; exit 1 when one loaded twice
+#   loads <port> [/path…]       opens the first path, moves in page to the rest (default /speak /speak/ask/1),
+#                               counts each board iframe's loads; exit 1 when one loaded twice
 #   boards <port>               visits every board variant path, one `✅ /speak/board/<name>` line each
 #   stop <pid> <job>    stops that server and trashes the copy
 # The checks print `✅` or `🐞` and exit 1 on any 🐞. Run from anywhere inside a checkout. Nothing here writes the studio job or fixtures/speak itself.
@@ -341,9 +342,20 @@ case "${1:-}" in
 
   loads)
     port=${2:?port}
+    shift 2
+    # the first path opens cold, the rest are in-page moves: a board must survive both
+    [ $# -gt 0 ] || set -- /speak /speak/ask/1
+    visited="$*"
     agent-browser set viewport 1440 900 >/dev/null
-    agent-browser open "http://localhost:${port}${3:-/speak}" >/dev/null
-    agent-browser wait 'aside li' >/dev/null
+    agent-browser open "http://localhost:${port}$1" >/dev/null
+    # every live frame's load is on record before the next move, or a move outruns the boards it should count
+    loaded="(() => document.querySelectorAll('[data-board] iframe').length > 0 && performance.getEntriesByType('resource').filter((r) => r.initiatorType === 'iframe').length >= document.querySelectorAll('[data-board] iframe').length)()"
+    agent-browser wait --fn "${loaded}" --timeout 15000 >/dev/null
+    shift
+    for path in "$@"; do
+      go "${path}"
+      agent-browser wait --fn "${loaded}" --timeout 15000 >/dev/null
+    done
     # a board that reloads does it after the first render: read until two reads 1 s apart agree, 10 s at most
     counts=$(js loads)
     for _ in $(seq 1 10); do
@@ -353,7 +365,7 @@ case "${1:-}" in
       counts=${again}
     done
     [[ "${counts}" == *' boards' && "${counts}" != '0 boards' ]] \
-      && pass "iframe loads: ${counts}, each loaded once" \
+      && pass "iframe loads: ${counts} over ${visited}, each loaded once" \
       || fail 'iframe loads' "${counts}"
     exit $((fails > 0))
     ;;

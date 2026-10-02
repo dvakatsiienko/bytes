@@ -46,14 +46,16 @@ them needs a fresh `start`.
 - `$K parallel 5291 <job> [n]` — **parallel POSTs**: n notes (default 8) posted to `ask-1` at once;
   every one must answer 200 and land in `answers.json`.
   - red: `server/job.ts` `inTurn(() => writeAnswerNow(jobDir, input))` → `writeAnswerNow(jobDir,
-    input)` on a server started after the swap (server code never hot-reloads) → `🐞 … 2 of 8 in
-    answers.json`
-- `$K loads 5291 [/path]` — **the iframe load counter**: opens the path and counts each board
-  iframe's loads from resource timing (`probes/loads.js`); a board loaded twice prints as
-  `<file>×<n>`. A check mid-walk reads the same probe with `js loads`. Chrome keeps 250 entries; a
-  full buffer fails the check, since it can hide a second load (a view fills 46–65 today).
-  - red: `board.tsx` src `?rev=${props.board.rev}` → `?rev=${props.board.rev}&t=${Date.now()}` →
-    `🐞 … admin-1728.dc.html×108`, or `🐞 … buffer full: 250 entries` once the reloads fill it
+    input)` — vite restarts the server on the swap, or `start` one after it → `🐞 … <n> of 8 in
+    answers.json`, n below 8 (1 and 2 seen)
+- `$K loads 5291 [/path…]` — **the iframe load counter**: opens the first path cold, moves in page
+  to each next one (default `/speak /speak/ask/1`), and counts each board revision's iframe loads
+  from resource timing (`probes/loads.js`); one loaded twice prints as `<file>?rev=<rev>×<n>`. A new
+  revision of a board is a new load, never a double. A check mid-walk reads the same probe with
+  `js loads`. Chrome keeps 250 entries; a full buffer fails the check, since it can hide a second
+  load (a view fills 46–65 today).
+  - red: `surface.tsx` `key={board.file}` → ``key={`${board.file}-${pinId}`}`` — a board remounts
+    when the open ask changes → `🐞 … Main.dc.html?rev=<rev>×2`
 - `$K boards 5291` — **the variant path list**: visits every board path the job holds
   (`/speak/board/<name>`, 25 in the fixture — every board, not only the ones `walk` opens) in page,
   one line each, `✅` when that board is framed whole.
