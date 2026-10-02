@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { Build, Other } from '../server/build.ts';
 import type { AnswerInput, JobView } from '../server/job.ts';
 
 const jobKey = ['job'] as const;
@@ -18,6 +19,19 @@ export const useJob = () => {
     queryKey: jobKey,
   });
 };
+
+/** this loupe's checkout */
+export const useBuild = () =>
+  useQuery({ queryFn: () => api<Build>('/api/build'), queryKey: ['build'] })
+    .data;
+
+/** the other loupes that answer right now; a server that stops drops out within about 10 s */
+export const useOthers = () =>
+  useQuery({
+    queryFn: () => api<Other[]>('/api/loupes'),
+    queryKey: ['loupes'],
+    refetchInterval: 10_000,
+  }).data ?? [];
 
 export const useAnswer = () => {
   const queryClient = useQueryClient();

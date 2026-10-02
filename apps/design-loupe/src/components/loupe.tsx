@@ -1,6 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 
 import { AskPanel } from '@/components/ask-panel';
+import { BuildBadge } from '@/components/build-badge';
 import { Section, errorText } from '@/components/section';
 import { Surface } from '@/components/surface';
 
@@ -46,6 +47,9 @@ export const Loupe = () => {
         <Section name='surface'>
           <Surface job={job.data} target={target} />
         </Section>
+        <div className='absolute top-3 left-3 rounded-lg border bg-background/90 px-1 shadow-sm empty:hidden'>
+          <BuildBadge />
+        </div>
       </div>
       <aside className='flex w-[380px] shrink-0 flex-col border-l bg-background'>
         <Section name='panel'>
