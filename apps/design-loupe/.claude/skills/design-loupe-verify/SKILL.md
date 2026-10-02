@@ -34,21 +34,30 @@ Done when every line the change touched prints `✅`, and the report quotes the 
 
 ## the edge checks — on the same server, after the walk
 
-Each prints one `✅` or `🐞` line and exits 1 on any 🐞. Each was proven red once against a planted
-defect (BYT-117).
+Each prints one `✅` or `🐞` line and exits 1 on any 🐞. Each `red:` line is the planted defect that
+turned it red once — swap that line, run the check, put the line back. A change to a check is
+proven the same way.
 
 - `$K broken 5291 <job>` — **a broken asks.json**: plants invalid json, waits for «loupe cannot read
-  the job», restores the file byte for byte (`cmp`) and waits for the asks to come back. Red when the
-  page keeps the old job on screen instead of saying so.
-- `$K parallel 5291 <job> [n]` — **parallel POSTs**: n notes (default 8) posted to `ask-1` at once,
-  every one must answer 200 and land in `answers.json`. Red when the server's writes stop running one
-  at a time and one note overwrites another.
+  the job», restores the file byte for byte (`cmp`) and waits for the asks to come back.
+  - red: `loupe.tsx` `if (job.isError)` → `if (job.isError && !job.data)` — the page keeps the old
+    job → `🐞 … no alert · asks · the file same`
+- `$K parallel 5291 <job> [n]` — **parallel POSTs**: n notes (default 8) posted to `ask-1` at once;
+  every one must answer 200 and land in `answers.json`.
+  - red: `server/job.ts` `inTurn(() => writeAnswerNow(jobDir, input))` → `writeAnswerNow(jobDir,
+    input)` on a server started after the swap (server code never hot-reloads) → `🐞 … 2 of 8 in
+    answers.json`
 - `$K loads 5291 [/path]` — **the iframe load counter**: opens the path and counts each board
-  iframe's loads from resource timing (`probes/loads.js`). Red when a board loaded twice, named as
-  `<file>×<n>`. A check mid-walk reads the same probe with `js loads`.
+  iframe's loads from resource timing (`probes/loads.js`); a board loaded twice prints as
+  `<file>×<n>`. A check mid-walk reads the same probe with `js loads`. Chrome keeps 250 entries; a
+  full buffer fails the check, since it can hide a second load (a view fills 46–65 today).
+  - red: `board.tsx` src `?rev=${props.board.rev}` → `?rev=${props.board.rev}&t=${Date.now()}` →
+    `🐞 … admin-1728.dc.html×108`
 - `$K boards 5291` — **the variant path list**: visits every board path the job holds
   (`/speak/board/<name>`, 25 in the fixture) in page, one line each, `✅` when that board is framed
-  whole. Red when a path frames another board or none.
+  whole.
+  - red: `route.ts` `board: decodeURIComponent(rest)` → `.toLowerCase()` on it →
+    `🐞 /speak/board/Main — framed 0 boards`
 
 ## look — after the walk
 

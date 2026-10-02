@@ -346,7 +346,7 @@ case "${1:-}" in
     # a board that reloads does it after the first render: give the page time to settle
     sleep 2
     counts=$(js loads)
-    [[ "${counts}" != *×* && "${counts}" != '0 boards' ]] \
+    [[ "${counts}" == *' boards' && "${counts}" != '0 boards' ]] \
       && pass "iframe loads: ${counts}, each loaded once" \
       || fail 'iframe loads' "${counts}"
     exit $((fails > 0))
