@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, watch } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import type { AskView } from '../server/job.ts';
 import {
   InputError,
   claimPush,
@@ -15,8 +16,9 @@ const usage = `loupe <verb> <job dir> — the designer's side of design-loupe
   round <job>                      check asks.json, stamp the round as pushed, print the one push
                                    line to send (PushNotification); a second call for the same
                                    round exits 1
-  wait <job>                       stream one line per new or changed answer, until stopped —
-                                   run it under Monitor, the session wakes on each line
+  wait <job>                       one block per handover — every open ask answered, or dima's
+                                   «send round» — until stopped; run it under Monitor, the session
+                                   wakes once per round, never per answer
   mark <job> <ask-id> seen         the designer read the answer
   mark <job> <ask-id> applied <v>  the answer landed in board version <v> (e.g. v1.20)
 
@@ -69,43 +71,62 @@ async function round() {
 }
 
 async function wait() {
-  const known: Record<string, { at?: string } | undefined> =
-    await readAnswers(jobDir);
+  // a handover already on file at start was read before; only the next ones wake the designer
+  let handled = (await readAnswers(jobDir)).sent.length;
   const job = await readJob(jobDir);
-  console.error(`loupe: waiting on answers for ${job.name}`);
-  // `known` moves only after a line is printed, so a read that fails mid-rewrite (the designer
+  console.error(`loupe: waiting on the next handover for ${job.name}`);
+  // `handled` moves only after the block prints, so a read that fails mid-rewrite (the designer
   // writing the next round) is retried, never skipped
   const check = async () => {
-    const answers = await readAnswers(jobDir);
+    const file = await readAnswers(jobDir);
+    if (file.sent.length <= handled) return;
     const fresh = await readJob(jobDir);
-    for (const ask of fresh.asks) {
-      const answer = answers[ask.id];
-      const was = known[ask.id];
-      if (answer?.at === was?.at) continue;
-      known[ask.id] = answer;
-      if (!answer?.at) {
-        console.log(`reopened ${ask.id}`);
-        continue;
-      }
-      // the last change is a note when the newest note carries the answer's own time
-      const note = answer.notes.at(-1);
-      const pick =
-        answer.pick === null ? 'no pick yet' : `«${ask.options[answer.pick]}»`;
-      console.log(
-        note?.at === answer.at
-          ? `noted ${ask.id}: «${note.text}» — pick ${pick} (board rev ${answer.rev})`
-          : `answered ${ask.id}: ${pick} (board rev ${answer.rev})`,
-      );
-    }
+    const blocks = file.sent.slice(handled).map((handover, index) => {
+      const since = file.sent[handled + index - 1]?.at ?? '';
+      const lineList = fresh.asks
+        .filter((ask) => {
+          const at = ask.answer?.at;
+          return at !== undefined && at > since && at <= handover.at;
+        })
+        .map((ask) => `  ${ask.id}: ${describe(ask)}`);
+      return [
+        `round ${handover.round} handed over (${handover.by}): ${lineList.length} ${lineList.length === 1 ? 'answer' : 'answers'}`,
+        ...lineList,
+      ].join('\n');
+    });
+    // one write per wake: Monitor turns lines that land together into one notification
+    console.log(blocks.join('\n'));
+    handled = file.sent.length;
   };
   const checkSoon = () => {
-    check().catch(() => setTimeout(checkSoon, RETRY_MS));
+    check().catch((error: unknown) => {
+      // a half-written file retries; a bug in this script never hides behind the retry
+      if (error instanceof ReferenceError || error instanceof TypeError) {
+        console.error(`loupe: wait stopped — ${error.message}`);
+        process.exit(1);
+      }
+      setTimeout(checkSoon, RETRY_MS);
+    });
   };
-  watch(jobDir, (_event, file) => {
-    if (file === 'answers.json' || file === 'asks.json') checkSoon();
+  watch(jobDir, (_event, name) => {
+    if (name === 'answers.json' || name === 'asks.json') checkSoon();
   });
   // a held-open process: Monitor ends it
   await new Promise(() => undefined);
+}
+
+/** one answer in a handover: the pick, and the notes when there are any; a declaration, so it
+ * exists before the verb dispatch above runs */
+function describe(ask: AskView) {
+  const { answer } = ask;
+  if (!answer) return 'no answer';
+  const pick =
+    answer.pick === null ? 'no pick' : `«${ask.options[answer.pick]}»`;
+  const last = answer.notes.at(-1);
+  const notes = last
+    ? ` + ${answer.notes.length} ${answer.notes.length === 1 ? 'note' : 'notes'}, last «${last.text}»`
+    : '';
+  return `${pick}${notes} (board rev ${answer.rev})`;
 }
 
 async function mark() {

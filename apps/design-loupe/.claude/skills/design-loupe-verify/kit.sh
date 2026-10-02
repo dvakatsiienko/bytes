@@ -23,6 +23,7 @@ key() { agent-browser eval "(() => { window.dispatchEvent(new KeyboardEvent('key
 # an in-page move, the way a link click makes one: pushState, then the popstate the route store hears
 go() { agent-browser eval "(() => { history.pushState(null, '', '$1'); dispatchEvent(new PopStateEvent('popstate')); return 1; })()" >/dev/null; sleep 1; }
 api() { curl -s "localhost:${port}/api/job" | jq -r "$1"; }
+post() { curl -s -X POST "localhost:${port}/api/$1" -H 'content-type: application/json' -d "$2" >/dev/null; }
 title() { agent-browser get title; }
 # one note through the open ask's own form, the way Enter in the note line sends it
 note() { agent-browser eval "(() => { const i = document.querySelector('input[aria-label^=\"add a note\"]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(i, '$1'); i.dispatchEvent(new Event('input', { bubbles: true })); i.form.requestSubmit(); return 1; })()" >/dev/null; sleep 1; }
@@ -94,14 +95,14 @@ case "${1:-}" in
     # Enter on a focused link follows the link and answers nothing
     sent=$(js enter-on-link)
     sleep 1
-    early=$(jq -c 'keys' "${job}/answers.json" 2>/dev/null || echo '[]')
+    early=$(jq -c '.answers | keys' "${job}/answers.json" 2>/dev/null || echo '[]')
     agent-browser eval '(() => { document.activeElement?.blur(); return 1; })()' >/dev/null
     key Enter
     sleep 1
     go '/speak/ask/2'
     key 2
     sleep 1
-    picks=$(jq -c '[."ask-1".pick, ."ask-2".pick, (."ask-1".rev | length)]' "${job}/answers.json")
+    picks=$(jq -c '.answers | [."ask-1".pick, ."ask-2".pick, (."ask-1".rev | length)]' "${job}/answers.json")
     [ "${sent}" = 'sent from the ask-2 link' ] && [ "${early}" = '[]' ] && [ "${picks}" = '[0,1,8]' ] && agent-browser get text aside | grep -q 'answered' \
       && pass 'answering an ask: Enter → option 1, 2 → option 2, each with a board revision; Enter on a link answers nothing' \
       || fail 'answering an ask' "Enter on a link: «${sent}» → ${early}, answers ${picks}"
@@ -115,7 +116,7 @@ case "${1:-}" in
     # 🧭 notes — a note keeps the pick, notes append oldest first with their time
     note 'first note'
     note 'second note'
-    thread=$(jq -c '[."ask-2".pick, [."ask-2".notes[].text], (."ask-2".notes | all(.at | length > 0))]' "${job}/answers.json")
+    thread=$(jq -c '.answers | [."ask-2".pick, [."ask-2".notes[].text], (."ask-2".notes | all(.at | length > 0))]' "${job}/answers.json")
     shown=$(agent-browser get text 'aside ol[aria-label="notes"]' 2>/dev/null | tr '\n' ' ')
     [ "${thread}" = '[1,["first note","second note"],true]' ] && [[ "${shown}" == *'first note'*'second note'* ]] \
       && pass 'notes: two notes keep the pick (option 2) and stack oldest first, each with its time' \
@@ -199,26 +200,49 @@ case "${1:-}" in
       && pass "a board reached by Tab comes into view: admin · 900 whole on screen after ${tabs} Tabs at 1280" \
       || fail 'a board reached by Tab comes into view' "after ${tabs} Tabs: ${seen}"
 
-    # 🧭 the designer wakes on an answer
+    # 🧭 the designer wakes once per round — nothing on one answer, one block when the last open ask is answered
     log=$(mktemp)
-    (cd "${app}" && timeout 20 node scripts/loupe.ts wait "${job}" > "${log}" 2>&1) &
+    (cd "${app}" && timeout 40 node scripts/loupe.ts wait "${job}" > "${log}" 2>&1) &
     sleep 1.5
-    curl -s -X POST "${url}/api/reopen" -H 'content-type: application/json' -d '{"id":"ask-1"}' >/dev/null
+    post reopen '{"id":"ask-1"}'
+    post reopen '{"id":"ask-2"}'
+    post answer '{"id":"ask-1","pick":null,"note":"kit probe"}'
+    sleep 2
+    early=$(grep -c 'handed over' "${log}")
     start=$(date +%s)
-    curl -s -X POST "${url}/api/answer" -H 'content-type: application/json' -d '{"id":"ask-1","pick":null,"note":"kit probe"}' >/dev/null
-    while [ $(($(date +%s) - start)) -lt 5 ] && ! grep -q 'noted ask-1' "${log}"; do sleep 0.2; done
+    post answer '{"id":"ask-2","pick":0,"note":""}'
+    while [ $(($(date +%s) - start)) -lt 5 ] && ! grep -q 'handed over' "${log}"; do sleep 0.2; done
     woke=$(($(date +%s) - start))
-    # an answer that lands while asks.json is half-written is printed once the file mends, and wait lives on
+    [ "${early}" = 0 ] && grep -q 'handed over (all answered): 2 answers' "${log}" && grep -q 'ask-1: no pick + 1 note, last «kit probe»' "${log}" \
+      && pass "the designer wakes once per round: nothing on the first answer, one block of 2 answers ${woke} s after the last" \
+      || fail 'the designer wakes once per round' "$(tr '\n' ' ' < "${log}" | cut -c1-240)"
+
+    # 🧭 send round — a change after the handover waits; «send round» hands it over
+    post answer '{"id":"ask-3","pick":null,"note":"after the handover"}'
+    sleep 2
+    waited=$(grep -c 'handed over' "${log}")
+    agent-browser open "${url}/speak" >/dev/null
+    agent-browser wait 'aside li' >/dev/null
+    bar=$(agent-browser get text 'aside [role=status]' | tr '\n' ' ')
+    agent-browser eval "(() => { [...document.querySelectorAll('aside button')].find((b) => b.textContent === 'send round').click(); return 1; })()" >/dev/null
+    sent=$(date +%s)
+    while [ $(($(date +%s) - sent)) -lt 5 ] && ! grep -q 'send round' "${log}"; do sleep 0.2; done
+    [ "${waited}" = 1 ] && [[ "${bar}" == *'1 answer not sent yet'* ]] && grep -q 'handed over (send round): 1 answer' "${log}" \
+      && pass 'send round: a note after the handover waits («1 answer not sent yet»); the button hands it over as one block' \
+      || fail 'send round' "handovers before the press ${waited}, bar «${bar}», log $(tr '\n' ' ' < "${log}" | cut -c1-200)"
+
+    # 🧭 the designer wakes once per round — a handover that lands while asks.json is half-written prints once the file mends
     cp "${job}/asks.json" "${job}/asks.good"
     printf '{broken' > "${job}/asks.json"
-    jq '."ask-2".at = "2026-10-02T13:00:00.000Z"' "${job}/answers.json" > "${job}/answers.next" && mv "${job}/answers.next" "${job}/answers.json"
+    jq '.answers."ask-2".at = "2099-01-01T00:00:00.000Z" | .sent += [{"at": "2099-01-01T00:00:00.001Z", "by": "send round", "round": 1}]' \
+      "${job}/answers.json" > "${job}/answers.next" && mv "${job}/answers.next" "${job}/answers.json"
     sleep 1.5
     mv "${job}/asks.good" "${job}/asks.json"
     mended=$(date +%s)
-    while [ $(($(date +%s) - mended)) -lt 5 ] && ! grep -q 'answered ask-2' "${log}"; do sleep 0.2; done
-    grep -q 'noted ask-1: «kit probe»' "${log}" && grep -q 'answered ask-2' "${log}" \
-      && pass "the designer wakes on an answer: within ${woke} s, and after a half-written asks.json" \
-      || fail 'the designer wakes on an answer' "$(tr '\n' ' ' < "${log}" | cut -c1-200)"
+    while [ $(($(date +%s) - mended)) -lt 5 ] && [ "$(grep -c 'handed over' "${log}")" -lt 3 ]; do sleep 0.2; done
+    [ "$(grep -c 'handed over' "${log}")" = 3 ] \
+      && pass 'the designer wakes after a half-written asks.json: the handover prints once the file mends' \
+      || fail 'a handover during a half-written asks.json' "$(tr '\n' ' ' < "${log}" | cut -c1-240)"
 
     agent-browser close >/dev/null 2>&1
     echo "ftr: $((checks - fails)) ✅ · ${fails} 🐞"

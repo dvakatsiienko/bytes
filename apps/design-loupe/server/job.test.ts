@@ -3,7 +3,14 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { claimPush, markAsk, readJob, reopenAsk, writeAnswer } from './job.ts';
+import {
+  claimPush,
+  markAsk,
+  readJob,
+  reopenAsk,
+  sendRound,
+  writeAnswer,
+} from './job.ts';
 
 let job: string;
 const shortHash = /^[0-9a-f]{8}$/;
@@ -80,9 +87,8 @@ describe('readJob', () => {
 describe('writeAnswer', () => {
   it('records the pick with the board revision', async () => {
     await writeAnswer(job, { id: 'ask-1', note: '', pick: 1 });
-    const answer = JSON.parse(readFileSync(join(job, 'answers.json'), 'utf8'))[
-      'ask-1'
-    ];
+    const answer = JSON.parse(readFileSync(join(job, 'answers.json'), 'utf8'))
+      .answers['ask-1'];
     expect(answer).toMatchObject({
       pick: 1,
       rev: expect.stringMatching(shortHash),
@@ -176,6 +182,42 @@ describe('notes', () => {
     expect((await readJob(job)).asks[0]?.answer?.notes).toEqual([
       { at: '2026-10-02T12:00:00.000Z', text: 'old line' },
     ]);
+  });
+});
+
+describe('handovers', () => {
+  const sentBy = async () =>
+    (await readJob(job)).sent.map((handover) => handover.by);
+
+  it('wait while an ask is still open', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
+    expect(await sentBy()).toEqual([]);
+  });
+
+  it('come once, when the last open ask is answered', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
+    await writeAnswer(job, { id: 'ask-2', note: 'go', pick: null });
+    expect(await sentBy()).toEqual(['all answered']);
+  });
+
+  it('leave a change after the handover for the next one', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
+    await writeAnswer(job, { id: 'ask-2', note: 'go', pick: null });
+    await writeAnswer(job, { id: 'ask-1', note: 'one more thing', pick: null });
+    expect([await sentBy(), (await readJob(job)).unsent]).toEqual([
+      ['all answered'],
+      ['ask-1'],
+    ]);
+  });
+
+  it('come early on «send round», open asks and all', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
+    await sendRound(job);
+    expect(await sentBy()).toEqual(['send round']);
+  });
+
+  it('refuse «send round» with nothing new', async () => {
+    await expect(sendRound(job)).rejects.toThrow('nothing new to send');
   });
 });
 

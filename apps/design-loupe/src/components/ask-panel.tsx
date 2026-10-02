@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 import type { AskView, BoardView, JobView } from '../../server/job.ts';
-import { useAnswer, useReopen } from '@/api.ts';
+import { useAnswer, useReopen, useSendRound } from '@/api.ts';
 import type { Route } from '@/route.ts';
 import {
   askIdOf,
@@ -148,7 +148,8 @@ export const AskPanel = (props: AskPanelProps) => {
         </div>
       )}
       <ol className='min-h-0 flex-1 overflow-y-auto py-1'>{askListJSX}</ol>
-      <footer className='flex flex-wrap items-center gap-x-3 gap-y-1 border-t px-5 py-2.5 text-muted-foreground text-xs'>
+      <RoundBar sent={props.job.sent} unsent={props.job.unsent.length} />
+      <footer className='flex flex-wrap items-center gap-x-3 gap-y-1 border-t px-5 py-2.5 text-muted-foreground text-xs [&_kbd]:text-foreground'>
         <span>
           <Kbd>1</Kbd>–<Kbd>9</Kbd> pick
         </span>
@@ -345,6 +346,55 @@ const AskLink = (props: AskLinkProps) => {
   );
 };
 
+/**
+ * The round goes to the designer in one handover: by itself once every ask is
+ * answered, or now with «send round». Each answer shows «answered» at once;
+ * the designer hears none of them until the handover.
+ */
+const RoundBar = (props: { sent: JobView['sent']; unsent: number }) => {
+  const sendRound = useSendRound();
+  const last = props.sent.at(-1);
+  return (
+    <div
+      className='flex items-center gap-3 border-t px-5 py-2.5 text-muted-foreground text-sm'
+      role='status'>
+      <RoundStatus last={last} unsent={props.unsent} />
+      <Button
+        className='ml-auto'
+        disabled={props.unsent === 0 || sendRound.isPending}
+        onClick={() => sendRound.mutate()}
+        size='sm'
+        variant='outline'>
+        send round
+      </Button>
+    </div>
+  );
+};
+
+const RoundStatus = (props: {
+  last: JobView['sent'][number] | undefined;
+  unsent: number;
+}) => {
+  if (props.unsent > 0)
+    return (
+      <span>
+        <span className='font-medium text-foreground tabular-nums'>
+          {props.unsent}
+        </span>{' '}
+        {props.unsent === 1 ? 'answer' : 'answers'} not sent yet
+      </span>
+    );
+  if (props.last)
+    return (
+      <span>
+        handed over at{' '}
+        <time dateTime={props.last.at}>{clockOf(props.last.at)}</time>,{' '}
+        {props.last.by}
+      </span>
+    );
+  return <span>sent by itself once every ask is answered</span>;
+};
+
 /** the panel's default with no ask open: what is left, or that nothing is */
 const RoundSummary = (props: { asks: number; open: number }) => {
   if (props.asks === 0) return <p>no asks in this round yet</p>;
@@ -392,7 +442,11 @@ const StateChip = (props: { ask: AskView }) => {
 const OPTION_KEY = /^[1-9]$/;
 
 const clockOf = (at: string) =>
-  new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  new Date(at).toLocaleTimeString([], {
+    hour: '2-digit',
+    hourCycle: 'h23',
+    minute: '2-digit',
+  });
 
 const isControl = (target: EventTarget | null) =>
   target instanceof HTMLAnchorElement || target instanceof HTMLButtonElement;

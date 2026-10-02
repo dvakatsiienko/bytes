@@ -69,7 +69,28 @@ const answerSchema = z.preprocess(
   }),
 );
 
-const answersSchema = z.record(askId, answerSchema);
+/**
+ * A handover: the moment a round's answers go to the designer, once for the
+ * whole round — every open ask got its answer, or dima pressed «send round».
+ * The designer's watch keys on these entries only, never on single answers.
+ */
+const handoverSchema = z.object({
+  at: z.string(),
+  by: z.enum(['all answered', 'send round']),
+  round: z.number().int().positive(),
+});
+
+const answersSchema = z.preprocess(
+  // a file written before handovers was the answers record alone
+  (value) =>
+    typeof value === 'object' && value !== null && !('answers' in value)
+      ? { answers: value, sent: [] }
+      : value,
+  z.object({
+    answers: z.record(askId, answerSchema),
+    sent: z.array(handoverSchema).default([]),
+  }),
+);
 
 const canvasSchema = z.object({
   boards: z.record(
@@ -101,15 +122,24 @@ export const readAsks = async (jobDir: string) =>
 export const readAnswers = async (jobDir: string) =>
   answersSchema.parse(await readJson(join(jobDir, 'answers.json'), {}));
 
+/** the asks whose answer changed after the last handover: what the next one will carry */
+export const unsentOf = (file: AnswersFile) => {
+  const since = file.sent.at(-1)?.at ?? '';
+  return Object.entries(file.answers)
+    .filter(([, answer]) => answer.at !== undefined && answer.at > since)
+    .map(([id]) => id);
+};
+
 export const boardsDirOf = (jobDir: string, asks: Asks) =>
   resolve(jobDir, asks.boards);
 
 /** the whole job as the page shows it; throws a readable error on a shape a person must fix */
 export const readJob = async (jobDir: string): Promise<JobView> => {
-  const [asks, answers] = await Promise.all([
+  const [asks, answersFile] = await Promise.all([
     readAsks(jobDir),
     readAnswers(jobDir),
   ]);
+  const { answers } = answersFile;
   const boardsDir = boardsDirOf(jobDir, asks);
   const canvas = canvasSchema.parse(
     await readJson(join(boardsDir, 'canvas.json'), undefined),
@@ -151,7 +181,9 @@ export const readJob = async (jobDir: string): Promise<JobView> => {
     boards: boards.map(({ pins: _pins, ...board }) => board),
     name: basename(jobDir),
     round: asks.round,
+    sent: answersFile.sent,
     title: canvas.title ?? basename(jobDir),
+    unsent: unsentOf(answersFile),
   };
 };
 
@@ -173,8 +205,9 @@ const writeAnswerNow = async (jobDir: string, input: AnswerInput) => {
     join(boardsDirOf(jobDir, asks), ask.board),
     'utf8',
   );
-  const answers = await readAnswers(jobDir);
-  const at = new Date().toISOString();
+  const file = await readAnswers(jobDir);
+  const { answers } = file;
+  const at = stamp();
   const before = answers[input.id];
   answers[input.id] = {
     at,
@@ -184,23 +217,44 @@ const writeAnswerNow = async (jobDir: string, input: AnswerInput) => {
     pick: input.pick ?? before?.pick ?? null,
     rev: revisionOf(html),
   };
-  await writeJson(join(jobDir, 'answers.json'), answers);
+  // the answer that closes the last open ask hands the round over; later changes wait for the next one
+  const isLastOpen =
+    !before?.at && asks.asks.every((candidate) => answers[candidate.id]?.at);
+  if (isLastOpen) file.sent.push({ at, by: 'all answered', round: asks.round });
+  await writeJson(join(jobDir, 'answers.json'), file);
 };
+
+/** dima's «send round»: hands over what changed since the last handover, open asks and all */
+export const sendRound = (jobDir: string) =>
+  inTurn(async () => {
+    const [asks, file] = await Promise.all([
+      readAsks(jobDir),
+      readAnswers(jobDir),
+    ]);
+    if (unsentOf(file).length === 0)
+      throw new InputError('nothing new to send since the last handover');
+    file.sent.push({
+      at: stamp(),
+      by: 'send round',
+      round: asks.round,
+    });
+    await writeJson(join(jobDir, 'answers.json'), file);
+  });
 
 /** reopening drops the pick and the answer's time, so the ask is open again and the designer's seen / applied no longer match; its notes stay */
 export const reopenAsk = (jobDir: string, id: string) =>
   inTurn(async () => {
-    const answers = await readAnswers(jobDir);
-    const answer = answers[id];
+    const file = await readAnswers(jobDir);
+    const answer = file.answers[id];
     if (!answer?.at) throw new InputError(`${id} has no answer to reopen`);
-    answers[id] = { notes: answer.notes, pick: null, rev: answer.rev };
-    await writeJson(join(jobDir, 'answers.json'), answers);
+    file.answers[id] = { notes: answer.notes, pick: null, rev: answer.rev };
+    await writeJson(join(jobDir, 'answers.json'), file);
   });
 
 /** the designer's side: mark the current answer seen, or applied in a board version */
 export const markAsk = async (jobDir: string, mark: Mark) => {
   const asks = await readAsks(jobDir);
-  const answers = await readAnswers(jobDir);
+  const { answers } = await readAnswers(jobDir);
   const ask = asks.asks.find((candidate) => candidate.id === mark.id);
   if (!ask) throw new InputError(`no ask ${mark.id} in asks.json`);
   const at = answers[mark.id]?.at;
@@ -241,6 +295,21 @@ const inTurn = <T>(write: () => Promise<T>): Promise<T> => {
   return next;
 };
 
+let lastStamp = '';
+/**
+ * The time of a write, strictly after the previous one: a handover and the
+ * next note can land in the same millisecond, and «changed since the last
+ * handover» compares these strings. The writes already run one at a time.
+ */
+const stamp = () => {
+  const now = new Date();
+  const last = lastStamp ? new Date(lastStamp) : undefined;
+  lastStamp = (
+    last && now <= last ? new Date(last.getTime() + 1) : now
+  ).toISOString();
+  return lastStamp;
+};
+
 const readJson = async (path: string, fallback: unknown) => {
   if (!existsSync(path)) {
     if (fallback !== undefined) return fallback;
@@ -261,6 +330,8 @@ const writeJson = async (path: string, value: unknown) => {
 type Asks = z.infer<typeof asksSchema>;
 type Ask = z.infer<typeof askSchema>;
 type Answer = z.infer<typeof answerSchema>;
+type AnswersFile = z.infer<typeof answersSchema>;
+export type Handover = z.infer<typeof handoverSchema>;
 
 type AskState = 'open' | 'answered' | 'seen' | 'applied';
 
@@ -286,7 +357,11 @@ export interface JobView {
   boards: BoardView[];
   name: string;
   round: number;
+  /** every handover so far, oldest first */
+  sent: Handover[];
   title: string;
+  /** the asks changed since the last handover */
+  unsent: string[];
 }
 
 export interface AnswerInput {

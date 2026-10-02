@@ -21,8 +21,12 @@ The element an ask points at, marked `id="ask-N"` in its board; the id comes off
 _Avoid_: anchor, marker
 
 **Round**:
-The set of asks the designer writes at once; dima gets one push per round.
+The set of asks the designer writes at once; dima gets one push per round, and the designer gets the answers back in handovers.
 _Avoid_: batch, phase
+
+**Handover**:
+The moment a round's answers go back to the designer, all at once: by itself when the last open ask is answered, or early when dima presses «send round». A pick or a note after a handover waits for the next one.
+_Avoid_: submit, push (the push is the designer's call to dima)
 
 **Answer**:
 dima's reply to one ask — the option he picked plus a thread of notes — written to `answers.json` with the ask id and the board revision. A note never clears the pick.

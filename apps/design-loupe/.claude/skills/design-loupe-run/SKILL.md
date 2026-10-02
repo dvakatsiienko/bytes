@@ -63,7 +63,7 @@ agent-browser screenshot "$S/ask-2.png"
 
 ```bash
 agent-browser eval '(() => { window.dispatchEvent(new KeyboardEvent("keydown", {key: "Enter"})); })()'
-sleep 1; jq -c '."ask-2"' "$S/speak/answers.json"
+sleep 1; jq -c '.answers."ask-2"' "$S/speak/answers.json"
 ```
 
 the panel listens on `window`, so a dispatched event is the real path. `Enter` takes the
@@ -84,9 +84,10 @@ curl -s localhost:$P/api/job | jq -c '[.asks[] | {id, state}]'
 
 - `loupe round` prints the one push line and stamps the round; a second call exits 1 with «round 1 was
   pushed already». a fresh copy of the fixture resets it.
-- `loupe wait <job>` streams one line per answer and never exits. test it under a timeout:
-  `(timeout 4 node scripts/loupe.ts wait "$S/speak"; true) &`, then post an answer — it prints
-  `noted ask-2: «…» — pick … (board rev …)` for a note, `answered ask-2: «…»` for a pick.
+- `loupe wait <job>` prints one block per handover and never exits — nothing for a single answer.
+  test it under a timeout: `(timeout 8 node scripts/loupe.ts wait "$S/speak"; true) &`, then answer
+  every open ask (or `curl -s -X POST localhost:$P/api/send -H 'content-type: application/json' -d '{}'`)
+  — it prints `round 1 handed over (all answered): 3 answers` and one `  ask-N: …` line each.
 - a write with a foreign `Origin` header, or without `content-type: application/json`, gets 403.
 
 ## 5. stop

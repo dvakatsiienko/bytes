@@ -49,6 +49,15 @@ export const useReopen = () => {
   });
 };
 
+/** «send round»: hands the round's answers to the designer now */
+export const useSendRound = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => post('/api/send', {}),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: jobKey }),
+  });
+};
+
 /* Helpers */
 
 const api = async <T>(path: string): Promise<T> => {

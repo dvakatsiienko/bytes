@@ -31,8 +31,8 @@ Done when every line the change touched prints `✅`, and the report quotes the 
 
 ## look — after the walk
 
-- **essentials**: `x:browser-headless` → `$K essentials 5291 /speak/ask/2 /speak/ask/3` — the essentials
-  at 1280 and 390 on an ask and a moved target, with design-loupe's three allows:
+- **essentials**: `x:browser-headless` → `$K essentials 5291 /speak /speak/ask/2 /speak/ask/3` — the essentials
+  at 1280 and 390 on the overview, an ask and a moved target, with design-loupe's three allows:
   - `--allow 'covered=use T1 .* covered by|^… [0-9]+ more$'` — the surface is a canvas: a board that
     runs past the surface edge sits under the panel, and its cover's centre is the panel (at 390 the
     list overflows into a «… N more» line, the same case)
