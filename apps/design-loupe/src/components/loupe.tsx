@@ -10,10 +10,20 @@ import { parseRoute, usePath } from '@/route.ts';
 import { faviconSvg, openCountOf, tabTitle } from '@/view.ts';
 
 /** the boards on the left, the asks on the right; the path says which ask is open */
+const overview = { job: '', kind: 'overview' } as const;
+
 export const Loupe = () => {
   const job = useJob();
-  const target = parseRoute(usePath());
+  const route = parseRoute(usePath());
   const openCount = job.data ? openCountOf(job.data.asks) : 0;
+
+  // one job per server: a path naming another job lands on this job's overview, never on its asks
+  const jobName = job.data?.name;
+  const isOtherJob = Boolean(jobName && route.job && route.job !== jobName);
+  const target = isOtherJob ? overview : route;
+  useEffect(() => {
+    if (isOtherJob && jobName) history.replaceState(null, '', `/${jobName}`);
+  }, [isOtherJob, jobName]);
 
   useEffect(() => {
     if (!job.data) return;

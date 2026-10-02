@@ -148,6 +148,15 @@ case "${1:-}" in
       && pass 'moving between asks and boards: one page marker held across every move of the walk' \
       || fail 'moving between asks and boards' 'the page reloaded'
 
+    # 🧭 a deep link opens an ask at its pin — a path naming another job lands on this job's overview
+    agent-browser open "${url}/nope/ask/1" >/dev/null
+    agent-browser wait 'aside li' >/dev/null
+    sleep 0.8
+    other=$(agent-browser eval "(() => location.pathname + ' ' + (document.querySelector('aside [aria-current]') ? 'open' : 'none'))()" | tr -d '"')
+    [ "${other}" = '/speak none' ] \
+      && pass 'another job in the path: /nope/ask/1 → /speak, no ask open' \
+      || fail 'another job in the path' "${other}"
+
     # 🧭 a board reached by Tab comes into view — admin · 900 sits half under the panel at 1280
     agent-browser set viewport 1280 800 >/dev/null
     agent-browser open "${url}/speak/ask/2" >/dev/null
@@ -197,10 +206,17 @@ case "${1:-}" in
       # a fresh browser per view: the second view in a reused session carries the first one's focus and frames
       n=$((n + 1))
       # the allows and their reasons: SKILL.md, «look»
-      AGENT_BROWSER_SESSION="${AGENT_BROWSER_SESSION}-essentials-${n}" "${run}" "http://localhost:${port}${path}" --wait 'aside li' \
+      # and fresh per run: a reused session keeps the console errors of the last one
+      session="${AGENT_BROWSER_SESSION}-essentials-$$-${n}"
+      out=$(AGENT_BROWSER_SESSION="${session}" "${run}" "http://localhost:${port}${path}" --wait 'aside li' \
         --allow 'covered=use T1 .* covered by|^… [0-9]+ more$' \
         --allow 'tab=«loupe»: jumps back up and left from' \
-        --allow 'axe=target-size' 2>&1 | tail -1 || status=1
+        --allow 'axe=target-size' 2>&1) || status=1
+      AGENT_BROWSER_SESSION="${session}" agent-browser close >/dev/null 2>&1
+      # the summary line, plus the console line when the view is red — it names the error
+      last=$(printf '%s\n' "${out}" | tail -1)
+      echo "${last}"
+      [[ "${last}" == 🔴* ]] && printf '%s\n' "${out}" | grep -i 'console' | head -3
     done
     exit "${status}"
     ;;
