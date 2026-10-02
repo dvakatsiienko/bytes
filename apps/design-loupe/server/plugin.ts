@@ -11,7 +11,7 @@ import {
   readAsks,
   readJob,
   reopenAsk,
-  sendRound,
+  sendToDesigner,
   writeAnswer,
 } from './job.ts';
 import type { FSWatcher } from 'node:fs';
@@ -23,7 +23,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
  *   GET  /api/job              the job: boards, asks, answers, states
  *   POST /api/answer           {id, pick, text} — dima's answer
  *   POST /api/reopen           {id} — drops the answer
- *   POST /api/send             {} — «send round»: hands the round's answers to the designer
+ *   POST /api/send             {} — «send to designer»: hands the round's answers to the designer
  *   GET  /boards/<file>        a board file, its assets, and `support.js` (the runtime)
  *
  * A change to any job file is pushed to the page as the `loupe:job` hmr event.
@@ -114,7 +114,7 @@ const routeApi = async (
     return;
   }
   if (req.method === 'POST' && path === '/send') {
-    await sendRound(jobDir);
+    await sendToDesigner(jobDir);
     send(res, 200, { ok: true });
     return;
   }

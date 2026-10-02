@@ -71,12 +71,15 @@ const answerSchema = z.preprocess(
 
 /**
  * A handover: the moment a round's answers go to the designer, once for the
- * whole round — every open ask got its answer, or dima pressed «send round».
+ * whole round — every open ask got its answer, or dima pressed «send to designer».
  * The designer's watch keys on these entries only, never on single answers.
  */
 const handoverSchema = z.object({
   at: z.string(),
-  by: z.enum(['all answered', 'send round']),
+  // «send round» was the button's first name; a file written then still reads
+  by: z
+    .enum(['all answered', 'send to designer', 'send round'])
+    .transform((by) => (by === 'send round' ? 'send to designer' : by)),
   round: z.number().int().positive(),
 });
 
@@ -224,8 +227,8 @@ const writeAnswerNow = async (jobDir: string, input: AnswerInput) => {
   await writeJson(join(jobDir, 'answers.json'), file);
 };
 
-/** dima's «send round»: hands over what changed since the last handover, open asks and all */
-export const sendRound = (jobDir: string) =>
+/** dima's «send to designer»: hands over what changed since the last handover, open asks and all */
+export const sendToDesigner = (jobDir: string) =>
   inTurn(async () => {
     const [asks, file] = await Promise.all([
       readAsks(jobDir),
@@ -235,7 +238,7 @@ export const sendRound = (jobDir: string) =>
       throw new InputError('nothing new to send since the last handover');
     file.sent.push({
       at: stamp(),
-      by: 'send round',
+      by: 'send to designer',
       round: asks.round,
     });
     await writeJson(join(jobDir, 'answers.json'), file);

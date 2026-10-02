@@ -49,8 +49,8 @@ export const useReopen = () => {
   });
 };
 
-/** «send round»: hands the round's answers to the designer now */
-export const useSendRound = () => {
+/** «send to designer»: hands the round's answers to the designer now */
+export const useSendToDesigner = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => post('/api/send', {}),

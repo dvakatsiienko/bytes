@@ -217,24 +217,26 @@ case "${1:-}" in
       && pass "the designer wakes once per round: nothing on the first answer, one block of 2 answers ${woke} s after the last" \
       || fail 'the designer wakes once per round' "$(tr '\n' ' ' < "${log}" | cut -c1-240)"
 
-    # 🧭 send round — a change after the handover waits; «send round» hands it over
-    post answer '{"id":"ask-3","pick":null,"note":"after the handover"}'
+    # 🧭 send to designer — a change after the handover waits; «send to designer» hands it over
+    post answer '{"id":"ask-1","pick":null,"note":"after the handover"}'
     sleep 2
     waited=$(grep -c 'handed over' "${log}")
     agent-browser open "${url}/speak" >/dev/null
     agent-browser wait 'aside li' >/dev/null
     bar=$(agent-browser get text 'aside [role=status]' | tr '\n' ' ')
-    agent-browser eval "(() => { [...document.querySelectorAll('aside button')].find((b) => b.textContent === 'send round').click(); return 1; })()" >/dev/null
+    agent-browser eval "(() => { [...document.querySelectorAll('aside button')].find((b) => b.textContent === 'send to designer').click(); return 1; })()" >/dev/null
     sent=$(date +%s)
-    while [ $(($(date +%s) - sent)) -lt 5 ] && ! grep -q 'send round' "${log}"; do sleep 0.2; done
-    [ "${waited}" = 1 ] && [[ "${bar}" == *'1 answer not sent yet'* ]] && grep -q 'handed over (send round): 1 answer' "${log}" \
-      && pass 'send round: a note after the handover waits («1 answer not sent yet»); the button hands it over as one block' \
-      || fail 'send round' "handovers before the press ${waited}, bar «${bar}», log $(tr '\n' ' ' < "${log}" | cut -c1-200)"
+    while [ $(($(date +%s) - sent)) -lt 5 ] && ! grep -q 'send to designer' "${log}"; do sleep 0.2; done
+    sleep 0.6
+    after=$(agent-browser get text 'aside [role=status]' | tr '\n' ' ')
+    [ "${waited}" = 1 ] && [[ "${bar}" == *'1 of 2 answers staged'* ]] && grep -q 'handed over (send to designer): 1 answer' "${log}" && [[ "${after}" == *'sent to the designer at '* ]] \
+      && pass 'send to designer: a note after the handover waits («1 of 2 answers staged»); the button hands it over as one block, and the bar says «sent to the designer at …»' \
+      || fail 'send to designer' "handovers before the press ${waited}, bar «${bar}», log $(tr '\n' ' ' < "${log}" | cut -c1-200)"
 
     # 🧭 the designer wakes once per round — a handover that lands while asks.json is half-written prints once the file mends
     cp "${job}/asks.json" "${job}/asks.good"
     printf '{broken' > "${job}/asks.json"
-    jq '.answers."ask-2".at = "2099-01-01T00:00:00.000Z" | .sent += [{"at": "2099-01-01T00:00:00.001Z", "by": "send round", "round": 1}]' \
+    jq '.answers."ask-2".at = "2099-01-01T00:00:00.000Z" | .sent += [{"at": "2099-01-01T00:00:00.001Z", "by": "send to designer", "round": 1}]' \
       "${job}/answers.json" > "${job}/answers.next" && mv "${job}/answers.next" "${job}/answers.json"
     sleep 1.5
     mv "${job}/asks.good" "${job}/asks.json"

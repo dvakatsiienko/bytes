@@ -63,16 +63,16 @@
 
 ## the designer's side
 
-- ✅ the designer wakes once per round: all answered, or send round
+- ✅ the designer wakes once per round: all answered, or send to designer
   - makes: a handover in `answers.json` (`sent`), one per round handed over
   - given the designer watches `answers.json` and 2 asks are open
   - when dima answers the first, then the last
   - then nothing wakes on the first; one block with both answers wakes the designer within 5 s of the last
   - decision: the designer reads a round as one batch, never one answer at a time (dima, 2026-10-02)
-- ✅ send round
+- ✅ send to designer
   - given every ask was handed over, and dima adds a note after it
-  - when he presses «send round» in the panel
-  - then the note waits until the press («1 answer not sent yet»), and the press hands it over as one block; each answer still shows «answered» at once
+  - when he presses «send to designer» in the panel
+  - then the bar reads «1 of 2 answers staged» until the press (a moved target is not counted), the press hands it over as one block, and the bar says «sent to the designer at HH:MM»; each answer still shows «answered» at once
 - ✅ one push per round
   - given the designer writes a round of 4 asks
   - then exactly one push arrives

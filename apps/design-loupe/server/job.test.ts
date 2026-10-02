@@ -8,7 +8,7 @@ import {
   markAsk,
   readJob,
   reopenAsk,
-  sendRound,
+  sendToDesigner,
   writeAnswer,
 } from './job.ts';
 
@@ -210,14 +210,25 @@ describe('handovers', () => {
     ]);
   });
 
-  it('come early on «send round», open asks and all', async () => {
+  it('come early on «send to designer», open asks and all', async () => {
     await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
-    await sendRound(job);
-    expect(await sentBy()).toEqual(['send round']);
+    await sendToDesigner(job);
+    expect(await sentBy()).toEqual(['send to designer']);
   });
 
-  it('refuse «send round» with nothing new', async () => {
-    await expect(sendRound(job)).rejects.toThrow('nothing new to send');
+  it('read a handover written as «send round» as «send to designer»', async () => {
+    writeFileSync(
+      join(job, 'answers.json'),
+      JSON.stringify({
+        answers: {},
+        sent: [{ at: '2026-10-02T12:00:00.000Z', by: 'send round', round: 1 }],
+      }),
+    );
+    expect(await sentBy()).toEqual(['send to designer']);
+  });
+
+  it('refuse «send to designer» with nothing new', async () => {
+    await expect(sendToDesigner(job)).rejects.toThrow('nothing new to send');
   });
 });
 

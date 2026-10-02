@@ -17,7 +17,7 @@ const usage = `loupe <verb> <job dir> — the designer's side of design-loupe
                                    line to send (PushNotification); a second call for the same
                                    round exits 1
   wait <job>                       one block per handover — every open ask answered, or dima's
-                                   «send round» — until stopped; run it under Monitor, the session
+                                   «send to designer» — until stopped; run it under Monitor, the session
                                    wakes once per round, never per answer
   mark <job> <ask-id> seen         the designer read the answer
   mark <job> <ask-id> applied <v>  the answer landed in board version <v> (e.g. v1.20)

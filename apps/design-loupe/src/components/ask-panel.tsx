@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 import type { AskView, BoardView, JobView } from '../../server/job.ts';
-import { useAnswer, useReopen, useSendRound } from '@/api.ts';
+import { useAnswer, useReopen, useSendToDesigner } from '@/api.ts';
 import type { Route } from '@/route.ts';
 import {
   askIdOf,
@@ -148,7 +148,13 @@ export const AskPanel = (props: AskPanelProps) => {
         </div>
       )}
       <ol className='min-h-0 flex-1 overflow-y-auto py-1'>{askListJSX}</ol>
-      <RoundBar sent={props.job.sent} unsent={props.job.unsent.length} />
+      <RoundBar
+        answerable={props.job.asks
+          .filter((ask) => !ask.isMoved)
+          .map((ask) => ask.id)}
+        sent={props.job.sent}
+        unsent={props.job.unsent}
+      />
       <footer className='flex flex-wrap items-center gap-x-3 gap-y-1 border-t px-5 py-2.5 text-muted-foreground text-xs [&_kbd]:text-foreground'>
         <span>
           <Kbd>1</Kbd>–<Kbd>9</Kbd> pick
@@ -348,51 +354,50 @@ const AskLink = (props: AskLinkProps) => {
 
 /**
  * The round goes to the designer in one handover: by itself once every ask is
- * answered, or now with «send round». Each answer shows «answered» at once;
+ * answered, or now with «send to designer». Each answer shows «answered» at once;
  * the designer hears none of them until the handover.
  */
-const RoundBar = (props: { sent: JobView['sent']; unsent: number }) => {
-  const sendRound = useSendRound();
+const RoundBar = (props: RoundBarProps) => {
+  const sendToDesigner = useSendToDesigner();
   const last = props.sent.at(-1);
   return (
     <div
       className='flex items-center gap-3 border-t px-5 py-2.5 text-muted-foreground text-sm'
       role='status'>
-      <RoundStatus last={last} unsent={props.unsent} />
+      <RoundStatus
+        answerable={props.answerable.length}
+        last={last}
+        // staged among the asks he can answer, so N never runs past M
+        staged={
+          props.unsent.filter((id) => props.answerable.includes(id)).length
+        }
+      />
       <Button
         className='ml-auto'
-        disabled={props.unsent === 0 || sendRound.isPending}
-        onClick={() => sendRound.mutate()}
+        disabled={props.unsent.length === 0 || sendToDesigner.isPending}
+        onClick={() => sendToDesigner.mutate()}
         size='sm'
         variant='outline'>
-        send round
+        send to designer
       </Button>
     </div>
   );
 };
 
-const RoundStatus = (props: {
-  last: JobView['sent'][number] | undefined;
-  unsent: number;
-}) => {
-  if (props.unsent > 0)
+const RoundStatus = (props: RoundStatusProps) => {
+  if (props.last && props.staged === 0)
     return (
       <span>
-        <span className='font-medium text-foreground tabular-nums'>
-          {props.unsent}
-        </span>{' '}
-        {props.unsent === 1 ? 'answer' : 'answers'} not sent yet
+        sent to the designer at{' '}
+        <time dateTime={props.last.at}>{clockOf(props.last.at)}</time>
       </span>
     );
-  if (props.last)
-    return (
-      <span>
-        handed over at{' '}
-        <time dateTime={props.last.at}>{clockOf(props.last.at)}</time>,{' '}
-        {props.last.by}
-      </span>
-    );
-  return <span>sent by itself once every ask is answered</span>;
+  return (
+    <span className='tabular-nums'>
+      <span className='font-medium text-foreground'>{props.staged}</span> of{' '}
+      {props.answerable} {props.answerable === 1 ? 'answer' : 'answers'} staged
+    </span>
+  );
 };
 
 /** the panel's default with no ask open: what is left, or that nothing is */
@@ -473,6 +478,19 @@ interface AskDetailProps {
   job: string;
   onNote: (note: string) => void;
   onPick: (index: number) => void;
+}
+
+interface RoundBarProps {
+  /** the asks he can answer: every ask but a moved target */
+  answerable: string[];
+  sent: JobView['sent'];
+  unsent: string[];
+}
+
+interface RoundStatusProps {
+  answerable: number;
+  last: JobView['sent'][number] | undefined;
+  staged: number;
 }
 
 interface AskLinkProps {

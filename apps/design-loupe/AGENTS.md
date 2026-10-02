@@ -16,13 +16,13 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 ## The shape
 
 - `answers.json` is `{ "answers": { "ask-N": { at, pick, notes: [{ at, text }], rev } }, "sent": [{ round,
-  at, by }] }` — `sent` holds the handovers, `by` is «all answered» or «send round»; an older flat
+  at, by }] }` — `sent` holds the handovers, `by` is «all answered» or «send to designer»; an older flat
   file reads as answers with nothing sent.
 - `server/job.ts` — the job on disk: `asks.json` (the designer's), `answers.json` (only loupe
   writes it), the boards folder `asks.json` names (`canvas.json` + `*.dc.html`). Each side writes
   only its own file; the server queues its own writes.
 - `server/plugin.ts` — the api on the vite dev server: `GET /api/job`, `POST /api/answer`,
-  `POST /api/reopen`, `POST /api/send` («send round»), `GET /boards/<file>`. A job file change is pushed to the page as the
+  `POST /api/reopen`, `POST /api/send` («send to designer»), `GET /boards/<file>`. A job file change is pushed to the page as the
   `loupe:job` hmr event.
 - `src/components/surface.tsx` + `board.tsx` — the pan / zoom surface, the boards, the ring.
 - `src/components/ask-panel.tsx` — the asks and the keys.
@@ -48,7 +48,7 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 2. `pnpm loupe round <job>` — checks the file, stamps the round, prints the one push line. Send it
    with `PushNotification`, once. A second call for the same round exits 1.
 3. `pnpm loupe wait <job>` under `Monitor` — one block per handover (the last open ask answered, or
-   dima's «send round»), never one per answer.
+   dima's «send to designer»), never one per answer.
 4. `pnpm loupe mark <job> ask-N seen`, then `pnpm loupe mark <job> ask-N applied v1.20` once the
    board changed. Take the pin id off the board when it is applied.
 
