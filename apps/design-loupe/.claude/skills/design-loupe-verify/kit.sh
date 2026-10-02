@@ -198,7 +198,7 @@ case "${1:-}" in
       n=$((n + 1))
       # the allows and their reasons: SKILL.md, «look»
       AGENT_BROWSER_SESSION="${AGENT_BROWSER_SESSION}-essentials-${n}" "${run}" "http://localhost:${port}${path}" --wait 'aside li' \
-        --allow 'covered=use T1 .* covered by' \
+        --allow 'covered=use T1 .* covered by|^… [0-9]+ more$' \
         --allow 'tab=«loupe»: jumps back up and left from' \
         --allow 'axe=target-size' 2>&1 | tail -1 || status=1
     done

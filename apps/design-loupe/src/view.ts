@@ -21,10 +21,12 @@ export const frameRect = (
   viewport: Size,
   pad = FRAME_PAD,
 ): View => {
-  const scale = Math.min(
-    (viewport.w - 2 * pad) / rect.w,
-    (viewport.h - 2 * pad) / rect.h,
+  // a surface narrower than its own pad (a phone-wide window) still gets a positive zoom, never a mirror
+  const fit = Math.min(
+    Math.max(1, viewport.w - 2 * pad) / rect.w,
+    Math.max(1, viewport.h - 2 * pad) / rect.h,
   );
+  const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, fit));
   return {
     scale,
     x: viewport.w / 2 - (rect.x + rect.w / 2) * scale,

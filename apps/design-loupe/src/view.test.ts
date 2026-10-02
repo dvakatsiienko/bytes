@@ -32,6 +32,14 @@ describe('frameRect', () => {
   });
 });
 
+describe('frameRect on a surface narrower than its pad', () => {
+  it('keeps the zoom positive', () => {
+    expect(
+      frameRect({ h: 900, w: 1440, x: 0, y: 0 }, { h: 800, w: 10 }, 48).scale,
+    ).toBeGreaterThan(0);
+  });
+});
+
 describe('wheelView', () => {
   it('keeps the point under the pointer still on a pinch', () => {
     const view = { scale: 0.5, x: 40, y: -20 };

@@ -33,8 +33,9 @@ Done when every line the change touched prints `✅`, and the report quotes the 
 
 - **essentials**: `x:browser-headless` → `$K essentials 5291 /speak/ask/2 /speak/ask/3` — the essentials
   at 1280 and 390 on an ask and a moved target, with design-loupe's three allows:
-  - `--allow 'covered=use T1 .* covered by'` — the surface is a canvas: a board that runs past the
-    surface edge sits under the panel, and its cover's centre is the panel
+  - `--allow 'covered=use T1 .* covered by|^… [0-9]+ more$'` — the surface is a canvas: a board that
+    runs past the surface edge sits under the panel, and its cover's centre is the panel (at 390 the
+    list overflows into a «… N more» line, the same case)
   - `--allow 'tab=«loupe»: jumps back up and left from'` — the boards come first, so the walk wraps
     once from the last board cover to the panel's wordmark
   - `--allow 'axe=target-size'` — axe counts those clipped covers as overlapping the ask rows; the
