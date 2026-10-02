@@ -368,6 +368,7 @@ case "${1:-}" in
       framed=$(js framed)
       [[ "${framed}" == "whole ${name} "* ]] && pass "${path}" || fail "${path}" "${framed}"
     done < <(api '.name as $job | .boards[] | "/\($job)/board/\(.name | @uri) \(.name)"')
+    [ "${checks}" -gt 0 ] || fail 'the variant path list' "the job on :${port} lists no boards"
     echo "boards: $((checks - fails)) ✅ · ${fails} 🐞"
     exit $((fails > 0))
     ;;
