@@ -3,9 +3,10 @@
  *
  * A worktree carries only what git tracks. This copies what git ignores and a
  * dev server needs — every app's `.env*`, `.claude/settings.local.json`,
- * trophy-sys's local caches, design-loupe's canvas runtime — from the main checkout, installs with `CI=1` so
- * lefthook cannot rewrite the shared hooks, and writes `.worktree-offset` so
- * `script/with-port.ts` moves every dev port clear of every other tree.
+ * trophy-sys's local caches, design-loupe's canvas runtime — from the main
+ * checkout, installs with `CI=1` so lefthook cannot rewrite the shared hooks,
+ * and writes `.worktree-offset` so `script/with-port.ts` moves every dev port
+ * clear of every other tree.
  *
  * ⚠️ Production kv never reaches a tree: `STAND_INS` blanks trophy-sys's
  * Vercel-pulled `.env.local`. The live NPSSO and grant are still copied, so a

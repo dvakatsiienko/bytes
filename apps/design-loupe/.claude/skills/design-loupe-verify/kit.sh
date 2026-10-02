@@ -325,6 +325,7 @@ case "${1:-}" in
     port=${2:?port}
     job=${3:?job}
     n=${4:-8}
+    [[ "${n}" =~ ^[1-9][0-9]*$ ]] || { echo "kit: n is a count, not «${n}»" >&2; exit 2; }
     tag="parallel-$$"
     codes=$(for i in $(seq 1 "${n}"); do
       curl -s -o /dev/null -w '%{http_code}\n' -X POST "localhost:${port}/api/answer" -H 'content-type: application/json' \
@@ -343,9 +344,14 @@ case "${1:-}" in
     agent-browser set viewport 1440 900 >/dev/null
     agent-browser open "http://localhost:${port}${3:-/speak}" >/dev/null
     agent-browser wait 'aside li' >/dev/null
-    # a board that reloads does it after the first render: give the page time to settle
-    sleep 2
+    # a board that reloads does it after the first render: read until two reads 1 s apart agree, 10 s at most
     counts=$(js loads)
+    for _ in $(seq 1 10); do
+      sleep 1
+      again=$(js loads)
+      [ "${again}" = "${counts}" ] && break
+      counts=${again}
+    done
     [[ "${counts}" == *' boards' && "${counts}" != '0 boards' ]] \
       && pass "iframe loads: ${counts}, each loaded once" \
       || fail 'iframe loads' "${counts}"
