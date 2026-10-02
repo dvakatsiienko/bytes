@@ -10,6 +10,7 @@ import {
   readJob,
 } from '../server/job.ts';
 import { askPath } from '../src/route.ts';
+import { oneAtATime } from './one-at-a-time.ts';
 
 const usage = `loupe <verb> <job dir> — the designer's side of design-loupe
 
@@ -102,8 +103,11 @@ async function wait() {
     console.log(blocks.join('\n'));
     handled = file.sent.length;
   };
+  // one check at a time: two fs events close together (a rename, asks.json right after answers.json)
+  // would both see the new handover before either marks it handled, and print it twice
+  const checkOnce = oneAtATime(check);
   const checkSoon = () => {
-    check().catch((error: unknown) => {
+    checkOnce().catch((error: unknown) => {
       // a half-written file retries; a bug in this script never hides behind the retry
       if (error instanceof ReferenceError || error instanceof TypeError) {
         console.error(`loupe: wait stopped — ${error.message}`);

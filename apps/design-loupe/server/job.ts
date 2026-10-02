@@ -125,7 +125,6 @@ export const readAsks = async (jobDir: string) =>
 export const readAnswers = async (jobDir: string) =>
   answersSchema.parse(await readJson(join(jobDir, 'answers.json'), {}));
 
-/** the asks whose answer changed after the last handover: what the next one will carry */
 /**
  * The asks whose answer changed after the last handover: what the next one
  * will carry. A moved ask is locked — its answer stays on file but never
