@@ -13,6 +13,7 @@ Each app in this monorepo is a bounded context. Per-app `CONTEXT.md` files are c
 - [trophy-sys](./apps/trophy-sys/CONTEXT.md) — PSN trophy tracker with a retro terminal UI
 - [sketchbook](./apps/sketchbook/CONTEXT.md) — prototype platform with one swappable proto slot
 - [atelier](./apps/atelier/CONTEXT.md) — the fleet's art studio: pieces drawn as code, shot into takes, shipped to readmes
+- [design-loupe](./apps/design-loupe/CONTEXT.md) — where the designer's asks reach dima, pinned to elements on live boards
 
 ## Relationships
 

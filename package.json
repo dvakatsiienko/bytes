@@ -10,6 +10,7 @@
     "dev:@space-explorer/ui": "turbo run @space-explorer/ui#dev",
     "dev:atelier": "turbo run atelier#dev",
     "dev:cv": "turbo run cv#dev",
+    "dev:design-loupe": "turbo run design-loupe#dev",
     "dev:figmentation": "turbo run figmentation#dev",
     "dev:financial": "turbo run financial#dev",
     "dev:sketchbook": "turbo run sketchbook#dev",

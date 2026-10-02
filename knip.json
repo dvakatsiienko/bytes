@@ -11,6 +11,9 @@
     "apps/cv": {
       "ignoreDependencies": ["@tailwindcss/typography", "tailwind-scrollbar"]
     },
+    "apps/design-loupe": {
+      "entry": [".claude/skills/*/probes/*.{js,mjs}"]
+    },
     "apps/figmentation": {
       "ignoreDependencies": ["@tailwindcss/typography"]
     },

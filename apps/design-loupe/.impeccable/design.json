@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-02T00:00:00Z",
+  "title": "Design System: design-loupe",
+  "extensions": {
+    "colorMeta": {
+      "loupe": {
+        "role": "primary",
+        "displayName": "Loupe Orange",
+        "canonical": "#c2410c",
+        "tonalRamp": [
+          "oklch(25% 0.09 38)",
+          "oklch(35% 0.13 38)",
+          "oklch(45% 0.16 38)",
+          "oklch(55% 0.18 38)",
+          "oklch(63% 0.19 38)",
+          "oklch(72% 0.15 38)",
+          "oklch(83% 0.09 38)",
+          "oklch(94% 0.03 38)"
+        ]
+      },
+      "loupe-dark": {
+        "role": "primary",
+        "displayName": "Loupe Orange, dark scheme",
+        "canonical": "#ff7a4d"
+      },
+      "loupe-ink": {
+        "role": "primary",
+        "displayName": "Loupe Ink",
+        "canonical": "#ffffff"
+      },
+      "loupe-ink-dark": {
+        "role": "primary",
+        "displayName": "Loupe Ink, dark scheme",
+        "canonical": "#1b0d07"
+      },
+      "desk": {
+        "role": "neutral",
+        "displayName": "Warm Desk",
+        "canonical": "#e9e7e2",
+        "tonalRamp": [
+          "oklch(18% 0.005 85)",
+          "oklch(28% 0.006 85)",
+          "oklch(40% 0.008 85)",
+          "oklch(52% 0.009 85)",
+          "oklch(64% 0.009 85)",
+          "oklch(76% 0.008 85)",
+          "oklch(92.5% 0.007 85)",
+          "oklch(97% 0.004 85)"
+        ]
+      },
+      "desk-dark": {
+        "role": "neutral",
+        "displayName": "Warm Desk, dark scheme",
+        "canonical": "#121212"
+      },
+      "desk-ink": {
+        "role": "neutral",
+        "displayName": "Desk Ink",
+        "canonical": "#6b6862"
+      },
+      "desk-ink-dark": {
+        "role": "neutral",
+        "displayName": "Desk Ink, dark scheme",
+        "canonical": "#8d8a84"
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel (kit background)",
+        "canonical": "oklch(1 0 0)"
+      },
+      "panel-dark": {
+        "role": "neutral",
+        "displayName": "Panel, dark scheme (kit background)",
+        "canonical": "oklch(0.145 0 0)"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink (kit foreground)",
+        "canonical": "oklch(0.145 0 0)"
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink (kit muted-foreground)",
+        "canonical": "oklch(0.556 0 0)"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted (kit muted)",
+        "canonical": "oklch(0.97 0 0)"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline (kit border)",
+        "canonical": "oklch(0.922 0 0)"
+      },
+      "picked": {
+        "role": "neutral",
+        "displayName": "Picked (kit primary)",
+        "canonical": "oklch(0.205 0 0)"
+      },
+      "lens": {
+        "role": "primary",
+        "displayName": "Lens Orange (favicon only)",
+        "canonical": "#e2552b"
+      },
+      "lens-badge": {
+        "role": "neutral",
+        "displayName": "Lens Badge (favicon count dot)",
+        "canonical": "#1c1b19"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "the full-page error cards."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "the loupe wordmark and section fallback headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "questions, the summary, the why, the status line."
+      },
+      "body-strong": {
+        "displayName": "Body Strong",
+        "purpose": "the open question, option labels, board titles."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "chips, the board name, round number, key hints, the recommended tag."
+      },
+      "id": {
+        "displayName": "Id",
+        "purpose": "ask-N in each row, and error text."
+      }
+    },
+    "shadows": [
+      {
+        "name": "board",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "under each board and the minimap card; the only shadow."
+      },
+      {
+        "name": "ring-halo",
+        "value": "0 0 0 calc(6px / var(--zoom, 1)) color-mix(in srgb, var(--loupe) 22%, transparent)",
+        "purpose": "the soft halo around the ring, zoom-proof."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ring-fade",
+        "value": "opacity 0 to 1, 0.25s",
+        "purpose": "the ring appears on a new pin."
+      },
+      {
+        "name": "frame-ease",
+        "value": "420ms easeOut",
+        "purpose": "the surface frames a new target (board or ask)."
+      },
+      {
+        "name": "row-colors",
+        "value": "transition-colors 150ms",
+        "purpose": "ask row hover."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ring",
+      "kind": "custom",
+      "description": "the zoom-proof loupe outline over a pinned element on a board.",
+      "html": "<div class=\"ds-ring-host\"><div class=\"ds-ring-pin\">pinned element</div></div>",
+      "css": ".ds-ring-host { --zoom: 1; padding: 24px; background: #e9e7e2; } .ds-ring-pin { padding: 10px 16px; border-radius: 10px; background: #1f1f1f; color: #fff; font: 500 14px 'Hanken Grotesk Variable', system-ui, sans-serif; outline: calc(2.5px / var(--zoom)) solid #c2410c; outline-offset: calc(2px / var(--zoom)); box-shadow: 0 0 0 calc(6px / var(--zoom)) color-mix(in srgb, #c2410c 22%, transparent); }"
+    },
+    {
+      "name": "Ask Row",
+      "kind": "custom",
+      "refersTo": "ask-row",
+      "description": "one ask in the panel list: id, state chip, question.",
+      "html": "<a class=\"ds-ask-row\" href=\"#\"><span class=\"ds-ask-meta\"><span class=\"ds-ask-id\">ask-1</span><span class=\"ds-chip-settled\">answered</span></span><span class=\"ds-ask-q\">the stats strip sits in a dark chrome footer. keep it dark, or let it sit on the page?</span></a>",
+      "css": ".ds-ask-row { display: flex; flex-direction: column; gap: 4px; padding: 12px 20px; border-left: 2px solid transparent; color: oklch(0.145 0 0); text-decoration: none; font: 400 14px/1.43 'Hanken Grotesk Variable', system-ui, sans-serif; transition: background-color 150ms; } .ds-ask-row:hover { background: color-mix(in oklab, oklch(0.97 0 0) 60%, transparent); } .ds-ask-row:focus-visible { outline: 2px solid oklch(0.708 0 0); outline-offset: -2px; } .ds-ask-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: oklch(0.556 0 0); } .ds-ask-id { font-family: ui-monospace, Menlo, monospace; } .ds-chip-settled { padding: 0 6px; border-radius: 6px; background: oklch(0.97 0 0); color: oklch(0.145 0 0); }"
+    },
+    {
+      "name": "Ask Row, active",
+      "kind": "custom",
+      "refersTo": "ask-row-active",
+      "description": "the open ask: loupe rail, muted wash, strong question.",
+      "html": "<a class=\"ds-ask-row-active\" href=\"#\"><span class=\"ds-ask-meta\"><span class=\"ds-ask-id\">ask-2</span><span class=\"ds-chip-open\">open</span></span><span>at 1728 the header stretches the full width. hold it at the content width instead?</span></a>",
+      "css": ".ds-ask-row-active { display: flex; flex-direction: column; gap: 4px; padding: 12px 20px; border-left: 2px solid #c2410c; background: color-mix(in oklab, oklch(0.97 0 0) 40%, transparent); color: oklch(0.145 0 0); text-decoration: none; font: 500 14px/1.43 'Hanken Grotesk Variable', system-ui, sans-serif; } .ds-ask-row-active .ds-ask-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 400; color: oklch(0.556 0 0); } .ds-ask-row-active .ds-ask-id { font-family: ui-monospace, Menlo, monospace; } .ds-chip-open { padding: 0 6px; border-radius: 6px; background: #c2410c; color: #fff; font-weight: 500; }"
+    },
+    {
+      "name": "Target Moved Chip",
+      "kind": "chip",
+      "description": "an open ask whose pinned element left the board.",
+      "html": "<span class=\"ds-chip-moved\">target moved</span>",
+      "css": ".ds-chip-moved { display: inline-block; padding: 0 6px; border-radius: 6px; border: 1px dashed oklch(0.922 0 0); color: oklch(0.556 0 0); font: 400 12px/1.33 'Hanken Grotesk Variable', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Option",
+      "kind": "button",
+      "refersTo": "option",
+      "description": "one outcome of an ask: kit outline button, key number first.",
+      "html": "<button class=\"ds-option\"><kbd class=\"ds-kbd\">1</kbd><span class=\"ds-option-label\">hold the header at the content width</span><span class=\"ds-option-tag\">recommended</span></button>",
+      "css": ".ds-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 1px solid oklch(0.922 0 0); border-radius: 10px; background: oklch(1 0 0); color: oklch(0.145 0 0); text-align: left; font: 500 14px/1.43 'Hanken Grotesk Variable', system-ui, sans-serif; cursor: pointer; transition: all 150ms; } .ds-option:hover { background: oklch(0.97 0 0); } .ds-option:focus-visible { border-color: oklch(0.708 0 0); box-shadow: 0 0 0 3px color-mix(in oklab, oklch(0.708 0 0) 50%, transparent); outline: none; } .ds-option:active { transform: translateY(1px); } .ds-option-label { flex: 1; } .ds-option-tag { font-size: 12px; font-weight: 400; color: #c2410c; } .ds-kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 4px; border-radius: 4px; background: oklch(0.97 0 0); color: oklch(0.556 0 0); font: 500 12px 'Hanken Grotesk Variable', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Option, picked",
+      "kind": "button",
+      "refersTo": "option-picked",
+      "description": "the chosen outcome: kit default (filled primary).",
+      "html": "<button class=\"ds-option-picked\" aria-pressed=\"true\"><kbd class=\"ds-kbd-picked\">2</kbd><span>stretch the header full width</span></button>",
+      "css": ".ds-option-picked { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 1px solid transparent; border-radius: 10px; background: oklch(0.205 0 0); color: oklch(0.985 0 0); text-align: left; font: 500 14px/1.43 'Hanken Grotesk Variable', system-ui, sans-serif; cursor: pointer; } .ds-option-picked:hover { background: color-mix(in oklab, oklch(0.205 0 0) 80%, transparent); } .ds-option-picked:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklab, oklch(0.708 0 0) 50%, transparent); outline: none; } .ds-kbd-picked { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 4px; border-radius: 4px; background: color-mix(in oklab, oklch(0.985 0 0) 20%, transparent); color: oklch(0.985 0 0); font: 500 12px 'Hanken Grotesk Variable', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Text Line",
+      "kind": "input",
+      "description": "kit Input for a free answer; Enter sends.",
+      "html": "<input class=\"ds-input\" placeholder=\"or say it in a line — Enter sends\" />",
+      "css": ".ds-input { width: 100%; height: 32px; padding: 4px 10px; border: 1px solid oklch(0.922 0 0); border-radius: 10px; background: transparent; color: oklch(0.145 0 0); font: 400 14px 'Hanken Grotesk Variable', system-ui, sans-serif; transition: box-shadow 150ms, border-color 150ms; } .ds-input::placeholder { color: oklch(0.556 0 0); } .ds-input:focus-visible { outline: none; border-color: oklch(0.708 0 0); box-shadow: 0 0 0 3px color-mix(in oklab, oklch(0.708 0 0) 50%, transparent); }"
+    },
+    {
+      "name": "Board Title",
+      "kind": "custom",
+      "refersTo": "board-title",
+      "description": "the label lying on the desk above each board.",
+      "html": "<div class=\"ds-desk\"><span class=\"ds-board-title\">T1 merge · admin · 1728</span><div class=\"ds-board\"></div></div>",
+      "css": ".ds-desk { padding: 20px; background: #e9e7e2; } .ds-board-title { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding-bottom: 6px; color: #6b6862; font: 500 14px 'Hanken Grotesk Variable', system-ui, sans-serif; } .ds-board { height: 80px; background: oklch(1 0 0); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Loupe on the Desk",
+    "overview": "boards lie on a quiet warm-grey desk; the operator's eye goes where the loupe colour is. the whole page is neutral kit chrome plus one hot orange, and that orange always means «here, now, you»: the ring around the pinned element, the rail on the open ask, the open chip, the framed board in the minimap.\n\ntwo regions, nothing else: the pan/zoom surface fills the left, the ask panel is a fixed 380px column on the right. the surface belongs to the boards, so loupe draws as little as it can on it: a title above each board, a ring, a minimap. the panel is dense and text-first, read top to bottom, driven by the keyboard.\n\nthe page follows the system scheme live. the desk and the loupe colour swap per scheme; the boards keep their own colours in both.",
+    "keyCharacteristics": [
+      "one chromatic accent, the loupe orange, on a neutral kit panel and a warm-grey desk",
+      "every control is a stock kit component; the app adds no variant",
+      "lines drawn on the surface are zoom-proof, the same screen width at every zoom",
+      "flat: depth is the desk below the boards, and one small shadow under each board"
+    ],
+    "rules": [
+      {
+        "name": "The One Loupe Rule",
+        "body": "the loupe orange is the only hue loupe owns. it marks where the operator should look, and nothing else. a second accent, or orange as a plain decoration, breaks the pointer.",
+        "section": "colors"
+      },
+      {
+        "name": "The Desk Is Warm Rule",
+        "body": "the desk is a warm grey (`desk`), never a kit neutral, so the boards read as objects on a table and the panel reads as chrome.",
+        "section": "colors"
+      },
+      {
+        "name": "The Muted Second Line Rule",
+        "body": "a secondary fact sits in `muted-foreground` at the same or one smaller size; it never gets its own colour.",
+        "section": "typography"
+      },
+      {
+        "name": "The Zoom-Proof Line Rule",
+        "body": "any line loupe draws over the boards divides its width by the current zoom (`--zoom`), so the ring is a 2.5px outline with a 2px gap and a 6px halo at 22% loupe, at every zoom. a live board's outline is 2px kit `ring`, by the same rule.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do take every control from `packages/kit` as is: `Button`, `Input`, `Kbd`.",
+      "Do spend the loupe colour only where the operator should look next.",
+      "Do divide any line drawn on the surface by `--zoom`.",
+      "Do keep secondary text in `muted-foreground`, not a new colour."
+    ],
+    "donts": [
+      "Don't add a second accent hue, or use loupe orange as a background panel.",
+      "Don't add app variants to kit, or brand values to kit.",
+      "Don't add shadows beyond the small one under boards and the minimap.",
+      "Don't add a looping animation on the surface; motion is one-shot (the ring fade, the 420ms frame ease)."
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "design-loupe",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node ../../script/with-port.ts 5181 vite",
+    "loupe": "node scripts/loupe.ts",
+    "loupe:fixture": "node scripts/loupe-fixture.ts",
+    "lint": "biome lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fontsource-variable/hanken-grotesk": "5.3.0",
+    "@tanstack/react-query": "5.103.2",
+    "@ui/kit": "workspace:*",
+    "cn": "0.3.0",
+    "lucide-react": "1.47.0",
+    "motion": "13.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-error-boundary": "6.1.6",
+    "react-zoom-pan-pinch": "4.2.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@vitejs/plugin-react": "6.1.1",
+    "oxc-transform-react": "0.150.0",
+    "vite": "8.3.0"
+  }
+}

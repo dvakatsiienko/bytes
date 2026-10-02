@@ -93,6 +93,14 @@ local only | [source](apps/atelier)
 
 <br clear="all">
 
+**design-loupe** — the designer's questions, pinned to live boards: one link lands on the spot, one key answers.
+
+local only | [source](apps/design-loupe)
+
+<details><summary>peek</summary><img src="assets/apps/design-loupe.webp" width="100%" alt="design-loupe: a speak board zoomed in with its header ringed in orange, the ask beside it with three outcome buttons"></details>
+
+<br clear="all">
+
 ## 🧰 libraries
 
 - [`biome-config-polished`](packages/biome-config-polished) — the lint and format rules every app extends

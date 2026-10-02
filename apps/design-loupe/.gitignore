@@ -1,0 +1,5 @@
+# the Claude Design runtime, read per canvas — never committed (AGENTS.md: the runtime)
+.runtime/
+# made by `pnpm loupe:fixture` from the studio boards; answers are what a test run writes
+fixtures/*/boards/
+fixtures/*/answers.json
