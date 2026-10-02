@@ -141,16 +141,24 @@ case "${1:-}" in
 
     # 🧭 the designer wakes on an answer
     log=$(mktemp)
-    (cd "${app}" && timeout 12 node scripts/loupe.ts wait "${job}" > "${log}" 2>/dev/null) &
+    (cd "${app}" && timeout 20 node scripts/loupe.ts wait "${job}" > "${log}" 2>&1) &
     sleep 1.5
     curl -s -X POST "${url}/api/reopen" -H 'content-type: application/json' -d '{"id":"ask-1"}' >/dev/null
     start=$(date +%s)
     curl -s -X POST "${url}/api/answer" -H 'content-type: application/json' -d '{"id":"ask-1","pick":null,"text":"kit probe"}' >/dev/null
     while [ $(($(date +%s) - start)) -lt 5 ] && ! grep -q 'answered ask-1' "${log}"; do sleep 0.2; done
     woke=$(($(date +%s) - start))
-    grep -q 'answered ask-1: «kit probe»' "${log}" \
-      && pass "the designer wakes on an answer: within ${woke} s" \
-      || fail 'the designer wakes on an answer' "nothing in 5 s"
+    # an answer that lands while asks.json is half-written is printed once the file mends, and wait lives on
+    cp "${job}/asks.json" "${job}/asks.good"
+    printf '{broken' > "${job}/asks.json"
+    jq '."ask-2".at = "2026-10-02T13:00:00.000Z"' "${job}/answers.json" > "${job}/answers.next" && mv "${job}/answers.next" "${job}/answers.json"
+    sleep 1.5
+    mv "${job}/asks.good" "${job}/asks.json"
+    mended=$(date +%s)
+    while [ $(($(date +%s) - mended)) -lt 5 ] && ! grep -q 'answered ask-2' "${log}"; do sleep 0.2; done
+    grep -q 'answered ask-1: «kit probe»' "${log}" && grep -q 'answered ask-2' "${log}" \
+      && pass "the designer wakes on an answer: within ${woke} s, and after a half-written asks.json" \
+      || fail 'the designer wakes on an answer' "$(tr '\n' ' ' < "${log}" | cut -c1-200)"
 
     agent-browser close >/dev/null 2>&1
     echo "ftr: $((10 - fails)) ✅ · ${fails} 🐞"

@@ -39,6 +39,8 @@ const offset = existsSync(offsetFile)
   ? Number(readFileSync(offsetFile, 'utf8').trim()) || 0
   : 0;
 const origin = `http://localhost:${process.env.PORT ?? 5181 + offset}`;
+/** how soon a failed read is tried again; above the dispatch, which runs the verbs before any later const exists */
+const RETRY_MS = 500;
 
 try {
   if (verb === 'round') await round();
@@ -64,9 +66,6 @@ async function round() {
     `${job.name} · round ${asks.round}: ${open.length} ${open.length === 1 ? 'ask' : 'asks'} → ${origin}/#${first?.id ?? ''}`,
   );
 }
-
-/** how soon a failed read is tried again */
-const RETRY_MS = 500;
 
 async function wait() {
   const known = await readAnswers(jobDir);
