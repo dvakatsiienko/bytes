@@ -9,6 +9,7 @@ import {
 import { Board } from '@/components/board';
 
 import type { JobView } from '../../server/job.ts';
+import { REFRAME_EVENT } from '@/hash.ts';
 import type { Rect, Target } from '@/view.ts';
 import {
   MAX_SCALE,
@@ -38,7 +39,7 @@ export const Surface = (props: SurfaceProps) => {
       : props.job.boards.find((board) => board.file === activeAsk?.board)?.name;
 
   // frames on a new target only: an answer refetches the job, and the view must not jump for it
-  const frameKey = framedBoard ?? 'overview';
+  const frameKey = askId ?? framedBoard ?? 'overview';
   const frameNow = () => {
     const zoom = zoomRef.current;
     const wrapper = zoom?.instance.wrapperComponent;
@@ -89,6 +90,12 @@ export const Surface = (props: SurfaceProps) => {
     wrapper.addEventListener('wheel', handleWheel, { passive: false });
     return () => wrapper.removeEventListener('wheel', handleWheel);
   }, [wrapper]);
+
+  useEffect(() => {
+    const handleReframe = () => frameRef.current();
+    window.addEventListener(REFRAME_EVENT, handleReframe);
+    return () => window.removeEventListener(REFRAME_EVENT, handleReframe);
+  }, []);
 
   useEffect(() => {
     if (!liveBoard) return;
@@ -152,14 +159,16 @@ export const Surface = (props: SurfaceProps) => {
       ref={zoomRef}
       wheel={{ disabled: true }}>
       <TransformComponent
-        contentProps={{
-          onPointerDown: (event) => {
-            if (event.target === event.currentTarget) setLiveBoard(null);
-          },
-        }}
         infinite
         wrapperClass='loupe-surface !h-full !w-full'
-        wrapperProps={{ 'aria-label': `${props.job.title} — the boards` }}>
+        wrapperProps={{
+          'aria-label': `${props.job.title} — the boards`,
+          // a press anywhere but on the live board, the desk past the boards included, ends it
+          onPointerDown: (event) => {
+            if (!(event.target as Element).closest('.loupe-board-live'))
+              setLiveBoard(null);
+          },
+        }}>
         <div
           className='relative'
           ref={contentRef}

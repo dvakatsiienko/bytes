@@ -19,7 +19,7 @@ export const BuildBadge = () => {
   const switchListJSX = others
     .filter((other) => other.isDev !== build.isDev)
     .map((other) => {
-      const href = `${location.protocol}//${location.hostname}:${other.port}${location.pathname}${location.search}`;
+      const href = `${location.protocol}//${location.hostname}:${other.port}${location.pathname}${location.search}${location.hash}`;
       return (
         <a
           className={cn(

@@ -4,6 +4,7 @@
 #                       prints `job=<dir> port=<port> pid=<pid>` — keep them for walk and stop
 #   walk <port> <job>   drives every FTR.md line on that server and job: `✅ <line>` or `🐞 <line> — why`;
 #                       exit 1 on any 🐞
+#   essentials <port> [#hash…]    x:browser-headless essentials at 1280 and 390, with the app's allows
 #   probe <port> <name> [#hash]   opens the page at the hash, prints probes/<name>.js, shoots it
 #   stop <pid> <job>    stops that server and trashes the copy
 # Run from anywhere inside a checkout. Nothing here writes the studio job or fixtures/speak itself.
@@ -53,6 +54,14 @@ case "${1:-}" in
       && pass 'the open count: 3 open → (3) speak · loupe, favicon 3' \
       || fail 'the open count' "title «$(title)», favicon «$(js favicon)»"
 
+    # 🧭 one push per round — first, while every ask is open
+    first=$(cd "${app}" && PORT="${port}" node scripts/loupe.ts round "${job}" 2>&1)
+    second=$(cd "${app}" && PORT="${port}" node scripts/loupe.ts round "${job}" 2>&1)
+    code=$?
+    [ "$(printf '%s\n' "${first}" | wc -l | tr -d ' ')" = 1 ] && [[ "${first}" == *'3 asks'* ]] && [ "${code}" = 1 ] \
+      && pass "one push per round: «${first}», a second call refused" \
+      || fail 'one push per round' "first «${first}», second «${second}» (exit ${code})"
+
     # 🧭 a deep link opens an ask at its pin — at the framed zoom, then 0.37 and 2.0
     ring=$(js ring)
     for target in 0.37 2.0; do
@@ -76,15 +85,20 @@ case "${1:-}" in
 
     # 🧭 answering an ask — Enter takes the recommendation, 2 picks option 2
     go '#ask-1'
+    # Enter on a focused link follows the link and answers nothing
+    js enter-on-link >/dev/null
+    sleep 1
+    early=$(jq -c 'keys' "${job}/answers.json" 2>/dev/null || echo '[]')
+    agent-browser eval '(() => { document.activeElement?.blur(); return 1; })()' >/dev/null
     key Enter
     sleep 1
     go '#ask-2'
     key 2
     sleep 1
     picks=$(jq -c '[."ask-1".pick, ."ask-2".pick, (."ask-1".rev | length)]' "${job}/answers.json")
-    [ "${picks}" = '[0,1,8]' ] && agent-browser get text aside | grep -q 'answered' \
-      && pass 'answering an ask: Enter → option 1, 2 → option 2, each with a board revision' \
-      || fail 'answering an ask' "answers ${picks}"
+    [ "${early}" = '[]' ] && [ "${picks}" = '[0,1,8]' ] && agent-browser get text aside | grep -q 'answered' \
+      && pass 'answering an ask: Enter → option 1, 2 → option 2, each with a board revision; Enter on a link answers nothing' \
+      || fail 'answering an ask' "after Enter on a link ${early}, answers ${picks}"
 
     # 🧭 an ask's life is visible
     (cd "${app}" && node scripts/loupe.ts mark "${job}" ask-2 seen >/dev/null)
@@ -138,17 +152,27 @@ case "${1:-}" in
       && pass "the designer wakes on an answer: within ${woke} s" \
       || fail 'the designer wakes on an answer' "nothing in 5 s"
 
-    # 🧭 one push per round
-    first=$(cd "${app}" && node scripts/loupe.ts round "${job}" 2>&1)
-    second=$(cd "${app}" && node scripts/loupe.ts round "${job}" 2>&1)
-    code=$?
-    [ "$(printf '%s\n' "${first}" | wc -l | tr -d ' ')" = 1 ] && [ "${code}" = 1 ] \
-      && pass "one push per round: «${first}», a second call refused" \
-      || fail 'one push per round' "first «${first}», second «${second}» (exit ${code})"
-
     agent-browser close >/dev/null 2>&1
     echo "ftr: $((10 - fails)) ✅ · ${fails} 🐞"
     exit $((fails > 0))
+    ;;
+
+  essentials)
+    port=${2:?port}
+    shift 2
+    run="${HOME}/frame/home/.claude/plugin-x/skills/browser-headless/essentials/run.sh"
+    status=0
+    n=0
+    for hash in "${@:-#ask-2}"; do
+      # a fresh browser per view: the second view in a reused session carries the first one's focus and frames
+      n=$((n + 1))
+      # the allows and their reasons: SKILL.md, «look»
+      AGENT_BROWSER_SESSION="${AGENT_BROWSER_SESSION}-essentials-${n}" "${run}" "http://localhost:${port}/${hash}" --wait 'aside li' \
+        --allow 'covered=use T1 .* covered by' \
+        --allow 'tab=«loupe»: jumps back up and left from' \
+        --allow 'axe=target-size' 2>&1 | tail -1 || status=1
+    done
+    exit "${status}"
     ;;
 
   probe)

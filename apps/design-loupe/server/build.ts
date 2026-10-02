@@ -29,7 +29,7 @@ export const readBuild = async (): Promise<Build> => {
 };
 
 /** every worktree in `git worktree list --porcelain` but the one at `self`; git lists the main checkout first */
-export const otherTrees = (porcelain: string, self: string) =>
+const otherTrees = (porcelain: string, self: string) =>
   porcelain
     .split('\n')
     .filter((line) => line.startsWith('worktree '))

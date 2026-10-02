@@ -13,6 +13,7 @@ import {
   reopenAsk,
   writeAnswer,
 } from './job.ts';
+import type { FSWatcher } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 /**
@@ -176,21 +177,30 @@ const watchJob = (server: ViteDevServer, jobDir: string) => {
       80,
     );
   };
-  const watchers = [jobDir];
-  readAsks(jobDir)
-    .then((asks) => {
-      const boardsDir = boardsDirOf(jobDir, asks);
-      if (relative(jobDir, boardsDir) !== '') watchers.push(boardsDir);
-    })
-    .catch(() => undefined)
-    .finally(() => {
-      const handles = watchers
-        .filter((dir) => existsSync(dir))
-        .map((dir) => watch(dir, announce));
-      server.httpServer?.on('close', () => {
-        for (const handle of handles) handle.close();
-      });
-    });
+  // the boards folder comes from asks.json, so a new round can move it: re-read on every asks.json change
+  let boards: { dir: string; handle: FSWatcher } | undefined;
+  const followBoards = async () => {
+    const dir = await readAsks(jobDir)
+      .then((asks) => boardsDirOf(jobDir, asks))
+      .catch(() => undefined);
+    if (dir === boards?.dir) return;
+    boards?.handle.close();
+    boards =
+      dir && relative(jobDir, dir) !== '' && existsSync(dir)
+        ? { dir, handle: watch(dir, announce) }
+        : undefined;
+  };
+  const job = existsSync(jobDir)
+    ? watch(jobDir, (_event, file) => {
+        announce();
+        if (file === 'asks.json') followBoards();
+      })
+    : undefined;
+  followBoards();
+  server.httpServer?.on('close', () => {
+    job?.close();
+    boards?.handle.close();
+  });
 };
 
 const readBody = async (req: IncomingMessage): Promise<unknown> => {

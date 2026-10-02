@@ -73,6 +73,8 @@ export const Board = (props: BoardProps) => {
         <iframe
           className='block border-0'
           height={props.board.h}
+          // a cover board is a picture: nothing inside it takes Tab or a click until it is live
+          inert={!props.isLive}
           key={props.board.rev}
           ref={setFrame}
           src={`/boards/${encodeURIComponent(props.board.file)}?rev=${props.board.rev}`}
@@ -102,7 +104,7 @@ export const Board = (props: BoardProps) => {
       {props.isLive ? null : (
         <button
           aria-label={`use ${props.board.title} — hover and play; Esc returns to panning`}
-          className='absolute inset-0 cursor-grab bg-transparent outline-none transition-colors hover:bg-loupe/[0.04] focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing'
+          className='absolute inset-0 cursor-grab bg-transparent outline-none transition-colors hover:bg-loupe/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:cursor-grabbing'
           // a press that moves is a pan, never a click
           onClick={(event) => {
             const start = downAt.current;

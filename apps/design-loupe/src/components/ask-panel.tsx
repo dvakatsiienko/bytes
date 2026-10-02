@@ -12,6 +12,7 @@ import {
 
 import type { AskView, BoardView, JobView } from '../../server/job.ts';
 import { useAnswer, useReopen } from '@/api.ts';
+import { reframe } from '@/hash.ts';
 import type { Target } from '@/view.ts';
 import { askIdOf, boardHash, stepAsk } from '@/view.ts';
 
@@ -53,11 +54,8 @@ export const AskPanel = (props: AskPanelProps) => {
         keys.pick(keys.active, Number(event.key) - 1);
         return;
       }
-      // a focused button answers Enter itself
-      if (
-        event.key === 'Enter' &&
-        !(event.target instanceof HTMLButtonElement)
-      ) {
+      // a focused link or button answers Enter itself; only an Enter with nothing in focus answers
+      if (event.key === 'Enter' && !isControl(event.target)) {
         const ask = keys.active;
         if (ask.state === 'open' && ask.recommend !== undefined)
           keys.pick(ask, ask.recommend);
@@ -74,10 +72,16 @@ export const AskPanel = (props: AskPanelProps) => {
         <a
           aria-current={isActive ? 'true' : undefined}
           className={cn(
-            'flex flex-col gap-1 border-l-2 px-5 py-3 transition-colors hover:bg-muted/60',
+            'flex flex-col gap-1 border-l-2 px-5 py-3 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
             isActive ? 'border-loupe bg-muted/40' : 'border-transparent',
           )}
-          href={`#${ask.id}`}>
+          href={`#${ask.id}`}
+          // the open ask clicked again frames its board again, after a pan; a pointer click lets go
+          // of the focus, so the next Enter answers the ask instead of following the link again
+          onClick={(event) => {
+            if (location.hash === `#${ask.id}`) reframe();
+            if (event.detail > 0) event.currentTarget.blur();
+          }}>
           <span className='flex items-center gap-2 text-muted-foreground text-xs'>
             <span className='font-mono'>{ask.id}</span>
             <StateChip ask={ask} />
@@ -94,7 +98,8 @@ export const AskPanel = (props: AskPanelProps) => {
           <AskDetail
             ask={ask}
             board={props.job.boards.find((board) => board.file === ask.board)}
-            error={answer.error}
+            // a failed save shows on the ask it was for, never on the next one
+            error={answer.variables?.id === ask.id ? answer.error : null}
             isSaving={answer.isPending}
             onPick={(index) => pick(ask, index)}
             onText={(text) => answer.mutate({ id: ask.id, pick: null, text })}
@@ -117,11 +122,11 @@ export const AskPanel = (props: AskPanelProps) => {
           />
           loupe
         </a>
-        <span
-          className='min-w-0 truncate text-muted-foreground text-sm'
+        <h1
+          className='min-w-0 truncate font-normal text-muted-foreground text-sm'
           title={props.job.title}>
           {props.job.title}
-        </span>
+        </h1>
         <span className='ml-auto shrink-0 text-muted-foreground text-xs tabular-nums'>
           round {props.job.round}
         </span>
@@ -334,6 +339,9 @@ const StateChip = (props: { ask: AskView }) => {
 /* Helpers */
 
 const OPTION_KEY = /^[1-9]$/;
+
+const isControl = (target: EventTarget | null) =>
+  target instanceof HTMLAnchorElement || target instanceof HTMLButtonElement;
 
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLInputElement ||

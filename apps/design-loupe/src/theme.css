@@ -13,7 +13,8 @@
    the one accent, loud enough to read over any board */
 :root {
   --desk: #e9e7e2;
-  --desk-ink: #6b6862;
+  /* 5.4:1 on the desk: board titles are 14px */
+  --desk-ink: #5f5c56;
   /* 5.2:1 against white both ways: the open chip and the recommended tag are 12px text */
   --loupe: #c2410c;
   --loupe-ink: #ffffff;

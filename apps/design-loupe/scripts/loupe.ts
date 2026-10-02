@@ -1,4 +1,4 @@
-import { existsSync, watch } from 'node:fs';
+import { existsSync, readFileSync, watch } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 import {
@@ -33,7 +33,12 @@ if (!verb || verb === '--help' || verb === '-h') {
 if (!jobArg) fail(`${verb} needs a job dir — loupe --help`);
 const jobDir = resolve(jobArg ?? '');
 if (!existsSync(join(jobDir, 'asks.json'))) fail(`no asks.json in ${jobDir}`);
-const origin = `http://localhost:${process.env.PORT ?? 5181}`;
+// a worktree's dev server runs at 5181 + its offset (`worktree:seed`), so the push link must too
+const offsetFile = resolve(import.meta.dirname, '../../../.worktree-offset');
+const offset = existsSync(offsetFile)
+  ? Number(readFileSync(offsetFile, 'utf8').trim()) || 0
+  : 0;
+const origin = `http://localhost:${process.env.PORT ?? 5181 + offset}`;
 
 try {
   if (verb === 'round') await round();
@@ -48,23 +53,29 @@ try {
 async function round() {
   // readJob first: a bad board name or a broken file fails here, before anything is stamped
   const job = await readJob(jobDir);
-  const asks = await claimPush(jobDir);
   const open = job.asks.filter((ask) => ask.state === 'open');
-  const first = open[0] ?? job.asks[0];
+  const [first] = open;
+  if (!first)
+    throw new InputError(
+      `nothing open in round ${job.round}, so there is nothing to push`,
+    );
+  const asks = await claimPush(jobDir);
   console.log(
     `${job.name} · round ${asks.round}: ${open.length} ${open.length === 1 ? 'ask' : 'asks'} → ${origin}/#${first?.id ?? ''}`,
   );
 }
 
+/** how soon a failed read is tried again */
+const RETRY_MS = 500;
+
 async function wait() {
-  let last = JSON.stringify(await readAnswers(jobDir));
   const known = await readAnswers(jobDir);
   const job = await readJob(jobDir);
   console.error(`loupe: waiting on answers for ${job.name}`);
+  // `known` moves only after a line is printed, so a read that fails mid-rewrite (the designer
+  // writing the next round) is retried, never skipped
   const check = async () => {
-    const answers = await readAnswers(jobDir).catch(() => null);
-    if (!answers || JSON.stringify(answers) === last) return;
-    last = JSON.stringify(answers);
+    const answers = await readAnswers(jobDir);
     const fresh = await readJob(jobDir);
     for (const ask of fresh.asks) {
       const answer = answers[ask.id];
@@ -84,8 +95,11 @@ async function wait() {
         console.log(`reopened ${id}`);
       }
   };
+  const checkSoon = () => {
+    check().catch(() => setTimeout(checkSoon, RETRY_MS));
+  };
   watch(jobDir, (_event, file) => {
-    if (file === 'answers.json') check().catch(() => undefined);
+    if (file === 'answers.json' || file === 'asks.json') checkSoon();
   });
   // a held-open process: Monitor ends it
   await new Promise(() => undefined);

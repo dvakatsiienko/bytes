@@ -5,6 +5,7 @@ import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { devCrash, isDev } from '@/dev-crash.ts';
+import { useHash } from '@/hash.ts';
 
 /** one region that fails alone: its fallback keeps the region's box, the other region keeps working */
 export const Section = (props: SectionProps) => {
@@ -12,7 +13,9 @@ export const Section = (props: SectionProps) => {
     <ErrorBoundary
       fallbackRender={(fallback) => {
         return <SectionFallback {...fallback} what={sections[props.name]} />;
-      }}>
+      }}
+      // a new ask or board in the url clears the error by itself
+      resetKeys={[useHash()]}>
       <DevCrash section={props.name} />
       {props.children}
     </ErrorBoundary>

@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore } from 'react';
+import { useEffect } from 'react';
 
 import { AskPanel } from '@/components/ask-panel';
 import { BuildBadge } from '@/components/build-badge';
@@ -6,13 +6,13 @@ import { Section, errorText } from '@/components/section';
 import { Surface } from '@/components/surface';
 
 import { useJob } from '@/api.ts';
+import { useHash } from '@/hash.ts';
 import { faviconSvg, openCountOf, parseHash, tabTitle } from '@/view.ts';
 
 /** the boards on the left, the asks on the right; the url hash says which ask is open */
 export const Loupe = () => {
   const job = useJob();
-  const hash = useSyncExternalStore(subscribeHash, readHash);
-  const target = parseHash(hash);
+  const target = parseHash(useHash());
   const openCount = job.data ? openCountOf(job.data.asks) : 0;
 
   useEffect(() => {
@@ -59,12 +59,3 @@ export const Loupe = () => {
     </main>
   );
 };
-
-/* Helpers */
-
-const subscribeHash = (onChange: () => void) => {
-  window.addEventListener('hashchange', onChange);
-  return () => window.removeEventListener('hashchange', onChange);
-};
-
-const readHash = () => location.hash;

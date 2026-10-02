@@ -40,7 +40,8 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 
 1. write `asks.json` in the job: `round`, `boards` (the take's project folder, relative to the
    job), and the asks — `id` (`ask-N`), `board`, `kind`, `question`, `options`, `recommend`, `why`.
-   Mark each pin in its board as `id="ask-N"`.
+   Mark each pin in its board's markup as `id="ask-N"` — «target moved» is read from the file's
+   text, so a pin the runtime adds later reads as moved.
 2. `pnpm loupe round <job>` — checks the file, stamps the round, prints the one push line. Send it
    with `PushNotification`, once. A second call for the same round exits 1.
 3. `pnpm loupe wait <job>` under `Monitor` — one line per answer, within a second of dima's key.
