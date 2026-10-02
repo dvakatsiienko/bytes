@@ -17,6 +17,34 @@ export const Board = (props: BoardProps) => {
   const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
   const downAt = useRef<{ x: number; y: number } | null>(null);
   const pinRect = usePinRect(frame, props.pinId);
+  const src = `/boards/${encodeURIComponent(props.board.file)}?rev=${props.board.rev}`;
+
+  // the comp's own links go nowhere here: the speak logo points at «/», which is design loupe
+  // itself, and a live board that followed it showed a second loupe inside the canvas
+  useEffect(() => {
+    if (!frame) return;
+    const block = (event: Event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest('a[href], form')
+      )
+        event.preventDefault();
+    };
+    const handleLoad = () => {
+      const doc = frame.contentDocument;
+      if (!doc || doc.location.href === 'about:blank') return;
+      // a frame that left its board anyway (a script, a redirect) is sent back to it
+      if (!doc.location.pathname.startsWith('/boards/')) {
+        frame.src = src;
+        return;
+      }
+      doc.addEventListener('click', block, true);
+      doc.addEventListener('submit', block, true);
+    };
+    frame.addEventListener('load', handleLoad);
+    handleLoad();
+    return () => frame.removeEventListener('load', handleLoad);
+  }, [frame, src]);
 
   // a live frame has the keyboard, so its own Esc must reach the surface too
   useEffect(() => {
@@ -77,7 +105,7 @@ export const Board = (props: BoardProps) => {
           inert={!props.isLive}
           key={props.board.rev}
           ref={setFrame}
-          src={`/boards/${encodeURIComponent(props.board.file)}?rev=${props.board.rev}`}
+          src={src}
           style={{ pointerEvents: props.isLive ? 'auto' : 'none' }}
           tabIndex={props.isLive ? 0 : -1}
           title={props.board.title}

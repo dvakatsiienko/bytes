@@ -80,8 +80,8 @@ export const runtimeOf = (appDir: string) =>
 
 const answerBody = z.object({
   id: z.string(),
+  note: z.string().max(2000),
   pick: z.number().int().nonnegative().nullable(),
-  text: z.string().max(2000),
 });
 const reopenBody = z.object({ id: z.string() });
 
@@ -106,7 +106,7 @@ const routeApi = async (
   }
   if (req.method === 'POST' && path === '/answer') {
     const body = answerBody.safeParse(await readBody(req));
-    if (!body.success) throw new InputError('an answer is {id, pick, text}');
+    if (!body.success) throw new InputError('an answer is {id, pick, note}');
     await writeAnswer(jobDir, body.data);
     send(res, 200, { ok: true });
     return;

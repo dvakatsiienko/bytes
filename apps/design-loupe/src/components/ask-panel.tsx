@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@ui/kit/components/button';
 import { Input } from '@ui/kit/components/input';
@@ -24,8 +25,10 @@ import { stepAsk } from '@/view.ts';
 
 /**
  * The round's asks, one open at a time. Keys: `1`–`9` pick an option, Enter
- * takes the recommendation, `j` / `k` move between asks; in the text line,
- * Enter sends the line.
+ * takes the recommendation, `j` / `k` move between asks; in the note line,
+ * Enter adds the note. A question is text to read, copy or have read aloud,
+ * so it is never inside a link: only an ask's header line and its board line
+ * jump the view.
  */
 export const AskPanel = (props: AskPanelProps) => {
   const answer = useAnswer();
@@ -34,7 +37,7 @@ export const AskPanel = (props: AskPanelProps) => {
 
   const pick = (ask: AskView, index: number) => {
     if (index < ask.options.length)
-      answer.mutate({ id: ask.id, pick: index, text: '' });
+      answer.mutate({ id: ask.id, note: '', pick: index });
   };
   const keysRef = useRef({
     active,
@@ -79,32 +82,27 @@ export const AskPanel = (props: AskPanelProps) => {
   const askListJSX = props.job.asks.map((ask) => {
     const isActive = ask.id === active?.id;
     return (
-      <li key={ask.id}>
-        <a
-          aria-current={isActive ? 'true' : undefined}
+      <li
+        className={cn(
+          'border-l-2',
+          isActive ? 'border-loupe bg-muted/40' : 'border-transparent',
+        )}
+        key={ask.id}>
+        <AskLink
+          ask={ask.id}
+          className='flex items-center gap-2 px-5 pt-3 pb-1 text-muted-foreground text-xs hover:text-foreground'
+          isCurrent={isActive}
+          job={props.job.name}>
+          <span className='font-mono'>{ask.id}</span>
+          <StateChip ask={ask} />
+        </AskLink>
+        <p
           className={cn(
-            'flex flex-col gap-1 border-l-2 px-5 py-3 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
-            isActive ? 'border-loupe bg-muted/40' : 'border-transparent',
-          )}
-          href={askPath(props.job.name, ask.id)}
-          // the open ask clicked again frames its board again, after a pan; a pointer click lets go
-          // of the focus, so the next Enter answers the ask instead of following the link again
-          onClick={(event) => {
-            handleLinkClick(event);
-            if (event.detail > 0) event.currentTarget.blur();
-          }}>
-          <span className='flex items-center gap-2 text-muted-foreground text-xs'>
-            <span className='font-mono'>{ask.id}</span>
-            <StateChip ask={ask} />
-          </span>
-          <span
-            className={cn(
-              'text-sm',
-              isActive ? 'font-medium' : 'line-clamp-2',
-            )}>
-            {ask.question}
-          </span>
-        </a>
+            'select-text px-5 pb-3 text-sm',
+            isActive ? 'font-medium' : 'line-clamp-2',
+          )}>
+          {ask.question}
+        </p>
         {isActive ? (
           <AskDetail
             ask={ask}
@@ -113,8 +111,8 @@ export const AskPanel = (props: AskPanelProps) => {
             error={answer.variables?.id === ask.id ? answer.error : null}
             isSaving={answer.isPending}
             job={props.job.name}
+            onNote={(note) => answer.mutate({ id: ask.id, note, pick: null })}
             onPick={(index) => pick(ask, index)}
-            onText={(text) => answer.mutate({ id: ask.id, pick: null, text })}
           />
         ) : null}
       </li>
@@ -207,6 +205,19 @@ const AskDetail = (props: AskDetailProps) => {
     );
   });
 
+  const noteListJSX = (props.ask.answer?.notes ?? []).map((note) => {
+    return (
+      <li className='text-sm' key={note.at}>
+        <time
+          className='mr-2 text-muted-foreground text-xs tabular-nums'
+          dateTime={note.at}>
+          {clockOf(note.at)}
+        </time>
+        <span className='select-text'>{note.text}</span>
+      </li>
+    );
+  });
+
   const statusJSX = (() => {
     switch (props.ask.state) {
       case 'open':
@@ -235,10 +246,14 @@ const AskDetail = (props: AskDetailProps) => {
   })();
 
   return (
-    <div className='flex flex-col gap-3 border-loupe border-l-2 bg-muted/40 px-5 pt-1 pb-4'>
-      <p className='text-muted-foreground text-xs'>
+    <div className='flex flex-col gap-3 px-5 pb-4'>
+      <AskLink
+        ask={props.ask.id}
+        className='-mt-1 self-start text-muted-foreground text-xs underline-offset-2 hover:text-foreground hover:underline'
+        isCurrent={false}
+        job={props.job}>
         on {props.board?.title ?? props.ask.board}
-      </p>
+      </AskLink>
       {props.ask.isMoved ? (
         <p
           className='flex gap-2 rounded-md border border-dashed px-3 py-2 text-sm'
@@ -260,15 +275,20 @@ const AskDetail = (props: AskDetailProps) => {
           {props.ask.why}
         </p>
       ) : null}
+      {noteListJSX.length > 0 ? (
+        <ol aria-label='notes' className='flex flex-col gap-1.5 border-l pl-3'>
+          {noteListJSX}
+        </ol>
+      ) : null}
       <form
         onSubmit={(event) => {
           event.preventDefault();
           if (line.trim() === '') return;
-          props.onText(line);
+          props.onNote(line);
           setLine('');
         }}>
         <Input
-          aria-label={`answer ${props.ask.id} in a line`}
+          aria-label={`add a note to ${props.ask.id}`}
           disabled={props.isSaving}
           onChange={(event) => setLine(event.target.value)}
           onKeyDown={(event) => {
@@ -276,18 +296,12 @@ const AskDetail = (props: AskDetailProps) => {
           }}
           placeholder={
             props.ask.options.length > 0
-              ? 'or say it in a line — Enter sends'
+              ? 'add a note — Enter sends, the pick stays'
               : 'your answer — Enter sends'
           }
           value={line}
         />
       </form>
-      {props.ask.answer && props.ask.answer.pick === null ? (
-        <p className='text-sm'>
-          you said:{' '}
-          <span className='select-text'>«{props.ask.answer.text}»</span>
-        </p>
-      ) : null}
       {props.error ? (
         <p className='text-destructive text-sm' role='alert'>
           {props.error.message}
@@ -307,6 +321,27 @@ const AskDetail = (props: AskDetailProps) => {
         </div>
       ) : null}
     </div>
+  );
+};
+
+/** a jump to an ask's spot; the open ask clicked again frames its board again, after a pan */
+const AskLink = (props: AskLinkProps) => {
+  return (
+    <a
+      aria-current={props.isCurrent ? 'true' : undefined}
+      className={cn(
+        'rounded-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
+        props.className,
+      )}
+      draggable={false}
+      href={askPath(props.job, props.ask)}
+      // a pointer click lets go of the focus, so the next Enter answers the ask instead of following the link again
+      onClick={(event) => {
+        handleLinkClick(event);
+        if (event.detail > 0) event.currentTarget.blur();
+      }}>
+      {props.children}
+    </a>
   );
 };
 
@@ -356,6 +391,9 @@ const StateChip = (props: { ask: AskView }) => {
 
 const OPTION_KEY = /^[1-9]$/;
 
+const clockOf = (at: string) =>
+  new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
 const isControl = (target: EventTarget | null) =>
   target instanceof HTMLAnchorElement || target instanceof HTMLButtonElement;
 
@@ -379,6 +417,14 @@ interface AskDetailProps {
   isSaving: boolean;
   /** the job's name, the first segment of every link */
   job: string;
+  onNote: (note: string) => void;
   onPick: (index: number) => void;
-  onText: (text: string) => void;
+}
+
+interface AskLinkProps {
+  ask: string;
+  children: ReactNode;
+  className: string;
+  isCurrent: boolean;
+  job: string;
 }

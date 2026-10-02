@@ -37,13 +37,37 @@ const asksSchema = z.object({
   round: z.number().int().positive(),
 });
 
-const answerSchema = z.object({
-  at: z.string(),
-  pick: z.number().int().nonnegative().nullable(),
-  /** the board's revision when dima answered */
-  rev: z.string(),
-  text: z.string(),
-});
+const noteSchema = z.object({ at: z.string(), text: z.string() });
+
+/**
+ * An answer is the picked option plus a thread of notes; a note never clears
+ * the pick and never replaces an earlier note. `at` is the time of the last
+ * pick or note, and it is what the designer's seen / applied point at; a
+ * reopen removes it (and the pick), so the ask reads open with its notes kept.
+ */
+const answerSchema = z.preprocess(
+  // an answer written before notes had one `text` line: it becomes the first note
+  (value) =>
+    typeof value === 'object' &&
+    value !== null &&
+    'text' in value &&
+    !('notes' in value)
+      ? (({ text, ...rest }) => ({
+          ...rest,
+          notes:
+            typeof text === 'string' && text.trim()
+              ? [{ at: (rest as { at?: string }).at ?? '', text }]
+              : [],
+        }))(value as { text?: unknown })
+      : value,
+  z.object({
+    at: z.string().optional(),
+    notes: z.array(noteSchema).default([]),
+    pick: z.number().int().nonnegative().nullable(),
+    /** the board's revision at the last pick or note */
+    rev: z.string(),
+  }),
+);
 
 const answersSchema = z.record(askId, answerSchema);
 
@@ -65,7 +89,7 @@ const pinId = /\bid="(ask-\d+)"/g;
 const boardSuffix = /\.dc\.html$/;
 
 const askState = (ask: Ask, answer: Answer | undefined): AskState => {
-  if (!answer) return 'open';
+  if (!answer?.at) return 'open';
   if (ask.applied?.at === answer.at) return 'applied';
   if (ask.seen === answer.at) return 'seen';
   return 'answered';
@@ -131,7 +155,7 @@ export const readJob = async (jobDir: string): Promise<JobView> => {
   };
 };
 
-/** dima's answer to one ask; a pick must name an option, a text answer must say something */
+/** dima's answer to one ask: a pick, a note, or both; a pick must name an option, a note must say something */
 export const writeAnswer = (jobDir: string, input: AnswerInput) =>
   inTurn(() => writeAnswerNow(jobDir, input));
 
@@ -141,29 +165,35 @@ const writeAnswerNow = async (jobDir: string, input: AnswerInput) => {
   if (!ask) throw new InputError(`no ask ${input.id} in asks.json`);
   if (input.pick !== null && input.pick >= ask.options.length)
     throw new InputError(`${input.id} has no option ${input.pick + 1}`);
-  if (input.pick === null && input.text.trim() === '')
-    throw new InputError('an answer is an option or a line of text');
+  const note = input.note.trim();
+  if (input.pick === null && note === '')
+    throw new InputError('an answer is an option, a note, or both');
 
   const html = await readFile(
     join(boardsDirOf(jobDir, asks), ask.board),
     'utf8',
   );
   const answers = await readAnswers(jobDir);
+  const at = new Date().toISOString();
+  const before = answers[input.id];
   answers[input.id] = {
-    at: new Date().toISOString(),
-    pick: input.pick,
+    at,
+    notes: note
+      ? [...(before?.notes ?? []), { at, text: note }]
+      : (before?.notes ?? []),
+    pick: input.pick ?? before?.pick ?? null,
     rev: revisionOf(html),
-    text: input.text.trim(),
   };
   await writeJson(join(jobDir, 'answers.json'), answers);
 };
 
-/** reopening drops the answer, so the ask is open again and the designer's seen / applied no longer match */
+/** reopening drops the pick and the answer's time, so the ask is open again and the designer's seen / applied no longer match; its notes stay */
 export const reopenAsk = (jobDir: string, id: string) =>
   inTurn(async () => {
     const answers = await readAnswers(jobDir);
-    if (!answers[id]) throw new InputError(`${id} has no answer to reopen`);
-    delete answers[id];
+    const answer = answers[id];
+    if (!answer?.at) throw new InputError(`${id} has no answer to reopen`);
+    answers[id] = { notes: answer.notes, pick: null, rev: answer.rev };
     await writeJson(join(jobDir, 'answers.json'), answers);
   });
 
@@ -173,10 +203,10 @@ export const markAsk = async (jobDir: string, mark: Mark) => {
   const answers = await readAnswers(jobDir);
   const ask = asks.asks.find((candidate) => candidate.id === mark.id);
   if (!ask) throw new InputError(`no ask ${mark.id} in asks.json`);
-  const answer = answers[mark.id];
-  if (!answer) throw new InputError(`${mark.id} has no answer yet`);
-  if (mark.as === 'seen') ask.seen = answer.at;
-  else ask.applied = { at: answer.at, in: mark.version };
+  const at = answers[mark.id]?.at;
+  if (!at) throw new InputError(`${mark.id} has no answer yet`);
+  if (mark.as === 'seen') ask.seen = at;
+  else ask.applied = { at, in: mark.version };
   await writeJson(join(jobDir, 'asks.json'), asks);
 };
 
@@ -261,8 +291,10 @@ export interface JobView {
 
 export interface AnswerInput {
   id: string;
+  /** a note to add to the thread, or '' for none */
+  note: string;
+  /** the option to pick, or null to keep the current pick */
   pick: number | null;
-  text: string;
 }
 
 type Mark = { id: string } & (

@@ -24,6 +24,8 @@ key() { agent-browser eval "(() => { window.dispatchEvent(new KeyboardEvent('key
 go() { agent-browser eval "(() => { history.pushState(null, '', '$1'); dispatchEvent(new PopStateEvent('popstate')); return 1; })()" >/dev/null; sleep 1; }
 api() { curl -s "localhost:${port}/api/job" | jq -r "$1"; }
 title() { agent-browser get title; }
+# one note through the open ask's own form, the way Enter in the note line sends it
+note() { agent-browser eval "(() => { const i = document.querySelector('input[aria-label^=\"add a note\"]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(i, '$1'); i.dispatchEvent(new Event('input', { bubbles: true })); i.form.requestSubmit(); return 1; })()" >/dev/null; sleep 1; }
 
 case "${1:-}" in
   start)
@@ -104,6 +106,21 @@ case "${1:-}" in
       && pass 'answering an ask: Enter → option 1, 2 → option 2, each with a board revision; Enter on a link answers nothing' \
       || fail 'answering an ask' "Enter on a link: «${sent}» → ${early}, answers ${picks}"
 
+    # 🧭 an ask's question is text — plain, selectable, outside every link
+    question=$(js question)
+    [ "${question}" = 'plain, 2 jump links' ] \
+      && pass 'the question is text: plain and selectable; the header and the board line are the 2 jumps' \
+      || fail 'the question is text' "${question}"
+
+    # 🧭 notes — a note keeps the pick, notes append oldest first with their time
+    note 'first note'
+    note 'second note'
+    thread=$(jq -c '[."ask-2".pick, [."ask-2".notes[].text], (."ask-2".notes | all(.at | length > 0))]' "${job}/answers.json")
+    shown=$(agent-browser get text 'aside ol[aria-label="notes"]' 2>/dev/null | tr '\n' ' ')
+    [ "${thread}" = '[1,["first note","second note"],true]' ] && [[ "${shown}" == *'first note'*'second note'* ]] \
+      && pass 'notes: two notes keep the pick (option 2) and stack oldest first, each with its time' \
+      || fail 'notes' "answers ${thread}, panel «${shown}»"
+
     # 🧭 an ask's life is visible
     (cd "${app}" && node scripts/loupe.ts mark "${job}" ask-2 seen >/dev/null)
     sleep 1
@@ -143,6 +160,17 @@ case "${1:-}" in
       && pass 'a board made interactive: a click → it takes the pointer; Esc inside it → panning' \
       || fail 'a board made interactive' "after click «${on}», after Esc «${off}»"
 
+    # 🧭 a board's own links stay inside it — the comp's logo points at «/», design loupe itself
+    agent-browser click '[data-board="admin-chain-of-one"] button' >/dev/null
+    sleep 0.4
+    clicked=$(js board-link)
+    sleep 1.5
+    frames=$(js board-page)
+    agent-browser eval "$(cat "${kit}/probes/esc-in-board.js")" >/dev/null
+    [ "${frames}" = 'every frame on its board' ] && [[ "${clicked}" == clicked* ]] \
+      && pass "a board's own links stay inside it: ${clicked}, the frame stays on its board" \
+      || fail "a board's own links stay inside it" "${clicked} → ${frames}"
+
     # 🧭 a deep link opens an ask at its pin — moving between asks and boards never reloads the page
     [ "$(js kept)" = kept ] \
       && pass 'moving between asks and boards: one page marker held across every move of the walk' \
@@ -176,8 +204,8 @@ case "${1:-}" in
     sleep 1.5
     curl -s -X POST "${url}/api/reopen" -H 'content-type: application/json' -d '{"id":"ask-1"}' >/dev/null
     start=$(date +%s)
-    curl -s -X POST "${url}/api/answer" -H 'content-type: application/json' -d '{"id":"ask-1","pick":null,"text":"kit probe"}' >/dev/null
-    while [ $(($(date +%s) - start)) -lt 5 ] && ! grep -q 'answered ask-1' "${log}"; do sleep 0.2; done
+    curl -s -X POST "${url}/api/answer" -H 'content-type: application/json' -d '{"id":"ask-1","pick":null,"note":"kit probe"}' >/dev/null
+    while [ $(($(date +%s) - start)) -lt 5 ] && ! grep -q 'noted ask-1' "${log}"; do sleep 0.2; done
     woke=$(($(date +%s) - start))
     # an answer that lands while asks.json is half-written is printed once the file mends, and wait lives on
     cp "${job}/asks.json" "${job}/asks.good"
@@ -187,7 +215,7 @@ case "${1:-}" in
     mv "${job}/asks.good" "${job}/asks.json"
     mended=$(date +%s)
     while [ $(($(date +%s) - mended)) -lt 5 ] && ! grep -q 'answered ask-2' "${log}"; do sleep 0.2; done
-    grep -q 'answered ask-1: «kit probe»' "${log}" && grep -q 'answered ask-2' "${log}" \
+    grep -q 'noted ask-1: «kit probe»' "${log}" && grep -q 'answered ask-2' "${log}" \
       && pass "the designer wakes on an answer: within ${woke} s, and after a half-written asks.json" \
       || fail 'the designer wakes on an answer' "$(tr '\n' ' ' < "${log}" | cut -c1-200)"
 

@@ -21,11 +21,22 @@
   - when design-loupe loads
   - then the ask says «target moved» and the view frames the whole board, never an empty zoom
 - ✅ answering an ask
-  - makes: an answer in `studio/jobs/<job>/answers.json`, with the ask id and the board revision
+  - makes: an answer in `studio/jobs/<job>/answers.json`: the ask id, the pick, its notes and the board revision
   - given an open pick ask
   - when dima presses Enter
   - then the recommended option is the answer and the ask shows «answered»; pressing `2` picks option 2
   - decision: buttons name the outcome («use header A»), never approve/reject — prior art: approve/reject confuses reviewers
+- ✅ an ask's question is text
+  - given an open ask
+  - when dima selects or drags across its question
+  - then it selects as text, ready to copy or have read aloud; only the ask's header line and its board line jump the view
+  - decision: a link never wraps a sentence (dima, 2026-10-02; x:guide-ui-ux)
+- ✅ notes on an ask
+  - makes: every note in the ask's answer in `answers.json`, oldest first, each with its time; nothing is overwritten
+  - given an ask with option 2 picked
+  - when dima adds a note, then another
+  - then option 2 stays picked and both notes show under the ask, oldest first, each with its time
+  - decision: an answer is the pick plus a thread of notes; a note never clears the pick, and a reopen keeps the notes (dima, 2026-10-02)
 - ✅ an ask's life is visible
   - given an answered ask
   - when the designer marks it seen, then applied
@@ -42,6 +53,10 @@
   - given a board that sits half under the panel
   - when dima tabs onto it
   - then the view pans until the whole board is on screen; focus is never hidden (dima, 2026-10-02)
+- ✅ a board's own links stay inside it
+  - given a live board whose comp has a link (the speak logo points at «/»)
+  - when dima clicks it
+  - then the board stays on screen as it was; design loupe never opens inside a board
 - ✅ a board made interactive
   - when dima clicks a board
   - then it takes hover and play; Esc returns to panning

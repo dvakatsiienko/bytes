@@ -79,7 +79,7 @@ describe('readJob', () => {
 
 describe('writeAnswer', () => {
   it('records the pick with the board revision', async () => {
-    await writeAnswer(job, { id: 'ask-1', pick: 1, text: '' });
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 1 });
     const answer = JSON.parse(readFileSync(join(job, 'answers.json'), 'utf8'))[
       'ask-1'
     ];
@@ -91,14 +91,14 @@ describe('writeAnswer', () => {
 
   it('refuses an option the ask does not have', async () => {
     await expect(
-      writeAnswer(job, { id: 'ask-1', pick: 2, text: '' }),
+      writeAnswer(job, { id: 'ask-1', note: '', pick: 2 }),
     ).rejects.toThrow('has no option 3');
   });
 
   it('keeps every answer when answers arrive at once', async () => {
     await Promise.all([
-      writeAnswer(job, { id: 'ask-1', pick: 0, text: '' }),
-      writeAnswer(job, { id: 'ask-2', pick: null, text: 'ship it' }),
+      writeAnswer(job, { id: 'ask-1', note: '', pick: 0 }),
+      writeAnswer(job, { id: 'ask-2', note: 'ship it', pick: null }),
     ]);
     expect((await readJob(job)).asks.map((ask) => ask.state)).toEqual([
       'answered',
@@ -109,30 +109,73 @@ describe('writeAnswer', () => {
 
 describe("an ask's life", () => {
   it('reads seen once the designer marks the answer seen', async () => {
-    await writeAnswer(job, { id: 'ask-1', pick: 0, text: '' });
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
     await markAsk(job, { as: 'seen', id: 'ask-1' });
     expect(await stateOf('ask-1')).toBe('seen');
   });
 
   it('reads applied once the designer marks it applied', async () => {
-    await writeAnswer(job, { id: 'ask-1', pick: 0, text: '' });
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
     await markAsk(job, { as: 'applied', id: 'ask-1', version: 'v2' });
     expect(await stateOf('ask-1')).toBe('applied');
   });
 
   it('reads open again after a reopen, even when it was applied', async () => {
-    await writeAnswer(job, { id: 'ask-1', pick: 0, text: '' });
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
     await markAsk(job, { as: 'applied', id: 'ask-1', version: 'v2' });
     await reopenAsk(job, 'ask-1');
     expect(await stateOf('ask-1')).toBe('open');
   });
 
   it('reads answered for a new answer after an applied one', async () => {
-    await writeAnswer(job, { id: 'ask-1', pick: 0, text: '' });
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 0 });
     await markAsk(job, { as: 'applied', id: 'ask-1', version: 'v2' });
     await reopenAsk(job, 'ask-1');
-    await writeAnswer(job, { id: 'ask-1', pick: 1, text: '' });
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 1 });
     expect(await stateOf('ask-1')).toBe('answered');
+  });
+});
+
+describe('notes', () => {
+  it('keep the pick', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: '', pick: 1 });
+    await writeAnswer(job, {
+      id: 'ask-1',
+      note: 'and make it bigger',
+      pick: null,
+    });
+    expect((await readJob(job)).asks[0]?.answer?.pick).toBe(1);
+  });
+
+  it('append, oldest first, each with its time', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: 'first', pick: null });
+    await writeAnswer(job, { id: 'ask-1', note: 'second', pick: null });
+    const notes = (await readJob(job)).asks[0]?.answer?.notes ?? [];
+    expect(notes.map((note) => note.text)).toEqual(['first', 'second']);
+  });
+
+  it('survive a reopen', async () => {
+    await writeAnswer(job, { id: 'ask-1', note: 'keep this', pick: 0 });
+    await reopenAsk(job, 'ask-1');
+    const [ask] = (await readJob(job)).asks;
+    expect([ask?.state, ask?.answer?.notes.length]).toEqual(['open', 1]);
+  });
+
+  it('read an answer written as one text line as its first note', async () => {
+    writeFileSync(
+      join(job, 'answers.json'),
+      JSON.stringify({
+        'ask-1': {
+          at: '2026-10-02T12:00:00.000Z',
+          pick: 0,
+          rev: 'abcdef12',
+          text: 'old line',
+        },
+      }),
+    );
+    expect((await readJob(job)).asks[0]?.answer?.notes).toEqual([
+      { at: '2026-10-02T12:00:00.000Z', text: 'old line' },
+    ]);
   });
 });
 

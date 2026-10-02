@@ -25,8 +25,12 @@ The set of asks the designer writes at once; dima gets one push per round.
 _Avoid_: batch, phase
 
 **Answer**:
-dima's reply to one ask — the option he picked or a line of text — written to `answers.json` with the ask id and the board revision.
+dima's reply to one ask — the option he picked plus a thread of notes — written to `answers.json` with the ask id and the board revision. A note never clears the pick.
 _Avoid_: vote, verdict
+
+**Note**:
+One line dima adds to an ask's answer, with its time; notes stack oldest first and none is ever overwritten, a reopen included.
+_Avoid_: comment, message
 
 **Ask states**:
 open → answered → seen (the designer read it) → applied (its board changed); any ask can be reopened.

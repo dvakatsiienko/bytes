@@ -69,7 +69,8 @@ async function round() {
 }
 
 async function wait() {
-  const known = await readAnswers(jobDir);
+  const known: Record<string, { at?: string } | undefined> =
+    await readAnswers(jobDir);
   const job = await readJob(jobDir);
   console.error(`loupe: waiting on answers for ${job.name}`);
   // `known` moves only after a line is printed, so a read that fails mid-rewrite (the designer
@@ -79,21 +80,23 @@ async function wait() {
     const fresh = await readJob(jobDir);
     for (const ask of fresh.asks) {
       const answer = answers[ask.id];
-      if (!answer || known[ask.id]?.at === answer.at) continue;
+      const was = known[ask.id];
+      if (answer?.at === was?.at) continue;
       known[ask.id] = answer;
-      const said =
-        answer.pick === null
-          ? `«${answer.text}»`
-          : `«${ask.options[answer.pick]}»`;
+      if (!answer?.at) {
+        console.log(`reopened ${ask.id}`);
+        continue;
+      }
+      // the last change is a note when the newest note carries the answer's own time
+      const note = answer.notes.at(-1);
+      const pick =
+        answer.pick === null ? 'no pick yet' : `«${ask.options[answer.pick]}»`;
       console.log(
-        `answered ${ask.id}: ${said}${answer.pick !== null && answer.text ? ` + «${answer.text}»` : ''} (board rev ${answer.rev})`,
+        note?.at === answer.at
+          ? `noted ${ask.id}: «${note.text}» — pick ${pick} (board rev ${answer.rev})`
+          : `answered ${ask.id}: ${pick} (board rev ${answer.rev})`,
       );
     }
-    for (const id of Object.keys(known))
-      if (!answers[id]) {
-        delete known[id];
-        console.log(`reopened ${id}`);
-      }
   };
   const checkSoon = () => {
     check().catch(() => setTimeout(checkSoon, RETRY_MS));

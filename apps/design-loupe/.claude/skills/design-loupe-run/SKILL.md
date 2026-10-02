@@ -75,7 +75,7 @@ recommendation, `"1"`–`"9"` pick an option, `"j"` / `"k"` step between asks. m
 
 ```bash
 curl -s -X POST localhost:$P/api/reopen -H 'content-type: application/json' -d '{"id":"ask-2"}'
-curl -s -X POST localhost:$P/api/answer -H 'content-type: application/json' -d '{"id":"ask-2","pick":null,"text":"fine by me"}'
+curl -s -X POST localhost:$P/api/answer -H 'content-type: application/json' -d '{"id":"ask-2","pick":null,"note":"fine by me"}'
 PORT=$P pnpm loupe round "$S/speak"
 pnpm loupe mark "$S/speak" ask-2 seen
 pnpm loupe mark "$S/speak" ask-2 applied v1.20
@@ -86,7 +86,7 @@ curl -s localhost:$P/api/job | jq -c '[.asks[] | {id, state}]'
   pushed already». a fresh copy of the fixture resets it.
 - `loupe wait <job>` streams one line per answer and never exits. test it under a timeout:
   `(timeout 4 node scripts/loupe.ts wait "$S/speak"; true) &`, then post an answer — it prints
-  `answered ask-2: «…» (board rev …)`.
+  `noted ask-2: «…» — pick … (board rev …)` for a note, `answered ask-2: «…»` for a pick.
 - a write with a foreign `Origin` header, or without `content-type: application/json`, gets 403.
 
 ## 5. stop
