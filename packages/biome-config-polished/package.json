@@ -24,6 +24,6 @@
     "format": "biome format --write"
   },
   "peerDependencies": {
-    "@biomejs/biome": ">=2.5.14"
+    "@biomejs/biome": ">=2.5.15"
   }
 }
