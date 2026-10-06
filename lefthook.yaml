@@ -59,7 +59,7 @@ pre-push:
     # everything and exits 0.
     - name: linear-push
       use_stdin: true
-      run: node /Users/dima/frame/script/linear-push.ts hook {1} {2}
+      run: f="$HOME/frame/script/linear-push.ts"; if [ -f "$f" ]; then node "$f" hook {1} {2}; fi
 
     # Typecheck only what moved since origin/main, so a kit consumer that
     # breaks under vercel's install never leaves the machine.
@@ -75,7 +75,7 @@ commit-msg:
     # Strips the `Claude-Session:` trailer the desktop harness asks agents to
     # append; the `Agent:` trailer is the fingerprint, this one is noise.
     - name: session-trailer
-      run: sed -i '' -e '/^Claude-Session:/d' {1}
+      run: perl -i -ne 'print unless /^Claude-Session:/' {1}
 
     # GitHub honours a CI-skip marker ANYWHERE in a commit message, body
     # included, and it skips every push- and pull_request-triggered workflow.
