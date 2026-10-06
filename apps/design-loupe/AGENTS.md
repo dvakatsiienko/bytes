@@ -8,7 +8,7 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 ## The authorities — read before changing
 
 - **`PRODUCT.md`** — the want, the users, the v1 cut and its out list. impeccable's file.
-- **`FTR.md` + `CONTEXT.md`** — every feature with its check, and the words they use. Read your
+- **`FTR.md` + `GLOSSARY.md`** — every feature with its check, and the words they use. Read your
   section before changing what the app does.
 - **`DESIGN.md`** — the look. impeccable's file: never hand-edit it.
 - `docs/adr/0001-the-stack.md` — why iframes on a zoom surface, why two json files.

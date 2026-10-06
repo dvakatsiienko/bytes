@@ -5,7 +5,7 @@ A visit-card site. Two routes:
 - `/` — CV page: name, contact links, photo, tech stack showcase via SVG icons (12 tool categories)
 - `/cover` — Short bio: professional intro with dynamically calculated years of experience and social links
 
-- **`FTR.md` + `CONTEXT.md`** — every feature with its check, and the words they use. Read
+- **`FTR.md` + `GLOSSARY.md`** — every feature with its check, and the words they use. Read
   your section before changing what the app does.
 
 ## Stack

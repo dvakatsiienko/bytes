@@ -3,7 +3,7 @@
 CSS/design experiments showcase. Each route is an isolated visual demo — no
 shared app logic, no backend.
 
-- **`FTR.md` + `CONTEXT.md`** — every feature with its check, and the words they use. read your section before changing what the app does.
+- **`FTR.md` + `GLOSSARY.md`** — every feature with its check, and the words they use. read your section before changing what the app does.
 
 ## Demos
 

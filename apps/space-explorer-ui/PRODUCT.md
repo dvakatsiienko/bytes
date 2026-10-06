@@ -49,7 +49,7 @@ a boarding-ticket take on a classic graphql tutorial: the same launches-and-trip
 ## Evidence on Hand
 
 - the live app at [space-explorer-ui.vercel.app](https://space-explorer-ui.vercel.app) and its readme shot `assets/apps/space-explorer-ui.webp`
-- `FTR.md` for every feature, `CONTEXT.md` for the words
+- `FTR.md` for every feature, `GLOSSARY.md` for the words
 
 ## Product Principles
 

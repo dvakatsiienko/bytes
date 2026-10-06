@@ -67,8 +67,8 @@ const rows = [
   },
   { gap: (app) => fileGap(app, 'FTR.md', 'x:ftr'), id: 'FTR.md' },
   {
-    gap: (app) => fileGap(app, 'CONTEXT.md', 'domain-modeling'),
-    id: 'CONTEXT.md',
+    gap: (app) => fileGap(app, 'GLOSSARY.md', 'domain-modeling'),
+    id: 'GLOSSARY.md',
   },
   {
     gap: (app) =>
@@ -98,10 +98,12 @@ const rows = [
   {
     bytes: true,
     gap: (app) =>
-      read(join(root, 'CONTEXT-MAP.md')).includes(`apps/${app.name}/CONTEXT.md`)
+      read(join(root, 'GLOSSARY-MAP.md')).includes(
+        `apps/${app.name}/GLOSSARY.md`,
+      )
         ? undefined
-        : `no row linking apps/${app.name}/CONTEXT.md`,
-    id: 'root:CONTEXT-MAP.md',
+        : `no row linking apps/${app.name}/GLOSSARY.md`,
+    id: 'root:GLOSSARY-MAP.md',
   },
   {
     bytes: true,
@@ -234,7 +236,7 @@ function gapsOf(app: App): Gap[] {
     });
 
   const yellow: Gap[] = [
-    ...(['FTR.md', 'CONTEXT.md'] as const)
+    ...(['FTR.md', 'GLOSSARY.md'] as const)
       .filter((doc) => !isWaived(doc))
       .flatMap((doc) => {
         const moved = commitsSince(app, doc);

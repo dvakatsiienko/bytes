@@ -1,6 +1,6 @@
 # space-explorer-ui
 
-the client of space explorer: a user logs in with an email, puts seats on hold and books them as trips. the shared words (launch, mission, rocket, site, flight number, user, token, trip, booked, gone session) are defined once in [space-explorer-api's CONTEXT.md](../space-explorer-api/CONTEXT.md); this file holds only the words the ui adds.
+the client of space explorer: a user logs in with an email, puts seats on hold and books them as trips. the shared words (launch, mission, rocket, site, flight number, user, token, trip, booked, gone session) are defined once in [space-explorer-api's GLOSSARY.md](../space-explorer-api/GLOSSARY.md); this file holds only the words the ui adds.
 
 ## Language
 

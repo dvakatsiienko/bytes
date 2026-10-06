@@ -11,7 +11,7 @@ Ticket: BYT-25
 **Date:** 2026-09-06
 **Repo:** `dvakatsiienko/bytes` @ `main`, tree `69aaf29c8330`
 **Audience:** CC coordinator + coder session, 2026-09-07
-**Method:** read-only scan via GitHub connector — `apps/` (563 files, 140 matched on a UI/theme/component filter), `packages/` (27 files, full), all eight app `CLAUDE.md`/`components.json`, root `CLAUDE.md`, `CONTEXT-MAP.md`, `pnpm-workspace.yaml`. No code was executed. All file sizes and blob hashes quoted below are from that tree.
+**Method:** read-only scan via GitHub connector — `apps/` (563 files, 140 matched on a UI/theme/component filter), `packages/` (27 files, full), all eight app `CLAUDE.md`/`components.json`, root `CLAUDE.md`, `GLOSSARY-MAP.md`, `pnpm-workspace.yaml`. No code was executed. All file sizes and blob hashes quoted below are from that tree.
 
 ---
 

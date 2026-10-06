@@ -3,7 +3,7 @@
 graphql server demo — apollo server over the spacex public api plus sqlite trip bookings.
 paired with `space-explorer-ui`, which needs this server on `:4000` for its codegen.
 
-- **`FTR.md` + `CONTEXT.md`** — every feature with its check, and the words they use (the pair's
+- **`FTR.md` + `GLOSSARY.md`** — every feature with its check, and the words they use (the pair's
   shared words live here). Read your section before changing what the app does.
 
 🐾 **pet project** — basic on purpose (dima, 2026-09-27): `db.sqlite` and `.env` are tracked in git, a minimal db with no setup. keep it; a test that writes goes to a scratch copy — `space-explorer-api-run` shows how.

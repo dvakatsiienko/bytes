@@ -3,7 +3,7 @@
 A permanent Vite app that replaces throwaway HTML prototypes. Everything is preinstalled so a
 new prototype starts at zero setup cost.
 
-- **`FTR.md` + `CONTEXT.md`** — every feature with its check, and the words they use. Read
+- **`FTR.md` + `GLOSSARY.md`** — every feature with its check, and the words they use. Read
   your section before changing what the app does.
 
 The split is the whole point:
