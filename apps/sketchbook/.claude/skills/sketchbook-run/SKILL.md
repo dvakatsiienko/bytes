@@ -80,4 +80,4 @@ cd apps/sketchbook && pnpm test    # vitest, 1 file, ~1 s: a shift keeps the old
 - **after a shift, reopen the page** — vite hot-updates `frame.tsx` (the `import.meta.glob` changed), but the nav only lists the new `003-…` archive after `open` again.
 - the empty-proto placeholder text names the folder it was made in, so a shifted blank still says `build it in src/protos/current-<old topic>` — cosmetic, not a broken shift.
 - vite listens on `[::1]` only — `localhost` works, `127.0.0.1:<port>` does not.
-- the ticket strip reads `src/frame/tickets.ts`; its chips show whatever ids are written there (some still say `DOT-`), not live linear state.
+- the ticket strip reads `src/frame/tickets.ts`; its chips show whatever ids are written there, not live linear state.

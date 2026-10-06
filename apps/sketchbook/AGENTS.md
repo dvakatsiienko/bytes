@@ -108,5 +108,5 @@ edit `tickets.ts` in the same turn — the strip must never lag behind reality. 
   not two — done (struck through), in-flight, queued.
 - **Tickets today**: processed / done / touched, live-updated as dispatch and `cc` stream in.
   Columns carry counts. Ticket chips are **links**, and they must open the Linear desktop app:
-  `linear://x-com/issue/DOT-N`, never an https workspace url.
+  `linear://x-com/issue/FRM-N`, never an https workspace url.
 - Both are live data — update them on every stream, in the same turn the update arrives.
