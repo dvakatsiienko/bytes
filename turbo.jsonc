@@ -1,6 +1,10 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  // `--affected` selects a task only when a changed file matches that task's
+  // own `inputs`, not every task of a changed package. Deploy reads
+  // `build --affected`, so `build.inputs` decides what reaches production.
+  "futureFlags": { "affectedUsingTaskInputs": true },
   // Two root files that change what an install PRODUCES without appearing in
   // any package. turbo's built-in globals cover the root manifest, the lockfile
   // and this file — not these — so without this key a commit touching only one
@@ -91,7 +95,12 @@
         // (measured: editing lefthook.yaml leaves every task hash untouched).
         "!CLAUDE.md",
         "!**/README.md",
-        "!.vscode/**"
+        "!.vscode/**",
+        // Agent memory and skills never reach a bundle. With
+        // `affectedUsingTaskInputs` these lines also keep a docs-only push
+        // from deploying the app (a skills-only push once deployed 6).
+        "!.claude/**",
+        "!AGENTS.md"
       ]
     },
 

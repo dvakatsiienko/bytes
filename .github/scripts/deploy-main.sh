@@ -146,9 +146,9 @@ else
   # which fixes it through turbo's own mechanism rather than a path list here
   # that would go stale. A reviewer caught it; the measurement is on that key.
   #
-  # 📌 `--affected` is package-level, not inputs-level, so the `transit`
-  # exclusions do not reach it: editing `apps/cv/CLAUDE.md` still deploys `cv`.
-  # Wasteful, never wrong, and not worth a path list to avoid.
+  # 📌 `--affected` reads `build.inputs` (`futureFlags.affectedUsingTaskInputs`
+  # in turbo.jsonc), so a push touching only an app's docs, `AGENTS.md` or
+  # `.claude/**` deploys nothing. Measured on BYT-106 in a throwaway clone.
   apps=$(
     while IFS= read -r pkg; do
       [ -n "$pkg" ] || continue
