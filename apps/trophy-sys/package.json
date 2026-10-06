@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "5.103.3",
-    "@tanstack/react-router": "1.170.40",
+    "@tanstack/react-router": "1.170.41",
     "@ui/kit": "workspace:*",
     "@upstash/redis": "1.38.4",
     "@visx/axis": "4.0.0",
@@ -40,8 +40,8 @@
     "@vitejs/plugin-react": "6.1.1",
     "esbuild": "0.28.2",
     "oxc-transform-react": "0.150.0",
-    "shadcn": "4.21.0",
+    "shadcn": "4.21.1",
     "undici": "8.10.2",
-    "vite": "8.3.1"
+    "vite": "8.3.2"
   }
 }

@@ -18,7 +18,7 @@
   "dependencies": {
     "@fontsource-variable/newsreader": "5.3.0",
     "@fontsource-variable/saira": "5.3.0",
-    "@tanstack/react-router": "1.170.40",
+    "@tanstack/react-router": "1.170.41",
     "@ui/kit": "workspace:*",
     "cva": "1.0.0-beta.12",
     "lucide-react": "1.47.0",
@@ -38,6 +38,6 @@
     "@vitejs/plugin-react": "6.1.1",
     "oxc-transform-react": "0.150.0",
     "tw-animate-css": "1.4.0",
-    "vite": "8.3.1"
+    "vite": "8.3.2"
   }
 }
