@@ -46,10 +46,10 @@ pre-commit:
 pre-push:
   jobs:
     # Links each pushed commit to the ticket its body names, and reverses the
-    # writes Linear's own integration still makes. The script lives in dotfiles
-    # and is shared, not forked — one implementation, two callers. The path is absolute on purpose: if it
-    # ever rots, node exits non-zero and the push fails LOUD rather than the
-    # hook quietly not running.
+    # writes Linear's own integration still makes. It is the fleet cli's verb,
+    # shared with frame, not forked — one implementation, two callers. An `x`
+    # missing from PATH exits 127 and the push fails LOUD rather than the hook
+    # quietly not running.
     #
     # {1} and {2} are git's own pre-push argv — remote name and remote url — and
     # the url is the guard that keeps this off repos we do not own. use_stdin
@@ -59,7 +59,7 @@ pre-push:
     # everything and exits 0.
     - name: linear-push
       use_stdin: true
-      run: f="$HOME/frame/script/linear-push.ts"; if [ -f "$f" ]; then node "$f" hook {1} {2}; fi
+      run: x linear push {1} {2}
 
     # Typecheck only what moved since origin/main, so a kit consumer that
     # breaks under vercel's install never leaves the machine.
