@@ -29,7 +29,7 @@
     "@visx/scale": "4.0.0",
     "@visx/shape": "4.0.0",
     "@visx/tooltip": "4.0.0",
-    "motion": "13.4.6",
+    "motion": "14.0.0",
     "psn-api": "2.18.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"

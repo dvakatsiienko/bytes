@@ -17,7 +17,7 @@
     "@ui/kit": "workspace:*",
     "cn": "0.3.0",
     "lucide-react": "1.47.0",
-    "motion": "13.4.6",
+    "motion": "14.0.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-error-boundary": "6.1.6",
