@@ -61,18 +61,27 @@ publish() {
 # both passed — a refusal writes nothing, and nothing else on the PR carries the
 # reviewer app's identity. The retry is for the api settling after a real post,
 # not for a refusal.
+#
+# 📌 The payloads travel as files, never as jq argv: #84's review volume passed
+# the argument limit, the guard died on `Argument list too long`, and a clean
+# verdict went red. The more a PR is reviewed, the likelier that is, so it
+# cannot be re-labelled away. `review-guard-big.sh` holds it.
+payloads=$(mktemp -d)
+trap 'rm -rf "$payloads"' EXIT
+
 for attempt in 1 2 3; do
-  if ! threads=$(apiStrict "pulls/$PR/comments"); then
+  if ! apiStrict "pulls/$PR/comments" > "$payloads/threads.json"; then
     publish failure 'could not read the review threads' \
       'The api call that lists the review comments failed, so whether any finding is unanswered is unknown. An unknown state is not a clean review. Re-apply the label to try again.'
     echo "::warning::could not read the threads — review:clean is red"
     exit 0
   fi
 
-  arts=$(artifacts "$PR")
+  artifacts "$PR" > "$payloads/artifacts.json"
 
-  decision=$(jq -n --argjson artifacts "$arts" --argjson threads "$threads" \
-      '{artifacts: $artifacts, threads: $threads}' \
+  decision=$(jq -n --slurpfile artifacts "$payloads/artifacts.json" \
+      --slurpfile threads "$payloads/threads.json" \
+      '{artifacts: $artifacts[0], threads: $threads[0]}' \
     | jq --arg who "$REVIEWER" --arg app "$APP" --arg author "$AUTHOR" \
          --arg owner "$OWNER" --arg since "$SINCE" \
          -f "$here/../review-gate.jq")

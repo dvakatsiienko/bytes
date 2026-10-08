@@ -1,0 +1,96 @@
+# A Vercel preview on demand: the `🚀 deploy:preview` label on a PR deploys a
+# preview of every app the PR affects and comments the urls. The label works as
+# a button: the job takes it off again, so adding it once more redeploys.
+#
+# Previews are off by default since BYT-84 (the hobby plan's daily cap), and
+# x-com-chat is the reason this exists: CI cannot build it (prerender calls
+# Convex), so a preview is its only build check before a bump merges.
+#
+# 🚨 `pull_request_target`, not `pull_request`. This job holds VERCEL_TOKEN,
+# which can deploy production too, and a `pull_request` run uses the PR's own
+# copy of this file, so a PR could rewrite it to send the token anywhere.
+# `pull_request_target` runs main's copy.
+#
+# 🚨 Nothing of the PR's is on this runner: no checkout of it, no tool that
+# reads its files. The app list comes from the api's changed-file names, and
+# Vercel's api builds the PR's commit from GitHub on its side (`gitSource`).
+# Two tools were tried and are out, both proven by the verifier on #127: turbo
+# on the PR's tree hands off to a binary the PR commits under `node_modules`,
+# and `vercel deploy` compiles and runs a `vercel.ts` from the tree it uploads.
+# Steps share the runner, so a «no secret» step was never a boundary.
+# The cost: these files change only by merging.
+name: preview
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+# The key answers «is THIS event asking for a preview», never just «which PR»:
+# any other label on the PR starts a run too, and a PR-only group would cancel
+# a live preview (the trap `review.yml`'s concurrency comment tells).
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}-${{ github.event.label.name == '🚀 deploy:preview' }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # A fork's PR is refused: Vercel would build its code with the projects'
+    # preview environment variables.
+    if: >-
+      github.event.label.name == '🚀 deploy:preview' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      # `gh pr edit --remove-label` goes through the issues api.
+      issues: write
+    steps:
+      # 📌 Unpinned on purpose until #126 lands; its renovate preset pins these.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Apps the PR touches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -o pipefail
+          .github/scripts/preview-apps.sh | tee "$RUNNER_TEMP/apps.txt"
+
+      - id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.event.pull_request.head.ref }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -o pipefail
+          .github/scripts/preview-deploy.sh < "$RUNNER_TEMP/apps.txt" | tee "$RUNNER_TEMP/urls.txt"
+
+      - name: Comment the urls and take the label off
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          OUTCOME: ${{ steps.deploy.outcome }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -uo pipefail
+          urls="$RUNNER_TEMP/urls.txt"
+          {
+            echo "🚀 preview of \`${SHA:0:7}\` — $OUTCOME ([run]($RUN))"
+            echo
+            if [ -s "$urls" ]; then
+              while read -r app url state; do echo "- $app — $url ($state)"; done < "$urls"
+            else
+              echo "- no app deployed"
+            fi
+          } > "$RUNNER_TEMP/comment.md"
+          gh pr comment "$PR" --repo "$REPO" --body-file "$RUNNER_TEMP/comment.md"
+          gh pr edit "$PR" --repo "$REPO" --remove-label '🚀 deploy:preview'
