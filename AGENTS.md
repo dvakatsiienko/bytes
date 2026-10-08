@@ -192,11 +192,12 @@ job is the only trigger now, and GitHub gives a workflow no way to opt out of it
 outright, which would leave nothing able to deploy. `git.deploymentEnabled: false` does not touch
 them — measured on BYT-84: a hook built a branch that carried the bool.
 
-📌 **Preview deployments no longer exist for any branch.** A branch push builds nothing, so CI is
-the only gate a branch gets. That is a real hole for `x-com-chat`: CI cannot build it (prerender
-calls Convex), and its `renovate/*` preview was the one place a bump actually built. Its bumps now
-reach production unbuilt. A label-triggered preview lane is the fix, tracked as
-[BYT-96](https://linear.app/x-com/issue/BYT-96).
+📌 **Previews come only by label.** A branch push builds nothing. The `🚀 deploy:preview` label on a
+PR runs `.github/workflows/preview.yml`: a Vercel preview of every app the PR touches (by changed
+paths, `preview-apps.sh` says the rule), the urls in a
+comment, the label taken off again (add it again to redeploy). Each preview counts on the daily cap,
+so use it where CI cannot reach — `x-com-chat`'s bumps above all (prerender calls Convex, so CI
+cannot build it). Project ids live in `.github/vercel-projects.json`; a new Vercel app adds its line.
 
 📌 A root file that carries no dependencies — `AGENTS.md`, `.node-version` — deploys nothing,
 because turbo reports nothing affected. A root manifest or lockfile change marks every package
