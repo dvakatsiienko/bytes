@@ -11,14 +11,14 @@
 # copy of this file, so a PR could rewrite it to send the token anywhere.
 # `pull_request_target` runs main's copy.
 #
-# 🚨 No program from the PR runs in this job, in any step: steps share the
-# runner (`$GITHUB_ENV`, `$GITHUB_PATH`, the disk), so a «no secret» step is no
-# boundary. The `vercel` CLI is installed from main's checkout before the PR's
-# tree exists; the app list comes from the api's changed-file names; the PR's
-# tree is checked out into `pr/` only to be uploaded, and Vercel builds it.
-# turbo is NOT used here: run on the PR's tree it hands off to a binary the PR
-# can commit under `node_modules` (proven by the verifier on #127). The cost:
-# these files change only by merging.
+# 🚨 Nothing of the PR's is on this runner: no checkout of it, no tool that
+# reads its files. The app list comes from the api's changed-file names, and
+# Vercel's api builds the PR's commit from GitHub on its side (`gitSource`).
+# Two tools were tried and are out, both proven by the verifier on #127: turbo
+# on the PR's tree hands off to a binary the PR commits under `node_modules`,
+# and `vercel deploy` compiles and runs a `vercel.ts` from the tree it uploads.
+# Steps share the runner, so a «no secret» step was never a boundary.
+# The cost: these files change only by merging.
 name: preview
 
 on:
@@ -52,18 +52,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24.21.0
-
-      # From main's checkout, with the registry spelled out, before the PR's
-      # tree exists: nothing in the PR can steer which vercel lands here.
-      - name: Install the vercel CLI
-        env:
-          # The CLI dima's mac runs; bump it here by hand.
-          VERCEL_CLI: 60.1.3
-        run: npm install --global --registry=https://registry.npmjs.org "vercel@$VERCEL_CLI"
-
       - name: Apps the PR touches
         env:
           GH_TOKEN: ${{ github.token }}
@@ -73,17 +61,12 @@ jobs:
           set -o pipefail
           .github/scripts/preview-apps.sh | tee "$RUNNER_TEMP/apps.txt"
 
-      # Data only: uploaded by the deploy step, never run here.
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          path: pr
-          persist-credentials: false
-
       - id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          SRC: ${{ github.workspace }}/pr
+          REPO: ${{ github.repository }}
+          REF: ${{ github.event.pull_request.head.ref }}
+          SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -o pipefail
           .github/scripts/preview-deploy.sh < "$RUNNER_TEMP/apps.txt" | tee "$RUNNER_TEMP/urls.txt"
@@ -104,7 +87,7 @@ jobs:
             echo "🚀 preview of \`${SHA:0:7}\` — $OUTCOME ([run]($RUN))"
             echo
             if [ -s "$urls" ]; then
-              while read -r app url; do echo "- $app — $url"; done < "$urls"
+              while read -r app url state; do echo "- $app — $url ($state)"; done < "$urls"
             else
               echo "- no app deployed"
             fi
