@@ -185,8 +185,8 @@ The urls live in the repo secret `VERCEL_DEPLOY_HOOKS`, a json object keyed by A
 `ci-main`, bound to `main`; manage them with `vercel deploy-hooks list|create|remove`.
 
 ⚠️ **`[skip ci]` on a `main` commit now means «do not deploy».** It skips every push-triggered
-workflow, so the apps that commit changed stay stale in production until a later push touches them
-or someone redeploys from the dashboard. Vercel used to deploy regardless of the directive; this
+workflow, CI included, so the apps that commit changed stay stale in production until the next green
+CI on `main` (Deploy diffs from the last real deploy) or a manual run. Vercel used to deploy regardless of the directive; this
 job is the only trigger now, and GitHub gives a workflow no way to opt out of it.
 
 ⚠️ **Never set `github.enabled: false`.** Vercel documents that one as disabling deploy hooks

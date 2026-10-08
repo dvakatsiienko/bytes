@@ -24,8 +24,18 @@ none() {
   exit 0
 }
 
+# The deployed sha is in the run's name (`run-name` in deploy.yml): a
+# `workflow_run` run's own `head_sha` is main's tip at creation, possibly a later
+# push than the one it deployed. A push-era run, from before the CI gate, has
+# no such name, and there `head_sha` is the pushed commit.
+# shellcheck disable=SC2016 # $sha is a jq variable
 runs=$(gh api "repos/$REPO/actions/workflows/deploy.yml/runs?status=success&per_page=100" \
-  --jq '.workflow_runs[] | select(.head_branch == "main" and .event != "workflow_dispatch") | "\(.id) \(.head_sha)"') \
+  --jq '.workflow_runs[] | select(.head_branch == "main")
+    | if .event == "workflow_run" then
+        (.display_title | (capture("^deploy (?<sha>[0-9a-f]{40})$") | .sha)? // null) as $sha
+        | select($sha != null) | "\(.id) \($sha)"
+      elif .event == "push" then "\(.id) \(.head_sha)"
+      else empty end') \
   || none "could not list the Deploy runs"
 
 while read -r id sha; do
