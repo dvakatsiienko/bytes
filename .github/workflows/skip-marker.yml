@@ -8,6 +8,10 @@
 #
 # The title and body reach the shell through env, never `${{ }}` inside `run`:
 # they are PR-author text, and inlined they would be shell code.
+#
+# 📌 The script runs from the PR head, so a PR could edit it and pass. That is
+# accepted: the hazard is a quoted marker by accident, not a hostile PR, and the
+# head copy is what lets a PR change the marker list and be checked by it.
 name: Skip marker
 
 on:

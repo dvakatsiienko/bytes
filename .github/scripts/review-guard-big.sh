@@ -14,11 +14,11 @@ case="$here/../review-cases/round-clean.json"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-jq '.input.threads' "$case" > "$work/threads.json"
-jq '.input.artifacts + [range(3000) | {
-      id: (100000 + .), user: {login: "dvakatsiienko", type: "User"},
-      created_at: "2026-09-11T16:00:00Z", body: ("x" * 1000)}]' \
-  "$case" > "$work/issues.json"
+filler='[range(3000) | {
+  id: (100000 + .), user: {login: "dvakatsiienko", type: "User"},
+  created_at: "2026-09-11T16:00:00Z", body: ("x" * 1000)}]'
+jq ".input.threads + $filler" "$case" > "$work/threads.json"
+jq ".input.artifacts + $filler" "$case" > "$work/issues.json"
 
 mkdir "$work/bin"
 cat > "$work/bin/gh" <<'GH'
