@@ -1,0 +1,85 @@
+# A Vercel preview on demand: the `🚀 deploy:preview` label on a PR deploys a
+# preview of every app the PR affects and comments the urls. The label works as
+# a button: the job takes it off again, so adding it once more redeploys.
+#
+# Previews are off by default since BYT-84 (the hobby plan's daily cap), and
+# x-com-chat is the reason this exists: CI cannot build it (prerender calls
+# Convex), so a preview is its only build check before a bump merges.
+#
+# 🚨 `pull_request_target`, not `pull_request`. This job holds VERCEL_TOKEN,
+# which can deploy production too, and a `pull_request` run uses the PR's own
+# copy of this file, so a PR could rewrite it to send the token anywhere.
+# `pull_request_target` runs main's copy. The PR's tree is checked out into
+# `pr/` as data and only uploaded; `preview.sh` says why nothing in it runs.
+# The cost: this file and `preview.sh` change only by merging.
+name: preview
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # A fork's PR is refused: Vercel would build its code with the projects'
+    # preview environment variables.
+    if: >-
+      github.event.label.name == '🚀 deploy:preview' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          # turbo diffs the PR against its base, so the base has to be present.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.21.0
+
+      - id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          # The CLI dima's mac runs; bump it here by hand.
+          VERCEL_CLI: 60.1.3
+          SRC: ${{ github.workspace }}/pr
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -o pipefail
+          .github/scripts/preview.sh | tee "$RUNNER_TEMP/urls.txt"
+
+      - name: Comment the urls and take the label off
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          OUTCOME: ${{ steps.deploy.outcome }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -uo pipefail
+          urls="$RUNNER_TEMP/urls.txt"
+          {
+            echo "🚀 preview of \`${SHA:0:7}\` — $OUTCOME ([run]($RUN))"
+            echo
+            if [ -s "$urls" ]; then
+              while read -r app url; do echo "- $app — $url"; done < "$urls"
+            else
+              echo "- no app deployed"
+            fi
+          } > "$RUNNER_TEMP/comment.md"
+          gh pr comment "$PR" --repo "$REPO" --body-file "$RUNNER_TEMP/comment.md"
+          gh pr edit "$PR" --repo "$REPO" --remove-label '🚀 deploy:preview'
