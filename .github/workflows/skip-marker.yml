@@ -1,0 +1,39 @@
+# A squash merge writes the PR title and body into the commit on `main`, and a
+# CI-skip marker anywhere in that message stops deploy.yml — the only thing
+# that deploys production — with nothing red to say so. The commit-msg hook
+# guards local commits; this guards the message composed on github.com.
+#
+# `edited` is the event that matters: a body changes without a push.
+# `synchronize` is here so every head carries the check, not just the first.
+#
+# The title and body reach the shell through env, never `${{ }}` inside `run`:
+# they are PR-author text, and inlined they would be shell code.
+name: Skip marker
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skip-marker-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  skip-marker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: PR title and body hold no CI-skip marker
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          printf '%s\n\n%s\n' "$TITLE" "$BODY" > "$RUNNER_TEMP/message.txt"
+          .github/scripts/skip-marker.sh "$RUNNER_TEMP/message.txt"
