@@ -108,7 +108,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           # turbo diffs this push's range, so the base commit has to be present.
           fetch-depth: 0
@@ -129,7 +129,7 @@ jobs:
       # went away was not replaced. Still a clear win, just not the gross figure.
       # `--prefer-offline` buys nothing without a cache; an npm cache on this
       # step is the thing that would, and it is not done here.
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so pin explicitly
           node-version: 24.21.0
