@@ -105,6 +105,9 @@ jobs:
       - name: Review gate cases
         run: .github/scripts/review-cases.sh
 
+      - name: Review guard on a big PR
+        run: .github/scripts/review-guard-big.sh
+
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v7
