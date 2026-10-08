@@ -23,7 +23,8 @@
 # sits above «Deployment Settings» in the root AGENTS.md.
 #
 # ⚠️ `[skip ci]` or `[ci skip]` in a commit subject skips every
-# `push`-triggered workflow, this one included. A commit carrying one does NOT
+# `push`-triggered workflow, CI included, and with no CI run this one never
+# starts. A commit carrying one does NOT
 # deploy, and the apps it changed stay stale in production until the next green
 # CI on main (it diffs from the last real deploy) or a manual run.
 #
