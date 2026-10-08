@@ -12,21 +12,32 @@
 # move the base past apps that never shipped. A manual run deploys only what was
 # picked, so it never counts either.
 #
+# 📌 It fails OPEN: an api error answers `sha=` too. A red step would deploy
+# nothing, and one extra build costs nothing against a stale production.
+#
 # Env: GH_TOKEN, REPO
-set -euo pipefail
+set -uo pipefail
 
-runs=$(gh api "repos/$REPO/actions/workflows/deploy.yml/runs?status=success&per_page=50" \
-  --jq '.workflow_runs[] | select(.head_branch == "main" and .event != "workflow_dispatch") | "\(.id) \(.head_sha)"')
+none() {
+  echo "::warning::$1 — deploying every app" >&2
+  echo "sha="
+  exit 0
+}
+
+runs=$(gh api "repos/$REPO/actions/workflows/deploy.yml/runs?status=success&per_page=100" \
+  --jq '.workflow_runs[] | select(.head_branch == "main" and .event != "workflow_dispatch") | "\(.id) \(.head_sha)"') \
+  || none "could not list the Deploy runs"
 
 while read -r id sha; do
   [ -n "$id" ] || continue
+  # The job name is deploy.yml's `name:` for the deploy job; the two move together.
   deployed=$(gh api "repos/$REPO/actions/runs/$id/jobs" \
-    --jq '[.jobs[] | select(.name == "deploy affected apps" and .conclusion == "success")] | length')
+    --jq '[.jobs[] | select(.name == "deploy affected apps" and .conclusion == "success")] | length') \
+    || none "could not read the jobs of Deploy run $id"
   if [ "$deployed" -gt 0 ]; then
     echo "sha=$sha"
     exit 0
   fi
 done <<<"$runs"
 
-echo "::warning::no earlier Deploy that ran its deploy job — deploying every app" >&2
-echo "sha="
+none "no earlier Deploy that ran its deploy job"

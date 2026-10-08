@@ -109,6 +109,7 @@ env:
 
 jobs:
   deploy:
+    # `deploy-base.sh` finds the last real deploy by this name; rename both or neither.
     name: deploy affected apps
     runs-on: ubuntu-latest
     timeout-minutes: 15
