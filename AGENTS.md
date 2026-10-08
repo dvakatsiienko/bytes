@@ -176,16 +176,17 @@ the bool, not the branch-prefix object it replaced. The object never stopped a d
 created, it only let Vercel CANCEL one afterwards, and a canceled deployment still counts against
 the hobby «Deployments Created per Day» cap. The bool is the only form with no webhook path at all.
 
-**`.github/workflows/deploy.yml` is the trigger, and the only one.** On a push to `main` it asks
-turbo which packages the push affected, and POSTs a Vercel deploy hook for each affected app.
+**`.github/workflows/deploy.yml` is the trigger, and the only one.** When CI goes green on a `main`
+push (`workflow_run`), it asks turbo which packages changed since the last real deploy, and POSTs a
+Vercel deploy hook for each affected app. A red CI on `main` deploys nothing; the next green push carries those apps.
 Vercel still clones, builds with its own cache and keeps its own logs; it no longer decides when.
 The urls live in the repo secret `VERCEL_DEPLOY_HOOKS`, a json object keyed by APP DIRECTORY name
 (`space-explorer-ui`, not the package name `@space-explorer/ui`). One hook per project, named
 `ci-main`, bound to `main`; manage them with `vercel deploy-hooks list|create|remove`.
 
 ⚠️ **`[skip ci]` on a `main` commit now means «do not deploy».** It skips every push-triggered
-workflow, so the apps that commit changed stay stale in production until a later push touches them
-or someone redeploys from the dashboard. Vercel used to deploy regardless of the directive; this
+workflow, CI included, so the apps that commit changed stay stale in production until the next green
+CI on `main` (Deploy diffs from the last real deploy) or a manual run. Vercel used to deploy regardless of the directive; this
 job is the only trigger now, and GitHub gives a workflow no way to opt out of it.
 
 ⚠️ **Never set `github.enabled: false`.** Vercel documents that one as disabling deploy hooks

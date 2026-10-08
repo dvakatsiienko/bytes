@@ -23,9 +23,10 @@
 # sits above «Deployment Settings» in the root AGENTS.md.
 #
 # ⚠️ `[skip ci]` or `[ci skip]` in a commit subject skips every
-# `push`-triggered workflow, this one included. A commit carrying one does NOT
-# deploy, and the apps it changed stay stale in production until a later push
-# touches them or somebody redeploys by hand from the Vercel dashboard.
+# `push`-triggered workflow, CI included, and with no CI run this one never
+# starts. A commit carrying one does NOT
+# deploy, and the apps it changed stay stale in production until the next green
+# CI on main (it diffs from the last real deploy) or a manual run.
 #
 # That directive used to be harmless here, because Vercel deployed whatever CI
 # did. It is not harmless now: this job is the only trigger there is. GitHub
@@ -46,12 +47,27 @@
 
 name: Deploy
 
+# 📌 The run is named after the commit it deploys, because a `workflow_run`
+# run's own `head_sha` is main's tip when the run was created, which can be a
+# later push than the one CI judged. `deploy-base.sh` reads the sha from here.
+run-name: deploy ${{ github.event.workflow_run.head_sha || 'by hand' }}
+
+# Deploy waits for CI. It ran beside CI on every push once, and on 2026-09-21
+# three production builds went red on a type error CI was about to catch, while
+# this job read `success` (the hooks fired, nothing more). `workflow_run` also
+# runs main's copy of this file by construction, so a PR cannot rewrite it.
+#
+# 📌 A red or cancelled CI leaves the deploy job skipped. That push's apps are
+# not lost: the base is the last run that really deployed (`deploy-base.sh`),
+# so the next green push carries them.
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
 
   # The replacement for the Vercel dashboard's Redeploy button. With the git
-  # integration off, a push to `main` and this are the only two ways anything
+  # integration off, a green CI on `main` and this are the only two ways anything
   # reaches production — so the manual door has to exist, for the cases a diff
   # cannot see: a root file that changes a build without moving a manifest, a
   # commit that carried the skip directive, a build that failed on Vercel's side.
@@ -78,9 +94,9 @@ on:
 # 🚨 NO `concurrency:` block, and it must stay that way — a shared group
 # silently loses deployments. GitHub keeps at most one running and one
 # pending run per concurrency group, so a third push EVICTS the second while it
-# is still pending. Each run fires hooks only for the apps its own push
-# touched, so an app changed only by the evicted push would never deploy and
-# would sit stale in production with nothing red anywhere.
+# is still pending. Each run diffs from the last real deploy, so an evicted
+# run's apps ride only on a LATER run — and if none comes, they sit stale in
+# production with nothing red anywhere. With no block, every green push deploys.
 #
 # Serialising was never needed for correctness anyway: a deploy hook builds the
 # BRANCH TIP at the moment it is fired, not the commit that triggered it. Two
@@ -99,19 +115,40 @@ env:
 
 jobs:
   deploy:
+    # `deploy-base.sh` finds the last real deploy by this name; rename both or neither.
     name: deploy affected apps
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # `branches: [main]` matches a branch NAME, and a fork's PR from its own
+    # `main` carries that name too — so the event and the repo are checked here.
+    if: >-
+      github.event_name == 'workflow_dispatch' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository
+      )
 
-    # It reads the repo and POSTs to Vercel. It writes nothing back to GitHub.
+    # It reads the repo and its Actions history, and POSTs to Vercel. It writes
+    # nothing back to GitHub.
     permissions:
       contents: read
+      actions: read
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          # turbo diffs this push's range, so the base commit has to be present.
+          # A `workflow_run` checks out main's tip by default, which may already
+          # be a later push than the one CI just judged. The diff is of that one.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          # turbo diffs back to the last deploy, so that commit has to be present.
           fetch-depth: 0
+
+      - id: base
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: .github/scripts/deploy-base.sh >> "$GITHUB_OUTPUT"
 
       # 📌 No `pnpm/action-setup`, no pnpm cache and no `pnpm install`, and that
       # is measured rather than hopeful. turbo answers `--affected --dry=json`
@@ -129,7 +166,7 @@ jobs:
       # went away was not replaced. Still a clear win, just not the gross figure.
       # `--prefer-offline` buys nothing without a cache; an npm cache on this
       # step is the thing that would, and it is not done here.
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so pin explicitly
           node-version: 24.21.0
@@ -137,7 +174,7 @@ jobs:
       - name: Deploy
         env:
           # Empty on a manual run, which is how the script tells the two apart.
-          BASE: ${{ github.event_name == 'push' && github.event.before || '' }}
+          BASE: ${{ steps.base.outputs.sha }}
           REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.app || '' }}
           HOOKS: ${{ secrets.VERCEL_DEPLOY_HOOKS }}
         run: .github/scripts/deploy-main.sh
