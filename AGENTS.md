@@ -176,8 +176,9 @@ the bool, not the branch-prefix object it replaced. The object never stopped a d
 created, it only let Vercel CANCEL one afterwards, and a canceled deployment still counts against
 the hobby «Deployments Created per Day» cap. The bool is the only form with no webhook path at all.
 
-**`.github/workflows/deploy.yml` is the trigger, and the only one.** On a push to `main` it asks
-turbo which packages the push affected, and POSTs a Vercel deploy hook for each affected app.
+**`.github/workflows/deploy.yml` is the trigger, and the only one.** When CI goes green on a `main`
+push (`workflow_run`), it asks turbo which packages changed since the last real deploy, and POSTs a
+Vercel deploy hook for each affected app. A red CI on `main` deploys nothing; the next green push carries those apps.
 Vercel still clones, builds with its own cache and keeps its own logs; it no longer decides when.
 The urls live in the repo secret `VERCEL_DEPLOY_HOOKS`, a json object keyed by APP DIRECTORY name
 (`space-explorer-ui`, not the package name `@space-explorer/ui`). One hook per project, named

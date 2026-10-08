@@ -46,8 +46,18 @@
 
 name: Deploy
 
+# Deploy waits for CI. It ran beside CI on every push once, and on 2026-09-21
+# three production builds went red on a type error CI was about to catch, while
+# this job read `success` (the hooks fired, nothing more). `workflow_run` also
+# runs main's copy of this file by construction, so a PR cannot rewrite it.
+#
+# 📌 A red or cancelled CI leaves the deploy job skipped. That push's apps are
+# not lost: the base is the last run that really deployed (`deploy-base.sh`),
+# so the next green push carries them.
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
 
   # The replacement for the Vercel dashboard's Redeploy button. With the git
@@ -102,16 +112,36 @@ jobs:
     name: deploy affected apps
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # `branches: [main]` matches a branch NAME, and a fork's PR from its own
+    # `main` carries that name too — so the event and the repo are checked here.
+    if: >-
+      github.event_name == 'workflow_dispatch' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository
+      )
 
-    # It reads the repo and POSTs to Vercel. It writes nothing back to GitHub.
+    # It reads the repo and its Actions history, and POSTs to Vercel. It writes
+    # nothing back to GitHub.
     permissions:
       contents: read
+      actions: read
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          # turbo diffs this push's range, so the base commit has to be present.
+          # A `workflow_run` checks out main's tip by default, which may already
+          # be a later push than the one CI just judged. The diff is of that one.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          # turbo diffs back to the last deploy, so that commit has to be present.
           fetch-depth: 0
+
+      - id: base
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: .github/scripts/deploy-base.sh >> "$GITHUB_OUTPUT"
 
       # 📌 No `pnpm/action-setup`, no pnpm cache and no `pnpm install`, and that
       # is measured rather than hopeful. turbo answers `--affected --dry=json`
@@ -137,7 +167,7 @@ jobs:
       - name: Deploy
         env:
           # Empty on a manual run, which is how the script tells the two apart.
-          BASE: ${{ github.event_name == 'push' && github.event.before || '' }}
+          BASE: ${{ steps.base.outputs.sha }}
           REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.app || '' }}
           HOOKS: ${{ secrets.VERCEL_DEPLOY_HOOKS }}
         run: .github/scripts/deploy-main.sh

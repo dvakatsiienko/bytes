@@ -6,7 +6,7 @@
 # the only thing that deploys production.
 #
 # Two ways in:
-#   · a push to `main` — the app list comes from turbo's own task graph rather
+#   · a green CI on a `main` push — the app list comes from turbo's own task graph rather
 #     than a path pattern, for the reason ci.yml's chromium step spells out: a
 #     path list cannot know that a new package started depending on `kit`, and
 #     turbo does.
@@ -14,7 +14,8 @@
 #     replacement for the Vercel dashboard's Redeploy button, which is the only
 #     other way to deploy now that the git integration is off.
 #
-# Env: BASE (the sha to diff against, push only), REQUESTED (the chosen app or
+# Env: BASE (the last real deploy's head from `deploy-base.sh`, CI-triggered
+# only; empty means «deploy every app»), REQUESTED (the chosen app or
 # `all`, manual only), HOOKS (the VERCEL_DEPLOY_HOOKS secret),
 # GITHUB_STEP_SUMMARY. It writes no step output — nothing downstream reads one.
 #
@@ -84,8 +85,8 @@ if [ -n "${REQUESTED:-}" ]; then
     exit 1
   fi
 else
-  # A push. A base that git cannot resolve — the all-zero sha of a first push, a
-  # force-push past the ref, a truncated clone — is not a reason to deploy
+  # A CI-triggered run. A base that git cannot resolve — none found by
+  # `deploy-base.sh`, a force-push past it, a truncated clone — is not a reason to deploy
   # nothing; it is a reason to deploy everything, because the cost of one extra
   # build is nothing against a production that silently never updates.
   if [ -n "${BASE:-}" ] && git rev-parse --verify --quiet "${BASE}^{commit}" >/dev/null; then
