@@ -7,8 +7,8 @@
 # 🚨 This step holds VERCEL_TOKEN, which can deploy production too. The only
 # program it runs is the `vercel` CLI, installed from main's checkout before
 # the PR tree was touched; `vercel deploy` reads the PR's files and uploads
-# them, it builds nothing here. The app list comes from `preview-apps.sh`, in
-# a step that holds no secret.
+# them, it builds nothing here. The app names on stdin come from the api
+# (`preview-apps.sh`) and are used only after matching a key in the map.
 #
 # Env: VERCEL_TOKEN, SRC (the PR checkout)
 set -euo pipefail

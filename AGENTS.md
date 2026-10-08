@@ -193,7 +193,8 @@ outright, which would leave nothing able to deploy. `git.deploymentEnabled: fals
 them — measured on BYT-84: a hook built a branch that carried the bool.
 
 📌 **Previews come only by label.** A branch push builds nothing. The `🚀 deploy:preview` label on a
-PR runs `.github/workflows/preview.yml`: a Vercel preview of every app the PR affects, the urls in a
+PR runs `.github/workflows/preview.yml`: a Vercel preview of every app the PR touches (by changed
+paths, `preview-apps.sh` says the rule), the urls in a
 comment, the label taken off again (add it again to redeploy). Each preview counts on the daily cap,
 so use it where CI cannot reach — `x-com-chat`'s bumps above all (prerender calls Convex, so CI
 cannot build it). Project ids live in `.github/vercel-projects.json`; a new Vercel app adds its line.

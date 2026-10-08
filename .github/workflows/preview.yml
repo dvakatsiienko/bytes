@@ -9,12 +9,16 @@
 # 🚨 `pull_request_target`, not `pull_request`. This job holds VERCEL_TOKEN,
 # which can deploy production too, and a `pull_request` run uses the PR's own
 # copy of this file, so a PR could rewrite it to send the token anywhere.
-# `pull_request_target` runs main's copy. The PR's tree is checked out into
-# `pr/` and handled in two steps: `preview-apps.sh` reads it with turbo in a
-# step that holds no secret; `preview-deploy.sh` holds the token and runs only
-# the `vercel` CLI, installed from main's checkout before `pr/` exists, so the
-# PR's `.npmrc` never chooses what gets installed. The cost: these files
-# change only by merging.
+# `pull_request_target` runs main's copy.
+#
+# 🚨 No program from the PR runs in this job, in any step: steps share the
+# runner (`$GITHUB_ENV`, `$GITHUB_PATH`, the disk), so a «no secret» step is no
+# boundary. The `vercel` CLI is installed from main's checkout before the PR's
+# tree exists; the app list comes from the api's changed-file names; the PR's
+# tree is checked out into `pr/` only to be uploaded, and Vercel builds it.
+# turbo is NOT used here: run on the PR's tree it hands off to a binary the PR
+# can commit under `node_modules` (proven by the verifier on #127). The cost:
+# these files change only by merging.
 name: preview
 
 on:
@@ -52,31 +56,29 @@ jobs:
         with:
           node-version: 24.21.0
 
-      # From main's checkout, with the registry spelled out: nothing in the PR
-      # can steer which turbo or vercel lands on the runner.
-      - name: Install the CLIs from main's pins
+      # From main's checkout, with the registry spelled out, before the PR's
+      # tree exists: nothing in the PR can steer which vercel lands here.
+      - name: Install the vercel CLI
         env:
           # The CLI dima's mac runs; bump it here by hand.
           VERCEL_CLI: 60.1.3
-        run: |
-          turbo_v=$(jq -r '.devDependencies.turbo' package.json)
-          npm install --global --registry=https://registry.npmjs.org "turbo@$turbo_v" "vercel@$VERCEL_CLI"
+        run: npm install --global --registry=https://registry.npmjs.org "vercel@$VERCEL_CLI"
 
+      - name: Apps the PR touches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -o pipefail
+          .github/scripts/preview-apps.sh | tee "$RUNNER_TEMP/apps.txt"
+
+      # Data only: uploaded by the deploy step, never run here.
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           path: pr
-          # turbo diffs the PR against its base, so the base has to be present.
-          fetch-depth: 0
           persist-credentials: false
-
-      - name: Apps the PR affects (no secret in this step)
-        env:
-          SRC: ${{ github.workspace }}/pr
-          BASE: ${{ github.event.pull_request.base.sha }}
-        run: |
-          set -o pipefail
-          .github/scripts/preview-apps.sh | tee "$RUNNER_TEMP/apps.txt"
 
       - id: deploy
         env:
