@@ -303,7 +303,7 @@ Multi-context — root `GLOSSARY-MAP.md` points at per-app `GLOSSARY.md` files. 
 
 **An app with `FTR.md` keeps its map and its `GLOSSARY.md` in step with the code:** a change to what
 the app does updates its ftr line, and any new domain word its `GLOSSARY.md` entry, in the same commit
-(`x:ftr`).
+(`x:ftr`). frame's `x lane gate` holds both at commit-msg; a machine without `x` refuses the commit.
 
 ## worktrees — one shared checkout, coders branch in their own tree
 
