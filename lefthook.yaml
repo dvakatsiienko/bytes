@@ -68,10 +68,15 @@ pre-push:
 
 commit-msg:
   jobs:
-    # an app's code lands with its FTR.md, or the body says «ftr: none». the script is frame's, run by path so
-    # every terminal on this mac runs it; a machine without frame (a cloud session) skips, never blocks
-    - name: ftr-gate
-      run: g="$HOME/frame/home/.claude/plugin-x/bin/ftr-gate"; if [ -x "$g" ]; then "$g" {1}; fi
+    # frame's `x lane gate`: an app's code lands with its FTR.md, a listed contract file with its glossary, a
+    # crew-/guide- skill never only grows. it fails closed: a machine without x refuses the commit (FRM-367)
+    - name: lane-gate
+      run: |
+        if ! command -v x >/dev/null 2>&1; then
+          echo "lane-gate: x not on PATH — this repo's commit gate is frame's x cli (~/frame/x)"
+          exit 1
+        fi
+        x lane gate {1}
     # Strips the `Claude-Session:` trailer the desktop harness asks agents to
     # append; the `Agent:` trailer is the fingerprint, this one is noise.
     - name: session-trailer
