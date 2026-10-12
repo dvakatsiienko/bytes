@@ -108,9 +108,9 @@ const rows = [
   {
     bytes: true,
     gap: (app) =>
-      read(join(root, 'AGENTS.md')).includes(`| \`${app.name}\``)
+      read(join(root, 'AGENTS.md')).includes(`- \`${app.name}\` — `)
         ? undefined
-        : 'no row in the app registry table',
+        : 'no line in the app registry',
     id: 'root:AGENTS.md',
   },
   {

@@ -47,7 +47,7 @@ has() { grep -qE "$1" <<<"$files"; }
   # to the matrix is exercised by the PR that makes it rather than one merge
   # later. That rule paid for itself immediately: this script's own first PR
   # touched no manifest at all.
-  # 📌 `.npmrc` is in the list and it is not padding. AGENTS.md names its
+  # 📌 `.npmrc` is in the list and it is not padding. docs/agents/toolchain.md names its
   # `public-hoist-pattern[]` as THE fix for «a tool that resolves its plugins
   # from its own package location fails in pnpm's strict store» — which is
   # exactly the failure `vercel-install` exists to catch. An `.npmrc` edit moves

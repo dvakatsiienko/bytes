@@ -18,7 +18,7 @@ description: Verify a trophy-sys change against the running web + api pair — d
 - `agent-browser` with a named session: `export AGENT_BROWSER_SESSION=verify-trophy-sys-<topic>`; `close` it at the end.
 - desktop `set viewport 1280 800`, phone `set viewport 390 844`.
 - `open <url>` → `wait 4000` (the PSN calls settle; `wait --load` returns before the charts draw) → probe → `console` → `screenshot <path>`.
-- the page scrolls inside `<main>`, not the document. read `AGENTS.md` → «Driving the page» before a screenshot or a hover: a full-page shot comes out empty, and a hover below the fold does nothing.
+- the page scrolls inside `<main>`, not the document. read `src/web/charts/AGENTS.md` → «Driving the page» before a screenshot or a hover: a full-page shot comes out empty, and a hover below the fold does nothing.
 
 ## checks — each prints a count, never a payload
 
@@ -27,9 +27,9 @@ description: Verify a trophy-sys change against the running web + api pair — d
 3. **the charts draw** — `/campaign` has 12 `.panel`s, `svg` count ~60 at 1280 (58 at 390), and body text holds 0 «could not read». one `TABLE` radio click turns one chart into one `main table`.
 4. **the journal** — 2 panels, 48 game links (`a[href^="/library/"]`), 0 broken images.
 5. **the theme sticks** — the L / D / S radios («Light palette, pinned.», «Dark palette, pinned.», «Follows your OS appearance.»): «D» sets `data-theme="dark"` on `<html>` and stores it in `localStorage` key `theme`, so it survives a full `open`. click «S» at the end — it removes both.
-6. **nothing scrolls sideways** — `scrollWidth - innerWidth` is `0` at 1280 and at 390; any growth is a finding. at 390 the tab nav wraps to two rows (60 px tall) — that is the fit, not a bug. a hidden `::after` counts toward that width and no element walk sees it — `AGENTS.md` → «Six things measured the hard way» has the `.hint` case and the chart rules (`min-w-0`, tick counts, overlays) a chart change must keep.
+6. **nothing scrolls sideways** — `scrollWidth - innerWidth` is `0` at 1280 and at 390; any growth is a finding. at 390 the tab nav wraps to two rows (60 px tall) — that is the fit, not a bug. a hidden `::after` counts toward that width and no element walk sees it — `src/web/charts/AGENTS.md` → «Six things measured the hard way» has the `.hint` case and the chart rules (`min-w-0`, tick counts, overlays) a chart change must keep.
 
-a chart change also gets a hover on one mark per touched chart, at 1280 and 390 — the tooltip portals to the body and must sit fully inside the viewport. the heatmap → progression link: click a heatmap day, and the progression panel scrolls into view with a `YYYY-MM` marker. (both read from `AGENTS.md`, not driven when this skill was written. several charts carry clickable marks that open a game — pick the mark by its panel, never «the last `rect`».)
+a chart change also gets a hover on one mark per touched chart, at 1280 and 390 — the tooltip portals to the body and must sit fully inside the viewport. the heatmap → progression link: click a heatmap day, and the progression panel scrolls into view with a `YYYY-MM` marker. (both read from `src/web/charts/AGENTS.md`, not driven when this skill was written. several charts carry clickable marks that open a game — pick the mark by its panel, never «the last `rect`».)
 
 ## the kit — `kit.sh` beside this file
 

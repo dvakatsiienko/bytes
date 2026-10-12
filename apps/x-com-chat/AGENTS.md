@@ -10,24 +10,12 @@ a system prompt); chats stream from an LLM and persist in real time.
 
 ## Stack
 
-- **Next.js 16** — App Router, Turbopack, React Compiler (`reactCompiler: true`), `typedRoutes`
-- **React 19**, **TypeScript** (strict)
-- **Convex** — the *only* backend: reactive DB, queries/mutations, live subscriptions
-- **Clerk** — auth, wired through `src/proxy.ts` (Next 16's renamed middleware)
-- **AI SDK 7** (`ai`) + **Groq** provider — streaming chat completions
-- **Jotai** — client UI state
-- **Tailwind v4** + **shadcn/ui** (base-nova, on Base UI) + **cva** + **motion**
-
-> No Prisma, no SQL database. Persistence is 100% Convex. (No React Query either —
-> reads go through Convex `useQuery`; see `financial` for a React Query reference setup.)
+Next.js 16 (App Router, React Compiler, `typedRoutes`), **Convex as the only backend** (no Prisma, no SQL, no React Query — reads go through Convex `useQuery`; `financial` is the React Query reference), Clerk wired through `src/proxy.ts` (Next 16's renamed middleware), AI SDK + Groq for streaming, Jotai for UI state, Tailwind v4 + kit.
 
 ## Architecture
 
 ### Data (Convex — `convex/`)
-- `schema.ts` — two tables:
-  - `friend` `{ name, system }` — the persona + its system prompt
-  - `chats` `{ friendId, messageList }`, indexed `by_friendId`
-  - `messageList` stores raw AI SDK `UIMessage[]` as `v.array(v.any())` for forward-compat
+- `schema.ts` — `friend` (a persona + its system prompt) and `chats`; `messageList` stores raw AI SDK `UIMessage[]` as `v.array(v.any())` for forward-compat
 - `chat.ts` — `seedFriends` (mutation), `getFriendList` / `getFriendById` /
   `getChatHistory` (queries), `saveChatHistory` (upsert mutation)
 - `seed_data.ts` — the built-in `friendList`. Seed via `pnpm convex:seed`.
@@ -54,20 +42,7 @@ a system prompt); chats stream from an LLM and persist in real time.
 
 ## Commands
 
-```bash
-pnpm dev            # next dev --inspect
-pnpm dev:convex     # convex dev (run alongside; or `pnpm dev:x-com-chat` from root for both)
-pnpm convex:seed    # seed built-in friends (convex run chat:seedFriends)
-pnpm build          # next build
-pnpm serve          # next start
-pnpm lint           # biome lint
-pnpm typecheck      # next typegen && tsc
-```
-
-> **`next build` type-checks.** `typescript.ignoreBuildErrors` used to be set here on purpose,
-> leaving type safety to `pnpm typecheck` and Biome in CI. It was removed once the app was
-> measured clean against it — the check costs 371ms and closes the window where a build goes
-> green on code `tsc` would reject.
+`package.json` holds the scripts. run `pnpm dev:convex` beside `pnpm dev` (or `pnpm dev:x-com-chat` from the root for both); `pnpm convex:seed` seeds the built-in friends. `next build` type-checks (371 ms, measured clean).
 
 ## Environment
 

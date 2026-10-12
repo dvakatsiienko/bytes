@@ -14,12 +14,3 @@ shared app logic, no backend.
 
 - **Next.js 16** (App Router), **React 19**, CSS Modules + theme CSS in `src/theme/`
   (`init.css` entry), `@ui/kit` workspace package, cva
-
-## Commands
-
-```bash
-pnpm dev        # next dev
-pnpm build      # next build
-pnpm lint       # biome lint
-pnpm typecheck  # tsc
-```

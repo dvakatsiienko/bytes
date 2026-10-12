@@ -37,12 +37,9 @@ Two rules keep that true:
 
 ## Commands
 
+`package.json` holds the rest (dev on :5179; `pnpm test` proves a shift keeps the old page). the proto verbs:
+
 ```bash
-pnpm dev          # vite on :5179
-pnpm build        # vite build
-pnpm typecheck    # tsc --noEmit
-pnpm lint         # biome
-pnpm test         # vitest: a shift keeps the old page
 pnpm proto:new <topic>     # start a proto when nothing is live
 pnpm proto:shift <topic>   # archive the live proto as NNN-<old topic>, start a blank one
 pnpm proto:clear           # delete every proto, leave a blank current-scratch
@@ -90,23 +87,22 @@ Default choices applied unless told otherwise in the moment.
 - **Data** — mock data in the proto's own `data.ts`, typed with `satisfies`, no fetching.
   Charts use `recharts`.
 
-## Use case — a board watched while dispatch works
+## Use case — a board watched while the fleet works
 
 This app is not only a prototype surface. Its live proto doubles as a **status board Dima
-periodically glances at while dispatch grinds through its side of the work**. Dispatch streams
+periodically glances at while the fleet grinds through its side of the work**. cclio streams
 updates here; Dima reads them. That drives three standing rules.
 
 **Ticket strip — a standing frame feature on every proto page.** `src/frame/ticket-strip.tsx`
 renders `src/frame/tickets.ts` at the top of the page: in progress / done / touched. Always
-keep and maintain this section: whenever a ticket update arrives (from Dima or dispatch),
-edit `tickets.ts` in the same turn — the strip must never lag behind reality. Chips are
-`linear://x-com/issue/<id>` links.
+keep and maintain this section: whenever a ticket update arrives (from Dima or cclio),
+edit `tickets.ts` in the same turn — the strip must never lag behind reality. Chips are https
+`linear.app/x-com/issue/<id>` links.
 
 **Board defaults — every live board carries these sections.**
 
 - **Roadmap checklist** at the top: compact, one item per line, checkbox per item. Three states,
   not two — done (struck through), in-flight, queued.
-- **Tickets today**: processed / done / touched, live-updated as dispatch and `cc` stream in.
-  Columns carry counts. Ticket chips are **links**, and they must open the Linear desktop app:
-  `linear://x-com/issue/FRM-N`, never an https workspace url.
+- **Tickets today**: processed / done / touched, live-updated as cclio and `cc` stream in.
+  Columns carry counts. Ticket chips are https **links** (`https://linear.app/x-com/issue/FRM-N`); dima opens one in the desktop app with his Hyper+G raycast command.
 - Both are live data — update them on every stream, in the same turn the update arrives.

@@ -33,30 +33,24 @@ Deployed: <https://trophy-sys.vercel.app>
 
 ## Commands
 
-```bash
-pnpm dev          # both processes
-pnpm dev:api      # api alone, node --watch, TS run natively (no build step)
-pnpm dev:web      # vite alone
-pnpm build        # vite build, esbuild the api bundle, then assemble .vercel/output
-pnpm typecheck    # both tsconfigs — app (DOM/bundler) and server (node/nodenext)
-pnpm lint         # biome
-pnpm trophies <cmd>   # same data as the API, straight to stdout as JSON
-```
+`package.json` holds the scripts; `pnpm dev` runs both processes, and from the monorepo root `pnpm dev:trophy-sys`, `pnpm build:trophy-sys`.
 
-From the monorepo root: `pnpm dev:trophy-sys`, `pnpm build:trophy-sys`.
-
-`pnpm trophies` commands: `profile`, `games [limit]`, `game <npCommunicationId>`, `news`,
+`pnpm trophies <cmd>` serves the API's data straight to stdout as JSON: `profile`, `games [limit]`, `game <npCommunicationId>`, `news`,
 `snapshot`, `stats`, `stats-sync`, and the Steam side — `steam-profile`, `steam-games`,
 `steam-game <appid>`, `steam-wishlist`.
 
-📌 `pnpm trophies` and `pnpm dev` load `.env.dev.local` **last**, and it blanks the KV
-credentials — so both work against the local `.trophy-*.json` files and cannot reach production.
-Editing `.env.local` instead would not hold: `vercel env pull` regenerates it with the production
-credentials, which is how a local `pnpm dev` once moved the live archive from 2122 to 2126 rows
-with nobody pressing anything (2026-09-05).
+## env — the production kv credentials live in `.env.local`
 
-`.env.dev.local` also carries a verified recipe for running a real Upstash-compatible redis
-locally, for when the KV code path itself is what needs exercising.
+⚠️ **`.env.local` holds the PRODUCTION kv credentials** (`vercel env pull` regenerates it), so one wrong env-file order in a local run writes to prod. a local run loads three files in order, last one wins (`node --env-file`, never `dotenv`): `.env` (the `NPSSO` seed), `.env.local` (production kv), `.env.dev.local` (blanks the kv credentials). `pnpm dev` and `pnpm trophies` load `.env.dev.local` last, so both work against the local `.trophy-*.json` files and cannot reach production; editing `.env.local` instead would not hold. prove the store is local first (`kit.sh health` → `stateBackend: file`); `worktree:seed` blanks `.env.local` in every tree. `.env.dev.local` also carries a verified recipe for a local Upstash-compatible redis, for when the KV code path itself needs exercising.
+
+- the vars are listed in `.env.example`; in production Vercel injects them. both entrypoints, `src/server/main.ts` and `src/server/cli.ts`, need the `--env-file` flags, and every key the app reads is also listed in `turbo.jsonc`'s `env` array, because Biome's `noUndeclaredEnvVars` reads that list
+- `dev:api` reads `API_PORT` / `PORT_OFFSET`, never `PORT`
+
+<!--
+a local pnpm dev once moved the live archive from 2122 to 2126 rows with nobody pressing anything (2026-09-05).
+a verifier's api landed on the main checkout's :5178 (2026-09-28).
+-->
+
 
 ## Querying trophies without the UI (this is how `cw` asks)
 
@@ -98,145 +92,6 @@ leaving a rule-hidden id out of a set is indistinguishable from asking to show i
 why one press overrules it — the rule is a visible default, never a verdict. `ost` is deliberately
 not a pattern: as a substring it claims Ghost of Tsushima.
 
-## Auth and state
-
-⚠️ **`.env.local` holds the PRODUCTION kv credentials.** one wrong env-file order in a local run writes to prod — prove the store is local first (`kit.sh health` → `stateBackend: file`); `worktree:seed` blanks `.env.local` in every tree. and `dev:api` reads `API_PORT` / `PORT_OFFSET`, never `PORT` (a verifier's api landed on the main checkout's :5178, 2026-09-28).
-
-Env vars, listed in `.env.example`: `NPSSO`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`,
-`STEAM_API_KEY`, `STEAM_ID64`, and the admin trio `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SECRET`. Locally
-they come from three files, loaded in order and last one wins (via `node --env-file`, never
-`dotenv`): `.env` holds the `NPSSO` seed, the Vercel-generated `.env.local` holds the production KV
-credentials, and `.env.dev.local` overrides them for dev. In production Vercel injects them. Both entrypoints — `src/server/main.ts` and
-`src/server/cli.ts` — need the flags. Every key the app reads must also be listed in
-`turbo.jsonc`'s `env` array, because Biome's `noUndeclaredEnvVars` reads that list.
-
-- `authGet()` in `psn.ts` takes the cheapest session it can get, in this order: the in-memory one,
-  the **refresh grant stored in KV**, and only then an NPSSO→access-code exchange. So a cold
-  serverless start — which is every cron run — costs one PSN call and spends no NPSSO.
-
-📌 **The grant is a hard ten-day window from the mint, and a refresh does not extend it.**
-Measured 2026-09-11: PSN reports `refreshTokenExpiresIn: 863999` (10.0000 days) on a fresh grant,
-and the number **counts down** — 863999 → 863830 while the grant aged 172s. So the grant expires
-*before* the NPSSO's observed ~25 days, and this path does not make the token renew itself; it only
-stops every cold start from spending one.
-
-📌 **At ≤ 3 days left, `sessionRenewEarly` re-mints the grant from the NPSSO while the old one still
-works.** A live NPSSO gets a fresh ten-day grant. A dead one is recorded as a death and the refreshed
-old session answers, so /console shows the dead token as a yellow note («the grant keeps the app up
-for N days») instead of the app going down when the grant ends. Every failure there falls back to the
-refreshed session. `psn-auth.test.ts` holds both branches.
-
-⚠️ **The panel prints the grant's age and its remaining days as two separate numbers, and that
-separation is the instrument — never fold them into one.** A window derived from the live
-`expiresIn` is constant by construction and answers nothing: under a countdown
-`(refreshedAt - mintedAt) + expiresIn` returns the published figure again, and under a reset it
-grows in lockstep with the age. Both make "has this grant outlived its window" unaskable. The
-window therefore comes from `mintedExpiresIn`, stored at the mint and **never overwritten**, and an
-age past it *with days still left* is the reading that would overturn the measurement above.
-
-⚠️ **`exchangeRefreshTokenForAuthTokens` never throws on a refused grant — it returns `{}`.**
-psn-api does not look at the response status on either token call, so the only error check is the
-response shape. `sessionBuild` returns null on a missing `accessToken`; without it a session gets
-`expiresAt: Date.now() + undefined * 1000` = `NaN`, which compares false against every clock, so
-every later call re-mints — forever, against a rate-limited api.
-
-📌 The refresh token **does not rotate**: PSN answers a refresh with the identical string, so two
-processes refreshing one grant cannot disagree and nothing here needs a lock.
-
-⚠️ The grant write is still guarded by **`isAutoWriteSafe`**, because nobody asks for it — it rides
-along on whatever route ran. The tempting exemption is that a grant is the session rather than data;
-that holds for the token and fails for `mintedAt`, which a local run pointed at production KV would
-stamp over with its own. So a local run verifies against the file backend or the local redis recipe
-in `.env.dev.local`, never by writing production.
-The grant deaths and the NPSSO deaths sit behind the same guard: a death is the measurement, and a
-local run must not add its own refusal to the live history.
-
-- Pasting a fresh NPSSO clears the stored grant (`refreshGrantClear` in `npssoSet`). Keeping it
-  would let a paste change nothing for up to ten days, and the owner pastes exactly when something
-  is broken.
-- 📌 **KV is the source of the NPSSO. `process.env.NPSSO` is a bootstrap seed and nothing else.**
-  `npssoRead()` is async and reads `npssoLoad()` first, the env var second — so the seed carries a
-  deploy that has never been pasted into, and the first paste retires it for good. Vercel env vars
-  cannot be written at runtime, and a token expires every few weeks, so a redeploy is the wrong way
-  to renew one. There is deliberately no fallback *back* to the env var on a refusal and no way to
-  clear the stored token: two live sources confused more than they protected (measured with both
-  built, 2026-09-10). The panel says which of the two is in use in one row and stops there.
-  An expired token throws the sentinel `NPSSO_INVALID` (`src/shared/types.ts`) rather than
-  psn-api's multi-line prose, and the header renders it as a link to `NPSSO_URL`, where a fresh
-  token is minted.
-- 📌 **A renewed NPSSO reaches a warm server on its next request with nothing else done** — the
-  server holds no dead token, only the store does (`psn-auth.test.ts`). The latch was the
-  client's: the layout's `profile` query kept its `NPSSO_INVALID` error across route switches.
-  `queryClientCreate` now refetches every query holding that error when a PSN-backed query
-  (`profile`, `games`, `game`) succeeds — `/stats` and `/settings` answer with PSN down — and
-  `useProfile` polls once a minute while it holds it, so an open tab heals with no reload.
-- Steam needs no session — the key is a query param. Two of its answers lie, and `steam.ts`
-  guards both. A private profile returns HTTP **200** with an empty envelope, which reads as an
-  empty library unless checked. And the envelope key is not always `response`:
-  `GetPlayerAchievements` uses `playerstats`, the global percentages use
-  `achievementpercentages`, and reading the wrong one yields `{}` — indistinguishable from the
-  private case.
-
-📌 **Steam's "Game details" privacy is a separate setting from "My profile", and both must be
-public for achievements to read.** A summary reporting `communityvisibilitystate: 3` says nothing
-about the second one: with game details closed, every `GetPlayerAchievements` call answers 403
-`Profile is not public` while the profile itself still reads public. `steam-game` raises a named
-error pointing at the setting rather than returning zero achievements — zero would be the same lie
-as reporting a private profile as an empty library.
-
-- The baseline is `npCommunicationId → trophyId[]`, stored in **Upstash Redis** under
-  `trophy-sys:baseline` when KV credentials exist, and in `.trophy-state.json` otherwise. The file
-  fallback keeps `pnpm dev` and the CLI working with no store attached; `/api/health` reports
-  which backend is live as `stateBackend`.
-- `newsFetch({ commit })` diffs live earnings against the baseline. **Only `POST /api/snapshot` and
-  `pnpm trophies snapshot` write it** — `/api/news` is read-only on purpose, so reading the feed
-  never destroys the diff you were about to look at.
-- Empty baseline = seed mode: no "new" trophies are reported, the snapshot just records what
-  exists.
-- `isStateWritable` is false only in the broken case — the file backend on a serverless host. The
-  snapshot route checks it *before* scanning, so a deploy missing its KV vars answers 501
-  immediately instead of spending 30 PSN calls and dying on `EROFS`.
-
-📌 `newsFetch({ commit: true })` is a read-modify-write over a now-shared store. Nothing triggers
-it concurrently today, but a cron or a UI button would need a lock — two overlapping snapshots
-would let the loser's trophies resurface as "new".
-
-Everything else the app persists rides the same `state.ts` store, one key each:
-`trophy-sys:stats`, `trophy-sys:hidden` (`string[]`), `trophy-sys:npsso` (`string`),
-`trophy-sys:psn-grant` (a `RefreshGrant`), `trophy-sys:psn-grant-deaths` (one entry per grant PSN
-refused), `trophy-sys:settings` (a `Settings` object, today one field `effortHideUntouched`),
-`trophy-sys:login-failures` (the console's login throttle: an `INCR` counter shared by every
-instance; the failure that opens the one-minute window sets its expiry, so hammering cannot stretch
-it, and a key found without one gets it back; the file backend keeps it in memory).
-
-📌 A **death goes under its own key, never into the live record** — the pattern the NPSSO uses
-and the grant now copies. A refusal is followed immediately by a fresh mint that overwrites the
-live record, so a death written there is clobbered by the very call that discovered it.
-
-📌 **`settingsLoad` spreads the store over `SETTINGS_DEFAULT`, so a key already written to the
-store outranks the code default forever.** Changing a default therefore reaches a fresh install
-and nobody else — the live value has to be flipped through `/console`, or the key deleted. Measured
-on `effortHideUntouched`: the default moved to `true` and production kept answering `false`,
-because a stored `false` was already sitting there.
-
-## The console
-
-`/console` is the owner's admin page — hide games, paste a fresh NPSSO, flip a setting. `src/server/admin.ts`
-holds the auth: an HMAC-SHA256 signed `sys_admin` cookie, `timingSafeEqual` on both the password and
-the signature, 30-day expiry, `Secure` dropped only on localhost.
-
-📌 **`adminConfig()` returns null when any of `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_SECRET` is
-missing, and every admin route then answers 503.** There is deliberately no fallback: a deploy
-missing a var is shut, never open.
-
-- Routes: `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/session`,
-  `GET`+`POST /api/admin/hidden`, `POST /api/admin/npsso`, `POST /api/admin/settings`,
-  `GET /api/admin/token`.
-- `GET /api/admin/session` never answers 401 — it reports `authed` either way, because the UI uses
-  it to pick a screen.
-- `routeResolve` takes a third `RouteRequest` argument carrying the cookie and host headers plus the
-  parsed body. Both entrypoints must pass it, or every admin route reads as signed out.
-
 ## Deployment — four constraints that will bite
 
 Deploys are **Git-triggered**: the GitHub repo is connected, Root Directory is `apps/trophy-sys`,
@@ -277,90 +132,6 @@ two PSN round-trips; the library list itself is one call regardless of limit.
 📌 `cache.ts` memoizes **successes only**, so a client retry replays the entire scan. That is why
 `retry` is 1 globally — react-query's default of 3 would replay a failed scan three more times.
 
-## The /campaign charts
-
-Eleven charts and a KPI strip, all visx, all reading one payload — `GET /api/stats`, the trophy
-fan-out cached in Upstash under `trophy-sys:stats`.
-
-- **The archive is versioned.** `ARCHIVE_VERSION` in `stats.ts` gates it: a stored archive whose
-  version does not match reads as empty, and the route's own "rescan trophies" button refills it.
-  Bump it whenever the stored shape changes — cheaper and safer than migrating, because the scan
-  is one button and eight seconds.
-- It carries earned trophies (`trophies`) and, for titles still under way, the unearned ones
-  (`remaining`) with their live counters. "Closest to done" is the only chart needing the second
-  list, and it is why the payload roughly doubled.
-- **Reach for the furniture before writing SVG.** `ChartFrame` gives the panel, the chart/table
-  toggle and the accessibility floor; `ChartTooltip` + `TooltipLayer` give the one tooltip, which
-  renders on the body in a portal; `BarRows` draws any ranked horizontal-bar chart, and four of the eleven are one
-  call to it; `chart-theme.ts` holds the ink. A chart module exports its own derivation and its
-  `*_COLUMNS`, so `campaign.tsx` only wires.
-- **A margin that holds axis text is a token in `chart-theme.ts`, never a literal.** `AXIS_BOTTOM`
-  (26), `AXIS_LEFT` (52), `MONTH_AXIS_RIGHT` (26). Each one replaced a set of hand-typed numbers
-  that had drifted: bottom ran 36/26/22, left ran 38/42/38 — and 38 was too small for the
-  progression's widest tick, so `2,000` drew as `,000` for months. `MONTH_AXIS_RIGHT` holds the
-  half of a `YYYY-MM` label that hangs past the last tick.
-  `campaign-layout.browser.test.tsx` holds the rule: it draws `/campaign` from
-  `campaign.fixture.ts` in chromium at 1280 and 390, and goes red when an x-axis chart ends at a
-  different distance above its panel edge, or a tick label on any axis leaves its chart's svg.
-  📌 visx wraps each tick label in its own `<svg style="overflow: visible">` — measure against the
-  chart's outer svg, never `closest('svg')`. A new x-axis chart bumps its `X_AXIS_CHARTS`.
-- **A tick count is derived from the width, never asked for flat.** `monthTicks(innerWidth, n)`
-  for the two month axes — both asked for 6 at every width and printed over each other at 390px.
-  `decadeTicks` in `effort-scatter.tsx` pins one tick per power of ten: 📌 **d3 abandons the count
-  you pass a log scale once the domain spans fewer decades than that count, and emits every minor
-  tick instead** — hiding untouched titles narrowed the effort domain enough to print 26
-  overlapping labels.
-
-### Charts talking to each other
-
-Clicking a day in the activity heatmap marks that month on the progression
-timeline. **The two charts share one `YYYY-MM` string and nothing else** — the
-route holds `focusMonth` state and a `ref` on the progression wrapper, the
-heatmap emits a date, the progression takes a `focusMonth` prop and draws a
-marker. Keep any future cross-chart link this shape: a value in the route, never
-an import between chart modules.
-
-The timeline draws every month it has at once, so "scroll to that date" is
-`scrollIntoView` on the panel plus the marker. There is no horizontal scrolling
-to drive.
-
-### Six things measured the hard way
-
-- 🚫 **Never put motion's `animate` transform and an SVG `transform` attribute on one node.**
-  Motion writes its scale into the `transform` style, which replaces the attribute outright — the
-  night-owl columns all drew at hour zero. Place with a plain `<g transform>`, animate with a
-  `<motion.g>` inside it. `scatter-mark.tsx` is the reference shape.
-- 🚫 **This palette carries two categorical series, not six.** gruvbox-material is desaturated by
-  design; its purple and blue sit ΔE 1.5 apart under deuteranopia, measured with the `dataviz`
-  validator. To separate many things use one hue at several strengths (the activity and night-owl
-  grids) or position, never a hue per item. The one two-colour split — platinum against the rest —
-  also carries a shape, so colour is never alone.
-- 🚫 **No chart has two y axes.** The velocity band under the progression area is a second plot
-  sharing the x axis, not a second scale on the same one.
-- 🚫 **An overlay positioned inside a chart is clipped three times over.** visx's `ParentSize`
-  wraps children in an `inset: 0; overflow: hidden` box — that one is invisible until you walk the
-  computed styles — and the panel body and `<main>` both scroll. The tooltip is 177px tall inside a
-  134px chart, so no flip can fit it; `TooltipLayer` portals to the body and positions against the
-  viewport instead. Any future overlay (a popover, a menu) needs the same escape.
-- 🚫 **A grid item needs `min-w-0`, or a wide chart stretches the page.** A grid item's
-  `min-width` defaults to `auto`, so the heatmap's 783px SVG widened its own column instead of
-  scrolling inside it. `ChartFrame` carries the class; so must any new wrapper around a panel.
-- 📌 **A hidden pseudo-element still counts toward the page's scroll width.** `.hint::after` is
-  `position: absolute` and up to 15rem wide, so the theme toggle at the end of the header pushed a
-  390px viewport out to 498px — invisibly, because `querySelectorAll('*')` never sees a
-  pseudo-element. Anything `.hint` near a right edge takes `hint-right` as well.
-
-### Driving the page
-
-`agent-browser` is the driver; it documents itself with `agent-browser skills get core`. Two
-things about **this** page waste a run otherwise:
-
-- A full-page screenshot comes out empty, because the page scrolls inside `<main>` rather than the
-  document. Capture the viewport, or one panel by selector.
-- A hover below the fold silently does nothing. Scroll the panel into view first, then move the
-  mouse to a mark's centre — marks are bare SVG, so they carry no accessibility refs and their
-  geometry has to come from `eval`.
-
 ## Conventions
 
 - Naming is subject-first: `gamesFetch`, `stateLoad`, `dateFormat`, `game-list.tsx`. Never
@@ -399,3 +170,9 @@ things about **this** page waste a run otherwise:
 - `.panel` + `.panel-title` is the boxed-with-a-label frame used by every region; the title is
   absolutely positioned outside the border, so a panel must not be the scroll container itself —
   put `overflow-y-auto` on a child.
+
+## where the rest lives
+
+- `src/server/AGENTS.md` — the PSN grant and NPSSO lifecycle, Steam's two lies, every store key, the console's auth; loads with any server file
+- `src/web/charts/AGENTS.md` — the /campaign archive, the chart furniture, axis tokens and tick counts, the six measured traps, driving the page; loads with any chart module, and `campaign.tsx` one level up reads it first
+- `docs/deploy-history.md` — what each deploy constraint cost

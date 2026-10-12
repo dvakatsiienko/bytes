@@ -10,7 +10,6 @@ modeled after the Next.js App Router dashboard course app.
 
 ## Stack
 
-- **Next.js 16** — App Router, **React 19**, TypeScript (strict)
 - **Prisma 7** — PostgreSQL via `@prisma/adapter-pg`; client generated to `.generated/prisma`
 - **better-auth** — email+password, `src/lib/auth.ts` (server) + `src/lib/auth-client.ts` (client);
   route guard in `src/proxy.ts`, catch-all handler at `api/auth/[...all]`; seed creates the user
@@ -33,17 +32,7 @@ modeled after the Next.js App Router dashboard course app.
 
 ## Commands
 
-```bash
-pnpm dev              # next dev --inspect
-pnpm build            # next build
-pnpm lint             # biome lint
-pnpm typecheck        # tsc
-pnpm db:push          # prisma db push (sync schema, no migration)
-pnpm db:seed          # prisma db seed
-pnpm db:reset         # prisma db push --force-reset (wipes data)
-pnpm db:reinit        # reset → generate → seed (full rebuild)
-pnpm prisma:generate  # regenerate client (also runs on postinstall)
-```
+`package.json` holds the scripts. 📌 `pnpm db:reset` (`prisma db push --force-reset`) and `pnpm db:reinit` wipe the data — and `.env` points at the hosted db (🐾 above).
 
 ## Environment (`.env`)
 
