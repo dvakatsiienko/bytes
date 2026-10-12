@@ -14,8 +14,7 @@ export const TicketsToday = (props: TicketsTodayProps) => {
         <motion.a
           animate={{ opacity: 1, y: 0 }}
           className={chipCva({ state: ticket.state })}
-          // linear:// opens the macOS app instead of the web workspace
-          href={`linear://x-com/issue/${ticket.id}`}
+          href={`https://linear.app/x-com/issue/${ticket.id}`}
           initial={{ opacity: 0, y: 4 }}
           key={ticket.id}
           title={ticket.note}

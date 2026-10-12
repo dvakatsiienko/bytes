@@ -41,7 +41,7 @@ export const TicketStrip = () => {
                 return (
                   <a
                     className='rounded border bg-card px-2 py-0.5 font-mono text-xs transition-colors hover:border-cobalt hover:text-cobalt'
-                    href={`linear://x-com/issue/${ticket.id}`}
+                    href={`https://linear.app/x-com/issue/${ticket.id}`}
                     key={ticket.id}
                     title={ticket.note}>
                     {ticket.id}

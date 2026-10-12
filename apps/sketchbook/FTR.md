@@ -18,7 +18,7 @@
 - ⬜ the ticket strip
   - given `tickets.ts` holds at least one ticket
   - then a «tickets» row groups the chips under «in progress», «done» and «touched», each with its dot
-  - and a chip opens the ticket in the linear desktop app
+  - and a chip opens the ticket's https page; dima's Hyper+G opens it in the desktop app
 - ⬜ the variant switcher
   - given the live proto exports two or more variants
   - when dima clicks a variant's pill at the bottom of the page
