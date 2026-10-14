@@ -17,7 +17,7 @@ description: Verify an atelier change against the running studio — drive it in
 
 1. **scope** — the touched lines are every line `git diff origin/main... -- apps/atelier/FTR.md` adds or edits, plus every line whose feature the source diff (`git diff origin/main... --name-only -- apps/atelier`) changes: find it by the ui words and the `?crash=` names the changed files print.
 2. **drive** each touched line's given/when/then on the tree's own server, and keep one piece of evidence per line (a probe line, a screenshot).
-3. **flip** in the pr's last commit (`x:ftr`): passed → ✅, failed → 🐞, not drivable here → stays ⬜ with the reason in the report. 🔎 is dima's alone.
+3. **flip** in the pr's last commit (`x:app-author-ftr`): passed → ✅, failed → 🐞, not drivable here → stays ⬜ with the reason in the report. 🔎 is dima's alone.
 
 Done when every touched line carries the status its drive earned, and the report says `ftr: <n> ✅ · <m> 🐞 · <k> ⬜` with the ⬜ reasons.
 

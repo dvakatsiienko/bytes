@@ -65,7 +65,7 @@ const rows = [
     gap: (app) => fileGap(app, 'AGENTS.md', 'the app memory file'),
     id: 'AGENTS.md',
   },
-  { gap: (app) => fileGap(app, 'FTR.md', 'x:ftr'), id: 'FTR.md' },
+  { gap: (app) => fileGap(app, 'FTR.md', 'x:app-author-ftr'), id: 'FTR.md' },
   {
     gap: (app) => fileGap(app, 'GLOSSARY.md', 'domain-modeling'),
     id: 'GLOSSARY.md',
@@ -82,7 +82,7 @@ const rows = [
     id: 'run-skill',
   },
   {
-    gap: (app) => skillGap(app, 'verify', 'x:app-essentials'),
+    gap: (app) => skillGap(app, 'verify', 'x:app-setup-essentials'),
     id: 'verify-skill',
   },
   {
