@@ -2,6 +2,15 @@
 
 loads with any file in `src/server/`; read it before touching a `trophy-sys:*` store key or `/console` from anywhere else. the env-file order and the production-credentials warning are the app's `AGENTS.md` § env.
 
+## the function bundle — two deploy constraints
+
+1. **The API is esbuild-bundled, and that is mandatory.** Vercel's dependency tracing ships no
+   `node_modules` into the function, so any bare specifier surviving the build dies at runtime.
+2. **The handler must use Node's `(req, res)` signature.** A web-standard handler returning a
+   `Response` is silently dropped and the request hangs until timeout.
+
+The other two (the build declares the function, explicit routing) and the deploy test are in `script/AGENTS.md`.
+
 ## sessions and state
 
 - `authGet()` in `psn.ts` takes the cheapest session it can get, in this order: the in-memory one,

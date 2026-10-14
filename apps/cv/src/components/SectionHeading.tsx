@@ -37,7 +37,7 @@ const accentCn = cva({
 type AccentCn = VariantProps<typeof accentCn>;
 
 interface SectionHeadingProps extends AccentCn {
+  className?: string;
   id?: string;
   text: string;
-  className?: string;
 }

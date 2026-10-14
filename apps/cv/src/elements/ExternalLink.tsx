@@ -20,6 +20,6 @@ export const ExternalLink = (props: ExternalLinkProps) => {
 
 /* Types */
 interface ExternalLinkProps extends React.PropsWithChildren {
-  href?: string;
   className?: string;
+  href?: string;
 }

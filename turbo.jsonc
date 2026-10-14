@@ -55,6 +55,7 @@
     // inputs count the file. That is the correct reading of both — a doc
     // cannot change a test result, and `lint` may one day lint the doc.
     "transit": {
+      "description": "No-op graph node: lint, typecheck and test see their dependencies' source without waiting on their gates",
       "dependsOn": ["^transit"],
       "inputs": [
         "$TURBO_DEFAULT$",
@@ -65,14 +66,24 @@
     },
 
     "dev": {
+      "description": "Runs an app's dev server",
       "cache": false,
       "persistent": true,
       "dependsOn": ["^prisma:generate"]
     },
-    "serve": { "cache": false, "persistent": true },
-    "dev:convex": { "cache": false, "persistent": true },
+    "serve": {
+      "description": "Serves an app's production build locally",
+      "cache": false,
+      "persistent": true
+    },
+    "dev:convex": {
+      "description": "Runs the Convex dev backend beside an app",
+      "cache": false,
+      "persistent": true
+    },
 
     "build": {
+      "description": "Builds an app for production; deploy.yml ships what build --affected selects",
       // `prisma:generate`, not `^prisma:generate`: the client a package builds
       // against is its OWN, and `^` only reaches dependencies. It used to work
       // by accident, through typecheck, which did name it correctly.
@@ -104,7 +115,10 @@
       ]
     },
 
-    "lint": { "dependsOn": ["transit"] },
+    "lint": {
+      "description": "Lints a package with biome",
+      "dependsOn": ["transit"]
+    },
 
     // Turbo skips every package without a `test` script, so this task covers
     // the whole graph whoever has one. Deliberately not listing them: the same
@@ -116,6 +130,7 @@
     // `pnpm test` is the other door — a single vitest run over every project,
     // for a human who wants one readable pass.
     "test": {
+      "description": "Runs a package's vitest suite, one cacheable task per package",
       "dependsOn": ["transit", "prisma:generate"],
       // No `outputs`. A test run's product is its exit code and its log, and
       // turbo caches both without a declaration. `coverage/` is written only
@@ -145,6 +160,7 @@
     },
 
     "prisma:generate": {
+      "description": "Generates a package's Prisma client into .generated/prisma",
       "inputs": ["prisma/**", "package.json"],
       // The generated client lands here (both schemas set `output`). Undeclared,
       // it was regenerated every run and a cache hit restored nothing.

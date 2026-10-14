@@ -1,6 +1,33 @@
 # packages/kit — mechanics
 
-The contract (rules, why) is the `## ui-kit` section of the root `AGENTS.md`. This file is only how.
+`packages/kit` is the one design system, on shadcn + Base UI. Architecture source of truth:
+[BYT-24](https://linear.app/x-com/issue/BYT-24). Read this file before any UI work in any app: the rules first, then the mechanics.
+
+## rules
+
+- **kit is the source.** Apps import shadcn components from `@ui/kit/components/*`; an app never
+  generates into its own `ui/` dir. A missing component is added from the app with `shadcn add` —
+  the app's `components.json` `ui` alias routes the file into kit.
+- **compose before eject.** Behaviour differences (lazy search, async states) live in an app-level
+  composition over the kit primitive.
+- **eject is gated.** On the smell («too unique, too many workarounds») print
+  `eject request: <component> · why composing fails · what structure differs` and stop. Dima's `y`
+  → copy the file from kit into the app's own `ui/` dir with a provenance header
+  (`// ejected from @ui/kit/components/<name> · <date> · <why>`), one-way door. There is no cli
+  verb for this: `shadcn eject` inlines `shadcn/tailwind.css`, unrelated. The kit starts at zero ejects.
+- **no brand in kit.** No hex, no font names, no logos, no app-conditional logic.
+- **kit stays slim.** A variant enters kit only when two apps need it; ≤4 of our own variants on
+  top of the registry's, a fifth is an eject signal. A coder mid-task does not scan the monorepo
+  for the second consumer: it leaves a `variant request: <component> · <variant> · <app>` line in
+  its done-comment; promotion is a periodic sweep.
+- **`baseColor` is `neutral`** and identical in every `components.json`; style, icons and `css`
+  match too (the shadcn monorepo guide requires it).
+- **token layers are frozen:** L1 the 12-step accent/gray scales in `packages/kit/src/styles/`
+  → L2 the shadcn vocabulary verbatim → L3 kit extensions. Never rename an L2 token.
+- **surfaces:** `financial`, `space-explorer-ui` and `figmentation` are live test surfaces;
+  `trophy-sys` adopts kit with its redesign.
+
+## mechanics
 
 ## add a component
 
@@ -31,7 +58,7 @@ swap.
 
 ## eject a component
 
-Only on Dima's `y` to an eject request (contract in the root `AGENTS.md`). Copy
+Only on Dima's `y` to an eject request (the gate is in § rules). Copy
 `src/components/<name>.tsx` into the app's `src/components/ui/`, first line:
 
 ```ts

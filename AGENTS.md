@@ -25,6 +25,16 @@ Each app keeps its memory in its own AGENTS.md. A block a tool generates there (
 
 `packages/`: `biome-config-polished` (the lint and format rules every app extends), `prettier-config-polished` (legacy, migrating to biome), `kit` (the design system, § ui-kit), `typescript-config`, `utils`.
 
+### operating this monorepo with agents — the baseline
+
+the expanded reference: `~/frame/docs/knowledge/monorepo.md`, kept true by the recipe `refresh-monorepo`.
+
+- gate only what you touched: `pnpm turbo query affected --tasks typecheck,test,lint --base origin/main --exit-code` names the gates a change needs, `turbo run <task> --affected` runs them.
+- a lockfile, `turbo.jsonc`, `.npmrc` or `pnpm-workspace.yaml` change marks every package affected, so its push redeploys every app: batch such changes, never drip them.
+- docs and agent memory (`AGENTS.md`, `CLAUDE.md`, `.claude/`, READMEs) never trigger a build; keep it that way when adding `inputs`.
+- an env var a task needs goes into `globalPassThroughEnv`, which strips every unnamed one.
+- worktrees share turbo's local cache: free for typecheck, test and lint; a cached `build` can carry another checkout's absolute path.
+
 ### Turbo filters, measured (2026-09-12)
 
 - Two negative filters INTERSECT: `--filter='!a' --filter='!b'` drops both packages. The docs read
@@ -74,34 +84,9 @@ Vercel's git integration is off: `.github/workflows/deploy.yml` deploys the apps
 
 ## ui-kit
 
-`packages/kit` is the one design system, on shadcn + Base UI. Architecture source of truth:
-[BYT-24](https://linear.app/x-com/issue/BYT-24). Mechanics live in `packages/kit/AGENTS.md`.
+`packages/kit` is our main UI library. Every React app reaches for a kit component before writing its own, and a missing one is added to kit, never built locally.
 
-- **kit is the source.** Apps import shadcn components from `@ui/kit/components/*`; an app never
-  generates into its own `ui/` dir. A missing component is added from the app with `shadcn add` —
-  the app's `components.json` `ui` alias routes the file into kit.
-- **compose before eject.** Behaviour differences (lazy search, async states) live in an app-level
-  composition over the kit primitive.
-- **eject is gated.** On the smell («too unique, too many workarounds») print
-  `eject request: <component> · why composing fails · what structure differs` and stop. Dima's `y`
-  → copy the file from kit into the app's own `ui/` dir with a provenance header
-  (`// ejected from @ui/kit/components/<name> · <date> · <why>`), one-way door. There is no cli
-  verb for this: `shadcn eject` inlines `shadcn/tailwind.css`, unrelated. The kit starts at zero ejects.
-- **no brand in kit.** No hex, no font names, no logos, no app-conditional logic.
-- **kit stays slim.** A variant enters kit only when two apps need it; ≤4 of our own variants on
-  top of the registry's, a fifth is an eject signal. A coder mid-task does not scan the monorepo
-  for the second consumer: it leaves a `variant request: <component> · <variant> · <app>` line in
-  its done-comment; promotion is a periodic sweep.
-- **`baseColor` is `neutral`** and identical in every `components.json`; style, icons and `css`
-  match too (the shadcn monorepo guide requires it).
-- **`cva` 1.0 beta everywhere.** shadcn generates `class-variance-authority`; after every
-  `shadcn add` swap the import to `cva` and wrap the args into its object form.
-  `shadcn add --diff` always shows the cva import + wrap; read past it. Revisit when cva 1.0
-  goes stable.
-- **token layers are frozen:** L1 the 12-step accent/gray scales in `packages/kit/src/styles/`
-  → L2 the shadcn vocabulary verbatim → L3 kit extensions. Never rename an L2 token.
-- **surfaces:** `financial`, `space-explorer-ui` and `figmentation` are live test surfaces;
-  `trophy-sys` adopts kit with its redesign.
+The rules and mechanics live in `packages/kit/AGENTS.md`; read it before any UI work.
 
 ## next apps
 

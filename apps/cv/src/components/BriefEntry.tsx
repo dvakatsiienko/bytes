@@ -18,6 +18,6 @@ export const BriefEntry = (props: BriefEntryProps) => {
 
 interface BriefEntryProps {
   className?: string;
-  name: string;
   content: string | React.ReactNode;
+  name: string;
 }
