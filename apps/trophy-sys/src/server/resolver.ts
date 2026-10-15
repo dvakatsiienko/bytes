@@ -21,10 +21,14 @@ export const lookupResilient: LookupFunction = (
     if (!(error && RESOLVER_CODES.has(error.code ?? ''))) {
       return callback(error, address, family);
     }
+    const answer = (found: string, foundFamily: 4 | 6) =>
+      options.all
+        ? callback(null, [{ address: found, family: foundFamily }])
+        : callback(null, found, foundFamily);
     resolve4(hostname, (error4, addresses4) => {
-      if (!error4 && addresses4[0]) return callback(null, addresses4[0], 4);
+      if (!error4 && addresses4[0]) return answer(addresses4[0], 4);
       resolve6(hostname, (error6, addresses6) => {
-        if (!error6 && addresses6[0]) return callback(null, addresses6[0], 6);
+        if (!error6 && addresses6[0]) return answer(addresses6[0], 6);
         callback(error, '', 0);
       });
     });

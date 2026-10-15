@@ -20,6 +20,15 @@ describe('lookupResilient', () => {
     );
     expect(answer).toEqual(['23.219.79.68', 4]);
   });
+
+  test('answers with an address list when the caller asks for all, as net.connect does', async () => {
+    const answer = await new Promise<unknown>((resolve, reject) =>
+      lookupResilient('ca.account.sony.com', { all: true }, (error, address) =>
+        error ? reject(error) : resolve(address),
+      ),
+    );
+    expect(answer).toEqual([{ address: '23.219.79.68', family: 4 }]);
+  });
 });
 
 describe('resolverExplain', () => {
