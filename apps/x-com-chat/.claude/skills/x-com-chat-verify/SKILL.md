@@ -30,5 +30,4 @@ a send is not part of this pass: it saves into dima's real Convex dev history an
 
 ## known noise
 
-- `next dev` rewrites the tracked `AGENTS.md` — `x-com-chat-run`'s gotchas say how to keep it out of a commit.
 - the Clerk dev-keys warning in the console, and the Next.js dev-tools button bottom left.

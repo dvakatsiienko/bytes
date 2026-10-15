@@ -46,4 +46,3 @@ main already fails axe. these are the baseline, not a finding of your change —
 
 - the portfolio section renders in dev only (`__DEV__` in `src/frags.ts`) — production has no portfolio.
 - the Next.js dev-tools button sits bottom left in every dev screenshot.
-- `next dev` rewrites `apps/cv/AGENTS.md` and `next-env.d.ts` — `cv-run`'s gotchas say how to keep them out of a commit.

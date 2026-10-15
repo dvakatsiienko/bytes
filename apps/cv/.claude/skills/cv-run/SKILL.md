@@ -55,7 +55,6 @@ Stop the background task that ran `pnpm dev` (TaskStop with its task id, or the 
 ```bash
 lsof -nP -iTCP:3010 -sTCP:LISTEN    # prints nothing
 lsof -nP -iTCP:9229 -sTCP:LISTEN    # prints nothing: the --inspect debugger went with it
-git -C .claude/worktrees/<slug> checkout -- apps/cv/AGENTS.md apps/cv/next-env.d.ts   # only if you did not mean to keep next's rewrite
 git worktree remove .claude/worktrees/<slug>
 ```
 
@@ -69,7 +68,6 @@ cd apps/cv && pnpm typecheck        # tsc, ~1 s, exit 0
 
 ## Gotchas
 
-- **`next dev` dirties two tracked files on every start** — it rewrites the next block in `apps/cv/AGENTS.md` and flips `apps/cv/next-env.d.ts` to `.next/dev/types/…`. `git worktree remove` then refuses with «contains modified or untracked files». Revert both, or commit the `AGENTS.md` block on purpose.
 - **the four next apps share base port 3000** — `cv`, `figmentation`, `financial` and `x-com-chat` all start on `3000 + offset`. Only one of them can hold the port per tree; check `lsof -nP -iTCP:3010 -sTCP:LISTEN` before starting, and report a taken port — never kill it.
 - **`--inspect` binds `127.0.0.1:9229`** — a second next server anywhere on the mac prints «Starting inspector on 127.0.0.1:9229 failed: address already in use» and keeps running. It is only a warning.
 - **one `next dev` per app dir** — a second start in the same `apps/cv` exits with «Another next dev server is already running» and names the first server's PID. Use the running one.

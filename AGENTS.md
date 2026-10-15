@@ -95,6 +95,9 @@ The rules and mechanics live in `packages/kit/AGENTS.md`; read it before any UI 
 - `@next/playwright` is allowed only as the harness for `next-cache-components-optimizer`'s
   `instant()` e2e; install it in the app that adopts it. `agent-browser` stays the fleet browser
   for everything else.
+- each next app's `AGENTS.md` holds next's managed `nextjs-agent-rules` block (`agentRules` stays on:
+  it points agents at the version-matched docs in `node_modules/next/dist/docs/`). `next dev` writes
+  only when the block is stale, i.e. after a next upgrade: commit that change, never revert it.
 
 ## the readme stays true
 

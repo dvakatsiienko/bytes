@@ -48,4 +48,3 @@ main already fails these. they are the baseline, not a finding of your change �
 
 - console warnings: `loading="eager"` on the LCP image (tesla, clinique) and «width or height modified» on clinique product images.
 - the Next.js dev-tools button sits bottom left in every dev screenshot.
-- `next dev` rewrites `AGENTS.md` and `next-env.d.ts` — `figmentation-run`'s gotchas say how to keep them out of a commit.

@@ -105,7 +105,6 @@ cd apps/financial && pnpm test       # vitest, 1 file, 2 tests, ~1 s
 - **the four next apps share base port 3000** — `cv`, `figmentation`, `financial` and `x-com-chat` all start on `3000 + offset`; one per tree.
 - **the offset is the tree's position in `git worktree list`**, read at seed time — a tree seeded after another one was removed can land on the same offset as a live tree. Read `.worktree-offset` and check the port before starting.
 - **`--inspect` prints «Starting inspector on 127.0.0.1:9229 failed: address already in use» on its own start** — the parent takes `:9229` and next's child process then fails on it. It is only a warning.
-- **in financial, `next dev` left `AGENTS.md` and `next-env.d.ts` clean** — unlike cv, both already carry next's form. Still run `git status --short` before `git worktree remove`; revert either one if next rewrites it.
 - **the seed prints «[Better Auth] Base URL is not set»** — harmless for a local run; login and redirects worked.
 - **`agent-browser find text '$42.50'` finds nothing** even while the row is on screen — use the `eval` on `innerText` above.
 - the TanStack Query devtools button and the Next.js dev-tools button sit in every dev screenshot — known, not a finding.

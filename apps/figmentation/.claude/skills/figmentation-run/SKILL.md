@@ -70,7 +70,6 @@ cd apps/figmentation && pnpm typecheck && pnpm lint   # tsc + biome, ~2 s; there
 ## Gotchas
 
 - **all four Next apps share base `3000` and `--inspect` on `:9229`.** A second one running prints `Starting inspector on 127.0.0.1:9229 failed: address already in use`. That is a warning only: the server still starts. Only the debugger is missing.
-- **`next dev` rewrites two tracked files** in the tree it serves: `apps/figmentation/AGENTS.md` (Next's generated rules block) and `next-env.d.ts` (`.next/types` → `.next/dev/types`). They are not your change. Keep them out of a commit with `git checkout -- AGENTS.md next-env.d.ts` in `apps/figmentation`.
 - **«Visit» is a client-side `NextLink`**, so `wait --load load` returns before the route changes. Wait on the url: `wait --url '**/tesla-landing'`.
 - **snapshot refs grow per session** — the second snapshot's «Visit» is `@e16`, not `@e6`. Click by role and name (`find role button click --name …`), or re-read the ref from the newest snapshot.
 - **clinique is a static mock.** «+», «−» and «ADD TO BAG» have no handlers; `BAG (0)` never moves. That is the design, not a bug.

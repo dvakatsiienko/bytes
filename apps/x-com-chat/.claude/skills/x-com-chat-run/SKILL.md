@@ -58,7 +58,6 @@ Stop only what you started: TaskStop each background task by its id (the `pnpm d
 ```bash
 lsof -nP -iTCP:3020 -sTCP:LISTEN     # prints nothing
 lsof -nP -iTCP:9229 -sTCP:LISTEN     # prints nothing (next's --inspect port)
-git -C .claude/worktrees/<slug> checkout -- apps/x-com-chat/AGENTS.md   # only if the diff is next's rewrite, see gotchas
 git worktree remove .claude/worktrees/<slug> && git branch -d coder/<slug>   # when the tree is done
 ```
 
@@ -68,7 +67,6 @@ No test suite. The gate is `cd apps/x-com-chat && pnpm typecheck` (next typegen 
 
 ## Gotchas
 
-- ⚠️ **`next dev` rewrites the tracked `apps/x-com-chat/AGENTS.md`** — it replaces the `nextjs-agent-rules` block on every start («Generated AGENTS.md for AI agents»). The tree goes dirty and `git worktree remove` refuses. Restore the file before removing a probe tree; a coder leaves it out of its commit unless told otherwise.
 - ⚠️ **everything hits shared cloud state.** Both `.env` and `.env.local` point at the one Convex **dev** deployment — the same one the main checkout uses. A sent message is saved into dima's real dev chat history, and each send calls Groq with the real key.
 - ⚠️ **`convex dev` from a worktree pushes that tree's `convex/` over the shared dev deployment.** Main's dev functions are replaced until someone pushes again. Run it only when the change touches `convex/`, and say so in the report.
 - **the port is `3000 + offset`** — `worktree:seed` prints it; `.worktree-offset` holds the offset (20 → `:3020`). The offset is shared by every next app in the tree.
