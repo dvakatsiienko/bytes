@@ -6,6 +6,8 @@
   "commitMessagePrefix": "🌲 evergreen:",
   "rangeStrategy": "bump",
   "minimumReleaseAge": "3 days",
+  "osvVulnerabilityAlerts": true,
+  "abandonmentThreshold": "1 year",
   "internalChecksFilter": "strict",
   "prCreation": "not-pending",
   "separateMajorMinor": true,
