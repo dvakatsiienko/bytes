@@ -1,6 +1,8 @@
 name: review-approved
 
-# The way past the two-round cap, and the whole of it: Dima approves the PR and
+# The way past the one-round cap (2026-10-22), and the whole of it: Dima's
+# account approves the PR — Dima, or cclio on the verifier's clean for that
+# head, since he does not read PRs (PK-103) — and
 # `review:clean` goes green on the head he approved.
 #
 # What this replaces was a lane that tried to decide, without a reviewer, whether
@@ -90,5 +92,5 @@ jobs:
 
           Published on $REVIEWED, \`$SHA\`.
 
-          This is the human gate past the two-round cap. It says a person read this head and accepted it — nothing more, and nothing automated can produce it." \
+          This is the gate past the one-round cap: the owner's account accepted this head — Dima, or cclio on the verifier's clean verdict for it. A bot app cannot produce it." \
             --jq '.conclusion'

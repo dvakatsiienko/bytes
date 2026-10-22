@@ -185,33 +185,34 @@ jobs:
           GATE: ${{ steps.gate.outputs.dir }}
         run: "$GATE/.github/scripts/review-rounds.sh"
 
-      # The cap. Two rounds per PR: the one at «final», and one after the fixes.
-      # A third is Dima's call, asked through cclio with a few words on what
-      # changed — so this fails early, before spending the window rather than
-      # after.
+      # The cap. One round per PR, at «final»: the fix rounds are reviewed
+      # locally by the coder before each verifier round, which is faster
+      # (Dima, 2026-10-22, PK-103 / FRM-72). A second is Dima's call, asked
+      # through cclio with a few words on what changed — so this fails early,
+      # before spending the window rather than after.
       #
       # 📌 Know what this costs now that the gate is real: `review:clean` lives
-      # on a head sha, so a push after the second round leaves the new head with
+      # on a head sha, so a push after the round leaves the new head with
       # no check. `review-approved.yml` is the way out: Dima approves the head
       # and that publishes `review:clean` on it.
       #
       # 📌 «Dima's word» is enforced rather than asked for. On a `labeled` event
-      # `github.event.sender` IS the account that applied the label, so a third
-      # round runs only when the repo owner applied it himself. The coder holds
+      # `github.event.sender` IS the account that applied the label, so a round past
+      # the cap runs only when the repo owner applied it himself. The coder holds
       # `pull-requests: write` and could otherwise lift its own cap, which is no
-      # cap at all. Before this, a third round was impossible for anyone without
-      # editing this file, which the ticket named as the gap.
-      - name: Two review rounds per PR
+      # cap at all. Before this, a round past the cap was impossible for anyone
+      # without editing this file, which the ticket named as the gap.
+      - name: One review round per PR
         if: >-
-          steps.rounds.outputs.count >= 2 &&
+          steps.rounds.outputs.count >= 1 &&
           github.event.sender.login != github.repository_owner
         run: |
-          echo "::error::Two review rounds already ran on this branch. A third needs Dima's word: he applies the label himself, with what changed since the last review."
+          echo "::error::The review round already ran on this branch. Another needs Dima's word: he applies the label himself, with what changed since the last review."
           exit 1
 
       # 📌 The check run is created AFTER the cap, never before. A check run is
       # keyed on (name, head sha) and GitHub shows the latest one, so creating it
-      # first would mean a refused third round replaces an already-green
+      # first would mean a refused round past the cap replaces an already-green
       # `review:clean` with a fresh `in_progress` — blocking a PR that had
       # passed. A re-label on the same head does create a second check run with
       # this name, and the latest winning is exactly what a re-review wants.
