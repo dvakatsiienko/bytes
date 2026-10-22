@@ -9,9 +9,9 @@ name: review-approved
 # a push had answered the last round's findings — reading thread replies, commit
 # authorship, and whether the answers had already been spent. It produced five of
 # the twelve defects on #79 and could never do better than guess, because «is
-# this finding answered» is not a question an api can settle. A human approval is
-# the same judgement, made by the only party entitled to make it, and the api
-# reports it in one field.
+# this finding answered» is not a question an api can settle. An approval on the
+# owner's account is that judgement — Dima's, or cclio's on the verifier's clean
+# verdict for the head — and the api reports it in one field.
 #
 # 🚨 The coder cannot forge this, for two independent reasons, and both are
 # measured rather than assumed (scratch PR #81, 2026-09-12):
