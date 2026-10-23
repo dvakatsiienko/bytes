@@ -22,6 +22,10 @@ Measured 2026-09-11: PSN reports `refreshTokenExpiresIn: 863999` (10.0000 days) 
 and the number **counts down** — 863999 → 863830 while the grant aged 172s. So the grant expires
 *before* the NPSSO's observed ~25 days, and this path does not make the token renew itself; it only
 stops every cold start from spending one.
+📌 open reading, 2026-10-23 (dima, the prod panel): «GRANT day 7 • 8 days left» sums to a 15-day
+window, against the 10.0 days above. unchecked: read `mintedExpiresIn` on the live grant before
+rewriting the measurement. the local NPSSO pasted 2026-09-27 answered 500 on 2026-10-23 (≤26 days;
+the first-500 day was never logged).
 
 📌 **At ≤ 3 days left, `sessionRenewEarly` re-mints the grant from the NPSSO while the old one still
 works.** A live NPSSO gets a fresh ten-day grant. A dead one is recorded as a death and the refreshed
