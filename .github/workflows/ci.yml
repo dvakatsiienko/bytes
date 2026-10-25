@@ -96,11 +96,11 @@ jobs:
         run: .github/scripts/ci-changes.sh
 
       # The review gate's decision, fed saved api payloads. It runs here rather
-      # than in review.yml because that is the one place it can run at all: a PR
-      # that edits a workflow already on the default branch makes the review
-      # action refuse itself, so the gate's findings path can never be exercised
-      # on the PR that changes it. jq and bash only, about a second, no install
-      # — cheap enough that narrowing it to `.github/**` changes would cost more
+      # than in review-round.yml because that is the one place it can run at
+      # all: callers call the round at `@main`, and the review action refuses
+      # itself on a PR that edits a workflow, so the gate's findings path can
+      # never be exercised on the PR that changes it. jq and bash only, about
+      # a second, no install — cheap enough that narrowing it to `.github/**` changes would cost more
       # in config than it saves in runtime.
       - name: Review gate cases
         run: .github/scripts/review-cases.sh

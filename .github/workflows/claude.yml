@@ -2,9 +2,9 @@ name: claude
 
 # The interactive lane, and nothing else. `@cc <ask>` in a comment.
 #
-# 📌 The review lane lived here too and is now `review.yml`, deliberately in its
-# own file. Any event here created a run in which the `review` job was SKIPPED,
-# and GitHub counts a skipped job as satisfying a required status check — so the
+# 📌 The review lane lived here too and is now `review.yml` (which calls
+# `review-round.yml`), deliberately in its own file. Any event here created a
+# run in which the `review` job was SKIPPED, and GitHub counts a skipped job as satisfying a required status check — so the
 # required `review` context reported green on PRs nobody had reviewed. Measured
 # on #74: a skip even OVERWRITES an earlier red conclusion for the same context
 # on the same head.

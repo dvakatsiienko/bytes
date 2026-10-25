@@ -4,7 +4,12 @@
 # its own start time, and the action overwrites that comment seconds later on
 # every round.
 #
-# 🚨 The invariant this rests on: `review.yml` holds ONE job on ONE trigger, so
+# The runs counted are the CALLER's — the repo's `review.yml`, which calls
+# `review-round.yml` — since a called workflow has no runs of its own. Its file
+# name is read from `github.workflow_ref`, so a caller under another name
+# counts its own rounds.
+#
+# 🚨 The invariant this rests on: the caller holds ONE job on ONE trigger, so
 # «a successful run of review.yml» and «a round that reached the reviewer» are
 # the same sentence. A workflow run concludes `success` when ANY job in it
 # succeeds, so a second job on a second trigger in that file makes every one of
@@ -25,15 +30,24 @@
 # A run that died on the cap, or one whose action refused itself, ends red and
 # is not counted — correct, it spent nothing.
 #
-# Env: GH_TOKEN, REPO, BRANCH, GITHUB_OUTPUT
+# Env: GH_TOKEN, REPO, BRANCH, WORKFLOW_REF, GITHUB_OUTPUT
 set -euo pipefail
+
+# Cut at the FIRST `@`: a path cannot hold one, a branch in the ref can.
+workflow=${WORKFLOW_REF:?the caller workflow ref is required to count its rounds}
+workflow=${workflow%%@*}
+workflow=${workflow##*/}
 
 # No `|| echo '[]'` here, and that is the same argument as the paragraph above:
 # a swallowed api failure reports zero rounds, which leaves the cap unenforced
 # and says nothing about it. Failing loudly spends no review and publishes no
 # check, so the PR stays blocked — the safe side.
-runs=$(gh api \
-  "repos/$REPO/actions/workflows/review.yml/runs?branch=$BRANCH&status=completed&per_page=100" \
+#
+# 🚨 The branch goes through `-f`, never into the url: a branch name is the
+# coder's to pick, and `x&status=failure` spliced into a query string asks for
+# branch `x`, counts zero rounds and lifts the cap. `-f` encodes it.
+runs=$(gh api -X GET "repos/$REPO/actions/workflows/$workflow/runs" \
+  -f branch="$BRANCH" -f status=completed -F per_page=100 \
   --jq '[.workflow_runs[] | select(.conclusion == "success")] | sort_by(.run_number)')
 
 count=$(jq 'length' <<<"$runs")
