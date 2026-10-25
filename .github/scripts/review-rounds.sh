@@ -42,8 +42,12 @@ workflow=${workflow##*/}
 # a swallowed api failure reports zero rounds, which leaves the cap unenforced
 # and says nothing about it. Failing loudly spends no review and publishes no
 # check, so the PR stays blocked — the safe side.
-runs=$(gh api \
-  "repos/$REPO/actions/workflows/$workflow/runs?branch=$BRANCH&status=completed&per_page=100" \
+#
+# 🚨 The branch goes through `-f`, never into the url: a branch name is the
+# coder's to pick, and `x&status=failure` spliced into a query string asks for
+# branch `x`, counts zero rounds and lifts the cap. `-f` encodes it.
+runs=$(gh api -X GET "repos/$REPO/actions/workflows/$workflow/runs" \
+  -f branch="$BRANCH" -f status=completed -F per_page=100 \
   --jq '[.workflow_runs[] | select(.conclusion == "success")] | sort_by(.run_number)')
 
 count=$(jq 'length' <<<"$runs")
