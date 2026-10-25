@@ -5,6 +5,8 @@ export const OTHERS_PATH = '/api/build/others';
 /* Types */
 
 export interface Build {
+  /** the app's folder name: next apps share one base port, so a sibling on that port may be another app */
+  app: string;
   /** `HEAD` on a detached checkout */
   branch: string;
   isDev: boolean;

@@ -63,7 +63,7 @@ export const BuildBadge = (props: BuildBadgeProps) => {
 
 // bottom centre: next's dev indicator holds the bottom-left corner and the query devtools the bottom-right
 const cornerClass =
-  'fixed bottom-2 left-1/2 z-50 -translate-x-1/2 rounded-md border bg-popover/90 py-0.5 pr-0.5 pl-2.5 shadow-md backdrop-blur-sm';
+  'fixed bottom-2 left-1/2 z-50 -translate-x-1/2 rounded-md border border-border bg-popover/90 py-0.5 pr-0.5 pl-2.5 shadow-md backdrop-blur-sm';
 
 /* Helpers */
 

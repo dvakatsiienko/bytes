@@ -25,7 +25,14 @@ test('a worktree shows its branch and a jump to main on main’s port', async ()
     answers({
       '/api/build': { branch: 'coder/x', isDev: true, sha: '1234abcd' },
       '/api/build/others': [
-        { branch: 'main', isDev: false, name: 'main', port: 5180, sha: 'a' },
+        {
+          app: 'kit',
+          branch: 'main',
+          isDev: false,
+          name: 'main',
+          port: 5180,
+          sha: 'a',
+        },
         {
           branch: 'coder/y',
           isDev: true,

@@ -1,4 +1,5 @@
 import { cx } from 'cva';
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import type { Metadata } from 'next';
 import { Geist_Mono, Manrope } from 'next/font/google';
 
@@ -41,6 +42,7 @@ export default (props: React.PropsWithChildren) => {
             </Browser>
           </section>
         </ThemeProvider>
+        <BuildBadge />
       </body>
     </html>
   );

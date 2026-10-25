@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { afterEach, expect, test, vi } from 'vitest';
 
-import { getBuild, otherTrees, readBuild } from './build-server';
+import { getBuild, isSameApp, otherTrees, readBuild } from './build-server';
 
 const gitHere = (...args: string[]) =>
   execFileSync('git', args, { encoding: 'utf8' }).trim();
@@ -54,6 +54,16 @@ test.each([
     expect((await readBuild()).isDev).toBe(isDev);
   },
 );
+
+test('names its app by the folder the dev server runs from', async () => {
+  expect((await readBuild()).app).toBe('kit');
+});
+
+test('another app answering the shared base port is not a sibling', () => {
+  const build = { branch: 'main', isDev: false, sha: '2a407e1f' };
+  expect(isSameApp({ ...build, app: 'kit' })).toBe(true);
+  expect(isSameApp({ ...build, app: 'x-com-chat' })).toBe(false);
+});
 
 test('the next route answers 404 in production, where no git checkout stands behind it', async () => {
   vi.stubEnv('NODE_ENV', 'production');

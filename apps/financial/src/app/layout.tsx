@@ -1,3 +1,4 @@
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import type { Metadata } from 'next';
 
 import { AppProviders } from './AppProviders';
@@ -9,6 +10,7 @@ export default (props: { children: React.ReactNode }) => {
     <html lang='en'>
       <body className={`${body.className} antialiased`}>
         <AppProviders>{props.children}</AppProviders>
+        <BuildBadge />
       </body>
     </html>
   );

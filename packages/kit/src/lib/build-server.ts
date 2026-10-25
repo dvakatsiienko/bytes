@@ -2,9 +2,10 @@ import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { promisify } from 'node:util';
+// through the package's own name: vite loads this file with plain node, which wants an extension, and an app's tsconfig refuses `.ts` in a path
+import type { Build, Other } from '@ui/kit/lib/build';
+import { BUILD_PATH, OTHERS_PATH } from '@ui/kit/lib/build';
 
-import type { Build, Other } from './build.ts';
-import { BUILD_PATH, OTHERS_PATH } from './build.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 const run = promisify(execFile);
@@ -26,8 +27,11 @@ export const readBuild = async (): Promise<Build> => {
     git('rev-parse', '--abbrev-ref', 'HEAD'),
     git('rev-parse', '--short=8', 'HEAD'),
   ]);
-  return { branch, isDev: offsetOf() > 0, sha };
+  return { app: appOf(), branch, isDev: offsetOf() > 0, sha };
 };
+
+/** a dev server runs from its app's folder */
+const appOf = () => basename(process.cwd());
 
 /** every worktree in `git worktree list --porcelain` but the one at `self`; git lists the main checkout first */
 export const otherTrees = (porcelain: string, self: string) =>
@@ -54,9 +58,11 @@ const treeOffset = async (tree: Tree) => {
   return Number(text.trim()) || 0;
 };
 
-const isBuild = (value: unknown): value is Build =>
+/** a build of this same app — the next apps share a base port, so another app may answer it */
+export const isSameApp = (value: unknown): value is Build =>
   typeof value === 'object' &&
   value !== null &&
+  (value as Record<string, unknown>).app === appOf() &&
   typeof (value as Record<string, unknown>).branch === 'string' &&
   typeof (value as Record<string, unknown>).sha === 'string';
 
@@ -85,7 +91,7 @@ export const readOthers = async (): Promise<Other[]> => {
             signal: AbortSignal.timeout(PROBE_MS),
           })
         ).json();
-        if (!isBuild(answer)) return null;
+        if (!isSameApp(answer)) return null;
         const name =
           answer.branch === 'HEAD' ? basename(tree.path) : answer.branch;
         return { ...answer, name, port };
