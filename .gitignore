@@ -3,6 +3,8 @@
 # dependencies
 node_modules
 build
+# the kit's build badge routes are source, not build output
+!apps/*/src/app/api/build/
 dist
 out
 .pnp

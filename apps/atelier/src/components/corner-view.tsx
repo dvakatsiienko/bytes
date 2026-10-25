@@ -1,9 +1,9 @@
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 
 import type { StudioActions } from '../actions.ts';
 import type { Theme } from '../state.ts';
 import { themes } from '../state.ts';
-import { BuildBadge } from './build-badge';
 import { Key } from './key';
 import { Segmented } from './segmented';
 
@@ -43,7 +43,7 @@ export const CornerView = (props: CornerViewProps) => {
           {themeIcon}
         </button>
       </div>
-      <BuildBadge />
+      <BuildBadge placement='inline' />
     </div>
   );
 };

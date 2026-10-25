@@ -256,7 +256,7 @@ function gapsOf(app: App): Gap[] {
       ? [
           {
             detail:
-              'no branch switcher (the branch name + a ⇆ jump between main and live worktrees, no commit sha) — a freebie on any branch, or main once the pr is closed; copy ~/projects/bytes/apps/atelier/src/components/build-badge.tsx',
+              'no branch switcher (the branch name + a ⇆ jump between main and live worktrees, no commit sha) — a freebie on any branch, or main once the pr is closed; render `BuildBadge` from `@ui/kit/components/build-badge` and serve its endpoints from `@ui/kit/lib/build-server`',
             level: 'yellow' as const,
             row: 'branch-badge' as const,
           },

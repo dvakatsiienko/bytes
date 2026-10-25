@@ -1,4 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs';
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import { cn } from '@ui/kit/lib/utils';
 import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
 import type { Metadata, Viewport } from 'next';
@@ -54,6 +55,7 @@ export default async function RootLayout(props: LayoutProps<'/'>) {
               </SidebarProvider>
 
               <JotaiDevtools open={false} position='top-left' />
+              <BuildBadge />
             </ThemeProvider>
           </body>
         </html>

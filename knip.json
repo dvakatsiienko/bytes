@@ -27,9 +27,6 @@
       "ignore": ["src/graphql/generated/**"],
       "ignoreDependencies": ["@graphql-codegen/client-preset"]
     },
-    "apps/trophy-sys": {
-      "ignoreDependencies": ["@ui/kit"]
-    },
     "apps/x-com-chat": {
       "ignoreDependencies": [
         "@tailwindcss/forms",

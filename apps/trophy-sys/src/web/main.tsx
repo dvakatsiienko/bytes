@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import { createRoot } from 'react-dom/client';
 
 import { focusListen, queryClientCreate } from './hooks/queries.ts';
@@ -18,5 +19,6 @@ createRoot(root).render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
     </QueryClientProvider>
+    <BuildBadge />
   </StrictMode>,
 );

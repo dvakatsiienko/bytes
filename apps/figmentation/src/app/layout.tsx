@@ -1,3 +1,4 @@
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
@@ -12,7 +13,10 @@ export default (props: React.PropsWithChildren) => {
         <meta content='width=device-width, initial-scale=1.0' name='viewport' />
       </head>
 
-      <body className={inter.className}>{props.children}</body>
+      <body className={inter.className}>
+        {props.children}
+        <BuildBadge />
+      </body>
     </html>
   );
 };

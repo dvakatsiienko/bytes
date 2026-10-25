@@ -14,15 +14,31 @@ import { defineConfig } from 'vitest/config';
  */
 export default defineConfig({
   test: {
-    browser: {
-      enabled: true,
-      headless: true,
-      instances: [{ browser: 'chromium' }],
-      provider: playwright(),
-    },
-    // `.ts` as well as `.tsx`: `src/lib` and `src/hooks` are plain TypeScript,
-    // and a `.tsx`-only glob would skip a test there without saying so.
-    include: ['src/**/*.test.{ts,tsx}'],
-    setupFiles: ['./vitest.setup.ts'],
+    projects: [
+      {
+        test: {
+          browser: {
+            enabled: true,
+            headless: true,
+            instances: [{ browser: 'chromium' }],
+            provider: playwright(),
+          },
+          // `.ts` as well as `.tsx`: `src/lib` and `src/hooks` are plain TypeScript,
+          // and a `.tsx`-only glob would skip a test there without saying so.
+          exclude: ['src/**/*.node.test.ts'],
+          include: ['src/**/*.test.{ts,tsx}'],
+          name: 'browser',
+          setupFiles: ['./vitest.setup.ts'],
+        },
+      },
+      // the build badge's server half runs git and probes ports, which only node can
+      {
+        test: {
+          environment: 'node',
+          include: ['src/**/*.node.test.ts'],
+          name: 'node',
+        },
+      },
+    ],
   },
 });

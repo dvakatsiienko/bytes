@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
+/* the kit's dev-only branch badge: only its two files, not the whole kit */
+@source "../../../../packages/kit/src/components/build-badge.tsx";
+@source "../../../../packages/kit/src/components/button.tsx";
 
 /*
  * Greenbar: the pale-banded continuous-feed paper that line printers used for
@@ -14,6 +17,14 @@
   --color-rule: #c9d2c6;
   --color-seal: #0b5d3b;
   --color-flag: #b4441f;
+
+  /* the kit vocabulary the branch badge reads, mapped onto greenbar */
+  --color-popover: var(--color-paper);
+  --color-muted: var(--color-bar);
+  --color-foreground: var(--color-ink);
+  --color-muted-foreground: var(--color-ink-soft);
+  --color-border: var(--color-rule);
+  --color-ring: var(--color-seal);
 
   --animate-shimmer: shimmer 2s ease-in-out infinite;
 

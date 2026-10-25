@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { ApolloProvider } from '@apollo/client/react';
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ const App = (
         <Pages />
       </ApolloProvider>
     </Router>
+    <BuildBadge />
   </StrictMode>
 );
 

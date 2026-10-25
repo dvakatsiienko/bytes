@@ -6,7 +6,6 @@ import type * as piecesModule from '../art/pieces.ts';
 import { isTime } from '../art/time.ts';
 import { errorText } from '../src/error-text.ts';
 import type * as settingsModule from '../src/stage/settings.ts';
-import { readBuild, readOthers } from './build.ts';
 import { closeBrowser, shoot } from './shot.ts';
 import type { Stash, Take, TakePatch } from './takes.ts';
 import {
@@ -79,12 +78,6 @@ const route = async (
   )) as typeof settingsModule;
   const url = new URL(req.url ?? '/', 'http://atelier');
   const parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
-
-  if (req.method === 'GET' && parts[0] === 'build' && parts.length === 1)
-    return send(res, 200, await readBuild());
-  // separate from /api/build, which answers for itself only: two servers probing each other's probe would never end
-  if (req.method === 'GET' && parts[0] === 'ateliers' && parts.length === 1)
-    return send(res, 200, await readOthers());
 
   if (req.method === 'POST' && parts[0] === 'shot' && parts.length === 1) {
     const body = await readBody(req);
