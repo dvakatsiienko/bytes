@@ -4,7 +4,6 @@ import { extname, join, relative, resolve, sep } from 'node:path';
 import type { Plugin, ViteDevServer } from 'vite';
 import { z } from 'zod';
 
-import { readBuild, readOthers } from './build.ts';
 import {
   InputError,
   boardsDirOf,
@@ -93,15 +92,6 @@ const routeApi = async (
   res: ServerResponse,
 ) => {
   const path = new URL(req.url ?? '/', 'http://loupe').pathname;
-  if (req.method === 'GET' && path === '/build') {
-    send(res, 200, await readBuild());
-    return;
-  }
-  // apart from /api/build, which answers for itself only: two servers probing each other's probe would never end
-  if (req.method === 'GET' && path === '/loupes') {
-    send(res, 200, await readOthers());
-    return;
-  }
   if (req.method === 'GET' && path === '/job') {
     send(res, 200, await readJob(jobDir));
     return;

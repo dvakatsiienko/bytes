@@ -1,10 +1,14 @@
 import { execFileSync } from 'node:child_process';
 import { afterEach, expect, test, vi } from 'vitest';
 
-import { otherTrees, readBuild } from './build.ts';
+import { getBuild, otherTrees, readBuild } from './build-server';
 
 const gitHere = (...args: string[]) =>
   execFileSync('git', args, { encoding: 'utf8' }).trim();
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 test('names the branch and the 8-character sha of the checkout it serves from', async () => {
   const build = await readBuild();
@@ -39,10 +43,6 @@ test('lists every worktree but its own, detached ones included', () => {
   ]);
 });
 
-afterEach(() => {
-  vi.unstubAllEnvs();
-});
-
 test.each([
   ['10', true],
   ['0', false],
@@ -54,3 +54,8 @@ test.each([
     expect((await readBuild()).isDev).toBe(isDev);
   },
 );
+
+test('the next route answers 404 in production, where no git checkout stands behind it', async () => {
+  vi.stubEnv('NODE_ENV', 'production');
+  expect((await getBuild()).status).toBe(404);
+});

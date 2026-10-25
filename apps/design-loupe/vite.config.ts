@@ -2,6 +2,7 @@ import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vitePluginTailwind from '@tailwindcss/vite';
+import { buildBadgeVite } from '@ui/kit/lib/build-server';
 import vitePluginReact from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -18,6 +19,7 @@ export default defineConfig({
   plugins: [
     vitePluginReact({ compiler: true }),
     vitePluginTailwind(),
+    buildBadgeVite(),
     loupeApi({ jobDir, runtime: runtimeOf(appDir) }),
   ],
   resolve: {
