@@ -92,8 +92,8 @@ jobs:
       github.event.label.name == '🤖 review:requested'
     # 📌 Everything past this line — the cap, the reviewer, the gate — lives in
     # `review-round.yml`, shared with frame's caller. It is called at `@main`,
-    # never as `./`: a local call would run the PR's own copy, so a PR could
-    # edit the reviewer that judges it. That file's header says the rest.
+    # never as `./`: a local call would run the PR's own copy of the round.
+    # That file's header says what `@main` holds and what it does not.
     uses: dvakatsiienko/bytes/.github/workflows/review-round.yml@main
     # A called workflow can only narrow the token it is handed, so the caller
     # grants everything the round needs.

@@ -8,11 +8,14 @@ name: review-round
 # together, and nothing drifts between them.
 #
 # 🚨 Callers call this at `@main`, never as `./`. A local call runs the copy on
-# the PR's own head, so a PR could lift its own cap or green its own gate by
-# editing this file. At `@main` the logic that judges a PR is the logic already
-# merged, the same anchor the gate code below has always used. The cost: a PR
-# that changes this file is reviewed by the old copy, and the very first PR
-# that adds it finds nothing to call.
+# the PR's own head, so editing THIS file would change the round judging the
+# PR. At `@main` it is the copy already merged, the same anchor the gate code
+# below has always used. 📌 It does not stop a PR from editing its caller to
+# point somewhere else — a `labeled` run takes the PR's copy of `review.yml`.
+# That door is held the way it always was: the action refuses itself on a PR
+# that edits a workflow, and the guard ends that round red. The cost: a PR that
+# changes this file is reviewed by the old copy, and the very first PR that
+# adds it finds nothing to call.
 #
 # Everything about the calling repo is read from it: `github.*` here is the
 # caller's context, so the event, the PR, the repository and the token's repo
@@ -236,10 +239,10 @@ jobs:
 
             Raise every finding you would block a merge on as an INLINE THREAD
             on the line it concerns, even when you also describe it in your
-            comment. A thread is the only form a later check can see answered:
-            once the two-round cap is spent, a push is allowed through only when
-            each of your threads carries a reply, and findings that exist only
-            as prose cannot be checked off at all. Prose is right for a summary
+            comment. A thread is the only form the coder can answer in place:
+            there is one round per PR, the fixes after it are checked against
+            your threads, and findings that exist only as prose cannot be
+            checked off at all. Prose is right for a summary
             and for anything you are not blocking on.
 
             Be terse. Every line you write is read back into the coder's
