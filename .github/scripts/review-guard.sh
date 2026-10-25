@@ -19,7 +19,7 @@
 #
 # An ANSWERED thread counts as handled, deliberately. A finding the coder
 # declines with a reason is work Dima reads in the PR, not a reason to block
-# correct code — without that rule, one disagreement plus the two-round cap is a
+# correct code — without that rule, one disagreement plus the one-round cap is a
 # deadlock with no way out.
 #
 # 📌 This exits 0 on almost every path. The verdict is the check run; the job's

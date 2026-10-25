@@ -78,9 +78,9 @@ jobs:
     #
     # 📌 Sharper than it was written: the refusal is about a workflow ALREADY on
     # the default branch. #75 created this file and the reviewer reviewed it
-    # twice; every PR that edits it afterwards — this one included — gets a
-    # stand-down and a red `review:clean`, which is why the gate's own decision
-    # lives in a file with saved-payload cases rather than only in this yaml.
+    # twice; every PR that edits it afterwards gets a stand-down and a red
+    # `review:clean`, which is why the gate's own decision lives in a file with
+    # saved-payload cases rather than only in yaml.
     #
     # 📌 The action ships its own `label_trigger` input and this predicate is
     # NOT it, deliberately. `label_trigger` is read inside the action, which is
@@ -90,10 +90,8 @@ jobs:
     if: >-
       github.event.action == 'labeled' &&
       github.event.label.name == '🤖 review:requested'
-    # 📌 Everything past this line — the cap, the reviewer, the gate — lives in
-    # `review-round.yml`, shared with frame's caller. It is called at `@main`,
-    # never as `./`: a local call would run the PR's own copy of the round.
-    # That file's header says what `@main` holds and what it does not.
+    # 📌 The cap, the reviewer and the gate live in `review-round.yml`, shared
+    # with frame's caller; its header says why the call is pinned to `@main`.
     uses: dvakatsiienko/bytes/.github/workflows/review-round.yml@main
     # A called workflow can only narrow the token it is handed, so the caller
     # grants everything the round needs.

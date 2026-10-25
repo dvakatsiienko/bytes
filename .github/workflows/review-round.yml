@@ -99,7 +99,10 @@ jobs:
       # It costs one thing: a PR legitimately stacked on another branch is judged
       # by `main`'s gate rather than its base's. For infrastructure that only
       # ever lives on `main`, that is the right answer rather than a compromise.
-      # bytes is public, so the fetch needs no token.
+      # Named outright rather than read from `job.workflow_repository` and
+      # `job.workflow_sha`: those are newer than actionlint, and an empty one
+      # would leave every round red. bytes is public, so the fetch needs no
+      # token.
       - id: gate
         env:
           GATE_REPO: https://github.com/dvakatsiienko/bytes.git
@@ -112,7 +115,7 @@ jobs:
              git archive FETCH_HEAD .github/review-gate.jq .github/scripts | tar -x -C "$dir"; then
             echo "state=ok" >> "$GITHUB_OUTPUT"
             echo "dir=$dir" >> "$GITHUB_OUTPUT"
-            echo "gate code taken from bytes $BASE"
+            echo "gate code taken from $GATE_REPO at $BASE"
           else
             echo "state=missing" >> "$GITHUB_OUTPUT"
             echo "::warning::the gate is not on the base revision — this head cannot be judged"
