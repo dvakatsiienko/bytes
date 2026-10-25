@@ -1,4 +1,5 @@
 import vitePluginTailwind from '@tailwindcss/vite';
+import { buildBadgeVite } from '@ui/kit/lib/build-server';
 import vitePluginReact from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -7,7 +8,11 @@ const API_PORT = Number(
 );
 
 export default defineConfig({
-  plugins: [vitePluginReact({ compiler: true }), vitePluginTailwind()],
+  plugins: [
+    vitePluginReact({ compiler: true }),
+    vitePluginTailwind(),
+    buildBadgeVite(),
+  ],
   // `@ui/kit` is consumed as source, so its React import must be the app's own.
   resolve: { dedupe: ['react', 'react-dom'] },
   server: {
