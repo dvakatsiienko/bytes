@@ -32,10 +32,4 @@ minimumReleaseAgeExclude:
   - its-fine@2.1.1
   - three@0.186.1
 
-# one @types/react copy: @visx/event (via prisma studio) still ranges 19.2.x and next's styled-jsx types
-# resolve the hoisted copy. drop the block when `pnpm why @types/react` shows one version without it.
-overrides:
-  '@types/react': 19.3.0
-  '@types/react-dom': 19.3.0
-
 autoDedupe: true
