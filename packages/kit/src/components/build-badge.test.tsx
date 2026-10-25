@@ -55,9 +55,12 @@ test('a worktree shows its branch and a jump to main on main’s port', async ()
 });
 
 test('an app with no endpoint renders nothing, even when a spa fallback answers with html', async () => {
-  vi.stubGlobal('fetch', answers({}));
+  const fetchMock = answers({});
+  vi.stubGlobal('fetch', fetchMock);
   const screen = await render(<BuildBadge />);
 
-  await new Promise((resolve) => setTimeout(resolve, 50));
+  // the html answer has been read once the badge's own ask settles
+  await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
+  await fetchMock.mock.results[0]?.value;
   expect(screen.container.querySelector('[data-slot=build-badge]')).toBeNull();
 });

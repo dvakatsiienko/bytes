@@ -46,7 +46,7 @@ export const BuildBadge = (props: BuildBadgeProps) => {
     <div
       className={cn(
         'hidden min-w-0 items-center gap-1 sm:flex',
-        props.placement === 'inline' ? '' : cornerClass,
+        props.placement !== 'inline' && cornerClass,
       )}
       data-slot='build-badge'>
       <span
@@ -73,8 +73,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const readJson = async <T,>(path: string, signal: AbortSignal) => {
   try {
     const answer = await fetch(path, { signal });
-    if (!(answer.ok && answer.headers.get('content-type')?.includes('json')))
-      return null;
+    if (!answer.ok) return null;
     return (await answer.json()) as T;
   } catch {
     return null;
