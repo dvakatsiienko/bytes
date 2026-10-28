@@ -11,12 +11,12 @@
       flashes the wrong theme. No stored value means follow the OS.
     -->
     <script>
-      "use strict";
-      {
-        const stored = localStorage.getItem("theme");
-        if (stored === "light" || stored === "dark")
-          document.documentElement.dataset.theme = stored;
-      }
+    'use strict';
+    {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light' || stored === 'dark')
+        document.documentElement.dataset.theme = stored;
+    }
     </script>
   </head>
   <body>
