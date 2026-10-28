@@ -81,18 +81,18 @@ export const Board = (props: BoardProps) => {
           width: `calc(${props.board.w}px * var(--zoom, 1))`,
         }}>
         <span
-          className='block truncate font-medium text-desk-ink text-sm'
+          className='text-desk-ink block truncate text-sm font-medium'
           title={props.board.title}>
           {props.board.title}
         </span>
       </KeepScale>
       <Virtualize
-        className='absolute inset-0 bg-background shadow-sm'
+        className='bg-background absolute inset-0 shadow-sm'
         height={props.board.h}
         margin={NEAR_MARGIN}
         placeholder={
           <div
-            className='absolute inset-0 grid place-items-center bg-background/60 shadow-sm'
+            className='bg-background/60 absolute inset-0 grid place-items-center shadow-sm'
             data-placeholder>
             <KeepScale>
               <span className='text-desk-ink text-sm'>{props.board.title}</span>
@@ -109,6 +109,8 @@ export const Board = (props: BoardProps) => {
           inert={!props.isLive}
           key={props.board.rev}
           ref={setFrame}
+          // same-origin on purpose: the loupe reads the board's document to place the ring
+          sandbox='allow-scripts allow-same-origin'
           src={src}
           style={{ pointerEvents: props.isLive ? 'auto' : 'none' }}
           tabIndex={props.isLive ? 0 : -1}
@@ -136,7 +138,7 @@ export const Board = (props: BoardProps) => {
       {props.isLive ? null : (
         <button
           aria-label={`use ${props.board.title} — hover and play; Esc returns to panning`}
-          className='absolute inset-0 cursor-grab bg-transparent outline-none transition-colors hover:bg-loupe/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:cursor-grabbing'
+          className='hover:bg-loupe/[0.04] focus-visible:ring-ring absolute inset-0 cursor-grab bg-transparent transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset active:cursor-grabbing'
           // a press that moves is a pan, never a click
           onClick={(event) => {
             const start = downAt.current;
