@@ -1,48 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
-  "timezone": "Europe/Kyiv",
-  "semanticCommits": "disabled",
-  "commitMessagePrefix": "🌲 evergreen:",
-  "rangeStrategy": "bump",
-  "minimumReleaseAge": "3 days",
-  "osvVulnerabilityAlerts": true,
-  "abandonmentThreshold": "1 year",
-  "internalChecksFilter": "strict",
-  "prCreation": "not-pending",
-  "separateMajorMinor": true,
-  "separateMinorPatch": true,
+  "extends": [
+    "github>dvakatsiienko/frame//renovate/default",
+    "helpers:pinGitHubActionDigests"
+  ],
   "packageRules": [
     {
-      "description": "toolchain pins are owned by `pnpm toolchain:sync` (installed node + pnpm are the truth): .node-version, packageManager and engines never move here — #41 re-pinned node to a patch fnm did not have",
-      "enabled": false,
-      "matchManagers": ["nodenv", "nvm"]
-    },
-    {
-      "description": "same contract for the manifest fields",
-      "enabled": false,
-      "matchDepTypes": ["packageManager", "engines"]
-    },
-    {
-      "description": "patches: one grouped pr overnight, automerged once ci is green",
-      "matchUpdateTypes": ["patch", "pin", "pinDigest", "digest"],
-      "groupName": "patches",
-      "schedule": ["* 0-5 * * *"],
-      "automerge": true,
-      "automergeType": "pr"
-    },
-    {
-      "description": "minors: one grouped pr on wednesday, merged by hand. the whole day, never a morning window: the hosted app's runs missed a 4-hour window 5 weeks of 6 (2026-10-13)",
-      "matchUpdateTypes": ["minor"],
-      "groupName": "minors",
-      "schedule": ["* * * * 3"]
-    },
-    {
-      "description": "0.x never automerges: semver lets a 0.x package break in a patch, so these ride the wednesday pr for a human to read. renovate's own matchUpdateTypes docs say to do this. last rule on purpose — later rules win, so this overrides the patch tier above. matchCurrentVersion prefers the locked version, so it catches a 0.x behind a range too.",
-      "matchCurrentVersion": "/^0\\./",
-      "groupName": "minors",
-      "schedule": ["* * * * 3"],
-      "automerge": false
+      "automergeSchedule": ["* 7-9 * * *"],
+      "description": "a bytes merge redeploys prod: the nightly patches pr merges only in dima's morning, 07:00–10:00 Kyiv",
+      "matchUpdateTypes": ["patch", "pin", "pinDigest", "digest"]
     },
     {
       "description": "jotai major is held in x-com-chat: jotai 3 removed the INTERNAL_buildStoreRev3 export that jotai-devtools imports, and devtools' peer range `>=2.20.0` admits jotai 3 anyway, so nothing warns — the prod build just dies in turbopack. lift this the day a stable jotai-devtools (>0.14.0, not the 0.15.0-alpha) declares jotai 3. app-scoped on purpose; no other app uses jotai.",
