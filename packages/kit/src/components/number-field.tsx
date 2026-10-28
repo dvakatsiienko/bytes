@@ -5,7 +5,7 @@ import { cn } from 'cn';
 
 // The whole text must be a plain decimal: no exponent, no hex, no stray letters.
 // `Number()` alone would take `1e3` and `0x10`, which nobody types on purpose.
-const DECIMAL = /^[-+]?(\d+\.?\d*|\.\d+)$/;
+const DECIMAL = /^[-+]?(?:\d+\.?\d*|\.\d+)$/u;
 
 const parse = (text: string) =>
   DECIMAL.test(text.trim()) ? Number(text) : null;

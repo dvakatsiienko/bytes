@@ -16,7 +16,7 @@ export class UserAPI extends RESTDataSource {
 
   private readonly userEmail: string | null;
 
-  async findOrCreate(email?: string | null) {
+  static async findOrCreate(email?: string | null) {
     const parsed = emailSchema.safeParse(email);
 
     if (!parsed.success) {
@@ -38,7 +38,7 @@ export class UserAPI extends RESTDataSource {
 
   async bookTrips(launchIds: string[]) {
     const email = this.validateAuth();
-    const user = await this.getUser(email);
+    const user = await UserAPI.getUser(email);
 
     const uniqueIds = [...new Set(launchIds)];
 
@@ -82,7 +82,7 @@ export class UserAPI extends RESTDataSource {
     return trip !== null;
   }
 
-  private async getUser(email: string) {
+  private static async getUser(email: string) {
     const user = await prismaClient.user.findUnique({
       include: { trips: true },
       where: { email },

@@ -66,8 +66,8 @@ const namePart = (name: string, index: number) => {
 const slug = (value: string) =>
   value
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[^a-z0-9]+/gu, '-')
+    .replace(/^-|-$/gu, '');
 
 /**
  * The launch id, and the one derivation a booking depends on.

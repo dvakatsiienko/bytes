@@ -52,15 +52,12 @@
   }
 
   button {
+    cursor: pointer;
     @apply border-none;
   }
   /* Undo @tailwindcss/forms styles */
 
   /* Define styles */
-  button {
-    cursor: pointer;
-  }
-
   :is(a):hover {
     @apply text-link-hover;
   }
