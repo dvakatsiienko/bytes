@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**"]
+    /* yaml.formatter.enabled skips `.yaml` but not `.yml` on biome 2.6.3, so yaml leaves biome by path */
+    "includes": ["**", "!**/*.yml", "!**/*.yaml"]
   },
   "vcs": {
     "clientKind": "git",
@@ -99,6 +100,14 @@
       "bracketSpacing": true,
       "attributePosition": "auto"
     }
+  },
+  /* biome 2.6 formats markdown and yaml: markdown is hand-shaped prose, yaml is indent-read by tools
+     (workflows, lockfiles, codegen), so neither is a formatter's call */
+  "markdown": {
+    "formatter": { "enabled": false }
+  },
+  "yaml": {
+    "formatter": { "enabled": false }
   },
   "json": {
     "formatter": {
