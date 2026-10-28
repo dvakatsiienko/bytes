@@ -51,6 +51,7 @@ function ProgressIndicator({
 
 function ProgressLabel({ className, ...props }: ProgressPrimitive.Label.Props) {
   return (
+    // biome-ignore lint/a11y/noLabelWithoutControl: base ui's progress label names the bar through aria-labelledby, no input to wrap
     <ProgressPrimitive.Label
       className={cn('text-sm font-medium', className)}
       data-slot='progress-label'

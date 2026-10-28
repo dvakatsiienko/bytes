@@ -18,10 +18,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@tanstack/react-query": "5.103.3",
-    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-query": "5.105.0",
+    "@tanstack/react-router": "1.170.46",
     "@ui/kit": "workspace:*",
-    "@upstash/redis": "1.38.4",
+    "@upstash/redis": "1.40.0",
     "@visx/axis": "4.0.0",
     "@visx/grid": "4.0.0",
     "@visx/group": "4.0.0",
@@ -29,19 +29,19 @@
     "@visx/scale": "4.0.0",
     "@visx/shape": "4.0.0",
     "@visx/tooltip": "4.0.0",
-    "motion": "14.0.0",
+    "motion": "14.7.1",
     "psn-api": "2.18.1",
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@fontsource-variable/jetbrains-mono": "5.3.0",
     "@tailwindcss/vite": "4.3.3",
     "@vitejs/plugin-react": "6.1.2",
     "esbuild": "0.28.2",
-    "oxc-transform-react": "0.150.0",
-    "shadcn": "4.21.2",
-    "undici": "8.10.2",
-    "vite": "8.3.2"
+    "oxc-transform-react": "0.156.0",
+    "shadcn": "4.23.0",
+    "undici": "8.12.3",
+    "vite": "8.3.5"
   }
 }

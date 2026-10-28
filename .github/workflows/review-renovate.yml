@@ -16,8 +16,8 @@ name: review-renovate
 # expensive way, through a PR's files and then through a PR's base field.
 on:
   workflow_run:
-    workflows: [CI]
-    types: [completed]
+    workflows: [ CI ]
+    types: [ completed ]
 
 concurrency:
   group: review-renovate-${{ github.event.workflow_run.head_branch }}
@@ -34,10 +34,11 @@ jobs:
     #   prefix trustworthy: a human or the coder pushing to a `renovate/*`
     #   branch is the actor on that run, and this lane stands down. Without it
     #   the gate has a door marked «name your branch renovate/anything».
+    #   renovate runs as our own app since FRM-465, so its login is `x-renovate[bot]`.
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
       startsWith(github.event.workflow_run.head_branch, 'renovate/') &&
-      github.event.workflow_run.actor.login == 'renovate[bot]'
+      github.event.workflow_run.actor.login == 'x-renovate[bot]'
     runs-on: ubuntu-latest
     permissions:
       checks: write

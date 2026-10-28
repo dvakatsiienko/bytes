@@ -73,7 +73,7 @@ const formatValue = (row: ControlRow, settings: Settings) => {
 
 /* Helpers */
 
-const SPACES = /\s+/;
+const SPACES = /\s+/u;
 
 const decimalsOf = (step: number) =>
   step >= 1 ? 0 : (String(step).split('.')[1]?.length ?? 0);

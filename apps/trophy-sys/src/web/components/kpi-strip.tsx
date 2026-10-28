@@ -100,7 +100,7 @@ export const KpiStrip = (props: KpiStripProps) => {
 
 /* Helpers */
 const numberFormat = (value: number) =>
-  value.toLocaleString('en-US').replace(/,/g, ' ');
+  value.toLocaleString('en-US').replace(/,/gu, ' ');
 
 /* Types */
 interface KpiStripProps {

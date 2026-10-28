@@ -233,7 +233,7 @@ export const controls = [
   },
 ] as const satisfies readonly ControlGroup[];
 
-const HEX = /^#[0-9a-f]{6}$/i;
+const HEX = /^#[0-9a-f]{6}$/iu;
 
 export const isHex = (value: string): value is Hex => HEX.test(value);
 

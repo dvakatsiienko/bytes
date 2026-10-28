@@ -95,7 +95,7 @@ const rejection = (cause: unknown) => {
   return REFUSAL.test(cause instanceof Error ? cause.message : String(cause));
 };
 
-const REFUSAL = /access code|npsso/i;
+const REFUSAL = /access code|npsso/iu;
 
 /**
  * A session from PSN's token response, or null when the response is not one.

@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useState } from 'react';
+import { cn } from '@ui/kit/lib/utils';
 import type { UIMessage as TMessage } from 'ai';
 import equal from 'fast-deep-equal';
 import { ChevronDownIcon, ChevronUpIcon, SparklesIcon } from 'lucide-react';
@@ -13,8 +14,6 @@ const Markdown = dynamic(
   () => import('./Markdown').then((mod) => mod.Markdown),
   { ssr: false },
 );
-
-import { cn } from '@ui/kit/lib/utils';
 
 const AnimatedBorder = (props: React.PropsWithChildren) => {
   return (

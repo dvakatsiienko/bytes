@@ -45,10 +45,10 @@ const ALIASES = new Map([
 ]);
 
 const ROMAN = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'];
-const NON_ALNUM = /[^a-z0-9]/g;
-const ARABIC = /\b(10|[1-9])\b/g;
-const TRAILING_TROPHIES = /trophies$/;
-const TRAILING_REMASTERED = /remastered$/;
+const NON_ALNUM = /[^a-z0-9]/gu;
+const ARABIC = /\b(?:10|[1-9])\b/gu;
+const TRAILING_TROPHIES = /trophies$/u;
+const TRAILING_REMASTERED = /remastered$/u;
 
 /**
  * Edition suffixes the two endpoints disagree about: the trophy list carries
@@ -67,8 +67,9 @@ const EDITIONS = [
   'gotyedition',
   'directorscut',
 ];
-const TRAILING_EDITION = new RegExp(`(?:${EDITIONS.join('|')})$`);
-const DURATION = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+const TRAILING_EDITION = new RegExp(`(?:${EDITIONS.join('|')})$`, 'u');
+const DURATION =
+  /PT(?:(?<hours>\d+)H)?(?:(?<minutes>\d+)M)?(?:(?<seconds>\d+)S)?/u;
 
 /** Second pass, applied only to names the exact match missed. */
 export const nameKeyLoose = (name: string) => {
@@ -86,7 +87,7 @@ export const nameKeyLoose = (name: string) => {
 const secondsParse = (duration: string) => {
   const parts = duration.match(DURATION);
   if (!parts) return 0;
-  const [, hours, minutes, seconds] = parts;
+  const { hours, minutes, seconds } = parts.groups ?? {};
   return (
     Number(hours ?? 0) * 3600 + Number(minutes ?? 0) * 60 + Number(seconds ?? 0)
   );
@@ -106,6 +107,7 @@ interface Entry {
 }
 
 const recordsMerge = (a: PlayRecord, b: PlayRecord): PlayRecord => ({
+  // biome-ignore lint/complexity/useMathMinMax: playedAt is an ISO string; Math.max would return NaN
   playedAt: a.playedAt > b.playedAt ? a.playedAt : b.playedAt,
   seconds: a.seconds + b.seconds,
 });

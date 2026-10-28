@@ -79,16 +79,14 @@
   --ground-muted: #b9c3c9;
 }
 
-/* a night piece sits on a dark ground whatever the theme: a pale surround reads its darks darker */
 [data-time="night"] {
+  /* a night piece sits on a dark ground whatever the theme: a pale surround reads its darks darker */
   --ground: #0e1216;
   --ground-ink: #f2f5f7;
   --ground-muted: #b9c3c9;
-}
 
-/* the readme chrome follows the time of day, not the studio theme: a night
-   shot is judged on github's dark page */
-[data-time="night"] {
+  /* the readme chrome follows the time of day, not the studio theme: a night
+     shot is judged on github's dark page */
   --gh: #0d1117;
   --gh-line: #30363d;
   --gh-muted: #9198a1;

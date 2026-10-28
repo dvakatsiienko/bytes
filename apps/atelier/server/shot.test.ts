@@ -36,7 +36,7 @@ test('a shot after chromium died gets a live browser, not the dead one', async (
 
 const { shoot } = await import('./shot.ts');
 
-const NO_MOTION = /no motion/;
+const NO_MOTION = /no motion/u;
 
 test('a loop of a scene with no motion is refused, not shot as a still', async () => {
   const load = (path: string) =>

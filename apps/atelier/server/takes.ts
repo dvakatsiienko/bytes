@@ -14,7 +14,7 @@ const takesRoot = () => process.env.ATELIER_TAKES_DIR ?? join(appRoot, 'takes');
 /** the art a shot reads: a change to any of these files changes the hash */
 const sourceRoots = ['art', 'src/stage'];
 
-const TAKE_ID = /^\d{2,}-[a-z0-9-]+$/;
+const TAKE_ID = /^\d{2,}-[a-z0-9-]+$/u;
 export const TAKE_FILES = ['shot.webp', 'piece.svg'] as const;
 
 const readJson = async (path: string): Promise<unknown> =>
@@ -49,8 +49,8 @@ const sourceHash = async () => {
 const slugOf = (text: string) =>
   text
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+    .replace(/[^a-z0-9]+/gu, '-')
+    .replace(/^-|-$/gu, '')
     .split('-')
     .slice(0, 4)
     .join('-');

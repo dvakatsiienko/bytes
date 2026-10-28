@@ -5,7 +5,40 @@ import { prismaClient } from '@/lib';
 
 import { sessionGone } from '@/utils';
 
-const emailSchema = z.string().email();
+const emailSchema = z.email();
+
+export const findOrCreateUser = async (email?: string | null) => {
+  const parsed = emailSchema.safeParse(email);
+
+  if (!parsed.success) {
+    throw new Error('A valid email is required.');
+  }
+
+  const validEmail = parsed.data;
+
+  const user = await prismaClient.user.upsert({
+    create: { email: validEmail },
+    include: { trips: true },
+    update: {},
+    where: { email: validEmail },
+  });
+
+  // token is derived from the email, not persisted — expose it as a computed field
+  return { ...user, token: Buffer.from(validEmail).toString('base64') };
+};
+
+const getUser = async (email: string) => {
+  const user = await prismaClient.user.findUnique({
+    include: { trips: true },
+    where: { email },
+  });
+
+  if (user === null) {
+    throw sessionGone('User not found.');
+  }
+
+  return user;
+};
 
 export class UserAPI extends RESTDataSource {
   constructor(userEmail: string | null) {
@@ -16,29 +49,9 @@ export class UserAPI extends RESTDataSource {
 
   private readonly userEmail: string | null;
 
-  async findOrCreate(email?: string | null) {
-    const parsed = emailSchema.safeParse(email);
-
-    if (!parsed.success) {
-      throw new Error('A valid email is required.');
-    }
-
-    const validEmail = parsed.data;
-
-    const user = await prismaClient.user.upsert({
-      create: { email: validEmail },
-      include: { trips: true },
-      update: {},
-      where: { email: validEmail },
-    });
-
-    // token is derived from the email, not persisted — expose it as a computed field
-    return { ...user, token: Buffer.from(validEmail).toString('base64') };
-  }
-
   async bookTrips(launchIds: string[]) {
     const email = this.validateAuth();
-    const user = await this.getUser(email);
+    const user = await getUser(email);
 
     const uniqueIds = [...new Set(launchIds)];
 
@@ -80,19 +93,6 @@ export class UserAPI extends RESTDataSource {
     });
 
     return trip !== null;
-  }
-
-  private async getUser(email: string) {
-    const user = await prismaClient.user.findUnique({
-      include: { trips: true },
-      where: { email },
-    });
-
-    if (user === null) {
-      throw sessionGone('User not found.');
-    }
-
-    return user;
   }
 
   validateAuth() {

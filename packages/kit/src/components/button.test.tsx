@@ -14,7 +14,7 @@ import { Button } from './button';
 
 // Case-insensitive: the assertion should survive playwright rewording its own
 // error, which is prose, not contract.
-const TIMED_OUT = /timeout/i;
+const TIMED_OUT = /timeout/iu;
 
 /** What both sides of the variant comparison collapse to when no stylesheet loaded. */
 const NO_STYLESHEET_BLACK = 'rgb(0, 0, 0)';

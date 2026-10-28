@@ -1,10 +1,9 @@
 import { BuildBadge } from '@ui/kit/components/build-badge';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import '@/theme/init.css';
 
 const inter = Inter({ subsets: ['latin'] });
-
-import '@/theme/init.css';
 
 export default (props: React.PropsWithChildren) => {
   return (

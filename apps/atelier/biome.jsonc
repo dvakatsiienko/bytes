@@ -13,6 +13,11 @@
   },
   "overrides": [
     {
+      // written by glyphs.py; its " " key is the space glyph, which the rule reads as empty
+      "includes": ["art/fonts/glyphs.json"],
+      "linter": { "rules": { "suspicious": { "noEmptyObjectKeys": "off" } } }
+    },
+    {
       // The drawing and the stage are generative code: seeded random numbers
       // are bit arithmetic (`Math.imul`, `>>> 0`), and pixel and point loops
       // count with `++`. Both rules are right for app code and wrong here.

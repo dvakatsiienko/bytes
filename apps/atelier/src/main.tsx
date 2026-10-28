@@ -12,7 +12,7 @@ import '@/theme.css';
 
 trackModality();
 
-const rootNode = document.getElementById('root');
+const rootNode = document.querySelector('#root');
 const shotPiece = new URLSearchParams(location.search).get('shot');
 
 if (rootNode) {

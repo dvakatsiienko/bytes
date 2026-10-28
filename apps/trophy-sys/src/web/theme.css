@@ -125,6 +125,7 @@
  * as the same accent the panels already use. `--radius` is 0 because the app
  * draws square boxes everywhere and uses no `rounded-*` utility of its own.
  */
+/* biome-ignore lint/suspicious/noDuplicateSelectors: the L2 mapping is its own layer over the palette block above */
 :root {
   --background: var(--p-bg);
   --foreground: var(--p-fg);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type ComponentProps, useState } from 'react';
 import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
@@ -9,24 +9,32 @@ import { NumberField } from './number-field';
  * The field is controlled, so every test mounts it with real state: a spy
  * alone would show what was reported, not what the field then displays.
  */
+const ControlledField = (props: ControlledFieldProps) => {
+  const [value, setValue] = useState(0.6);
+
+  return (
+    <NumberField
+      aria-label='ambient'
+      max={props.max}
+      onValueChange={(next) => {
+        setValue(next);
+        props.onValueChange(next);
+      }}
+      step={props.step ?? 0.01}
+      value={value}
+    />
+  );
+};
+
 const renderField = async (props: { max?: number; step?: number } = {}) => {
   const onValueChange = vi.fn();
-  function Harness() {
-    const [value, setValue] = useState(0.6);
-    return (
-      <NumberField
-        aria-label='ambient'
-        onValueChange={(next) => {
-          setValue(next);
-          onValueChange(next);
-        }}
-        step={0.01}
-        value={value}
-        {...props}
-      />
-    );
-  }
-  return { onValueChange, screen: await render(<Harness />) };
+
+  return {
+    onValueChange,
+    screen: await render(
+      <ControlledField onValueChange={onValueChange} {...props} />,
+    ),
+  };
 };
 
 test('typed garbage never reaches the value and blur restores it', async () => {
@@ -164,3 +172,10 @@ test('a bad edit after arrow steps restores the stepped value', async () => {
 
   await expect.element(field).toHaveValue('0.62');
 });
+
+/* Types */
+
+type ControlledFieldProps = Pick<
+  ComponentProps<typeof NumberField>,
+  'max' | 'onValueChange' | 'step'
+>;

@@ -13,7 +13,7 @@ import {
 } from './job.ts';
 
 let job: string;
-const shortHash = /^[0-9a-f]{8}$/;
+const shortHash = /^[0-9a-f]{8}$/u;
 
 beforeEach(() => {
   job = mkdtempSync(join(tmpdir(), 'loupe-job-'));

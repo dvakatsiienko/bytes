@@ -109,6 +109,8 @@ export const Board = (props: BoardProps) => {
           inert={!props.isLive}
           key={props.board.rev}
           ref={setFrame}
+          // same-origin on purpose: the loupe reads the board's document to place the ring
+          sandbox='allow-scripts allow-same-origin'
           src={src}
           style={{ pointerEvents: props.isLive ? 'auto' : 'none' }}
           tabIndex={props.isLive ? 0 : -1}

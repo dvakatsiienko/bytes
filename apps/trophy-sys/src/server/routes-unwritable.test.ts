@@ -42,7 +42,7 @@ const signedIn = {
   host: 'example.com',
 };
 
-const MENTIONS_KV = /KV/;
+const MENTIONS_KV = /KV/u;
 
 const post = (path: string, body: unknown = null, cookie?: string) =>
   routeResolve(new URL(`https://example.com${path}`), 'POST', {

@@ -52,7 +52,7 @@ if (index === 0) {
 }
 
 const SEEDS = ['.claude/settings.local.json'];
-const APP_SEEDS = [/^\.env(\..+)?$/, /^\.trophy-.*\.json$/];
+const APP_SEEDS = [/^\.env(?:\..+)?$/u, /^\.trophy-.*\.json$/u];
 const APP_FILES = ['.claude/settings.local.json', '.runtime/dc-runtime.js'];
 
 function ignored(file: string): boolean {
@@ -67,7 +67,7 @@ function ignored(file: string): boolean {
   }
 }
 
-const ENV_LINE = /^([A-Z0-9_]+)=.*$/gm;
+const ENV_LINE = /^(?<key>[A-Z0-9_]+)=.*$/gmu;
 
 /** Files written transformed instead of copied. */
 const STAND_INS: Record<string, (text: string) => string> = {

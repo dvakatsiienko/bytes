@@ -64,7 +64,7 @@ export const Journal = () => {
           {/* Printed, not parsed. `date` is already a local gaming-day key, and
               sending it back through a Date would read it as UTC midnight. */}
           <span className='text-orange tracking-[0.15em]'>
-            {day.date.replace(/-/g, '.')}
+            {day.date.replace(/-/gu, '.')}
           </span>
           <span className='text-dim'>{weekdayOf(day.date)}</span>
           <span aria-hidden='true' className='h-px min-w-4 flex-1 bg-line' />

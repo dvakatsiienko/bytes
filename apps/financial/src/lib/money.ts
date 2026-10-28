@@ -4,7 +4,7 @@
  * touches an amount (1234567.89 * 100 === 123456788.99999999).
  */
 
-const USD_PATTERN = /^\d+(\.\d{0,2})?$/;
+const USD_PATTERN = /^\d+(?:\.\d{0,2})?$/u;
 
 export const usdToCents = (input: string): number | null => {
   const clean = input.replaceAll(',', '').trim();

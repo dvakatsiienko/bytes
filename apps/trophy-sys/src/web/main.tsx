@@ -11,7 +11,7 @@ import './theme.css';
 const queryClient = queryClientCreate();
 focusListen(window);
 
-const root = document.getElementById('root');
+const root = document.querySelector('#root');
 if (!root) throw new Error('#root missing');
 
 createRoot(root).render(

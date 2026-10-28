@@ -171,7 +171,9 @@
       },
 
       /* rules under development */
-      "nursery": {},
+      "nursery": {
+        "useTailwindSortedClasses": "off"
+      },
 
       /* rules catching ways your code could be written to run faster, or generally be more efficient. */
       "performance": {
@@ -206,6 +208,13 @@
 
       /* rules that detect code that is likely to be incorrect or useless. */
       "suspicious": {
+        "useBaseline": {
+          "level": "on",
+          "options": {
+            "available": "newly"
+          }
+        },
+
         // ultracite rule — off on purpose. Its fix is unsafe (it deletes the
         // call), so a `biome check --write --unsafe` pass silently strips the
         // output out of CLI scripts and leaves them running mute. Console noise
@@ -278,9 +287,7 @@
       },
       "linter": {
         "rules": {
-          "nursery": {
-            "useSortedClasses": "off"
-          },
+          "nursery": {},
           "suspicious": {
             "noEqualsToNull": "off"
           }

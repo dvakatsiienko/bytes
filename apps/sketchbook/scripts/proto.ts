@@ -13,8 +13,8 @@ const PROTOS_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
   '../src/protos',
 );
-const ARCHIVE_PATTERN = /^(\d{3})-(.+)$/;
-const QUESTION_PATTERN = /question:\s*'([^']*)'/;
+const ARCHIVE_PATTERN = /^(?<number>\d{3})-.+$/u;
+const QUESTION_PATTERN = /question:\s*'(?<question>[^']*)'/u;
 
 const [command, ...topicWords] = process.argv.slice(2);
 
@@ -43,8 +43,8 @@ const toSlug = (words: string[]) => {
   const slug = words
     .join(' ')
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[^a-z0-9]+/gu, '-')
+    .replace(/^-|-$/gu, '');
 
   if (!slug) {
     throw new Error('a topic is required, e.g. pnpm proto:shift ledger view');
@@ -63,7 +63,7 @@ const readQuestion = async (name: string) => {
     return '';
   });
 
-  return QUESTION_PATTERN.exec(source)?.[1] ?? '';
+  return QUESTION_PATTERN.exec(source)?.groups?.question ?? '';
 };
 
 const writeBlank = async (slug: string) => {
@@ -96,7 +96,10 @@ export const Proto = () => {
 // while a shift touches exactly one directory.
 const nextNumber = (archiveList: string[]) => {
   const highest = archiveList.reduce((max, name) => {
-    return Math.max(max, Number(ARCHIVE_PATTERN.exec(name)?.[1] ?? 0));
+    return Math.max(
+      max,
+      Number(ARCHIVE_PATTERN.exec(name)?.groups?.number ?? 0),
+    );
   }, 0);
 
   return String(highest + 1).padStart(3, '0');
