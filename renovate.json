@@ -7,8 +7,9 @@
   "packageRules": [
     {
       "automergeSchedule": ["* 7-9 * * *"],
-      "description": "a bytes merge redeploys prod: the nightly patches pr merges only in dima's morning, 07:00–10:00 Kyiv",
-      "matchUpdateTypes": ["patch", "pin", "pinDigest", "digest"]
+      "description": "a bytes merge redeploys prod: the nightly patches pr merges only in dima's morning, 07:00–10:00 Kyiv. platformAutomerge off, or github queues the merge when the pr opens at night and the window is ignored (renovate's automergeSchedule docs)",
+      "matchUpdateTypes": ["patch", "pin", "pinDigest", "digest"],
+      "platformAutomerge": false
     },
     {
       "allowedVersions": "<17",
