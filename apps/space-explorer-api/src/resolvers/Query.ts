@@ -1,3 +1,4 @@
+import { findOrCreateUser } from '../datasources/UserAPI';
 import type * as gql from '../graphql';
 import type { Resolver } from '../types';
 import { paginate, sessionGone } from '../utils';
@@ -29,12 +30,12 @@ export const Query: QueryResolvers = {
     };
   },
   userProfile: (_, __, ctx) => {
-    // A stale token reaches here with no email, and findOrCreate would answer
+    // A stale token reaches here with no email, and findOrCreateUser would answer
     // "a valid email is required" — an input error for a session problem, which
     // the client cannot tell apart from a genuinely bad login.
     if (!ctx.userEmail) throw sessionGone('Not authenticated.');
 
-    return ctx.dataSources.userAPI.findOrCreate(ctx.userEmail);
+    return findOrCreateUser(ctx.userEmail);
   },
 };
 

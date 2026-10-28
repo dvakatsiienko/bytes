@@ -1,3 +1,4 @@
+import { findOrCreateUser } from '@/datasources/UserAPI';
 import type * as gql from '@/graphql';
 import type { Resolver } from '@/types';
 import { injectLaunchesIntoTrips } from '@/utils';
@@ -19,8 +20,8 @@ export const Mutation: MutationResolvers = {
   cancelTrip: (_, args, { dataSources }) => {
     return dataSources.userAPI.cancelTrip(args.tripId);
   },
-  login: (_, args, { dataSources }) => {
-    return dataSources.userAPI.findOrCreate(args.email);
+  login: (_, args) => {
+    return findOrCreateUser(args.email);
   },
   // auth is a stateless bearer token; logout is a client-side token discard
   logout: () => true,
