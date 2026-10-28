@@ -11,6 +11,11 @@
       "matchUpdateTypes": ["patch", "pin", "pinDigest", "digest"]
     },
     {
+      "allowedVersions": "<17",
+      "description": "graphql held on 16 in the space-explorer pair: @apollo/server 5.5.1 peers graphql ^16.11; lift this the day an @apollo/server release accepts 17 (2026-10-28)",
+      "matchPackageNames": ["graphql"]
+    },
+    {
       "description": "jotai major is held in x-com-chat: jotai 3 removed the INTERNAL_buildStoreRev3 export that jotai-devtools imports, and devtools' peer range `>=2.20.0` admits jotai 3 anyway, so nothing warns — the prod build just dies in turbopack. lift this the day a stable jotai-devtools (>0.14.0, not the 0.15.0-alpha) declares jotai 3. app-scoped on purpose; no other app uses jotai.",
       "enabled": false,
       "matchFileNames": ["apps/x-com-chat/package.json"],
