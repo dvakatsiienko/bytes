@@ -14,7 +14,7 @@ A visit-card site. Two routes:
 - custom SVG tech icons in `src/app/parts/svg/`
 - Tool categories config in `src/app/parts/toolConfig.tsx`
 - External links centralized in `src/links.ts`
-- `next build` type-checks. `ignoreBuildErrors` was set here once and removed after the app measured clean against it; `pnpm typecheck` still runs the same check on demand
+- `next build` type-checks; `pnpm typecheck` runs the same check on demand
 
 <!-- BEGIN:nextjs-agent-rules -->
 

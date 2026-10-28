@@ -65,8 +65,7 @@ Authorized auth origins are set in `src/proxy.ts` (`localhost:3000`,
 
 - Components: named arrow exports, `props.x` accessor (no destructuring), file layout
   `imports → component → helpers → types` (see root guides).
-- Convex: before backend work, read `convex/_generated/ai/guidelines.md` (overrides
-  training-data assumptions). Convex agent skills live under `.agents/skills/`.
+- Convex agent skills live under `.agents/skills/`.
 
 <!-- convex-ai-start -->
 

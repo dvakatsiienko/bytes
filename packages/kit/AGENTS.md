@@ -1,13 +1,12 @@
-# packages/kit — mechanics
+# packages/kit
 
 `packages/kit` is the one design system, on shadcn + Base UI. Architecture source of truth:
-[BYT-24](https://linear.app/x-com/issue/BYT-24). Read this file before any UI work in any app: the rules first, then the mechanics.
+[BYT-24](https://linear.app/x-com/issue/BYT-24).
 
 ## rules
 
 - **kit is the source.** Apps import shadcn components from `@ui/kit/components/*`; an app never
-  generates into its own `ui/` dir. A missing component is added from the app with `shadcn add` —
-  the app's `components.json` `ui` alias routes the file into kit.
+  generates into its own `ui/` dir. A missing component is added per § add a component.
 - **compose before eject.** Behaviour differences (lazy search, async states) live in an app-level
   composition over the kit primitive.
 - **eject is gated.** On the smell («too unique, too many workarounds») print
@@ -58,15 +57,9 @@ swap.
 
 ## eject a component
 
-Only on Dima's `y` to an eject request (the gate is in § rules). Copy
-`src/components/<name>.tsx` into the app's `src/components/ui/`, first line:
-
-```ts
-// ejected from @ui/kit/components/<name> · <date> · <why>
-```
-
-Then point the app's imports at the local copy. `shadcn eject` is a different thing (it inlines
-`shadcn/tailwind.css`); never use it for this.
+Only on Dima's `y` to an eject request (the gate and the header are in § rules). Copy
+`src/components/<name>.tsx` into the app's `src/components/ui/` with that first line, then point the
+app's imports at the local copy.
 
 ## check drift
 
