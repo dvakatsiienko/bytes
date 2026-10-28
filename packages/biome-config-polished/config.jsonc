@@ -3,11 +3,20 @@
   "files": {
     "ignoreUnknown": false,
     /* yaml.formatter.enabled skips `.yaml` but not `.yml` on biome 2.6.3, so yaml leaves biome by path */
-    "includes": ["**", "!**/*.yml", "!**/*.yaml"]
+    "includes": [
+      "**",
+      "!**/*.yml",
+      "!**/*.yaml",
+      /* written by claude code itself (plugin installs, runtime settings, the skills cli's lockfile):
+         formatting one starts a two-owner churn the pre-commit hook loses silently */
+      "!**/.claude/*.json",
+      "!**/.claude-plugin",
+      "!**/skills-lock.json"
+    ]
   },
   "vcs": {
     "clientKind": "git",
-    "defaultBranch": "master",
+    "defaultBranch": "main",
     "enabled": true,
     "useIgnoreFile": true
   },
@@ -121,7 +130,9 @@
   "css": {
     "parser": {
       "cssModules": true,
-      "allowWrongLineComments": false
+      "allowWrongLineComments": false,
+      /* `@theme`, `@source`, `@custom-variant`: tailwind v4 at-rules the parser reads as errors until told */
+      "tailwindDirectives": true
     }
   },
   // FORMATTER
