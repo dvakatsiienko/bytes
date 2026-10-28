@@ -231,7 +231,11 @@
         "useBaseline": {
           "level": "on",
           "options": {
-            "available": "newly"
+            "available": "newly",
+            // every engine we target ships these; web-features marks them limited over edge sub-features
+            "allowSelectors": ["selection", "marker"],
+            "allowProperties": ["accent-color", "user-select"],
+            "allowPropertyValues": { "font-family": ["ui-sans-serif"] }
           }
         },
 
