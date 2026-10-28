@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { join } from 'node:path';
 import { afterEach, expect, test, vi } from 'vitest';
 
 import { getBuild, isSameApp, otherTrees, readBuild } from './build-server';
@@ -8,6 +9,7 @@ const gitHere = (...args: string[]) =>
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 test('names the branch and the 8-character sha of the checkout it serves from', async () => {
@@ -55,11 +57,17 @@ test.each([
   },
 );
 
+// a root `vitest run` starts every project at the repo root, so the dev server's folder is set by hand
+const servedFromKit = () =>
+  vi.spyOn(process, 'cwd').mockReturnValue(join(import.meta.dirname, '../..'));
+
 test('names its app by the folder the dev server runs from', async () => {
+  servedFromKit();
   expect((await readBuild()).app).toBe('kit');
 });
 
 test('another app answering the shared base port is not a sibling', () => {
+  servedFromKit();
   const build = { branch: 'main', isDev: false, sha: '2a407e1f' };
   expect(isSameApp({ ...build, app: 'kit' })).toBe(true);
   expect(isSameApp({ ...build, app: 'x-com-chat' })).toBe(false);
