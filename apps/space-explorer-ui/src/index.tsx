@@ -8,7 +8,8 @@ import { client } from './lib/apollo';
 import { Pages } from './pages';
 import './theme.css';
 
-const rootEl = document.querySelector('#root') as HTMLElement;
+const rootEl = document.querySelector('#root');
+if (!rootEl) throw new Error('#root missing');
 
 const App = (
   <StrictMode>

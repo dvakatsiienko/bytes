@@ -81,18 +81,18 @@ export const Board = (props: BoardProps) => {
           width: `calc(${props.board.w}px * var(--zoom, 1))`,
         }}>
         <span
-          className='text-desk-ink block truncate text-sm font-medium'
+          className='block truncate font-medium text-desk-ink text-sm'
           title={props.board.title}>
           {props.board.title}
         </span>
       </KeepScale>
       <Virtualize
-        className='bg-background absolute inset-0 shadow-sm'
+        className='absolute inset-0 bg-background shadow-sm'
         height={props.board.h}
         margin={NEAR_MARGIN}
         placeholder={
           <div
-            className='bg-background/60 absolute inset-0 grid place-items-center shadow-sm'
+            className='absolute inset-0 grid place-items-center bg-background/60 shadow-sm'
             data-placeholder>
             <KeepScale>
               <span className='text-desk-ink text-sm'>{props.board.title}</span>
@@ -138,7 +138,7 @@ export const Board = (props: BoardProps) => {
       {props.isLive ? null : (
         <button
           aria-label={`use ${props.board.title} — hover and play; Esc returns to panning`}
-          className='hover:bg-loupe/[0.04] focus-visible:ring-ring absolute inset-0 cursor-grab bg-transparent transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset active:cursor-grabbing'
+          className='absolute inset-0 cursor-grab bg-transparent outline-none transition-colors hover:bg-loupe/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:cursor-grabbing'
           // a press that moves is a pan, never a click
           onClick={(event) => {
             const start = downAt.current;

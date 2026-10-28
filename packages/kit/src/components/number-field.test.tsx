@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type ComponentProps, useState } from 'react';
 import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
@@ -9,19 +9,19 @@ import { NumberField } from './number-field';
  * The field is controlled, so every test mounts it with real state: a spy
  * alone would show what was reported, not what the field then displays.
  */
-const ControlledField = ({ onValueChange, ...props }: ControlledFieldProps) => {
+const ControlledField = (props: ControlledFieldProps) => {
   const [value, setValue] = useState(0.6);
 
   return (
     <NumberField
       aria-label='ambient'
+      max={props.max}
       onValueChange={(next) => {
         setValue(next);
-        onValueChange(next);
+        props.onValueChange(next);
       }}
-      step={0.01}
+      step={props.step ?? 0.01}
       value={value}
-      {...props}
     />
   );
 };
@@ -175,8 +175,7 @@ test('a bad edit after arrow steps restores the stepped value', async () => {
 
 /* Types */
 
-interface ControlledFieldProps {
-  max?: number;
-  onValueChange: (value: number) => void;
-  step?: number;
-}
+type ControlledFieldProps = Pick<
+  ComponentProps<typeof NumberField>,
+  'max' | 'onValueChange' | 'step'
+>;

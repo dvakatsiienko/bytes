@@ -5,10 +5,6 @@
   // `ultracite/biome/next`, whose Next.js-only rules fire on this Vite app.
   "root": false,
   "extends": "//",
-  "files": {
-    // written by glyphs.py; its " " key is the space glyph, which noEmptyObjectKeys reads as empty
-    "includes": ["**", "!art/fonts/glyphs.json"]
-  },
   "linter": {
     "rules": {
       // There is no next/image in a Vite app to prefer over <img>.
@@ -16,6 +12,11 @@
     }
   },
   "overrides": [
+    {
+      // written by glyphs.py; its " " key is the space glyph, which the rule reads as empty
+      "includes": ["art/fonts/glyphs.json"],
+      "linter": { "rules": { "suspicious": { "noEmptyObjectKeys": "off" } } }
+    },
     {
       // The drawing and the stage are generative code: seeded random numbers
       // are bit arithmetic (`Math.imul`, `>>> 0`), and pixel and point loops

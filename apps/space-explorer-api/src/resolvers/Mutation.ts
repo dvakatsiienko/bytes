@@ -1,4 +1,4 @@
-import { findOrCreateUser } from '@/datasources/UserAPI';
+import { findOrCreateUser } from '@/datasources';
 import type * as gql from '@/graphql';
 import type { Resolver } from '@/types';
 import { injectLaunchesIntoTrips } from '@/utils';
