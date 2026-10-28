@@ -22,11 +22,11 @@ import { parseArgs } from 'node:util';
 
 const root = resolve(import.meta.dirname, '..');
 const staleAfterCommits = 20;
-const adrFile = /^\d{4}-.+\.md$/;
-const whitespace = /\s+/;
-const codeBlock = /```[^\n]*\n([\s\S]*?)```/g;
-const pnpmCall = /\bpnpm((?:[ \t]+[^\s|;&`]+)+)/g;
-const scriptName = /^[a-z][\w:.-]*$/;
+const adrFile = /^\d{4}-.+\.md$/u;
+const whitespace = /\s+/u;
+const codeBlock = /```[^\n]*\n(?<code>[\s\S]*?)```/gu;
+const pnpmCall = /\bpnpm(?<argv>(?:[ \t]+[^\s|;&`]+)+)/gu;
+const scriptName = /^[a-z][\w:.-]*$/u;
 const pnpmFlagsWithValue = new Set(['--filter', '-F', '-C', '--dir']);
 const pnpmVerbs = new Set([
   'add',
@@ -315,9 +315,11 @@ function unknownVerifyScripts(app: App): string[] {
         .scripts ?? {},
     ),
   ]);
-  const code = [...skill.matchAll(codeBlock)].map((m) => m[1]).join('\n');
+  const code = [...skill.matchAll(codeBlock)]
+    .map((m) => m.groups?.code)
+    .join('\n');
   const called = [...code.matchAll(pnpmCall)]
-    .map((m) => scriptOf(m[1].trim().split(whitespace)))
+    .map((m) => scriptOf((m.groups?.argv ?? '').trim().split(whitespace)))
     .filter((script): script is string => script !== undefined);
   return [...new Set(called)].filter((script) => !known.has(script));
 }
@@ -402,7 +404,7 @@ function isInBytes(dir: string): boolean {
 }
 
 function isInDeployDropdown(name: string): boolean {
-  return new RegExp(`^\\s*- ${name}$`, 'm').test(
+  return new RegExp(`^\\s*- ${name}$`, 'mu').test(
     read(join(root, '.github/workflows/deploy.yml')),
   );
 }

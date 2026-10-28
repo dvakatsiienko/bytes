@@ -8,7 +8,7 @@ import { client } from './lib/apollo';
 import { Pages } from './pages';
 import './theme.css';
 
-const rootEl = document.getElementById('root') as HTMLElement;
+const rootEl = document.querySelector('#root') as HTMLElement;
 
 const App = (
   <StrictMode>

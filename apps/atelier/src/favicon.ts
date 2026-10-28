@@ -1,6 +1,6 @@
 import { svgDataUrl } from './image.ts';
 
-const schemeQuery = /\(\s*prefers-color-scheme\s*:\s*dark\s*\)/g;
+const schemeQuery = /\(\s*prefers-color-scheme\s*:\s*dark\s*\)/gu;
 
 /**
  * `favicon.svg` picks its look with a `prefers-color-scheme` query, and a

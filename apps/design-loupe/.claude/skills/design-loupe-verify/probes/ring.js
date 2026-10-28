@@ -3,8 +3,8 @@
   const ring = document.querySelector('[data-ring]');
   if (!ring) return 'no-ring';
   const frame = ring.parentElement.querySelector('iframe');
-  const pin = frame.contentDocument.getElementById(
-    ring.getAttribute('data-ring'),
+  const pin = frame.contentDocument.querySelector(
+    `#${CSS.escape(ring.getAttribute('data-ring'))}`,
   );
   if (!pin) return 'no-pin';
   const f = frame.getBoundingClientRect();

@@ -29,7 +29,7 @@ export const GRADE_MARK: Record<TrophyGrade, string> = {
  * than send it back through a Date.
  */
 export const dateFormat = (iso: string | null) =>
-  iso ? dayKey(new Date(iso)).replace(/-/g, '.') : '—';
+  iso ? dayKey(new Date(iso)).replace(/-/gu, '.') : '—';
 
 /**
  * Shown wherever playtimeFormat returns its dash, so the gap reads as a known

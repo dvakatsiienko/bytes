@@ -442,7 +442,7 @@ const StateChip = (props: { ask: AskView }) => {
 
 /* Helpers */
 
-const OPTION_KEY = /^[1-9]$/;
+const OPTION_KEY = /^[1-9]$/u;
 
 const clockOf = (at: string) =>
   new Date(at).toLocaleTimeString([], {

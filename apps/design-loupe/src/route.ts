@@ -50,8 +50,8 @@ export const handleLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
 
 /* Helpers */
 
-const ASK_NUMBER = /^\d+$/;
-const ASK_PREFIX = /^ask-/;
+const ASK_NUMBER = /^\d+$/u;
+const ASK_PREFIX = /^ask-/u;
 
 const subscribe = (onChange: () => void) => {
   window.addEventListener('popstate', onChange);

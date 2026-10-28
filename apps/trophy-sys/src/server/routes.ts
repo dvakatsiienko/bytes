@@ -26,7 +26,7 @@ import {
 } from './state.ts';
 import { statsFetch, statsSync } from './stats.ts';
 
-const GAME_PATH = /^\/api\/games\/([\w-]+)$/;
+const GAME_PATH = /^\/api\/games\/(?<id>[\w-]+)$/u;
 
 /**
  * 800 is PSN's page size for this endpoint, and the whole library rather than a
@@ -284,7 +284,7 @@ export const routeResolve = async (
     return ok(await newsFetch({ commit: true }));
   }
 
-  const gameId = path.match(GAME_PATH)?.[1];
+  const gameId = path.match(GAME_PATH)?.groups?.id;
   if (gameId)
     return ok(await cached(`game:${gameId}`, () => gameDetailFetch(gameId)));
 

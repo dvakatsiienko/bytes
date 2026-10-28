@@ -49,7 +49,7 @@ describe('resolverExplain', () => {
 
 /* Helpers */
 const EXPLAINED =
-  /^ENOTFOUND for ca\.account\.sony\.com — .*killall -HUP mDNSResponder$/;
+  /^ENOTFOUND for ca\.account\.sony\.com — .*killall -HUP mDNSResponder$/u;
 
 /* Types */
 type LookupCb = (error: Error | null, address: string, family: number) => void;

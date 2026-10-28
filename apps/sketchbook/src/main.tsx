@@ -5,7 +5,7 @@ import { Frame } from '@/frame/frame';
 
 import '@/frame/theme.css';
 
-const rootNode = document.getElementById('root');
+const rootNode = document.querySelector('#root');
 
 if (rootNode) {
   createRoot(rootNode).render(

@@ -7,11 +7,11 @@ const adaptive = readFileSync(
   new URL('../public/favicon.svg', import.meta.url),
   'utf8',
 );
-const schemeQuery = /prefers-color-scheme/g;
-const alwaysOn = /@media all\b/g;
-const alwaysOff = /@media not all\b/g;
-const dotInk = /#f2f5f7"/g;
-const devDot = /<circle cx="432"[^>]*\/>/;
+const schemeQuery = /prefers-color-scheme/gu;
+const alwaysOn = /@media all\b/gu;
+const alwaysOff = /@media not all\b/gu;
+const dotInk = /#f2f5f7"/gu;
+const devDot = /<circle cx="432"[^>]*\/>/u;
 
 describe('pinColorScheme', () => {
   it('leaves no colour-scheme query for the browser to decide, in either theme', () => {

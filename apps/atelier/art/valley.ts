@@ -28,7 +28,7 @@ const pileSlots = [
   [2, 0],
 ] as const;
 
-const LEADING_MOVE = /^M[^C]+/;
+const LEADING_MOVE = /^M[^C]+/u;
 
 const W = 1600;
 const H = 600;

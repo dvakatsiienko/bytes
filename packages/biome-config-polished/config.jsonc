@@ -208,11 +208,6 @@
 
       /* rules that detect code that is likely to be incorrect or useless. */
       "suspicious": {
-        // "useBaseline": {
-        //   "level": "on",
-        //   "options": {
-        //     "available": "newly"
-        //   },
         "useBaseline": {
           "level": "on",
           "options": {

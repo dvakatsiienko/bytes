@@ -11,7 +11,7 @@ import { z } from 'zod';
  * ever rewrites the other's file, so a write never races the other side.
  */
 
-const askId = z.string().regex(/^ask-\d+$/, 'an ask id is ask-<n>');
+const askId = z.string().regex(/^ask-\d+$/u, 'an ask id is ask-<n>');
 
 const askSchema = z.object({
   /** the answer the designer applied, matched by its `at`, and the board version it landed in */
@@ -109,8 +109,8 @@ const canvasSchema = z.object({
   title: z.string().optional(),
 });
 
-const pinId = /\bid="(ask-\d+)"/g;
-const boardSuffix = /\.dc\.html$/;
+const pinId = /\bid="(?<id>ask-\d+)"/gu;
+const boardSuffix = /\.dc\.html$/u;
 
 const askState = (ask: Ask, answer: Answer | undefined): AskState => {
   if (!answer?.at) return 'open';
@@ -169,7 +169,7 @@ const movedOnDisk = async (jobDir: string, asks: Asks) => {
       ).catch(() => '');
       return [
         file,
-        [...html.matchAll(pinId)].map((match) => match[1] ?? ''),
+        [...html.matchAll(pinId)].map((match) => match.groups?.id ?? ''),
       ] as const;
     }),
   );
@@ -198,7 +198,7 @@ export const readJob = async (jobDir: string): Promise<JobView> => {
         ...box,
         file,
         name: file.replace(boardSuffix, ''),
-        pins: [...html.matchAll(pinId)].map((match) => match[1] ?? ''),
+        pins: [...html.matchAll(pinId)].map((match) => match.groups?.id ?? ''),
         rev: revisionOf(html),
         title: box.title ?? file,
       };

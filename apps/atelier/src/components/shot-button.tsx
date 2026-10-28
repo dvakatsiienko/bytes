@@ -60,7 +60,9 @@ export const ShotButton = (props: ShotButtonProps) => {
  */
 const ShotProgress = (props: { step: string | null }) => {
   const frames = FRAME_STEP.exec(props.step ?? '');
-  const share = frames ? Number(frames[1]) / Number(frames[2]) : 0;
+  const share = frames
+    ? Number(frames.groups?.done) / Number(frames.groups?.total)
+    : 0;
   // the frames' share holds through the steps after them, so the long webp step never reads as a restart
   const [held, setHeld] = useState(0);
   if (frames && share !== held) setHeld(share);
@@ -144,7 +146,7 @@ const NoteForm = (props: ShotButtonProps) => {
 /* Helpers */
 
 /** the shot's long step, as the server names it: «frame 31 of 72» */
-const FRAME_STEP = /frame (\d+) of (\d+)/;
+const FRAME_STEP = /frame (?<done>\d+) of (?<total>\d+)/u;
 
 /* Types */
 

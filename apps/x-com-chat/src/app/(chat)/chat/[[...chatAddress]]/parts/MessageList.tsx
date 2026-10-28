@@ -22,7 +22,6 @@ export const MessageList = (props: MessageListProps) => {
     <Button
       key={msg.text + msg.emoji}
       onClick={() => {
-        // biome-ignore lint/suspicious/noUnnecessaryConditions: todo process it later
         if (isChatInitRef.current) return;
 
         isChatInitRef.current = true;
@@ -57,7 +56,6 @@ export const MessageList = (props: MessageListProps) => {
       )}
       ref={containerRef}>
       <AnimatePresence mode='popLayout'>
-        {/* biome-ignore lint/suspicious/noUnnecessaryConditions: ref mutates in event handlers */}
         {!(isChatInitRef.current || messageListJSX.length) && (
           <motion.div
             className='mx-auto grid w-full max-w-sm place-content-center gap-4 self-center justify-self-center text-balance'
