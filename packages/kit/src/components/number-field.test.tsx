@@ -9,24 +9,32 @@ import { NumberField } from './number-field';
  * The field is controlled, so every test mounts it with real state: a spy
  * alone would show what was reported, not what the field then displays.
  */
+const ControlledField = ({ onValueChange, ...props }: ControlledFieldProps) => {
+  const [value, setValue] = useState(0.6);
+
+  return (
+    <NumberField
+      aria-label='ambient'
+      onValueChange={(next) => {
+        setValue(next);
+        onValueChange(next);
+      }}
+      step={0.01}
+      value={value}
+      {...props}
+    />
+  );
+};
+
 const renderField = async (props: { max?: number; step?: number } = {}) => {
   const onValueChange = vi.fn();
-  function Harness() {
-    const [value, setValue] = useState(0.6);
-    return (
-      <NumberField
-        aria-label='ambient'
-        onValueChange={(next) => {
-          setValue(next);
-          onValueChange(next);
-        }}
-        step={0.01}
-        value={value}
-        {...props}
-      />
-    );
-  }
-  return { onValueChange, screen: await render(<Harness />) };
+
+  return {
+    onValueChange,
+    screen: await render(
+      <ControlledField onValueChange={onValueChange} {...props} />,
+    ),
+  };
 };
 
 test('typed garbage never reaches the value and blur restores it', async () => {
@@ -164,3 +172,11 @@ test('a bad edit after arrow steps restores the stepped value', async () => {
 
   await expect.element(field).toHaveValue('0.62');
 });
+
+/* Types */
+
+interface ControlledFieldProps {
+  max?: number;
+  onValueChange: (value: number) => void;
+  step?: number;
+}
