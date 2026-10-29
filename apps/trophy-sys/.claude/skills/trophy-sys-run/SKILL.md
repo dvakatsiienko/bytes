@@ -32,7 +32,7 @@ timeout 40 bash -c 'until curl -sf localhost:5188/api/health >/dev/null && curl 
 
 `"file"` is the point: `.env.dev.local` blanks the KV credentials, so the tree reads and writes its own `.trophy-*.json` copies and never production.
 
-A `run` pass stops both processes when its check is done. A coder serving the tree for dima keeps them up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops both processes when its check is done. Codie serving the tree for dima keeps them up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 

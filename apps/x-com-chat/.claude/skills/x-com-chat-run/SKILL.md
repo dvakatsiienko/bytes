@@ -28,7 +28,7 @@ curl -s -o /dev/null -w '%{http_code}\n' localhost:3020/chat    # 200 (first com
 
 `convex dev` is ready when its output prints `Convex functions ready!` (~1.5 s). It needs no login on dima's mac.
 
-A `run` pass stops what it started when its check is done. A coder serving the tree for dima keeps it up by its own contract (`x:crew-coder`), not this skill's.
+A `run` pass stops what it started when its check is done. Codie serving the tree for dima keeps it up by its own contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 

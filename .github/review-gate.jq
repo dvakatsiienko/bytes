@@ -33,8 +33,8 @@
 # 🚨 The second clause is an IDENTITY, never a body. Two earlier versions asked
 # the prose: first «any comment carrying the job-run url», then «a login
 # containing `claude` carrying it». Both were forgeable by the reviewed party —
-# the second because `claude.yml` carries `allowed_bots: "x-coder-cc[bot]"`, so
-# the coder can reach the assist lane with `@cc` and have `claude[bot]` write
+# the second because `claude.yml` carries `allowed_bots: "x-codie-cc[bot]"`, so
+# codie can reach the assist lane with `@cc` and have `claude[bot]` write
 # whatever it is told to write, run url and `verdict: clean` included.
 #
 # 📌 `performed_via_github_app` is present on ISSUE comments only — measured:

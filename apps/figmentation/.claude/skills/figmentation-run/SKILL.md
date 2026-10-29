@@ -28,7 +28,7 @@ timeout 60 bash -c 'until curl -sfo /dev/null localhost:3020; do sleep 1; done' 
 
 The one process to know is `pnpm dev`. It leads a process group of five: `pnpm dev` → pnpm → `with-port.ts` → `next dev` → `next-server`, the one that listens.
 
-A `run` pass stops the server when its check is done. A coder serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 

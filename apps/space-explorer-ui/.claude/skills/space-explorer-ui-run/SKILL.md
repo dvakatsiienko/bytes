@@ -31,7 +31,7 @@ timeout 40 bash -c 'until curl -sf -o /dev/null -X POST -H "content-type: applic
 timeout 40 bash -c 'until curl -sf -o /dev/null localhost:5193/; do sleep 1; done'
 ```
 
-A `run` pass stops both when its check is done. A coder serving the tree keeps them up by its own contract (`x:crew-coder`), not this skill's.
+A `run` pass stops both when its check is done. Codie serving the tree keeps them up by its own contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 

@@ -29,7 +29,7 @@ Ready in ~1 s:
 timeout 40 bash -c 'until curl -sf localhost:<port> >/dev/null; do sleep 1; done' && echo READY
 ```
 
-A `run` pass stops the server when its check is done. A coder serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 

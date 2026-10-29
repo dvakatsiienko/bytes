@@ -39,7 +39,7 @@ cd .claude/worktrees/<slug>/apps/financial && DATABASE_URL=postgresql://postgres
 timeout 90 bash -c 'until curl -sf -o /dev/null localhost:3010; do sleep 1; done'
 ```
 
-A `run` pass stops both processes when its check is done. A coder serving the tree for dima keeps them up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops both processes when its check is done. Codie serving the tree for dima keeps them up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 

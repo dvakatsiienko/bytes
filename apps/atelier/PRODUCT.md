@@ -13,7 +13,7 @@ vite + react 19.3 + tailwind + typescript, three.js through `@react-three/fiber`
 ## Users
 
 - **dima** — the art director. he steers, compares takes, picks, and tweaks scene settings. he uses it alone for now; a portfolio showing may come later, only after it works.
-- **the fleet's agents** (cclio first, any cc session that is asked for art) — the hands. they write scene code, shoot, save takes and ship assets. every fleet member knows atelier exists and routes art work to it.
+- **the fleet's agents** (clio first, any cc session that is asked for art) — the hands. they write scene code, shoot, save takes and ship assets. every fleet member knows atelier exists and routes art work to it.
 - **the products** — any game, app or website we build takes its art from atelier; a product's needs decide which asset kinds atelier grows next.
 
 ## Product Purpose
@@ -41,7 +41,7 @@ art as code, directed by a human. every picture is a seeded, reproducible scene:
 - every asset kind has a ready starting point (a scene template or an icon template), so a new ask starts drawing, not setting up
 - asset kinds grow with the products: a game brings sprite sheets and tilesets, a website brings illustrations and backgrounds — each kind gets its template the first time a product needs it
 - self-documented: an `AGENTS.md` that tells any agent how to add a scene, shoot, and ship
-- undecided: the story world is a first draft by cclio (Oles the t-rex, Pinefold, Lanternhill), not yet reviewed by dima
+- undecided: the story world is a first draft by clio (Oles the t-rex, Pinefold, Lanternhill), not yet reviewed by dima
 - undecided: which motion reaches the readmes (foliage wind and fireflies are liked) and the night tone mapping — both explored inside atelier once its tools are connected
 
 ## Brand Commitments

@@ -51,7 +51,7 @@ dima also likes and would like to build somthing like:
 - **no commits.** leave the tree dirty; dima judges in tabs first.
 - **report:** ≤12 lines in your chat: what you built · which skill commands fired · measured
   numbers (min font, contrast on body text, tokens + minutes spent) · one line per defect left.
-  then ping cclio (`mcp__ccd_session_mgmt__send_message`, session id in your pointer message).
+  then ping clio (`mcp__ccd_session_mgmt__send_message`, session id in your pointer message).
 
 ## the rubric you are judged on (know it, do not game it)
 

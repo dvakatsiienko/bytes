@@ -90,12 +90,12 @@ Default choices applied unless told otherwise in the moment.
 ## Use case — a board watched while the fleet works
 
 This app is not only a prototype surface. Its live proto doubles as a **status board Dima
-periodically glances at while the fleet grinds through its side of the work**. cclio streams
+periodically glances at while the fleet grinds through its side of the work**. clio streams
 updates here; Dima reads them. That drives three standing rules.
 
 **Ticket strip — a standing frame feature on every proto page.** `src/frame/ticket-strip.tsx`
 renders `src/frame/tickets.ts` at the top of the page: in progress / done / touched. Always
-keep and maintain this section: whenever a ticket update arrives (from Dima or cclio),
+keep and maintain this section: whenever a ticket update arrives (from Dima or clio),
 edit `tickets.ts` in the same turn — the strip must never lag behind reality. Chips are https
 `linear.app/x-com/issue/<id>` links.
 
@@ -103,6 +103,6 @@ edit `tickets.ts` in the same turn — the strip must never lag behind reality. 
 
 - **Roadmap checklist** at the top: compact, one item per line, checkbox per item. Three states,
   not two — done (struck through), in-flight, queued.
-- **Tickets today**: processed / done / touched, live-updated as cclio and `cc` stream in.
+- **Tickets today**: processed / done / touched, live-updated as clio and `cc` stream in.
   Columns carry counts. Ticket chips are https **links** (`https://linear.app/x-com/issue/FRM-N`); dima opens one in the desktop app with his Hyper+G raycast command.
 - Both are live data — update them on every stream, in the same turn the update arrives.

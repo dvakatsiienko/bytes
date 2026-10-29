@@ -8,7 +8,7 @@
   },
   "args": {
     "who": "x-reviewer-cc[bot]",
-    "author": "x-coder-cc[bot]",
+    "author": "x-codie-cc[bot]",
     "owner": "dvakatsiienko",
     "since": "2026-09-11T17:00:00Z",
     "app": "x-reviewer-cc"
@@ -41,7 +41,7 @@
         "id": 9002,
         "in_reply_to_id": 9001,
         "user": {
-          "login": "x-coder-cc[bot]",
+          "login": "x-codie-cc[bot]",
           "type": "Bot"
         },
         "created_at": "2026-09-11T17:14:00Z",

@@ -1,7 +1,7 @@
 name: review-approved
 
 # The way past the one-round cap (2026-10-22), and the whole of it: Dima's
-# account approves the PR — Dima, or cclio on the verifier's clean for that
+# account approves the PR — Dima, or clio on sixth sense's clean for that
 # head, since he does not read PRs (PK-103) — and
 # `review:clean` goes green on the head he approved.
 #
@@ -10,14 +10,14 @@ name: review-approved
 # authorship, and whether the answers had already been spent. It produced five of
 # the twelve defects on #79 and could never do better than guess, because «is
 # this finding answered» is not a question an api can settle. An approval on the
-# owner's account is that judgement — Dima's, or cclio's on the verifier's clean
+# owner's account is that judgement — Dima's, or clio's on sixth sense's clean
 # verdict for the head — and the api reports it in one field.
 #
 # 🚨 The coder cannot forge this, for two independent reasons, and both are
 # measured rather than assumed (scratch PR #81, 2026-09-12):
 #
 #  1. GitHub refuses an approving review from the PR's own author, and every
-#     coder PR is authored by `x-coder-cc[bot]`.
+#     codie PR is authored by `x-codie-cc[bot]`.
 #  2. An app's approval does not count anyway. With
 #     `required_approving_review_count: 1` in force, an APPROVED review from
 #     `x-reviewer-cc[bot]` left `reviewDecision` at `REVIEW_REQUIRED` — the app's
@@ -92,5 +92,5 @@ jobs:
 
           Published on $REVIEWED, \`$SHA\`.
 
-          This is the gate past the one-round cap: the owner's account accepted this head — Dima, or cclio on the verifier's clean verdict for it. A bot app cannot produce it." \
+          This is the gate past the one-round cap: the owner's account accepted this head — Dima, or clio on sixth sense's clean verdict for it. A bot app cannot produce it." \
             --jq '.conclusion'

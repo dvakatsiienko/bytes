@@ -28,7 +28,7 @@ timeout 40 bash -c 'until curl -sf -o /dev/null -H "apollo-require-preflight: 1"
 
 `injected env (0)` means `.env` set nothing, because `DATABASE_URL` was already set. A `(1)` means the server is writing to the tracked `db.sqlite`.
 
-A `run` pass stops the server when its check is done. A coder keeping it up for its own work owns that lifetime (`x:crew-coder`), not this skill.
+A `run` pass stops the server when its check is done. Codie keeping it up for its own work owns that lifetime (`x:crew-coder`), not this skill.
 
 ## Drive
 

@@ -53,7 +53,7 @@ jobs:
           # Keeps the default token on purpose: assist writes code and opens
           # branches, which is the app that already has those rights. Only the
           # reviewer gets its own face.
-          allowed_bots: "x-coder-cc[bot]"
+          allowed_bots: "x-codie-cc[bot]"
           trigger_phrase: "@cc"
           claude_args: |
             --model claude-opus-5

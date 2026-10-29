@@ -52,7 +52,7 @@ a verifier's api landed on the main checkout's :5178 (2026-09-28).
 -->
 
 
-## Querying trophies without the UI (this is how `cw` asks)
+## Querying trophies without the UI (this is how `cloud-chat` asks)
 
 Three paths, same JSON:
 
@@ -65,7 +65,7 @@ Routes: `/api/health`, `/api/profile`, `/api/games?limit=`, `/api/games/:npCommu
 `/api/news`, `/api/settings`, `POST /api/snapshot`, `POST /api/client-error` (the route error
 screen reports a render error there; it only logs, so `vercel logs` is where a production one shows).
 
-📌 **Shapes that bit `cw` (2026-09-17)** — `games` and `steam-games` return bare arrays, not
+📌 **Shapes that bit `cloud-chat` (2026-09-17)** — `games` and `steam-games` return bare arrays, not
 `{games: […]}`. `progress` is base + DLC combined and is not a platinum flag: a platinumed game
 can read 89 %; read the platinum trophy's own `earned`, and filter `group == "default"` for base
 progress. `playSeconds` / `lastPlayedAt` are `null` on never-launched entries. A PSN title gets

@@ -26,7 +26,7 @@ timeout 60 bash -c 'until curl -sf -o /dev/null localhost:3010; do sleep 1; done
 curl -s -o /dev/null -w '%{http_code}\n' localhost:3010/cover   # 200
 ```
 
-A `run` pass stops the server when its check is done. A coder serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
 
 ## Drive
 

@@ -146,7 +146,7 @@ jobs:
       # The cap. One round per PR, at «final»: the fix rounds are reviewed
       # locally by the coder before each verifier round, which is faster
       # (Dima, 2026-10-22, PK-103 / FRM-72). A second is Dima's call, asked
-      # through cclio with a few words on what changed — so this fails early,
+      # through clio with a few words on what changed — so this fails early,
       # before spending the window rather than after.
       #
       # 📌 Know what this costs now that the gate is real: `review:clean` lives
@@ -196,11 +196,11 @@ jobs:
         with:
           github_token: ${{ steps.reviewer.outputs.token }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # The coder's own identity. It changed from `x-coder-bot[bot]` to
-          # `x-coder-cc[bot]`, and until this line caught up every review the
+          # Codie's own identity. It changed from `x-coder-bot[bot]` to
+          # `x-coder-cc[bot]`, then to `x-codie-cc[bot]` (10-29), and until this line caught up every review the
           # coder asked for died on arrival with «Workflow initiated by
           # non-human actor».
-          allowed_bots: "x-coder-cc[bot]"
+          allowed_bots: "x-codie-cc[bot]"
           # Kept in step with the job's `if` above. The predicate is what gates;
           # this only stops the action's own default (`claude`) from disagreeing
           # with us about which label means a review.
