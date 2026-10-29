@@ -1,6 +1,6 @@
 ---
 name: figmentation-run
-description: Run, start or screenshot figmentation — a next dev server for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run figmentation, start its dev server, show the tesla-landing or clinique demo, or screenshot it.
+description: Run, start or screenshot figmentation — a next dev server for a worktree or codie's live changes, driven with agent-browser. Use when asked to run figmentation, start its dev server, show the tesla-landing or clinique demo, or screenshot it.
 ---
 
 # run figmentation
@@ -9,10 +9,10 @@ A Next 16 showcase: a home page with two cards, and two static demo routes, `/te
 
 Paths are relative to the bytes repo root unless they start with `apps/figmentation`.
 
-## Start: a worktree (the coder path)
+## Start: a worktree (the codie path)
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>        # ~4 s; prints «ports: +20 (… next apps 3020)»
 lsof -nP -iTCP:3020 -sTCP:LISTEN                   # must print nothing — a taken port is reported, never killed
 cd .claude/worktrees/<slug>/apps/figmentation && exec pnpm dev   # run_in_background — note its task id
@@ -28,7 +28,7 @@ timeout 60 bash -c 'until curl -sfo /dev/null localhost:3020; do sleep 1; done' 
 
 The one process to know is `pnpm dev`. It leads a process group of five: `pnpm dev` → pnpm → `with-port.ts` → `next dev` → `next-server`, the one that listens.
 
-A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is codie's contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 
@@ -58,7 +58,7 @@ Stop the background task that ran `pnpm dev` (TaskStop with its task id). That t
 lsof -nP -iTCP:3020 -sTCP:LISTEN   # prints nothing
 ps -o pid=,command= -g <pgid>      # prints nothing — <pgid> is the PID of `pnpm dev`
 git worktree remove --force .claude/worktrees/<slug>   # --force: next dev dirtied two tracked files, see gotchas
-git branch -D coder/<slug>
+git branch -D codie/<slug>
 ```
 
 ## Check

@@ -10,7 +10,7 @@ import { defineConfig } from 'vitest/config';
  * config that sets them is ignored, so they live here and nowhere else.
  *
  * There is deliberately no `exclude` for `.claude/worktrees/**`. A flat config
- * needs one — its repo-rooted include counts a coder worktree's copy of every
+ * needs one — its repo-rooted include counts a codie worktree's copy of every
  * test a second time (measured in dotfiles, 166 = 2 × 83). With `projects`
  * set, the root config collects no files itself and each project's include is
  * rooted at its own package, so nothing can reach a worktree. Verified here by

@@ -9,7 +9,7 @@
 # than turbo's graph, and it is chosen on purpose: turbo, run on the
 # PR's tree, hands off to a binary the PR can commit under `node_modules`, and
 # in a `pull_request_target` job that binary would share the runner with
-# VERCEL_TOKEN (the verifier proved it on #127). A list of names from the api
+# VERCEL_TOKEN (sixth sense proved it on #127). A list of names from the api
 # runs nothing. A preview is asked for by hand, so an extra one costs only quota.
 #
 # Env: GH_TOKEN, REPO, PR

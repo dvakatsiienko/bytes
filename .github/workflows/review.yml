@@ -26,7 +26,7 @@ name: review
 #   pull_request_review_comment  PR head sha         → reachable
 #   issue_comment                DEFAULT branch sha  → never touched the PR
 #
-# So a reply on a review thread — the coder answering a finding — was itself
+# So a reply on a review thread — codie answering a finding — was itself
 # enough to green the gate, which is the worst of the three.
 #
 # 📌 The first two also run the PR BRANCH's copy of a workflow, not the default

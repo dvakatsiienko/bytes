@@ -1,6 +1,6 @@
 ---
 name: sketchbook-run
-description: Run, start or screenshot sketchbook — the prototype platform's vite dev server in a worktree, driven with agent-browser. Use when asked to run sketchbook, start its dev server, show a proto or an archived page, or check a coder's proto changes.
+description: Run, start or screenshot sketchbook — the prototype platform's vite dev server in a worktree, driven with agent-browser. Use when asked to run sketchbook, start its dev server, show a proto or an archived page, or check codie's proto changes.
 ---
 
 # run sketchbook
@@ -12,7 +12,7 @@ Paths are relative to the bytes repo root unless they start with `apps/sketchboo
 ## Start
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>   # ~5 s; last line names the port: «sketchbook 5189» (5199 when another tree holds +10)
 lsof -nP -iTCP:<port> -sTCP:LISTEN           # prints nothing, or the port is taken: report it, never kill it
 ```
@@ -29,7 +29,7 @@ Ready in ~1 s:
 timeout 40 bash -c 'until curl -sf localhost:<port> >/dev/null; do sleep 1; done' && echo READY
 ```
 
-A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is codie's contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 
@@ -63,7 +63,7 @@ Then prove it, and clean up:
 
 ```bash
 lsof -nP -iTCP:<port> -sTCP:LISTEN; pgrep -g <pgid> | wc -l    # nothing, then 0
-git worktree remove --force .claude/worktrees/<slug> && git branch -D coder/<slug>
+git worktree remove --force .claude/worktrees/<slug> && git branch -D codie/<slug>
 ```
 
 `--force` is needed only when the tree holds untracked proto folders you made on purpose — read `git status --short` in the tree first.
@@ -76,7 +76,7 @@ cd apps/sketchbook && pnpm test    # vitest, 1 file, ~1 s: a shift keeps the old
 
 ## Gotchas
 
-- **`proto:new`, `proto:shift` and `proto:clear` write to `src/protos/`** — run them only in your own worktree, never in the main checkout or a coder's tree. `proto:new` exits 1 when a proto is already live; use `proto:shift` then.
+- **`proto:new`, `proto:shift` and `proto:clear` write to `src/protos/`** — run them only in your own worktree, never in the main checkout or another codie's tree. `proto:new` exits 1 when a proto is already live; use `proto:shift` then.
 - **after a shift, reopen the page** — vite hot-updates `frame.tsx` (the `import.meta.glob` changed), but the nav only lists the new `003-…` archive after `open` again.
 - the empty-proto placeholder text names the folder it was made in, so a shifted blank still says `build it in src/protos/current-<old topic>` — cosmetic, not a broken shift.
 - vite listens on `[::1]` only — `localhost` works, `127.0.0.1:<port>` does not.

@@ -1,6 +1,6 @@
 ---
 name: atelier-run
-description: Run, start or screenshot atelier — a dev server for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run atelier, start its dev server, show a coder's changes, or screenshot it.
+description: Run, start or screenshot atelier — a dev server for a worktree or codie's live changes, driven with agent-browser. Use when asked to run atelier, start its dev server, show codie's changes, or screenshot it.
 ---
 
 # run atelier
@@ -9,10 +9,10 @@ A Vite + React studio. The **main checkout is already served** by launchd (`x-at
 
 Paths are relative to the bytes repo root unless they start with `apps/atelier`.
 
-## Run: a worktree (the coder path)
+## Run: a worktree (the codie path)
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>        # ~7 s: copies .env*, installs with CI=1, writes .worktree-offset; prints «atelier 5190»
 cd .claude/worktrees/<slug>/apps/atelier && pnpm dev   # run_in_background — note its task id; it stays up
 ```
@@ -21,10 +21,10 @@ Ready when the build probe answers, and it names the tree it serves:
 
 ```bash
 timeout 40 bash -c 'until curl -sf localhost:5190/api/build >/dev/null; do sleep 1; done' && curl -s localhost:5190/api/build
-# {"branch":"coder/<slug>","isDev":true,"sha":"2d09f775"}
+# {"branch":"codie/<slug>","isDev":true,"sha":"2d09f775"}
 ```
 
-A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is codie's contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 
@@ -60,7 +60,7 @@ cd apps/atelier && pnpm test       # vitest, 13 files, ~2 s
 
 - **the port is `5180 + offset`** — `worktree:seed` prints it (`atelier 5190`); `.worktree-offset` holds the offset (10 → `:5190`, 20 → `:5200`).
 - **isolation is proven**: an edit in the worktree reached `:5190` by hmr in ~2 s while `:5180` kept main's text. Check `/api/build` before trusting any screenshot — `:5180` answers `"branch":"main","isDev":false`.
-- the header badge and `/api/build` name the worktree's branch (`coder/<slug>`); a `--detach` tree reports `HEAD`.
+- the header badge and `/api/build` name the worktree's branch (`codie/<slug>`); a `--detach` tree reports `HEAD`.
 - `TAKES 0` on a piece is real, not a seeding bug — `takes/` is tracked and only a few pieces have takes.
 - the console warns `THREE.Clock … deprecated` on every load — known noise, not a finding.
 - shot and ship write to `takes/` — drive them only with `ATELIER_TAKES_DIR=<scratch copy>` set on the worktree server (see the `verify` skill, which owns what to check once the app runs).

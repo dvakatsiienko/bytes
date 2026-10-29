@@ -12,7 +12,7 @@ A PlayStation trophy tracker that looks like a DOS terminal. Live at
 - News tab diffs your earnings against a saved baseline, so it shows what's new
   since you last looked — and flags games that quietly added trophies
 - Light and dark, following your OS unless you say otherwise
-- Same data as JSON from the CLI, so `cloud-chat` can answer trophy questions with no
+- Same data as JSON from the CLI, so cloud chat can answer trophy questions with no
   server running
 
 ## 🔧 Tech

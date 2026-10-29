@@ -1,6 +1,6 @@
 ---
 name: space-explorer-api-run
-description: Run, start or smoke-test space-explorer-api — the graphql server behind space-explorer-ui — in a worktree, driven with curl. Use when asked to run the api, start its server, query it, or check a coder's resolver change against the live server.
+description: Run, start or smoke-test space-explorer-api — the graphql server behind space-explorer-ui — in a worktree, driven with curl. Use when asked to run the api, start its server, query it, or check codie's resolver change against the live server.
 ---
 
 # run space-explorer-api
@@ -9,10 +9,10 @@ An Apollo graphql server with no ui. Launches come from an external SpaceX rest 
 
 Paths are relative to the bytes repo root unless they start with `apps/space-explorer-api`.
 
-## Run: a worktree (the coder path)
+## Run: a worktree (the codie path)
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>     # ~4 s; prints «space-explorer 5183/4010» — the api is the second number
 cd .claude/worktrees/<slug>/apps/space-explorer-api
 cp db.sqlite <scratch>/se-api.sqlite            # the throwaway db — see «the db» below
@@ -28,7 +28,7 @@ timeout 40 bash -c 'until curl -sf -o /dev/null -H "apollo-require-preflight: 1"
 
 `injected env (0)` means `.env` set nothing, because `DATABASE_URL` was already set. A `(1)` means the server is writing to the tracked `db.sqlite`.
 
-A `run` pass stops the server when its check is done. Codie keeping it up for its own work owns that lifetime (`x:crew-coder`), not this skill.
+A `run` pass stops the server when its check is done. Codie keeping it up for its own work owns that lifetime (`x:crew-codie`), not this skill.
 
 ## Drive
 

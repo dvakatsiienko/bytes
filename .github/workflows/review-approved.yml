@@ -13,7 +13,7 @@ name: review-approved
 # owner's account is that judgement — Dima's, or clio's on sixth sense's clean
 # verdict for the head — and the api reports it in one field.
 #
-# 🚨 The coder cannot forge this, for two independent reasons, and both are
+# 🚨 Codie cannot forge this, for two independent reasons, and both are
 # measured rather than assumed (scratch PR #81, 2026-09-12):
 #
 #  1. GitHub refuses an approving review from the PR's own author, and every
@@ -25,7 +25,7 @@ name: review-approved
 #     directions. The same PR flipped to `APPROVED` the moment a human approved.
 #
 # So the `sender.login == repository_owner` test below is not belt-and-braces
-# over a weak check; it is the check, and nothing the coder holds can satisfy it.
+# over a weak check; it is the check, and nothing codie holds can satisfy it.
 on:
   pull_request_review:
     types: [submitted]

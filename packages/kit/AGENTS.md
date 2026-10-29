@@ -16,7 +16,7 @@
   verb for this: `shadcn eject` inlines `shadcn/tailwind.css`, unrelated. The kit starts at zero ejects.
 - **no brand in kit.** No hex, no font names, no logos, no app-conditional logic.
 - **kit stays slim.** A variant enters kit only when two apps need it; ≤4 of our own variants on
-  top of the registry's, a fifth is an eject signal. A coder mid-task does not scan the monorepo
+  top of the registry's, a fifth is an eject signal. Codie mid-task does not scan the monorepo
   for the second consumer: it leaves a `variant request: <component> · <variant> · <app>` line in
   its done-comment; promotion is a periodic sweep.
 - **`baseColor` is `neutral`** and identical in every `components.json`; style, icons and `css`

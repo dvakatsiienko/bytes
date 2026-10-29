@@ -17,7 +17,7 @@
 #    carries no `verdict:` line is red too, because what it concluded is then
 #    unknown, and unknown is not clean.
 #
-# An ANSWERED thread counts as handled, deliberately. A finding the coder
+# An ANSWERED thread counts as handled, deliberately. A finding codie
 # declines with a reason is work Dima reads in the PR, not a reason to block
 # correct code — without that rule, one disagreement plus the one-round cap is a
 # deadlock with no way out.

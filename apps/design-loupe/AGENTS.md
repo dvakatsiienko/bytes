@@ -33,7 +33,7 @@ Local only: `pnpm dev`, no vercel project, no deploy. Scripts: `package.json`.
 - **the job dir** is `LOUPE_JOB` (relative to the app), default `~/projects/studio/jobs/speak`.
   The test job is `fixtures/speak`: `pnpm loupe:fixture` copies the studio speak boards into
   `fixtures/speak/boards` (gitignored), plants the pins for `ask-1` and `ask-2`, and clears
-  `answers.json`. Tests and verifier rounds use a copy of it, never the studio job.
+  `answers.json`. Tests and sixth sense rounds use a copy of it, never the studio job.
 - **the runtime**: every board loads `./support.js`, the Claude Design runtime. It lives at
   `.runtime/dc-runtime.js` (gitignored, ~190 kB), read from the canvas with `Artifact read <canvas
   url>` and `path: artifact-type/dc-runtime.js`; `pnpm worktree:seed` copies the main checkout's into a

@@ -8,7 +8,7 @@
 # of the PR's is on this runner: no checkout, no CLI. The api's `gitSource`
 # names the commit and Vercel fetches and builds it on its side. The `vercel`
 # CLI was tried first and is out: `vercel deploy` compiles and runs a
-# `vercel.ts` from the tree it uploads (the verifier proved it on #127).
+# `vercel.ts` from the tree it uploads (sixth sense proved it on #127).
 #
 # Env: VERCEL_TOKEN, REPO (owner/name), REF (the PR branch), SHA (its head)
 set -euo pipefail

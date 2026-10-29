@@ -1,6 +1,6 @@
 ---
 name: financial-run
-description: Run, start or screenshot financial — the invoices dashboard with login, a next dev server for a worktree or a coder's live changes, on a scratch Postgres, driven with agent-browser. Use when asked to run financial, start its dev server, log in to it, show a coder's changes, or screenshot it.
+description: Run, start or screenshot financial — the invoices dashboard with login, a next dev server for a worktree or codie's live changes, on a scratch Postgres, driven with agent-browser. Use when asked to run financial, start its dev server, log in to it, show codie's changes, or screenshot it.
 ---
 
 # run financial
@@ -11,10 +11,10 @@ A Next.js 16 dashboard (invoices, customers, revenue) behind a better-auth login
 
 Paths are relative to the bytes repo root unless they start with `apps/financial`.
 
-## Run: a worktree (the coder path)
+## Run: a worktree (the codie path)
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>        # ~4 s; prints «next apps 3010» for offset 10
 ```
 
@@ -39,7 +39,7 @@ cd .claude/worktrees/<slug>/apps/financial && DATABASE_URL=postgresql://postgres
 timeout 90 bash -c 'until curl -sf -o /dev/null localhost:3010; do sleep 1; done'
 ```
 
-A `run` pass stops both processes when its check is done. Codie serving the tree for dima keeps them up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops both processes when its check is done. Codie serving the tree for dima keeps them up until the worktree goes — that lifetime is codie's contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 

@@ -16,7 +16,7 @@ name: claude
 #   pull_request_review_comment    PR head sha  → the gate was reachable
 #   issue_comment                  DEFAULT branch sha → it never touched the PR
 #
-# So a reply on a review thread — the coder answering a finding — was itself
+# So a reply on a review thread — codie answering a finding — was itself
 # enough to turn the gate green. Every trigger this file grows is a fresh way to
 # mint a skipped `review`. There is no job named `review` here any more, and
 # adding one back reopens the hole.

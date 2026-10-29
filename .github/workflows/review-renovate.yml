@@ -31,7 +31,7 @@ jobs:
     # - the branch is renovate's. A `renovate/*` name alone is not enough —
     #   anyone with push access can pick that prefix.
     # - 📌 the run was triggered by renovate itself. This is what makes the
-    #   prefix trustworthy: a human or the coder pushing to a `renovate/*`
+    #   prefix trustworthy: a human or codie pushing to a `renovate/*`
     #   branch is the actor on that run, and this lane stands down. Without it
     #   the gate has a door marked «name your branch renovate/anything».
     #   renovate runs as our own app since FRM-465, so its login is `x-renovate[bot]`.

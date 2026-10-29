@@ -1,6 +1,6 @@
 ---
 name: cv-run
-description: Run, start or screenshot cv — the personal cv site (`/` and `/cover`), a next dev server for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run cv, start its dev server, show a coder's changes, or screenshot it.
+description: Run, start or screenshot cv — the personal cv site (`/` and `/cover`), a next dev server for a worktree or codie's live changes, driven with agent-browser. Use when asked to run cv, start its dev server, show codie's changes, or screenshot it.
 ---
 
 # run cv
@@ -9,10 +9,10 @@ A Next.js 16 site with two routes: `/` (the cv: brief, tool grid, portfolio) and
 
 Paths are relative to the bytes repo root unless they start with `apps/cv`.
 
-## Run: a worktree (the coder path)
+## Run: a worktree (the codie path)
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>        # ~4 s; prints «next apps 3010» for offset 10
 cd .claude/worktrees/<slug>/apps/cv && pnpm dev    # run_in_background — note its task id
 ```
@@ -26,7 +26,7 @@ timeout 60 bash -c 'until curl -sf -o /dev/null localhost:3010; do sleep 1; done
 curl -s -o /dev/null -w '%{http_code}\n' localhost:3010/cover   # 200
 ```
 
-A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops the server when its check is done. Codie serving the tree for dima keeps it up until the worktree goes — that lifetime is codie's contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 

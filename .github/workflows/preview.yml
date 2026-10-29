@@ -14,7 +14,7 @@
 # 🚨 Nothing of the PR's is on this runner: no checkout of it, no tool that
 # reads its files. The app list comes from the api's changed-file names, and
 # Vercel's api builds the PR's commit from GitHub on its side (`gitSource`).
-# Two tools were tried and are out, both proven by the verifier on #127: turbo
+# Two tools were tried and are out, both proven by sixth sense on #127: turbo
 # on the PR's tree hands off to a binary the PR commits under `node_modules`,
 # and `vercel deploy` compiles and runs a `vercel.ts` from the tree it uploads.
 # Steps share the runner, so a «no secret» step was never a boundary.

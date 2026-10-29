@@ -1,6 +1,6 @@
 ---
 name: space-explorer-ui-run
-description: Run, start or screenshot space-explorer-ui — the ui plus its own space-explorer-api in a worktree, driven with agent-browser. Use when asked to run space-explorer, start its dev servers, log in, book a launch, show a coder's changes, or screenshot it.
+description: Run, start or screenshot space-explorer-ui — the ui plus its own space-explorer-api in a worktree, driven with agent-browser. Use when asked to run space-explorer, start its dev servers, log in, book a launch, show codie's changes, or screenshot it.
 ---
 
 # run space-explorer-ui
@@ -12,7 +12,7 @@ Paths are relative to the bytes repo root unless they start with `apps/`.
 ## Start (a worktree)
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>   # ~4 s; last line prints «space-explorer 5193/4020» (ui/api)
 lsof -nP -iTCP:5193 -sTCP:LISTEN; lsof -nP -iTCP:4020 -sTCP:LISTEN   # both print nothing, or pick another tree
 ```
@@ -31,7 +31,7 @@ timeout 40 bash -c 'until curl -sf -o /dev/null -X POST -H "content-type: applic
 timeout 40 bash -c 'until curl -sf -o /dev/null localhost:5193/; do sleep 1; done'
 ```
 
-A `run` pass stops both when its check is done. Codie serving the tree keeps them up by its own contract (`x:crew-coder`), not this skill's.
+A `run` pass stops both when its check is done. Codie serving the tree keeps them up by its own contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 
@@ -59,7 +59,7 @@ Stop **both** background tasks (TaskStop with each task id) — never a PID foun
 ```bash
 lsof -nP -iTCP:5193 -sTCP:LISTEN; lsof -nP -iTCP:4020 -sTCP:LISTEN   # both print nothing
 git -C .claude/worktrees/<slug> restore apps/space-explorer-api/db.sqlite   # only if you booked or logged in a new email
-git worktree remove .claude/worktrees/<slug> && git branch -d coder/<slug>
+git worktree remove .claude/worktrees/<slug> && git branch -d codie/<slug>
 ```
 
 ## Test

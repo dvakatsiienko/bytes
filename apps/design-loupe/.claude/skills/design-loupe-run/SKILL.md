@@ -27,7 +27,7 @@ lsof -nP -iTCP:$P -sTCP:LISTEN
   `fixtures/speak/answers.json` under any server already running on it — so it runs only when the
   boards are missing.
 - `pnpm dev` alone takes `5181 + .worktree-offset` (5191 in the BYT-116 tree) with `strictPort`, so it
-  dies when the coder's server holds that port. an explicit `PORT` wins. the `lsof` line must print
+  dies when codie's server holds that port. an explicit `PORT` wins. the `lsof` line must print
   nothing; if it prints a listener, pick another `P`.
 - `.runtime/dc-runtime.js` must exist — every board loads it as `./support.js`. without it the boards
   are blank and `/boards/support.js` answers 404.

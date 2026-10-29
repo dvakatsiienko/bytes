@@ -61,7 +61,7 @@ Done when the piece shows in the pieces list and renders by day and by night:
 
 - A shot loads `art/` through vite's module loader, so it always draws the code on disk now. A
   node script that imports `art/` directly is fine too — nothing there needs a bundler.
-- `ATELIER_TAKES_DIR` points the take store at a scratch folder: tests and verifier rounds use
+- `ATELIER_TAKES_DIR` points the take store at a scratch folder: tests and sixth sense rounds use
   it, so they never write into the real takes. It is declared in the root `turbo.jsonc`.
 - The stage's «exact» look is no tone mapping on sRGB maps: a lit spot shows its map's colour.
   The passes are three's own (`src/stage/renderer.ts`). They match pmndrs `postprocessing` in

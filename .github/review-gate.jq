@@ -46,7 +46,7 @@
 # is true of every artifact that does not carry the field — so `ours` would match
 # every comment on the PR and the verdict would be read out of anybody's, while
 # `$who` (built as `<slug>[bot]`, so `"[bot]"`) matched nothing. Not a degraded
-# gate, an inverted one: `verdict: clean` is three words the coder can type.
+# gate, an inverted one: `verdict: clean` is three words codie can type.
 def ours:
   select(.user.login == $who
          or (($app != "") and ((.performed_via_github_app.slug // "") == $app)));
@@ -58,7 +58,7 @@ def touched: select(((.updated_at // .submitted_at // "") > $since));
 # A reply that clears a finding: the PR's own author, or the repo owner. Anyone
 # else's reply is a comment, not an answer — the repo is public, and a green a
 # passer-by can hand out is not a gate. The owner is named so Dima can answer a
-# finding on a PR he opened himself, which a hardcoded coder login once made
+# finding on a PR he opened himself, which a hardcoded codie login once made
 # impossible.
 def answerer: select(.user.login != $who and (.user.login == $author or .user.login == $owner));
 

@@ -44,7 +44,7 @@ workflow=${workflow##*/}
 # check, so the PR stays blocked — the safe side.
 #
 # 🚨 The branch goes through `-f`, never into the url: a branch name is the
-# coder's to pick, and `x&status=failure` spliced into a query string asks for
+# codie's to pick, and `x&status=failure` spliced into a query string asks for
 # branch `x`, counts zero rounds and lifts the cap. `-f` encodes it.
 runs=$(gh api -X GET "repos/$REPO/actions/workflows/$workflow/runs" \
   -f branch="$BRANCH" -f status=completed -F per_page=100 \

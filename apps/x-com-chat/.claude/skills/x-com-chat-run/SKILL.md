@@ -1,6 +1,6 @@
 ---
 name: x-com-chat-run
-description: Run, start or screenshot x-com-chat — its next dev server plus convex dev for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run x-com-chat, start its dev server, send a chat message in it, show a coder's changes, or screenshot it.
+description: Run, start or screenshot x-com-chat — its next dev server plus convex dev for a worktree or codie's live changes, driven with agent-browser. Use when asked to run x-com-chat, start its dev server, send a chat message in it, show codie's changes, or screenshot it.
 ---
 
 # run x-com-chat
@@ -9,10 +9,10 @@ A Next 16 chat app with two dev processes: **`next dev`** serves the pages on `3
 
 Paths are relative to the bytes repo root unless they start with `apps/x-com-chat`.
 
-## Start: a worktree (the coder path)
+## Start: a worktree (the codie path)
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>   # ~4 s: copies .env/.env.local, installs with CI=1, writes .worktree-offset; prints «next apps 30N0»
 lsof -nP -iTCP:3020 -sTCP:LISTEN              # empty = free. taken → report it, never kill it
 cd .claude/worktrees/<slug>/apps/x-com-chat && pnpm dev          # run_in_background — note its task id
@@ -28,7 +28,7 @@ curl -s -o /dev/null -w '%{http_code}\n' localhost:3020/chat    # 200 (first com
 
 `convex dev` is ready when its output prints `Convex functions ready!` (~1.5 s). It needs no login on dima's mac.
 
-A `run` pass stops what it started when its check is done. Codie serving the tree for dima keeps it up by its own contract (`x:crew-coder`), not this skill's.
+A `run` pass stops what it started when its check is done. Codie serving the tree for dima keeps it up by its own contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 
@@ -58,7 +58,7 @@ Stop only what you started: TaskStop each background task by its id (the `pnpm d
 ```bash
 lsof -nP -iTCP:3020 -sTCP:LISTEN     # prints nothing
 lsof -nP -iTCP:9229 -sTCP:LISTEN     # prints nothing (next's --inspect port)
-git worktree remove .claude/worktrees/<slug> && git branch -d coder/<slug>   # when the tree is done
+git worktree remove .claude/worktrees/<slug> && git branch -d codie/<slug>   # when the tree is done
 ```
 
 ## Test

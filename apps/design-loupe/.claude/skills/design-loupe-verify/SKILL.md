@@ -1,6 +1,6 @@
 ---
 name: design-loupe-verify
-description: Load BEFORE you verify a design-loupe change or report one done — «verify loupe», «check the ftr lines», «does the ring hold», a coder's «final», a verifier round on apps/design-loupe.
+description: Load BEFORE you verify a design-loupe change or report one done — «verify loupe», «check the ftr lines», «does the ring hold», codie's «final», a sixth sense round on apps/design-loupe.
 ---
 
 # verify design-loupe
@@ -11,7 +11,7 @@ prints one `✅` or `🐞` line per check. How to start, drive and stop the app 
 
 ## the walk — every change
 
-📌 call `kit.sh` by its literal path and keep probes in scratch files: a worktree-isolated session refuses a computed command name (`$K walk`) and an inline `agent-browser eval` (BYT-117 coder, ~6 refused calls).
+📌 call `kit.sh` by its literal path and keep probes in scratch files: a worktree-isolated session refuses a computed command name (`$K walk`) and an inline `agent-browser eval` (BYT-117 codie, ~6 refused calls).
 
 From the tree under test (paths relative to `apps/design-loupe`):
 

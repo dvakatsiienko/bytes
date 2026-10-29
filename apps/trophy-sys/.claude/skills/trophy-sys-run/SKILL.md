@@ -1,6 +1,6 @@
 ---
 name: trophy-sys-run
-description: Run, start or screenshot trophy-sys — its web + api dev pair for a worktree or a coder's live changes, driven with agent-browser. Use when asked to run trophy-sys, start its dev server, show a coder's changes, or screenshot the library, campaign charts or console.
+description: Run, start or screenshot trophy-sys — its web + api dev pair for a worktree or codie's live changes, driven with agent-browser. Use when asked to run trophy-sys, start its dev server, show codie's changes, or screenshot the library, campaign charts or console.
 ---
 
 # run trophy-sys
@@ -12,7 +12,7 @@ Paths are relative to the bytes repo root unless they start with `apps/trophy-sy
 ## Start
 
 ```bash
-git worktree add .claude/worktrees/<slug> -b coder/<slug> main
+git worktree add .claude/worktrees/<slug> -b codie/<slug> main
 pnpm worktree:seed .claude/worktrees/<slug>   # ~6 s: copies .env* and the .trophy-*.json state, installs with CI=1; prints «trophy-sys 5187/5188»
 lsof -nP -iTCP:5187 -iTCP:5188 -sTCP:LISTEN   # must print nothing; a taken port is reported, never killed
 ```
@@ -32,7 +32,7 @@ timeout 40 bash -c 'until curl -sf localhost:5188/api/health >/dev/null && curl 
 
 `"file"` is the point: `.env.dev.local` blanks the KV credentials, so the tree reads and writes its own `.trophy-*.json` copies and never production.
 
-A `run` pass stops both processes when its check is done. Codie serving the tree for dima keeps them up until the worktree goes — that lifetime is the coder's contract (`x:crew-coder`), not this skill's.
+A `run` pass stops both processes when its check is done. Codie serving the tree for dima keeps them up until the worktree goes — that lifetime is codie's contract (`x:crew-codie`), not this skill's.
 
 ## Drive
 
@@ -72,7 +72,7 @@ Then prove both ports are free and drop the tree:
 
 ```bash
 lsof -nP -iTCP:5187 -iTCP:5188 -sTCP:LISTEN   # prints nothing
-git worktree remove .claude/worktrees/<slug> && git branch -D coder/<slug>
+git worktree remove .claude/worktrees/<slug> && git branch -D codie/<slug>
 ```
 
 ## Test
