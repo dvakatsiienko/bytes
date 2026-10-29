@@ -197,7 +197,7 @@ jobs:
           github_token: ${{ steps.reviewer.outputs.token }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Codie's own identity. It changed from `x-coder-bot[bot]` to
-          # `x-coder-cc[bot]`, then to `x-codie-cc[bot]` (10-29), and until this line caught up every review
+          # `x-coder-cc[bot]`, then to `x-codie-cc[bot]` (2026-10-29), and until this line caught up every review
           # codie asked for died on arrival with «Workflow initiated by
           # non-human actor».
           allowed_bots: "x-codie-cc[bot]"

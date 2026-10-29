@@ -43,6 +43,13 @@ pre-commit:
     - name: apps-essentials
       run: node script/apps-essentials.ts --staged
 
+    # Temporary, from frame's rename sweep (2026-10-29): an added line naming a
+    # retired fleet form reds the commit. The forms and the history exceptions
+    # live once, in ~/frame/script/lib/retired-names.ts; a machine without
+    # frame skips. 14 green days and a ticket removes it.
+    - name: retired-names
+      run: if [ -f "$HOME/frame/script/retired-names-check.ts" ]; then node "$HOME/frame/script/retired-names-check.ts"; fi
+
 pre-push:
   jobs:
     # Typecheck only what moved since origin/main, so a kit consumer that
