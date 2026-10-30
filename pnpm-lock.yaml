@@ -886,7 +886,7 @@ importers:
   packages/prettier-config-polished:
     dependencies:
       prettier:
-        specifier: '>=3.9.9'
+        specifier: '>=3.9.10'
         version: 3.9.10
 
   packages/typescript-config: {}
