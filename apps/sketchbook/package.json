@@ -21,7 +21,7 @@
     "@tanstack/react-router": "1.170.46",
     "@ui/kit": "workspace:*",
     "cva": "1.0.0-beta.12",
-    "lucide-react": "1.62.0",
+    "lucide-react": "1.63.0",
     "motion": "14.7.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
