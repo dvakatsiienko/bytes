@@ -45,9 +45,9 @@
     "format": "biome format --write"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.3",
+    "@biomejs/biome": "2.6.4",
     "@tailwindcss/postcss": "4.3.3",
-    "@types/node": "26.6.5",
+    "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/tinycolor2": "1.4.6",
