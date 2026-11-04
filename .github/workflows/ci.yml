@@ -133,7 +133,7 @@ jobs:
       # every run — 25 s spent on a file that changes a few times a year.
       - name: Validate renovate config
         if: steps.touched.outputs.renovate == 'true'
-        run: npx --yes --package renovate -- renovate-config-validator --strict
+        run: npx --yes --package renovate@latest -- renovate-config-validator --strict
 
       # Vercel's remote cache is already on for deploys; this is the same cache,
       # reached from GitHub. OIDC exchanges the runner's token for a short-lived
