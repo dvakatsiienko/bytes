@@ -16,7 +16,7 @@ const OUT = '.vercel/output';
 const FUNCTION_CONFIG = {
   handler: 'index.js',
   launcherType: 'Nodejs',
-  runtime: 'nodejs24.x',
+  runtime: 'nodejs26.x',
   shouldAddHelpers: true,
 };
 
