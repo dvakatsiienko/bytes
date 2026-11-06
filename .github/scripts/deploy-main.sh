@@ -251,14 +251,10 @@ done <<<"$apps"
 # enough to match a row here to a build there.
 summary ""
 summary "Builds and logs live in the Vercel dashboard; the job id above identifies the deployment each hook started."
-# 📌 Re-running a partly failed job re-fires the hooks that already succeeded,
-# because there is no per-app record of what got through — up to five redundant
-# CREATED deployments against the very budget this job exists to protect. Not
-# worth the state needed to make it idempotent, but worth knowing before anyone
-# reaches for Re-run: the manual `workflow_dispatch` above deploys ONE app, and
-# that is the cheaper repair.
+# 📌 A push run's re-run refires only the apps with no Ready build, since each app's
+# base is its own. A manual run's re-run refires its pick.
 summary ""
-summary "> Re-running this job re-fires every hook listed above. To repair a single app, run the **Deploy** workflow manually and choose just that one."
+summary "> Re-running a push's run refires only the apps that did not reach Ready. To repair a single app, run the **Deploy** workflow manually and choose just that one."
 
 output "apps=$(tr '\n' ' ' <<<"$apps" | sed 's/ $//')"
 
