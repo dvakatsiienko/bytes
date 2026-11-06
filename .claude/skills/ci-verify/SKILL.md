@@ -11,10 +11,13 @@ prove a ci change against what github really sends, not against how the yaml rea
 
 - a guard fix's test runs against main's copy of the script, not the branch's (BYT-100 sixth sense)
 - a script's jq filter is pulled out and fed crafted inputs (BYT-95 sixth sense)
+- a fake of a remote read honours its arguments, or the arguments get a mutant of their own (BYT-130 sixth sense)
+- a rewrite after a clean voids its live proofs: each one reruns on the head's code (BYT-130 sixth sense)
 
 ## events
 
 - a workflow event field is checked against real run history: `gh api repos/dvakatsiienko/bytes/actions/runs --jq '.workflow_runs[] | {event, head_branch, head_sha}'` (BYT-95 sixth sense)
+- a read script runs free against real statuses from the mac: `DEADLINE_SECONDS=0 .github/scripts/deploy-read.sh` (BYT-130 sixth sense)
 
 ## secrets
 
