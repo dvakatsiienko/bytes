@@ -40,12 +40,12 @@ graphql)
   ;;
 */actions/workflows/*) cat "$FAKE/runs.json" 2>/dev/null || echo '{"workflow_runs":[]}' ;;
 */commits/*)
-  [ ! -e "$FAKE/commits-down" ] || { echo 'HTTP 502' >&2; exit 1; }
   # The rest read of one commit: a build's terminal row, then the pending row that
   # began it. A url ending /old is a build that began before the fire.
   n=$(wc -l <"$FAKE/gh-calls" | tr -d ' ')
   [ -e "$FAKE/history.$n.json" ] || n=$(cat "$FAKE/history-last")
   sha=${2#*/commits/}
+  [ "$(cat "$FAKE/commit-down" 2>/dev/null)" != "${sha%%/*}" ] || { echo 'HTTP 502' >&2; exit 1; }
   jq --arg sha "${sha%%/*}" '[.data.repository.object.history.nodes[]
     | select(.oid == $sha) | .status.contexts[]
     | {context, state: (.state | ascii_downcase), description, created_at: .createdAt, target_url: .targetUrl}]
@@ -272,10 +272,10 @@ read_step c1 cv
 check 'a status read that never answers is red' 1 'could not read'
 
 reset
-history 1 "c1|cv|SUCCESS|$DONE|2026-11-04T09:28:51Z"
-touch "$fake/commits-down"
+history 1 "c2||||" "c1|cv|SUCCESS|$DONE|2026-11-04T09:28:51Z"
+echo c2 >"$fake/commit-down"
 read_step c1 cv
-check 'a commit read that never answers is red' 1 'could not read'
+check 'one commit read that never answers is red, never an older row' 1 'could not read'
 
 # --- the base and the hooks, in a planted checkout
 
