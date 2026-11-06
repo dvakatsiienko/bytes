@@ -26,15 +26,33 @@ ALL_APPS='cv figmentation financial space-explorer-ui trophy-sys x-com-chat'
 cat >"$work/bin/gh" <<'EOF'
 #!/usr/bin/env bash
 [ ! -e "$FAKE/gh-down" ] || { echo 'HTTP 502' >&2; exit 1; }
-echo x >>"$FAKE/gh-calls"
-n=$(wc -l <"$FAKE/gh-calls" | tr -d ' ')
-[ -e "$FAKE/history.$n.json" ] || n=$(cat "$FAKE/history-last")
-rev=main
-for arg in "$@"; do
-  case "$arg" in rev=*) rev=${arg#rev=} ;; esac
-done
-jq --arg rev "$rev" '.data.repository.object.history.nodes |=
-  ((map(.oid) | index($rev)) as $i | if $i then .[$i:] else . end)' "$FAKE/history.$n.json"
+case "$2" in
+graphql)
+  echo x >>"$FAKE/gh-calls"
+  n=$(wc -l <"$FAKE/gh-calls" | tr -d ' ')
+  [ -e "$FAKE/history.$n.json" ] || n=$(cat "$FAKE/history-last")
+  rev=main
+  for arg in "$@"; do
+    case "$arg" in rev=*) rev=${arg#rev=} ;; esac
+  done
+  jq --arg rev "$rev" '.data.repository.object.history.nodes |=
+    ((map(.oid) | index($rev)) as $i | if $i then .[$i:] else . end)' "$FAKE/history.$n.json"
+  ;;
+*/actions/workflows/*) cat "$FAKE/runs.json" 2>/dev/null || echo '{"workflow_runs":[]}' ;;
+*/commits/*)
+  # The rest read of one commit: a build's terminal row, then the pending row that
+  # began it. A url ending /old is a build that began before the fire.
+  n=$(wc -l <"$FAKE/gh-calls" | tr -d ' ')
+  [ -e "$FAKE/history.$n.json" ] || n=$(cat "$FAKE/history-last")
+  sha=${2#*/commits/}
+  jq --arg sha "${sha%%/*}" '[.data.repository.object.history.nodes[]
+    | select(.oid == $sha) | .status.contexts[]
+    | {context, state: (.state | ascii_downcase), description, created_at: .createdAt, target_url: .targetUrl}]
+    | sort_by(.created_at) | reverse
+    | map(., (select(.state != "pending") | .state = "pending"
+        | if (.target_url | endswith("/old")) then .created_at = "2026-11-04T09:00:00Z" else . end))' "$FAKE/history.$n.json"
+  ;;
+esac
 EOF
 # Answers the way turbo does: a root lockfile marks all, an app path marks its app.
 cat >"$work/bin/npx" <<'EOF'
@@ -64,8 +82,8 @@ reset() {
   export FAKE=$fake
 }
 
-# One history per argument list, newest commit first: `sha|app|STATE|description|createdAt`.
-# `sha||||` is a commit with no status.
+# One history per argument list, newest commit first: `sha|app|STATE|description|createdAt`,
+# with `|old` for a build that began before the fire. `sha||||` is a commit with no status.
 history() {
   local n=$1
   shift
@@ -75,7 +93,7 @@ history() {
         | . as $sha | {oid: $sha, status: {contexts: [
             $rows[] | select(.[0] == $sha and .[1] != "")
             | {context: ("Vercel – " + .[1]), state: .[2], description: .[3], createdAt: .[4],
-               targetUrl: ("https://vercel.example/" + .[1])}
+               targetUrl: ("https://vercel.example/" + .[1] + (if .[5] == "old" then "/old" else "" end))}
           ]}}
       ]}}}}}' >"$fake/history.$n.json"
   echo "$n" >"$fake/history-last"
@@ -102,6 +120,13 @@ check() {
   else
     echo "  ok $name"
   fi
+}
+
+# A later Deploy run on <sha>, with the run conclusion github gives it.
+later_run() {
+  jq -n --arg sha "$1" --arg conclusion "$2" '{workflow_runs: [{id: 1, event: "workflow_run",
+    display_title: ("deploy " + $sha), conclusion: (if $conclusion == "" then null else $conclusion end)}]}' \
+    >"$fake/runs.json"
 }
 
 read_step() {
@@ -155,8 +180,36 @@ check 'a descendant outranks a cancel on this commit' 0 'cv — Ready'
 
 reset
 history 1 "c2|cv|SUCCESS|$DONE|2026-11-04T09:28:51Z" "c1||||" "c0|figmentation|SUCCESS|$DONE|2026-11-04T09:25:00Z"
+later_run c2 ''
 read_step c1 figmentation
-check 'an ancestor status does not count, and main moved on: superseded is green' 0 'figmentation — superseded'
+check 'an ancestor status does not count, and a later Deploy running owns it: green' 0 'figmentation — superseded'
+
+reset
+history 1 "c2||||" "c1||||"
+read_step c1 cv
+check 'main moved on with no later Deploy run is red' 1 'cv — no record'
+
+reset
+history 1 "c2||||" "c1||||"
+later_run c2 skipped
+read_step c1 cv
+check 'a later Deploy skipped by a red CI owns nothing: red' 1 'cv — no record'
+
+reset
+history 1 "c2||||" "c1||||"
+later_run c1 success
+read_step c1 cv
+check 'this commit own Deploy run is no later run: red' 1 'cv — no record'
+
+reset
+history 1 "c1|cv|PENDING|$BUILDING|2026-11-04T09:24:23Z" "c1|cv|SUCCESS|$DONE|2026-11-04T09:24:30Z|old"
+read_step c1 cv
+check 'an older build finishing after the fire is not ours: still building' 1 'cv — still building'
+
+reset
+history 1 "c1|cv|SUCCESS|$DONE|2026-11-04T09:24:30Z|old"
+read_step c1 cv
+check 'only an older build finishing after the fire is no record' 1 'cv — no record'
 
 reset
 history 1 "c2||||" "c1||||"
@@ -295,6 +348,26 @@ history 1 "$p2|cv|SUCCESS|$DONE|2026-11-04T10:00:00Z" "$p1|cv|SUCCESS|$DONE|2026
 base_step "$p1"
 want_base 'a Ready commit after this one is no base' cv "$p1"
 
+# p1 moved the lockfile, so from p0 every app reads affected: only the running
+# build on p1 keeps cv from refiring on p2.
+reset
+now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+history 1 "$p2||||" "$p1|cv|PENDING|$BUILDING|$now" "$p0|cv|SUCCESS|$DONE|2026-11-04T09:00:00Z"
+base_step "$p2"
+want_base 'a build still running is the base' cv "$p1"
+git checkout -q "$p2"
+main_step "$bases"
+case "$fired" in
+cv*) echo "FAIL a push inside a running build refired it: $fired"; failed=1 ;;
+*) echo '  ok a push inside a running build does not refire it' ;;
+esac
+git checkout -q main
+
+reset
+history 1 "$p2|cv|PENDING|$BUILDING|2026-11-04T10:00:00Z" "$p1|cv|SUCCESS|$DONE|2026-11-04T09:00:00Z"
+base_step "$p2"
+want_base 'a build stuck past the job timeout is no base' cv "$p1"
+
 reset
 history 1 "$p1|cv|SUCCESS|$DONE|2026-11-04T09:00:00Z"
 base_step "$p1"
@@ -369,7 +442,7 @@ git checkout -q main
 
 cd "$here/../.."
 # Grep, since no case runs a workflow: losing one of these reads green over a failed deploy.
-for wire in 'statuses: read' 'id: deploy' 'APPS: ${{ steps.deploy.outputs.apps }}' \
+for wire in 'statuses: read' 'actions: read' 'id: deploy' 'APPS: ${{ steps.deploy.outputs.apps }}' \
   'FIRED_AT: ${{ steps.deploy.outputs.fired_at }}' 'run: .github/scripts/deploy-read.sh'; do
   grep -qF "$wire" .github/workflows/deploy.yml && echo "  ok deploy.yml holds $wire" ||
     { echo "FAIL deploy.yml lost $wire"; failed=1; }

@@ -49,7 +49,7 @@ name: Deploy
 
 # 📌 The run is named after the commit it deploys, because a `workflow_run`
 # run's own `head_sha` is main's tip when the run was created, which can be a
-# later push than the one CI judged.
+# later push than the one CI judged. `deploy-read.sh` reads the sha from here.
 run-name: deploy ${{ github.event.workflow_run.head_sha || 'by hand' }}
 
 # Deploy waits for CI. It ran beside CI on every push once, and on 2026-09-21
@@ -127,10 +127,11 @@ jobs:
         github.event.workflow_run.head_repository.full_name == github.repository
       )
 
-    # It reads the repo and the commit statuses Vercel posts, and POSTs to
-    # Vercel. It writes nothing back to GitHub.
+    # It reads the repo, the commit statuses Vercel posts and its own run history,
+    # and POSTs to Vercel. It writes nothing back to GitHub.
     permissions:
       contents: read
+      actions: read
       statuses: read
 
     steps:

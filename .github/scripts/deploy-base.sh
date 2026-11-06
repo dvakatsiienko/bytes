@@ -3,6 +3,10 @@
 # the history of $COMMIT, `{"cv":"<sha>"}`. An app it does not name has no known
 # base, and deploy-main.sh deploys it.
 #
+# A build still running counts as Ready: the run that fired it owns its result, and
+# refiring would only build it twice. Past the job's 15 min the build is stuck, and
+# no longer counts.
+#
 # Each app keeps its own base, so a failed app retries on the next push, and a
 # healthy app does not redeploy, unless it sits past deploy-history.sh's 100
 # commits. A push that deployed nothing, or a red or
@@ -22,9 +26,10 @@ if ! nodes=$("$here/deploy-history.sh" "$COMMIT"); then
   exit 0
 fi
 
-# Newest first, so the first success an app meets is its base.
+# Newest first, so the first such status an app meets is its base.
 bases=$(jq -c 'reduce (.[] | .oid as $oid | .status.contexts[]?
-    | select(.state == "SUCCESS" and (.context | startswith("Vercel – ")))
+    | select(.context | startswith("Vercel – "))
+    | select(.state == "SUCCESS" or (.state == "PENDING" and (.createdAt | fromdate) > (now - 900)))
     | {app: (.context | ltrimstr("Vercel – ")), oid: $oid}) as $ready
   ({}; .[$ready.app] //= $ready.oid)' <<<"$nodes")
 echo "bases=$bases"
