@@ -5,7 +5,9 @@
 #
 # A build still running counts as Ready: the run that fired it owns its result, and
 # refiring would only build it twice. Past the job's 15 min the build is stuck, and
-# no longer counts.
+# no longer counts. The one gap: a re-run after a refused hook does not read a build
+# its first attempt fired, so that build failing leaves the re-run green, until the
+# next push retries it.
 #
 # Each app keeps its own base, so a failed app retries on the next push, and a
 # healthy app does not redeploy, unless it sits past deploy-history.sh's 100

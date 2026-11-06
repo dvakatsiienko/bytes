@@ -40,6 +40,7 @@ graphql)
   ;;
 */actions/workflows/*) cat "$FAKE/runs.json" 2>/dev/null || echo '{"workflow_runs":[]}' ;;
 */commits/*)
+  [ ! -e "$FAKE/commits-down" ] || { echo 'HTTP 502' >&2; exit 1; }
   # The rest read of one commit: a build's terminal row, then the pending row that
   # began it. A url ending /old is a build that began before the fire.
   n=$(wc -l <"$FAKE/gh-calls" | tr -d ' ')
@@ -197,6 +198,12 @@ check 'a later Deploy skipped by a red CI owns nothing: red' 1 'cv — no record
 
 reset
 history 1 "c2||||" "c1||||"
+later_run c2 cancelled
+read_step c1 cv
+check 'a cancelled later Deploy owns nothing: red' 1 'cv — no record'
+
+reset
+history 1 "c2||||" "c1||||"
 later_run c1 success
 read_step c1 cv
 check 'this commit own Deploy run is no later run: red' 1 'cv — no record'
@@ -213,6 +220,7 @@ check 'only an older build finishing after the fire is no record' 1 'cv — no r
 
 reset
 history 1 "c2||||" "c1||||"
+later_run c2 success
 got=0
 out=$(GITHUB_EVENT_NAME=workflow_dispatch COMMIT=c1 APPS=cv FIRED_AT=$FIRE DEADLINE_SECONDS=0 POLL_SECONDS=0 \
   "$here/deploy-read.sh" 2>&1) || got=$?
@@ -262,6 +270,12 @@ reset
 touch "$fake/gh-down"
 read_step c1 cv
 check 'a status read that never answers is red' 1 'could not read'
+
+reset
+history 1 "c1|cv|SUCCESS|$DONE|2026-11-04T09:28:51Z"
+touch "$fake/commits-down"
+read_step c1 cv
+check 'a commit read that never answers is red' 1 'could not read'
 
 # --- the base and the hooks, in a planted checkout
 

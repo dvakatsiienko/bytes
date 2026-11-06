@@ -50,8 +50,7 @@ later_deploy_ran() {
   timeout 60 gh api "repos/$REPO/actions/workflows/deploy.yml/runs?per_page=30" |
     jq -e --argjson later "$later" 'any(.workflow_runs[];
       (.display_title | ltrimstr("deploy ")) as $sha
-      | .event == "workflow_run" and .conclusion != "skipped" and .conclusion != "cancelled"
-        and any($later[]; . == $sha))' >/dev/null
+      | .conclusion != "skipped" and .conclusion != "cancelled" and any($later[]; . == $sha))' >/dev/null
 }
 
 # One tab-separated line per app: its name, its word, its Vercel url.
