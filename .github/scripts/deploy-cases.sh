@@ -9,7 +9,6 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 echo "  jq $(jq --version)"
 
 work=$(mktemp -d)
-trap 'chmod -R u+w "$work"; rm -rf "$work"' EXIT
 mkdir -p "$work/bin"
 failed=0
 
@@ -34,7 +33,7 @@ EOF
 # Answers the way turbo does: a root lockfile marks all, an app path marks its app.
 cat >"$work/bin/npx" <<'EOF'
 #!/usr/bin/env bash
-echo "$TURBO_SCM_BASE" >>"$FAKE/turbo-bases"
+[ ! -e "$FAKE/npx-down" ] || exit 1
 changed=$(git diff --name-only "$TURBO_SCM_BASE" HEAD)
 for f in apps/*/package.json; do
   dir=$(dirname "$f")
@@ -154,9 +153,35 @@ read_step c1 figmentation
 check 'an ancestor status does not count, and main moved on: superseded is green' 0 'figmentation — superseded'
 
 reset
+history 1 "c2||||" "c1||||"
+got=0
+out=$(GITHUB_EVENT_NAME=workflow_dispatch COMMIT=c1 APPS=cv FIRED_AT=$FIRE DEADLINE_SECONDS=0 POLL_SECONDS=0 \
+  "$here/deploy-read.sh" 2>&1) || got=$?
+check 'a manual run with no record is red even when main moved on' 1 'cv — no record'
+
+reset
 history 1 "c2||||" "c1|cv|FAILURE|$CANCELED|2026-11-04T09:25:00Z"
 read_step c1 cv
-check 'a cancel with a later push on main is superseded, not red' 0 'cv — superseded'
+check 'a cancel with a later push and no later status is still red' 1 'cv — Canceled'
+
+reset
+history 1 "c1|cv|FAILURE|$CANCELED|2026-11-04T09:25:00Z"
+history 2 "c1|cv|SUCCESS|$DONE|2026-11-04T09:25:30Z"
+read_step c1 cv 30
+check 'a cancel then Ready on one commit is green' 0 'cv — Ready'
+
+reset
+history 1 "c1|cv|FAILURE||2026-11-04T09:25:00Z"
+jq '.data.repository.object.history.nodes[0].status.contexts[0].description = null' \
+  "$fake/history.1.json" >"$fake/h" && mv "$fake/h" "$fake/history.1.json"
+read_step c1 cv
+check 'a failed status with a null description is red' 1 'cv — Error'
+
+reset
+echo '{"data":{"repository":{"object":{"history":{"nodes":[{"oid":"c1","status":{"contexts":[{"context":"Vercel – cv","state":"FAILURE","createdAt":"2026-11-04T09:25:00Z","description":3,"targetUrl":"x"}]}}]}}}}}' >"$fake/history.1.json"
+echo 1 >"$fake/history-last"
+read_step c1 cv
+check 'a status jq cannot read is red, never green' 1 'cv — unreadable'
 
 reset
 history 1 "c1|cv|SUCCESS|$DONE|2026-11-04T09:20:00Z"
@@ -196,6 +221,7 @@ p0=$(commit p0 pnpm-lock.yaml)
 p1=$(commit p1 pnpm-lock.yaml)
 p2=$(commit p2 docs.txt)
 p3=$(commit p3 docs.txt)
+p4=$(commit p4 docs.txt)
 
 hooks=$(jq -n --arg a "$ALL_APPS" '$a | split(" ") | map({key: ., value: ("https://hook.example/" + .)}) | from_entries')
 
@@ -229,21 +255,27 @@ rows() { # rows <sha> <STATE> <description> <createdAt> <apps…>
 
 # One app fails across 3 pushes: only it refires, the others hold their base.
 reset
-p0_rows=$(rows "$p0" SUCCESS "$DONE" 2026-11-04T08:00:00Z $ALL_APPS)
 healthy='figmentation financial space-explorer-ui trophy-sys x-com-chat'
-p1_rows=$(rows "$p1" SUCCESS "$DONE" 2026-11-04T09:00:00Z $healthy; rows "$p1" FAILURE "$ERRORED" 2026-11-04T09:00:00Z cv)
-IFS=$'\n' read -r -d '' -a lines <<<"$p1_rows
-$p0_rows" || true
-history 1 "${lines[@]}"
-base_step "$p1"
-check 'the first read of a failed push exits clean' 0 -
-want_base 'a failed app keeps its last Ready commit' cv "$p0"
-want_base 'a healthy app moves to its own Ready commit' figmentation "$p1"
-for p in "$p2" "$p3"; do
+p0_rows=$(rows "$p0" SUCCESS "$DONE" 2026-11-04T08:00:00Z $ALL_APPS)
+p1_healthy=$(rows "$p1" SUCCESS "$DONE" 2026-11-04T09:00:00Z $healthy)
+p1_failed=$(rows "$p1" FAILURE "$ERRORED" 2026-11-04T09:00:00Z cv)
+known="$p1_healthy
+$p1_failed
+$p0_rows"
+for p in "$p2" "$p3" "$p4"; do
+  known="$p||||
+$known"
+  IFS=$'\n' read -r -d '' -a lines <<<"$known" || true
+  history 1 "${lines[@]}"
+  base_step "$p"
+  want_base 'a failed app keeps its last Ready commit' cv "$p0"
+  for app in $healthy; do want_base "healthy $app holds its base" "$app" "$p1"; done
   git checkout -q "$p"
   : >"$fake/fired"
   main_step "$bases"
   want_fired "only the failed app refires on $(git log -1 --format=%s)" 'cv '
+  known="$p|cv|FAILURE|$ERRORED|2026-11-04T10:00:00Z
+${known#*$'\n'}"
 done
 git checkout -q main
 
@@ -267,11 +299,11 @@ main_step "$bases"
 want_fired 'no bases deploys every app' 'cv figmentation financial space-explorer-ui trophy-sys x-com-chat '
 
 reset
-main_step '{"cv":"0000000000000000000000000000000000000000","figmentation":"'"$p3"'","financial":"'"$p3"'","space-explorer-ui":"'"$p3"'","trophy-sys":"'"$p3"'","x-com-chat":"'"$p3"'"}'
+main_step '{"cv":"0000000000000000000000000000000000000000","figmentation":"'"$p4"'","financial":"'"$p4"'","space-explorer-ui":"'"$p4"'","trophy-sys":"'"$p4"'","x-com-chat":"'"$p4"'"}'
 want_fired 'a base git cannot resolve deploys that app alone' 'cv '
 
 reset
-same=$(jq -n --arg s "$p3" --arg a "$ALL_APPS" '$a | split(" ") | map({key: ., value: $s}) | from_entries')
+same=$(jq -n --arg s "$p4" --arg a "$ALL_APPS" '$a | split(" ") | map({key: ., value: $s}) | from_entries')
 main_step "$same"
 want_fired 'nothing affected fires nothing' ''
 grep -qx 'apps=' "$fake/output" && echo '  ok nothing affected hands the read no apps' || { echo 'FAIL apps output'; cat "$fake/output"; failed=1; }
@@ -281,6 +313,23 @@ main_step '' cv
 want_fired 'a manual run deploys the pick' 'cv '
 grep -qx 'apps=cv' "$fake/output" && echo '  ok a manual run hands the read its pick' || { echo 'FAIL manual apps output'; failed=1; }
 grep -q '^fired_at=20' "$fake/output" && echo '  ok the fire time reaches the read' || { echo 'FAIL fired_at'; failed=1; }
+
+# A turbo that fails stops the run before any hook fires.
+reset
+touch "$fake/npx-down"
+main_step "$same"
+check 'a failed turbo reds the run' 1 -
+want_fired 'a failed turbo fires no hook' ''
+
+# A broken turbo pin stops a diff, never the deploy that needs no diff.
+reset
+cp package.json "$fake/package.json"
+echo '{"devDependencies":{"turbo":"^2"}}' >package.json
+main_step '{}'
+want_fired 'no base needs no turbo pin' 'cv figmentation financial space-explorer-ui trophy-sys x-com-chat '
+main_step "$same"
+check 'a range in the turbo pin reds a diff' 1 'not an exact version'
+cp "$fake/package.json" package.json
 
 # --- 2026-11-04 replayed: 6 errored, the read reds, the next push retries those 6
 
@@ -308,10 +357,16 @@ git checkout -q main
 # --- the workflow wires it
 
 cd "$here/../.."
-grep -q 'statuses: read' .github/workflows/deploy.yml &&
-  grep -q 'deploy-read.sh' .github/workflows/deploy.yml &&
-  echo '  ok deploy.yml runs the read with statuses: read' ||
-  { echo 'FAIL deploy.yml does not wire the read'; failed=1; }
+# Grep, since no case runs a workflow: losing one of these reads green over a failed deploy.
+for wire in 'statuses: read' 'id: deploy' 'APPS: ${{ steps.deploy.outputs.apps }}' \
+  'FIRED_AT: ${{ steps.deploy.outputs.fired_at }}' 'run: .github/scripts/deploy-read.sh'; do
+  grep -qF "$wire" .github/workflows/deploy.yml && echo "  ok deploy.yml holds $wire" ||
+    { echo "FAIL deploy.yml lost $wire"; failed=1; }
+done
+job_minutes=$(sed -n 's/^    timeout-minutes: //p' .github/workflows/deploy.yml)
+deadline=$(sed -n 's/^deadline=${DEADLINE_SECONDS:-\([0-9]*\)}$/\1/p' "$here/deploy-read.sh")
+[ "${deadline:-9999}" -lt "$((job_minutes * 60))" ] && echo "  ok the ${deadline}s deadline sits under the job's ${job_minutes} min" ||
+  { echo "FAIL deadline «$deadline» is not under the job's «$job_minutes» min"; failed=1; }
 
 [ "$failed" = 0 ] && echo 'all deploy cases pass'
 exit "$failed"

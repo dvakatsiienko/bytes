@@ -4,7 +4,8 @@
 # base, and deploy-main.sh deploys it.
 #
 # Each app keeps its own base, so a failed app retries on the next push, and a
-# healthy app does not redeploy. A push that deployed nothing, or a red or
+# healthy app does not redeploy, unless it sits past deploy-history.sh's 100
+# commits. A push that deployed nothing, or a red or
 # cancelled CI, moves no base, so those apps ride on the next green push.
 #
 # 📌 It fails OPEN: an api error answers `bases={}`. A red step would deploy

@@ -89,37 +89,50 @@ else
   # A CI-triggered run.
   bases=${BASES:-'{}'}
 
-  # 📌 No workspace install. Measured on BYT-84: turbo answers
-  # `--affected --dry=json` from the manifests and the lockfile alone, and
-  # returns the IDENTICAL package list it returns after a full install — the
-  # graph is all it needs. That removes `pnpm/action-setup` (4-6 s), the pnpm
-  # cache restore, and `pnpm install` (12-14 s) from the only job standing
-  # between a merge and production.
-  #
-  # The version is read from the manifest rather than written here, so it
-  # cannot drift from the turbo the rest of the repo runs.
-  turbo_v=$(jq -r '.devDependencies.turbo // empty' package.json)
-  if [ -z "$turbo_v" ]; then
-    echo "::error::the root package.json no longer pins turbo in devDependencies"
-    exit 1
-  fi
-  # 🚨 An EXACT version, or nothing. `.npmrc` sets `save-exact = true`, so this
-  # field reads `2.10.12` today — but if a range ever lands in it, `npx` picks
-  # the newest match and an untested turbo decides what production deploys.
-  # A reviewer spotted that the empty-check alone was one arm short.
-  case "$turbo_v" in
-    [0-9]*.[0-9]*.[0-9]*) : ;;
-    *)
-      echo "::error::turbo is pinned as '$turbo_v', not an exact version — npx would resolve a turbo this repo never tested, and that turbo decides what deploys"
-      exit 1 ;;
-  esac
-
-  # One turbo call per distinct base, and most pushes have one. Built in a plain
-  # loop, never a command substitution, where `set -e` would not see turbo fail.
+  # A base git cannot resolve, or none at all, is not a reason to deploy nothing;
+  # it is a reason to deploy, because the cost of one extra build is nothing
+  # against a production that silently never updates.
   apps=""
-  for base in $(jq -r '[.[]] | unique | .[]' <<<"$bases"); do
-    git rev-parse --verify --quiet "${base}^{commit}" >/dev/null || continue
+  diffable=""
+  while IFS= read -r app; do
+    base=$(jq -r --arg app "$app" '.[$app] // empty' <<<"$bases")
+    if [ -n "$base" ] && git rev-parse --verify --quiet "${base}^{commit}" >/dev/null; then
+      diffable="$diffable"$'\n'"$app $base"
+    else
+      echo "$app has no usable base (${base:-none}) — deploying it"
+      apps="$apps"$'\n'"$app"
+    fi
+  done <<<"$all_apps"
+
+  # One turbo call per distinct base, and most pushes have one.
+  for base in $(awk 'NF { print $2 }' <<<"$diffable" | sort -u); do
     echo "diffed against $base"
+
+    # 📌 No workspace install. Measured on BYT-84: turbo answers
+    # `--affected --dry=json` from the manifests and the lockfile alone, and
+    # returns the IDENTICAL package list it returns after a full install — the
+    # graph is all it needs. That removes `pnpm/action-setup` (4-6 s), the pnpm
+    # cache restore, and `pnpm install` (12-14 s) from the only job standing
+    # between a merge and production.
+    #
+    # The version is read from the manifest rather than written here, so it
+    # cannot drift from the turbo the rest of the repo runs.
+    turbo_v=$(jq -r '.devDependencies.turbo // empty' package.json)
+    if [ -z "$turbo_v" ]; then
+      echo "::error::the root package.json no longer pins turbo in devDependencies"
+      exit 1
+    fi
+    # 🚨 An EXACT version, or nothing. `.npmrc` sets `save-exact = true`, so this
+    # field reads `2.10.12` today — but if a range ever lands in it, `npx` picks
+    # the newest match and an untested turbo decides what production deploys.
+    # A reviewer spotted that the empty-check alone was one arm short.
+    case "$turbo_v" in
+      [0-9]*.[0-9]*.[0-9]*) : ;;
+      *)
+        echo "::error::turbo is pinned as '$turbo_v', not an exact version — npx would resolve a turbo this repo never tested, and that turbo decides what deploys"
+        exit 1 ;;
+    esac
+
     # 🚨 `TURBO_SCM_BASE` is not optional. Without it turbo cannot resolve a
     # base ref, falls back to «assuming all files have changed», and every push
     # deploys all six apps — the affected list silently stops meaning anything.
@@ -130,22 +143,11 @@ else
     while IFS= read -r pkg; do
       [ -n "$pkg" ] || continue
       app=$(jq -r --arg pkg "$pkg" '.[$pkg] // empty' <<<"$deployable")
-      if [ -n "$app" ] && [ "$(jq -r --arg app "$app" '.[$app] // empty' <<<"$bases")" = "$base" ]; then
+      if [ -n "$app" ] && grep -qx "$app $base" <<<"$diffable"; then
         apps="$apps"$'\n'"$app"
       fi
     done <<<"$affected"
   done
-
-  # A base git cannot resolve, or none at all, is not a reason to deploy nothing;
-  # it is a reason to deploy, because the cost of one extra build is nothing
-  # against a production that silently never updates.
-  while IFS= read -r app; do
-    base=$(jq -r --arg app "$app" '.[$app] // empty' <<<"$bases")
-    if [ -z "$base" ] || ! git rev-parse --verify --quiet "${base}^{commit}" >/dev/null; then
-      echo "$app has no usable base (${base:-none}) — deploying it"
-      apps="$apps"$'\n'"$app"
-    fi
-  done <<<"$all_apps"
 
   # 📌 Measured on BYT-84, because the answer is not the obvious one and the
   # whole job rests on it:

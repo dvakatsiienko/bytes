@@ -21,7 +21,8 @@ push (`workflow_run`), it asks turbo which packages changed since each app's las
 Vercel deploy hook for each affected app. A red CI on `main` deploys nothing; the next green push carries those apps.
 Vercel still clones, builds with its own cache and keeps its own logs; it no longer decides when.
 
-**Deploy is green only if every app it fired for reached Ready.** It reads the `Vercel – <app>` commit statuses on that commit or a descendant, since a hook builds the branch tip, and waits up to 12 min. Error, Canceled, still building or no record reds the run and names the app. A failed app has no new Ready commit, so the next push retries it alone. Nothing to deploy stays green. `deploy-cases.sh` proves all of it with a fake status read; a real Canceled row was never seen, so that case's description is inference.
+**Deploy is green only if every app it fired for reached Ready.** It reads the `Vercel – <app>` commit statuses on that commit or a descendant, since a hook builds the branch tip, and waits up to 12 min. Error, Canceled, still building or no record reds the run and names the app; a push's app with no record stays green when main has moved past it, since a later run owns it. A failed app has no new Ready commit, so the next push retries it alone. Nothing to deploy stays green. The read reaches back 100 commits: an app untouched for longer redeploys once. `deploy-cases.sh` proves all of it with a fake status read; a real Canceled row was never seen, so that case's description is inference.
+
 The urls live in the repo secret `VERCEL_DEPLOY_HOOKS`, a json object keyed by APP DIRECTORY name
 (`space-explorer-ui`, not the package name `@space-explorer/ui`). One hook per project, named
 `ci-main`, bound to `main`; manage them with `vercel deploy-hooks list|create|remove`.
