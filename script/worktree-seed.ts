@@ -36,14 +36,14 @@ const trees = execFileSync('git', ['worktree', 'list', '--porcelain'], {
   .map((l) => l.slice('worktree '.length));
 const [main] = trees;
 if (!main) throw new Error('not inside a git worktree');
-// no path: the tree you stand in, or — from the main checkout — the newest one
-// (`camp … && pnpm worktree:seed` is the whole move)
+// no path: the tree you stand in; from the main checkout the newest tree may be another session's, so it asks
 const cwd = process.cwd();
 const cwdTree = trees.find((t) => cwd === t || cwd.startsWith(`${t}/`));
-const target = resolve(
-  process.argv[2] ??
-    (cwdTree && cwdTree !== main ? cwdTree : (trees.at(-1) ?? main)),
-);
+if (!process.argv[2] && cwdTree === main) {
+  console.error('usage from the main checkout: pnpm worktree:seed <path>');
+  process.exit(2);
+}
+const target = resolve(process.argv[2] ?? cwdTree ?? main);
 const index = trees.indexOf(target);
 if (index === -1) throw new Error(`${target} is not a worktree of ${main}`);
 if (index === 0) {
