@@ -75,6 +75,8 @@ EOF
 chmod +x "$work/bin/"*
 
 export PATH="$work/bin:$PATH" GH_TOKEN=fake REPO=owner/repo
+# These cases run inside ci, whose own run must not change them or fill its summary.
+unset GITHUB_RUN_ATTEMPT GITHUB_EVENT_NAME GITHUB_STEP_SUMMARY GITHUB_OUTPUT
 export GIT_AUTHOR_NAME=case GIT_AUTHOR_EMAIL=case@example.com GIT_COMMITTER_NAME=case GIT_COMMITTER_EMAIL=case@example.com
 
 # Every case gets its own empty state.
@@ -374,6 +376,18 @@ main_step "$bases"
 case "$fired" in
 cv*) echo "FAIL a push inside a running build refired it: $fired"; failed=1 ;;
 *) echo '  ok a push inside a running build does not refire it' ;;
+esac
+git checkout -q main
+
+reset
+history 1 "$p2||||" "$p1|cv|PENDING|$BUILDING|$now" "$p0|cv|SUCCESS|$DONE|2026-11-04T09:00:00Z"
+GITHUB_RUN_ATTEMPT=2 base_step "$p2"
+want_base 'a re-run counts no running build' cv "$p0"
+git checkout -q "$p2"
+main_step "$bases"
+case "$fired" in
+cv*) echo '  ok a re-run refires a running build and reads its own' ;;
+*) echo "FAIL a re-run did not refire: $fired"; failed=1 ;;
 esac
 git checkout -q main
 

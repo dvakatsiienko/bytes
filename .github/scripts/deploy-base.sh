@@ -5,9 +5,8 @@
 #
 # A build still running counts as Ready: the run that fired it owns its result, and
 # refiring would only build it twice. Past the job's 15 min the build is stuck, and
-# no longer counts. The one gap: a re-run after a refused hook does not read a build
-# its first attempt fired, so that build failing leaves the re-run green, until the
-# next push retries it.
+# no longer counts. A re-run counts no running build: one may be its own first
+# attempt's, which nothing would read, so it refires and reads its own.
 #
 # Each app keeps its own base, so a failed app retries on the next push, and a
 # healthy app does not redeploy, unless it sits past deploy-history.sh's 100
@@ -29,9 +28,9 @@ if ! nodes=$("$here/deploy-history.sh" "$COMMIT"); then
 fi
 
 # Newest first, so the first such status an app meets is its base.
-bases=$(jq -c 'reduce (.[] | .oid as $oid | .status.contexts[]?
+bases=$(jq -c --arg attempt "${GITHUB_RUN_ATTEMPT:-1}" 'reduce (.[] | .oid as $oid | .status.contexts[]?
     | select(.context | startswith("Vercel – "))
-    | select(.state == "SUCCESS" or (.state == "PENDING" and (.createdAt | fromdate) > (now - 900)))
+    | select(.state == "SUCCESS" or ($attempt == "1" and .state == "PENDING" and (.createdAt | fromdate) > (now - 900)))
     | {app: (.context | ltrimstr("Vercel – ")), oid: $oid}) as $ready
   ({}; .[$ready.app] //= $ready.oid)' <<<"$nodes")
 echo "bases=$bases"
