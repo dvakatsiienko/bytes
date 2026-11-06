@@ -17,16 +17,18 @@ created, it only let Vercel CANCEL one afterwards, and a canceled deployment sti
 the hobby «Deployments Created per Day» cap. The bool is the only form with no webhook path at all.
 
 **`.github/workflows/deploy.yml` is the trigger, and the only one.** When CI goes green on a `main`
-push (`workflow_run`), it asks turbo which packages changed since the last real deploy, and POSTs a
+push (`workflow_run`), it asks turbo which packages changed since each app's last Ready commit, and POSTs a
 Vercel deploy hook for each affected app. A red CI on `main` deploys nothing; the next green push carries those apps.
 Vercel still clones, builds with its own cache and keeps its own logs; it no longer decides when.
+
+**Deploy is green only if every app it fired for reached Ready.** It reads the `Vercel – <app>` commit statuses on that commit or a descendant, since a hook builds the branch tip, and waits up to 12 min. Error, Canceled, still building or no record reds the run and names the app. A failed app has no new Ready commit, so the next push retries it alone. Nothing to deploy stays green. `deploy-cases.sh` proves all of it with a fake status read; a real Canceled row was never seen, so that case's description is inference.
 The urls live in the repo secret `VERCEL_DEPLOY_HOOKS`, a json object keyed by APP DIRECTORY name
 (`space-explorer-ui`, not the package name `@space-explorer/ui`). One hook per project, named
 `ci-main`, bound to `main`; manage them with `vercel deploy-hooks list|create|remove`.
 
 ⚠️ **`[skip ci]` on a `main` commit now means «do not deploy».** It skips every push-triggered
 workflow, CI included, so the apps that commit changed stay stale in production until the next green
-CI on `main` (Deploy diffs from the last real deploy) or a manual run. Vercel used to deploy regardless of the directive; this
+CI on `main` (Deploy diffs from each app's last Ready commit) or a manual run. Vercel used to deploy regardless of the directive; this
 job is the only trigger now, and GitHub gives a workflow no way to opt out of it.
 
 ⚠️ **Never set `github.enabled: false`.** Vercel documents that one as disabling deploy hooks

@@ -26,7 +26,7 @@
 # `push`-triggered workflow, CI included, and with no CI run this one never
 # starts. A commit carrying one does NOT
 # deploy, and the apps it changed stay stale in production until the next green
-# CI on main (it diffs from the last real deploy) or a manual run.
+# CI on main (it diffs from each app's last Ready commit) or a manual run.
 #
 # That directive used to be harmless here, because Vercel deployed whatever CI
 # did. It is not harmless now: this job is the only trigger there is. GitHub
@@ -49,7 +49,7 @@ name: Deploy
 
 # 📌 The run is named after the commit it deploys, because a `workflow_run`
 # run's own `head_sha` is main's tip when the run was created, which can be a
-# later push than the one CI judged. `deploy-base.sh` reads the sha from here.
+# later push than the one CI judged.
 run-name: deploy ${{ github.event.workflow_run.head_sha || 'by hand' }}
 
 # Deploy waits for CI. It ran beside CI on every push once, and on 2026-09-21
@@ -58,8 +58,8 @@ run-name: deploy ${{ github.event.workflow_run.head_sha || 'by hand' }}
 # runs main's copy of this file by construction, so a PR cannot rewrite it.
 #
 # 📌 A red or cancelled CI leaves the deploy job skipped. That push's apps are
-# not lost: the base is the last run that really deployed (`deploy-base.sh`),
-# so the next green push carries them.
+# not lost: each app's base is its own last Ready commit (`deploy-base.sh`), so
+# the next green push carries them.
 on:
   workflow_run:
     workflows: [CI]
@@ -94,7 +94,7 @@ on:
 # 🚨 NO `concurrency:` block, and it must stay that way — a shared group
 # silently loses deployments. GitHub keeps at most one running and one
 # pending run per concurrency group, so a third push EVICTS the second while it
-# is still pending. Each run diffs from the last real deploy, so an evicted
+# is still pending. Each run diffs from each app's last Ready commit, so an evicted
 # run's apps ride only on a LATER run — and if none comes, they sit stale in
 # production with nothing red anywhere. With no block, every green push deploys.
 #
@@ -115,7 +115,6 @@ env:
 
 jobs:
   deploy:
-    # `deploy-base.sh` finds the last real deploy by this name; rename both or neither.
     name: deploy affected apps
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -128,11 +127,11 @@ jobs:
         github.event.workflow_run.head_repository.full_name == github.repository
       )
 
-    # It reads the repo and its Actions history, and POSTs to Vercel. It writes
-    # nothing back to GitHub.
+    # It reads the repo and the commit statuses Vercel posts, and POSTs to
+    # Vercel. It writes nothing back to GitHub.
     permissions:
       contents: read
-      actions: read
+      statuses: read
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -148,6 +147,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          COMMIT: ${{ github.event.workflow_run.head_sha }}
         run: .github/scripts/deploy-base.sh >> "$GITHUB_OUTPUT"
 
       # 📌 No `pnpm/action-setup`, no pnpm cache and no `pnpm install`, and that
@@ -172,9 +172,21 @@ jobs:
           node-version-file: .node-version
 
       - name: Deploy
+        id: deploy
         env:
           # Empty on a manual run, which is how the script tells the two apart.
-          BASE: ${{ steps.base.outputs.sha }}
+          BASES: ${{ steps.base.outputs.bases }}
           REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.app || '' }}
           HOOKS: ${{ secrets.VERCEL_DEPLOY_HOOKS }}
         run: .github/scripts/deploy-main.sh
+
+      # A hook only queues a build. This is what reds the run on a failed deploy,
+      # and it waits for the builds, so the run lasts as long as they do.
+      - name: Read the deploys
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
+          APPS: ${{ steps.deploy.outputs.apps }}
+          FIRED_AT: ${{ steps.deploy.outputs.fired_at }}
+        run: .github/scripts/deploy-read.sh

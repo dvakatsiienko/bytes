@@ -14,10 +14,11 @@
 #     replacement for the Vercel dashboard's Redeploy button, which is the only
 #     other way to deploy now that the git integration is off.
 #
-# Env: BASE (the last real deploy's head from `deploy-base.sh`, CI-triggered
-# only; empty means «deploy every app»), REQUESTED (the chosen app or
+# Env: BASES (each app's last Ready commit from `deploy-base.sh`, CI-triggered
+# only; an app it does not name deploys), REQUESTED (the chosen app or
 # `all`, manual only), HOOKS (the VERCEL_DEPLOY_HOOKS secret),
-# GITHUB_STEP_SUMMARY. It writes no step output — nothing downstream reads one.
+# GITHUB_STEP_SUMMARY, GITHUB_OUTPUT. It writes the step outputs `apps` and
+# `fired_at`, which `deploy-read.sh` reads.
 #
 # 🚨 Every hook url is a bearer credential — anyone holding one can deploy the
 # project. GitHub masks a secret's exact string, NOT a value parsed out of it,
@@ -85,48 +86,66 @@ if [ -n "${REQUESTED:-}" ]; then
     exit 1
   fi
 else
-  # A CI-triggered run. A base that git cannot resolve — none found by
-  # `deploy-base.sh`, a force-push past it, a truncated clone — is not a reason to deploy
-  # nothing; it is a reason to deploy everything, because the cost of one extra
-  # build is nothing against a production that silently never updates.
-  if [ -n "${BASE:-}" ] && git rev-parse --verify --quiet "${BASE}^{commit}" >/dev/null; then
-    echo "diffed against $BASE"
+  # A CI-triggered run.
+  bases=${BASES:-'{}'}
 
-    # 📌 No workspace install. Measured on BYT-84: turbo answers
-    # `--affected --dry=json` from the manifests and the lockfile alone, and
-    # returns the IDENTICAL package list it returns after a full install — the
-    # graph is all it needs. That removes `pnpm/action-setup` (4-6 s), the pnpm
-    # cache restore, and `pnpm install` (12-14 s) from the only job standing
-    # between a merge and production.
-    #
-    # The version is read from the manifest rather than written here, so it
-    # cannot drift from the turbo the rest of the repo runs.
-    turbo_v=$(jq -r '.devDependencies.turbo // empty' package.json)
-    if [ -z "$turbo_v" ]; then
-      echo "::error::the root package.json no longer pins turbo in devDependencies"
-      exit 1
-    fi
-    # 🚨 An EXACT version, or nothing. `.npmrc` sets `save-exact = true`, so this
-    # field reads `2.10.12` today — but if a range ever lands in it, `npx` picks
-    # the newest match and an untested turbo decides what production deploys.
-    # A reviewer spotted that the empty-check alone was one arm short.
-    case "$turbo_v" in
-      [0-9]*.[0-9]*.[0-9]*) : ;;
-      *)
-        echo "::error::turbo is pinned as '$turbo_v', not an exact version — npx would resolve a turbo this repo never tested, and that turbo decides what deploys"
-        exit 1 ;;
-    esac
+  # 📌 No workspace install. Measured on BYT-84: turbo answers
+  # `--affected --dry=json` from the manifests and the lockfile alone, and
+  # returns the IDENTICAL package list it returns after a full install — the
+  # graph is all it needs. That removes `pnpm/action-setup` (4-6 s), the pnpm
+  # cache restore, and `pnpm install` (12-14 s) from the only job standing
+  # between a merge and production.
+  #
+  # The version is read from the manifest rather than written here, so it
+  # cannot drift from the turbo the rest of the repo runs.
+  turbo_v=$(jq -r '.devDependencies.turbo // empty' package.json)
+  if [ -z "$turbo_v" ]; then
+    echo "::error::the root package.json no longer pins turbo in devDependencies"
+    exit 1
+  fi
+  # 🚨 An EXACT version, or nothing. `.npmrc` sets `save-exact = true`, so this
+  # field reads `2.10.12` today — but if a range ever lands in it, `npx` picks
+  # the newest match and an untested turbo decides what production deploys.
+  # A reviewer spotted that the empty-check alone was one arm short.
+  case "$turbo_v" in
+    [0-9]*.[0-9]*.[0-9]*) : ;;
+    *)
+      echo "::error::turbo is pinned as '$turbo_v', not an exact version — npx would resolve a turbo this repo never tested, and that turbo decides what deploys"
+      exit 1 ;;
+  esac
+
+  # One turbo call per distinct base, and most pushes have one. Built in a plain
+  # loop, never a command substitution, where `set -e` would not see turbo fail.
+  apps=""
+  for base in $(jq -r '[.[]] | unique | .[]' <<<"$bases"); do
+    git rev-parse --verify --quiet "${base}^{commit}" >/dev/null || continue
+    echo "diffed against $base"
     # 🚨 `TURBO_SCM_BASE` is not optional. Without it turbo cannot resolve a
     # base ref, falls back to «assuming all files have changed», and every push
     # deploys all six apps — the affected list silently stops meaning anything.
     # It is the same trap ci.yml's own env block is written about, and dropping
     # this prefix while rewriting the call is exactly how it comes back.
-    plan=$(TURBO_SCM_BASE="$BASE" npx --yes "turbo@$turbo_v" run build --affected --dry=json)
+    plan=$(TURBO_SCM_BASE="$base" npx --yes "turbo@$turbo_v" run build --affected --dry=json)
     affected=$(jq -r '[.tasks[] | select(.command != "<NONEXISTENT>") | .package] | unique | .[]' <<<"$plan")
-  else
-    echo "no usable base (${BASE:-unset}) — deploying every app"
-    affected=$(jq -r 'to_entries | .[] | .key' <<<"$deployable")
-  fi
+    while IFS= read -r pkg; do
+      [ -n "$pkg" ] || continue
+      app=$(jq -r --arg pkg "$pkg" '.[$pkg] // empty' <<<"$deployable")
+      if [ -n "$app" ] && [ "$(jq -r --arg app "$app" '.[$app] // empty' <<<"$bases")" = "$base" ]; then
+        apps="$apps"$'\n'"$app"
+      fi
+    done <<<"$affected"
+  done
+
+  # A base git cannot resolve, or none at all, is not a reason to deploy nothing;
+  # it is a reason to deploy, because the cost of one extra build is nothing
+  # against a production that silently never updates.
+  while IFS= read -r app; do
+    base=$(jq -r --arg app "$app" '.[$app] // empty' <<<"$bases")
+    if [ -z "$base" ] || ! git rev-parse --verify --quiet "${base}^{commit}" >/dev/null; then
+      echo "$app has no usable base (${base:-none}) — deploying it"
+      apps="$apps"$'\n'"$app"
+    fi
+  done <<<"$all_apps"
 
   # 📌 Measured on BYT-84, because the answer is not the obvious one and the
   # whole job rests on it:
@@ -150,21 +169,18 @@ else
   # 📌 `--affected` reads `build.inputs` (`futureFlags.affectedUsingTaskInputs`
   # in turbo.jsonc), so a push touching only an app's docs, `AGENTS.md` or
   # `.claude/**` deploys nothing. Measured on BYT-106 in a throwaway clone.
-  apps=$(
-    while IFS= read -r pkg; do
-      [ -n "$pkg" ] || continue
-      jq -r --arg pkg "$pkg" '.[$pkg] // empty' <<<"$deployable"
-    done <<<"$affected" | sort -u
-  )
+  apps=$(sed '/^$/d' <<<"$apps" | sort -u)
 fi
 
 summary() { [ -n "${GITHUB_STEP_SUMMARY:-}" ] && printf '%s\n' "$1" >> "$GITHUB_STEP_SUMMARY"; return 0; }
+output() { [ -n "${GITHUB_OUTPUT:-}" ] && printf '%s\n' "$1" >> "$GITHUB_OUTPUT"; return 0; }
 
 if [ -z "$apps" ]; then
   echo "nothing affected that Vercel deploys — no hooks fired"
   summary "### No deployment"
   summary ""
   summary "This push changed nothing any Vercel app builds from, so no deploy hook was fired."
+  output "apps="
   exit 0
 fi
 
@@ -191,6 +207,9 @@ summary "### Deployments triggered"
 summary ""
 summary "| App | Vercel job | State |"
 summary "| --- | --- | --- |"
+
+# Before the first hook, so no status of this fire can read as older than it.
+output "fired_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 failed=""
 while IFS= read -r app; do
@@ -238,6 +257,8 @@ summary "Builds and logs live in the Vercel dashboard; the job id above identifi
 # that is the cheaper repair.
 summary ""
 summary "> Re-running this job re-fires every hook listed above. To repair a single app, run the **Deploy** workflow manually and choose just that one."
+
+output "apps=$(tr '\n' ' ' <<<"$apps" | sed 's/ $//')"
 
 if [ -n "$failed" ]; then
   echo "::error::deploy hooks failed for:$failed"
