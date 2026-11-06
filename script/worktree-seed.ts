@@ -38,8 +38,11 @@ const [main] = trees;
 if (!main) throw new Error('not inside a git worktree');
 // no path: the tree you stand in; from the main checkout the newest tree may be another session's, so it asks
 const cwd = process.cwd();
-const cwdTree = trees.find((t) => cwd === t || cwd.startsWith(`${t}/`));
-if (!process.argv[2] && cwdTree === main) {
+// linked trees nest under main, so the deepest match is the tree you stand in
+const [cwdTree] = trees
+  .filter((t) => cwd === t || cwd.startsWith(`${t}/`))
+  .sort((a, b) => b.length - a.length);
+if (!process.argv[2] && (!cwdTree || cwdTree === main)) {
   console.error('usage from the main checkout: pnpm worktree:seed <path>');
   process.exit(2);
 }
