@@ -21,14 +21,20 @@ ERRORED='Deployment has failed — run this Vercel CLI command: npx vercel inspe
 CANCELED='Deployment has been canceled'
 ALL_APPS='cv figmentation financial space-explorer-ui trophy-sys x-com-chat'
 
-# Each call answers the next saved history; the last one repeats.
+# Each call answers the next saved history; the last one repeats. Like github, a
+# rev that names a commit starts the history there, so its descendants are out.
 cat >"$work/bin/gh" <<'EOF'
 #!/usr/bin/env bash
 [ ! -e "$FAKE/gh-down" ] || { echo 'HTTP 502' >&2; exit 1; }
 echo x >>"$FAKE/gh-calls"
 n=$(wc -l <"$FAKE/gh-calls" | tr -d ' ')
 [ -e "$FAKE/history.$n.json" ] || n=$(cat "$FAKE/history-last")
-cat "$FAKE/history.$n.json"
+rev=main
+for arg in "$@"; do
+  case "$arg" in rev=*) rev=${arg#rev=} ;; esac
+done
+jq --arg rev "$rev" '.data.repository.object.history.nodes |=
+  ((map(.oid) | index($rev)) as $i | if $i then .[$i:] else . end)' "$FAKE/history.$n.json"
 EOF
 # Answers the way turbo does: a root lockfile marks all, an app path marks its app.
 cat >"$work/bin/npx" <<'EOF'
@@ -283,6 +289,11 @@ reset
 history 1 "$p1|cv|SUCCESS|$DONE|2026-11-04T09:00:00Z" "$p0|cv|SUCCESS|$DONE|2026-11-04T08:00:00Z"
 base_step "$p1"
 want_base 'the newest Ready commit is the base' cv "$p1"
+
+reset
+history 1 "$p2|cv|SUCCESS|$DONE|2026-11-04T10:00:00Z" "$p1|cv|SUCCESS|$DONE|2026-11-04T09:00:00Z"
+base_step "$p1"
+want_base 'a Ready commit after this one is no base' cv "$p1"
 
 reset
 history 1 "$p1|cv|SUCCESS|$DONE|2026-11-04T09:00:00Z"
