@@ -11,7 +11,7 @@ a pr reaches `main` through one door: `x lane merge-auto <pr> --apply`.
 7. `x lane merge-auto` lands the pr when all of these hold:
    - sixth sense is clean on the head
    - the required checks are green: `lint + typecheck + test + build`, `apps essentials`, `skip-marker`
-   - the reviewer job finished a round on an ancestor of the head
+   - the reviewer job finished a round on an ancestor of the head, or a rebase kept its code
    - no review thread is open
    - the brake is off, and a self-edit has dima's word
 
