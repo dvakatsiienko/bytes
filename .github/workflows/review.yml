@@ -61,7 +61,7 @@ jobs:
     # used to work too and is gone deliberately: two doors to one action means
     # two things to keep in step, and the comment door looked like an escape
     # hatch for a PR that edits this file — which it never was, because the
-    # action refuses itself on such a PR whichever door opened it.
+    # action can refuse itself on such a PR whichever door opened it.
     #
     # 📌 The action ships its own `label_trigger` input and this predicate is
     # NOT it, deliberately. `label_trigger` is read inside the action, which is

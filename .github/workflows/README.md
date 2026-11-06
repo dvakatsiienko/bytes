@@ -15,9 +15,10 @@ a pr reaches `main` through one door: `x lane merge-auto <pr> --apply`.
    - no review thread is open
    - the brake is off, and a self-edit has dima's word
 
-## the two other paths
+## the other paths
 
-- **a pr that edits a workflow**: the reviewer stands down, so it has no round. merge-auto names the door, `--dima-ok <pr>`, on dima's prompt or a tick quoting that pr.
+- **a round that stood down**: it holds no round. merge-auto names the door, `--dima-ok <pr>`, on dima's prompt or a tick quoting that pr.
+- **a pr that edits `review.yml` or `review-round.yml`**: a self-edit, so it needs that same word, round or no round.
 - **a renovate pr**: needs no round. its automerge group merges itself on ci; one outside the group goes through a member.
 
 ## not here on purpose
