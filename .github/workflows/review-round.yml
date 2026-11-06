@@ -200,6 +200,7 @@ jobs:
             echo "::error::no rounds script on the base revision — the round ends red"
             exit 1
           fi
+          jq --version
           for attempt in 1 2 3; do
             posted=$(for feed in "issues/$PR/comments" "pulls/$PR/comments" "pulls/$PR/reviews"; do
                 gh api "repos/$REPO/$feed" --paginate
