@@ -17,9 +17,9 @@
 set -euo pipefail
 
 # `^{commit}` is load-bearing: a bare 40-hex sha passes `--verify` whether or
-# not the object exists, and renovate's rebases force-push, so on a `push` run
-# `github.event.before` names a commit no ref reaches. The diff then died with
-# exit 128 and the head carried a red check-run beside the green pr one (#85).
+# not the object exists, and after a force-push `github.event.before` names a
+# commit no ref reaches. The diff then died with exit 128 and the head carried a
+# red check-run beside the green pr one (#85).
 if [ -n "${BASE:-}" ] && git rev-parse --verify --quiet "$BASE^{commit}" >/dev/null; then
   files=$(git diff --name-only "$BASE"...HEAD)
   echo "diffed against $BASE"

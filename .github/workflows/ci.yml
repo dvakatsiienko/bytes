@@ -3,11 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    # `renovate/**` is deliberate. renovate.json sets `prCreation: "not-pending"`,
-    # which holds the PR back until the branch's checks finish — and a branch
-    # carrying no checks at all reads as pending forever, so the PR would never
-    # open. Running CI on the bare branch is what gives it something to wait for.
-    branches: [main, 'renovate/**']
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -262,9 +258,6 @@ jobs:
   financial:
     name: financial build (postgres)
     needs: changes
-    # Both arms carry an event test, for the reason spelled out on the
-    # `vercel-install` gate below: a `renovate/**` branch push reaches an
-    # untested `||` arm, and reaches it unconditionally on a branch's first push.
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true')
@@ -343,22 +336,6 @@ jobs:
   vercel-install:
     name: clean install · ${{ matrix.app.name }}
     needs: changes
-    # 🚨 BOTH arms carry an event test, and the second one is the whole lesson.
-    # This workflow's push trigger also carries `renovate/**`, so the first
-    # version ran all six legs on every renovate branch push AND again on the PR
-    # renovate opens — twelve clean-clone legs per bump, four minutes each, on a
-    # change whose point is cutting CI overhead.
-    #
-    # Adding `refs/heads/main` to the push arm did NOT fix that, which is the
-    # part worth remembering: the `||` arm had no event test, so the branch push
-    # still reached it. And it reached it unconditionally — on a branch's FIRST
-    # push `github.event.before` is the all-zero sha, `ci-changes.sh` correctly
-    # rejects it as unusable and answers «everything changed», so `installs` is
-    # `true` by construction there. The reviewer caught the second version with
-    # the commit still titled for fixing the first.
-    #
-    # `check` alone satisfies renovate's `prCreation: "not-pending"`, so gating
-    # this arm on `pull_request` costs the branch nothing.
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'pull_request' && needs.changes.outputs.installs == 'true')

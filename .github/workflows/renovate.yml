@@ -37,9 +37,9 @@ jobs:
       contents: read
 
     steps:
-      # 📌 our own App's token, never `GITHUB_TOKEN`: a push made with `GITHUB_TOKEN` starts no
-      # workflow, so renovate's branches would carry no CI and `prCreation: not-pending` would
-      # hold every pr forever. the app, `x-renovate`, is installed on frame and bytes only, with
+      # 📌 our own App's token, never `GITHUB_TOKEN`: a pr made with `GITHUB_TOKEN` starts no
+      # workflow, so renovate's prs would carry no CI and automerge would wait on it
+      # forever. the app, `x-renovate`, is installed on frame and bytes only, with
       # Contents, Pull requests, Issues, Workflows: write and Checks, Commit statuses, Dependabot
       # alerts: read (renovate reads the alerts to open its security prs).
       - id: app-token
