@@ -18,6 +18,8 @@ prove a ci change against what github really sends, not against how the yaml rea
 
 - a workflow event field is checked against real run history: `gh api repos/dvakatsiienko/bytes/actions/runs --jq '.workflow_runs[] | {event, head_branch, head_sha}'` (BYT-95 sixth sense)
 - a read script runs free against real statuses from the mac: `DEADLINE_SECONDS=0 .github/scripts/deploy-read.sh` (BYT-130 sixth sense)
+- a renovate preset is proven by a real lookup, not the validator: `npx renovate --platform=local --dry-run=lookup` in a scratch repo with old pinned actions, about 1 min, shows the real branch names (BYT-94 sixth sense)
+- how github reads a forged identity is learned from a dangling commit through `POST /git/commits`, cheap and unreachable (BYT-94 sixth sense)
 
 ## secrets
 
