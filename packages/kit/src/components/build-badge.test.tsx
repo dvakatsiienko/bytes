@@ -64,3 +64,4 @@ test('an app with no endpoint renders nothing, even when a spa fallback answers 
   await fetchMock.mock.results[0]?.value;
   expect(screen.container.querySelector('[data-slot=build-badge]')).toBeNull();
 });
+// scratch: a real test change for BYT-132 exit 2
