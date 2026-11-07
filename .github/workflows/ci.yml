@@ -3,11 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    # `renovate/**` is deliberate. renovate.json sets `prCreation: "not-pending"`,
-    # which holds the PR back until the branch's checks finish — and a branch
-    # carrying no checks at all reads as pending forever, so the PR would never
-    # open. Running CI on the bare branch is what gives it something to wait for.
-    branches: [main, 'renovate/**']
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -83,7 +79,7 @@ jobs:
     # 📌 No postgres service here any more. Only `financial`'s build needs one,
     # the container cost 24 s of every run whether or not `financial` was
     # touched, and a service is fixed at job-definition time so it cannot be
-    # made conditional. `financial` builds in its own job below instead.
+    # made conditional. `financial` builds in the jobs below instead.
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -104,7 +100,6 @@ jobs:
         with:
           # setup-node reads engines.node, which moved to devEngines.runtime — unsupported there, so read the major from .node-version
           node-version-file: .node-version
-          cache: pnpm
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -162,8 +157,9 @@ jobs:
       # miss: a new package depending on kit. `<NONEXISTENT>` is how turbo spells
       # a package that has no such script, and the graph lists those too.
       #
-      # Worth 15 s even on a cache hit, because `install-deps` re-adds system
-      # libraries the cache cannot carry.
+      # 📌 `!= "HIT"`, not `== "MISS"`: a plan that stops naming a status installs
+      # chromium, and a replayed test needs none. Worth 20 s of install on a run
+      # where every browser test replays from cache.
       - id: browser
         name: Does anything test in a browser this run?
         run: |
@@ -174,50 +170,22 @@ jobs:
           # — a gate whose broken state is indistinguishable from its negative
           # state. An unparseable plan leaves `browser` empty here, and the
           # comparison below then fails the step out loud.
-          browser=$(jq '[.tasks[] | select(.task == "test" and (.package == "@ui/kit" or .package == "trophy-sys") and .command != "<NONEXISTENT>")] | length' <<<"$plan")
+          browser=$(jq '[.tasks[] | select(.task == "test" and (.package == "@ui/kit" or .package == "trophy-sys") and .command != "<NONEXISTENT>" and .cache.status != "HIT")] | length' <<<"$plan")
           if [ "$browser" -gt 0 ]; then
             echo "needed=true" >> "$GITHUB_OUTPUT"
-            echo "browser tests are in the plan — chromium is needed"
+            echo "browser tests will run — chromium is needed"
           else
             echo "needed=false" >> "$GITHUB_OUTPUT"
-            echo "no browser tests in the plan — skipping chromium"
+            echo "no browser test will run — skipping chromium"
           fi
 
-      # Browser tests need chromium on the runner. The
-      # download is ~90 MB and the only part of this job that would be slow, so
-      # it is cached on the lockfile hash — the playwright version lives there,
-      # and a bump is exactly when a fresh browser is required.
-      - name: Cache playwright browsers
-        if: steps.browser.outputs.needed == 'true'
-        id: playwright-cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
-        with:
-          path: ~/.cache/ms-playwright
-          # Keyed on the ROOT MANIFEST, not the lockfile. `.npmrc` sets
-          # `save-exact`, so `playwright` is pinned literally there and the key
-          # moves when the browser version does. A lockfile key moves on every
-          # dependency change in the monorepo — and a primary-key miss is what
-          # makes this action SAVE, so each renovate PR wrote a fresh entry
-          # carrying the prefix-restored old builds plus the new one, growing
-          # both count and size against a shared 10 GB LRU.
-          key: playwright-${{ runner.os }}-${{ hashFiles('package.json') }}
-          # The net for the misses that remain. 📌 `cache-hit` stays false on a
-          # prefix restore — it means exact match only — so the step below still
-          # takes the `--with-deps` branch; playwright finds the binary present
-          # and skips the download. A real bump restores a stale copy, misses
-          # the version it needs, and fetches.
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      # `--with-deps` only on a miss: it installs system libraries, which the
-      # cache cannot carry. On a hit the browser binary is already restored and
-      # `install-deps` alone re-adds the libraries, which is seconds rather than
-      # a download.
+      # 📌 No browser cache, measured: 20 to 29 s with the download, 14 to 19 s on a
+      # cache hit, since the system libraries need installing either way. A hit
+      # saved 10 s at best for 293 MB of a 10 GB quota per entry, and a main run
+      # with replayed tests skips this step, so main would not write one for prs.
       - name: Install chromium
         if: steps.browser.outputs.needed == 'true'
-        run: >-
-          pnpm exec playwright
-          ${{ steps.playwright-cache.outputs.cache-hit == 'true' && 'install-deps chromium' || 'install --with-deps chromium' }}
+        run: pnpm exec playwright install --with-deps chromium
 
       # Turbo skips every package without a `test` script, so this stays green
       # as more arrive. The list of which packages have one lives in neither
@@ -237,7 +205,7 @@ jobs:
       # enough and no service container can stand in for one.
       #
       # `financial` prerenders /dashboard, which queries Postgres. It builds in
-      # its own job below, where the container it needs is worth starting. 📌
+      # the jobs below, where the container it needs is worth starting. 📌
       # Measured before relying on it: two negative filters INTERSECT — the plan
       # drops both packages, not neither. Turbo's docs say filters union, which
       # reads the other way for negations.
@@ -250,24 +218,19 @@ jobs:
   # own and skip that job — 24 s off the common path, at the cost of one extra
   # setup on the runs that do touch it.
   #
-  # 📌 On a push to `main` this always runs. `--affected` is not passed there, so
-  # the whole graph builds and `financial` is always in it — the same reason the
-  # check job above builds everything on main.
+  # 📌 Only a PR whose `installs` is false. Otherwise `vercel-install`'s `financial`
+  # leg builds the app with its own container, so this job would build it twice.
   #
   # ⚠️ If either of the two new jobs is ever made a REQUIRED check on `main`,
   # read `review.yml`'s opening comment first: GitHub counts a skipped job as
   # satisfying a required context, so a conditional job as a required check is a
   # gate that passes by not running. These are deliberately not required; the
-  # `main` push is what makes them unskippable where it matters.
+  # `main` push's `vercel-install` is what makes the build unskippable where it
+  # matters.
   financial:
     name: financial build (postgres)
     needs: changes
-    # Both arms carry an event test, for the reason spelled out on the
-    # `vercel-install` gate below: a `renovate/**` branch push reaches an
-    # untested `||` arm, and reaches it unconditionally on a branch's first push.
-    if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true')
+    if: github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true' && needs.changes.outputs.installs != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -308,7 +271,6 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: .node-version
-          cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
       - name: Remote cache
@@ -343,22 +305,6 @@ jobs:
   vercel-install:
     name: clean install · ${{ matrix.app.name }}
     needs: changes
-    # 🚨 BOTH arms carry an event test, and the second one is the whole lesson.
-    # This workflow's push trigger also carries `renovate/**`, so the first
-    # version ran all six legs on every renovate branch push AND again on the PR
-    # renovate opens — twelve clean-clone legs per bump, four minutes each, on a
-    # change whose point is cutting CI overhead.
-    #
-    # Adding `refs/heads/main` to the push arm did NOT fix that, which is the
-    # part worth remembering: the `||` arm had no event test, so the branch push
-    # still reached it. And it reached it unconditionally — on a branch's FIRST
-    # push `github.event.before` is the all-zero sha, `ci-changes.sh` correctly
-    # rejects it as unusable and answers «everything changed», so `installs` is
-    # `true` by construction there. The reviewer caught the second version with
-    # the commit still titled for fixing the first.
-    #
-    # `check` alone satisfies renovate's `prCreation: "not-pending"`, so gating
-    # this arm on `pull_request` costs the branch nothing.
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'pull_request' && needs.changes.outputs.installs == 'true')
@@ -486,7 +432,7 @@ jobs:
   #
   # 📌 The `needs:` edge here is safe where `check`'s header forbids one: this job is not a
   # required context and gates nothing, it only reports. A skipped leg (an app the push did not
-  # touch) is not a failure; only a `failure` among the four turns the badge red. It runs on a
+  # touch) is not a failure; only a `failure` among the three turns the badge red. It runs on a
   # push to `main` only, so the write token never meets branch or pull-request code.
   #
   # ⚠️ Vercel builds every branch push unless the app's own `vercel.json` says
@@ -496,7 +442,7 @@ jobs:
   # copied from this checkout: derived, never a hand list.
   badge:
     name: ci badge
-    needs: [check, financial, vercel-install, essentials]
+    needs: [check, vercel-install, essentials]
     if: >-
       always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       !contains(needs.*.result, 'cancelled')

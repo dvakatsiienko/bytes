@@ -36,6 +36,7 @@ on:
 jobs:
   reviewer:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # The caller's job must grant at least these: a called workflow can only
     # narrow the token it is handed, never widen it.
     permissions:

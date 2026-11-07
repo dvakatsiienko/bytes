@@ -6,8 +6,8 @@
   ],
   "packageRules": [
     {
-      "automergeSchedule": ["* 7-9 * * *"],
-      "description": "a bytes merge redeploys prod: the nightly patches pr merges only in dima's morning, 07:00–10:00 Kyiv. platformAutomerge off, or github queues the merge when the pr opens at night and the window is ignored (renovate's automergeSchedule docs)",
+      "automergeSchedule": ["* 7-18 * * *"],
+      "description": "a bytes merge redeploys prod: the nightly patches pr merges only in dima's day, 07:00–18:59 Kyiv, wide on purpose: renovate wakes 6–8 h apart, and a wake that rebases needs a second wake to merge. platformAutomerge off, or github queues the merge when the pr opens at night and the window is ignored (renovate's automergeSchedule docs)",
       "matchUpdateTypes": ["patch", "pin", "pinDigest", "digest"],
       "platformAutomerge": false
     },

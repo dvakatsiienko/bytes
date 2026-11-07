@@ -60,6 +60,7 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "!CLAUDE.md",
+        "!**/AGENTS.md",
         "!**/README.md",
         "!.vscode/**"
       ]
@@ -111,7 +112,7 @@
         // `affectedUsingTaskInputs` these lines also keep a docs-only push
         // from deploying the app (a skills-only push once deployed 6).
         "!.claude/**",
-        "!AGENTS.md"
+        "!**/AGENTS.md"
       ]
     },
 
@@ -138,6 +139,7 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "!CLAUDE.md",
+        "!**/AGENTS.md",
         "!**/README.md",
         "!.vscode/**"
       ]
