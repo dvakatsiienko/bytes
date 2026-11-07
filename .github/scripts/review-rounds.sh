@@ -40,8 +40,8 @@ workflow=${workflow##*/}
 
 # No `|| echo '[]'` here, and that is the same argument as the paragraph above:
 # a swallowed api failure reports zero rounds, which leaves the cap unenforced
-# and says nothing about it. Failing loudly spends no review and publishes no
-# check, so the PR stays blocked — the safe side.
+# and says nothing about it. Failing loudly spends no review and counts no
+# round, so merge-auto keeps refusing — the safe side.
 #
 # 🚨 The branch goes through `-f`, never into the url: a branch name is the
 # codie's to pick, and `x&status=failure` spliced into a query string asks for

@@ -35,18 +35,13 @@ name: review
 # `claude.yml` take effect on the branch that removes it, rather than one merge
 # later.
 #
-# Which is why this file publishes its verdict as a check run it creates itself.
-# A head nobody labelled never gets a `review:clean` check at all — the required
-# context stays PENDING and the merge is blocked. Silence blocks; only a clean
-# review opens.
-#
 # 🚨 ONE trigger, ONE job, and that is load-bearing beyond the paragraph above:
 # a round is counted as a successful run of THIS FILE, and a workflow run
 # concludes `success` when any job in it succeeds. A second job on a second
 # trigger here would make every one of its events a completed review round — the
 # post-cap lane was written into this file first, and two ordinary pushes would
-# then have eaten the whole cap while spending zero reviews. It lives in its own
-# file — `review-approved.yml` now. Caught in review before it shipped.
+# then have eaten the whole cap while spending zero reviews. Caught in review
+# before it shipped.
 on:
   pull_request:
     types: [labeled]
@@ -61,26 +56,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # 📌 NOT named `review`, and that is load-bearing. A job's name IS the check
-  # context it publishes, so a job called `review` here would still mint a
-  # skipped `review` check on every unrelated label — satisfying the old
-  # required context exactly as before, for as long as `main` still requires it.
-  # With no job of that name anywhere in the repo, the old context can never be
-  # reported by anything, so it blocks until branch protection is switched to
-  # `review:clean`. The fix does not depend on that switch happening promptly.
-  # CodeRabbit caught this.
   review-round:
     # The label is the ONLY way to start a review. `@claude review` in a comment
     # used to work too and is gone deliberately: two doors to one action means
-    # two things to keep in step, and the comment door looked like an escape
-    # hatch for a PR that edits this file — which it never was, because the
-    # action refuses itself on such a PR whichever door opened it.
-    #
-    # 📌 Sharper than it was written: the refusal is about a workflow ALREADY on
-    # the default branch. #75 created this file and the reviewer reviewed it
-    # twice; every PR that edits it afterwards gets a stand-down and a red
-    # `review:clean`, which is why the gate's own decision lives in a file with
-    # saved-payload cases rather than only in yaml.
+    # two things to keep in step.
     #
     # 📌 The action ships its own `label_trigger` input and this predicate is
     # NOT it, deliberately. `label_trigger` is read inside the action, which is
@@ -90,7 +69,7 @@ jobs:
     if: >-
       github.event.action == 'labeled' &&
       github.event.label.name == '🤖 review:requested'
-    # 📌 The cap, the reviewer and the gate live in `review-round.yml`, shared
+    # 📌 The cap and the reviewer live in `review-round.yml`, shared
     # with frame's caller; its header says why the call is pinned to `@main`.
     uses: dvakatsiienko/bytes/.github/workflows/review-round.yml@main
     # A called workflow can only narrow the token it is handed, so the caller
@@ -101,6 +80,7 @@ jobs:
       issues: read
       id-token: write
       actions: read
+      # 📌 `main`'s round asks for it, and a caller granting less fails at startup. Goes once the new round is on `main`.
       checks: write
     with:
       app-id: ${{ vars.X_REVIEWER_CC_APP_ID }}
