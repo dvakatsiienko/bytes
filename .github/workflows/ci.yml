@@ -157,8 +157,9 @@ jobs:
       # miss: a new package depending on kit. `<NONEXISTENT>` is how turbo spells
       # a package that has no such script, and the graph lists those too.
       #
-      # Worth 15 s even on a cache hit, because `install-deps` re-adds system
-      # libraries the cache cannot carry.
+      # 📌 `!= "HIT"`, not `== "MISS"`: a plan that stops naming a status installs
+      # chromium, and a replayed test needs none. Worth 15 s of `install-deps`
+      # on a run where every browser test replays from cache.
       - id: browser
         name: Does anything test in a browser this run?
         run: |
@@ -169,13 +170,13 @@ jobs:
           # — a gate whose broken state is indistinguishable from its negative
           # state. An unparseable plan leaves `browser` empty here, and the
           # comparison below then fails the step out loud.
-          browser=$(jq '[.tasks[] | select(.task == "test" and (.package == "@ui/kit" or .package == "trophy-sys") and .command != "<NONEXISTENT>")] | length' <<<"$plan")
+          browser=$(jq '[.tasks[] | select(.task == "test" and (.package == "@ui/kit" or .package == "trophy-sys") and .command != "<NONEXISTENT>" and .cache.status != "HIT")] | length' <<<"$plan")
           if [ "$browser" -gt 0 ]; then
             echo "needed=true" >> "$GITHUB_OUTPUT"
-            echo "browser tests are in the plan — chromium is needed"
+            echo "browser tests will run — chromium is needed"
           else
             echo "needed=false" >> "$GITHUB_OUTPUT"
-            echo "no browser tests in the plan — skipping chromium"
+            echo "no browser test will run — skipping chromium"
           fi
 
       # Browser tests need chromium on the runner. The
