@@ -19,7 +19,7 @@ a pr reaches `main` through one door: `x lane merge-auto <pr> --apply`.
 
 - **a round that stood down**: it holds no round. merge-auto names the door, `--dima-ok <pr>`, on dima's prompt or a tick quoting that pr.
 - **a pr that edits `review.yml` or `review-round.yml`**: a self-edit, so it needs that same word, round or no round.
-- **a renovate pr**: needs no round. its automerge group merges itself on ci; one outside the group goes through a member.
+- **a renovate pr**: needs no round. its automerge group merges itself on ci. merge-auto lands one made only of renovate's own signed commits with no clean; a member's commit or a changed workflow file asks a clean, and an action bump never automerges.
 
 ## not here on purpose
 
