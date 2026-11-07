@@ -56,7 +56,7 @@ deploy script would go stale, turbo's own answer does not.
 📌 `--affected` is task-level (`futureFlags.affectedUsingTaskInputs`): a task is selected only when a
 changed file matches its own `inputs`. `build.inputs` drops `README.md`, `CLAUDE.md`, `AGENTS.md`
 and `.claude/**`, so a docs- or skills-only push deploys nothing. `typecheck` and `lint` still
-select on any file; `test` skips `README.md` and `CLAUDE.md` (BYT-106, measured in a clone).
+select on any file; `test` skips `README.md`, `CLAUDE.md` and `AGENTS.md` (BYT-106, measured in a clone).
 
 To deploy by hand — a build that died on Vercel's side, a commit that carried the skip directive —
 run the **Deploy** workflow from the Actions tab and pick an app, or `all`. The Vercel dashboard's
