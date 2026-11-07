@@ -79,7 +79,7 @@ jobs:
     # 📌 No postgres service here any more. Only `financial`'s build needs one,
     # the container cost 24 s of every run whether or not `financial` was
     # touched, and a service is fixed at job-definition time so it cannot be
-    # made conditional. `financial` builds in its own job below instead.
+    # made conditional. `financial` builds in the jobs below instead.
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -228,7 +228,7 @@ jobs:
       # enough and no service container can stand in for one.
       #
       # `financial` prerenders /dashboard, which queries Postgres. It builds in
-      # its own job below, where the container it needs is worth starting. 📌
+      # the jobs below, where the container it needs is worth starting. 📌
       # Measured before relying on it: two negative filters INTERSECT — the plan
       # drops both packages, not neither. Turbo's docs say filters union, which
       # reads the other way for negations.
@@ -241,21 +241,19 @@ jobs:
   # own and skip that job — 24 s off the common path, at the cost of one extra
   # setup on the runs that do touch it.
   #
-  # 📌 On a push to `main` this always runs. `--affected` is not passed there, so
-  # the whole graph builds and `financial` is always in it — the same reason the
-  # check job above builds everything on main.
+  # 📌 PRs only. On a push to `main`, `vercel-install`'s `financial` leg builds the
+  # app with its own container, so this job would build it a second time.
   #
   # ⚠️ If either of the two new jobs is ever made a REQUIRED check on `main`,
   # read `review.yml`'s opening comment first: GitHub counts a skipped job as
   # satisfying a required context, so a conditional job as a required check is a
   # gate that passes by not running. These are deliberately not required; the
-  # `main` push is what makes them unskippable where it matters.
+  # `main` push's `vercel-install` is what makes the build unskippable where it
+  # matters.
   financial:
     name: financial build (postgres)
     needs: changes
-    if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true')
+    if: github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
