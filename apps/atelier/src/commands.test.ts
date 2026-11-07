@@ -25,3 +25,7 @@ test('no two commands share a bare key', () => {
 
   expect(new Set(keys).size).toBe(keys.length);
 });
+
+it('scratch: a test that must fail', () => {
+  expect(1).toBe(2);
+});
