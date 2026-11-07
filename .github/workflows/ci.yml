@@ -179,9 +179,10 @@ jobs:
             echo "no browser test will run — skipping chromium"
           fi
 
-      # 📌 No browser cache, measured: 20 s with the download, 14 to 19 s on a cache
-      # hit, since the system libraries need installing either way. A hit saved
-      # about 4 s for 293 MB of a 10 GB quota per entry.
+      # 📌 No browser cache, measured: 20 to 29 s with the download, 14 to 19 s on a
+      # cache hit, since the system libraries need installing either way. A hit
+      # saved 10 s at best for 293 MB of a 10 GB quota per entry, and a main run
+      # with replayed tests skips this step, so main would not write one for prs.
       - name: Install chromium
         if: steps.browser.outputs.needed == 'true'
         run: pnpm exec playwright install --with-deps chromium
