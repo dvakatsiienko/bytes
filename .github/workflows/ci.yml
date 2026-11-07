@@ -158,8 +158,8 @@ jobs:
       # a package that has no such script, and the graph lists those too.
       #
       # 📌 `!= "HIT"`, not `== "MISS"`: a plan that stops naming a status installs
-      # chromium, and a replayed test needs none. Worth 15 s of `install-deps`
-      # on a run where every browser test replays from cache.
+      # chromium, and a replayed test needs none. Worth 20 s of install on a run
+      # where every browser test replays from cache.
       - id: browser
         name: Does anything test in a browser this run?
         run: |
@@ -179,36 +179,12 @@ jobs:
             echo "no browser test will run — skipping chromium"
           fi
 
-      # Browser tests need chromium on the runner. The download is ~90 MB and the
-      # only part of this job that would be slow, so it is cached per playwright
-      # version: a bump is exactly when a fresh browser is required.
-      - name: Playwright version
-        if: steps.browser.outputs.needed == 'true'
-        id: playwright-version
-        run: |
-          set -euo pipefail
-          echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache playwright browsers
-        if: steps.browser.outputs.needed == 'true'
-        id: playwright-cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
-        with:
-          path: ~/.cache/ms-playwright
-          # 📌 No restore-keys. A primary-key miss is what makes this action SAVE,
-          # so a prefix restore wrote the old build into the new entry, growing
-          # count and size against a shared 10 GB quota.
-          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-
-      # `--with-deps` only on a miss: it installs system libraries, which the
-      # cache cannot carry. On a hit the browser binary is already restored and
-      # `install-deps` alone re-adds the libraries, which is seconds rather than
-      # a download.
+      # 📌 No browser cache, measured: 20 s with the download, 14 to 19 s on a cache
+      # hit, since the system libraries need installing either way. A hit saved
+      # about 4 s for 293 MB of a 10 GB quota per entry.
       - name: Install chromium
         if: steps.browser.outputs.needed == 'true'
-        run: >-
-          pnpm exec playwright
-          ${{ steps.playwright-cache.outputs.cache-hit == 'true' && 'install-deps chromium' || 'install --with-deps chromium' }}
+        run: pnpm exec playwright install --with-deps chromium
 
       # Turbo skips every package without a `test` script, so this stays green
       # as more arrive. The list of which packages have one lives in neither
