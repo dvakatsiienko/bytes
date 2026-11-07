@@ -60,6 +60,7 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "!CLAUDE.md",
+        "!AGENTS.md",
         "!**/README.md",
         "!.vscode/**"
       ]
@@ -138,6 +139,7 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "!CLAUDE.md",
+        "!AGENTS.md",
         "!**/README.md",
         "!.vscode/**"
       ]
