@@ -218,8 +218,8 @@ jobs:
   # own and skip that job — 24 s off the common path, at the cost of one extra
   # setup on the runs that do touch it.
   #
-  # 📌 PRs only. On a push to `main`, `vercel-install`'s `financial` leg builds the
-  # app with its own container, so this job would build it a second time.
+  # 📌 Only a PR whose `installs` is false. Otherwise `vercel-install`'s `financial`
+  # leg builds the app with its own container, so this job would build it twice.
   #
   # ⚠️ If either of the two new jobs is ever made a REQUIRED check on `main`,
   # read `review.yml`'s opening comment first: GitHub counts a skipped job as
@@ -230,7 +230,7 @@ jobs:
   financial:
     name: financial build (postgres)
     needs: changes
-    if: github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true'
+    if: github.event_name == 'pull_request' && needs.changes.outputs.financial == 'true' && needs.changes.outputs.installs != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
