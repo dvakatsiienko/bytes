@@ -4,7 +4,7 @@ import requestHandle from './handler.ts';
 import { resolverInstall } from './resolver.ts';
 
 const PORT = Number(
-  process.env.API_PORT ?? 5178 + Number(process.env.PORT_OFFSET ?? 0),
+  process.env.PORT ?? 5178 + Number(process.env.PORT_OFFSET ?? 0),
 );
 
 resolverInstall();
