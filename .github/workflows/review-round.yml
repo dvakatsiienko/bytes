@@ -159,6 +159,11 @@ jobs:
 
             ${{ steps.rounds.outputs.last && format('This is a RE-REVIEW. You already reviewed this PR at {0}. Review the commits since that sha, plus the replies on your own open threads — not the whole diff again. Say plainly which of your earlier findings are now fixed, which are answered with a reason, and which still stand.', steps.rounds.outputs.last) || 'This is the first review of this PR. Review the whole diff.' }}
 
+            Before the diff, read REVIEW.md at the repo root and the REVIEW.md
+            nearest each changed file, when they exist. They say what a failure
+            looks like in this repo and how a finding is written; where they
+            disagree with your defaults, they win.
+
             Raise every finding you would block a merge on as an INLINE THREAD
             on the line it concerns, even when you also describe it in your
             comment. A thread is the only form the PR's author (codie) can answer in place:
