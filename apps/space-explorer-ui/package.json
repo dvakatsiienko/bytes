@@ -33,7 +33,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "7.4.6",
     "@graphql-codegen/client-preset": "6.2.3",
-    "@tailwindcss/vite": "4.3.4",
+    "@tailwindcss/vite": "4.3.5",
     "@types/debug": "4.1.13",
     "@vitejs/plugin-react": "6.1.2",
     "oxc-transform-react": "0.156.0",
