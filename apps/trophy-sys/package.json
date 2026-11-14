@@ -18,10 +18,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@tanstack/react-query": "5.105.3",
+    "@tanstack/react-query": "5.107.1",
     "@tanstack/react-router": "1.170.46",
     "@ui/kit": "workspace:*",
-    "@upstash/redis": "1.40.0",
+    "@upstash/redis": "1.41.0",
     "@visx/axis": "4.0.0",
     "@visx/grid": "4.0.0",
     "@visx/group": "4.0.0",
@@ -29,7 +29,7 @@
     "@visx/scale": "4.0.0",
     "@visx/shape": "4.0.0",
     "@visx/tooltip": "4.0.0",
-    "motion": "14.7.1",
+    "motion": "14.12.0",
     "psn-api": "2.18.1",
     "react": "19.3.1",
     "react-dom": "19.3.1"
@@ -37,9 +37,9 @@
   "devDependencies": {
     "@fontsource-variable/jetbrains-mono": "5.3.0",
     "@tailwindcss/vite": "4.3.5",
-    "@vitejs/plugin-react": "6.1.2",
+    "@vitejs/plugin-react": "6.3.0",
     "esbuild": "0.28.2",
-    "oxc-transform-react": "0.156.0",
+    "oxc-transform-react": "0.158.0",
     "shadcn": "4.23.0",
     "undici": "8.12.4",
     "vite": "8.3.7"
