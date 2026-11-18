@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm i -F '@space-explorer/ui...'",
+  "installCommand": "pnpm i --store-dir .pnpm-store -F '@space-explorer/ui...'",
   "git": {
     "deploymentEnabled": false
   },

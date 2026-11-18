@@ -47,6 +47,8 @@ cannot build it). Project ids live in `.github/vercel-projects.json`; a new Verc
 because turbo reports nothing affected. A root manifest or lockfile change marks every package
 affected, so a renovate bump does reach production. Both measured on BYT-84.
 
+⚠️ **Every `installCommand` pins `--store-dir .pnpm-store`, relative on purpose.** pnpm's default store moved between 12.16.1 (`/vercel/path0/.pnpm-store`) and 12.21.0 (`node_modules/.pnpm-store`), and Vercel's restored build cache holds the old one: all six apps died at install with `ERR_PNPM_UNEXPECTED_STORE` on 18 Nov 2026. Relative, because ci's «Filtered install, exactly as Vercel runs it» step runs the same string on a runner with no `/vercel`; at the repo root it is the same place on both. A pnpm bump never moves it now.
+
 ⚠️ **A root file that changes a BUILD must be a `globalDependencies` entry in `turbo.jsonc`, or
 the commit that fixes production deploys nothing and exits green.** `.npmrc` and
 `pnpm-workspace.yaml` are there for exactly that reason — the first carries `public-hoist-pattern[]`,
