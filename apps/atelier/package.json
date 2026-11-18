@@ -35,7 +35,7 @@
     "@tailwindcss/vite": "4.3.5",
     "@types/three": "0.187.0",
     "@vitejs/plugin-react": "6.3.0",
-    "oxc-transform-react": "0.158.0",
+    "oxc-transform-react": "0.156.0",
     "playwright": "1.65.1",
     "sharp": "0.35.5",
     "svgo": "4.1.0",
