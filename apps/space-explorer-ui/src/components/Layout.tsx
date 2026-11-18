@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/client/react';
 import { Outlet } from 'react-router-dom';
 
-import { Footer } from '@/components';
+import { Footer } from '@/components/Footer';
+
 import * as gql from '@/graphql';
 
 export const Layout = () => {
