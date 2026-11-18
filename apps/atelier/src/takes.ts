@@ -43,7 +43,7 @@ const postShot = async (
   if (!(response.ok && response.body)) throw await failure(response);
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
   let rest = '';
-  for (;;) {
+  while (true) {
     // biome-ignore lint/performance/noAwaitInLoops: a stream is read one chunk after another
     const chunk = await reader.read();
     if (chunk.done) break;
