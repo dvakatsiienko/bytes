@@ -13,7 +13,7 @@ The other two (the build declares the function, explicit routing) and the deploy
 
 ## sessions and state
 
-- `authGet()` in `psn.ts` takes the cheapest session it can get, in this order: the in-memory one,
+- `authGet()` in `auth.ts` takes the cheapest session it can get, in this order: the in-memory one,
   the **refresh grant stored in KV**, and only then an NPSSO→access-code exchange. So a cold
   serverless start — which is every cron run — costs one PSN call and spends no NPSSO.
 

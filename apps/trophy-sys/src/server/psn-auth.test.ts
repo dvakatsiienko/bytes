@@ -61,7 +61,7 @@ vi.mock('./state.ts', () => ({
   refreshGrantSave: vi.fn(),
 }));
 
-const { authGet, sessionReset } = await import('./psn.ts');
+const { authGet, sessionReset } = await import('./auth.ts');
 const { exchangeNpssoForAccessCode } = await import('psn-api');
 const { npssoDeathRecord, refreshGrantSave } = await import('./state.ts');
 

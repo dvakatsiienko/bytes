@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest';
 
-vi.mock('./psn.ts', () => ({ authGet: () => Promise.resolve({}) }));
+vi.mock('./auth.ts', () => ({ authGet: () => Promise.resolve({}) }));
 
 vi.mock('psn-api', () => ({
   getUserPlayedGames: () =>

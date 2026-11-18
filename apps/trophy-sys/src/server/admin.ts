@@ -2,8 +2,9 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 
 import type { Game } from '../shared/types.ts';
 import { isNonGame } from '../shared/types.ts';
+import { sessionReset } from './auth.ts';
 import { cached } from './cache.ts';
-import { gamesFetch, sessionReset } from './psn.ts';
+import { gamesFetch } from './psn.ts';
 import {
   type FailureCounter,
   hiddenLoad,
