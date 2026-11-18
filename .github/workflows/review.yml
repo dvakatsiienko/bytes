@@ -71,7 +71,7 @@ jobs:
       github.event.label.name == '🤖 review:requested'
     # 📌 The cap and the reviewer live in `review-round.yml`, shared
     # with frame's caller; its header says why the call is pinned to `@main`.
-    uses: dvakatsiienko/bytes/.github/workflows/review-round.yml@main
+    uses: dvakatsiienko/bytes/.github/workflows/review-round.yml@ccf48f5e9757e7b27b7d0fac62b94c9a387e2e23 # main
     # A called workflow can only narrow the token it is handed, so the caller
     # grants everything the round needs.
     permissions:
