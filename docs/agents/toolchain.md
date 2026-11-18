@@ -13,6 +13,8 @@ copy of one to go stale. Root looks like `typescript`, `vitest`, biome, turbo, `
 `tailwindcss` and `postcss`. Per app looks like `vite` and its plugins, the tailwind plugins a
 given app's stylesheets call, `prisma`, `@graphql-codegen/cli`.
 
+📌 A next app compiles tailwind through `@tailwindcss/turbopack`, a rule in its `next.config.ts` (`turbopack.rules['*.css']`) and a pin in its own manifest, with no `postcss.config.mjs`; a vite app uses `@tailwindcss/vite`. `@tailwindcss/postcss` stays at the root only for `packages/kit`'s test stylesheet.
+
 📌 Why not everything at the root, which is where BYT-91 first put it: **a root bump moves 32 of
 32 task hashes** — measured on a real `prettier` 3.9.6 → 3.9.5, `prisma:generate` included despite
 its hand-narrowed `inputs` — and rebuilds and redeploys every app. A tool three apps use, parked

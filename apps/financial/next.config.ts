@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   reactStrictMode: true,
   transpilePackages: ['@ui/kit'],
+  turbopack: { rules: { '*.css': { loaders: ['@tailwindcss/turbopack'] } } },
 };
 
 export default nextConfig;

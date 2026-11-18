@@ -15,7 +15,7 @@ const nextConfig = {
     },
   ],
   transpilePackages: ['@ui/kit', 'jotai-devtools'],
-  turbopack: {}, // Acknowledge Turbopack usage (webpack config below will be ignored)
+  turbopack: { rules: { '*.css': { loaders: ['@tailwindcss/turbopack'] } } },
   typedRoutes: true, // todo test it out
 } satisfies NextConfig;
 
