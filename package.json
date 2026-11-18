@@ -45,7 +45,7 @@
     "format": "biome format --write"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.7",
+    "@biomejs/biome": "2.6.8",
     "@tailwindcss/postcss": "4.3.5",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
@@ -74,13 +74,13 @@
     "vitest-browser-react": "2.3.0"
   },
   "engines": {
-    "node": ">=26",
+    "node": ">=26.13.1",
     "pnpm": ">=12.21.0"
   },
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=26.0.0",
+      "version": ">=26.13.1",
       "onFail": "error"
     }
   },
