@@ -1,6 +1,6 @@
 import { getUserPlayedGames } from 'psn-api';
 
-import { authGet } from './psn.ts';
+import { authGet } from './auth.ts';
 
 export interface PlayRecord {
   playedAt: string;

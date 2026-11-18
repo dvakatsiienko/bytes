@@ -1,7 +1,7 @@
 import type { AuthorizationPayload, PurchasedGame } from 'psn-api';
 import { getPurchasedGames } from 'psn-api';
 
-import { authGet } from './psn.ts';
+import { authGet } from './auth.ts';
 
 /**
  * The owned library, which is a different thing from the trophy library.
