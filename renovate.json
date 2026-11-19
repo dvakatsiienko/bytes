@@ -15,6 +15,11 @@
       "allowedVersions": "<17",
       "description": "graphql held on 16 in the space-explorer pair: @apollo/server 5.5.1 peers graphql ^16.11; lift this the day an @apollo/server release accepts 17 (2026-10-28)",
       "matchPackageNames": ["graphql"]
+    },
+    {
+      "description": "rebase a renovate pr only on a conflict: the default rebased every open pr on every wake once main moved, each one regenerating pnpm-lock.yaml (~2 min), so five open prs made a 10 min run (BYT-135). main's protection does not require an up-to-date branch, so a stale green pr still merges",
+      "matchPackageNames": ["*"],
+      "rebaseWhen": "conflicted"
     }
   ]
 }
