@@ -218,6 +218,7 @@
         "noMagicNumbers": "off", // ultracite rule — sometimes magic numbers are useful.
         "useConsistentTypeDefinitions": "off", // ultracite rule — type and interface are useful in different situations.
         "useConsistentArrowReturn": "off", // ultracite rule — no need for arrow functions shorthand.
+        "useImportType": { "level": "error", "options": { "style": "auto" } }, // ultracite rule — 8.3 demands a separate `import type`; inline `type` specifiers stay, as in 8.2.
 
         /* React */
         "useComponentExportOnlyModules": "off", // TODO thus rule is probably useful — review it and enable
