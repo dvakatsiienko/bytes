@@ -20,5 +20,5 @@
     },
     "verbatimModuleSyntax": true
   },
-  "include": ["src", "script", "ports.ts", "vite.config.ts", "vitest.config.ts"]
+  "include": ["src", "script", "vite.config.ts", "vitest.config.ts"]
 }
