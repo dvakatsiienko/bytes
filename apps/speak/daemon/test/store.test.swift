@@ -106,6 +106,10 @@ enum StoreTest {
         file.link()
         _ = try? store.save(json(#"{"meterFlowMs":3}"#), over: store.saved().version)
         rows.append(("a linked file stays a link, and its target is written", "\(file.isLink) \(file.text.contains("\"meterFlowMs\": 3"))", "true true"))
+        store.refresh()
+        file.editTarget(file.text.replacingOccurrences(of: "\"meterFlowMs\": 3", with: "\"meterFlowMs\": 4"))
+        store.refresh()
+        rows.append(("a hand edit of the target is seen", "\(store.current.meterFlowMs)", "4.0"))
         file.unlink()
         file.put(shape.replacingOccurrences(of: "900", with: "800"))
         rows.append(("a hand edit in the same turn is seen", "\(store.refresh() ?? "ok") \(store.current.firstAudioMs)", "ok 800"))
@@ -242,6 +246,11 @@ private final class Scratch {
     func link() {
         try? FileManager.default.moveItem(at: url, to: target)
         try? FileManager.default.createSymbolicLink(at: url, withDestinationURL: target)
+    }
+    func editTarget(_ text: String) {
+        stamp += 10
+        try? Data(text.utf8).write(to: target)
+        try? FileManager.default.setAttributes([.modificationDate: stamp], ofItemAtPath: target.path)
     }
     func unlink() {
         try? FileManager.default.removeItem(at: url)

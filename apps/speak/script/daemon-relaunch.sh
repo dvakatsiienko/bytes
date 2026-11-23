@@ -17,7 +17,7 @@ if [ "$(cat "$reads" 2>/dev/null || true)" = "$settings" ]; then
         exit 3
     fi
     if moved_too_early; then
-        echo "relaunch: $(moved_line 1) changed since the settings moved — script/settings-move.sh $(sha_of "$(moved_line 1)") brings the change" >&2
+        echo "relaunch: $(moved_line 1) changed since the settings moved, compare it with $settings — script/settings-move.sh $(sha_of "$(moved_line 1)") brings that change" >&2
         exit 3
     fi
 fi

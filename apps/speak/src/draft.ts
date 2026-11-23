@@ -22,6 +22,21 @@ export const changesOf = (saved: object, draft: object): Patch | undefined => {
 export const unsavedOf = (draft: Draft | undefined) =>
   draft && changesOf(draft.from.config, draft.config);
 
+// the pressed settings over the ones the draft stands on now. hearts are the daemon's own: one that landed since the
+// press is no edit
+export const changesSince = (pressed: Config, from: Config) => {
+  const engines = { ...pressed.engines };
+  for (const engine of Object.keys({
+    ...from.engines,
+    ...engines,
+  }) as Engine[]) {
+    const favourites = from.engines[engine]?.favourites;
+    if (favourites ?? engines[engine])
+      engines[engine] = { ...engines[engine], favourites };
+  }
+  return changesOf(from, { ...pressed, engines });
+};
+
 // a ♥ is saved at once and touches that engine's list alone, so no copy of the settings moves anywhere else
 const withHeart = (config: Config, engine: Engine, saved: Config): Config => ({
   ...config,

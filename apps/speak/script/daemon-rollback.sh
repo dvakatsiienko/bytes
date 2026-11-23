@@ -10,6 +10,9 @@ hash_of() { sha_of "$1" | cut -c1-12; }
 # a second link, then one rename over the target: the installed path is never missing, and each file keeps its inode,
 # which is how the build knows the running binary. $1 and $2: what the binary now kept ran with (record_kept)
 swap() {
+    # half a swap would tell each binary the other's place
+    trap '' HUP INT TERM
+    rm -f "$install_dir/x-speak.swap.reads"
     ln -f "$installed" "$install_dir/x-speak.swap"
     mv -f "$kept" "$installed"
     mv -f "$install_dir/x-speak.swap" "$kept"
@@ -18,6 +21,7 @@ swap() {
     if [ -f "$kept.reads" ]; then mv -f "$kept.reads" "$reads"; fi
     if [ -f "$install_dir/x-speak.swap.reads" ]; then mv -f "$install_dir/x-speak.swap.reads" "$kept.reads"; fi
     record_kept "$1" "$2"
+    trap - HUP INT TERM
 }
 # a daemon from before the settings had a place of their own reads the file its argument names. that file gets the
 # settings of today, but only while nobody changed it since they moved: two sets of changes have no right answer
@@ -25,7 +29,7 @@ old_place=
 carry_settings() {
     target=$(config_argument)
     if [ ! -f "$settings" ] || [ "$(cat "$kept.reads" 2>/dev/null || true)" = "$settings" ] || [ "$target" = "$settings" ]; then return 0; fi
-    [ "$(moved_line 1)" = "$target" ] \
+    { [ -n "$target" ] && [ "$(moved_line 1)" = "$target" ]; } \
         || refuse "the kept daemon reads $target, and nothing says the settings moved from there; compare it with $settings by hand"
     [ "$(sha_of "$target" 2>/dev/null)" = "$(moved_line 2)" ] \
         || refuse "the kept daemon reads $target, which changed since the settings moved; compare it with $settings by hand"

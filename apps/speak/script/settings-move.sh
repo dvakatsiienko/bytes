@@ -15,6 +15,7 @@ fi
 [ -f "$from" ] || refuse "the launchd job names no settings file: «$from»"
 [ "$(sha_of "$from")" = "$want" ] || refuse "$from is not the file that was hashed: $(sha_of "$from")"
 mkdir -p "$(dirname "$settings")"
+[ ! -e "$settings" ] || cp "$settings" "$settings.before-move"
 cp "$from" "$settings.new"
 [ "$(sha_of "$settings.new")" = "$want" ] || refuse "the copy differs, nothing moved: $settings.new"
 printf '%s\n%s\n' "$from" "$want" >"$moved_from"

@@ -4,6 +4,7 @@ import { type Config, api } from './src/api.ts';
 import {
   afterHeart,
   changesOf,
+  changesSince,
   draftAfterHeart,
   draftAfterSave,
   unsavedOf,
@@ -179,6 +180,45 @@ describe('a heart on its way', () => {
     expect(afterHeart(read, 'kokoro', elsewhere)).toEqual({
       config: lily,
       version: 'v1',
+    });
+  });
+});
+
+describe('a save whose turn comes later', () => {
+  const faster = withEngine(CONFIG, 'kokoro', { speed: 1.4 });
+
+  it('names a value set back since an earlier save', () => {
+    const pressed = withEngine(CONFIG, 'kokoro', { gain: 3 });
+
+    expect(changesSince(pressed, faster)).toEqual({
+      engines: { kokoro: { gain: 3, speed: 1 } },
+    });
+  });
+
+  it.each([
+    [
+      'on',
+      withEngine(CONFIG, 'kokoro', { favourites: ['af_heart', 'af_sky'] }),
+    ],
+    ['off', withEngine(CONFIG, 'kokoro', { favourites: [] })],
+    [
+      'the first of an engine',
+      withEngine(CONFIG, 'fish', { favourites: ['x'] }),
+    ],
+  ])('carries no heart: one that landed %s', (_, from) => {
+    expect(changesSince(faster, from)).toEqual({
+      engines: { kokoro: { speed: 1.4 } },
+    });
+  });
+
+  it('carries no heart of an engine it never had', () => {
+    const from = {
+      ...CONFIG,
+      engines: { ...CONFIG.engines, gemini: { favourites: ['Kore'] } },
+    };
+
+    expect(changesSince(faster, from)).toEqual({
+      engines: { kokoro: { speed: 1.4 } },
     });
   });
 });

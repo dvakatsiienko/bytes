@@ -34,6 +34,8 @@ final class ConfigStore {
     private(set) var current = Config.fallback
 
     var path: String { url.path }
+    // a link stays a link: its target is the file that is read and renamed over
+    private var file: URL { url.resolvingSymlinksInPath() }
 
     private let write: (String) -> Void
 
@@ -92,8 +94,8 @@ final class ConfigStore {
         let data = Data((after.text() + "\n").utf8)
         let config: Config = try decoded(data)
         guard after != before else { return SavedSettings(config: before, version: mark(old), was: mark(old)) }
-        // the rename is the write: until it, the file is the old one whole. a link stays one, its file is the one renamed over
-        do { try data.write(to: url.resolvingSymlinksInPath(), options: .atomic) } catch { throw SaveError.notWritten(error.localizedDescription) }
+        // the rename is the write: until it, the file is the old one whole
+        do { try data.write(to: file, options: .atomic) } catch { throw SaveError.notWritten(error.localizedDescription) }
         // the next press reads the file again: a hand edit right after the rename must not pass for this save
         loadedStamp = nil
         write("config: saved \(before.changes(to: after).joined(separator: ", "))")
@@ -118,7 +120,7 @@ final class ConfigStore {
     }
 
     // read fresh: a url keeps its stat until the run loop turns, and a hand edit in that turn would be missed
-    private func stamp() -> Date? { (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date }
+    private func stamp() -> Date? { (try? FileManager.default.attributesOfItem(atPath: file.path))?[.modificationDate] as? Date }
 
     private func named(_ reason: String) -> String { "\(url.lastPathComponent): \(reason)" }
 

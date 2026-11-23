@@ -182,6 +182,7 @@ is 'forward again, with a change in the old file alone: refused, the binaries st
 says 'forward again, with a change in the old file alone: names the way' "settings-move.sh $(sha "$old")"
 move "$(sha "$old")"
 is 'a second move brings that change' '0 saved by the old one/saved by the old one' "$code $(places)"
+is 'a second move keeps the settings it went over' today "$(cat "$place.before-move")"
 rollback
 is 'forward again, with the change moved' '0 new/old saved by the old one/saved by the old one' "$code $(pair) $(places)"
 is 'forward again: where each one reads goes with it' "$place/none" "$(reads)"
@@ -203,6 +204,11 @@ moved; rm "$place.moved-from"; rollback
 is 'no word of where the settings came from: refused' '1 new/old tracked/today' "$code $(pair) $(places)"
 moved; plist /elsewhere.json; rollback
 is 'the job names a third file: refused' '1 new/old tracked/today' "$code $(pair) $(places)"
+moved; rm "$HOME/Library/LaunchAgents/com.dima.x-speak.plist" "$place.moved-from"; rollback
+is 'a job that names no settings: refused, the binaries stay' '1 new/old' "$code $(pair)"
+says 'a job that names no settings: says so' 'nothing says the settings moved'
+moved; touch "$libexec/x-speak.swap.reads"; rm "$libexec/x-speak.reads"; rollback
+is 'a place a killed swap left behind is nobody'"'"'s' 'none/none' "$(reads)"
 moved; plist "$place"; rollback
 is 'the job names the new place too: nothing to copy' '0 old/new tracked/today' "$code $(pair) $(places)"
 moved; rm "$state/status" "$state/inode"; printf '{"speaking":false}' >"$state/status"; rollback
