@@ -11,44 +11,50 @@ refuse() {
     exit 1
 }
 hash_of() { shasum -a 256 "$1" | cut -c1-12; }
-# the last word on the settings, also a daemon that could not read them: the reason after the dash
-settings_line() { grep -hE 'config: (loaded|kept|running)' "$HOME/.local/share/x-speak/daemon.err.log" 2>/dev/null | tail -1 | sed 's/^.* — //'; }
 # a second link, then one rename over the target: the installed path is never missing, and each file keeps its inode,
-# which is how the build knows the running binary
+# which is how the build knows the running binary. $1 and $2: what the binary now kept ran with, its argument and settings
 swap() {
     ln -f "$installed" "$install_dir/x-speak.swap"
     mv -f "$kept" "$installed"
     mv -f "$install_dir/x-speak.swap" "$kept"
+    if [ -f "$rolled_back" ]; then rm -f "$rolled_back"; else : >"$rolled_back"; fi
+    printf '%s\n' "$1" >"$kept.config"
+    printf '%s\n' "$2" >"$kept.settings"
+}
+told() { # label, now, recorded at the build
+    if [ -z "$3" ]; then echo "$1: $2, the build recorded none"
+    elif [ "$2" = "$3" ]; then echo "$1: the same"
+    else echo "$1: $2, the kept binary ran with $3"; fi
 }
 
 [ -f "$kept" ] || refuse "nothing to go back to: no build has kept a binary at $kept"
 [ -f "$installed" ] || refuse "no binary at $installed"
-codesign --verify --strict -R='identifier "com.dima.x-speak" and certificate leaf[subject.CN] = "x-speak local signing"' "$kept" 2>/dev/null \
-    || refuse "the kept binary's signature is not x-speak's, its Accessibility grant would not hold"
+# the grant is pinned to what the installed binary is signed with, down to the certificate's hash
+grant=$(codesign -d -r- "$installed" 2>/dev/null | sed -n 's/^designated => //p')
+codesign --verify --strict -R="$grant" "$kept" 2>/dev/null \
+    || refuse "the kept binary is not signed like the installed one, the Accessibility grant would not hold"
+case "$(daemon_status)" in *'"speaking":true'*) refuse 'x-speak is reading aloud now — wait for it to end' ;; esac
 
-before=$(settings_line)
 ran_with=$(cat "$kept.config" 2>/dev/null || true)
-argument=$(config_argument)
-swap
-if ! "$here/daemon-relaunch.sh"; then
-    # a relaunch refuses before it stops anything; past that point the way back is the restored binary, not the bad one
-    launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || refuse "x-speak is not running: the restored binary is installed, daemon-relaunch.sh starts it"
-    swap
+ran_settings=$(cat "$kept.settings" 2>/dev/null || true)
+swap "$(running_argument)" "$(settings_line)"
+code=0
+"$here/daemon-relaunch.sh" || code=$?
+if [ "$code" -eq 3 ]; then
+    swap "$ran_with" "$ran_settings"
     refuse 'the relaunch was refused, the binaries are back as they were'
 fi
+# past a refusal the old process is stopped or stopping: the way back is the restored binary, not the bad one
+[ "$code" -eq 0 ] || refuse 'x-speak was not started: the restored binary is installed, daemon-relaunch.sh starts it'
+# longer than launchd's 30 s retry of a start that died
 tries=0
-until [ -n "$(daemon_status)" ]; do
+until daemon_answers; do
     tries=$((tries + 1))
     [ "$tries" -le 40 ] || refuse "the restored daemon ($(hash_of "$installed")) does not answer; $kept holds the one before it"
-    sleep 0.5
+    sleep 1
 done
 [ "$(running_inode)" = "$(stat -f %i "$installed")" ] || refuse 'launchd runs another binary than the installed one'
-printf '%s\n' "$argument" >"$kept.config"
 
 echo "rollback: running $(hash_of "$installed")"
-if [ "$(settings_line)" = "$before" ]; then echo 'settings: the same'; else echo "settings: not the same — $(settings_line)"; fi
-if [ -z "$ran_with" ] || [ "$ran_with" = "$argument" ]; then
-    echo 'config argument: the same'
-else
-    echo "config argument: $argument, the kept binary ran with $ran_with"
-fi
+told settings "$(settings_line)" "$ran_settings"
+told 'config argument' "$(config_argument)" "$ran_with"

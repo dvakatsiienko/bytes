@@ -6,12 +6,17 @@ here=$(cd "$(dirname "$0")" && pwd)
 app() {
     setup
     stub_file "$state/next" 'for word in "$@"; do printf "[%s]" "$word"; done >>"$state/argv"
-echo $$ >"$state/child"
 trap "echo stopped >\"$state/ended\"; exit 143" TERM
-if [ -f "$state/reads-on" ]; then while :; do /bin/sleep 0.02; done; fi
+echo $$ >"$state/child"
+left=150; [ -f "$state/reads-on" ] || left=0
+while [ "$left" -gt 0 ]; do left=$((left - 1)); /bin/sleep 0.02; done
 exit "$(cat "$state/child-exit" 2>/dev/null || echo 0)"'
 }
 try() { out=$("$root/app/script/daemon-try.sh" "$@" 2>&1); code=$?; }
+left() { # the stub's process, given a moment to end
+    for _ in 1 2 3 4 5 6 7 8 9 10; do kill -0 "$(cat "$state/child")" 2>/dev/null || { echo gone; return; }; /bin/sleep 0.05; done
+    echo left
+}
 argv() { cat "$state/argv" 2>/dev/null || printf none; }
 built() { [ -f "$root/app/daemon/build/x-speak-try" ] && echo yes || echo no; }
 argv_config() { argv | sed "s|\[[^]]*/app/daemon/config.json\]|[CONFIG]|"; }
@@ -51,12 +56,12 @@ stub sleep '[ -f "$state/child" ] && printf "{\"speaking\":true}" >"$state/statu
 try hello
 is 'a live read stops it' '1 stopped' "$code $(cat "$state/ended" 2>/dev/null)"
 says 'a live read: says so' 'the live daemon started a read'
-is 'a stopped try leaves no process' gone "$(kill -0 "$(cat "$state/child")" 2>/dev/null || echo gone)"
+is 'a stopped try leaves no process' gone "$(left)"
 
 app; touch "$state/reads-on"
 stub sleep '[ -f "$state/child" ] && kill -TERM "$PPID"; /bin/sleep 0.05'
 try hello
-is 'a try that is ended takes its process along' 'stopped gone' "$(cat "$state/ended" 2>/dev/null) $(kill -0 "$(cat "$state/child")" 2>/dev/null || echo gone)"
+is 'a try that is ended takes its process along' 'stopped gone' "$(cat "$state/ended" 2>/dev/null) $(left)"
 
 app; echo 3 >"$state/child-exit"; try hello
 is 'a binary that fails is an error' 3 "$code"

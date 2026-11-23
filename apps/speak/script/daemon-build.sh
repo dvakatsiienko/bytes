@@ -13,12 +13,15 @@ cd "$here/../daemon"
 mkdir -p build "$install_dir"
 "$here/daemon-compile.sh" -O -o build/x-speak
 codesign --force --sign 'x-speak local signing' --identifier com.dima.x-speak build/x-speak
-# only a binary that runs and answers is worth keeping: a build that never started must not push the good one out
+# only a binary that runs and answers is worth keeping: a build that never started must not push the good one out.
+# after a rollback the kept one is the bad one, and the installed one is kept whatever it answers
 if [ -f "$installed" ]; then
-    if [ -n "$(daemon_status)" ] && [ "$(running_inode)" = "$(stat -f %i "$installed")" ] || [ ! -f "$kept" ]; then
+    if daemon_answers && [ "$(running_inode)" = "$(stat -f %i "$installed")" ] || [ ! -f "$kept" ] || [ -f "$rolled_back" ]; then
         cp "$installed" "$kept.new"
         mv -f "$kept.new" "$kept"
-        config_argument >"$kept.config"
+        rm -f "$rolled_back"
+        running_argument >"$kept.config"
+        settings_line >"$kept.settings"
     fi
 fi
 mv -f build/x-speak "$installed"

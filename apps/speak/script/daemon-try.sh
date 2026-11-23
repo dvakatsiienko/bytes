@@ -25,14 +25,13 @@ mkdir -p build
 "$here/daemon-compile.sh" -O -o build/x-speak-try
 live_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 
+trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 build/x-speak-try --config "$PWD/config.json" "$text" &
 child=$!
-trap 'kill "$child" 2>/dev/null || true' EXIT
 while kill -0 "$child" 2>/dev/null; do
     live_speaks && refuse 'the live daemon started a read, this one stopped'
     sleep 1
 done
 code=0
 wait "$child" || code=$?
-trap - EXIT
 exit "$code"

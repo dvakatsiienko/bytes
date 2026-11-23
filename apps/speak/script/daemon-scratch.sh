@@ -1,7 +1,7 @@
 # sourced by the script tests, with `here` set: a scratch home with a stub of every tool that would reach the mac
 # (launchctl, lsof, nc, codesign, swiftc) on PATH, so the installed daemon is never touched
 set -u
-root=$(mktemp -d "${TMPDIR:-/tmp}/x-speak-test.XXXXXX")
+root=$(mktemp -d "${TMPDIR:-/tmp}/x-speak-test.XXXXXX") || exit 1
 trap 'rm -rf "$root"' EXIT
 fails=0
 count=0
@@ -20,18 +20,19 @@ setup() {
     stub_file "$root/app/script/daemon-test.sh" 'exit "$(cat "$state/test-exit" 2>/dev/null || echo 0)"'
     printf 'old' >"$libexec/x-speak"
     plist '/old/config.json'
+    echo /old/config.json >"$state/argument"
     printf '{"speaking":false,"paused":false}' >"$state/status"
     started
     echo 'loaded /c.json — same' >"$state/settings"
     stub swiftc 'for last in "$@"; do :; done; [ -f "$state/compile-fails" ] && exit 1; cp "$state/next" "$last"'
-    stub codesign 'case "$*" in *--verify*) for last in "$@"; do :; done; [ "$(cat "$last")" != unsigned ] ;; *) [ ! -f "$state/sign-fails" ] ;; esac'
+    stub codesign 'case "$*" in *-r-*) [ -f "$state/no-grant" ] || echo "designated => the grant" ;; *--verify*) case "$*" in *"-R=the grant"*) ;; *) exit 1 ;; esac; for last in "$@"; do :; done; [ "$(cat "$last")" != unsigned ] ;; *) [ ! -f "$state/sign-fails" ] ;; esac'
     stub nc 'cat >/dev/null; [ -f "$state/status" ] && cat "$state/status"'
     stub sleep ':'
     stub lsof '[ -f "$state/inode" ] && printf "x-speak 1 me txt REG 1,15 5 %s %s\n" "$(cat "$state/inode")" "$libexec/x-speak"'
     stub launchctl 'case "$1" in
         bootout) rm -f "$state/inode" ;;
-        print) [ -f "$state/inode" ] && printf "\tstate = running\n\tpid = 1\n" ;;
-        bootstrap) echo relaunch >>"$state/relaunches"; [ -f "$state/bootstrap-fails" ] && exit 5; stat -f %i "$libexec/x-speak" >"$state/inode"; [ -f "$state/other" ] && echo 7 >"$state/inode"
+        print) [ -f "$state/inode" ] && printf "\tstate = running\n\targuments = {\n\t\tx\n\t\t--config\n\t\t%s\n\t}\n\tpid = 1\n" "$(cat "$state/argument")" ;;
+        bootstrap) plutil -extract ProgramArguments.2 raw "$HOME/Library/LaunchAgents/com.dima.x-speak.plist" >"$state/argument"; echo relaunch >>"$state/relaunches"; [ -f "$state/bootstrap-fails" ] && exit 5; stat -f %i "$libexec/x-speak" >"$state/inode"; [ -f "$state/other" ] && echo 7 >"$state/inode"
             [ -f "$state/dies" ] && rm -f "$state/status"
             echo "2026-11-23 10:00:01.000 config: $(cat "$state/settings")" >>"$HOME/.local/share/x-speak/daemon.err.log" ;;
     esac'
