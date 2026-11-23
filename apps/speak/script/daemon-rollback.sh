@@ -22,6 +22,7 @@ report_change() { # label, now, recorded at the build
     else echo "$1: $2, the kept binary ran with $3"; fi
 }
 
+lock_binaries
 [ -f "$kept" ] || refuse "nothing to go back to: no build has kept a binary at $kept"
 [ -f "$installed" ] || refuse "no binary at $installed"
 # the grant is pinned to what the installed binary is signed with, down to the certificate's hash

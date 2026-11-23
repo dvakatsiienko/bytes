@@ -20,7 +20,7 @@ daemon_answers() {
 running_inode() {
     pid=$(launchctl print "gui/$(id -u)/$label" 2>/dev/null | awk '/^\tpid = /{print $3}')
     [ -n "$pid" ] || return 0
-    lsof -a -p "$pid" -d txt -F in 2>/dev/null | awk -v path="$installed" '/^i/ {inode = substr($0, 2)} $0 == "n" path {print inode; exit}'
+    lsof -a -p "$pid" -d txt -F in 2>/dev/null | awk -v path="$installed" '/^f/ {inode = ""} /^i/ {inode = substr($0, 2)} $0 == "n" path {print inode; exit}'
 }
 
 # what the daemon last said of its settings: the values of a load, or why it kept or fell back. a load's path is
@@ -45,6 +45,14 @@ config_argument() {
         [ "$word" = --config ] && plutil -extract "ProgramArguments.$i" raw "$args" && return 0
     done
     return 0
+}
+
+# one build or rollback at a time moves the binaries: two swaps at once can lose one
+lock_binaries() {
+    mkdir -p "$install_dir"
+    mkdir "$install_dir/x-speak.lock" 2>/dev/null \
+        || refuse "another build or rollback moves the binaries; none running: rmdir $install_dir/x-speak.lock"
+    trap 'rmdir "$install_dir/x-speak.lock"' EXIT
 }
 
 # what the kept binary ran with: its config argument, then its settings
