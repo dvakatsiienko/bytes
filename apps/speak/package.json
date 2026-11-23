@@ -9,7 +9,9 @@
     "admin:build": "vite build",
     "daemon:build": "script/daemon-build.sh",
     "daemon:relaunch": "script/daemon-relaunch.sh",
+    "daemon:rollback": "script/daemon-rollback.sh",
     "daemon:test": "script/daemon-test.sh",
+    "daemon:try": "script/daemon-try.sh",
     "lint": "biome lint",
     "typecheck": "tsc --noEmit"
   },
