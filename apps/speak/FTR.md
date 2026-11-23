@@ -204,6 +204,9 @@
 - ✅ `x-speak-admin` (launchd, always on) serves the built page and the api on 127.0.0.1:7386; `pnpm --filter speak admin` runs the same server by hand when the job is stopped
 - ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386
 - ✅ `pnpm --filter speak admin:build` builds `dist/`
+- ✅ `pnpm --filter speak daemon:build` installs the signed daemon to `~/.local/libexec/x-speak/x-speak`, with no launchd change
+  - makes: `~/.local/libexec/x-speak/x-speak`, signed «x-speak local signing»
+- ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
 - ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases and the argv parser
 - ⬜ x-speak takes its paths as flags: `--config <config.json>`, `--keys-run <script>`
   - given the daemon started with `--config <path>` alone

@@ -7,6 +7,8 @@
     "dev": "node ../../script/with-port.ts 7387 vite",
     "admin": "node ../../script/with-port.ts 7386 node server.ts",
     "admin:build": "vite build",
+    "daemon:build": "script/daemon-build.sh",
+    "daemon:relaunch": "script/daemon-relaunch.sh",
     "daemon:test": "script/daemon-test.sh",
     "lint": "biome lint",
     "typecheck": "tsc --noEmit"
