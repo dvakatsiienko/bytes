@@ -211,8 +211,9 @@
 - ✅ `pnpm --filter speak daemon:build` installs the signed daemon to `~/.local/libexec/x-speak/x-speak`, with no launchd change
   - makes: `~/.local/libexec/x-speak/x-speak`, signed «x-speak local signing»
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
-- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases and the argv parser
+- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser and the config load line, after a typecheck of the whole daemon
 - ⬜ x-speak takes its paths as flags: `--config <config.json>`, `--keys-run <script>`
   - given the daemon started with `--config <path>` alone
-  - then it stays up as the daemon, logs «config: loaded <the full path>» with each engine's voice, speed and gain, and speaks nothing
-  - and with no `--config` it exits at once with one usage line
+  - then it stays up as the daemon, logs «config: loaded <the full path>» with each engine's voices, speed and gain, and speaks nothing
+  - and with no `--config`, an empty one or a flag it does not know, it exits at once with one usage line
+  - and a config file that is not there logs «running on the built-in defaults» with the full path

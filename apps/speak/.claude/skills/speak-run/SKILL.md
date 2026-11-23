@@ -1,6 +1,6 @@
 ---
 name: speak-run
-description: Load BEFORE you run, start, build, screenshot or click through speak, the voice admin — «run speak», «speak:admin», «open the voice admin», «preview a voice», a change under `apps/speak/` that needs proof in the real page.
+description: Load BEFORE you run, start, build, screenshot or click through speak, the voice admin — «run speak», «open the voice admin», «preview a voice», a change under `apps/speak/` that needs proof in the real page.
 ---
 
 # speak-run

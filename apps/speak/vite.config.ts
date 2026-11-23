@@ -19,7 +19,7 @@ export default defineConfig({
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   server: {
-    port: speakDevPort,
+    port: Number(process.env.PORT ?? speakDevPort),
     // every api call goes to the admin server: it alone writes config.json and reaches the daemon
     proxy: { '/api': `http://127.0.0.1:${speakPort}` },
     strictPort: true,

@@ -8,8 +8,8 @@ Prefer a committed `vercel.json` over the Vercel dashboard. Dashboard-only setti
 to agents and to code review, and they silently override the repo — a dashboard edit to
 `trophy-sys`'s Root Directory once broke a deploy that no diff could explain. Six apps have one —
 `cv`, `figmentation`, `financial`, `space-explorer-ui`, `trophy-sys`, `x-com-chat`. `sketchbook`,
-`atelier`, `design-loupe` and `space-explorer-api` do not; `space-explorer-api` deploys on Railway
-instead, from `railway.json`, and `atelier` and `design-loupe` never deploy — they are local tools.
+`atelier`, `design-loupe`, `speak` and `space-explorer-api` do not; `space-explorer-api` deploys on Railway
+instead, from `railway.json`, and `atelier`, `design-loupe` and `speak` never deploy — they are local tools.
 
 **Vercel's git integration is off.** Every `vercel.json` carries `git.deploymentEnabled: false` —
 the bool, not the branch-prefix object it replaced. The object never stopped a deployment being

@@ -22,7 +22,7 @@ struct Arguments: Equatable {
                 text.append(word)
                 continue
             }
-            guard let value = rest.popFirst(), !value.hasPrefix("--") else { throw ArgumentsError.missingValue(word) }
+            guard let value = rest.popFirst(), !value.isEmpty, !value.hasPrefix("-") else { throw ArgumentsError.missingValue(word) }
             values[word] = value
         }
         guard let configPath = values["--config"] else { throw ArgumentsError.missingConfig }
