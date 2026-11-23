@@ -9,6 +9,7 @@ import AppKit
 @MainActor
 final class App {
     let arguments: Arguments
+    let paths: Paths
     let configFile: ConfigFile
     let keys: Keys
     let kokoro: KokoroServer
@@ -25,16 +26,18 @@ final class App {
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })
     private let heartbeat = Heartbeat()
     private lazy var control = Control(
-        socket: NSHomeDirectory() + "/.local/share/x-speak/control.sock",
+        socket: paths.controlSocket,
         answers: Answers(commands: { [unowned self] in commands }, mainAge: { [heartbeat] in heartbeat.age })
     )
 
     init(_ arguments: Arguments) {
         self.arguments = arguments
+        let paths = Paths()
+        self.paths = paths
         let configFile = ConfigFile(URL(fileURLWithPath: arguments.configPath))
         self.configFile = configFile
         keys = Keys(run: arguments.keysRunPath)
-        kokoro = KokoroServer(mayStart: arguments.mayStartKokoro, voice: { configFile.current[.kokoro].voice(for: .en) })
+        kokoro = KokoroServer(paths: paths, mayStart: arguments.mayStartKokoro, voice: { configFile.current[.kokoro].voice(for: .en) })
     }
 
     func start(only: Engine?) {

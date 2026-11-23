@@ -34,6 +34,12 @@ is 'a module-level variable in the core fails the run' 1 "$code"
 says 'a module-level variable in the core is named' 'core/Planted.swift'
 says 'a module-level variable in the core is named for what it is' 'a module-level value'
 
+for line in 'private let at = NSHomeDirectory()' 'private let at = "/Users/dima/x"' 'private let at = "/.local/share/x"'; do
+    app; plant "$line"; run
+    is "«${line}» outside the paths fails the run" 1 "$code"
+    says "«${line}» outside the paths is named for what it is" 'a place named outside core/paths.swift'
+done
+
 app; plant 'enum Planted { static let planted: Int = "a word" }'; run
 is 'a core file with a wrong type fails the run' 1 "$code"
 says 'a core file with a wrong type is named' 'Planted.swift'

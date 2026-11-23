@@ -12,7 +12,7 @@ struct Case: Decodable {
 struct DaemonTest {
     @MainActor
     static func main() async throws {
-        var failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + ConfigTest.failures() + ChainTest.failures()
+        var failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + ConfigTest.failures() + ChainTest.failures()
         failed += await SeamsTest.failures()
         exit(failed == 0 ? 0 : 1)
     }
