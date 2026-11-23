@@ -47,6 +47,7 @@ pre-commit:
     # normalizer's golden cases, the core's rules, its scripts) run here, on the mac.
     - name: speak-daemon-test
       glob:
+        - 'apps/speak/contract/**'
         - 'apps/speak/daemon/**'
         - 'apps/speak/script/**'
       run: if command -v swiftc >/dev/null; then pnpm --filter speak daemon:test; fi

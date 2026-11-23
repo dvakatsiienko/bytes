@@ -97,7 +97,16 @@ enum StoreTest {
         _ = try? store.save(json(#"{"engines":{"system":{"voice":{"en":"Samantha"}}},"meterFlowMs":1}"#), over: at)
         rows.append(("the log names the keys a save changed", file.lines.first ?? "-", "config: saved engines.system.voice, meterFlowMs"))
         rows.append(("a save is a load", String(file.lines.dropFirst().joined().prefix(26)), "config: loaded SETTINGS — "))
-        rows.append(("the next press reads nothing again", "\(store.refresh() ?? "ok") \(file.lines.count)", "ok 2"))
+        let edited = file.text.replacingOccurrences(of: "\"meterFlowMs\": 1", with: "\"meterFlowMs\": 2")
+        rows.append(("the next press reads the file once more", "\(store.refresh() ?? "ok") \(file.lines.count) \(store.refresh() ?? "ok") \(file.lines.count)", "ok 3 ok 3"))
+        _ = try? store.save(json(#"{"meterFlowMs":1.5}"#), over: store.saved().version)
+        file.putInTheSameMoment(edited)
+        store.refresh()
+        rows.append(("a hand edit in the moment of a save is seen", "\(store.current.meterFlowMs)", "2.0"))
+        file.link()
+        _ = try? store.save(json(#"{"meterFlowMs":3}"#), over: store.saved().version)
+        rows.append(("a linked file stays a link, and its target is written", "\(file.isLink) \(file.text.contains("\"meterFlowMs\": 3"))", "true true"))
+        file.unlink()
         file.put(shape.replacingOccurrences(of: "900", with: "800"))
         rows.append(("a hand edit in the same turn is seen", "\(store.refresh() ?? "ok") \(store.current.firstAudioMs)", "ok 800"))
         return check("save", rows)
@@ -220,6 +229,23 @@ private final class Scratch {
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         try? Data(text.utf8).write(to: url)
         try? FileManager.default.setAttributes([.modificationDate: stamp], ofItemAtPath: url.path)
+    }
+
+    func putInTheSameMoment(_ text: String) {
+        let moment = (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
+        try? Data(text.utf8).write(to: url)
+        if let moment { try? FileManager.default.setAttributes([.modificationDate: moment], ofItemAtPath: url.path) }
+    }
+
+    private var target: URL { folder.appendingPathComponent("TARGET") }
+    var isLink: Bool { (try? FileManager.default.destinationOfSymbolicLink(atPath: url.path)) != nil }
+    func link() {
+        try? FileManager.default.moveItem(at: url, to: target)
+        try? FileManager.default.createSymbolicLink(at: url, withDestinationURL: target)
+    }
+    func unlink() {
+        try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.moveItem(at: target, to: url)
     }
 
     func diff(from before: String) -> String {

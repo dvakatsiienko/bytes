@@ -1,8 +1,8 @@
 import {
   mkdirSync,
   mkdtempSync,
-  readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { type Server, createServer, request } from 'node:http';
@@ -25,7 +25,6 @@ const SETTINGS = {
 const JSON_TYPE = { 'content-type': 'application/json' };
 
 let home: string;
-let config: string;
 let admin: Server;
 let fakeDaemon: SocketServer;
 let asked: unknown[];
@@ -35,10 +34,8 @@ let rawReply: string | undefined;
 
 beforeEach(async () => {
   home = mkdtempSync(join(tmpdir(), 'x-speak-admin-'));
-  config = join(home, 'config.json');
   const dist = join(home, 'dist');
   const socket = join(home, 'control.sock');
-  writeFileSync(config, JSON.stringify(SETTINGS));
   mkdirSync(join(dist, 'assets'), { recursive: true });
   mkdirSync(join(home, 'dist-secret'));
   writeFileSync(join(dist, 'index.html'), '<p>the page</p>');
@@ -96,7 +93,6 @@ describe('the write guard', () => {
         type: 'application/json',
       });
       expect(asked).toEqual([]);
-      expect(readFileSync(config, 'utf8')).toBe(JSON.stringify(SETTINGS));
     },
   );
 
@@ -133,7 +129,7 @@ describe('the host', () => {
     'evil.example:7386',
     'localhost.evil.example',
     '127.0.0.1.evil.example:7386',
-  ])('«%s» is refused and reaches nothing', async (host) => {
+  ])('«%s» reaches nothing', async (host) => {
     const answer = await ask('POST', '/api/stop', { ...JSON_TYPE, host });
 
     expect(answer.status).toBe(403);
@@ -256,25 +252,12 @@ describe('the routes over a daemon', () => {
     ['H1: a save the daemon refuses', '{"firstAudioMs":0}'],
     ['H1: an empty-body save', ''],
     ['H4: a save over settings that moved on', JSON.stringify(SETTINGS)],
-  ])('%s leaves the settings file as it was, and says why', async (_, sent) => {
+  ])('%s says why', async (_, sent) => {
     replies.save = { error: 'refused' };
-    replies.reload = { error: 'refused' };
 
     const answer = await ask('PUT', '/api/config', JSON_TYPE, sent);
 
     expect(answer.body).toEqual({ error: 'refused' });
-    expect(readFileSync(config, 'utf8')).toBe(JSON.stringify(SETTINGS));
-  });
-
-  it('H4: a heart leaves every other key to the daemon', async () => {
-    await ask(
-      'PUT',
-      '/api/favourites',
-      JSON_TYPE,
-      '{"engine":"kokoro","favourites":["af_sky"],"on":true,"voice":"af_sky"}',
-    );
-
-    expect(readFileSync(config, 'utf8')).toBe(JSON.stringify(SETTINGS));
   });
 
   it.each([
@@ -282,7 +265,7 @@ describe('the routes over a daemon', () => {
     ['M19: empty', ''],
     ['M19: an empty object', '{}\n'],
     ['M19: not an object', '7\n'],
-  ])('a reply %s is an error, and the server lives', async (_, line) => {
+  ])('a reply %s is an error the server survives', async (_, line) => {
     rawReply = line;
     const error = { error: 'x-speak closed the line before it answered' };
 
@@ -290,6 +273,21 @@ describe('the routes over a daemon', () => {
     expect((await ask('PUT', '/api/config', JSON_TYPE, '{}')).body).toEqual(
       error,
     );
+  });
+
+  it('a letter split over two chunks arrives whole', async () => {
+    const line = Buffer.from('{"error":"її"}\n');
+    fakeDaemon.removeAllListeners('connection');
+    fakeDaemon.on('connection', (connection) => {
+      connection.once('data', () => {
+        connection.write(line.subarray(0, 11));
+        setTimeout(() => connection.end(line.subarray(11)), 20);
+      });
+    });
+
+    expect((await ask('POST', '/api/stop', JSON_TYPE)).body).toEqual({
+      error: 'її',
+    });
   });
 
   it('M19: an answer that says neither ok nor error is no success', async () => {
@@ -315,7 +313,7 @@ describe('the routes over a daemon', () => {
 });
 
 describe('a worktree’s server', () => {
-  it('refuses a save and a heart, and still plays', async () => {
+  it('plays but never saves', async () => {
     await new Promise((resolve) => admin.close(resolve));
     admin = createServer(
       createAdmin({
@@ -340,6 +338,19 @@ describe('a worktree’s server', () => {
     expect((await ask('POST', '/api/stop', JSON_TYPE)).body).toEqual({
       ok: true,
     });
+  });
+
+  it('given a link to the live socket never saves', () => {
+    const app = join(home, 'repo/apps/speak');
+    const state = join(home, '.local/share/x-speak');
+    const own = join(home, 'own.sock');
+    mkdirSync(app, { recursive: true });
+    mkdirSync(state, { recursive: true });
+    writeFileSync(join(home, 'repo/.git'), 'gitdir: x');
+    writeFileSync(join(state, 'control.sock'), '');
+    symlinkSync(join(state, 'control.sock'), own);
+
+    expect(adminPaths({ app, home, own }).canSave).toBe(false);
   });
 
   it.each([

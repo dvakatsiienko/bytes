@@ -21,7 +21,8 @@ the page AND the state behind it: a drag or a save is proven by the ranks the pa
    file against the copy shows exactly that one change, `git status` stays clean. move it back, save, `cmp`
 6. **reject** — `GET /api/config` gives a version; `PUT /api/config` with it and `{"patch":{"chain":{"en":["koko"]}}}`
    answers the daemon's «unknown name «…»» line, an empty body «a save needs the version it edits», a page opened before a hand edit
-   «the settings changed since this page read them · reset loads them»; the file `cmp`s equal after each. a worktree:
+   «the settings changed since this page read them · reset loads them»; the file `cmp`s equal to a copy taken right before
+   each. a worktree:
    the same over a fake daemon's socket (`pnpm admin <socket>`); without one a save answers «a worktree never saves …»
 7. **preview** — ▶ on the kokoro card: the status line reads «▶ kokoro · en» and the daemon log gets a
    `first audio: kokoro` line

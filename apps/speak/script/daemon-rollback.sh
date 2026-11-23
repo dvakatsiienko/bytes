@@ -8,13 +8,16 @@ here=$(cd "$(dirname "$0")" && pwd)
 
 hash_of() { sha_of "$1" | cut -c1-12; }
 # a second link, then one rename over the target: the installed path is never missing, and each file keeps its inode,
-# which is how the build knows the running binary. $1 to $3: what the binary now kept ran with (record_kept)
+# which is how the build knows the running binary. $1 and $2: what the binary now kept ran with (record_kept)
 swap() {
     ln -f "$installed" "$install_dir/x-speak.swap"
     mv -f "$kept" "$installed"
     mv -f "$install_dir/x-speak.swap" "$kept"
     if [ -f "$rolled_back" ]; then rm -f "$rolled_back"; else : >"$rolled_back"; fi
-    record_kept "$1" "$2" "$3"
+    if [ -f "$reads" ]; then mv -f "$reads" "$install_dir/x-speak.swap.reads"; fi
+    if [ -f "$kept.reads" ]; then mv -f "$kept.reads" "$reads"; fi
+    if [ -f "$install_dir/x-speak.swap.reads" ]; then mv -f "$install_dir/x-speak.swap.reads" "$kept.reads"; fi
+    record_kept "$1" "$2"
 }
 # a daemon from before the settings had a place of their own reads the file its argument names. that file gets the
 # settings of today, but only while nobody changed it since they moved: two sets of changes have no right answer
@@ -22,9 +25,9 @@ old_place=
 carry_settings() {
     target=$(config_argument)
     if [ ! -f "$settings" ] || [ "$(cat "$kept.reads" 2>/dev/null || true)" = "$settings" ] || [ "$target" = "$settings" ]; then return 0; fi
-    { [ -f "$moved_from" ] && [ "$(sed -n 1p "$moved_from")" = "$target" ]; } \
+    [ "$(moved_line 1)" = "$target" ] \
         || refuse "the kept daemon reads $target, and nothing says the settings moved from there; compare it with $settings by hand"
-    [ "$(sha_of "$target" 2>/dev/null)" = "$(sed -n 2p "$moved_from")" ] \
+    [ "$(sha_of "$target" 2>/dev/null)" = "$(moved_line 2)" ] \
         || refuse "the kept daemon reads $target, which changed since the settings moved; compare it with $settings by hand"
     old_place=$target
     cp "$target" "$settings.old-place"
@@ -53,13 +56,12 @@ daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 
 ran_with=$(cat "$kept.config" 2>/dev/null || true)
 ran_settings=$(cat "$kept.settings" 2>/dev/null || true)
-ran_reads=$(cat "$kept.reads" 2>/dev/null || true)
 carry_settings
-swap "$(running_argument)" "$(settings_line)" "$(running_settings)"
+swap "$(running_argument)" "$(settings_line)"
 code=0
 "$here/daemon-relaunch.sh" || code=$?
 if [ "$code" -eq 3 ]; then
-    swap "$ran_with" "$ran_settings" "$ran_reads"
+    swap "$ran_with" "$ran_settings"
     [ -z "$old_place" ] || place "$settings.old-place"
     refuse 'the relaunch was refused, the binaries are back as they were'
 fi

@@ -33,7 +33,9 @@ if [ "$runs" = yes ] || { [ -f "$installed" ] && [ ! -f "$kept" ]; }; then
     cp "$installed" "$kept.new"
     mv -f "$kept.new" "$kept"
     rm -f "$rolled_back"
-    if [ "$runs" = yes ]; then record_kept "$(running_argument)" "$(settings_line)" "$(running_settings)"; else record_kept '' '' ''; fi
+    if [ "$runs" = yes ]; then record_kept "$(running_argument)" "$(settings_line)"; else record_kept '' ''; fi
+    if [ -f "$reads" ]; then cp "$reads" "$kept.reads"; else rm -f "$kept.reads"; fi
 fi
 mv -f build/x-speak "$installed"
+printf '%s\n' "$settings" >"$reads"
 echo "installed $installed — script/daemon-relaunch.sh starts it"

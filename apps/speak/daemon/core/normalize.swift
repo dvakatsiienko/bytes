@@ -3,7 +3,7 @@
 // so every engine is fed text rewritten here first. golden.json is the contract.
 import Foundation
 
-enum Lang: String, Codable { case en, uk, ru }
+enum Lang: String, Codable, CaseIterable { case en, uk, ru }
 
 struct Run: Equatable {
     var lang: Lang

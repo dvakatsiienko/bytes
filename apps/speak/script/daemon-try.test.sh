@@ -24,7 +24,7 @@ argv_config() { argv | sed "s|\[$place\]|[CONFIG]|"; }
 app; try 'a first line'
 is 'a text is spoken by the built binary, with the config and no keys runner' '[--config][CONFIG][a first line]' "$(argv_config)"
 is 'a spoken text ends well' 0 "$code"
-is 'the built binary stays out of the install folder' old "$(ls "$libexec" | grep -vx x-speak)$(content_of x-speak)"
+is 'the built binary stays out of the install folder' old "$(ls "$libexec" | grep -vxE 'x-speak(\.reads)?')$(content_of x-speak)"
 is 'the built binary is in the tree' yes "$(built)"
 is 'the live daemon is not relaunched' '' "$(relaunches)"
 is 'the launchd job is not touched' "$(stat -f %i "$libexec/x-speak")" "$(cat "$state/inode")"

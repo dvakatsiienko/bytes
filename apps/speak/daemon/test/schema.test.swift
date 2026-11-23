@@ -13,7 +13,7 @@ enum SchemaTest {
             ("the settings' names", top.keys.sorted().joined(separator: " "), Config.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("an engine's names", engine.keys.sorted().joined(separator: " "), EngineConfig.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("the engines", names(defs["engine"]), Engine.allCases.map(\.rawValue).sorted().joined(separator: " ")),
-            ("the languages", names(top["chain"]), ["en", "ru", "uk"].compactMap(Lang.init).map(\.rawValue).joined(separator: " ")),
+            ("the languages", names(top["chain"]), Lang.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a voice's languages", names(engine["voice"]), "* " + names(top["chain"])),
         ]
         for key in schema["required"] as? [String] ?? [] {

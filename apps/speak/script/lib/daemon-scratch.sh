@@ -22,11 +22,12 @@ setup() {
     printf 'old' >"$libexec/x-speak"
     plist '/old/config.json'
     echo /old/config.json >"$state/argument"
-    # both daemons read the settings at their own place, as after the move
+    # both daemons read the settings at their own place, as after the move; `old` was installed knowing it
     place="$HOME/Library/Application Support/speak/config.json"
     mkdir -p "$(dirname "$place")"
     echo today >"$place"
-    printf '{"speaking":false,"paused":false,"settings":"%s"}' "$(printf %s "$place" | sed 's#/#\\/#g')" >"$state/status"
+    echo "$place" >"$libexec/x-speak.reads"
+    printf '{"speaking":false,"paused":false}' >"$state/status"
     started
     echo 'loaded /c.json — same' >"$state/settings"
     stub swiftc 'for last in "$@"; do :; done; [ -f "$state/compile-fails" ] && exit 1; cp "$state/next" "$last"'

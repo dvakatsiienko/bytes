@@ -61,8 +61,8 @@ const read = async <T extends object>(path: string): Promise<T> => {
 
 export const api = {
   config: () => read<Settings>('/api/config'),
-  heart: (engine: Engine, voice: string, on: boolean) =>
-    call<Saved>('PUT', '/api/favourites', { engine, on, voice }),
+  heart: (engine: Engine, voice: string, isOn: boolean) =>
+    call<Saved>('PUT', '/api/favourites', { engine, on: isOn, voice }),
   pause: () => call('POST', '/api/pause'),
   preview: (payload: Preview) => call('POST', '/api/preview', payload),
   save: (patch: Patch, version: string) =>

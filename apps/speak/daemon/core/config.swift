@@ -81,7 +81,7 @@ private func inRange(_ field: String, _ value: Double, _ range: ClosedRange<Doub
 }
 
 struct EngineConfig: Decodable {
-    // the page's alone: the voices dima hearted
+    // the voices dima hearted: the page sorts by them, a heart writes them, no read asks them
     var favourites: [String] = []
     var model: String?
     // per language; for kokoro and gemini one voice serves every language they speak

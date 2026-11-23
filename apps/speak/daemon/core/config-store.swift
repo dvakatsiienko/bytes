@@ -92,9 +92,10 @@ final class ConfigStore {
         let data = Data((after.text() + "\n").utf8)
         let config: Config = try decoded(data)
         guard after != before else { return SavedSettings(config: before, version: mark(old), was: mark(old)) }
-        // the rename is the write: until it, the file is the old one whole
-        do { try data.write(to: url, options: .atomic) } catch { throw SaveError.notWritten(error.localizedDescription) }
-        loadedStamp = stamp()
+        // the rename is the write: until it, the file is the old one whole. a link stays one, its file is the one renamed over
+        do { try data.write(to: url.resolvingSymlinksInPath(), options: .atomic) } catch { throw SaveError.notWritten(error.localizedDescription) }
+        // the next press reads the file again: a hand edit right after the rename must not pass for this save
+        loadedStamp = nil
         write("config: saved \(before.changes(to: after).joined(separator: ", "))")
         adopt(config)
         return SavedSettings(config: after, version: mark(data), was: mark(old))

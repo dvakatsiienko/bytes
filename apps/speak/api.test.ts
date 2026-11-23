@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { type Config, api } from './src/api.ts';
-import { afterHeart, changesOf, withHeart } from './src/draft.ts';
+import {
+  afterHeart,
+  changesOf,
+  draftAfterHeart,
+  draftAfterSave,
+  unsavedOf,
+} from './src/draft.ts';
 
 const answers = (status: number, body: string) =>
   vi.stubGlobal('fetch', async () => new Response(body, { status }));
@@ -123,40 +129,76 @@ describe('a save names the changed keys alone', () => {
   });
 });
 
-describe('a heart', () => {
+describe('a heart on its way', () => {
   const lily = withEngine(CONFIG, 'kokoro', { favourites: ['af_lily'] });
+  const slider = withEngine(CONFIG, 'kokoro', { speed: 1.4 });
+  const read = { config: CONFIG, version: 'v1' };
+  const saved = { config: lily, version: 'v2', was: 'v1' };
 
-  it('H5: leaves a slider moved while it was on its way', () => {
-    const draft = withEngine(CONFIG, 'kokoro', { speed: 1.4 });
+  it('H5: leaves a slider moved meanwhile', () => {
+    const draft = draftAfterHeart(
+      { config: slider, from: read },
+      'kokoro',
+      saved,
+    );
 
-    expect(withHeart(draft, 'kokoro', lily).engines.kokoro).toEqual({
+    expect(draft.config.engines.kokoro).toEqual({
       favourites: ['af_lily'],
       gain: 2,
       speed: 1.4,
     });
+    expect(unsavedOf(draft)).toEqual({ engines: { kokoro: { speed: 1.4 } } });
+  });
+
+  it('takes the page’s version along', () => {
+    expect(afterHeart(read, 'kokoro', saved)).toEqual({
+      config: lily,
+      version: 'v2',
+    });
+    expect(
+      draftAfterHeart({ config: slider, from: read }, 'kokoro', saved).from
+        .version,
+    ).toBe('v2');
   });
 
   it('is no unsaved change', () => {
-    const settings = afterHeart({ config: CONFIG, version: 'v1' }, 'kokoro', {
-      config: lily,
-      version: 'v2',
-      was: 'v1',
-    });
-
-    expect(settings.version).toBe('v2');
     expect(
-      changesOf(settings.config, withHeart(CONFIG, 'kokoro', lily)),
+      unsavedOf(
+        draftAfterHeart({ config: CONFIG, from: read }, 'kokoro', saved),
+      ),
     ).toBeUndefined();
   });
 
-  it('H4: over settings this page never read, its next save stays stale', () => {
-    const elsewhere = { ...lily, firstAudioMs: 300 };
-    const settings = afterHeart({ config: CONFIG, version: 'v1' }, 'kokoro', {
-      config: elsewhere,
+  it('H4: over settings this page never read, leaves its next save stale', () => {
+    const elsewhere = {
+      config: { ...lily, firstAudioMs: 300 },
       version: 'v3',
       was: 'v2',
-    });
+    };
 
-    expect(settings).toEqual({ config: lily, version: 'v1' });
+    expect(afterHeart(read, 'kokoro', elsewhere)).toEqual({
+      config: lily,
+      version: 'v1',
+    });
+  });
+});
+
+describe('a save on its way', () => {
+  const read = { config: CONFIG, version: 'v1' };
+  const faster = withEngine(CONFIG, 'kokoro', { speed: 1.4 });
+  const saved = { config: faster, version: 'v2' };
+
+  it('ends the draft it saved', () => {
+    expect(
+      draftAfterSave({ config: faster, from: read }, saved),
+    ).toBeUndefined();
+  });
+
+  it('leaves an edit made meanwhile an edit over what it saved', () => {
+    const louder = withEngine(faster, 'kokoro', { gain: 3 });
+    const draft = draftAfterSave({ config: louder, from: read }, saved);
+
+    expect(draft?.from).toBe(saved);
+    expect(unsavedOf(draft)).toEqual({ engines: { kokoro: { gain: 3 } } });
   });
 });

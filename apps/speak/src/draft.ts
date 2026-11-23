@@ -19,12 +19,11 @@ export const changesOf = (saved: object, draft: object): Patch | undefined => {
   return Object.keys(patch).length > 0 ? patch : undefined;
 };
 
-// a ♥ is saved at once and touches that engine's list alone, so neither copy of the settings moves anywhere else
-export const withHeart = (
-  config: Config,
-  engine: Engine,
-  saved: Config,
-): Config => ({
+export const unsavedOf = (draft: Draft | undefined) =>
+  draft && changesOf(draft.from.config, draft.config);
+
+// a ♥ is saved at once and touches that engine's list alone, so no copy of the settings moves anywhere else
+const withHeart = (config: Config, engine: Engine, saved: Config): Config => ({
   ...config,
   engines: {
     ...config.engines,
@@ -46,6 +45,31 @@ export const afterHeart = (
   version: saved.was === settings.version ? saved.version : settings.version,
 });
 
+export const draftAfterHeart = (
+  draft: Draft,
+  engine: Engine,
+  saved: Saved,
+): Draft => ({
+  config: withHeart(draft.config, engine, saved.config),
+  from: afterHeart(draft.from, engine, saved),
+});
+
+// an edit made while the save was on its way stays an edit, now over what was saved
+export const draftAfterSave = (
+  draft: Draft,
+  saved: Settings,
+): Draft | undefined =>
+  changesOf(saved.config, draft.config)
+    ? { config: draft.config, from: saved }
+    : undefined;
+
 /* Helpers */
 const isObject = (value: unknown): value is Patch =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/* Types */
+// the edited settings, and the ones the edits were made over
+export interface Draft {
+  config: Config;
+  from: Settings;
+}

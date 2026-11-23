@@ -7,6 +7,18 @@ label=com.dima.x-speak
 # the daemon's own place for its settings (daemon/core/paths.swift), and the file they were moved from with its hash
 settings="$HOME/Library/Application Support/speak/config.json"
 moved_from="$settings.moved-from"
+# where the installed binary reads its settings, written as it is installed; a binary from before the settings had a
+# place of their own has no such file, and reads what its launchd argument names
+reads="$installed.reads"
+
+# 1 the file the settings moved from, 2 its hash then
+moved_line() { sed -n "$1p" "$moved_from" 2>/dev/null || true; }
+# the old file changed since the settings moved, the moved ones did not: a start on those loses that change
+moved_too_early() {
+    old=$(moved_line 1)
+    [ -n "$old" ] && [ "$old" = "$(config_argument)" ] && [ -f "$old" ] \
+        && [ "$(sha_of "$settings")" = "$(moved_line 2)" ] && [ "$(sha_of "$old")" != "$(moved_line 2)" ]
+}
 
 sha_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
 
@@ -41,13 +53,6 @@ running_argument() {
     if [ -n "$argument" ]; then printf '%s\n' "$argument"; else config_argument; fi
 }
 
-# where the running daemon reads its settings. a daemon from before they had a place of their own names none, and reads
-# its argument
-running_settings() {
-    named=$(daemon_status | sed -n 's/.*"settings":"\([^"]*\)".*/\1/p' | sed 's#\\/#/#g')
-    if [ -n "$named" ]; then printf '%s\n' "$named"; else running_argument; fi
-}
-
 # what the next start gets
 config_argument() {
     args="$HOME/Library/LaunchAgents/$label.plist"
@@ -67,11 +72,10 @@ lock_binaries() {
     trap 'rmdir "$install_dir/x-speak.lock"' EXIT
 }
 
-# what the kept binary ran with: its config argument, its settings' values, and where it read them
+# what the kept binary ran with: its config argument, its settings' values
 record_kept() {
     printf '%s\n' "$1" >"$kept.config"
     printf '%s\n' "$2" >"$kept.settings"
-    printf '%s\n' "$3" >"$kept.reads"
 }
 
 refuse() {

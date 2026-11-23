@@ -1,6 +1,6 @@
 // the voice admin's handler: the built page, and the daemon's control socket as an api. no state and no file of its
 // own: the daemon owns the settings. server.ts hands it this mac's paths and listens
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { createConnection } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
 
@@ -74,6 +74,7 @@ function askDaemon(socketPath: string, request: { op: string }) {
   return new Promise<Record<string, unknown>>((answer) => {
     const socket = createConnection(socketPath);
     let reply = '';
+    socket.setEncoding('utf8');
     socket.setTimeout(3000, () =>
       socket.destroy(new Error('the daemon did not answer in 3 s')),
     );
@@ -90,6 +91,7 @@ function askDaemon(socketPath: string, request: { op: string }) {
 
 async function body(request: IncomingMessage) {
   let text = '';
+  request.setEncoding('utf8');
   for await (const chunk of request) text += chunk;
   return JSON.parse(text || '{}');
 }
@@ -170,6 +172,10 @@ export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
 const WORKTREE =
   'a worktree never saves the live settings — start its server with a socket of its own';
 
+// a link to the live socket is the live socket
+const canonical = (path: string) =>
+  existsSync(path) ? realpathSync(path) : resolve(path);
+
 // where this server's page and its daemon are. a worktree's server reaches the live daemon to play, never to save
 export const adminPaths = ({ app, home, own }: AdminPlace): AdminPaths => {
   const live = join(home, '.local/share/x-speak/control.sock');
@@ -178,7 +184,7 @@ export const adminPaths = ({ app, home, own }: AdminPlace): AdminPaths => {
   const isWorktree = existsSync(git) && statSync(git).isFile();
   const socket = own ?? live;
   return {
-    canSave: !isWorktree || resolve(socket) !== live,
+    canSave: !isWorktree || canonical(socket) !== canonical(live),
     dist: join(app, 'dist'),
     socket,
   };

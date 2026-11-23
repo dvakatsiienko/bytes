@@ -34,7 +34,9 @@ is 'a module-level variable in the core fails the run' 1 "$code"
 says 'a module-level variable in the core is named' 'core/Planted.swift'
 says 'a module-level variable in the core is named for what it is' 'a module-level value'
 
-for line in 'private let at = NSHomeDirectory()' 'private let at = "/Users/dima/x"' 'private let at = "/.local/share/x"'; do
+for line in 'private let at = NSHomeDirectory()' 'private let at = "/Users/dima/x"' 'private let at = "/.local/share/x"' 'private let at = "/tmp/x"' \
+    'private let at = "~/x"' 'private let at = "file:///tmp/x"' 'private let at = FileManager.default.homeDirectoryForCurrentUser' \
+    'private let at = FileManager.default.temporaryDirectory' 'private let at = URL.applicationSupportDirectory' 'private let at = FileManager.SearchPathDirectory.libraryDirectory'; do
     app; plant "$line"; run
     is "«${line}» outside the paths fails the run" 1 "$code"
     says "«${line}» outside the paths is named for what it is" 'a place named outside core/paths.swift'

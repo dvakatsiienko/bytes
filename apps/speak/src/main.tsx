@@ -9,7 +9,11 @@ import { App } from '@/App.tsx';
 import './theme.css';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
+  defaultOptions: {
+    // the server is this mac's own: no network is no reason to hold a write back, and to send it later
+    mutations: { networkMode: 'always' },
+    queries: { networkMode: 'always', refetchOnWindowFocus: false, retry: 1 },
+  },
 });
 const root = document.querySelector('#root');
 

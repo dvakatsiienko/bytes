@@ -1,8 +1,20 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { type Config, type Engine, type Settings, api } from '@/api.ts';
-import { afterHeart, changesOf, withHeart } from '@/draft.ts';
+import {
+  type Config,
+  type Engine,
+  type Patch,
+  type Settings,
+  api,
+} from '@/api.ts';
+import {
+  type Draft,
+  afterHeart,
+  draftAfterHeart,
+  draftAfterSave,
+  unsavedOf,
+} from '@/draft.ts';
 
 // the settings the daemon holds, and this page's unsaved edits over them
 export const useSettings = () => {
@@ -13,21 +25,29 @@ export const useSettings = () => {
     staleTime: Number.POSITIVE_INFINITY,
   });
   // undefined: nothing edited, the page shows the saved settings
-  const [draft, setDraft] = useState<Config>();
-  const config = draft ?? saved.data?.config;
-  const changes = saved.data && draft && changesOf(saved.data.config, draft);
+  const [draft, setDraft] = useState<Draft>();
+  // what an answer or a second edit meets before the next render
+  const latest = useRef<Draft>(undefined);
+  const put = (next: Draft | undefined) => {
+    latest.current = next;
+    setDraft(next);
+  };
+  const changes = unsavedOf(draft);
+  // a read that left before this answer knows less than it
+  const write = async (next: (now?: Settings) => Settings | undefined) => {
+    await queryClient.cancelQueries({ queryKey: KEY });
+    queryClient.setQueryData<Settings>(KEY, next);
+  };
 
   // one at a time: the daemon's answers are taken in the order the writes were asked for
   const save = useMutation({
-    mutationFn: async (sent: Config) => {
-      const now = queryClient.getQueryData<Settings>(KEY);
-      const patch = now && changesOf(now.config, sent);
-      if (!(now && patch)) return;
-      const answer = await api.save(patch, now.version);
+    // the changes are the ones on screen at the press; a ♥ that lands before them moves the version alone
+    mutationFn: async (patch: Patch) => {
+      if (!latest.current) return;
+      const answer = await api.save(patch, latest.current.from.version);
       if (answer.error !== undefined) return answer;
-      queryClient.setQueryData<Settings>(KEY, answer);
-      // an edit made while the save was on its way stays an edit
-      setDraft((latest) => (latest === sent ? undefined : latest));
+      await write(() => answer);
+      if (latest.current) put(draftAfterSave(latest.current, answer));
     },
     scope: { id: 'settings' },
   });
@@ -36,31 +56,29 @@ export const useSettings = () => {
       const { engine, isOn, voice } = toggle;
       const answer = await api.heart(engine, voice, isOn);
       if (answer.error !== undefined) return answer;
-      queryClient.setQueryData<Settings>(
-        KEY,
-        (now) => now && afterHeart(now, engine, answer),
-      );
-      setDraft((latest) => latest && withHeart(latest, engine, answer.config));
+      await write((now) => now && afterHeart(now, engine, answer));
+      if (latest.current) put(draftAfterHeart(latest.current, engine, answer));
     },
     scope: { id: 'settings' },
   });
 
   return {
-    config,
-    edit: (change: (config: Config) => Config) =>
-      setDraft((latest) => {
-        const from = latest ?? saved.data?.config;
-        return from && change(from);
-      }),
+    config: draft?.config ?? saved.data?.config,
+    edit: (change: (config: Config) => Config) => {
+      const from =
+        latest.current?.from ?? queryClient.getQueryData<Settings>(KEY);
+      if (!from) return;
+      put({ config: change(latest.current?.config ?? from.config), from });
+    },
     error: saved.error,
     heart: heart.mutateAsync,
     isDirty: changes !== undefined,
     // back to the file as it is now: every unsaved edit goes, nothing is written
     reset: () => {
-      setDraft(undefined);
+      put(undefined);
       return saved.refetch();
     },
-    save: async () => (draft ? save.mutateAsync(draft) : undefined),
+    save: async () => (changes ? save.mutateAsync(changes) : undefined),
   };
 };
 
