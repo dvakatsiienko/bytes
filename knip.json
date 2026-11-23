@@ -27,6 +27,9 @@
       "ignore": ["src/graphql/generated/**"],
       "ignoreDependencies": ["@graphql-codegen/client-preset"]
     },
+    "apps/speak": {
+      "entry": ["server.ts"]
+    },
     "apps/x-com-chat": {
       "ignoreDependencies": [
         "@tailwindcss/forms",

@@ -9,20 +9,20 @@ import { App } from '@/App.tsx';
 import './theme.css';
 
 const queryClient = new QueryClient({
-    defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
+  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
-const root = document.getElementById('root');
+const root = document.querySelector('#root');
 
 if (!root) throw new Error('#root missing');
 
 createRoot(root, {
-    onUncaughtError: (error) => console.error('speak: uncaught', error),
+  onUncaughtError: (error) => console.error('speak: uncaught', error),
 }).render(
-    <StrictMode>
-        <ErrorBoundary FallbackComponent={SectionFallback}>
-            <QueryClientProvider client={queryClient}>
-                <App />
-            </QueryClientProvider>
-        </ErrorBoundary>
-    </StrictMode>,
+  <StrictMode>
+    <ErrorBoundary FallbackComponent={SectionFallback}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </ErrorBoundary>
+  </StrictMode>,
 );

@@ -1,6 +1,6 @@
 ---
 name: speak-verify
-description: Load BEFORE you verify a change to speak, the voice admin — «verify speak», «check the voice admin», a codie or sixth sense round on `speak/`, an ftr line under speak to flip.
+description: Load BEFORE you verify a change to speak, the voice admin — «verify speak», «check the voice admin», a codie or sixth sense round on `apps/speak/`, an ftr line under speak to flip.
 ---
 
 # speak-verify
@@ -18,7 +18,7 @@ the page AND the state behind it: a drag or a save is proven by the ranks the pa
 4. **keyboard drag** — focus the first handle, space, ArrowDown, space: that card reads «2nd in the en chain».
    again with esc instead of the last space: the order is back
 5. **save** — after one change, save: the status line reads «saved · the daemon loaded it», `git diff` on
-   config.json shows exactly that one change, and `npx biome format schedule/jobs/x-speak/config.json` fixes
+   config.json shows exactly that one change, and `pnpm exec biome format apps/speak/daemon/config.json` fixes
    nothing. move it back, save, `cmp` against the copy
 6. **reject** — `PUT /api/config` with an unknown engine name answers the daemon's «unknown name «…»» line
 7. **preview** — ▶ on the kokoro card: the status line reads «▶ kokoro · en» and the daemon log gets a
@@ -52,5 +52,5 @@ popover sits on — run `essentials.js` alone for that state and read it as expe
 
 - the check lines above, one each, and `errors: 0` from the console
 - `essentials: <n> pass · <m> fail`, the baseline fail named as baseline
-- `pnpm --filter speak typecheck` and `pnpm speak:admin-build`, read by exit code
+- `pnpm --filter speak typecheck` and `pnpm --filter speak admin:build`, read by exit code
 - config.json back byte-for-byte

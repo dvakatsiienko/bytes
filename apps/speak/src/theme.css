@@ -41,12 +41,10 @@
 }
 
 @layer base {
-  :root {
-    accent-color: var(--color-accent);
-    color-scheme: light dark;
-  }
   /* tab focus scrolls clear of the sticky save bar */
   html {
+    accent-color: var(--color-accent);
+    color-scheme: light dark;
     scroll-padding-top: 88px;
     scroll-padding-bottom: 88px;
   }
