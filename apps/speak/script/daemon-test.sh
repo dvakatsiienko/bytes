@@ -1,6 +1,7 @@
 #!/bin/sh
 # typechecks the whole daemon, then compiles the whole core with its tests and runs them: the normalizer against
-# golden.json, the argv parser, the config load line. the scripts' own tests run last, on stubs. mac only (swiftc).
+# golden.json, the argv parser, the config load line, the read path, the seams. the scripts' own tests run last, on
+# stubs. mac only (swiftc).
 # usage: script/daemon-test.sh
 set -eu
 cd "$(dirname "$0")/../daemon"
