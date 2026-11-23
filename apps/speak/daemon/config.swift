@@ -1,4 +1,4 @@
-// config.json beside this file: dima's knobs, re-read on the next F4 after a save. a bad edit logs one
+// config.json, at the path the launchd job hands in as --config: dima's knobs, re-read on the next F4 after a save. a bad edit logs one
 // line and the last good config stays; the daemon never dies on a typo.
 import Foundation
 
@@ -14,6 +14,13 @@ struct Config: Decodable {
     let engines: [Engine: EngineConfig]
 
     subscript(engine: Engine) -> EngineConfig { engines[engine] ?? EngineConfig() }
+
+    // the load line's proof that the file in use is the one meant: each engine's english voice, speed and gain
+    var summary: String {
+        engines.sorted { $0.key.rawValue < $1.key.rawValue }
+            .map { "\($0.key.rawValue): voice \($0.value.voice(for: .en) ?? "-"), speed \($0.value.speed), gain \($0.value.gain)" }
+            .joined(separator: "; ")
+    }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -123,7 +130,7 @@ final class ConfigFile {
         do {
             current = try JSONDecoder().decode(Config.self, from: Data(contentsOf: url))
             lastError = nil
-            log("config: loaded \(url.lastPathComponent)")
+            log("config: loaded \(url.path) — \(current.summary)")
         } catch {
             lastError = "\(url.lastPathComponent): \(Self.describe(error))"
             log("config: kept the last good one — \(lastError!)")

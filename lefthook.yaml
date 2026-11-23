@@ -43,6 +43,12 @@ pre-commit:
     - name: apps-essentials
       run: node script/apps-essentials.ts --staged
 
+    # speak's daemon is swift, and linux ci has no swiftc: its tests (the
+    # normalizer's golden cases, the argv parser) run here, on the mac.
+    - name: speak-daemon-test
+      glob: 'apps/speak/daemon/**'
+      run: if command -v swiftc >/dev/null; then pnpm --filter speak daemon:test; fi
+
 pre-push:
   jobs:
     # Typecheck only what moved since origin/main, so a kit consumer that

@@ -1,7 +1,7 @@
 // x-speak — F4 reads the selection aloud, cutting off what plays, and with none pauses / resumes; ⇧F4 pauses / resumes; F5 stops. one resident process so the hot path
 // pays no boot, no key fetch and no player spawn (the node version paid ~1.2 s, measured 2026-09-29).
-// usage: x-speak                        the daemon (launchd)
-//        x-speak [--engine <name>] text one-shot, for listening tests
+// usage: x-speak --config <path> [--keys-run <script>]         the daemon (launchd)
+//        x-speak --config <path> [--engine <name>] text       one-shot, for listening tests
 import AppKit
 import AVFoundation
 import Carbon.HIToolbox
@@ -16,7 +16,17 @@ enum Engine: String, CaseIterable {
 }
 
 // chain, voices, speed, gain and the first-audio budget live in config.json, read again on the next F4 after a save
-@MainActor let configFile = ConfigFile(URL(fileURLWithPath: NSHomeDirectory() + "/frame/schedule/jobs/x-speak/config.json"))
+// the paths come in on argv (arguments.swift); a bad argv ends the process with one usage line
+func usageExit(_ reason: String) -> Never {
+    FileHandle.standardError.write(Data("x-speak: \(reason)\n\(Arguments.usage)\n".utf8))
+    exit(2)
+}
+
+let launch: Arguments = {
+    do { return try Arguments.parse(Array(CommandLine.arguments.dropFirst())) } catch { usageExit("\(error)") }
+}()
+
+@MainActor let configFile = ConfigFile(URL(fileURLWithPath: launch.configPath))
 @MainActor var config: Config { configFile.current }
 
 // :7385, clear of chords' worktree daemon on :7383
@@ -354,13 +364,14 @@ final class Speaker {
 
     // one op-run per daemon start (~0.8 s), never on the hot path; a key pasted later is picked up within a minute
     func loadKeys() async {
+        guard let keysRun = launch.keysRunPath else { return }
         keysLoadedAt = Date()
         let names: [(Engine, String)] = [(.elevenlabs, "ELEVENLABS_API_KEY"), (.fish, "FISH_API_KEY"), (.gemini, "GEMINI_API_KEY")]
         let printf = "printf '%s\\0%s\\0%s' " + names.map { "\"$\($0.1)\"" }.joined(separator: " ")
         let output: String = await Task.detached {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/bin/sh")
-            process.arguments = [NSHomeDirectory() + "/frame/script/op-run.sh", "/bin/sh", "-c", printf]
+            process.arguments = [keysRun, "/bin/sh", "-c", printf]
             // op run masks secrets in its child's stdout; the keys go straight into this process, never a log
             process.environment = ProcessInfo.processInfo.environment.merging(["OP_RUN_NO_MASKING": "true"]) { $1 }
             let pipe = Pipe()
@@ -481,7 +492,7 @@ final class Speaker {
         configFile.refresh()
         // read live: a grant given while the daemon runs applies on the next press, no restart
         guard AXIsProcessTrusted() else {
-            log("press: accessibility missing — grant bin/x-speak in Privacy & Security")
+            log("press: accessibility missing — grant \(CommandLine.arguments[0]) in Privacy & Security")
             return
         }
         var (text, via) = await grabSelection()
@@ -818,19 +829,18 @@ func copySelection() async -> String? {
 struct XSpeak {
     @MainActor
     static func main() {
-        var args = Array(CommandLine.arguments.dropFirst())
         var only: Engine?
-        if let flag = args.firstIndex(of: "--engine"), flag + 1 < args.count, let engine = Engine(rawValue: args[flag + 1]) {
+        if let name = launch.engine {
+            guard let engine = Engine(rawValue: name) else { usageExit("unknown engine «\(name)»") }
             only = engine
-            args.removeSubrange(flag...(flag + 1))
         }
         configFile.refresh()
 
-        if !args.isEmpty {
+        if !launch.text.isEmpty {
             Task {
                 await speaker.loadKeys()
                 if only == nil || only == .kokoro { await speaker.warmKokoro() }
-                speaker.speak(chunks(normalize(args.joined(separator: " "))), only: only, pressed: .now)
+                speaker.speak(chunks(normalize(launch.text.joined(separator: " "))), only: only, pressed: .now)
                 while speaker.isSpeaking { try? await Task.sleep(for: .milliseconds(50)) }
                 exit(0)
             }
@@ -840,6 +850,7 @@ struct XSpeak {
             NSApplication.shared.run()
         }
 
+        if launch.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have no key") }
         Task {
             await speaker.loadKeys()
             await speaker.probeQuota()
