@@ -7,7 +7,7 @@
 # usage: script/daemon-build.sh
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
-. "$here/daemon-installed.sh"
+. "$here/lib/daemon-installed.sh"
 "$here/daemon-test.sh"
 cd "$here/../daemon"
 mkdir -p build "$install_dir"
@@ -24,15 +24,13 @@ for _ in 1 2 3; do
 done
 # after a rollback either of the two may be the good one, until the one put back answers
 if [ "$runs" = no ] && [ -f "$rolled_back" ]; then
-    echo 'build: not installed — the binary the rollback put back does not answer. daemon-relaunch.sh starts it, speak:rollback comes forward again' >&2
-    exit 1
+    refuse 'not installed — the binary the rollback put back does not answer. daemon-relaunch.sh starts it, speak:rollback comes forward again'
 fi
 if [ "$runs" = yes ] || { [ -f "$installed" ] && [ ! -f "$kept" ]; }; then
     cp "$installed" "$kept.new"
     mv -f "$kept.new" "$kept"
     rm -f "$rolled_back"
-    running_argument >"$kept.config"
-    settings_line >"$kept.settings"
+    if [ "$runs" = yes ]; then record_kept "$(running_argument)" "$(settings_line)"; else record_kept '' ''; fi
 fi
 mv -f build/x-speak "$installed"
 echo "installed $installed — script/daemon-relaunch.sh starts it"

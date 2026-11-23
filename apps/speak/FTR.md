@@ -222,7 +222,7 @@
   - makes: `~/.local/libexec/x-speak/x-speak`, signed «x-speak local signing»
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
 - ✅ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
-  - makes: `~/.local/libexec/x-speak/x-speak.prev`, kept by each build from the binary that was running
+  - makes: `~/.local/libexec/x-speak/x-speak.prev`, kept by each build from the binary that was running (the installed one, when nothing is kept yet)
   - given a build that was relaunched, when the rollback runs, then the daemon that ran before it answers `status`, named by its hash, with its settings and config argument held against the ones it ran with at the build
   - given nothing kept, a kept binary with another signature, or a daemon reading aloud, then it refuses in one line and the binaries stay as they were
 - ✅ `pnpm speak:try "<text>"` (`daemon:try`) speaks one text with this tree's daemon, built beside the live one
@@ -230,7 +230,7 @@
   - given the live daemon quiet, when it runs, then the text is heard, and the live daemon answers `status` before and after and keeps its keys
   - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
   - given no text, an empty one or one that opens with a dash, then it refuses in one line and starts nothing
-  - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the macOS voice speaks
+  - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)
 - ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the config load line, the build's way back and the try run on stubs, after a typecheck of the whole daemon
 - ⬜ x-speak takes its paths as flags: `--config <config.json>`, `--keys-run <script>`
   - given the daemon started with `--config <path>` alone

@@ -5,15 +5,12 @@
 # answer in 2 s is relaunched. exit 3 is that refusal, with nothing stopped; any other failure comes after the bootout.
 # usage: script/daemon-relaunch.sh — the plist is ~/Library/LaunchAgents/com.dima.x-speak.plist (frame's schedule/)
 set -eu
-label=com.dima.x-speak
+. "$(dirname "$0")/lib/daemon-installed.sh"
 domain="gui/$(id -u)"
-status=$(printf '%s\n' '{"op":"status"}' | nc -U -w 2 "$HOME/.local/share/x-speak/control.sock" 2>/dev/null || true)
-case "$status" in
-*'"speaking":true'*)
-    echo "relaunch: x-speak is reading aloud now — wait for it to end" >&2
+if daemon_speaks; then
+    echo 'relaunch: x-speak is reading aloud now — wait for it to end' >&2
     exit 3
-    ;;
-esac
+fi
 launchctl bootout "$domain/$label" 2>/dev/null || true
 # bootout returns before the teardown ends, and a bootstrap inside that window fails with «5: Input/output error»
 tries=0

@@ -1,16 +1,16 @@
 #!/bin/sh
 # the build's kept binary and the way back, in a scratch home. usage: script/daemon-swap.test.sh
 here=$(cd "$(dirname "$0")" && pwd)
-. "$here/daemon-scratch.sh"
+. "$here/lib/daemon-scratch.sh"
 build() { printf '%s' "$1" >"$state/next"; out=$("$root/app/script/daemon-build.sh" 2>&1); code=$?; }
 rollback() { out=$("$root/app/script/daemon-rollback.sh" 2>&1); code=$?; }
 logs() { echo "2026-11-23 10:00:00.500 config: $1" >>"$HOME/.local/share/x-speak/daemon.err.log"; }
-pair() { printf '%s/%s' "$(bytes x-speak)" "$(bytes x-speak.prev)"; }
+pair() { printf '%s/%s' "$(content_of x-speak)" "$(content_of x-speak.prev)"; }
 
 setup; build new
 is 'a build keeps the running binary it replaces' 'new/old' "$(pair)"
 is 'a build never relaunches' '' "$(relaunches)"
-is 'the kept binary carries the config argument it ran with' '/old/config.json' "$(bytes x-speak.prev.config)"
+is 'the kept binary carries the config argument it ran with' '/old/config.json' "$(content_of x-speak.prev.config)"
 
 setup; build two; build three
 is 'a build over a binary that never started keeps the one that did' 'three/old' "$(pair)"
@@ -20,6 +20,7 @@ is 'a build over a started binary keeps that one' 'three/two' "$(pair)"
 
 setup; rm "$state/inode" "$state/status"; build new
 is 'nothing running and nothing kept: the installed binary is kept' 'new/old' "$(pair)"
+is 'nothing running and nothing kept: what it ran with is not made up' '' "$(content_of x-speak.prev.config)$(content_of x-speak.prev.settings)"
 setup; printf 'good' >"$libexec/x-speak.prev"; rm "$state/inode" "$state/status"; build new
 is 'nothing running: a kept binary is not overwritten' 'new/good' "$(pair)"
 setup; printf 'good' >"$libexec/x-speak.prev"; rm "$state/status"; build new
@@ -29,7 +30,7 @@ is 'running with a stuck main thread: a kept binary is not overwritten' 'new/goo
 setup; printf 'good' >"$libexec/x-speak.prev"; printf '{"speaking":false,"main":"blocked for 9.0 s"}' >"$state/status"; build new
 is 'a stuck main thread with its last status: a kept binary is not overwritten' 'new/good' "$(pair)"
 setup; plist '/new/config.json'; build new
-is 'the argument kept is the one the process runs with, not the next start'"'"'s' '/old/config.json' "$(bytes x-speak.prev.config)"
+is 'the argument kept is the one the process runs with, not the next start'"'"'s' '/old/config.json' "$(content_of x-speak.prev.config)"
 setup; build bad; started; rollback; build fix
 is 'a build after a rollback keeps the binary that was put back' 'fix/old' "$(pair)"
 build fix2
@@ -97,7 +98,7 @@ is 'a broken daemon that answers nothing is rolled back' '0 old/new' "$code $(pa
 
 setup; build new; started; plist '/new/config.json'; rollback
 says 'a changed config argument is named' 'config argument: /new/config.json, the kept binary ran with /old/config.json'
-is 'the binary rolled back is kept with the argument it ran with' '/old/config.json' "$(bytes x-speak.prev.config)"
+is 'the binary rolled back is kept with the argument it ran with' '/old/config.json' "$(content_of x-speak.prev.config)"
 setup; build new; started; rm "$libexec/x-speak.prev.config" "$libexec/x-speak.prev.settings"; rollback
 says 'a build that recorded no argument is named' 'config argument: /old/config.json, the build recorded none'
 
@@ -110,22 +111,23 @@ setup; build new; started; echo 'loaded /d.json — same' >"$state/settings"; ro
 says 'the same values from another place are the same' 'settings: the same'
 setup; build new; started; logs 'loaded /c.json — other'; echo 'loaded /c.json — other' >"$state/settings"; rollback
 says 'settings the new build changed are named' 'settings: loaded — other, the kept binary ran with loaded — same'
-is 'the binary rolled back is kept with the settings it ran with' 'loaded — other' "$(bytes x-speak.prev.settings)"
+is 'the binary rolled back is kept with the settings it ran with' 'loaded — other' "$(content_of x-speak.prev.settings)"
 setup; build new; started; logs 'running on the built-in defaults — /c.json: not readable'; rollback
 says 'settings only the new build could not read are the same' 'settings: the same'
 setup; logs 'kept the last good one — /c.json: bad'; build new; started; echo 'running on the built-in defaults — /c.json: bad' >"$state/settings"; rollback
 says 'a restored daemon on the built-in defaults is named' 'settings: running on the built-in defaults'
 
-setup; build new; started; echo /new/config.json >"$state/argument"; touch "$state/dies"; rollback
-is 'a rollback that fails keeps the argument of the binary it put aside' '/new/config.json' "$(bytes x-speak.prev.config)"
+setup; echo /moved/config.json >"$state/argument"; build new; started; echo /new/config.json >"$state/argument"; touch "$state/dies"; rollback
+is 'a rollback that fails keeps the argument of the binary it put aside' '/new/config.json' "$(content_of x-speak.prev.config)"
 is 'a restored daemon that never answers is an error' '1' "$code"
 says 'a restored daemon that never answers is named' 'does not answer'
+says 'a restored daemon that never answers: the moved config argument is still named' 'config argument: /old/config.json, the kept binary ran with /moved/config.json'
 setup; build new; started; stub nc 'cat >/dev/null; if [ -f "$state/relaunches" ]; then echo "{\"error\":\"main thread blocked\",\"main\":\"blocked for 9.0 s\"}"; else echo "{\"speaking\":false}"; fi'; rollback
 is 'a restored daemon with a stuck main thread is an error' '1' "$code"
 
 setup; build new; started; echo /new/config.json >"$state/argument"; logs 'loaded /c.json — other'; stub_file "$root/app/script/daemon-relaunch.sh" 'echo "relaunch: x-speak is reading aloud now" >&2; exit 3'; rollback
 is 'a refused relaunch leaves no trace of a rollback' no "$([ -f "$libexec/x-speak.prev.rolled-back" ] && echo yes || echo no)"
-is 'a refused relaunch keeps what the kept binary ran with' '/old/config.json loaded — same' "$(bytes x-speak.prev.config) $(bytes x-speak.prev.settings)"
+is 'a refused relaunch keeps what the kept binary ran with' '/old/config.json loaded — same' "$(content_of x-speak.prev.config) $(content_of x-speak.prev.settings)"
 is 'a refused relaunch is an error' '1' "$code"
 is 'a refused relaunch puts the binaries back' 'new/old' "$(pair)"
 

@@ -1,7 +1,7 @@
 // x-speak — F4 reads the selection aloud, cutting off what plays, and with none pauses / resumes; ⇧F4 pauses / resumes; F5 stops. one resident process so the hot path
 // pays no boot, no key fetch and no player spawn (the node version paid ~1.2 s, measured 2026-09-29).
 // usage: x-speak --config <path> [--keys-run <script>]         the daemon (launchd)
-//        x-speak --config <path> [--keys-run <script>] [--engine <name>] text   one-shot, for listening tests
+//        x-speak --config <path> [--keys-run <script>] [--engine <name>] text   one-shot, for listening tests; it never starts the kokoro server
 import AppKit
 import AVFoundation
 import Carbon.HIToolbox

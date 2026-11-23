@@ -1,4 +1,4 @@
-# sourced by the build and the rollback: what is installed, what is running, what it answers
+# sourced by the daemon scripts: what is installed, what is running, what it answers
 install_dir="$HOME/.local/libexec/x-speak"
 installed="$install_dir/x-speak"
 kept="$install_dir/x-speak.prev"
@@ -9,6 +9,8 @@ daemon_status() {
     printf '%s\n' '{"op":"status"}' | nc -U -w 2 "$HOME/.local/share/x-speak/control.sock" 2>/dev/null || true
 }
 
+daemon_speaks() { case "$(daemon_status)" in *'"speaking":true'*) ;; *) return 1 ;; esac }
+
 # a reply is not an answer: a daemon whose main thread is stuck still sends its last status, or an error, with the stall named
 daemon_answers() {
     case "$(daemon_status)" in *'"main":'*) return 1 ;; *'"speaking":'*) ;; *) return 1 ;; esac
@@ -18,7 +20,7 @@ daemon_answers() {
 running_inode() {
     pid=$(launchctl print "gui/$(id -u)/$label" 2>/dev/null | awk '/^\tpid = /{print $3}')
     [ -n "$pid" ] || return 0
-    lsof -a -p "$pid" -d txt 2>/dev/null | awk -v path="$installed" '$NF == path {print $(NF - 1); exit}'
+    lsof -a -p "$pid" -d txt -F in 2>/dev/null | awk -v path="$installed" '/^i/ {inode = substr($0, 2)} $0 == "n" path {print inode; exit}'
 }
 
 # what the daemon last said of its settings: the values of a load, or why it kept or fell back. a load's path is
@@ -43,4 +45,15 @@ config_argument() {
         [ "$word" = --config ] && plutil -extract "ProgramArguments.$i" raw "$args" && return 0
     done
     return 0
+}
+
+# what the kept binary ran with: its config argument, then its settings
+record_kept() {
+    printf '%s\n' "$1" >"$kept.config"
+    printf '%s\n' "$2" >"$kept.settings"
+}
+
+refuse() {
+    echo "$(basename "$0" .sh): $1" >&2
+    exit 1
 }

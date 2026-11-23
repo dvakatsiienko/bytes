@@ -2,7 +2,7 @@
 # a build tried beside the live daemon, in a scratch home: the built binary is a stub that writes down its argv.
 # usage: script/daemon-try.test.sh
 here=$(cd "$(dirname "$0")" && pwd)
-. "$here/daemon-scratch.sh"
+. "$here/lib/daemon-scratch.sh"
 app() {
     setup
     stub_file "$state/next" 'for word in "$@"; do printf "[%s]" "$word"; done >>"$state/argv"
@@ -13,7 +13,7 @@ while [ "$left" -gt 0 ]; do left=$((left - 1)); /bin/sleep 0.02; done
 exit "$(cat "$state/child-exit" 2>/dev/null || echo 0)"'
 }
 try() { out=$("$root/app/script/daemon-try.sh" "$@" 2>&1); code=$?; }
-left() { # the stub's process, given a moment to end
+child_state() { # the stub's process, given a moment to end
     for _ in 1 2 3 4 5 6 7 8 9 10; do kill -0 "$(cat "$state/child")" 2>/dev/null || { echo gone; return; }; /bin/sleep 0.05; done
     echo left
 }
@@ -24,7 +24,7 @@ argv_config() { argv | sed "s|\[[^]]*/app/daemon/config.json\]|[CONFIG]|"; }
 app; try 'a first line'
 is 'a text is spoken by the built binary, with the config and no keys runner' '[--config][CONFIG][a first line]' "$(argv_config)"
 is 'a spoken text ends well' 0 "$code"
-is 'the built binary stays out of the install folder' old "$(ls "$libexec" | grep -vx x-speak)$(bytes x-speak)"
+is 'the built binary stays out of the install folder' old "$(ls "$libexec" | grep -vx x-speak)$(content_of x-speak)"
 is 'the built binary is in the tree' yes "$(built)"
 is 'the live daemon is not relaunched' '' "$(relaunches)"
 is 'the launchd job is not touched' "$(stat -f %i "$libexec/x-speak")" "$(cat "$state/inode")"
@@ -56,12 +56,12 @@ stub sleep '[ -f "$state/child" ] && printf "{\"speaking\":true}" >"$state/statu
 try hello
 is 'a live read stops it' '1 stopped' "$code $(cat "$state/ended" 2>/dev/null)"
 says 'a live read: says so' 'the live daemon started a read'
-is 'a stopped try leaves no process' gone "$(left)"
+is 'a stopped try leaves no process' gone "$(child_state)"
 
 app; touch "$state/reads-on"
 stub sleep '[ -f "$state/child" ] && kill -TERM "$PPID"; /bin/sleep 0.05'
 try hello
-is 'a try that is ended takes its process along' 'stopped gone' "$(cat "$state/ended" 2>/dev/null) $(left)"
+is 'a try that is ended takes its process along' 'stopped gone' "$(cat "$state/ended" 2>/dev/null) $(child_state)"
 
 app; echo 3 >"$state/child-exit"; try hello
 is 'a binary that fails is an error' 3 "$code"

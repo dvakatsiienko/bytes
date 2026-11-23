@@ -8,15 +8,15 @@ count=0
 
 # a fresh home with `old` installed and running, and the scripts beside a stub test run
 setup() {
-    rm -rf "$root/home" "$root/app" "$root/state" "$root/bin"
-    mkdir -p "$root/home/.local/libexec/x-speak" "$root/home/.local/share/x-speak" "$root/home/Library/LaunchAgents" \
+    rm -rf "$root/a home" "$root/app" "$root/state" "$root/bin"
+    mkdir -p "$root/a home/.local/libexec/x-speak" "$root/a home/.local/share/x-speak" "$root/a home/Library/LaunchAgents" \
         "$root/app/daemon" "$root/app/script" "$root/state" "$root/bin"
-    HOME="$root/home"
+    HOME="$root/a home"
     export HOME
     libexec="$HOME/.local/libexec/x-speak"
     state="$root/state"
     export state libexec
-    cp "$here"/*.sh "$root/app/script/"
+    cp -R "$here"/. "$root/app/script/"
     stub_file "$root/app/script/daemon-test.sh" 'exit "$(cat "$state/test-exit" 2>/dev/null || echo 0)"'
     printf 'old' >"$libexec/x-speak"
     plist '/old/config.json'
@@ -28,7 +28,7 @@ setup() {
     stub codesign 'case "$*" in *-r-*) [ -f "$state/no-grant" ] || echo "designated => the grant" ;; *--verify*) case "$*" in *"-R=the grant"*) ;; *) exit 1 ;; esac; for last in "$@"; do :; done; [ "$(cat "$last")" != unsigned ] ;; *) [ ! -f "$state/sign-fails" ] ;; esac'
     stub nc 'cat >/dev/null; [ -f "$state/status" ] && cat "$state/status"'
     stub sleep ':'
-    stub lsof '[ -f "$state/inode" ] && printf "x-speak 1 me txt REG 1,15 5 %s %s\n" "$(cat "$state/inode")" "$libexec/x-speak"'
+    stub lsof '[ -f "$state/inode" ] && printf "p1\nftxt\ni9\nn/usr/lib/dyld\nftxt\ni%s\nn%s\n" "$(cat "$state/inode")" "$libexec/x-speak"'
     stub launchctl 'case "$1" in
         bootout) rm -f "$state/inode" ;;
         print) [ -f "$state/inode" ] && printf "\tstate = running\n\targuments = {\n\t\tx\n\t\t--config\n\t\t%s\n\t}\n\tpid = 1\n" "$(cat "$state/argument")" ;;
@@ -48,7 +48,7 @@ plist() {
     printf '<?xml version="1.0"?><plist version="1.0"><dict><key>ProgramArguments</key><array><string>x</string><string>--config</string><string>%s</string></array></dict></plist>' "$1" \
         >"$HOME/Library/LaunchAgents/com.dima.x-speak.plist"
 }
-bytes() { cat "$libexec/$1" 2>/dev/null || printf none; }
+content_of() { cat "$libexec/$1" 2>/dev/null || printf none; }
 relaunches() { [ ! -f "$state/relaunches" ] || wc -l <"$state/relaunches" | tr -d ' '; }
 is() { # name, want, got
     count=$((count + 1))

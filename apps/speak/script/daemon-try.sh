@@ -4,13 +4,8 @@
 # usage: script/daemon-try.sh <text …>
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
-. "$here/daemon-installed.sh"
+. "$here/lib/daemon-installed.sh"
 
-refuse() {
-    echo "try: $1" >&2
-    exit 1
-}
-live_speaks() { case "$(daemon_status)" in *'"speaking":true'*) ;; *) return 1 ;; esac }
 
 # with no text the binary is a daemon: a second one, which takes the live one's socket and hotkeys
 text=$*
@@ -19,17 +14,17 @@ case "$text" in
 *[![:space:]]*) ;;
 *) refuse 'nothing to speak — usage: script/daemon-try.sh <text …>' ;;
 esac
-live_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
+daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 cd "$here/../daemon"
 mkdir -p build
 "$here/daemon-compile.sh" -O -o build/x-speak-try
-live_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
+daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 
 trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 build/x-speak-try --config "$PWD/config.json" "$text" &
 child=$!
 while kill -0 "$child" 2>/dev/null; do
-    live_speaks && refuse 'the live daemon started a read, this one stopped'
+    daemon_speaks && refuse 'the live daemon started a read, this one stopped'
     sleep 1
 done
 code=0

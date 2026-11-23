@@ -15,3 +15,6 @@
 - **pill** — the small floating window x-speak shows while it speaks: its wave, ⏸ / ▶, ■, stick and close; it keeps its spot per display
 - **pill glide** — how long the pill's bars take to reach a new level, in ms (`meterGlideMs`)
 - **pill flow** — how long the pill's wave holds before moving one bar outward, in ms (`meterFlowMs`)
+- **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with
+- **rollback** — the kept binary and the installed one change places and the daemon restarts; a second one comes forward again
+- **try run** — one text spoken by a tree's own daemon build, beside the live daemon
