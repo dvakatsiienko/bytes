@@ -24,6 +24,7 @@ the admin reaches x-speak only through `~/.local/share/x-speak/control.sock` —
 the chain, voices, speed, gain and budget live in `daemon/config.json`; the page holds nothing else, and the daemon
 re-reads the file on the next F4 after a save.
 
+- **the binary lives outside every repo**: `pnpm --filter speak daemon:build` tests, compiles, signs with «x-speak local signing» and installs to `~/.local/libexec/x-speak/x-speak`, the path its Accessibility grant is given to; it never touches launchd. `pnpm --filter speak daemon:relaunch` restarts the job onto it, and refuses while the daemon is speaking
 - **the two launchd plists live in frame** (`~/frame/schedule/jobs/x-speak`, `x-speak-admin`), frame's one home for every launchd job; they point into this app
 - **no swift file names a repo path**: the launchd job hands the daemon its config as `--config <path>` and its keys runner as `--keys-run <path>` (frame's `script/op-run.sh`); `server.ts` builds the same config path from its own directory. with no `--config` the daemon exits with a usage line, and launchd restarts it every 30 s
 - **a second x-speak beside the live one is never started by hand**: it unlinks the live control socket and registers the same hotkeys
