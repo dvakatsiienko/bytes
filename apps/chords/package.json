@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node ../../script/with-port.ts 7374 node script/dev.ts",
+    "dev": "port=$(node script/dev-port.ts) && exec node ../../script/with-port.ts $port node script/dev.ts",
     "chords:build": "vite build",
     "lint": "biome lint",
     "typecheck": "tsc --noEmit",

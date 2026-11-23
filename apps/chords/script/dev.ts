@@ -1,17 +1,11 @@
 // The one run script: the page's dev server, and frame's daemon with it when none serves the api.
 import { type ChildProcess, spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 import { type ApiHolder, apiHolder } from './api-holder.ts';
+import { daemonPath, readFramePorts } from './frame-ports.ts';
 
-const daemonPath = resolve(
-  process.env.CHORDS_DAEMON ?? join(homedir(), 'frame/hotkeys/live.ts'),
-);
-// frame holds the one port pair, beside its daemon
-const portsPath = join(dirname(daemonPath), 'ports.ts');
+const { chordsDevPort, chordsPort } = await readFramePorts(daemonPath);
 const pagePort = Number(process.env.PORT);
 const startDeadlineMs = 15_000;
 const children: ChildProcess[] = [];
@@ -44,11 +38,6 @@ const start = (
   });
   children.push(child);
 };
-
-if (!existsSync(daemonPath)) fail(`no daemon at ${daemonPath}`);
-if (!existsSync(portsPath)) fail(`no ports.ts beside ${daemonPath}`);
-
-const { chordsDevPort, chordsPort }: FramePorts = await import(portsPath);
 
 const startDaemon = async () => {
   console.log(`chords: nothing on ${chordsPort}, starting ${daemonPath}`);
@@ -113,9 +102,3 @@ start('the page', 'vite', [], {
   ...process.env,
   CHORDS_PORT: String(chordsPort),
 });
-
-/* Types */
-interface FramePorts {
-  chordsDevPort: number;
-  chordsPort: number;
-}
