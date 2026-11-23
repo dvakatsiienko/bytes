@@ -83,7 +83,7 @@ enum SeamsTest {
         let slow = SlowStop()
         let begun = Answers(commands: { slow }, mainAge: { .zero }, budget: { _ in 0 }, onMain: { work in
             DispatchQueue.main.async { MainActor.assumeIsolated { work() } }
-            slow.begun.wait()
+            _ = slow.begun.wait(timeout: .now() + 2)
         })
         let late = await withCheckedContinuation { done in
             DispatchQueue.global().async { done.resume(returning: String(decoding: begun.answer(Data(stop.utf8)), as: UTF8.self)) }
