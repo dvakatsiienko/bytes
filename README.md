@@ -101,6 +101,14 @@ local only | [source](apps/design-loupe)
 
 <br clear="all">
 
+**speak** — read-aloud on the mac: F4 reads the selection in a voice you tuned, a pill shows the wave.
+
+local only | [source](apps/speak)
+
+<details><summary>peek</summary><img src="assets/apps/speak.webp" width="100%" alt="speak: the voice admin, a column per language, each engine a card with its voice, speed and gain"></details>
+
+<br clear="all">
+
 ## 🧰 libraries
 
 - [`biome-config-polished`](packages/biome-config-polished) — the lint and format rules every app extends

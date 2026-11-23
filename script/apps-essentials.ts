@@ -53,6 +53,11 @@ const waivers: Record<string, Waiver> = {
     ticket: 'BYT-111',
     why: 'launchd serves it (x-atelier-live, :5180)',
   },
+  speak: {
+    rows: ['launch-entry'],
+    ticket: 'BYT-111',
+    why: 'launchd serves it (x-speak-admin, :7386)',
+  },
   'trophy-sys': {
     rows: ['FTR.md', 'PRODUCT.md', 'DESIGN.md'],
     ticket: 'BYT-86',

@@ -1,7 +1,5 @@
 # speak — feature map
 
-claims: `schedule/jobs/x-speak/`
-
 - 🧭 asked, not built yet · ⬜ built, not checked yet · 🐞 built, its check fails · ✅ passes in `speak-verify` · 🔎 dima used it and it holds
 - given/when/then lines are sixth sense's exit lines
 - makes: lines name what a feature leaves behind
@@ -125,7 +123,7 @@ claims: `schedule/jobs/x-speak/`
 ## save
 
 - ✅ save writes config.json
-  - makes: `schedule/jobs/x-speak/config.json`, in biome's own format with its keys sorted
+  - makes: `daemon/config.json`, in biome's own format with its keys sorted
   - given an unsaved change
   - when the user presses save
   - then the file changes by exactly that edit, and the status line reads «saved · the daemon loaded it»
@@ -203,6 +201,6 @@ claims: `schedule/jobs/x-speak/`
 
 ## scripts
 
-- ✅ `x-speak-admin` (launchd, always on) serves the built page and the api on 127.0.0.1:7386; `pnpm speak:admin` runs the same server by hand when the job is stopped
-- ✅ `pnpm speak:admin-dev` runs vite on 7387, proxying /api to 7386
-- ✅ `pnpm speak:admin-build` builds `dist/`
+- ✅ `x-speak-admin` (launchd, always on) serves the built page and the api on 127.0.0.1:7386; `pnpm --filter speak admin` runs the same server by hand when the job is stopped
+- ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386
+- ✅ `pnpm --filter speak admin:build` builds `dist/`

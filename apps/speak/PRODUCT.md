@@ -57,7 +57,7 @@ change before saving it. success: the next F4 sounds the way dima wants, without
 
 ## Brand Commitments
 
-- part of frame, an x-com product.
+- part of bytes, an x-com product.
 - names: speak (this admin), x-speak (the daemon). one name per thing on every layer.
 - ui copy: lowercase, short, plain words.
 - the pill is the brand's centre; the page takes its cues from it.

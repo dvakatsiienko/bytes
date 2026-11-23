@@ -1,6 +1,6 @@
 # readaloud playbook — how to build speak well
 
-the build knowledge for speak: the practices, the bar, the architecture calls and the voice safety rule. `refresh-speak` (`recipes/refresh-speak/`) writes it; a design or build change to speak reads it first. every line carries its source, or «?»; read 2026-11-19 unless a line says otherwise.
+the build knowledge for speak: the practices, the bar, the architecture calls and the voice safety rule. `refresh-speak` (frame's `recipes/refresh-speak/`) writes it; a design or build change to speak reads it first. every line carries its source, or «?»; read 2026-11-19 unless a line says otherwise.
 
 ## contents
 
@@ -65,7 +65,7 @@ the build knowledge for speak: the practices, the bar, the architecture calls an
 ## long-form controls
 
 - the floor every bar app ships: play/pause, stop, speed, back and forward; Speechify skips 10 s ([speechify.com/mac](https://speechify.com/mac/))
-- speak's sentence chunks are the natural unit for skip and rewind, and a kept position is last read plus chunk index (`schedule/jobs/x-speak/main.swift`)
+- speak's sentence chunks are the natural unit for skip and rewind, and a kept position is last read plus chunk index (`daemon/main.swift`)
 
 ## tech text
 
@@ -94,7 +94,7 @@ the build knowledge for speak: the practices, the bar, the architecture calls an
 
 ## ideas to borrow
 
-from the exa lane (`recipes/refresh-speak/last/exa.md`, 2026-11-19; patterns, not measured here):
+from the exa lane (frame's `recipes/refresh-speak/last/exa.md`, 2026-11-19; patterns, not measured here):
 - latency targets: hot local first audio under 150 ms, cold local under 1 s
 - a sentence-chunk cache keyed by normalized text, voice, model revision and rate: a re-read plays at once; sensitive text never cached without a setting
 - every read carries a rising request token, so late audio and late word timings from a stopped read are dropped
