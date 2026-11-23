@@ -27,8 +27,8 @@ struct DaemonTest {
         let cases: [(name: String, passes: Bool)] = [
             ("the fixture loads", good.refresh() == nil),
             ("the summary prints every voice, speed and gain", good.current.summary == "elevenlabs: voice *=Sarah,en=Jessica, speed 1.0, gain 1.2; system: voice -, speed 1.0, gain 1.0"),
-            ("a missing file is an error that names the full path", missing.refresh() == "/nonexistent/x-speak/config.json: not readable"),
-            ("the missing file's error stays on the next press", missing.refresh() == "/nonexistent/x-speak/config.json: not readable"),
+            ("a missing file is an error the admin can show", missing.refresh() == "config.json: not readable"),
+            ("the missing file's error stays on the next press", missing.refresh() == "config.json: not readable"),
             ("the shipped config.json loads", ConfigFile(URL(fileURLWithPath: shipped)).refresh() == nil),
         ]
         for item in cases where !item.passes { print("✗ config: \(item.name)") }
