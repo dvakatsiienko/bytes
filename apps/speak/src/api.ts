@@ -1,4 +1,4 @@
-// the page's one door to the admin server; the shapes mirror x-speak's config.swift
+// the page's one door to the admin server; the shapes mirror x-speak's core/config.swift
 
 export const LANGS = [
   ['en', 'english'],

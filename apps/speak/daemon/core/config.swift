@@ -10,11 +10,6 @@ enum Engine: String, CaseIterable {
     func speaks(_ lang: Lang) -> Bool { self != .kokoro || lang == .en }
 }
 
-func log(_ line: String) {
-    let stamp = ISO8601DateFormatter.string(from: Date(), timeZone: .current, formatOptions: [.withFullDate, .withDashSeparatorInDate, .withSpaceBetweenDateAndTime, .withTime, .withColonSeparatorInTime, .withFractionalSeconds])
-    FileHandle.standardError.write(Data("\(stamp) \(line)\n".utf8))
-}
-
 struct Config: Decodable {
     // per language, tried in order; an engine that fails or runs out of quota is skipped silently
     let chain: [Lang: [Engine]]
@@ -124,7 +119,12 @@ final class ConfigFile {
     private var hasLoaded = false
     private(set) var current = Config.fallback
 
-    init(_ url: URL) { self.url = url }
+    private let write: (String) -> Void
+
+    init(_ url: URL, log write: @escaping (String) -> Void = log) {
+        self.url = url
+        self.write = write
+    }
 
     private static func describe(_ error: Error) -> String {
         let path = { (context: DecodingError.Context) in context.codingPath.map(\.stringValue).joined(separator: ".") }
@@ -149,12 +149,12 @@ final class ConfigFile {
             current = try JSONDecoder().decode(Config.self, from: Data(contentsOf: url))
             lastError = nil
             hasLoaded = true
-            log("config: loaded \(url.path) — \(current.summary)")
+            write("config: loaded \(url.path) — \(current.summary)")
         } catch {
             // the admin's status line gets the short name, the log the full path
             let reason = stamp == nil ? "not readable" : Self.describe(error)
             lastError = "\(url.lastPathComponent): \(reason)"
-            log("config: \(hasLoaded ? "kept the last good one" : "running on the built-in defaults") — \(url.path): \(reason)")
+            write("config: \(hasLoaded ? "kept the last good one" : "running on the built-in defaults") — \(url.path): \(reason)")
         }
         return lastError
     }

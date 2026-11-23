@@ -10,7 +10,7 @@ not deployed anywhere, and it carries no `vercel.json`: it edits this mac's `dae
 
 - dev: `pnpm dev:speak` runs vite on 7387, proxying `/api` to the admin on 7386; a worktree gets both ports plus its offset, and each side binds an explicit `PORT` when one is set
 - a ui change is live after `pnpm --filter speak admin:build` (the server reads `dist/` on every request)
-- a `server.ts` change needs `pnpm -C ~/frame schedule:restart x-speak-admin`
+- a `server.ts` (the paths, the listening) or `admin.ts` (the api) change needs `pnpm -C ~/frame schedule:restart x-speak-admin`
 
 📌 before changing what the app does, read your section of `FTR.md` + `GLOSSARY.md` and `PRODUCT.md` (impeccable `init`, the product record);
 `DESIGN.md` (impeccable `document`) is the look record — read it before changing how anything renders. both
@@ -26,8 +26,9 @@ the admin reaches x-speak only through `~/.local/share/x-speak/control.sock` —
 the chain, voices, speed, gain and budget live in `daemon/config.json`; the page holds nothing else, and the daemon
 re-reads the file on the next F4 after a save.
 
+- **a rule lives in `daemon/core/`, what touches the mac lives beside it**: the core imports Foundation alone, the tests build all of it by glob, and `App` in `main.swift` makes every part and hands it what it needs. `daemon:test` fails on another import there, and on a module-level value anywhere but a private constant of the core's
 - **the binary lives outside every repo**: `pnpm --filter speak daemon:build` tests, compiles, signs with «x-speak local signing» and installs to `~/.local/libexec/x-speak/x-speak`, the path its Accessibility grant is given to; it never touches launchd. `pnpm --filter speak daemon:relaunch` restarts the job onto it, and refuses while the daemon is speaking
-- **the way back**: a build keeps the running binary it replaces as `x-speak.prev` beside it (one that never started, or whose main thread is stuck, never pushes it out; after a rollback a build is refused until the one put back answers); `pnpm speak:rollback` swaps the two, relaunches and waits for `status`, and says which binary runs, whether the settings are the same and whether the config argument moved
+- **the way back**: a build keeps the running binary it replaces as `x-speak.prev` beside it (one that never started, or whose main thread is stuck, never pushes it out; after a rollback a build is refused until the one put back answers; one build or rollback at a time, by the `x-speak.lock` folder); `pnpm speak:rollback` swaps the two, relaunches and waits for `status`, and says which binary runs, whether the settings are the same and whether the config argument moved
 - **the two launchd plists live in frame** (`~/frame/schedule/jobs/x-speak`, `x-speak-admin`), frame's one home for every launchd job; they point into this app
 - **a changed program in a job's plist costs one killed start at the next login** (a crash report, «Launch Constraint Violation», then the 30 s retry passes); a rebuild onto the same path costs none. the mechanics: `~/frame/schedule/AGENTS.md`
 - **no swift file names a repo path**: the launchd job hands the daemon its config as `--config <path>` and its keys runner as `--keys-run <path>` (frame's `script/op-run.sh`); `server.ts` builds the same config path from its own directory. with no `--config` the daemon exits with a usage line, and launchd restarts it every 30 s
@@ -47,6 +48,6 @@ re-reads the file on the next F4 after a save.
 - **only a chain card registers with dnd-kit** — it stamps `role` and a tab stop on what it registers, which broke
   the list semantics on the cards outside the chain
 - **every write to the api carries `content-type: application/json`**, or the server answers 415: that header is what keeps another web page from driving the daemon; a `curl -X PUT` needs `-H 'content-type: application/json'`
-- the voice lists are data in `server.ts`, each id proven by a real call (elevenlabs premades on the restricted key,
+- the voice lists are data in `admin.ts`, each id proven by a real call (elevenlabs premades on the restricted key,
   kokoro on the warm server); a library voice answers 402 on a restricted key
-- **the swift tests run only on the mac**: `pnpm --filter speak daemon:test`, run by lefthook on a commit under `daemon/`; bytes' linux ci runs no swift
+- **the swift tests run only on the mac**: `pnpm --filter speak daemon:test`, run by lefthook on a commit under `daemon/` or `script/`; bytes' linux ci runs no swift

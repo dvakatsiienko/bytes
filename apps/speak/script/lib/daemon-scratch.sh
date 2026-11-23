@@ -2,13 +2,14 @@
 # (launchctl, lsof, nc, codesign, swiftc) on PATH, so the installed daemon is never touched
 set -u
 root=$(mktemp -d "${TMPDIR:-/tmp}/x-speak-test.XXXXXX") || exit 1
-trap 'rm -rf "$root"' EXIT
+# a run that is ended early leaves its stubs: a script it left behind would find the mac's own launchctl without them
+trap 'rm -rf "$root/a home" "$root/app" "$root/state"' EXIT
 fails=0
 count=0
 
-# a fresh home with `old` installed and running, and the scripts beside a stub test run
+# a fresh home with `old` installed and running, and the scripts beside a stub test run. the stubs are written over
 setup() {
-    rm -rf "$root/a home" "$root/app" "$root/state" "$root/bin"
+    rm -rf "$root/a home" "$root/app" "$root/state"
     mkdir -p "$root/a home/.local/libexec/x-speak" "$root/a home/.local/share/x-speak" "$root/a home/Library/LaunchAgents" \
         "$root/app/daemon" "$root/app/script" "$root/state" "$root/bin"
     HOME="$root/a home"
@@ -62,4 +63,4 @@ says() { # name, part of the last output
     fails=$((fails + 1))
     printf '✗ %s\n  want a line with %s\n  got  %s\n' "$1" "$2" "$out"
 }
-passed() { echo "$((count - fails))/$count $1 cases pass"; [ "$fails" -eq 0 ]; }
+passed() { rm -rf "$root"; echo "$((count - fails))/$count $1 cases pass"; [ "$fails" -eq 0 ]; }

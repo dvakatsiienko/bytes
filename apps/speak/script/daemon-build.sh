@@ -10,9 +10,10 @@ here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib/daemon-installed.sh"
 "$here/daemon-test.sh"
 cd "$here/../daemon"
-mkdir -p build "$install_dir"
+mkdir -p build
 "$here/daemon-compile.sh" -O -o build/x-speak
 codesign --force --sign 'x-speak local signing' --identifier com.dima.x-speak build/x-speak
+lock_binaries
 # only a binary that runs and answers is worth keeping: a build that never started must not push the good one out
 runs=no
 for _ in 1 2 3; do
