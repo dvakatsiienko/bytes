@@ -225,7 +225,13 @@
   - makes: `~/.local/libexec/x-speak/x-speak.prev`, kept by each build from the binary that was running
   - given a build that was relaunched, when the rollback runs, then the daemon that ran before it answers `status`, named by its hash
   - given nothing kept, a kept binary with another signature, or a daemon reading aloud, then it refuses in one line and the binaries stay as they were
-- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the config load line and the build's way back on stubs, after a typecheck of the whole daemon
+- ⬜ `pnpm speak:try "<text>"` (`daemon:try`) speaks one text with this tree's daemon, built beside the live one
+  - makes: `daemon/build/x-speak-try`, in the tree
+  - given the live daemon quiet, when it runs, then the text is heard, and the live daemon answers `status` before and after and keeps its keys
+  - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
+  - given no text, an empty one or one that opens with a dash, then it refuses in one line and starts nothing
+  - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the macOS voice speaks
+- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the config load line, the build's way back and the try run on stubs, after a typecheck of the whole daemon
 - ⬜ x-speak takes its paths as flags: `--config <config.json>`, `--keys-run <script>`
   - given the daemon started with `--config <path>` alone
   - then it stays up as the daemon, logs «config: loaded <the full path>» with each engine's voices, speed and gain, and speaks nothing

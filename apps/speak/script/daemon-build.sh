@@ -11,8 +11,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 "$here/daemon-test.sh"
 cd "$here/../daemon"
 mkdir -p build "$install_dir"
-swiftc -O -parse-as-library -swift-version 5 -suppress-warnings \
-    normalize.swift arguments.swift config.swift control.swift panel.swift main.swift -o build/x-speak
+"$here/daemon-compile.sh" -O -o build/x-speak
 codesign --force --sign 'x-speak local signing' --identifier com.dima.x-speak build/x-speak
 # only a binary that runs and answers is worth keeping: a build that never started must not push the good one out
 if [ -f "$installed" ]; then

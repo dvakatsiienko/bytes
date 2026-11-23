@@ -10,6 +10,9 @@ struct Arguments: Equatable {
     var engine: String?
     var text: [String] = []
 
+    // a one-shot leaves when it has spoken, so a server it started would be nobody's
+    var mayStartKokoro: Bool { text.isEmpty }
+
     static let usage = "usage: x-speak --config <config.json> [--keys-run <script>] [--engine <name>] [text …]"
 
     static func parse(_ argv: [String]) throws -> Arguments {

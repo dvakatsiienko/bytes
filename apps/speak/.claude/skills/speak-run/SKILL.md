@@ -29,6 +29,7 @@ cd apps/speak && pnpm admin        # run_in_background, under `timeout 7200`; no
 - the daemon must run for status, preview and save: `launchctl print gui/$(id -u)/com.dima.x-speak | grep state`
 - 📌 a save in the main checkout writes dima's real `apps/speak/daemon/config.json` — copy it aside first and put it
   back after, byte-for-byte (`cmp`); a worktree's server writes that worktree's copy
+- a daemon change heard before it is installed: `pnpm speak:try "<text>"`, from a worktree too; it speaks through the mac's speakers and refuses while the live daemon reads
 - a daemon build that went wrong: `pnpm speak:rollback` from the main checkout, announced like any relaunch
 - 📌 every server talks to the one live daemon: ▶ speaks through the mac's speakers, from a worktree too
 

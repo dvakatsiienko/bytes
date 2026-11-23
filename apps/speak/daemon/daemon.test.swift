@@ -78,6 +78,20 @@ struct DaemonTest {
             }
         }
         print("\(cases.count - failed)/\(cases.count) argv cases pass")
-        return failed
+        return failed + kokoroStartFailures()
+    }
+
+    static func kokoroStartFailures() -> Int {
+        let cases: [(argv: [String], want: Bool)] = [
+            (["--config", "/c.json"], true),
+            (["--config", "/c.json", "--keys-run", "/op-run.sh"], true),
+            (["--config", "/c.json", "hello"], false),
+            (["--config", "/c.json", "--keys-run", "/op-run.sh", "hello"], false),
+            (["--config", "/c.json", "--engine", "kokoro", "hello"], false),
+        ]
+        let failing = cases.filter { (try? Arguments.parse($0.argv))?.mayStartKokoro != $0.want }
+        for item in failing { print("✗ kokoro start \(item.argv)\n  want \(item.want)") }
+        print("\(cases.count - failing.count)/\(cases.count) kokoro start cases pass")
+        return failing.count
     }
 }

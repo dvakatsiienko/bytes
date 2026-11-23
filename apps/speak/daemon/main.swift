@@ -430,6 +430,7 @@ final class Speaker {
         isWarmingKokoro = true
         defer { isWarmingKokoro = false }
         if await kokoroReady() { return }
+        guard launch.mayStartKokoro else { return }
         let server = Process()
         server.executableURL = URL(fileURLWithPath: NSHomeDirectory() + "/.local/bin/mlx_audio.server")
         server.arguments = ["--host", "127.0.0.1", "--port", String(kokoroURL.port ?? 7385)]
