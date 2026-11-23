@@ -16,7 +16,7 @@ func systemVoice(for lang: Lang, _ settings: EngineConfig) -> NSSpeechSynthesize
 // one synth at a time, and only its own callbacks count: a stopped synth's late «finished» once resumed the next
 // read's wait, that read moved on while its synth still talked, and F5 could no longer reach the orphan
 @MainActor
-final class SystemVoice: NSObject, NSSpeechSynthesizerDelegate {
+final class MacVoice: NSObject, NSSpeechSynthesizerDelegate, SpeechOutput {
     private var synth: NSSpeechSynthesizer?
     private var done: CheckedContinuation<Void, Never>?
     private var onFirstWord: (() -> Void)?

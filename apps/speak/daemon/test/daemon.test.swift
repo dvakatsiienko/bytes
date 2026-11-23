@@ -11,8 +11,9 @@ struct Case: Decodable {
 @main
 struct DaemonTest {
     @MainActor
-    static func main() throws {
-        let failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + ChainTest.failures()
+    static func main() async throws {
+        var failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + ChainTest.failures()
+        failed += await SeamsTest.failures()
         exit(failed == 0 ? 0 : 1)
     }
 

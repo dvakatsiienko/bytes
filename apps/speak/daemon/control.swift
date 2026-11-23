@@ -1,55 +1,30 @@
 // the admin page's door into the running daemon: one json line in, one json line out, over a unix socket
 // only this user can open. previews go through the daemon's own speak path, never a second synth.
 // the socket lives on its own queue: a main thread stuck for minutes once took the admin down with it
-import ApplicationServices
-import AVFoundation
 import Foundation
 import Network
 import os
 
-let controlSocket = NSHomeDirectory() + "/.local/share/x-speak/control.sock"
-
-// a watchdog thread hands main a stamp twice a second; the socket and the watchdog read how long main has left it
-// unrun. a main-queue stamp, not a timer: app nap coalesces a windowless daemon's timers by seconds, and a late
-// timer read as a 4 s stall on an idle main. the suspending clock stops while the mac sleeps, so a night asleep
-// never reads as a blocked main on wake
-final class Heartbeat: @unchecked Sendable {
-    private let last = OSAllocatedUnfairLock(initialState: SuspendingClock.now)
-
-    var age: Duration { SuspendingClock.now - last.withLock { $0 } }
-
-    func start() {
-        Thread.detachNewThread { [self] in
-            var longest: Duration?
-            while true {
-                DispatchQueue.main.async { [last] in last.withLock { $0 = SuspendingClock.now } }
-                Thread.sleep(forTimeInterval: 0.5)
-                let age = self.age
-                if age > .seconds(2) {
-                    if longest == nil { log("main: blocked for \(seconds(age))") }
-                    longest = max(longest ?? .zero, age)
-                } else if let stall = longest, age < .seconds(1) {
-                    log("main: answering again after \(seconds(stall))+")
-                    longest = nil
-                }
-            }
-        }
-    }
-}
-
-let heartbeat = Heartbeat()
-
 final class Control: @unchecked Sendable {
+    private let socket: String
+    private let commands: @MainActor () -> any DaemonCommands
+    private let mainAge: @Sendable () -> Duration
     // concurrent: a status must never queue behind another request's 2 s wait on a blocked main
     private let queue = DispatchQueue(label: "x-speak.control", attributes: .concurrent)
     private var listener: NWListener?
     // the last status main gave, served with a «main» note while main cannot answer
     private let lastStatus = OSAllocatedUnfairLock<[String: Any]?>(uncheckedState: nil)
 
+    init(socket: String, commands: @escaping @MainActor () -> any DaemonCommands, mainAge: @escaping @Sendable () -> Duration) {
+        self.socket = socket
+        self.commands = commands
+        self.mainAge = mainAge
+    }
+
     func start() {
-        unlink(controlSocket)
+        unlink(socket)
         let parameters = NWParameters.tcp
-        parameters.requiredLocalEndpoint = NWEndpoint.unix(path: controlSocket)
+        parameters.requiredLocalEndpoint = NWEndpoint.unix(path: socket)
         do {
             let listener = try NWListener(using: parameters)
             listener.newConnectionHandler = { [self] connection in
@@ -61,7 +36,7 @@ final class Control: @unchecked Sendable {
             }
             listener.start(queue: queue)
             self.listener = listener
-            log("control: listening on \(controlSocket)")
+            log("control: listening on \(socket)")
         } catch {
             log("control: no socket — \(error)")
         }
@@ -96,7 +71,7 @@ final class Control: @unchecked Sendable {
                     current.isRunning = true
                     return true
                 }) else { return }
-                let object = self.handle(request)
+                let object = runOp(request, with: self.commands())
                 state.withLock { $0.object = object }
                 done.signal()
             }
@@ -109,7 +84,7 @@ final class Control: @unchecked Sendable {
             if isRunning {
                 done.wait()
             } else {
-                let age = heartbeat.age
+                let age = mainAge()
                 let note = "blocked for \(seconds(age))"
                 // a busy main that missed 50 ms is not a stall: the note starts where the watchdog's line does
                 if isStatus, var last = lastStatus.withLock({ $0 }) {
@@ -124,80 +99,7 @@ final class Control: @unchecked Sendable {
         return reply(object)
     }
 
-    @MainActor
-    private func handle(_ request: Request) -> [String: Any] {
-        switch request.op {
-        case "status":
-            return [
-                "engines": speaker.health(), "accessibility": AXIsProcessTrusted(),
-                "speaking": speaker.isSpeaking, "paused": speaker.panel.model.isPaused,
-            ]
-        case "voices":
-            return ["system": installedVoices()]
-        case "reload":
-            let error = configFile.refresh()
-            return error.map { ["error": $0] } ?? ["ok": true]
-        // pause and resume, the pill's ⏸ from the admin
-        case "pause":
-            speaker.togglePause()
-            return ["ok": true]
-        case "stop":
-            speaker.stop()
-            speaker.panel.speechEnded()
-            return ["ok": true]
-        // shows the pill with sample levels, for screenshots of a design take
-        case "panel-demo":
-            speaker.panel.demo()
-            return ["ok": true]
-        case "wave":
-            speaker.panel.wave(on: request.on ?? false, glide: request.glide, flow: request.flow)
-            return ["ok": true]
-        case "panel-hide":
-            speaker.panel.hide()
-            return ["ok": true]
-        // a test hook: holds main for `seconds`, so the socket's answer under a blocked main can be measured
-        case "block-main":
-            let hold = request.seconds ?? 5
-            DispatchQueue.main.async { Thread.sleep(forTimeInterval: hold) }
-            return ["ok": true]
-        // a text read as F4 reads a selection: the per-language chain, cutting off whatever plays (a mod's 🔊, FRM-381)
-        case "read":
-            guard let text = request.text else { return ["error": "read needs text"] }
-            let parts = chunks(normalize(text))
-            guard !parts.isEmpty else { return ["error": "read: nothing to say"] }
-            configFile.refresh()
-            speaker.stop()
-            speaker.speak(parts, only: nil, pressed: .now)
-            return ["ok": true]
-        case "preview":
-            guard let engine = request.engine.flatMap(Engine.init), let text = request.text else { return ["error": "preview needs engine and text"] }
-            speaker.preview(text, with: engine, settings: request.settings ?? config[engine])
-            return ["ok": true]
-        default:
-            return ["error": "unknown op \(request.op)"]
-        }
-    }
-
     private func reply(_ object: [String: Any]) -> Data {
         (try? JSONSerialization.data(withJSONObject: object)) ?? Data("{}".utf8)
     }
-}
-
-// every installed en/uk/ru voice, best quality first — the mac voice card's dropdown
-func installedVoices() -> [[String: String]] {
-    AVSpeechSynthesisVoice.speechVoices()
-        .filter { ["en", "uk", "ru"].contains(String($0.language.prefix(2))) && $0.gender == .female }
-        .sorted { $0.quality.rawValue > $1.quality.rawValue }
-        .map { ["id": $0.identifier, "name": $0.name, "lang": String($0.language.prefix(2)), "quality": ["", "default", "enhanced", "premium"][$0.quality.rawValue]] }
-}
-
-struct Request: Decodable {
-    let op: String
-    let engine: String?
-    let text: String?
-    let settings: EngineConfig?
-    let on: Bool?
-    let glide: Double?
-    let flow: Double?
-    let seconds: Double?
 }

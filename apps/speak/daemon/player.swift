@@ -1,7 +1,7 @@
 import AVFoundation
 
 @MainActor
-final class Player {
+final class Player: SpeechOutput {
     private let engine = AVAudioEngine()
     private let node = AVAudioPlayerNode()
     // speed without a pitch shift, applied on playback so no engine re-renders for it
@@ -16,6 +16,7 @@ final class Player {
     private var dryAt: ContinuousClock.Instant?
 
     var isPlaying: Bool { pending > 0 }
+    var isBusy: Bool { isPlaying }
     // the panel's meter: the mixer's levels, one per 10 ms of a rendered buffer, and the spacing between them
     var onLevels: (([Float], TimeInterval) -> Void)?
 

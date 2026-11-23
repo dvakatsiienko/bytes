@@ -9,6 +9,9 @@ mkdir -p build
 for module in $(swiftc -frontend -emit-imported-modules core/*.swift -module-name core -o -); do
     [ "$module" = Foundation ] || { echo "daemon-test: daemon/core imports $module" >&2; exit 1; }
 done
+# each part is handed what it needs: no module-level value, but a private constant of the core's
+globals=$(grep -nE '^(@[A-Za-z]+(\([a-z]+\))? |private |fileprivate |internal |public |nonisolated(\(unsafe\))? )*(let|var) ' ./*.swift core/*.swift | grep -vE '^core/[^:]*:[0-9]+:private let ' || true)
+[ -z "$globals" ] || { printf 'daemon-test: a module-level value\n%s\n' "$globals" >&2; exit 1; }
 ../script/daemon-compile.sh -typecheck
 swiftc -parse-as-library -swift-version 5 core/*.swift test/*.swift -o build/daemon-test
 ./build/daemon-test golden.json config.json
