@@ -1,9 +1,10 @@
 // the voice admin's handler: the built page, and the daemon's control socket as an api. no state and no file of its
 // own: the daemon owns the settings. server.ts hands it this mac's paths and listens
-import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { createConnection } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
 
+import { isWorktree } from './ports.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 // female only (dima's blind test). elevenlabs premades answered 200 on the restricted key; charlotte and aria are
@@ -93,7 +94,15 @@ async function body(request: IncomingMessage) {
   let text = '';
   request.setEncoding('utf8');
   for await (const chunk of request) text += chunk;
-  return JSON.parse(text || '{}');
+  // json has no infinity: a number past a double's range would travel on as null, and null takes a key out
+  return JSON.parse(text || '{}', (_, value) => {
+    if (
+      value === Number.POSITIVE_INFINITY ||
+      value === Number.NEGATIVE_INFINITY
+    )
+      throw new Error('a number is out of range');
+    return value;
+  });
 }
 
 function send(
@@ -174,17 +183,14 @@ const WORKTREE =
 
 // a link to the live socket is the live socket
 const canonical = (path: string) =>
-  existsSync(path) ? realpathSync(path) : resolve(path);
+  existsSync(path) ? realpathSync.native(path) : resolve(path);
 
 // where this server's page and its daemon are. a worktree's server reaches the live daemon to play, never to save
 export const adminPaths = ({ app, home, own }: AdminPlace): AdminPaths => {
   const live = join(home, '.local/share/x-speak/control.sock');
-  // a worktree's .git is a file that names the main checkout's
-  const git = join(app, '../../.git');
-  const isWorktree = existsSync(git) && statSync(git).isFile();
   const socket = own ?? live;
   return {
-    canSave: !isWorktree || canonical(socket) !== canonical(live),
+    canSave: !isWorktree(app) || canonical(socket) !== canonical(live),
     dist: join(app, 'dist'),
     socket,
   };

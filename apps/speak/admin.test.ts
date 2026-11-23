@@ -16,6 +16,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { adminPaths, createAdmin } from './admin.ts';
+import { adminUrl } from './ports.ts';
 
 const SETTINGS = {
   chain: { en: ['kokoro'] },
@@ -298,6 +299,21 @@ describe('the routes over a daemon', () => {
     });
   });
 
+  it.each(['1e400', '-1e400'])(
+    'a number past a double’s range (%s) reaches nothing',
+    async (number) => {
+      const answer = await ask(
+        'PUT',
+        '/api/config',
+        JSON_TYPE,
+        `{"patch":{"meterGlideMs":${number}},"version":"v"}`,
+      );
+
+      expect(answer.status).toBe(400);
+      expect(asked).toEqual([]);
+    },
+  );
+
   it('a body that is not json is a 400', async () => {
     expect((await ask('POST', '/api/preview', JSON_TYPE, 'hi')).status).toBe(
       400,
@@ -381,6 +397,28 @@ describe('a worktree’s server', () => {
       dist: join(app, 'dist'),
       socket: own ?? '/h/.local/share/x-speak/control.sock',
     });
+  });
+});
+
+describe('the dev page’s admin', () => {
+  it.each([
+    ['the main checkout', 'folder', 7386],
+    ['a seeded worktree', 'file', 7396],
+  ])('%s has its own', (_, git, port) => {
+    const app = join(home, 'repo/apps/speak');
+    mkdirSync(app, { recursive: true });
+    if (git === 'folder') mkdirSync(join(home, 'repo/.git'));
+    else writeFileSync(join(home, 'repo/.git'), 'gitdir: x');
+
+    expect(adminUrl(app, port)).toBe(`http://127.0.0.1:${port}`);
+  });
+
+  it('an unseeded worktree never takes the live one', () => {
+    const app = join(home, 'repo/apps/speak');
+    mkdirSync(app, { recursive: true });
+    writeFileSync(join(home, 'repo/.git'), 'gitdir: x');
+
+    expect(() => adminUrl(app, 7386)).toThrow('pnpm worktree:seed');
   });
 });
 

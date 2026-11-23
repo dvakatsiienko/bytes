@@ -249,13 +249,14 @@
 - ✅ `pnpm --filter speak test` runs the admin server's tests over a fake daemon: the write guard, the host, the page folder's jail, each route, the page's requests and its draft
 - ✅ `pnpm --filter speak daemon:build` installs the signed daemon to `~/.local/libexec/x-speak/x-speak`, with no launchd change
   - makes: `~/.local/libexec/x-speak/x-speak`, signed «x-speak local signing»
-  - given no settings file at its place, then it refuses in one line and installs nothing
+  - given no settings file at its place, or a change in the old file since the move, then it refuses in one line and installs nothing
 - ⬜ `apps/speak/script/settings-move.sh <sha256>` copies the settings out of the tracked tree
   - makes: the settings file, and `config.json.moved-from` beside it (the old path and its hash)
   - given the file the launchd job names has that hash, when it runs, then the copy has it too and the old file is untouched
+  - given a change the old file got since, when it runs with that file's hash, then the change is brought and the settings it went over are kept as `config.json.before-move`; with `seen` nothing is copied
   - given another hash, a copy that differs, or settings there with a change of their own, then it refuses in one line and nothing moves
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
-  - given no settings at their place, or a change in the old file since they moved, then it refuses in one line and stops nothing
+  - given no settings at their place, or a change in the old file since they moved that nobody brought, then it refuses in one line, names the way, and stops nothing
 - ✅ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
   - makes: `~/.local/libexec/x-speak/x-speak.prev`, kept by each build from the binary that was running (the installed one, when nothing is kept yet)
   - given a build that was relaunched, when the rollback runs, then the daemon that ran before it answers `status`, named by its hash, with its settings and config argument held against the ones it ran with at the build

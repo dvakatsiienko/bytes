@@ -41,14 +41,18 @@ export const useSettings = () => {
   const save = useMutation({
     // what is on screen at the press; a save or a ♥ may land before its turn comes
     mutationFn: async (pressed: Pressed) => {
-      const { from } = latest.current ?? {};
-      if (!from || pressed.resets !== resets.current) return RESET;
+      if (pressed.resets !== resets.current) return RESET;
+      // an earlier save may have left nothing to save
+      if (!latest.current) return;
+      const { from } = latest.current;
       const patch = changesSince(pressed.config, from.config);
       if (!patch) return;
       const answer = await api.save(patch, from.version);
       if (answer.error !== undefined) return answer;
       await write(() => answer);
-      if (latest.current) put(draftAfterSave(latest.current, answer));
+      // edits made after a reset were not made over what this saved: their own save is refused as stale
+      if (latest.current && pressed.resets === resets.current)
+        put(draftAfterSave(latest.current, answer));
     },
     scope: { id: 'settings' },
   });

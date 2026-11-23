@@ -17,6 +17,6 @@
 - **pill flow** — how long the pill's wave holds before moving one bar outward, in ms (`meterFlowMs`)
 - **settings file** — dima's knobs on this mac, `~/Library/Application Support/speak/config.json`; the daemon alone writes it
 - **settings version** — the mark of the settings file's bytes; a save names the one it edits, and is refused when the file moved on
-- **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with and where it read them
+- **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with
 - **rollback** — the kept binary and the installed one change places and the daemon restarts; a second one comes forward again
 - **try run** — one text spoken by a tree's own daemon build, beside the live daemon

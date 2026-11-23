@@ -7,20 +7,21 @@ label=com.dima.x-speak
 # the daemon's own place for its settings (daemon/core/paths.swift), and the file they were moved from with its hash
 settings="$HOME/Library/Application Support/speak/config.json"
 moved_from="$settings.moved-from"
-# where the installed binary reads its settings, written as it is installed; a binary from before the settings had a
-# place of their own has no such file, and reads what its launchd argument names
-reads="$installed.reads"
+# the binaries that read the settings at their place, by hash, each written down as a build installs it; a binary from
+# before the settings had a place of their own reads what its launchd argument names
+readers="$install_dir/x-speak.readers"
 
 # 1 the file the settings moved from, 2 its hash then
 moved_line() { sed -n "$1p" "$moved_from" 2>/dev/null || true; }
-# the old file changed since the settings moved, the moved ones did not: a start on those loses that change
-moved_too_early() {
-    old=$(moved_line 1)
-    [ -n "$old" ] && [ "$old" = "$(config_argument)" ] && [ -f "$old" ] \
-        && [ "$(sha_of "$settings")" = "$(moved_line 2)" ] && [ "$(sha_of "$old")" != "$(moved_line 2)" ]
+# the file the settings moved from changed since: a daemon that reads the moved ones would drop that change
+old_file_changed() { [ -f "$(moved_line 1)" ] && [ "$(sha_of "$(moved_line 1)")" != "$(moved_line 2)" ]; }
+old_file_line() {
+    if [ "$(sha_of "$settings")" = "$(moved_line 2)" ]; then way='brings that change'; else way="seen, once $settings has that change too"; fi
+    echo "$(moved_line 1) changed since the settings moved — script/settings-move.sh $(sha_of "$(moved_line 1)") $way"
 }
 
 sha_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
+reads_settings() { grep -qx "$(sha_of "$1")" "$readers" 2>/dev/null; }
 
 daemon_status() {
     printf '%s\n' '{"op":"status"}' | nc -U -w 2 "$HOME/.local/share/x-speak/control.sock" 2>/dev/null || true

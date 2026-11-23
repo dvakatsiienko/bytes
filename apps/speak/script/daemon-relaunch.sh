@@ -11,13 +11,14 @@ if daemon_speaks; then
     echo 'relaunch: x-speak is reading aloud now — wait for it to end' >&2
     exit 3
 fi
-if [ "$(cat "$reads" 2>/dev/null || true)" = "$settings" ]; then
+# by its build, or by its argument, the daemon this starts reads the settings at their place
+if reads_settings "$installed" || [ "$(config_argument)" = "$settings" ]; then
     if [ ! -f "$settings" ]; then
         echo "relaunch: no settings at $settings, x-speak would run on its built-in defaults" >&2
         exit 3
     fi
-    if moved_too_early; then
-        echo "relaunch: $(moved_line 1) changed since the settings moved, compare it with $settings — script/settings-move.sh $(sha_of "$(moved_line 1)") brings that change" >&2
+    if old_file_changed; then
+        echo "relaunch: $(old_file_line)" >&2
         exit 3
     fi
 fi

@@ -26,7 +26,7 @@ setup() {
     place="$HOME/Library/Application Support/speak/config.json"
     mkdir -p "$(dirname "$place")"
     echo today >"$place"
-    echo "$place" >"$libexec/x-speak.reads"
+    shasum -a 256 "$libexec/x-speak" | cut -d' ' -f1 >"$libexec/x-speak.readers"
     printf '{"speaking":false,"paused":false}' >"$state/status"
     started
     echo 'loaded /c.json — same' >"$state/settings"
