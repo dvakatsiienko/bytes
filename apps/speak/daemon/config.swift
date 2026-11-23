@@ -2,6 +2,19 @@
 // line and the last good config stays; the daemon never dies on a typo.
 import Foundation
 
+enum Engine: String, CaseIterable {
+    case elevenlabs, fish, kokoro, system, gemini
+
+    var isCloud: Bool { self != .kokoro && self != .system }
+    var streams: Bool { self == .elevenlabs || self == .fish }
+    func speaks(_ lang: Lang) -> Bool { self != .kokoro || lang == .en }
+}
+
+func log(_ line: String) {
+    let stamp = ISO8601DateFormatter.string(from: Date(), timeZone: .current, formatOptions: [.withFullDate, .withDashSeparatorInDate, .withSpaceBetweenDateAndTime, .withTime, .withColonSeparatorInTime, .withFractionalSeconds])
+    FileHandle.standardError.write(Data("\(stamp) \(line)\n".utf8))
+}
+
 struct Config: Decodable {
     // per language, tried in order; an engine that fails or runs out of quota is skipped silently
     let chain: [Lang: [Engine]]
@@ -15,10 +28,10 @@ struct Config: Decodable {
 
     subscript(engine: Engine) -> EngineConfig { engines[engine] ?? EngineConfig() }
 
-    // the load line's proof that the file in use is the one meant: each engine's english voice, speed and gain
+    // the load line's proof that the file in use is the one meant: each engine's voices, speed and gain
     var summary: String {
         engines.sorted { $0.key.rawValue < $1.key.rawValue }
-            .map { "\($0.key.rawValue): voice \($0.value.voice(for: .en) ?? "-"), speed \($0.value.speed), gain \($0.value.gain)" }
+            .map { "\($0.key.rawValue): voice \($0.value.voices), speed \($0.value.speed), gain \($0.value.gain)" }
             .joined(separator: "; ")
     }
 
@@ -71,6 +84,9 @@ struct EngineConfig: Decodable {
 
     func voice(for lang: Lang) -> String? { voice[lang.rawValue] ?? voice["*"] }
 
+    // every language's voice, for the load line: «*=Sarah,en=Jessica»
+    var voices: String { voice.isEmpty ? "-" : voice.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: ",") }
+
     init(voice: [String: String] = [:], gain: Double = 1) {
         self.voice = voice
         self.gain = gain
@@ -105,6 +121,7 @@ final class ConfigFile {
     private let url: URL
     private var loadedStamp: Date?
     private var lastError: String?
+    private var hasLoaded = false
     private(set) var current = Config.fallback
 
     init(_ url: URL) { self.url = url }
@@ -131,10 +148,11 @@ final class ConfigFile {
         do {
             current = try JSONDecoder().decode(Config.self, from: Data(contentsOf: url))
             lastError = nil
+            hasLoaded = true
             log("config: loaded \(url.path) — \(current.summary)")
         } catch {
             lastError = "\(url.path): \(stamp == nil ? "not readable" : Self.describe(error))"
-            log("config: kept the last good one — \(lastError!)")
+            log("config: \(hasLoaded ? "kept the last good one" : "running on the built-in defaults") — \(lastError!)")
         }
         return lastError
     }

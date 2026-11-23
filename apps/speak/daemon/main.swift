@@ -1,19 +1,11 @@
 // x-speak — F4 reads the selection aloud, cutting off what plays, and with none pauses / resumes; ⇧F4 pauses / resumes; F5 stops. one resident process so the hot path
 // pays no boot, no key fetch and no player spawn (the node version paid ~1.2 s, measured 2026-09-29).
 // usage: x-speak --config <path> [--keys-run <script>]         the daemon (launchd)
-//        x-speak --config <path> [--engine <name>] text       one-shot, for listening tests
+//        x-speak --config <path> [--keys-run <script>] [--engine <name>] text   one-shot, for listening tests
 import AppKit
 import AVFoundation
 import Carbon.HIToolbox
 import os
-
-enum Engine: String, CaseIterable {
-    case elevenlabs, fish, kokoro, system, gemini
-
-    var isCloud: Bool { self != .kokoro && self != .system }
-    var streams: Bool { self == .elevenlabs || self == .fish }
-    func speaks(_ lang: Lang) -> Bool { self != .kokoro || lang == .en }
-}
 
 // chain, voices, speed, gain and the first-audio budget live in config.json, read again on the next F4 after a save
 // the paths come in on argv (arguments.swift); a bad argv ends the process with one usage line
@@ -62,11 +54,6 @@ func failure(_ status: Int, _ bytes: URLSession.AsyncBytes) async -> EngineError
     let detail = (try? JSONSerialization.jsonObject(with: body) as? [String: Any])?["detail"] as? [String: Any]
     guard detail?["status"] as? String == "quota_exceeded" || detail?["code"] as? String == "quota_exceeded" else { return .status(status) }
     return .quota(detail?["message"] as? String ?? "out of quota")
-}
-
-func log(_ line: String) {
-    let stamp = ISO8601DateFormatter.string(from: Date(), timeZone: .current, formatOptions: [.withFullDate, .withDashSeparatorInDate, .withSpaceBetweenDateAndTime, .withTime, .withColonSeparatorInTime, .withFractionalSeconds])
-    FileHandle.standardError.write(Data("\(stamp) \(line)\n".utf8))
 }
 
 func elapsed(_ since: ContinuousClock.Instant) -> String {
@@ -835,6 +822,7 @@ struct XSpeak {
             only = engine
         }
         configFile.refresh()
+        if launch.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have no key") }
 
         if !launch.text.isEmpty {
             Task {
@@ -850,7 +838,6 @@ struct XSpeak {
             NSApplication.shared.run()
         }
 
-        if launch.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have no key") }
         Task {
             await speaker.loadKeys()
             await speaker.probeQuota()

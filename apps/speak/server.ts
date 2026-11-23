@@ -17,6 +17,8 @@ const REPO = join(import.meta.dirname, '../..');
 // the daemon reads the same file: its launchd job hands it this path as `--config`
 const CONFIG = join(import.meta.dirname, 'daemon/config.json');
 const DIST = join(import.meta.dirname, 'dist');
+// an explicit PORT wins, as in every bytes app
+const port = Number(process.env.PORT ?? speakPort);
 const SOCKET = join(homedir(), '.local/share/x-speak/control.sock');
 
 // female only (dima's blind test). elevenlabs premades answered 200 on the restricted key; charlotte and aria are
@@ -91,8 +93,19 @@ async function body(request: IncomingMessage) {
   return JSON.parse(text || '{}');
 }
 
-// the saved file is exactly what biome would write — formatted and its keys sorted — so a save never dirties the
+// the saved file is exactly what biome would write, its keys sorted here (bytes' biome sorts none; an array keeps
+// its order, a chain's order is dima's) — so a save never dirties the
 // diff or trips the commit hook (a format-only save left favourites unsorted, and the hook refused dima's commit)
+function keySorted(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(keySorted);
+  if (value === null || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([key, inner]) => [key, keySorted(inner)]),
+  );
+}
+
 function biomeFormatted(value: unknown) {
   return execFileSync(
     join(REPO, 'node_modules/.bin/biome'),
@@ -101,7 +114,7 @@ function biomeFormatted(value: unknown) {
       cwd: REPO,
       encoding: 'utf8',
       // indented in: biome keeps an object expanded when its input was, which is the committed shape
-      input: JSON.stringify(value, null, 2),
+      input: JSON.stringify(keySorted(value), null, 2),
     },
   );
 }
@@ -180,6 +193,6 @@ createServer(async (request, response) => {
   } catch (error) {
     send(response, 400, { error: (error as Error).message });
   }
-}).listen(speakPort, '127.0.0.1', () =>
-  console.log(`🔊 speak → http://127.0.0.1:${speakPort}`),
+}).listen(port, '127.0.0.1', () =>
+  console.log(`🔊 speak → http://127.0.0.1:${port}`),
 );

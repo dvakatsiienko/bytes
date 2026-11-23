@@ -345,7 +345,7 @@ function scriptOf(argv: string[]): string | undefined {
 }
 
 function toApp(arg: string): App {
-  // a bare name is a bytes app first; one bytes lacks resolves from the cwd (frame's `speak`)
+  // a bare name is a bytes app first; one bytes lacks resolves from the cwd (an app outside bytes)
   const bytesApp = join(root, 'apps', arg);
   const dir =
     arg.includes('/') || arg.startsWith('.') || !exists(bytesApp)

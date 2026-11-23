@@ -1,6 +1,6 @@
 // the daemon's tests, one binary. golden.json is dima's real text (tickets, commits, a url and a path
-// mid-sentence) and what a voice should receive for it; the argv cases guard the launchd job's flags.
-// usage: daemon-test <golden.json>
+// mid-sentence) and what a voice should receive for it; the argv cases guard the launchd job's flags; the
+// config cases guard the load line. usage: daemon-test <golden.json> <config.json>
 import Foundation
 
 struct Case: Decodable {
@@ -10,9 +10,31 @@ struct Case: Decodable {
 
 @main
 struct DaemonTest {
+    @MainActor
     static func main() throws {
-        let failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures()
+        let failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2])
         exit(failed == 0 ? 0 : 1)
+    }
+
+    // the load line is the switch's proof that the right file is in use: what it prints, and what a bad path says
+    @MainActor
+    static func configFailures(_ shipped: String) throws -> Int {
+        let fixture = FileManager.default.temporaryDirectory.appendingPathComponent("x-speak-test-\(ProcessInfo.processInfo.processIdentifier).json")
+        defer { try? FileManager.default.removeItem(at: fixture) }
+        try Data(#"{"chain":{"en":["kokoro"]},"firstAudioMs":900,"engines":{"elevenlabs":{"voice":{"en":"Jessica","*":"Sarah"},"gain":1.2},"system":{}}}"#.utf8).write(to: fixture)
+        let good = ConfigFile(fixture)
+        let missing = ConfigFile(URL(fileURLWithPath: "/nonexistent/x-speak/config.json"))
+        let cases: [(name: String, passes: Bool)] = [
+            ("the fixture loads", good.refresh() == nil),
+            ("the summary prints every voice, speed and gain", good.current.summary == "elevenlabs: voice *=Sarah,en=Jessica, speed 1.0, gain 1.2; system: voice -, speed 1.0, gain 1.0"),
+            ("a missing file is an error that names the full path", missing.refresh() == "/nonexistent/x-speak/config.json: not readable"),
+            ("the missing file's error stays on the next press", missing.refresh() == "/nonexistent/x-speak/config.json: not readable"),
+            ("the shipped config.json loads", ConfigFile(URL(fileURLWithPath: shipped)).refresh() == nil),
+        ]
+        for item in cases where !item.passes { print("✗ config: \(item.name)") }
+        let failed = cases.filter { !$0.passes }.count
+        print("\(cases.count - failed)/\(cases.count) config cases pass")
+        return failed
     }
 
     static func goldenFailures(_ path: String) throws -> Int {
@@ -45,6 +67,7 @@ struct DaemonTest {
             (["--config", "/c.json", "--keysrun", "/op-run.sh"], .failure(.unknownFlag("--keysrun"))),
             (["--config", "/c.json", "--engine", "kokoro"], .failure(.engineWithoutText)),
             (["--config", "/c.json", "-keys-run", "/op-run.sh"], .failure(.unknownFlag("-keys-run"))),
+            (["--config", ""], .failure(.missingValue("--config"))),
         ]
         var failed = 0
         for item in cases {

@@ -8,7 +8,7 @@ read-aloud on dima's mac, in two parts that share this home:
 
 not deployed anywhere, and it carries no `vercel.json`: it edits this mac's `daemon/config.json` and talks to this mac's daemon.
 
-- dev: `pnpm dev:speak` runs vite on 7387, proxying `/api` to the admin on 7386; a worktree gets both ports plus its offset
+- dev: `pnpm dev:speak` runs vite on 7387, proxying `/api` to the admin on 7386; a worktree gets both ports plus its offset, and each side binds an explicit `PORT` when one is set
 - a ui change is live after `pnpm --filter speak admin:build` (the server reads `dist/` on every request)
 - a `server.ts` change needs `pnpm -C ~/frame schedule:restart x-speak-admin`
 
@@ -38,7 +38,7 @@ re-reads the file on the next F4 after a save.
 
 ## hazards
 
-- **save goes through bytes' biome, fed indented json** — biome keeps an object expanded only when its input
+- **a save sorts the keys itself, then goes through bytes' biome, fed indented json** (bytes' biome sorts no json keys; an array keeps its order) — biome keeps an object expanded only when its input
   was; compact input rewrote dima's whole file and the commit hook refused it
 - **a dnd-kit reorder applies `move()` on every drag-over**, with the snapshot back on a cancel — applying it only
   on drop fought dnd-kit's optimistic dom move, and the page and the ranks disagreed after a keyboard drag
