@@ -162,8 +162,18 @@ is 'no hash: refused' '1 tracked/none' "$code $(places)"
 says 'no hash: says how' 'usage'
 unmoved; hash=$(sha "$old"); rm "$old"; move "$hash"
 is 'no file where the job points: refused' '1 none/none' "$code $(places)"
+says 'no file where the job points: names the place' "no settings file to move: «${old}»"
 unmoved; stub cp 'for last in "$@"; do :; done; echo torn >"$last"'; move "$(sha "$old")"; rm "$root/bin/cp"
 is 'a torn copy: refused, no settings appear' '1 tracked/none' "$code $(places)"
+
+unmoved; stub mv 'exit 1'; move "$(sha "$old")"; rm "$root/bin/mv"
+is 'a first move killed before its last step leaves no word of one' '1 tracked/none no' "$code $(places) $([ -f "$place.moved-from" ] && echo yes || echo no)"
+unmoved; move "$(sha "$old")"; was=$(sed -n 2p "$place.moved-from"); echo edited >"$old"; stub mv 'exit 1'; move "$(sha "$old")"; rm "$root/bin/mv"
+is 'a second move killed before its last step: the change still counts as one nobody brought' "1 edited/tracked $was" "$code $(places) $(sed -n 2p "$place.moved-from")"
+move "$was" seen
+is 'seen with another hash: refused' "1 $was" "$code $(sed -n 2p "$place.moved-from")"
+unmoved; move "$(sha "$old")" seen
+is 'seen with no settings: refused' '1 tracked/none no' "$code $(places) $([ -f "$place.moved-from" ] && echo yes || echo no)"
 
 unmoved; build new
 is 'a build with no settings at their place: refused, nothing changes' '1 old/none' "$code $(pair)"

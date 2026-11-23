@@ -9,7 +9,7 @@ want=${1:-}
 from=$(moved_line 1)
 [ -n "$from" ] || from=$(config_argument)
 [ -n "$want" ] || refuse 'usage: script/settings-move.sh <sha256 of the old file> [seen]'
-[ -f "$from" ] || refuse "no settings file to move: «$from»"
+[ -f "$from" ] || refuse "no settings file to move: «${from}»"
 [ "$(sha_of "$from")" = "$want" ] || refuse "$from is not the file that was hashed: $(sha_of "$from")"
 # last: until it is written, a relaunch still sees the change as one nobody brought
 record() { printf '%s\n%s\n' "$from" "$want" >"$moved_from"; }

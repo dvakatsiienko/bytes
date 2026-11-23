@@ -103,6 +103,12 @@ enum StoreTest {
         file.putInTheSameMoment(edited)
         store.refresh()
         rows.append(("a hand edit in the moment of a save is seen", "\(store.current.meterFlowMs)", "2.0"))
+        file.put(shape)
+        store.refresh()
+        _ = try? store.save(json(#"{"meterFlowMs":5}"#), over: at)
+        file.putBack(shape)
+        store.refresh()
+        rows.append(("a backup put back with its old moment is seen", "\(store.current.meterFlowMs)", "70.0"))
         file.link()
         _ = try? store.save(json(#"{"meterFlowMs":3}"#), over: store.saved().version)
         rows.append(("a linked file stays a link, and its target is written", "\(file.isLink) \(file.text.contains("\"meterFlowMs\": 3"))", "true true"))
@@ -239,6 +245,12 @@ private final class Scratch {
         let moment = (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
         try? Data(text.utf8).write(to: url)
         if let moment { try? FileManager.default.setAttributes([.modificationDate: moment], ofItemAtPath: url.path) }
+    }
+
+    // as cp -p does: the bytes and the moment they had before a save
+    func putBack(_ text: String) {
+        try? Data(text.utf8).write(to: url)
+        try? FileManager.default.setAttributes([.modificationDate: stamp], ofItemAtPath: url.path)
     }
 
     private var target: URL { folder.appendingPathComponent("TARGET") }

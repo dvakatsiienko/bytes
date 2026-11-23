@@ -1,4 +1,4 @@
-// whose settings a process reads, on a home that is nobody's
+// where the daemon looks, on a home that is nobody's: the admin, the stash mod and the scripts look there too
 import Foundation
 
 enum PathsTest {
@@ -6,6 +6,11 @@ enum PathsTest {
         let paths = Paths(home: "/h")
         let settings = { (text: [String]) in Arguments(configPath: "/c.json", text: text).settings(paths) }
         return check("paths", [
+            ("the word lists", paths.wordLists, "/h/Library/Application Support/speak/word-lists"),
+            ("the control socket", paths.controlSocket, "/h/.local/share/x-speak/control.sock"),
+            ("kokoro's server", paths.kokoroServer, "/h/.local/bin/mlx_audio.server"),
+            ("kokoro's folder", paths.kokoroFolder, "/h/.local/share/x-speak"),
+            ("kokoro's log", paths.kokoroLog, "/h/.local/share/x-speak/kokoro.log"),
             ("the daemon's settings, whatever --config names", settings([]), "/h/Library/Application Support/speak/config.json"),
             ("a one-shot's settings", settings(["hello"]), "/c.json"),
         ])
