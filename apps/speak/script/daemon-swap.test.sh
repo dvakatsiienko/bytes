@@ -148,12 +148,16 @@ says 'launchd running another binary is named' 'another binary'
 # the first run stays inside its relaunch until `go` appears
 held() {
     cp "$root/app/script/daemon-relaunch.sh" "$root/app/script/real-relaunch.sh"
-    stub_file "$root/app/script/daemon-relaunch.sh" 'touch "$state/inside"; n=0; until [ -f "$state/go" ] || [ $n -gt 200 ]; do n=$((n + 1)); /bin/sleep 0.02; done; exec "$(dirname "$0")/real-relaunch.sh"'
+    stub_file "$root/app/script/daemon-relaunch.sh" 'echo $$ >"$state/held"; touch "$state/inside"; n=0; until [ -f "$state/go" ] || [ $n -gt 200 ]; do n=$((n + 1)); /bin/sleep 0.02; done; exec "$(dirname "$0")/real-relaunch.sh"'
     "$root/app/script/daemon-rollback.sh" >"$state/first" 2>&1 &
     first=$!
     n=0; until [ -f "$state/inside" ] || [ $n -gt 200 ]; do n=$((n + 1)); /bin/sleep 0.02; done
 }
-release() { touch "$state/go"; first_code=0; wait "$first" 2>/dev/null || first_code=$?; }
+# a rollback that is ended leaves its relaunch running, so that one is waited for too
+release() {
+    touch "$state/go"; first_code=0; wait "$first" 2>/dev/null || first_code=$?
+    n=0; while kill -0 "$(cat "$state/held")" 2>/dev/null && [ $n -le 200 ]; do n=$((n + 1)); /bin/sleep 0.02; done
+}
 locked() { [ -d "$libexec/x-speak.lock" ] && echo locked || echo free; }
 
 setup; build new; started; held
@@ -173,6 +177,7 @@ started; printf '{"speaking":true}' >"$state/status"; rollback
 is 'a refused rollback leaves no lock' free "$(locked)"
 setup; build new; started; held; kill -TERM "$first"; release
 is 'a rollback that is ended leaves no lock' free "$(locked)"
+is 'the relaunch it left behind has ended, on the stubs' 1 "$(relaunches)"
 setup; build new; started; mkdir "$libexec/x-speak.lock"; rollback
 is 'a lock left behind: refused, nothing changes' '1 new/old' "$code $(pair)"
 says 'a lock left behind: the line says how to clear it' 'rmdir'

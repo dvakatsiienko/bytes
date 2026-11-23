@@ -1,6 +1,6 @@
 // the daemon's tests, one binary. golden.json is dima's real text (tickets, commits, a url and a path
 // mid-sentence) and what a voice should receive for it; the argv cases guard the launchd job's flags; the
-// config cases guard the load line. usage: daemon-test <golden.json> <config.json>
+// config cases guard the load line; chain.test.swift and seams.test.swift hold the rest of the core. usage: daemon-test <golden.json> <config.json>
 import Foundation
 
 struct Case: Decodable {

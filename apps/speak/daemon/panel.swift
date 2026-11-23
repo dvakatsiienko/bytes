@@ -1,6 +1,6 @@
 // the floating pill while x-speak talks: close, a level meter, pause, stop, stick. never takes focus, floats on
 // every space, drags anywhere and remembers where. the meter is the one moving part: the mixer's real level, drawn
-// at the display's refresh rate while audio plays and still otherwise — cut `LevelMeter` and `Player.onLevel` to drop it.
+// at the display's refresh rate while audio plays and still otherwise — cut `LevelMeter` and `Player.onLevels` to drop it.
 import AppKit
 import SwiftUI
 
@@ -230,7 +230,6 @@ final class Panel {
         return CGDisplayCreateUUIDFromDisplayID(number).map { CFUUIDCreateString(nil, $0.takeRetainedValue()) as String } ?? "\(number)"
     }
 
-    var isVisible: Bool { window.isVisible }
 
     func show() {
         model.isPaused = false
@@ -285,7 +284,6 @@ final class Panel {
         window.orderFrontRegardless()
     }
 
-    var windowNumber: Int { window.windowNumber }
 
     // speech is over: the panel goes too, unless stick holds it
     func speechEnded() {

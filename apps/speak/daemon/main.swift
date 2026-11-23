@@ -5,7 +5,7 @@
 import AppKit
 
 // the one value that hands each part what it needs. chain, voices, speed, gain and the first-audio budget live in
-// config.json, read again on the next F4 after a save; the paths come in on argv (arguments.swift)
+// config.json, read again on the next F4 after a save; the paths come in on argv (core/arguments.swift)
 @MainActor
 final class App {
     let arguments: Arguments
@@ -26,8 +26,7 @@ final class App {
     private let heartbeat = Heartbeat()
     private lazy var control = Control(
         socket: NSHomeDirectory() + "/.local/share/x-speak/control.sock",
-        commands: { [unowned self] in commands },
-        mainAge: { [heartbeat] in heartbeat.age }
+        answers: Answers(commands: { [unowned self] in commands }, mainAge: { [heartbeat] in heartbeat.age })
     )
 
     init(_ arguments: Arguments) {

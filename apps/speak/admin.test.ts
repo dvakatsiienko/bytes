@@ -100,9 +100,13 @@ describe('the write guard', () => {
     'application/json',
     'application/json; charset=utf-8',
     'application/jsonp',
-  ])('a POST as %s passes', async (type) => {
+  ])('a write as %s passes', async (type) => {
+    const headers = { 'content-type': type };
+
+    expect((await ask('POST', '/api/stop', headers)).status).toBe(200);
     expect(
-      (await ask('POST', '/api/stop', { 'content-type': type })).status,
+      (await ask('PUT', '/api/config', headers, JSON.stringify(SETTINGS)))
+        .status,
     ).toBe(200);
   });
 

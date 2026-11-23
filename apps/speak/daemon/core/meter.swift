@@ -23,8 +23,7 @@ final class Meter {
 
     // a reading still undrawn a second past its moment is dropped: with the timeline paused and the tap still feeding,
     // five idle hours piled up ~1.8 M readings, and the next frame spent 6.5 min of main draining them
-    func enqueue(_ levels: [Float], spacing: TimeInterval) {
-        let now = Date()
+    func enqueue(_ levels: [Float], spacing: TimeInterval, at now: Date = Date()) {
         pending.removeFirst(pending.prefix { $0.due < now.addingTimeInterval(-1) }.count)
         let start = max(now, pending.last.map { $0.due.addingTimeInterval(spacing) } ?? .distantPast)
         pending += levels.enumerated().map { (start.addingTimeInterval(Double($0.offset) * spacing), $0.element) }

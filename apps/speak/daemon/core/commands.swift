@@ -12,9 +12,20 @@ struct Request: Decodable {
     let seconds: Double?
 }
 
+struct Status {
+    let engines: [String: [String: String]]
+    let isTrusted: Bool
+    let isSpeaking: Bool
+    let isPaused: Bool
+
+    var reply: [String: Any] {
+        ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused]
+    }
+}
+
 @MainActor
 protocol DaemonCommands: AnyObject {
-    func status() -> [String: Any]
+    func status() -> Status
     func voices() -> [[String: String]]
     // the reason the file on disk is not the one in use, if it is not
     func reload() -> String?
@@ -32,7 +43,7 @@ protocol DaemonCommands: AnyObject {
 func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: Any] {
     switch request.op {
     case "status":
-        return commands.status()
+        return commands.status().reply
     case "voices":
         return ["system": commands.voices()]
     case "reload":

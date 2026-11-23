@@ -9,10 +9,7 @@ app() {
     mkdir -p "$root/app"
     cp -R "$here" "$root/app/script"
     cp -R "$here/../daemon" "$root/app/daemon"
-    for later in swap try core; do stub_file "$root/app/script/daemon-$later.test.sh" 'touch "$state/reached"'; done
-    state="$root/app/state"
-    export state
-    mkdir -p "$state"
+    for later in swap try core; do stub_file "$root/app/script/daemon-$later.test.sh" ':'; done
 }
 plant() { printf '%b\n' "$1" >"$root/app/daemon/core/Planted.swift"; }
 run() { out=$("$root/app/script/daemon-test.sh" 2>&1); code=$?; }
@@ -25,7 +22,8 @@ for line in 'import AppKit' '@preconcurrency import AVFoundation' 'import Carbon
 done
 
 for line in '@MainActor let speaker = 1' '@MainActor var config: Int { 1 }' 'let configFile = 1' 'private let launch = 1' 'nonisolated(unsafe) var heartbeat = 1' \
-    '@MainActor\nvar waveTuning: Int?' 'let controlSocket = "x"'; do
+    '@MainActor\nvar waveTuning: Int?' 'let controlSocket = "x"' 'private(set) var reads = 0' 'weak var panel: AnyObject?' \
+    '@available(macOS 15, *) let voice = 1' 'import os; let cache = 1' 'package final let quota = 1'; do
     app; printf '%b\n' "$line" >"$root/app/daemon/planted.swift"; run
     is "«${line}» in the shell fails the run" 1 "$code"
     says "«${line}» in the shell is named" 'planted.swift'

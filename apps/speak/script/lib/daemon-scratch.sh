@@ -6,9 +6,10 @@ trap 'rm -rf "$root"' EXIT
 fails=0
 count=0
 
-# a fresh home with `old` installed and running, and the scripts beside a stub test run
+# a fresh home with `old` installed and running, and the scripts beside a stub test run. the stubs are written over,
+# never removed: a script a test left running would find the mac's own launchctl behind them
 setup() {
-    rm -rf "$root/a home" "$root/app" "$root/state" "$root/bin"
+    rm -rf "$root/a home" "$root/app" "$root/state"
     mkdir -p "$root/a home/.local/libexec/x-speak" "$root/a home/.local/share/x-speak" "$root/a home/Library/LaunchAgents" \
         "$root/app/daemon" "$root/app/script" "$root/state" "$root/bin"
     HOME="$root/a home"

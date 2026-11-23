@@ -198,9 +198,11 @@ final class Speaker: ReadTarget {
             try Task.checkCancellation()
             await macVoice.speak(chunk, settings(.system), onFirstWord: onAudio)
         case .gemini:
-            let pcm = try await geminiPCM(chunk, key: keys[.gemini], settings: settings(.gemini))
+            // read once: a save while it renders waits for the next chunk
+            let settings = settings(.gemini)
+            let pcm = try await geminiPCM(chunk, key: keys[.gemini], settings: settings)
             try Task.checkCancellation()
-            try player.schedule(pcm, settings(.gemini))
+            try player.schedule(pcm, settings)
             onAudio()
         // the kokoro server answers only once the whole chunk is rendered, so there is nothing to stream
         case .kokoro:

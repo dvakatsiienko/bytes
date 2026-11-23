@@ -38,8 +38,8 @@ the page AND the state behind it: a drag or a save is proven by the ranks the pa
 13. **infinite waveform** — toggle it on: a window owned by «x-speak» is on screen (`CGWindowListCopyWindowInfo`)
     and a `screencapture -l` of it shows moving bars across two shots; toggle off: the daemon stops feeding it
     (the pill hides unless its pin is on)
-14. **the daemon's scripts** — `pnpm --filter speak daemon:test`: the golden, argv, kokoro start, config, swap and
-    try lines each read whole («n/n»). a rollback or a try run on the live mac only on dima's word, announced
+14. **the daemon's scripts** — `pnpm --filter speak daemon:test`: every family's line, from golden to try, reads whole («n/n»). a rollback or a try run on the live mac only on dima's word, announced
+15. **the admin's tests** — `pnpm --filter speak test`: green
 
 ## essentials
 

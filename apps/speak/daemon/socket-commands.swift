@@ -13,11 +13,8 @@ final class SocketCommands: DaemonCommands {
         self.configFile = configFile
     }
 
-    func status() -> [String: Any] {
-        [
-            "engines": speaker.health(), "accessibility": AXIsProcessTrusted(),
-            "speaking": speaker.isSpeaking, "paused": speaker.isPaused,
-        ]
+    func status() -> Status {
+        Status(engines: speaker.health(), isTrusted: AXIsProcessTrusted(), isSpeaking: speaker.isSpeaking, isPaused: speaker.isPaused)
     }
 
     func voices() -> [[String: String]] { installedVoices() }
