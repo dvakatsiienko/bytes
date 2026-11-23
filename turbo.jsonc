@@ -35,9 +35,10 @@
     "ATELIER_TAKES_DIR",
     // design-loupe: the job it serves (the test fixture, a verifier's copy)
     "LOUPE_JOB",
-    // chords: a second daemon beside the live one, its port and its source (a test pair, a verifier round)
+    // chords: a second daemon beside the live one — its port, its source, the build it serves (a test pair, a verifier round)
     "CHORDS_PORT",
-    "CHORDS_DAEMON"
+    "CHORDS_DAEMON",
+    "CHORDS_DIST"
   ],
   "tasks": {
     // A no-op task with no matching script anywhere. It exists so `lint` and

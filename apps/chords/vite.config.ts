@@ -35,6 +35,7 @@ const buildStamp = (): Plugin => ({
       '--',
       '.',
       '../../packages/kit',
+      '../../pnpm-lock.yaml',
     );
 
     return [

@@ -12,8 +12,8 @@
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "@fontsource/ibm-plex-mono/600.css";
 
-/* The kit's build badge, the one kit component here: tailwind scans its two files, and the kit's colour
- * names below point at this palette. */
+/* The kit's build badge, the one kit component here: tailwind scans its two files, the kit's colour names
+ * below point at this palette, and its blurred shadow goes (DESIGN.md § Zero Blur). */
 @source "../../../packages/kit/src/components/build-badge.tsx";
 @source "../../../packages/kit/src/components/button.tsx";
 
@@ -358,4 +358,9 @@
       transition: none;
     }
   }
+}
+
+[data-slot="build-badge"] {
+  box-shadow: none;
+  backdrop-filter: none;
 }

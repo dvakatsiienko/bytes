@@ -1,6 +1,7 @@
 /**
  * Who answers on the api's port: `none` when it refuses, `daemon` when it answers like frame's hotkey
- * daemon, `other` for anything else — a stray server, or a socket that never answers.
+ * daemon, `outdated` when that daemon predates the chord rule on the wire, `other` for anything else —
+ * a stray server, or a socket that never answers.
  */
 export const apiHolder = async (port: number): Promise<ApiHolder> => {
   try {
@@ -10,7 +11,7 @@ export const apiHolder = async (port: number): Promise<ApiHolder> => {
     });
     const body: unknown = await answer.json();
 
-    return isDaemonAnswer(answer.status, body) ? 'daemon' : 'other';
+    return holderOf(answer.status, body);
   } catch (error) {
     return isRefused(error) ? 'none' : 'other';
   }
@@ -18,14 +19,15 @@ export const apiHolder = async (port: number): Promise<ApiHolder> => {
 
 /* Helpers */
 
-// 503 is the daemon before its first scan
-const isDaemonAnswer = (status: number, body: unknown) => {
-  if (typeof body !== 'object' || body === null) return false;
-  if (status === 503) {
-    return 'error' in body && String(body.error).startsWith('no scan yet');
+const holderOf = (status: number, body: unknown): ApiHolder => {
+  if (typeof body !== 'object' || body === null) return 'other';
+  // the daemon before its first scan
+  if (status === 503 && 'error' in body) {
+    return String(body.error).startsWith('no scan yet') ? 'daemon' : 'other';
   }
+  if (!('hotkeys' in body && Array.isArray(body.hotkeys))) return 'other';
 
-  return 'hotkeys' in body && Array.isArray(body.hotkeys);
+  return 'modifierOrder' in body ? 'daemon' : 'outdated';
 };
 
 const isRefused = (error: unknown) =>
@@ -33,4 +35,4 @@ const isRefused = (error: unknown) =>
   (error.cause as { code?: string } | undefined)?.code === 'ECONNREFUSED';
 
 /* Types */
-export type ApiHolder = 'daemon' | 'none' | 'other';
+export type ApiHolder = 'daemon' | 'none' | 'other' | 'outdated';
