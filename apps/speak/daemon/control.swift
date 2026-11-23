@@ -39,10 +39,6 @@ final class Heartbeat: @unchecked Sendable {
 
 let heartbeat = Heartbeat()
 
-func seconds(_ duration: Duration) -> String {
-    String(format: "%.1f s", Double(duration.components.seconds) + Double(duration.components.attoseconds) / 1e18)
-}
-
 final class Control: @unchecked Sendable {
     // concurrent: a status must never queue behind another request's 2 s wait on a blocked main
     private let queue = DispatchQueue(label: "x-speak.control", attributes: .concurrent)

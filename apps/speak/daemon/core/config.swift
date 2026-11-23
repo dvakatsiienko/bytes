@@ -10,11 +10,6 @@ enum Engine: String, CaseIterable {
     func speaks(_ lang: Lang) -> Bool { self != .kokoro || lang == .en }
 }
 
-func log(_ line: String) {
-    let stamp = ISO8601DateFormatter.string(from: Date(), timeZone: .current, formatOptions: [.withFullDate, .withDashSeparatorInDate, .withSpaceBetweenDateAndTime, .withTime, .withColonSeparatorInTime, .withFractionalSeconds])
-    FileHandle.standardError.write(Data("\(stamp) \(line)\n".utf8))
-}
-
 struct Config: Decodable {
     // per language, tried in order; an engine that fails or runs out of quota is skipped silently
     let chain: [Lang: [Engine]]
