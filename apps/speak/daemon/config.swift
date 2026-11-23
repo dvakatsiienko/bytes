@@ -125,14 +125,15 @@ final class ConfigFile {
     @discardableResult
     func refresh() -> String? {
         let stamp = try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
-        guard stamp != loadedStamp else { return lastError }
+        // a file that is not there has no stamp: it still gets its one «kept» line, or a wrong --config runs silent
+        guard stamp != loadedStamp || (stamp == nil && lastError == nil) else { return lastError }
         loadedStamp = stamp
         do {
             current = try JSONDecoder().decode(Config.self, from: Data(contentsOf: url))
             lastError = nil
             log("config: loaded \(url.path) — \(current.summary)")
         } catch {
-            lastError = "\(url.lastPathComponent): \(Self.describe(error))"
+            lastError = "\(url.path): \(stamp == nil ? "not readable" : Self.describe(error))"
             log("config: kept the last good one — \(lastError!)")
         }
         return lastError

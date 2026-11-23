@@ -46,7 +46,9 @@ pre-commit:
     # speak's daemon is swift, and linux ci has no swiftc: its tests (the
     # normalizer's golden cases, the argv parser) run here, on the mac.
     - name: speak-daemon-test
-      glob: 'apps/speak/daemon/**'
+      glob:
+        - 'apps/speak/daemon/**'
+        - 'apps/speak/script/**'
       run: if command -v swiftc >/dev/null; then pnpm --filter speak daemon:test; fi
 
 pre-push:

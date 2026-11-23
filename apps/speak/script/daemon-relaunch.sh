@@ -1,12 +1,13 @@
 #!/bin/sh
 # restarts the launchd job com.dima.x-speak onto the installed binary. bootout, wait, bootstrap: `kickstart -k`
 # right after a swap died with OS_REASON_CODESIGNING and sat out the 30 s throttle (3 of 3, 2026-09-30).
-# a relaunch cuts a read in progress, so it refuses while the daemon is speaking.
+# a relaunch cuts a read in progress, so it refuses while the daemon is speaking; a daemon too stuck to
+# answer in 2 s is relaunched.
 # usage: script/daemon-relaunch.sh — the plist is ~/Library/LaunchAgents/com.dima.x-speak.plist (frame's schedule/)
 set -eu
 label=com.dima.x-speak
 domain="gui/$(id -u)"
-status=$(printf '%s\n' '{"op":"status"}' | nc -U "$HOME/.local/share/x-speak/control.sock" 2>/dev/null || true)
+status=$(printf '%s\n' '{"op":"status"}' | nc -U -w 2 "$HOME/.local/share/x-speak/control.sock" 2>/dev/null || true)
 case "$status" in
 *'"speaking":true'*)
     echo "relaunch: x-speak is reading aloud now — wait for it to end" >&2
