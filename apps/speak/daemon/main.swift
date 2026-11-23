@@ -5,7 +5,7 @@
 import AppKit
 
 // the one value that hands each part what it needs. chain, voices, speed, gain and the first-audio budget live in
-// config.json, read again on the next F4 after a save; the paths come in on argv (core/arguments.swift)
+// the settings file (core/config-store.swift), read again on the next F4 after a hand edit
 @MainActor
 final class App {
     let arguments: Arguments
@@ -34,7 +34,7 @@ final class App {
         self.arguments = arguments
         let paths = Paths()
         self.paths = paths
-        let configStore = ConfigStore(URL(fileURLWithPath: arguments.configPath))
+        let configStore = ConfigStore(URL(fileURLWithPath: arguments.settings(paths)))
         self.configStore = configStore
         keys = Keys(run: arguments.keysRunPath)
         kokoro = KokoroServer(paths: paths, mayStart: arguments.mayStartKokoro, voice: { configStore.current[.kokoro].voice(for: .en) })
@@ -73,6 +73,7 @@ final class App {
         let registered = hotkeys.register()
         // with the prompt option macos itself asks for the grant, naming this exact process — no guessing which entry
         let isTrusted = AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
+        if arguments.configPath != paths.settings { log("config: --config names \(arguments.configPath), the settings are at \(paths.settings)") }
         log("daemon: \(registered), accessibility \(isTrusted ? "granted" : "missing — macos shows its grant prompt")")
     }
 }

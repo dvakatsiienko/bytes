@@ -33,6 +33,8 @@ final class ConfigStore {
     private var hasLoaded = false
     private(set) var current = Config.fallback
 
+    var path: String { url.path }
+
     private let write: (String) -> Void
 
     init(_ url: URL, log write: @escaping (String) -> Void = log) {

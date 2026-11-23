@@ -4,6 +4,11 @@ installed="$install_dir/x-speak"
 kept="$install_dir/x-speak.prev"
 rolled_back="$kept.rolled-back"
 label=com.dima.x-speak
+# the daemon's own place for its settings (daemon/core/paths.swift), and the file they were moved from with its hash
+settings="$HOME/Library/Application Support/speak/config.json"
+moved_from="$settings.moved-from"
+
+sha_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
 
 daemon_status() {
     printf '%s\n' '{"op":"status"}' | nc -U -w 2 "$HOME/.local/share/x-speak/control.sock" 2>/dev/null || true
@@ -36,6 +41,13 @@ running_argument() {
     if [ -n "$argument" ]; then printf '%s\n' "$argument"; else config_argument; fi
 }
 
+# where the running daemon reads its settings. a daemon from before they had a place of their own names none, and reads
+# its argument
+running_settings() {
+    named=$(daemon_status | sed -n 's/.*"settings":"\([^"]*\)".*/\1/p' | sed 's#\\/#/#g')
+    if [ -n "$named" ]; then printf '%s\n' "$named"; else running_argument; fi
+}
+
 # what the next start gets
 config_argument() {
     args="$HOME/Library/LaunchAgents/$label.plist"
@@ -55,10 +67,11 @@ lock_binaries() {
     trap 'rmdir "$install_dir/x-speak.lock"' EXIT
 }
 
-# what the kept binary ran with: its config argument, then its settings
+# what the kept binary ran with: its config argument, its settings' values, and where it read them
 record_kept() {
     printf '%s\n' "$1" >"$kept.config"
     printf '%s\n' "$2" >"$kept.settings"
+    printf '%s\n' "$3" >"$kept.reads"
 }
 
 refuse() {

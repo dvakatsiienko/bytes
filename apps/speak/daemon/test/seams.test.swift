@@ -26,7 +26,7 @@ enum SeamsTest {
         let plain = { (line: String) in ask(line, { _ in }) }
         let settings = #"{"config":{"chain":{"en":["kokoro"]},"firstAudioMs":900},"ok":true,"version":"v2","was":"v1"}"#
         return check("op", [
-            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"speaking":true}"#),
+            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"settings":"at","speaking":true}"#),
             ("voices", plain(#"{"op":"voices"}"#), #"{"system":[{"id":"a"}]}"#),
             ("reload", plain(#"{"op":"reload"}"#), #"{"ok":true} | reload"#),
             ("reload with a bad file", ask(#"{"op":"reload"}"#) { $0.reloadError = "config.json: not readable" }, #"{"error":"config.json: not readable"} | reload"#),
@@ -76,7 +76,7 @@ enum SeamsTest {
         let ask = { (answers: Answers, line: String) -> String in
             let object = try? JSONSerialization.jsonObject(with: answers.answer(Data(line.utf8)))
             let json = object.flatMap { try? JSONSerialization.data(withJSONObject: $0, options: .sortedKeys) }
-            return (json.map { String(decoding: $0, as: UTF8.self) } ?? "?").replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ")
+            return (json.map { String(decoding: $0, as: UTF8.self) } ?? "?").replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "")
         }
         let status = #"{"op":"status"}"#, stop = #"{"op":"stop"}"#
         var rows: [(name: String, got: String, want: String)] = []
@@ -249,7 +249,7 @@ class Recorder: DaemonCommands {
     var calls: [String] = []
     var reloadError: String?
     var isSpeaking = true
-    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: false) }
+    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: false, settings: "at") }
     func voices() -> [[String: String]] { [["id": "a"]] }
     func reload() -> String? { calls.append("reload"); return reloadError }
     var refusal: SaveError?

@@ -21,7 +21,8 @@ mkdir -p build
 daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 
 trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
-build/x-speak-try --config "$PWD/config.json" "$text" &
+[ -f "$settings" ] || settings=$PWD/config.json
+build/x-speak-try --config "$settings" "$text" &
 child=$!
 while kill -0 "$child" 2>/dev/null; do
     daemon_speaks && refuse 'the live daemon started a read, this one stopped'

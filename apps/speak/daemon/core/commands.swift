@@ -21,9 +21,11 @@ struct Status {
     let isTrusted: Bool
     let isSpeaking: Bool
     let isPaused: Bool
+    // where the settings are: a rollback reads it to know whether an older daemon looks elsewhere
+    let settings: String
 
     var reply: [String: Any] {
-        ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused]
+        ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused, "settings": settings]
     }
 }
 

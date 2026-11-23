@@ -8,6 +8,8 @@
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib/daemon-installed.sh"
+# a daemon with no settings runs on its built-in defaults: kokoro and the mac voice, no chain of dima's
+[ -f "$settings" ] || refuse "no settings at $settings — script/settings-move.sh brings them, a new mac copies daemon/config.json there"
 "$here/daemon-test.sh"
 cd "$here/../daemon"
 mkdir -p build
@@ -31,7 +33,7 @@ if [ "$runs" = yes ] || { [ -f "$installed" ] && [ ! -f "$kept" ]; }; then
     cp "$installed" "$kept.new"
     mv -f "$kept.new" "$kept"
     rm -f "$rolled_back"
-    if [ "$runs" = yes ]; then record_kept "$(running_argument)" "$(settings_line)"; else record_kept '' ''; fi
+    if [ "$runs" = yes ]; then record_kept "$(running_argument)" "$(settings_line)" "$(running_settings)"; else record_kept '' '' ''; fi
 fi
 mv -f build/x-speak "$installed"
 echo "installed $installed — script/daemon-relaunch.sh starts it"

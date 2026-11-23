@@ -11,11 +11,12 @@
 - **first audio budget** — how long a cloud engine may take to start speaking before the chain moves on
 - **benched** — an engine the daemon skips for a while after a quota, auth or network failure
 - **no quota** — an engine its provider reports out of credits, found by the daemon's quota probe (at start, on a status older than 10 min, right after a refused request); benched until the provider's refill date (elevenlabs) or for an hour (fish's api balance), and cleared when the probe sees credits again or the engine next succeeds
-- **x-speak** — the resident daemon (`daemon/`) that owns the hotkeys (F4 reads, or pauses / resumes with nothing selected; ⇧F4 pauses / resumes; F5 stops), the engines and config.json
+- **x-speak** — the resident daemon (`daemon/`) that owns the hotkeys (F4 reads, or pauses / resumes with nothing selected; ⇧F4 pauses / resumes; F5 stops), the engines and the settings file
 - **pill** — the small floating window x-speak shows while it speaks: its wave, ⏸ / ▶, ■, stick and close; it keeps its spot per display
 - **pill glide** — how long the pill's bars take to reach a new level, in ms (`meterGlideMs`)
 - **pill flow** — how long the pill's wave holds before moving one bar outward, in ms (`meterFlowMs`)
+- **settings file** — dima's knobs on this mac, `~/Library/Application Support/speak/config.json`; the daemon alone writes it
 - **settings version** — the mark of the settings file's bytes; a save names the one it edits, and is refused when the file moved on
-- **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with
+- **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with and where it read them
 - **rollback** — the kept binary and the installed one change places and the daemon restarts; a second one comes forward again
 - **try run** — one text spoken by a tree's own daemon build, beside the live daemon

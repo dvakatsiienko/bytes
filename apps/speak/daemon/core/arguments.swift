@@ -1,5 +1,6 @@
 // the daemon's argv. its launchd job hands it every path it needs, so no source file names a repo:
-//   --config <path>     config.json, required
+//   --config <path>     required. the settings a one-shot speaks with; the daemon's are at their one place (paths.swift),
+//                       and it only says so when this names another
 //   --keys-run <path>   the script that runs a command with the api keys in its environment; none: no cloud keys
 //   --engine <name>     a one-shot run through that engine only
 // whatever is left is the text of a one-shot run; with none left, the process is the daemon.
@@ -9,6 +10,8 @@ struct Arguments: Equatable {
     var keysRunPath: String?
     var engine: String?
     var text: [String] = []
+
+    func settings(_ paths: Paths) -> String { text.isEmpty ? paths.settings : configPath }
 
     // a one-shot leaves when it has spoken, so a server it started would be nobody's
     var mayStartKokoro: Bool { text.isEmpty }

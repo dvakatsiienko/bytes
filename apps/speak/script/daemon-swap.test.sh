@@ -145,6 +145,65 @@ setup; build new; started; touch "$state/other"; rollback
 is 'launchd running another binary is an error' '1' "$code"
 says 'launchd running another binary is named' 'another binary'
 
+# the settings move out of the file the launchd job names, once, and every byte is checked
+move() { out=$("$root/app/script/settings-move.sh" "$@" 2>&1); code=$?; }
+sha() { shasum -a 256 "$1" | cut -d' ' -f1; }
+unmoved() { setup; rm "$place"; old="$state/old place.json"; echo tracked >"$old"; plist "$old"; echo "$old" >"$state/argument"; }
+places() { printf '%s/%s' "$(cat "$old" 2>/dev/null || echo none)" "$(cat "$place" 2>/dev/null || echo none)"; }
+unmoved; move "$(sha "$old")"
+is 'the settings move, and the old file stays' '0 tracked/tracked' "$code $(places)"
+says 'the settings moved: the line names the new place' "$place"
+move "$(sha "$old")"
+is 'a second move: refused' '1 tracked/tracked' "$code $(places)"
+says 'a second move: says they are there' 'already at'
+unmoved; hash=$(sha "$old"); echo edited >"$old"; move "$hash"
+is 'a file that changed since its hash: refused' '1 edited/none' "$code $(places)"
+unmoved; move
+is 'no hash: refused' '1 tracked/none' "$code $(places)"
+unmoved; hash=$(sha "$old"); rm "$old"; move "$hash"
+is 'no file where the job points: refused' '1 none/none' "$code $(places)"
+unmoved; stub cp 'for last in "$@"; do :; done; echo torn >"$last"'; move "$(sha "$old")"; rm "$root/bin/cp"
+is 'a torn copy: refused, no settings appear' '1 tracked/none' "$code $(places)"
+
+unmoved; build new
+is 'a build with no settings at their place: refused, nothing changes' '1 old/none' "$code $(pair)"
+says 'a build with no settings at their place: names the move' 'settings-move.sh'
+
+# the daemon before the move names no settings in its status; the one after it does
+before_move() { printf '{"speaking":false}' >"$state/status"; }
+after_move() { printf '{"speaking":false,"settings":"%s"}' "$place" >"$state/status"; }
+moved() { unmoved; before_move; move "$(sha "$old")"; build new; started; after_move; echo today >"$place"; }
+moved
+is 'the kept daemon is known by the file it read' "$old" "$(content_of x-speak.prev.reads)"
+rollback
+is 'back to a daemon from before the move: its file gets the settings of today' '0 old/new today/today' "$code $(pair) $(places)"
+says 'back to a daemon from before the move: says where they went' "copied to $old"
+is 'the daemon put aside is known by the place it read' "$place" "$(content_of x-speak.prev.reads)"
+before_move; echo saved by the old one >"$old"; rollback
+is 'forward again: nothing is copied, either way' '0 new/old saved by the old one/today' "$code $(pair) $(places)"
+after_move; rollback
+is 'back once more, with a change in the old file: refused, the binaries stay' '1 new/old saved by the old one/today' "$code $(pair) $(places)"
+says 'back once more, with a change in the old file: says so' 'changed since the settings moved'
+is 'a refusal never relaunches' '2' "$(relaunches)"
+moved; rollback; before_move; rollback; after_move; echo later >"$place"; rollback
+is 'back once more, the old file as the rollback left it: the settings go along' '0 old/new later/later' "$code $(pair) $(places)"
+moved; echo hand edit >"$old"; rollback
+is 'the old file changed since the move: refused before anything moves' '1 new/old hand edit/today' "$code $(pair) $(places)"
+moved; rm "$place.moved-from"; rollback
+is 'no word of where the settings came from: refused' '1 new/old tracked/today' "$code $(pair) $(places)"
+moved; plist /elsewhere.json; rollback
+is 'the job names a third file: refused' '1 new/old tracked/today' "$code $(pair) $(places)"
+moved; plist "$place"; rollback
+is 'the job names the new place too: nothing to copy' '0 old/new tracked/today' "$code $(pair) $(places)"
+moved; rm "$libexec/x-speak.prev.reads"; rollback
+is 'a daemon kept by an older build counts as from before the move' '0 old/new today/today' "$code $(pair) $(places)"
+moved; stub_file "$root/app/script/daemon-relaunch.sh" 'echo reading aloud >&2; exit 3'; rollback
+is 'a refused relaunch: the old file is back as it was' '1 new/old tracked/today' "$code $(pair) $(places)"
+is 'a refused relaunch: the old file still counts as unchanged' "$(sha "$old")" "$(sed -n 2p "$place.moved-from")"
+is 'a refused relaunch: the kept daemon is known as before' "$old" "$(content_of x-speak.prev.reads)"
+setup; build new; started; rollback
+is 'two daemons that read the new place: nothing is copied' '0 today' "$code $(cat "$place")"
+
 # the first run stays inside its relaunch until `go` appears
 held() {
     cp "$root/app/script/daemon-relaunch.sh" "$root/app/script/real-relaunch.sh"
