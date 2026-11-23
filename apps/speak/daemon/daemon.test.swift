@@ -44,6 +44,7 @@ struct DaemonTest {
             (["--config", "/c.json", "--keys-run"], .failure(.missingValue("--keys-run"))),
             (["--config", "/c.json", "--keysrun", "/op-run.sh"], .failure(.unknownFlag("--keysrun"))),
             (["--config", "/c.json", "--engine", "kokoro"], .failure(.engineWithoutText)),
+            (["--config", "/c.json", "-keys-run", "/op-run.sh"], .failure(.unknownFlag("-keys-run"))),
         ]
         var failed = 0
         for item in cases {

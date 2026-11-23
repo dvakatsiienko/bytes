@@ -17,6 +17,8 @@ not deployed anywhere, and it carries no `vercel.json`: it edits this mac's `dae
 are impeccable's files: change them through it, never by hand.
 📌 before a design or build change, read `docs/readaloud-playbook.md`: the read-aloud practices, the bar and the voice safety rule.
 
+📌 **kit**: speak's controls are its own until its v2 redesign ([FRM-288](https://linear.app/x-com/issue/FRM-288)), which adopts `@ui/kit`; it moved into bytes as it was.
+
 ## the daemon
 
 the admin reaches x-speak only through `~/.local/share/x-speak/control.sock` — one json line each way: `status`,
@@ -42,6 +44,7 @@ re-reads the file on the next F4 after a save.
   on drop fought dnd-kit's optimistic dom move, and the page and the ranks disagreed after a keyboard drag
 - **only a chain card registers with dnd-kit** — it stamps `role` and a tab stop on what it registers, which broke
   the list semantics on the cards outside the chain
+- **every write to the api carries `content-type: application/json`**, or the server answers 415: that header is what keeps another web page from driving the daemon; a `curl -X PUT` needs `-H 'content-type: application/json'`
 - the voice lists are data in `server.ts`, each id proven by a real call (elevenlabs premades on the restricted key,
   kokoro on the warm server); a library voice answers 402 on a restricted key
 - **the swift tests run only on the mac**: `pnpm --filter speak daemon:test`, run by lefthook on a commit under `daemon/`; bytes' linux ci runs no swift

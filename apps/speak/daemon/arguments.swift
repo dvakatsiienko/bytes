@@ -3,7 +3,7 @@
 //   --keys-run <path>   the script that runs a command with the api keys in its environment; none: no cloud keys
 //   --engine <name>     a one-shot run through that engine only
 // whatever is left is the text of a one-shot run; with none left, the process is the daemon.
-// an unknown --word is refused, never spoken: a typo in the launchd job must not turn the daemon into a one-shot
+// an unknown -word is refused, never spoken: a typo in the launchd job must not turn the daemon into a one-shot
 struct Arguments: Equatable {
     var configPath: String
     var keysRunPath: String?
@@ -18,7 +18,7 @@ struct Arguments: Equatable {
         var rest = argv[...]
         while let word = rest.popFirst() {
             guard ["--config", "--keys-run", "--engine"].contains(word) else {
-                guard !word.hasPrefix("--") else { throw ArgumentsError.unknownFlag(word) }
+                guard !word.hasPrefix("-") else { throw ArgumentsError.unknownFlag(word) }
                 text.append(word)
                 continue
             }
