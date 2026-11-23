@@ -1,5 +1,12 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, expect, it } from 'vitest';
@@ -66,14 +73,31 @@ it('the dev script takes its port from frame and holds none of its own', () => {
   expect(dev).not.toMatch(fourDigits);
 
   writePorts(
-    'export const chordsPort = 7901; export const chordsDevPort = 7902;',
+    'export const chordsPort = 7901; export const chordsDevPort = Number(process.env.CHORDS_DEV_PORT ?? 7902);',
   );
 
-  const printed = execFileSync(
-    process.execPath,
-    [join(import.meta.dirname, 'dev-port.ts')],
-    { encoding: 'utf8', env: { ...process.env, CHORDS_DAEMON: daemon } },
+  const root = mkdtempSync(join(tmpdir(), 'chords-dev-'));
+
+  mkdirSync(join(root, 'script'));
+  mkdirSync(join(root, 'apps/chords'), { recursive: true });
+  symlinkSync(import.meta.dirname, join(root, 'apps/chords/script'));
+  writeFileSync(
+    join(root, 'script/with-port.ts'),
+    'console.log(process.argv.slice(2).join(" "));',
   );
 
-  expect(printed).toBe('7902\n');
+  const printed = execFileSync('sh', ['-c', dev], {
+    cwd: join(root, 'apps/chords'),
+    encoding: 'utf8',
+    // a colour or a second daemon's dev port in the shell must not reach the number
+    env: {
+      ...process.env,
+      CHORDS_DAEMON: daemon,
+      CHORDS_DEV_PORT: '7999',
+      FORCE_COLOR: '1',
+    },
+  });
+
+  rmSync(root, { recursive: true });
+  expect(printed).toBe('7902 node script/dev.ts\n');
 });

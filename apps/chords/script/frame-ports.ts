@@ -13,6 +13,10 @@ export const readFramePorts = async (daemon: string): Promise<FramePorts> => {
   if (!existsSync(daemon)) throw new Error(`no daemon at ${daemon}`);
   if (!existsSync(path)) throw new Error(`no ports.ts beside ${daemon}`);
 
+  // the live daemon takes saves from its own dev port, so this shell's override would only hide a mismatch
+  // biome-ignore lint/suspicious/noUndeclaredEnvVars: turbo strips it, as this line does
+  delete process.env.CHORDS_DEV_PORT;
+
   const { chordsDevPort, chordsPort } = await import(path);
 
   if (!(isPort(chordsDevPort) && isPort(chordsPort))) {
