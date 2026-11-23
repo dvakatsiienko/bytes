@@ -33,7 +33,7 @@ there. what the page reads:
   the edit exactly, `400` when a field is missing or carries a control character
 
 📌 **the page holds no chord rule**: which modifier comes first is frame's `chord.ts`, and it travels
-with the bindings answer. the page joins a layer and a key, never sorts modifiers on its own.
+with the bindings answer. the page joins a layer and a key, and sorts modifiers only by the order it was sent.
 
 📌 **both writing routes take a write from a loopback peer only, demand `application/json` and
 refuse an unknown `Origin`.** the phone on the wi-fi reads and never writes; the last two checks
@@ -54,6 +54,8 @@ writes answer 403. `CHORDS_PORT` + `CHORDS_DAEMON` give it a daemon of its own (
 
 ## conventions
 
+- **the layer and the selected key sit in search params** (`/?layer=…&key=…`), against bytes' § URL Shape: the
+  addresses moved in unchanged (BYT-109), the path shape belongs to the kit chunk
 - the guides bind here: `x:guide-react` for components, `x:guide-typescript` for types,
   `x:guide-ui-ux` for anything rendered. `DESIGN.md` binds on top of them for this app
 - the keyboard layout table in `src/keyboard.ts` carries a `biome-ignore format` line on purpose:
