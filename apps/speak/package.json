@@ -13,7 +13,8 @@
     "daemon:test": "script/daemon-test.sh",
     "daemon:try": "script/daemon-try.sh",
     "lint": "biome lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@dnd-kit/helpers": "0.5.3",
