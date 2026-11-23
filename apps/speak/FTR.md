@@ -221,11 +221,11 @@
 - ✅ `pnpm --filter speak daemon:build` installs the signed daemon to `~/.local/libexec/x-speak/x-speak`, with no launchd change
   - makes: `~/.local/libexec/x-speak/x-speak`, signed «x-speak local signing»
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
-- ⬜ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
+- ✅ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
   - makes: `~/.local/libexec/x-speak/x-speak.prev`, kept by each build from the binary that was running
   - given a build that was relaunched, when the rollback runs, then the daemon that ran before it answers `status`, named by its hash, with its settings and config argument held against the ones it ran with at the build
   - given nothing kept, a kept binary with another signature, or a daemon reading aloud, then it refuses in one line and the binaries stay as they were
-- ⬜ `pnpm speak:try "<text>"` (`daemon:try`) speaks one text with this tree's daemon, built beside the live one
+- ✅ `pnpm speak:try "<text>"` (`daemon:try`) speaks one text with this tree's daemon, built beside the live one
   - makes: `daemon/build/x-speak-try`, in the tree
   - given the live daemon quiet, when it runs, then the text is heard, and the live daemon answers `status` before and after and keeps its keys
   - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
