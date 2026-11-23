@@ -143,10 +143,10 @@ const routes: Record<string, (request: IncomingMessage) => Promise<unknown>> = {
   }),
   'POST /api/pause': async () => daemon({ op: 'pause' }),
   'POST /api/preview': async (request) =>
-    daemon({ op: 'preview', ...(await body(request)) }),
+    daemon({ ...(await body(request)), op: 'preview' }),
   'POST /api/stop': async () => daemon({ op: 'stop' }),
   'POST /api/wave': async (request) =>
-    daemon({ op: 'wave', ...(await body(request)) }),
+    daemon({ ...(await body(request)), op: 'wave' }),
   'PUT /api/config': async (request) => {
     writeFileSync(CONFIG, biomeFormatted(await body(request)));
     return daemon({ op: 'reload' });
@@ -164,14 +164,19 @@ const routes: Record<string, (request: IncomingMessage) => Promise<unknown>> = {
 };
 
 createServer(async (request, response) => {
-  const route = routes[`${request.method} ${request.url}`];
-  if (!route) {
+  // a write must say it is json: a browser sends that header cross-origin only after a preflight, which this
+  // server never answers, so no other page can drive the daemon or save the config
+  if (
+    request.method !== 'GET' &&
+    !request.headers['content-type']?.startsWith('application/json')
+  )
+    return send(response, 415, { error: 'send application/json' });
+  try {
+    const route = routes[`${request.method} ${request.url}`];
+    if (route) return send(response, 200, await route(request));
     if (request.method === 'GET' && !request.url?.startsWith('/api/'))
       return sendStatic(response, request.url ?? '/');
-    return send(response, 404, { error: 'not found' });
-  }
-  try {
-    send(response, 200, await route(request));
+    send(response, 404, { error: 'not found' });
   } catch (error) {
     send(response, 400, { error: (error as Error).message });
   }

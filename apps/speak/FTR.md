@@ -136,6 +136,10 @@
   - when it is saved
   - then the status line reads «rejected — config.json: unknown name «…» …» and the daemon keeps its last good config
 
+- ✅ only the admin page can write: another web page's request is refused
+  - given a POST or PUT to the api without `content-type: application/json`
+  - then the server answers 415, nothing is saved and the daemon hears nothing
+
 ## x-speak — hotkey + pill
 
 - ✅ F4 reads the selected text aloud, cutting off whatever plays
