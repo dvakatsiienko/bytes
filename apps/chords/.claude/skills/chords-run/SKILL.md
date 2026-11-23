@@ -28,7 +28,6 @@ only itself. the press log is shared and read-only.
 
 ```bash
 cp -R ~/frame/hotkeys <scratch>/hotkeys
-mkdir -p <scratch>/script/lib && cp ~/frame/script/lib/print.ts <scratch>/script/lib/
 pnpm --filter chords chords:build
 CHORDS_PORT=7383 CHORDS_DAEMON=<scratch>/hotkeys/live.ts CHORDS_DIST=$PWD/apps/chords/dist pnpm --filter chords dev
 ```

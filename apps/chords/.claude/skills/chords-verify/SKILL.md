@@ -53,6 +53,16 @@ this skill never re-describes launching.
 6. **stats renders** — `find role button click --name stats --exact` → `/stats`: the totals row
    and the CHORDS / TIME PER APP lists (DOM bars, no chart svg), `errors` at 0.
 
+7. **the badge is dev only** — on the dev page `[data-slot=build-badge]` reads the branch, with
+   `box-shadow` and `backdrop-filter` both `none` (computed); on `:7383` the element is absent.
+8. **the run script reads the port** — in `apps/chords`, each on a free `PORT`: `CHORDS_PORT` refusing and
+   `CHORDS_DAEMON` a copy → the listener's parent is `script/dev.ts`, and a `kill` of the `with-port` pid
+   leaves both ports free within 3 s; a daemon already there → «already served», the page alone, the
+   listener's pid unchanged (with `CHORDS_DAEMON` set it refuses, exit 1); an html server there → exit 1; a
+   daemon whose answer lacks `modifierOrder` → «older than this page», exit 1.
+9. **the built page names its commit** — after `chords:build` on a clean tree, the `build-commit` meta in
+   `dist/index.html` equals `git rev-parse HEAD`; with an app file edited it ends in `-dirty`.
+
 ## the false lead — `aria-disabled` on caps
 
 dnd-kit sets `aria-disabled="true"` on every cap whose drag is off: 61 of 84 on main, and they are

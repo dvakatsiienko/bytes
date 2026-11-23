@@ -32,8 +32,4 @@ const child = spawn(cmd, args, {
   env: { ...process.env, PORT: port, PORT_OFFSET: String(offset) },
   stdio: 'inherit',
 });
-// a kill of this wrapper alone must not leave the server running on its port; ctrl-c reaches both by itself
-for (const signal of ['SIGTERM', 'SIGHUP'] as const) {
-  process.on(signal, () => child.kill(signal));
-}
 child.on('exit', (code, signal) => process.exit(code ?? (signal ? 1 : 0)));

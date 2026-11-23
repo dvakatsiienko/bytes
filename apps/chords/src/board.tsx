@@ -16,6 +16,7 @@ import { Notice, apiTrouble } from '@/components/Notice.tsx';
 
 import {
   type Hotkey,
+  type NoteInput,
   type NoteStore,
   postManualMove,
   putNote,
@@ -55,7 +56,9 @@ export const BoardPage = (props: BoardPageProps) => {
   const notes = notesQuery.data ?? EMPTY_NOTES;
   // stats hands a chord back as ?layer=&key=, so a row there opens the board on that key. An
   // absent param is not the same as an empty one: layer='' is the no-modifier layer.
-  const [layer, setLayer] = useState(props.params.get('layer') ?? 'hyper');
+  const [askedLayer, setLayer] = useState(props.params.get('layer') ?? 'hyper');
+  // a hand-typed url spells the modifiers in any order
+  const layer = canonicalQuery(askedLayer, modifierOrder);
   const [selected, setSelected] = useState<string | null>(
     props.params.get('key'),
   );
@@ -290,6 +293,10 @@ export const BoardPage = (props: BoardPageProps) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [listening]);
 
+  // the notes file is hand-editable, so its layer may stand in any order
+  const noteChord = (note: NoteInput) =>
+    joinChord(canonicalQuery(note.layer, modifierOrder), note.key);
+
   const saveNote = async (text: string) => {
     if (!selected) return;
 
@@ -303,7 +310,7 @@ export const BoardPage = (props: BoardPageProps) => {
   const notesMarkdown = () =>
     Object.values(notes)
       .sort((a, z) => (a.layer + a.key).localeCompare(z.layer + z.key))
-      .map((note) => `- ${joinChord(note.layer, note.key)} — ${note.text}`)
+      .map((note) => `- ${noteChord(note)} — ${note.text}`)
       .join('\n');
 
   // The selected list sits under a header that already shows the chord; the layer list does not.
@@ -329,7 +336,7 @@ export const BoardPage = (props: BoardPageProps) => {
     (note) =>
       needle === '' ||
       note.text.toLowerCase().includes(needle) ||
-      joinChord(note.layer, note.key).toLowerCase().includes(chordNeedle),
+      noteChord(note).toLowerCase().includes(chordNeedle),
   );
 
   const noteRowJSX = matchingNotes
@@ -337,7 +344,7 @@ export const BoardPage = (props: BoardPageProps) => {
     .map((note) => {
       return (
         <ListRow
-          chord={joinChord(note.layer, note.key)}
+          chord={noteChord(note)}
           color='var(--color-accent)'
           key={`${note.layer}-${note.key}`}>
           {note.text}

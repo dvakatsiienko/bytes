@@ -72,6 +72,12 @@ for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) {
   process.on(signal, () => stop(0));
 }
 
+// `with-port` passes no signal on: when it is killed alone, this process would keep both halves and the port
+const parent = process.ppid;
+setInterval(() => {
+  if (process.ppid !== parent) stop(1);
+}, 1000).unref();
+
 const holder = await apiHolder(chordsPort);
 
 if (holder === 'other') {
@@ -81,6 +87,11 @@ if (holder === 'outdated') {
   fail(`the daemon on ${chordsPort} is older than this page, restart it`);
 }
 if (holder === 'none') await startDaemon();
+if (holder === 'daemon' && process.env.CHORDS_DAEMON) {
+  fail(
+    `CHORDS_DAEMON names ${daemonPath}, but a daemon already serves ${chordsPort}`,
+  );
+}
 if (holder === 'daemon') {
   console.log(
     `chords: the api is already served on ${chordsPort}, starting the page alone`,
