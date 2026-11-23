@@ -2,7 +2,8 @@
 //   --config <path>     config.json, required
 //   --keys-run <path>   the script that runs a command with the api keys in its environment; none: no cloud keys
 //   --engine <name>     a one-shot run through that engine only
-// whatever is left is the text of a one-shot run; with none left, the process is the daemon
+// whatever is left is the text of a one-shot run; with none left, the process is the daemon.
+// an unknown --word is refused, never spoken: a typo in the launchd job must not turn the daemon into a one-shot
 struct Arguments: Equatable {
     var configPath: String
     var keysRunPath: String?
@@ -17,6 +18,7 @@ struct Arguments: Equatable {
         var rest = argv[...]
         while let word = rest.popFirst() {
             guard ["--config", "--keys-run", "--engine"].contains(word) else {
+                guard !word.hasPrefix("--") else { throw ArgumentsError.unknownFlag(word) }
                 text.append(word)
                 continue
             }
@@ -24,17 +26,20 @@ struct Arguments: Equatable {
             values[word] = value
         }
         guard let configPath = values["--config"] else { throw ArgumentsError.missingConfig }
+        guard values["--engine"] == nil || !text.isEmpty else { throw ArgumentsError.engineWithoutText }
         return Arguments(configPath: configPath, keysRunPath: values["--keys-run"], engine: values["--engine"], text: text)
     }
 }
 
 enum ArgumentsError: Error, Equatable, CustomStringConvertible {
-    case missingConfig, missingValue(String)
+    case missingConfig, missingValue(String), unknownFlag(String), engineWithoutText
 
     var description: String {
         switch self {
         case .missingConfig: "no --config: the daemon has no built-in config path"
         case .missingValue(let flag): "\(flag) needs a value"
+        case .unknownFlag(let flag): "unknown flag \(flag)"
+        case .engineWithoutText: "--engine is for a one-shot run: it needs text to speak"
         }
     }
 }
