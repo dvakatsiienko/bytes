@@ -159,7 +159,7 @@ describe('the routes over a daemon', () => {
     [
       'POST',
       '/api/preview',
-      '{"engine":"kokoro","text":"hi"}',
+      '{"engine":"kokoro","op":"stop","text":"hi"}',
       { engine: 'kokoro', op: 'preview', text: 'hi' },
     ],
   ])('%s %s asks the daemon', async (method, path, sent, want) => {

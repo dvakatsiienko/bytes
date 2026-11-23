@@ -23,7 +23,7 @@ done
 
 for line in '@MainActor let speaker = 1' '@MainActor var config: Int { 1 }' 'let configFile = 1' 'private let launch = 1' 'nonisolated(unsafe) var heartbeat = 1' \
     '@MainActor\nvar waveTuning: Int?' 'let controlSocket = "x"' 'private(set) var reads = 0' 'weak var panel: AnyObject?' \
-    '@available(macOS 15, *) let voice = 1' 'import os; let cache = 1' 'package let quota = 1' '@_spi(X)  public let quota = 1'; do
+    '@available(macOS 15, *) let voice = 1' 'import os; let cache = 1' 'package let quota = 1' '@_spi(X)  public let quota = 1' 'enum Shared { static var speaker = 1 }'; do
     app; printf '%b\n' "$line" >"$root/app/daemon/planted.swift"; run
     is "«${line}» in the shell fails the run" 1 "$code"
     says "«${line}» in the shell is named" 'planted.swift'

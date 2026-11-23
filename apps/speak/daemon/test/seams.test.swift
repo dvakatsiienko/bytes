@@ -10,6 +10,7 @@ enum SeamsTest {
         failed += await pressFailures()
         failed += pillFailures()
         failed += meterFailures()
+        failed += clockFailures()
         return failed
     }
 
@@ -45,6 +46,18 @@ enum SeamsTest {
             ("preview with no text", plain(#"{"op":"preview","engine":"kokoro"}"#), #"{"error":"preview needs engine and text"}"#),
             ("an unknown op", plain(#"{"op":"dance"}"#), #"{"error":"unknown op dance"}"#),
             ("no op", plain("{}"), "bad request"),
+        ])
+    }
+
+    // the log's two clocks: a press's milliseconds, a stall's seconds
+    static func clockFailures() -> Int {
+        let ms = { (ago: Duration) in Int(elapsed(.now - ago).dropLast(3)) ?? -1 }
+        return check("clock", [
+            ("a second and a half in ms", (1500..<2000).contains(ms(.milliseconds(1500))), true),
+            ("a minute in ms", (60_000..<60_500).contains(ms(.seconds(60))), true),
+            ("ms are named", elapsed(.now).hasSuffix(" ms"), true),
+            ("a second and a half", seconds(.milliseconds(1500)) == "1.5 s", true),
+            ("a minute", seconds(.seconds(60)) == "60.0 s", true),
         ])
     }
 
@@ -173,8 +186,8 @@ enum SeamsTest {
             ("the step's loudest", centre(0, 20, 0) { $0.push(1); $0.reset(); $0.push(0); $0.push(0) }, "0.00"),
             ("the step's count", centre(0, 20, 0) { $0.push(0); $0.reset(); $0.push(1) }, "0.00"),
             ("the last frame", centre(200, 10, 10) { _ = $0.frame(at: start); $0.reset(); $0.push(1) }, "0.04"),
-        ]) + check("sample voice", [0, 0.1, 0.35, 0.8, 1.4, 1.7].map { String(format: "%.3f", speechLevel(at: $0)) }.enumerated().map { index, got in
-            ("moment \(index)", got, ["0.325", "0.723", "0.745", "0.792", "0.020", "0.516"][index])
+        ]) + check("sample voice", [0, 0.1, 0.35, 0.8, 1.29, 1.31, 1.4, 1.7].map { String(format: "%.3f", speechLevel(at: $0)) }.enumerated().map { index, got in
+            ("moment \(index)", got, ["0.325", "0.723", "0.745", "0.792", "0.797", "0.020", "0.020", "0.516"][index])
         })
     }
 

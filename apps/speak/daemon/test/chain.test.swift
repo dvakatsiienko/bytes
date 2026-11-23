@@ -132,6 +132,12 @@ enum ChainTest {
                 "en: " + String(repeating: "word ", count: 12) + "here,", "en: " + String(repeating: "more ", count: 12) + "end.",
             ]),
             ("a long first sentence, its comma before the 40th character", cut([(.en, "Well, " + words)]), ["en: Well, " + words]),
+            ("a comma that is the 41st character", cut([(.en, String(repeating: "a", count: 40) + ", " + words)]), [
+                "en: " + String(repeating: "a", count: 40) + ",", "en: " + words,
+            ]),
+            ("a comma that is the 40th character", cut([(.en, String(repeating: "a", count: 39) + ", " + words)]), [
+                "en: " + String(repeating: "a", count: 39) + ", " + words,
+            ]),
             ("a long first sentence with no comma", cut([(.en, words)]), ["en: " + words]),
             ("a short first sentence with a comma", cut([(.en, "One, two.")]), ["en: One, two."]),
             ("a first sentence of 100 characters, a comma past the 40th", cut([(.en, hundred)]), ["en: " + hundred]),
