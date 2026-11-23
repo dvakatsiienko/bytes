@@ -197,7 +197,7 @@ the daemon and its scripts live in frame; `hotkeys/…` paths here are frame's.
 - ⬜ `pnpm dev:chords` starts the dev page, and the daemon with it when none runs
   - given nothing on 7373, then the daemon starts as the script's child and both stop together
   - given the daemon on 7373, then the script says the api is already served and starts the page alone
-  - given anything else on 7373, then it says so, starts nothing and exits non-zero
+  - given a daemon older than the page, or anything else on 7373, then it says so, starts nothing and exits non-zero
 - ⬜ `pnpm --filter chords chords:build` builds the page the daemon serves
   - makes: `apps/chords/dist/`, its `build-commit` meta naming the commit it came from
 - ✅ `pnpm hotkeys:scan` reads wispr flow, macos and `manual.ts`, and says nothing when all read

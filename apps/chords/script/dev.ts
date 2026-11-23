@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 import { chordsDevPort, chordsPort } from '../ports.ts';
-import { apiHolder } from './api-holder.ts';
+import { type ApiHolder, apiHolder } from './api-holder.ts';
 
 const daemonPath =
   process.env.CHORDS_DAEMON ?? join(homedir(), 'frame/hotkeys/live.ts');
@@ -53,17 +53,19 @@ const startDaemon = async () => {
     CHORDS_PORT: String(chordsPort),
   });
 
-  if (!(await answersBy(Date.now() + startDeadlineMs))) {
-    fail(`the daemon did not answer on ${chordsPort}`);
-  }
+  const started = await holderBy(Date.now() + startDeadlineMs);
+
+  if (started === 'outdated') fail(`${daemonPath} is older than this page`);
+  if (started !== 'daemon') fail(`the daemon did not answer on ${chordsPort}`);
 };
 
-const answersBy = async (deadline: number): Promise<boolean> => {
-  if ((await apiHolder(chordsPort)) === 'daemon') return true;
-  if (Date.now() > deadline) return false;
+const holderBy = async (deadline: number): Promise<ApiHolder> => {
+  const now = await apiHolder(chordsPort);
+
+  if (now !== 'none' || Date.now() > deadline) return now;
 
   await sleep(200);
-  return answersBy(deadline);
+  return holderBy(deadline);
 };
 
 for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) {
@@ -74,6 +76,9 @@ const holder = await apiHolder(chordsPort);
 
 if (holder === 'other') {
   fail(`something that is not the hotkey daemon holds ${chordsPort}`);
+}
+if (holder === 'outdated') {
+  fail(`the daemon on ${chordsPort} is older than this page, restart it`);
 }
 if (holder === 'none') await startDaemon();
 if (holder === 'daemon') {

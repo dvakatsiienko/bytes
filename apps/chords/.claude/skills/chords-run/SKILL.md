@@ -106,7 +106,7 @@ stop only what you started:
 
 ```bash
 agent-browser close
-for p in 7374 7383 7384; do lsof -nP -iTCP:$p -sTCP:LISTEN -t >/dev/null && echo "$p STILL BUSY" || echo "$p free"; done
+for p in 7383 <the port vite printed>; do lsof -nP -iTCP:$p -sTCP:LISTEN -t >/dev/null && echo "$p STILL BUSY" || echo "$p free"; done
 ```
 
 :7373 stays busy — that is the launchd daemon, and it is supposed to.

@@ -164,7 +164,7 @@ export const Board = (props: BoardProps) => {
 // read out of its own app's config, so a write here would be a lie the next scan erases.
 const Keycap = (props: KeycapProps) => {
   const isMod = modKeys.has(props.label);
-  const chord = joinChord(props.layer, props.label);
+  const chord = props.binds[0]?.chord ?? joinChord(props.layer, props.label);
   const hits = props.binds.length ? (props.presses[chord] ?? 0) : 0;
   const movable = props.binds.find((bind) => bind.source === 'manual');
   const isSource = props.dragging?.key === props.label;
