@@ -196,7 +196,7 @@ the daemon and its scripts live in frame; `hotkeys/…` paths here are frame's.
 
 - ✅ `pnpm dev:chords` starts the dev page, and the daemon with it when none runs
   - given nothing on 7373, then the daemon starts as the script's child and both stop together
-  - given the daemon on 7373, then the script says the api is already served and starts the page alone; on an offset port it names the port saves are taken from
+  - given the daemon on 7373, then the script says the api is already served and starts the page alone; on another port than frame's dev port it warns that saves may answer 403
   - given a daemon older than the page, or anything else on 7373, then it says so, starts nothing and exits non-zero
 - ✅ `pnpm --filter chords chords:build` builds the page the daemon serves
   - makes: `apps/chords/dist/`, its `build-commit` meta naming the commit it came from

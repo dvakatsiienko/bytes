@@ -53,7 +53,7 @@ hands the api's port to vite, so bare `vite` has no api. `7374` in the `dev` scr
 
 📌 vite does not rewrite `Origin` when it proxies, so a dev page's origin is its own port. the daemon takes
 writes from that pair only: a worktree's dev page (an offset port) on the live daemon reads, its writes answer
-403, and the run script says so. `CHORDS_PORT` + `CHORDS_DAEMON` give it a daemon of its own (`chords-run`).
+403, and the run script warns of it. `CHORDS_PORT` + `CHORDS_DAEMON` give it a daemon of its own (`chords-run`).
 
 ## conventions
 
