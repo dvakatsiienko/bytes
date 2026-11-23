@@ -13,6 +13,7 @@ import {
   type Lang,
   type Status,
 } from '@/api.ts';
+import { LIMITS, type Limit } from '@/limits.ts';
 
 export const EngineCard = (props: EngineCardProps) => {
   const label = ENGINE_LABELS[props.engine];
@@ -91,23 +92,21 @@ export const EngineCard = (props: EngineCardProps) => {
       <Slider
         info='how fast the voice talks. too fast → lower it. try 1.0'
         label='speed'
-        max={2}
-        min={0.5}
+        limit={LIMITS.speed}
         name={`${label} speed`}
         onChange={(value) => props.onSettings({ speed: value })}
         step={0.05}
-        value={props.settings.speed ?? 1}
+        value={props.settings.speed ?? LIMITS.speed.default}
       />
       {props.engine !== 'system' && (
         <Slider
           info='how loud the voice is. too quiet → raise it. try 1.5'
           label='gain'
-          max={4}
-          min={0}
+          limit={LIMITS.gain}
           name={`${label} gain`}
           onChange={(value) => props.onSettings({ gain: value })}
           step={0.1}
-          value={props.settings.gain ?? 1}
+          value={props.settings.gain ?? LIMITS.gain.default}
         />
       )}
     </div>
@@ -169,8 +168,8 @@ const Slider = (props: SliderProps) => {
       <input
         aria-label={props.name}
         className='h-6 w-full'
-        max={props.max}
-        min={props.min}
+        max={props.limit.maximum}
+        min={props.limit.minimum}
         onChange={(event) => props.onChange(Number(event.target.value))}
         step={props.step}
         type='range'
@@ -215,8 +214,7 @@ interface EngineCardProps {
 interface SliderProps {
   info?: string;
   label: string;
-  max: number;
-  min: number;
+  limit: Limit;
   name: string;
   onChange: (value: number) => void;
   step: number;

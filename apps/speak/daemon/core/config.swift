@@ -35,9 +35,16 @@ struct Config: Decodable {
         chain = try Self.keyed(container.decode([String: [String]].self, forKey: .chain), Lang.init) { names in
             try names.map { try Self.parse($0, Engine.init) }
         }
-        firstAudioMs = try container.decode(Int.self, forKey: .firstAudioMs)
+        // asked for as an Int, a half is reported as broken json and names no key
+        guard let budget = Int(exactly: try container.decode(Double.self, forKey: .firstAudioMs)) else {
+            throw DecodingError.dataCorruptedError(forKey: .firstAudioMs, in: container, debugDescription: "not whole")
+        }
+        firstAudioMs = budget
         meterGlideMs = try container.decodeIfPresent(Double.self, forKey: .meterGlideMs) ?? 30
         meterFlowMs = try container.decodeIfPresent(Double.self, forKey: .meterFlowMs) ?? 40
+        try inRange("firstAudioMs", Double(firstAudioMs), 100...3000)
+        try inRange("meterGlideMs", meterGlideMs, 0...200)
+        try inRange("meterFlowMs", meterFlowMs, 0...200)
         engines = try Self.keyed(container.decode([String: EngineConfig].self, forKey: .engines), Engine.init) { $0 }
     }
 
@@ -50,7 +57,7 @@ struct Config: Decodable {
     }
 
     // an unknown engine or language name fails the whole load, so a typo is reported instead of ignored
-    private static func parse<T>(_ name: String, _ make: (String) -> T?) throws -> T {
+    fileprivate static func parse<T>(_ name: String, _ make: (String) -> T?) throws -> T {
         guard let value = make(name) else { throw ConfigError.unknownName(name) }
         return value
     }
@@ -66,10 +73,17 @@ struct Config: Decodable {
         engines: [.kokoro: EngineConfig(voice: ["en": "af_heart"], gain: 1.9)],
     )
 
-    private enum CodingKeys: String, CodingKey { case chain, firstAudioMs, meterGlideMs, meterFlowMs, engines }
+    enum CodingKeys: String, CodingKey, CaseIterable { case chain, firstAudioMs, meterGlideMs, meterFlowMs, engines }
+}
+
+// the bounds and defaults here are contract/config.schema.json's; its test drives each one through this decoder
+private func inRange(_ field: String, _ value: Double, _ range: ClosedRange<Double>) throws {
+    guard range.contains(value) else { throw ConfigError.outOfRange(field, value, range) }
 }
 
 struct EngineConfig: Decodable {
+    // the page's alone: the voices dima hearted
+    var favourites: [String] = []
     var model: String?
     // per language; for kokoro and gemini one voice serves every language they speak
     var voice: [String: String] = [:]
@@ -89,25 +103,44 @@ struct EngineConfig: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        favourites = try container.decodeIfPresent([String].self, forKey: .favourites) ?? []
         model = try container.decodeIfPresent(String.self, forKey: .model)
         voice = try container.decodeIfPresent([String: String].self, forKey: .voice) ?? [:]
+        for name in voice.keys where name != "*" { _ = try Config.parse(name, Lang.init) }
         speed = try container.decodeIfPresent(Double.self, forKey: .speed) ?? 1
         gain = try container.decodeIfPresent(Double.self, forKey: .gain) ?? 1
-        guard (0.5...3).contains(speed) else { throw ConfigError.outOfRange("speed", speed) }
-        guard (0...4).contains(gain) else { throw ConfigError.outOfRange("gain", gain) }
+        try inRange("speed", speed, 0.5...3)
+        try inRange("gain", gain, 0...4)
     }
 
-    private enum CodingKeys: String, CodingKey { case model, voice, speed, gain }
+    enum CodingKeys: String, CodingKey, CaseIterable { case favourites, model, voice, speed, gain }
 }
 
 enum ConfigError: Error, CustomStringConvertible {
-    case unknownName(String), outOfRange(String, Double)
+    case unknownName(String), outOfRange(String, Double, ClosedRange<Double>)
 
     var description: String {
         switch self {
         case .unknownName(let name): "unknown name «\(name)» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru"
-        case .outOfRange(let field, let value): "\(field) \(value) is out of range (speed 0.5–3, gain 0–4)"
+        case .outOfRange(let field, let value, let range): "\(field) \(plain(value)) is out of range (\(plain(range.lowerBound))–\(plain(range.upperBound)))"
         }
+    }
+}
+
+// a number as the settings file prints it: 1, not 1.0
+func plain(_ value: Double) -> String { value == value.rounded() ? String(format: "%.0f", value) : "\(value)" }
+
+// why a settings file did not load, in words the page can show
+func configReason(_ error: Error) -> String {
+    let path = { (context: DecodingError.Context) in context.codingPath.map(\.stringValue).joined(separator: ".") }
+    return switch error {
+    // a number that does not fit its type: json is fine, the value is not
+    case DecodingError.dataCorrupted(let context) where !context.codingPath.isEmpty: "«\(path(context))» has the wrong type"
+    case DecodingError.dataCorrupted(let context):
+        "not valid json — \((context.underlyingError as NSError?)?.userInfo[NSDebugDescriptionErrorKey] ?? context.debugDescription)"
+    case DecodingError.keyNotFound(let key, let context): "missing «\((path(context).isEmpty ? "" : path(context) + ".") + key.stringValue)»"
+    case DecodingError.typeMismatch(_, let context), DecodingError.valueNotFound(_, let context): "«\(path(context))» has the wrong type"
+    default: "\(error)"
     }
 }
 
@@ -126,17 +159,6 @@ final class ConfigFile {
         self.write = write
     }
 
-    private static func describe(_ error: Error) -> String {
-        let path = { (context: DecodingError.Context) in context.codingPath.map(\.stringValue).joined(separator: ".") }
-        return switch error {
-        case DecodingError.dataCorrupted(let context):
-            "not valid json — \((context.underlyingError as NSError?)?.userInfo[NSDebugDescriptionErrorKey] ?? context.debugDescription)"
-        case DecodingError.keyNotFound(let key, let context): "missing «\((path(context).isEmpty ? "" : path(context) + ".") + key.stringValue)»"
-        case DecodingError.typeMismatch(_, let context), DecodingError.valueNotFound(_, let context): "«\(path(context))» has the wrong type"
-        default: "\(error)"
-        }
-    }
-
     // cheap enough for every press: one stat, and a parse only when the file changed. returns the reason the
     // file on disk is not the one in use, if it is not
     @discardableResult
@@ -152,7 +174,7 @@ final class ConfigFile {
             write("config: loaded \(url.path) — \(current.summary)")
         } catch {
             // the admin's status line gets the short name, the log the full path
-            let reason = stamp == nil ? "not readable" : Self.describe(error)
+            let reason = stamp == nil ? "not readable" : configReason(error)
             lastError = "\(url.lastPathComponent): \(reason)"
             write("config: \(hasLoaded ? "kept the last good one" : "running on the built-in defaults") — \(url.path): \(reason)")
         }

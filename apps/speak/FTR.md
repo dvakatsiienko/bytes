@@ -93,7 +93,13 @@
   - glide: how long a bar takes to reach a new level (0 jumps). flow: how long the wave holds before moving one bar outward
   - decision: a slider, not a fixed number — dima tuned it by feel over six rounds (70 → 1 ms)
 - ✅ ■ stop ends any speech
-- ✅ the first audio budget, in ms
+- ⬜ the first audio budget, in ms, 100 to 3000
+  - given the budget reads 900
+  - when the user clears its box, or types 0
+  - then the setting stays 900, and the box reads 900 again when the caret leaves it
+- ⬜ a number the daemon refuses cannot be set in the page: the sliders and boxes take their ranges and defaults from `contract/config.schema.json`
+  - given the speed slider
+  - then it runs from 0.5 to 3, as the daemon does
 
 - ⬜ the logo goes home without a reload
   - given the page scrolled down, with an unsaved edit

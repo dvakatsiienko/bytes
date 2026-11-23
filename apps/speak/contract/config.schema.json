@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "engine": { "enum": ["elevenlabs", "fish", "kokoro", "system", "gemini"] },
+    "settings": {
+      "properties": {
+        "favourites": { "items": { "type": "string" }, "type": "array" },
+        "gain": { "default": 1, "maximum": 4, "minimum": 0, "type": "number" },
+        "model": { "type": "string" },
+        "speed": {
+          "default": 1,
+          "maximum": 3,
+          "minimum": 0.5,
+          "type": "number"
+        },
+        "voice": {
+          "additionalProperties": { "type": "string" },
+          "propertyNames": { "enum": ["en", "uk", "ru", "*"] },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "chain": {
+      "additionalProperties": {
+        "items": { "$ref": "#/$defs/engine" },
+        "type": "array"
+      },
+      "propertyNames": { "enum": ["en", "uk", "ru"] },
+      "type": "object"
+    },
+    "engines": {
+      "additionalProperties": { "$ref": "#/$defs/settings" },
+      "propertyNames": { "$ref": "#/$defs/engine" },
+      "type": "object"
+    },
+    "firstAudioMs": { "maximum": 3000, "minimum": 100, "type": "integer" },
+    "meterFlowMs": {
+      "default": 40,
+      "maximum": 200,
+      "minimum": 0,
+      "type": "number"
+    },
+    "meterGlideMs": {
+      "default": 30,
+      "maximum": 200,
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": ["chain", "engines", "firstAudioMs"],
+  "type": "object"
+}

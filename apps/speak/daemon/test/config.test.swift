@@ -19,7 +19,7 @@ enum ConfigTest {
             return "\(fish.model ?? "-") \(fish.speed) \(fish.gain)"
         } }
         let voice = { (voices: String, lang: Lang) in answer(file(engines: #"{"fish":{"voice":\#(voices)}}"#)) { $0[.fish].voice(for: lang) ?? "-" } }
-        let range = { (field: String, value: String) in "\(field) \(value) is out of range (speed 0.5–3, gain 0–4)" }
+        let range = { (field: String, value: String) in "\(field) \(value) is out of range (\(field == "speed" ? "0.5–3" : "0–4"))" }
         let unknown = { (name: String) in "unknown name «\(name)» — engines: elevenlabs, fish, kokoro, system, gemini; languages: en, uk, ru" }
         return check("config decode", [
             ("an engine with nothing named", knobs("{}"), "- 1.0 1.0"),
@@ -87,7 +87,7 @@ enum ConfigTest {
         rows.append(("its log line", lines.last ?? "-", "config: kept the last good one — PATH: «engines.fish.gain» has the wrong type"))
         rows.append(("a null", saved(file(chain: "null")), error("«chain» has the wrong type", 900)))
         rows.append(("a missing key inside", saved(#"{"chain":{},"engines":{}}"#), error("missing «firstAudioMs»", 900)))
-        rows.append(("out of range", saved(file(engines: #"{"fish":{"gain":9}}"#)), error("gain 9.0 is out of range (speed 0.5–3, gain 0–4)", 900)))
+        rows.append(("out of range", saved(file(engines: #"{"fish":{"gain":9}}"#)), error("gain 9 is out of range (0–4)", 900)))
         rows.append(("a good one again clears the reason", saved(#"{"chain":{},"firstAudioMs":700,"engines":{}}"#), "ok 700"))
         try? Data(file().utf8).write(to: url)
         try? FileManager.default.setAttributes([.modificationDate: stamp], ofItemAtPath: url.path)

@@ -1,6 +1,6 @@
 // the daemon's tests, one binary. golden.json is dima's real text (tickets, commits, a url and a path
 // mid-sentence) and what a voice should receive for it; the argv cases guard the launchd job's flags; the
-// config cases guard the load line; config, chain and seams.test.swift hold the rest of the core. usage: daemon-test <golden.json> <config.json>
+// config cases guard the load line; config, chain and seams.test.swift hold the rest of the core. usage: daemon-test <golden.json> <config.json> <config.schema.json>
 import Foundation
 
 struct Case: Decodable {
@@ -12,7 +12,7 @@ struct Case: Decodable {
 struct DaemonTest {
     @MainActor
     static func main() async throws {
-        var failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + ConfigTest.failures() + ChainTest.failures()
+        var failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3]) + ConfigTest.failures() + ChainTest.failures()
         failed += await SeamsTest.failures()
         exit(failed == 0 ? 0 : 1)
     }

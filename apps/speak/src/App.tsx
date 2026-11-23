@@ -6,7 +6,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import { Column } from '@/components/Column.tsx';
 import { Info } from '@/components/Info.tsx';
-import { MsSetting } from '@/components/MsSetting.tsx';
+import { MsBox, MsSetting } from '@/components/MsSetting.tsx';
 import { SectionFallback } from '@/components/SectionFallback.tsx';
 
 import {
@@ -18,6 +18,7 @@ import {
   api,
   voiceOf,
 } from '@/api.ts';
+import { LIMITS } from '@/limits.ts';
 
 export const App = () => {
   const saved = useQuery({
@@ -291,7 +292,7 @@ export const App = () => {
         <section
           aria-label='playback'
           className='flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[22px] border border-line bg-surface px-5 py-3'>
-          <label className='flex items-center gap-2 text-sm text-muted'>
+          <div className='flex items-center gap-2 text-sm text-muted'>
             <span className='flex items-center gap-1 whitespace-nowrap'>
               first audio budget
               <Info
@@ -299,35 +300,29 @@ export const App = () => {
                 text='how long a cloud voice gets to start before the next takes over. too many fallbacks → raise it. try 900'
               />
             </span>
-            <input
-              className='w-20 rounded-md border border-line bg-surface px-2 py-1 text-right text-sm tabular-nums text-ink'
-              max={3000}
-              min={100}
-              onChange={(event) =>
-                edit({
-                  ...draft,
-                  firstAudioMs: Number(event.target.value),
-                })
-              }
+            <MsBox
+              className='w-20'
+              label='first audio budget in ms'
+              limit={LIMITS.firstAudioMs}
+              onChange={(value) => edit({ ...draft, firstAudioMs: value })}
               step={50}
-              type='number'
               value={draft.firstAudioMs}
             />{' '}
             ms
-          </label>
+          </div>
           <MsSetting
             info='how smoothly a bar reaches its height. too sharp → raise it. try 30'
             label='pill glide'
-            max={200}
+            limit={LIMITS.meterGlideMs}
             onChange={(value) => edit({ ...draft, meterGlideMs: value })}
-            value={draft.meterGlideMs ?? 30}
+            value={draft.meterGlideMs ?? LIMITS.meterGlideMs.default}
           />
           <MsSetting
             info='how fast the wave travels outward. too fast → raise it first. try 70'
             label='pill flow'
-            max={200}
+            limit={LIMITS.meterFlowMs}
             onChange={(value) => edit({ ...draft, meterFlowMs: value })}
-            value={draft.meterFlowMs ?? 40}
+            value={draft.meterFlowMs ?? LIMITS.meterFlowMs.default}
           />
           <label className='flex min-h-8 cursor-pointer select-none items-center gap-2.5 text-sm text-muted'>
             <input
