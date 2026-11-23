@@ -1,4 +1,4 @@
-// the page's one door to the admin server; the shapes mirror x-speak's core/config.swift
+// the page's one door to the admin server; the settings' shape is contract/config.schema.json's
 
 export const LANGS = [
   ['en', 'english'],
@@ -30,30 +30,47 @@ export const voiceOf = (config: Config, engine: Engine, lang: Lang) => {
   return voice[lang] ?? voice['*'] ?? '';
 };
 
-const call = async <T>(
+// every request ends in an answer or a reason, never in a dropped rejection
+const call = async <T extends object>(
   method: string,
   path: string,
   payload?: unknown,
-): Promise<T> => {
-  const response = await fetch(path, {
-    body: payload === undefined ? undefined : JSON.stringify(payload),
-    headers: { 'content-type': 'application/json' },
-    method,
-  });
-  return response.json();
+): Promise<Answer<T>> => {
+  try {
+    const response = await fetch(path, {
+      body: payload === undefined ? undefined : JSON.stringify(payload),
+      headers: { 'content-type': 'application/json' },
+      method,
+    });
+    const answer = await response.json();
+    if (response.ok || answer.error) return answer;
+    return { error: `the admin server answered ${response.status}` };
+  } catch (error) {
+    return {
+      error: `the admin server is not answering — ${(error as Error).message}`,
+    };
+  }
+};
+
+// a query with no answer has no data: the reason is its error
+const read = async <T extends object>(path: string): Promise<T> => {
+  const answer = await call<T>('GET', path);
+  if (answer.error !== undefined) throw new Error(answer.error);
+  return answer as T;
 };
 
 export const api = {
-  config: () => call<Config>('GET', '/api/config'),
-  favourites: (engine: Engine, favourites: string[]) =>
-    call<Reply>('PUT', '/api/favourites', { engine, favourites }),
-  pause: () => call<Reply>('POST', '/api/pause'),
-  preview: (payload: Preview) => call<Reply>('POST', '/api/preview', payload),
-  save: (config: Config) => call<Reply>('PUT', '/api/config', config),
-  status: () => call<Status & Reply>('GET', '/api/status'),
-  stop: () => call<Reply>('POST', '/api/stop'),
-  voices: () => call<Voices>('GET', '/api/voices'),
-  wave: (payload: Wave) => call<Reply>('POST', '/api/wave', payload),
+  config: () => read<Settings>('/api/config'),
+  heart: (engine: Engine, voice: string, on: boolean) =>
+    call<Saved>('PUT', '/api/favourites', { engine, on, voice }),
+  pause: () => call('POST', '/api/pause'),
+  preview: (payload: Preview) => call('POST', '/api/preview', payload),
+  save: (patch: Patch, version: string) =>
+    call<Saved>('PUT', '/api/config', { patch, version }),
+  status: () => read<Status>('/api/status'),
+  stop: () => call('POST', '/api/stop'),
+  voices: () => read<Voices>('/api/voices'),
+  wave: (payload: Wave) => call('POST', '/api/wave', payload),
 };
 
 /* Types */
@@ -78,9 +95,28 @@ export interface Config {
   meterGlideMs?: number;
 }
 
-export interface Reply {
-  error?: string;
-  ok?: boolean;
+// the settings file and the mark of its bytes; a save names the mark it edits
+export interface Settings {
+  config: Config;
+  version: string;
+}
+
+// a save's answer also names the file it went over
+export interface Saved extends Settings {
+  was: string;
+}
+
+// the changed keys alone; null takes a key out
+export type Patch = { [key: string]: unknown };
+
+export type Answer<T extends object = object> =
+  | (T & { error?: undefined })
+  | Refusal;
+
+// stale: the settings file moved on since this page read it
+export interface Refusal {
+  error: string;
+  stale?: boolean;
 }
 
 export interface Status {

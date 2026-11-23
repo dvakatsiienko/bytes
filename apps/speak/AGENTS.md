@@ -4,7 +4,7 @@ read-aloud on dima's mac, in two parts that share this home:
 
 - **x-speak**, the daemon (`daemon/`, swift, launchd): owns the hotkeys, the engines and the pill
 - **the voice admin** (`src/`, vite + react + tailwind, one page): built to `dist/` and served with its api by
-  `server.ts` on 127.0.0.1:7386, always on through the launchd job `x-speak-admin`
+  `server.ts` on 127.0.0.1:7386, always on through the launchd job `x-speak-admin`; it holds no settings, every api call goes to the daemon
 
 not deployed anywhere, and it carries no `vercel.json`: it edits this mac's `daemon/config.json` and talks to this mac's daemon.
 
@@ -42,12 +42,12 @@ re-reads the file on the next F4 after a save.
 
 ## hazards
 
-- **a save sorts the keys itself, then goes through bytes' biome, fed indented json** (bytes' biome sorts no json keys; an array keeps its order) — biome keeps an object expanded only when its input
-  was; compact input rewrote dima's whole file and the commit hook refused it
 - **a dnd-kit reorder applies `move()` on every drag-over**, with the snapshot back on a cancel — applying it only
   on drop fought dnd-kit's optimistic dom move, and the page and the ranks disagreed after a keyboard drag
 - **only a chain card registers with dnd-kit** — it stamps `role` and a tab stop on what it registers, which broke
   the list semantics on the cards outside the chain
+- **a worktree's server never saves the live settings**: it plays through the live daemon, and takes a save only when started with a fake daemon's socket, `pnpm admin <socket>`
+- **the api answers to localhost's own names alone**: another page can point its name at 127.0.0.1 and pass as same-origin
 - **every write to the api carries `content-type: application/json`**, or the server answers 415: that header is what keeps another web page from driving the daemon; a `curl -X PUT` needs `-H 'content-type: application/json'`
 - the voice lists are data in `admin.ts`, each id proven by a real call (elevenlabs premades on the restricted key,
   kokoro on the warm server); a library voice answers 402 on a restricted key

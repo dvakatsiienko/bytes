@@ -33,7 +33,7 @@ enum SeamsTest {
             ("config", plain(#"{"op":"config"}"#), settings + " | config"),
             ("save", plain(#"{"op":"save","version":"v1","patch":{"engines":{"fish":{"gain":2,"model":null}}}}"#), settings + #" | save {"engines":{"fish":{"gain":2,"model":null}}} v1"#),
             ("save with nothing", plain(#"{"op":"save"}"#), settings + " | save - -"),
-            ("a refused save", ask(#"{"op":"save"}"#) { $0.refusal = .stale }, #"{"error":"the settings changed since this page read them"} | save - -"#),
+            ("a refused save", ask(#"{"op":"save"}"#) { $0.refusal = .stale }, #"{"error":"the settings changed since this page read them","stale":true} | save - -"#),
             ("heart", plain(#"{"op":"heart","engine":"fish","voice":"x","on":true}"#), settings + " | heart fish x true"),
             ("heart with nothing", plain(#"{"op":"heart"}"#), settings + " | heart - - -"),
             ("a refused heart", ask(#"{"op":"heart"}"#) { $0.refusal = .heartless }, #"{"error":"a heart needs an engine it knows, a voice, and on or off"} | heart - - -"#),

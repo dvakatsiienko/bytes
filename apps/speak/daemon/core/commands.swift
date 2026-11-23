@@ -95,6 +95,8 @@ private func settingsReply(_ ask: () throws -> SavedSettings) -> [String: Any] {
     do {
         let saved = try ask()
         return ["ok": true, "config": saved.config.any, "version": saved.version, "was": saved.was]
+    } catch SaveError.stale {
+        return ["error": "\(SaveError.stale)", "stale": true]
     } catch {
         return ["error": "\(error)"]
     }

@@ -44,6 +44,7 @@
   - when the user presses ♡ beside a voice
   - then it turns ♥ and the voice moves to the top of that engine's list in every language
   - and it is saved at once, outside the save button: pending edits stay unsaved, and save does not light up
+  - and two quick ♥ both land, and a slider moved meanwhile stays where it is
   - decision: a ♥ is a bookmark, not a setting — dima wants it kept the moment he clicks
 - ✅ «only ♥ favourites» filters a voice list to the favourites
   - given an engine with at least one favourite
@@ -146,10 +147,20 @@
   - then the file keeps every byte and the reply says why
   - given an accepted save
   - then the file's diff is that change only, a key the daemon does not read stays, and the log line «config: saved …» names the keys
+- ⬜ a page left open never writes over newer settings
+  - given the settings changed since the page read them: a hand edit, a save or a ♥ from another tab
+  - when the page saves
+  - then the status line reads «rejected — the settings changed since this page read them · reset loads them» and the file keeps every byte
+- ⬜ a request that fails says why
+  - given the admin server is down
+  - when the user presses save, ♥, ▶, ⏸ or ■
+  - then the status line reads «the admin server is not answering — …», and an unsaved edit stays
+  - given the settings file cannot be read when the page opens
+  - then the page shows the daemon's reason in place of the columns
 - ✅ reset drops every unsaved edit
   - given an unsaved change
   - when the user presses reset
-  - then the page shows the saved config again, save and reset disable, and nothing is written
+  - then the page shows the settings as they are on disk now, save and reset disable, and nothing is written
 - ✅ a rejected save shows the daemon's own line
   - given a config the daemon cannot read
   - when it is saved
@@ -158,6 +169,12 @@
 - ✅ only the admin page can write: another web page's request is refused
   - given a POST or PUT to the api without `content-type: application/json`
   - then the server answers 415, nothing is saved and the daemon hears nothing
+  - given a request under a name that is not this mac's own (a page that points its name at 127.0.0.1)
+  - then the server answers 403 and the daemon hears nothing
+- ⬜ a worktree's server plays but never saves
+  - given the admin started from a worktree with no socket of its own
+  - when the page saves or hearts
+  - then the status line reads «… a worktree never saves the live settings …»
 
 ## x-speak — hotkey + pill
 

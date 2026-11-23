@@ -54,7 +54,7 @@ enum Json: Equatable, Decodable {
         case .string(let string): return Self.quoted(string)
         case .array(let items):
             let line = "[" + items.map { $0.text() }.joined(separator: ", ") + "]"
-            if items.isEmpty || (lead + line.count + tail <= 80 && !line.contains("\n")) { return line }
+            if lead + line.count + tail <= 80, !line.contains("\n") { return line }
             return "[\n" + items.map { inner + $0.text(indent: inner, lead: inner.count) }.joined(separator: ",\n") + "\n\(indent)]"
         case .object(let pairs):
             if pairs.isEmpty { return "{}" }

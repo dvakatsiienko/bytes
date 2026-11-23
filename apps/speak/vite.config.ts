@@ -20,7 +20,7 @@ export default defineConfig({
   },
   server: {
     port: Number(process.env.PORT ?? speakDevPort),
-    // every api call goes to the admin server: it alone writes config.json and reaches the daemon
+    // every api call goes to the admin server: it alone reaches the daemon
     proxy: { '/api': `http://127.0.0.1:${speakPort}` },
     strictPort: true,
   },

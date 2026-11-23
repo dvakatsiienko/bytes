@@ -92,6 +92,8 @@ enum StoreTest {
         rows.append(("a folder it cannot write", reason { try store.save(json(#"{"meterFlowMs":1}"#), over: at) }.hasPrefix("not written — ") && file.text == shape ? "said, and whole" : "?", "said, and whole"))
         chmod(file.folder.path, 0o700)
         file.lines = []
+        _ = try? store.save(json(#"{"meterFlowMs":70}"#), over: at)
+        rows.append(("a save of the value it has is no write", file.lines.joined(), ""))
         _ = try? store.save(json(#"{"engines":{"system":{"voice":{"en":"Samantha"}}},"meterFlowMs":1}"#), over: at)
         rows.append(("the log names the keys a save changed", file.lines.first ?? "-", "config: saved engines.system.voice, meterFlowMs"))
         rows.append(("a save is a load", String(file.lines.dropFirst().joined().prefix(26)), "config: loaded SETTINGS — "))

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { move } from '@dnd-kit/helpers';
 import { DragDropProvider } from '@dnd-kit/react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { Column } from '@/components/Column.tsx';
@@ -10,6 +10,7 @@ import { MsBox, MsSetting } from '@/components/MsSetting.tsx';
 import { SectionFallback } from '@/components/SectionFallback.tsx';
 
 import {
+  type Answer,
   type Config,
   type Engine,
   type EngineSettings,
@@ -19,13 +20,11 @@ import {
   voiceOf,
 } from '@/api.ts';
 import { LIMITS } from '@/limits.ts';
+import { useSettings } from '@/useSettings.ts';
 
 export const App = () => {
-  const saved = useQuery({
-    queryFn: api.config,
-    queryKey: ['config'],
-    staleTime: Number.POSITIVE_INFINITY,
-  });
+  const settings = useSettings();
+  const draft = settings.config;
   const voices = useQuery({
     queryFn: api.voices,
     queryKey: ['voices'],
@@ -39,10 +38,8 @@ export const App = () => {
     queryKey: ['status'],
     refetchInterval: playing ? 700 : 5000,
   });
-  const queryClient = useQueryClient();
-  const [draft, setDraft] = useState<Config>();
   const [samples, setSamples] = useState<Record<Lang, string>>(SAMPLES);
-  const dragStart = useRef<Config>(undefined);
+  const dragStart = useRef<Config['chain']>(undefined);
   // the pill's infinite waveform: it plays the draft's glide and flow live, re-arms the daemon's 5-minute deadline
   // every minute, and turns off when toggled off, on unmount, or when the tab goes away
   const [isWaveOn, setIsWaveOn] = useState(false);
@@ -73,9 +70,12 @@ export const App = () => {
     kind?: 'ok' | 'error';
   }>({ text: 'no changes' });
 
-  useEffect(() => {
-    if (saved.data && !draft) setDraft(saved.data);
-  }, [saved.data, draft]);
+  // an action that did not happen says why in the save line
+  const report = async (action: Promise<Answer>) => {
+    const { error } = await action;
+    if (error !== undefined) setMessage({ kind: 'error', text: error });
+    return error === undefined;
+  };
 
   // a preview counts as over once the daemon was seen speaking and then went quiet, or never started within 8 s
   useEffect(() => {
@@ -90,62 +90,40 @@ export const App = () => {
   if (!draft)
     return (
       <p className='p-4 text-muted'>
-        {saved.error
-          ? `the admin server is not answering — ${saved.error.message}`
-          : 'reading config.json…'}
+        {settings.error ? settings.error.message : 'reading the settings…'}
       </p>
     );
 
-  // by content, not identity: a ♥ updates the draft and the saved copy alike, and that is no unsaved change
-  const isDirty = JSON.stringify(draft) !== JSON.stringify(saved.data);
-  const edit = (next: Config) => {
-    setDraft(next);
+  const edit = (change: (config: Config) => Config) => {
+    settings.edit(change);
     setMessage({ text: 'unsaved changes' });
   };
-  const setEngine = (engine: Engine, patch: EngineSettings) => {
-    edit({
-      ...draft,
-      engines: {
-        ...draft.engines,
-        [engine]: { ...draft.engines[engine], ...patch },
-      },
-    });
-  };
-  const setVoice = (engine: Engine, lang: Lang, voice: string) => {
-    const current = { ...draft.engines[engine]?.voice };
-    if (voice) current[lang] = voice;
-    else delete current[lang];
-    setEngine(engine, { voice: current });
-  };
-  // a ♥ saves at once, outside the save button: the file, the saved copy and the draft all take it, so it
-  // never shows as an unsaved change and never carries the draft's other edits with it
-  const setFavourite = async (
+  const editEngine = (
     engine: Engine,
-    voice: string,
-    isFavourite: boolean,
-  ) => {
-    const current = draft.engines[engine]?.favourites ?? [];
-    const favourites = isFavourite
-      ? [...current, voice]
-      : current.filter((each) => each !== voice);
-    const reply = await api.favourites(engine, favourites);
-    if (reply.error)
-      return setMessage({
-        kind: 'error',
-        text: `♥ not saved — ${reply.error}`,
-      });
-    const withFavourites = (config: Config): Config => ({
+    change: (current: EngineSettings) => EngineSettings,
+  ) =>
+    edit((config) => ({
       ...config,
       engines: {
         ...config.engines,
-        [engine]: { ...config.engines[engine], favourites },
+        [engine]: change(config.engines[engine] ?? {}),
       },
+    }));
+  const setEngine = (engine: Engine, patch: EngineSettings) =>
+    editEngine(engine, (current) => ({ ...current, ...patch }));
+  const setVoice = (engine: Engine, lang: Lang, voice: string) =>
+    editEngine(engine, (current) => {
+      const { [lang]: _, ...others } = current.voice ?? {};
+      return {
+        ...current,
+        voice: voice ? { ...others, [lang]: voice } : others,
+      };
     });
-    queryClient.setQueryData<Config>(
-      ['config'],
-      (config) => config && withFavourites(config),
-    );
-    setDraft(withFavourites(draft));
+  // a ♥ saves at once, outside the save button, and carries no other edit with it
+  const setFavourite = async (engine: Engine, voice: string, isOn: boolean) => {
+    const refusal = await settings.heart({ engine, isOn, voice });
+    if (refusal)
+      setMessage({ kind: 'error', text: `♥ not saved — ${refusal.error}` });
   };
   const preview = async (engine: Engine, lang: Lang) => {
     const voice = voiceOf(draft, engine, lang);
@@ -157,42 +135,39 @@ export const App = () => {
       },
       text: samples[lang],
     });
-    setMessage(
-      reply.error
-        ? { kind: 'error', text: reply.error }
-        : { text: `▶ ${engine} · ${lang}` },
-    );
-    if (!reply.error)
-      setPlaying({ engine, hasStarted: false, lang, since: Date.now() });
+    if (reply.error) return setMessage({ kind: 'error', text: reply.error });
+    setMessage({ text: `▶ ${engine} · ${lang}` });
+    setPlaying({ engine, hasStarted: false, lang, since: Date.now() });
   };
   const pause = async () => {
-    await api.pause();
+    await report(api.pause());
     await status.refetch();
   };
   const stop = async () => {
-    await api.stop();
-    setPlaying(undefined);
+    if (await report(api.stop())) setPlaying(undefined);
   };
-  // back to the saved config: every unsaved edit goes, nothing is written
-  const reset = () => {
-    setDraft(saved.data);
-    setMessage({ text: 'reset to the saved config' });
+  const reset = async () => {
+    const { error } = await settings.reset();
+    setMessage(
+      error
+        ? { kind: 'error', text: error.message }
+        : { text: 'reset to the saved config' },
+    );
   };
   const save = async () => {
-    const reply = await api.save(draft);
-    if (reply.error)
-      return setMessage({
-        kind: 'error',
-        text: `rejected — ${reply.error}`,
-      });
-    await saved.refetch();
-    setDraft(undefined);
-    setMessage({ kind: 'ok', text: 'saved · the daemon loaded it' });
+    const refusal = await settings.save();
+    if (!refusal)
+      return setMessage({ kind: 'ok', text: 'saved · the daemon loaded it' });
+    const wayOut = refusal.stale ? ' · reset loads them' : '';
+    setMessage({
+      kind: 'error',
+      text: `rejected — ${refusal.error}${wayOut}`,
+    });
   };
 
   const statusData = status.data ?? {};
-  const healthText = statusData.error
-    ? statusData.error
+  const healthText = status.error
+    ? status.error.message
     : `daemon up${statusData.accessibility === false ? ' · accessibility missing' : ''}${statusData.speaking ? ' · speaking' : ''}`;
 
   const columnListJSX = LANGS.map(([lang, title]) => {
@@ -205,10 +180,10 @@ export const App = () => {
           config={draft}
           lang={lang}
           onChain={(chain) =>
-            edit({
-              ...draft,
-              chain: { ...draft.chain, [lang]: chain },
-            })
+            edit((config) => ({
+              ...config,
+              chain: { ...config.chain, [lang]: chain },
+            }))
           }
           onFavourite={(engine, voice, isFavourite) =>
             void setFavourite(engine, voice, isFavourite)
@@ -304,7 +279,9 @@ export const App = () => {
               className='w-20'
               label='first audio budget in ms'
               limit={LIMITS.firstAudioMs}
-              onChange={(value) => edit({ ...draft, firstAudioMs: value })}
+              onChange={(value) =>
+                edit((config) => ({ ...config, firstAudioMs: value }))
+              }
               step={50}
               value={draft.firstAudioMs}
             />{' '}
@@ -314,14 +291,18 @@ export const App = () => {
             info='how smoothly a bar reaches its height. too sharp → raise it. try 30'
             label='pill glide'
             limit={LIMITS.meterGlideMs}
-            onChange={(value) => edit({ ...draft, meterGlideMs: value })}
+            onChange={(value) =>
+              edit((config) => ({ ...config, meterGlideMs: value }))
+            }
             value={draft.meterGlideMs ?? LIMITS.meterGlideMs.default}
           />
           <MsSetting
             info='how fast the wave travels outward. too fast → raise it first. try 70'
             label='pill flow'
             limit={LIMITS.meterFlowMs}
-            onChange={(value) => edit({ ...draft, meterFlowMs: value })}
+            onChange={(value) =>
+              edit((config) => ({ ...config, meterFlowMs: value }))
+            }
             value={draft.meterFlowMs ?? LIMITS.meterFlowMs.default}
           />
           <label className='flex min-h-8 cursor-pointer select-none items-center gap-2.5 text-sm text-muted'>
@@ -342,7 +323,8 @@ export const App = () => {
         // cancel. applying it only on drop fought dnd-kit's optimistic dom reorder (the page and the ranks
         // disagreed after a keyboard drag)
         onDragEnd={(event) => {
-          if (event.canceled && dragStart.current) edit(dragStart.current);
+          const { current: chain } = dragStart;
+          if (event.canceled && chain) edit((config) => ({ ...config, chain }));
           dragStart.current = undefined;
         }}
         onDragOver={(event) => {
@@ -360,10 +342,10 @@ export const App = () => {
             ]),
           );
           if (JSON.stringify(chain) !== JSON.stringify(draft.chain))
-            edit({ ...draft, chain });
+            edit((config) => ({ ...config, chain }));
         }}
         onDragStart={() => {
-          dragStart.current = draft;
+          dragStart.current = draft.chain;
         }}>
         <main className='mx-auto grid max-w-[1280px] grid-cols-1 gap-x-6 gap-y-10 px-4 pt-8 pb-28 min-[900px]:grid-cols-3'>
           {columnListJSX}
@@ -373,15 +355,15 @@ export const App = () => {
         <footer className='flex flex-wrap items-center gap-2 rounded-[22px] border border-pill-line bg-pill/95 p-2 text-pill-ink shadow-lg'>
           <button
             className={savePillClass}
-            disabled={!isDirty}
+            disabled={!settings.isDirty}
             onClick={() => void save()}
             type='button'>
             save
           </button>
           <button
             className={pillButtonClass}
-            disabled={!isDirty}
-            onClick={reset}
+            disabled={!settings.isDirty}
+            onClick={() => void reset()}
             type='button'>
             reset
           </button>
