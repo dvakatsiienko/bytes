@@ -204,3 +204,8 @@
 - ✅ `x-speak-admin` (launchd, always on) serves the built page and the api on 127.0.0.1:7386; `pnpm --filter speak admin` runs the same server by hand when the job is stopped
 - ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386
 - ✅ `pnpm --filter speak admin:build` builds `dist/`
+- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases and the argv parser
+- ⬜ x-speak takes its paths as flags: `--config <config.json>`, `--keys-run <script>`
+  - given the daemon started with `--config <path>` alone
+  - then it stays up as the daemon, logs «config: loaded <the full path>» with each engine's voice, speed and gain, and speaks nothing
+  - and with no `--config` it exits at once with one usage line
