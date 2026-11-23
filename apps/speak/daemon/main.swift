@@ -36,13 +36,10 @@ func systemVoice(for lang: Lang, _ settings: EngineConfig) -> NSSpeechSynthesize
         .map { NSSpeechSynthesizer.VoiceName(rawValue: $0.identifier) }
 }
 
-// a non-200 reply: a quota answer (elevenlabs says `quota_exceeded` in its json) is told apart from a plain status
 func failure(_ status: Int, _ bytes: URLSession.AsyncBytes) async -> EngineError {
     var body = Data()
     do { for try await byte in bytes { body.append(byte); if body.count > 4096 { break } } } catch {}
-    let detail = (try? JSONSerialization.jsonObject(with: body) as? [String: Any])?["detail"] as? [String: Any]
-    guard detail?["status"] as? String == "quota_exceeded" || detail?["code"] as? String == "quota_exceeded" else { return .status(status) }
-    return .quota(detail?["message"] as? String ?? "out of quota")
+    return engineError(status: status, body: body)
 }
 
 func elapsed(_ since: ContinuousClock.Instant) -> String {
@@ -478,7 +475,6 @@ final class Speaker {
         }
     }
 
-    // `only` is --engine: one engine, no chain
     func speak(_ parts: [Chunk], only: Engine?, pressed: ContinuousClock.Instant) {
         // real speech ends the admin's infinite waveform: the meter goes back to the sound
         panel.stopWave()
@@ -487,27 +483,25 @@ final class Speaker {
         let read = reads
         job = Task {
             var isFirst = true
-            // the engine that played the read's first chunk leads every later one, so one read keeps one voice: a
-            // cloud engine that missed chunk 1's budget no longer takes over mid-read once audio is playing
+            // a cloud engine that missed chunk 1's budget never takes over mid-read once audio is playing
             var lead: Engine?
             for (index, chunk) in parts.enumerated() {
                 // the mac voice and kokoro finish a chunk normally even after a stop, so a stopped read ends here
                 if Task.isCancelled { return }
                 log("read \(read): chunk \(index + 1)/\(parts.count)")
-                var candidates = (only.map { [$0] } ?? config.chain[chunk.lang] ?? []).filter { $0.speaks(chunk.lang) && (skipUntil[$0] ?? .distantPast) < Date() }
-                if let lead, let at = candidates.firstIndex(of: lead) { candidates.insert(candidates.remove(at: at), at: 0) }
-                // a cloud engine racing its deadline: kokoro renders the same chunk meanwhile, so a miss costs nothing
-                if lead == nil, candidates.first?.isCloud == true, candidates.contains(.kokoro), !player.isPlaying {
+                let engines = candidates(chain: config.chain, lang: chunk.lang, only: only, benched: skipUntil, lead: lead, now: Date())
+                if rendersKokoroAhead(engines, lead: lead, isPlaying: player.isPlaying) {
                     let voice = settings(.kokoro).voice(for: .en)
                     kokoroPrefetch = (chunk.text, Task { try await kokoroPCM(chunk.text, voice: voice) })
                 }
-                // one first-audio budget per chunk, shared by every cloud engine: misses never stack
-                let budgetEnds = player.isPlaying || systemVoice.isBusy ? nil : ContinuousClock.now + .milliseconds(config.firstAudioMs)
-                for engine in candidates {
-                    // the last candidate has nothing to yield to, so it waits as long as it takes; neither does the read's
-                    // lead — a gap between chunks must not hand its voice to the next engine
-                    let deadline = engine.isCloud && engine != candidates.last && engine != lead ? budgetEnds.map { $0 - ContinuousClock.now } : nil
-                    if let deadline, deadline <= .zero { continue }
+                let budgetEnds = firstAudioBudgetEnds(isPlaying: player.isPlaying || systemVoice.isBusy, firstAudioMs: config.firstAudioMs, now: .now)
+                for engine in engines {
+                    let deadline: Duration?
+                    switch firstAudioWait(for: engine, among: engines, lead: lead, budgetEnds: budgetEnds, now: .now) {
+                    case .skip: continue
+                    case .asLongAsItTakes: deadline = nil
+                    case .atMost(let wait): deadline = wait
+                    }
                     do {
                         try await speak(chunk, with: engine, deadline: deadline) {
                             if isFirst { log("first audio: \(engine.rawValue) \(elapsed(pressed))") }
@@ -536,28 +530,18 @@ final class Speaker {
         }
     }
 
-    // quota or auth → an hour off; 5xx or offline → a minute off. a slow start and a missing key cost only this
-    // press: benching on a slow start turned one miss into a minute of kokoro (dima, 2026-09-29)
     private func handle(_ error: Error, from engine: Engine) {
-        let pause: TimeInterval? = switch error {
-        case EngineError.noKey, EngineError.noVoice, EngineError.timeout: nil
-        case EngineError.status(let code) where [401, 402, 403, 429].contains(code): 3600
-        case EngineError.quota: 3600
-        default: 60
-        }
-        if let pause { skipUntil[engine] = Date().addingTimeInterval(pause) }
-        if case EngineError.quota(let message) = error {
+        let decision = bench(for: error, from: engine)
+        if let seconds = decision.seconds { skipUntil[engine] = Date().addingTimeInterval(seconds) }
+        if let message = decision.quota {
             outOfQuota[engine] = message
             // the refusal knows no refill date; the probe does, and benches the engine until then instead of for an hour
             Task { await probeQuota() }
         }
-        // the kokoro server is ours to keep alive: one that stops answering is started again, off the hot path
-        if engine == .kokoro, (error as? URLError)?.code == .cannotConnectToHost {
-            Task { await warmKokoro() }
-        }
-        log("\(engine.rawValue) skipped: \(error)\(pause.map { ", off for \(Int($0)) s" } ?? "")")
-        // fish's free model ends on a date its blog names twice (11-30, 08-31): its refusal reads as the tier's end
-        if engine == .fish, case EngineError.status(let code) = error, [402, 429].contains(code) {
+        // off the hot path
+        if decision.restartsKokoro { Task { await warmKokoro() } }
+        log("\(engine.rawValue) skipped: \(error)\(decision.seconds.map { ", off for \(Int($0)) s" } ?? "")")
+        if decision.mayEndFishFreeTier, case EngineError.status(let code) = error {
             log("⚠️ FISH REFUSED \(settings(.fish).model ?? "s2.1-pro-free") (\(code)): the free tier may have ended; the chain falls through for an hour; check fish.audio")
         }
     }

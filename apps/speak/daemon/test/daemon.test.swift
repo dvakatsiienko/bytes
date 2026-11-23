@@ -12,7 +12,7 @@ struct Case: Decodable {
 struct DaemonTest {
     @MainActor
     static func main() throws {
-        let failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2])
+        let failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + ChainTest.failures()
         exit(failed == 0 ? 0 : 1)
     }
 
