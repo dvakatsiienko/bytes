@@ -32,6 +32,7 @@
     "pretest": "playwright install chromium",
     "prettier-config:publish": "pnpm -F='prettier-config-polished' publish",
     "projects:sync": "node script/projects-sync.ts",
+    "speak:rollback": "pnpm --filter speak daemon:rollback",
     "tint:apply": "node script/tint-apply.ts",
     "turbo:devtools": "turbo devtools",
     "worktree:seed": "node ./script/worktree-seed.ts",
