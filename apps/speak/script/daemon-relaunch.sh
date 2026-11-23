@@ -25,4 +25,4 @@ while launchctl print "$domain/$label" >/dev/null 2>&1; do
     fi
     sleep 0.2
 done
-launchctl bootstrap "$domain" "$HOME/Library/LaunchAgents/$label.plist"
+launchctl bootstrap "$domain" "$HOME/Library/LaunchAgents/$label.plist" || exit 1

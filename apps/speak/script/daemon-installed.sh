@@ -30,7 +30,7 @@ settings_line() {
 
 # what the running process was started with: the plist may have moved on since
 running_argument() {
-    argument=$(launchctl print "gui/$(id -u)/$label" 2>/dev/null | awk 'found {print $1; exit} $1 == "--config" {found = 1}')
+    argument=$(launchctl print "gui/$(id -u)/$label" 2>/dev/null | awk 'found {sub(/^[ \t]+/, ""); print; exit} $1 == "--config" {found = 1}')
     if [ -n "$argument" ]; then printf '%s\n' "$argument"; else config_argument; fi
 }
 

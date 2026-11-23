@@ -30,10 +30,21 @@ setup; printf 'good' >"$libexec/x-speak.prev"; printf '{"speaking":false,"main":
 is 'a stuck main thread with its last status: a kept binary is not overwritten' 'new/good' "$(pair)"
 setup; plist '/new/config.json'; build new
 is 'the argument kept is the one the process runs with, not the next start'"'"'s' '/old/config.json' "$(bytes x-speak.prev.config)"
-setup; build bad; started; rollback; rm "$state/inode" "$state/status"; build fix
+setup; build bad; started; rollback; build fix
 is 'a build after a rollback keeps the binary that was put back' 'fix/old' "$(pair)"
 build fix2
 is 'a build after that one keeps it still' 'fix2/old' "$(pair)"
+setup; build bad; started; rollback; rm "$state/inode" "$state/status"; build fix
+is 'a build after a rollback nobody has seen answer: refused, both binaries stay' '1 old/bad' "$code $(pair)"
+says 'a build after a rollback nobody has seen answer: says the two ways on' 'speak:rollback'
+setup; build new; started; touch "$state/dies"; rollback; build fix
+is 'a build after a rollback that failed: refused, both binaries stay' '1 old/new' "$code $(pair)"
+rm "$state/dies"; printf '{"speaking":false}' >"$state/status"; rollback; build fix
+is 'coming forward again opens the build, and the one that answers is kept' '0 fix/new' "$code $(pair)"
+setup; stub nc 'cat >/dev/null; [ -f "$state/asked" ] && echo "{\"speaking\":false}" || echo "{\"error\":\"x\",\"main\":\"blocked for 0.1 s\"}"; touch "$state/asked"'; printf 'good' >"$libexec/x-speak.prev"; build new
+is 'a main thread busy for a moment is asked again' 'new/old' "$(pair)"
+setup; plist '/a b/config.json'; echo '/a b/config.json' >"$state/argument"; build new; started; rollback
+says 'a config path with a space is read whole' 'config argument: the same'
 setup; build two; started; rollback; rollback; rm "$state/inode" "$state/status"; build three
 is 'a rollback that came forward again leaves the kept binary as it was' 'three/old' "$(pair)"
 setup; rm "$libexec/x-speak" "$state/inode" "$state/status"; build new
@@ -124,6 +135,9 @@ is 'a relaunch that fails while the old process stops leaves the restored binary
 setup; build new; started; touch "$state/bootstrap-fails"; rollback
 is 'a relaunch that ends with nothing running leaves the restored binary in place' '1 old/new' "$code $(pair)"
 says 'a relaunch that ends with nothing running says so' 'x-speak was not started'
+
+setup; build new; started; touch "$state/bootstrap-refuses"; rollback
+is 'a start that fails with the refusal'"'"'s number is no refusal' '1 old/new' "$code $(pair)"
 
 setup; build new; started; touch "$state/other"; rollback
 is 'launchd running another binary is an error' '1' "$code"

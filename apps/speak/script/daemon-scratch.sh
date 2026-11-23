@@ -32,7 +32,7 @@ setup() {
     stub launchctl 'case "$1" in
         bootout) rm -f "$state/inode" ;;
         print) [ -f "$state/inode" ] && printf "\tstate = running\n\targuments = {\n\t\tx\n\t\t--config\n\t\t%s\n\t}\n\tpid = 1\n" "$(cat "$state/argument")" ;;
-        bootstrap) plutil -extract ProgramArguments.2 raw "$HOME/Library/LaunchAgents/com.dima.x-speak.plist" >"$state/argument"; echo relaunch >>"$state/relaunches"; [ -f "$state/bootstrap-fails" ] && exit 5; stat -f %i "$libexec/x-speak" >"$state/inode"; [ -f "$state/other" ] && echo 7 >"$state/inode"
+        bootstrap) plutil -extract ProgramArguments.2 raw "$HOME/Library/LaunchAgents/com.dima.x-speak.plist" >"$state/argument"; echo relaunch >>"$state/relaunches"; [ -f "$state/bootstrap-fails" ] && exit 5; [ -f "$state/bootstrap-refuses" ] && exit 3; stat -f %i "$libexec/x-speak" >"$state/inode"; [ -f "$state/other" ] && echo 7 >"$state/inode"
             [ -f "$state/dies" ] && rm -f "$state/status"
             echo "2026-11-23 10:00:01.000 config: $(cat "$state/settings")" >>"$HOME/.local/share/x-speak/daemon.err.log" ;;
     esac'
