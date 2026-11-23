@@ -151,8 +151,10 @@ final class ConfigFile {
             hasLoaded = true
             log("config: loaded \(url.path) — \(current.summary)")
         } catch {
-            lastError = "\(url.path): \(stamp == nil ? "not readable" : Self.describe(error))"
-            log("config: \(hasLoaded ? "kept the last good one" : "running on the built-in defaults") — \(lastError!)")
+            // the admin's status line gets the short name, the log the full path
+            let reason = stamp == nil ? "not readable" : Self.describe(error)
+            lastError = "\(url.lastPathComponent): \(reason)"
+            log("config: \(hasLoaded ? "kept the last good one" : "running on the built-in defaults") — \(url.path): \(reason)")
         }
         return lastError
     }
