@@ -30,7 +30,7 @@
 - ✅ footer names where the bindings and the notes come from
   - then the footer names `pnpm hotkeys:scan`, `hotkeys/manual.ts` and `hotkeys/notes.json`
 
-- ⬜ the build badge names the branch on the dev page, bottom centre; the built page shows none
+- ✅ the build badge names the branch on the dev page, bottom centre; the built page shows none
   - given the dev page is open, then the badge reads the checkout's branch
   - given the built page at `http://localhost:7373`, then no badge shows
   - decision: dev only, the kit's own rule (dima, 2026-11-23)
@@ -194,11 +194,11 @@
 
 the daemon and its scripts live in frame; `hotkeys/…` paths here are frame's.
 
-- ⬜ `pnpm dev:chords` starts the dev page, and the daemon with it when none runs
+- ✅ `pnpm dev:chords` starts the dev page, and the daemon with it when none runs
   - given nothing on 7373, then the daemon starts as the script's child and both stop together
   - given the daemon on 7373, then the script says the api is already served and starts the page alone
   - given a daemon older than the page, or anything else on 7373, then it says so, starts nothing and exits non-zero
-- ⬜ `pnpm --filter chords chords:build` builds the page the daemon serves
+- ✅ `pnpm --filter chords chords:build` builds the page the daemon serves
   - makes: `apps/chords/dist/`, its `build-commit` meta naming the commit it came from
 - ✅ `pnpm hotkeys:scan` reads wispr flow, macos and `manual.ts`, and says nothing when all read
   - decision: cursor is not read — dima tracks none of its in-app shortcuts (2026-09-29)
