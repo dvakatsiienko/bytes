@@ -4,33 +4,28 @@
 // or a pasted url lands on the right page.
 import { useEffect, useState } from 'react';
 
-export const routes = ['/', '/stats'] as const;
-
 export const navigate = (to: string) => {
-    window.history.pushState(null, '', to);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+  window.history.pushState(null, '', to);
+  window.dispatchEvent(new PopStateEvent('popstate'));
 };
 
 // Module scope, so the effect below has nothing to depend on: a reader rebuilt every render
 // would be a new dependency every render.
 const read = () => ({
-    params: new URLSearchParams(window.location.search),
-    path: window.location.pathname,
+  params: new URLSearchParams(window.location.search),
+  path: window.location.pathname,
 });
 
 export const useRoute = () => {
-    const [route, setRoute] = useState(read);
+  const [route, setRoute] = useState(read);
 
-    useEffect(() => {
-        const onPop = () => setRoute(read());
+  useEffect(() => {
+    const onPop = () => setRoute(read());
 
-        window.addEventListener('popstate', onPop);
+    window.addEventListener('popstate', onPop);
 
-        return () => window.removeEventListener('popstate', onPop);
-    }, []);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
-    return route;
+  return route;
 };
-
-/* Types */
-export type RoutePath = (typeof routes)[number];

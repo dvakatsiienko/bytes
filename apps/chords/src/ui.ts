@@ -11,7 +11,7 @@
 // the label, which is the gesture the fold button, the move button and the notice retry already
 // spoke; this pass only brought the rest of the page into it.
 export const TAB =
-    'flex cursor-pointer items-center gap-2 rounded-md border px-[11px] py-1.5 font-mono text-[13px]/[normal] font-medium select-none hover:border-accent hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+  'flex cursor-pointer items-center gap-2 rounded-md border px-[11px] py-1.5 font-mono text-[13px]/[normal] font-medium select-none hover:border-accent hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 
 // A panel label: deliberately smaller than the body it introduces, because it is a signpost and
 // not a headline. The uppercase is dima's call, over the repo's own lowercase rule.
@@ -21,7 +21,7 @@ export const TAB =
 // anything a reader is meant to read. It is the de-emphasis token — a free key's legend, a
 // disabled control, an unpressed count's em dash — and nothing informational.
 export const H2 =
-    'm-0 font-sans text-[13px] font-semibold tracking-[.06em] text-ink-2 uppercase';
+  'm-0 font-sans text-[13px] font-semibold tracking-[.06em] text-ink-2 uppercase';
 
 // 📌 A button's shape, type, focus ring and disabled treatment — and deliberately NOT its fill,
 // border colour or label colour. Those belong to the variant, because a variant cannot win them
@@ -30,7 +30,7 @@ export const H2 =
 // first version of this file put the ghost tones in the base, and `save note` — which appended
 // `bg-accent text-on-accent` — rendered white on a transparent fill at 1.16:1. Invisible.
 const CONTROL =
-    'cursor-pointer rounded-md border px-3 py-1.5 font-sans text-[13px] font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-default disabled:border-line disabled:bg-cap-free disabled:text-ink-3 disabled:hover:border-line disabled:hover:text-ink-3';
+  'cursor-pointer rounded-md border px-3 py-1.5 font-sans text-[13px] font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-default disabled:border-line disabled:bg-cap-free disabled:text-ink-3 disabled:hover:border-line disabled:hover:text-ink-3';
 
 // Transparent fill, hairline border, muted label: anything that is not the one obvious action.
 export const GHOST = `${CONTROL} border-line bg-transparent text-ink-2 hover:border-accent hover:text-ink`;

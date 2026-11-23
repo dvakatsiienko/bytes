@@ -28,7 +28,7 @@ _Avoid_: empty key, unbound cap
 ## what is bound
 
 **Mark**:
-A product's own logo, or a mac app's own icon, drawn beside its name; every mark comes from frame's `@frame/logos` store.
+A product's own logo, or a mac app's own icon, drawn beside its name; every mark is this app's own file in `src/logos/`.
 _Avoid_: icon, glyph
 
 **Binding**:

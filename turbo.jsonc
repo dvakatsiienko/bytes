@@ -34,7 +34,10 @@
     // atelier: points the take store at a scratch folder (tests, a verifier round)
     "ATELIER_TAKES_DIR",
     // design-loupe: the job it serves (the test fixture, a verifier's copy)
-    "LOUPE_JOB"
+    "LOUPE_JOB",
+    // chords: a second daemon beside the live one, its port and its source (a test pair, a verifier round)
+    "CHORDS_PORT",
+    "CHORDS_DAEMON"
   ],
   "tasks": {
     // A no-op task with no matching script anywhere. It exists so `lint` and

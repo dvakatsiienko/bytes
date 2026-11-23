@@ -8,6 +8,9 @@
     "apps/x-com-chat/src/components/ui/sidebar.tsx": ["exports"]
   },
   "workspaces": {
+    "apps/chords": {
+      "entry": ["script/dev.ts"]
+    },
     "apps/cv": {
       "ignoreDependencies": ["@tailwindcss/typography", "tailwind-scrollbar"]
     },

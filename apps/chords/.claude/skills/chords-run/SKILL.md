@@ -1,61 +1,44 @@
 ---
 name: chords-run
-description: Load BEFORE you run, start, build, screenshot or click through chords, the hotkey map — «run chords», «chords:dev», «check the board», «screenshot the map», «does the stats page render», a change under `hotkeys/chords/` or `hotkeys/serve.ts` that needs proof in the real page.
+description: Load BEFORE you run, start, build, screenshot or click through chords, the hotkey map — «run chords», «dev:chords», «chords:dev», «check the board», «screenshot the map», «does the stats page render», a change under `apps/chords/` or frame's `hotkeys/serve.ts` that needs proof in the real page.
 ---
 
 # chords-run
 
-chords is a vite + react page served by the always-on launchd daemon `x-monitor-hotkey-live`
-(`hotkeys/live.ts --watch`) on **:7373**; the same daemon owns the api and the sse stream
-(`hotkeys/serve.ts`). you drive the page with **`agent-browser`** and the api with **`curl`**.
-commands run from the frame repo root (or a worktree root) unless a line `cd`s.
+chords is a vite + react page served by frame's always-on launchd daemon `x-monitor-hotkey-live`
+(`~/frame/hotkeys/live.ts --watch`) on **:7373**; the same daemon owns the api and the sse stream. you
+drive the page with **`agent-browser`** and the api with **`curl`**. commands run from the bytes repo root
+(or a worktree root) unless a line `cd`s.
 
 ## pick the lane
 
-- **main checkout, ui change** — run vite dev on :7374. it proxies `/api` to the live daemon, so
-  the page shows real bindings and presses. reads are safe; a save writes dima's real
-  `hotkeys/notes.json` / `hotkeys/manual.ts`.
-- **a worktree** (`~/frame/.claude/worktrees/<slug>`), or any write flow — stand up a second
-  daemon on **:7383** from the worktree. `hotkeys.json`, `notes.json`, `manual.ts` and
-  `chords/dist` all resolve from the file's own dir, so the worktree daemon reads and writes only
-  its own tree. the press log is shared and read-only.
-- **the served build on :7373** — dima's page. `pnpm chords:build` in the main checkout
+- **main checkout, ui change** — `pnpm dev:chords`, the page on :7374. it proxies `/api` to the live
+  daemon, so it shows real bindings and presses. reads are safe; a save writes dima's real
+  `~/frame/hotkeys/notes.json` / `manual.ts`.
+- **a worktree, reads only** — `pnpm --filter chords dev`: the page on 7374 plus the tree's offset, over the
+  live daemon. its writes answer 403 (an origin the daemon does not know).
+- **any write flow** — a second daemon from a copy of frame's `hotkeys/`, below.
+- **the served build on :7373** — dima's page. `pnpm --filter chords chords:build` in the main checkout
   refreshes it with no restart; never stop or restart the launchd daemon.
-
-## lane: main checkout, dev
-
-start with `run_in_background: true` on the Bash call, and keep its task id:
-
-```bash
-pnpm chords:dev
-```
-
-ready when the log prints `Local: http://localhost:7374/`. the tab title reads `chords: dev`.
 
 ## lane: worktree, second daemon
 
-a fresh tree has no `hotkeys.json` and no `dist/` — the daemon does not scan at boot, so
-`/api/hotkeys` answers 503 until the scan runs:
+`hotkeys.json`, `notes.json` and `manual.ts` resolve from the daemon's own dir, so a copy reads and writes
+only itself. the press log is shared and read-only.
 
 ```bash
-cd ~/frame/.claude/worktrees/<slug>
-CI=1 pnpm install
-pnpm hotkeys:scan
-pnpm chords:build
+cp -R ~/frame/hotkeys <scratch>/hotkeys
+mkdir -p <scratch>/script/lib && cp ~/frame/script/lib/print.ts <scratch>/script/lib/
+pnpm --filter chords chords:build
+CHORDS_PORT=7383 CHORDS_DAEMON=<scratch>/hotkeys/live.ts CHORDS_DIST=$PWD/apps/chords/dist pnpm --filter chords dev
 ```
 
-then two background Bash calls (`run_in_background: true`), keep both task ids:
+the last line is the one run script: nothing answers on 7383, so it starts the copy as its child and then
+the page. run it with `run_in_background: true`, under `timeout 7200`, and keep its task id. `:7383` serves
+the tree's built `dist`, the vite port its log prints is the dev page.
 
-```bash
-CHORDS_PORT=7383 CHORDS_DEV_PORT=7384 node hotkeys/live.ts --watch
-```
-
-```bash
-CHORDS_PORT=7383 CHORDS_DEV_PORT=7384 pnpm chords:dev
-```
-
-- :7383 serves the worktree's built `dist`; :7384 is its vite dev, proxying to :7383
-- both env vars go on both processes: the daemon's origin allowlist is built from the pair
+- a fresh copy has no `hotkeys.json` when frame never scanned: `/api/hotkeys` answers 503 until
+  `node <scratch>/hotkeys/scan.ts` runs
 - ready check:
 
 ```bash
@@ -64,17 +47,15 @@ curl -s -o /dev/null -w '%{http_code}\n' localhost:7383/api/hotkeys
 
 ## drive it — agent-browser
 
-own session, absolute screenshot paths (see gotchas). `$CLAUDE_JOB_DIR` is set only in a
-background job; elsewhere use any absolute scratch dir outside the repo:
+own session, absolute screenshot paths (see gotchas):
 
 ```bash
 export AGENT_BROWSER_SESSION=chords-run
 agent-browser set viewport 1280 900
 agent-browser open http://localhost:7374/
-agent-browser wait 1500
-agent-browser get title
+agent-browser wait '[role=tab]'
 agent-browser snapshot -i -c | head -40
-agent-browser screenshot "$CLAUDE_JOB_DIR/tmp/board.png"
+agent-browser screenshot <scratch>/board.png
 ```
 
 the page's accessible names are the handle — every key is a button named
@@ -92,12 +73,7 @@ agent-browser errors --json | jq -r '.data.errors[] | .text | split("\n")[0]' | 
 
 - the board opens on the `hyper` layer; a key named on another layer is not found until its tab
   is clicked
-- a save is proven in the tree, never in the page:
-
-```bash
-git diff hotkeys/notes.json
-```
-
+- a save is proven in the daemon's own files, never in the page: `diff ~/frame/hotkeys/notes.json <scratch>/hotkeys/notes.json`
 - the sse stream, straight from the api:
 
 ```bash
@@ -113,12 +89,12 @@ curl -s -o /dev/null -w '%{http_code}\n' -X PUT -H 'Content-Type: application/js
 ## tests
 
 ```bash
-pnpm exec vitest run hotkeys
+pnpm --filter chords test
 pnpm --filter chords typecheck
 ```
 
-the vitest files cover the node side (`chord`, `keycodes`, `manual-edit`, `stats`); the page has
-no tests, so a ui change is proven in agent-browser.
+they cover the page's helpers and the run script's port check; the board has no tests, so a ui change is
+proven in agent-browser. the node side's tests are frame's: `pnpm -C ~/frame exec vitest run hotkeys`.
 
 ## stop
 
@@ -138,36 +114,25 @@ for p in 7374 7383 7384; do lsof -nP -iTCP:$p -sTCP:LISTEN -t >/dev/null && echo
 ## gotchas
 
 - **a relative screenshot path lands in the agent-browser daemon's cwd**, the dir of the shell
-  that first launched it — not the current shell's cwd. a `board.png` appeared in `~/frame`'s
-  root. always pass an absolute path.
+  that first launched it — not the current shell's cwd. always pass an absolute path.
 - **`agent-browser errors` prints bare `✗` lines** with no text. `--json` shows the message.
 - **`agent-browser errors --clear` clears nothing** — it prints the buffer, which keeps every
   error since the session began, stale code included. an error count per load comes from a fresh
   `AGENT_BROWSER_SESSION` name, closed after.
 - **the page loads with zero console errors.** any `VGPUError` is new: vgpu fires `onResize`
   callbacks from inside its own frame, so a draw there must wait for the next animation frame.
+- **a dev shot taken too early shows the fallback mono face**: the plex files load later on vite than
+  from the build. wait a second before comparing two shots.
 - **vite binds `[::1]` only** — `localhost:7374` answers, `127.0.0.1:7374` does not.
-- **the daemon binds `0.0.0.0`**, ipv4 only, on purpose since `daecf880` (a phone on the wi-fi
-  opens it) — `[::1]:7383` does not connect. writes answer 403 unless they come from loopback, so
-  a write probe goes to `127.0.0.1` or `localhost`, never the mac's wi-fi address.
-- **`pnpm hotkeys:scan` prints nothing on stderr when every source reads.** a `skipped <source>`
+- **the daemon binds `0.0.0.0`**, ipv4 only, on purpose (a phone on the wi-fi opens it) — `[::1]:7383`
+  does not connect. writes answer 403 unless they come from loopback, so a write probe goes to
+  `127.0.0.1` or `localhost`, never the mac's wi-fi address.
+- **`pnpm -C ~/frame hotkeys:scan` prints nothing on stderr when every source reads.** a `skipped <source>`
   line is a real change on this mac — an app gone or its config moved — never noise.
-- **a hand-made worktree cannot `git-crypt unlock`** with the recipe in frame's `AGENTS.md`: the
-  unlock runs `git status`, which dies on the clean filter. the unlock that worked:
-
-```bash
-git -c filter.git-crypt.smudge=cat -c filter.git-crypt.required=false worktree add -b <slug> .claude/worktrees/<slug> HEAD
-cd .claude/worktrees/<slug>
-GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=filter.git-crypt.clean GIT_CONFIG_VALUE_0=cat GIT_CONFIG_KEY_1=filter.git-crypt.required GIT_CONFIG_VALUE_1=false git-crypt unlock "$(git rev-parse --git-common-dir)/git-crypt/keys/default"
-```
-
-  the `worktree add` still prints `clean filter 'git-crypt' failed` and exits non-zero, but the
-  tree and branch exist; after the unlock `git status --short` is empty.
 
 ## troubleshooting
 
 - `✗ 89 elements have role "button", but none match name …` — the key lives on another layer, or
   its press count moved. `snapshot -i -c | grep` for the current name.
-- `/api/hotkeys` → 503 on a worktree daemon — the scan never ran in that tree: `pnpm hotkeys:scan`.
-- a saved note does not show in `git diff` — nothing was selected when you saved; select a key
-  first, the SELECTED KEY panel names it.
+- a saved note does not land — nothing was selected when you saved; select a key first, the SELECTED KEY
+  panel names it.

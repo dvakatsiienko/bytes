@@ -15,6 +15,7 @@ Each app keeps its memory in its own AGENTS.md. A block a tool generates there (
 - `atelier` — Art studio: scenes as code, lit and shot · Active Dev, local only
 - `design-loupe` — Designer asks pinned to live boards, answered in place · Active Dev, local only
 - `speak` — Read-aloud: F4 reads the selection, a swift daemon and its voice admin · Active Dev, local only
+- `chords` — Hotkey map: every binding on the keyboard, notes and rebinds · Active Dev, local only
 - `figmentation` — CSS/design experiments · Showcase
 - `trophy-sys` — PSN trophy tracker, retro terminal UI · Active Dev
 

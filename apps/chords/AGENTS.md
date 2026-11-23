@@ -1,8 +1,8 @@
 # AGENTS.md: chords
 
-the hotkey map, as a served app. vite + react + tailwind, one page today, built to `dist/` and
-served by the always-on `x-monitor-hotkey-live` daemon. it is not deployed anywhere and there is
-nothing to deploy it to — it draws this mac's bindings and this mac's press log.
+the hotkey map. vite + react + tailwind, one page, built to `dist/`, which frame's always-on
+`x-monitor-hotkey-live` daemon serves on 7373. it is not deployed anywhere and carries no
+`vercel.json`: it draws this mac's bindings and this mac's press log.
 
 **before changing what the app does, read `PRODUCT.md` (the product authority) and your section
 of `FTR.md` + `GLOSSARY.md`; before changing how anything renders, `DESIGN.md` (the look
@@ -13,32 +13,44 @@ Owner Edge, Earned Accent, Two Hands, Tabular, Cold Ring — are the ones a revi
 `document`) and keep impeccable's shape — never rewrite them into another one.**
 `.impeccable/design.json` is `document`'s sidecar and is regenerated with them, never by hand.
 
-## the server is not here
+📌 **kit**: chords' ui is its own; only the build badge is the kit's. it moved into bytes as it was, its
+move onto `@ui/kit` is a later chunk of [BYT-109](https://linear.app/x-com/issue/BYT-109).
 
-`hotkeys/serve.ts` is the other half of this app and lives one directory up, inside the daemon,
-because the daemon is already watching the press log and the config sources. the contract:
+## the mac side is in frame
 
-- `GET /api/hotkeys` — the scan snapshot. `503` until `pnpm hotkeys:scan` has run once
+`~/frame/hotkeys/` holds the daemon (`live.ts`, `serve.ts`), the scan, the hand-kept bindings (`manual.ts`)
+and the notes (`notes.json`); its `AGENTS.md` is the contract. launchd, the recorder and every grant stay
+there. what the page reads:
+
+- `GET /api/hotkeys` — the scan snapshot: each row with its `chord` spelled, and `modifierOrder` beside
+  them. `503` until frame's `pnpm hotkeys:scan` has run once
 - `GET /api/presses` — server-sent events, two kinds: `presses` when a chord is pressed,
   `bindings` when a config source moved and the scan reran. the page holds no timer of its own
-- `GET /api/stats?window=all|month|week` — the press report (`report.ts`); `400` on any other
-  window, `503` before the first scan
-- `GET`/`PUT /api/notes` — `hotkeys/notes.json`. empty text is the delete
+- `GET /api/stats?window=all|month|week` — the press report; `400` on any other window, `503` before
+  the first scan
+- `GET`/`PUT /api/notes` — `notes.json`. empty text is the delete
 - `POST /api/manual` — a rebind, written surgically into `manual.ts`. `409` when it cannot place
   the edit exactly, `400` when a field is missing or carries a control character
+
+📌 **the page holds no chord rule**: which modifier comes first is frame's `chord.ts`, and it travels
+with the bindings answer. the page joins a layer and a key, never sorts modifiers on its own.
 
 📌 **both writing routes take a write from a loopback peer only, demand `application/json` and
 refuse an unknown `Origin`.** the phone on the wi-fi reads and never writes; the last two checks
 stop a browser page on this mac. the full reasoning is in `serve.ts`'s own header.
 
-## the scripts
+## run
 
-- `pnpm chords:dev` — vite on 7374, proxying `/api` to the daemon on 7373
-- `pnpm chords:build` — writes `dist/`, which the daemon serves
-- `pnpm hotkeys:map` — opens the served page
+- `pnpm dev:chords` — the one run script (`script/dev.ts`): the page on 7374, and the daemon with it when nothing holds 7373
+- `pnpm --filter chords chords:build` — writes `dist/`; the live page shows it on the next load, no restart
+- `pnpm -C ~/frame hotkeys:map` — opens the served page
 
-📌 vite does not rewrite `Origin` when it proxies, so a dev page's origin is 7374's. both ports
-are on the server's allowlist and removing either breaks a loop that looks unrelated.
+📌 a `serve.ts` change in frame needs `pnpm -C ~/frame schedule:restart x-monitor-hotkey-live`; the page is
+dima's live tool, so the restart is announced first.
+
+📌 vite does not rewrite `Origin` when it proxies, so a dev page's origin is its own port. the daemon takes
+writes from 7373 and 7374 only: a worktree's dev page (an offset port) on the live daemon reads, and its
+writes answer 403. `CHORDS_PORT` + `CHORDS_DAEMON` give it a daemon of its own (`chords-run`).
 
 ## conventions
 
@@ -46,5 +58,5 @@ are on the server's allowlist and removing either breaks a loop that looks unrel
   `x:guide-ui-ux` for anything rendered. `DESIGN.md` binds on top of them for this app
 - the keyboard layout table in `src/keyboard.ts` carries a `biome-ignore format` line on purpose:
   one line per keyboard row, because the shape of that table is the keyboard
-- `chord.ts` and `manual.ts` are imported from one directory up. they are shared with the node
-  side (`scan.ts`, `top.ts`, `live.ts`), so neither may grow a browser-only import
+- **a new mark** is fetched by art-kit's `logo.ts` into frame's `logos/marks`, then its file is copied to
+  `src/logos/` under the same name; the store stays in frame until frame folds into bytes (dima, 2026-11-23)
