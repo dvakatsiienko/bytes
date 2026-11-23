@@ -114,7 +114,7 @@ export type Answer<T extends object = object> =
   | Refusal;
 
 // stale: the settings file moved on since this page read it
-export interface Refusal {
+interface Refusal {
   error: string;
   stale?: boolean;
 }
