@@ -15,6 +15,8 @@
 
 ## / — voices
 
+> states: all live, the big card plays, unsaved edits, a rejected save, no key, «set key» open, benched (no quota), a chain of one, the sample line edited, the daemon down, night, wide 1728 / standard 1440 / narrow 900, the speechify card, the Siri favourite mark
+
 - ✅ one column per language, in the order english, українська, русский
   - decision: the order is dima's; it lives in an array so a key sort cannot reorder it
 - ✅ a chain card per engine, in the order the daemon tries them
@@ -100,11 +102,15 @@
 
 ## keys and settings
 
+> states: the settings popover open, the waveform switcher
+
 - 🧭 a key typed in the admin is stored in the macOS keychain, never in config.json; when the keychain and 1password both hold one, the keychain wins (dima, 2026-10-01)
 - 🧭 one waveform setting (bars by default; thin, wide, dots, curve, blocks) draws every card and the pill
   - makes: a `waveform` key in config.json
 
 ## stats — the quick view
+
+> states: the week strip in the save bar, the week hover, the per-app hover, the cut hover, the detail on click
 
 - 🧭 every read leaves one record
   - makes: `~/.local/share/x-speak/reads.jsonl`, one line per read: time, source app, words, characters the normalizer cut, seconds listened, engine
@@ -121,6 +127,8 @@
   - decision: 238 wpm is the default silent reading speed (Brysbaert 2019, unchecked); a one-time «measure me» is later, not in the cut
 
 ## save
+
+> states: clean, unsaved (save lit), rejected
 
 - ✅ save writes config.json
   - makes: `daemon/config.json`, in biome's own format with its keys sorted
@@ -141,6 +149,8 @@
   - then the server answers 415, nothing is saved and the daemon hears nothing
 
 ## x-speak — hotkey + pill
+
+> states: reading, the word highlight, paused, idle with stick on, a long line, fell through to the next engine, the code block cue, hover tooltips, the volume popover, the speed popover, on a light and a dark desktop
 
 - ✅ F4 reads the selected text aloud, cutting off whatever plays
   - given text selected in any app
