@@ -1,7 +1,5 @@
 # chords — the ftr
 
-claims: `hotkeys/serve.ts`
-
 - 🧭 asked, not built yet (a new ask, an experiment) · ⬜ built, not checked yet · 🐞 built, its check fails · ✅ passes in the app's verify recipe · 🔎 dima used it and it holds
 - given/when/then lines are sixth sense's exit lines
 - makes: lines name what a feature leaves behind — a file, a take, a clipboard item
@@ -25,12 +23,17 @@ claims: `hotkeys/serve.ts`
   - then the url reads `/stats`, then `/` again, and the board is back
 - ✅ the phone on the wi-fi reads the ftr; only this mac writes
   - given a machine on the wi-fi
-  - when it opens the ftr or reads `/api/hotkeys` / `/api/notes`, then 200
+  - when it opens the page or reads `/api/hotkeys` / `/api/notes`, then 200
   - when it writes to `/api/notes` or `/api/manual`, then 403 «writes are taken from this mac only»
   - and a write from this mac answers 200
   - decision: writes accepted from loopback only, reads stay open for the phone — dima 2026-09-27
 - ✅ footer names where the bindings and the notes come from
   - then the footer names `pnpm hotkeys:scan`, `hotkeys/manual.ts` and `hotkeys/notes.json`
+
+- ⬜ the build badge names the branch on the dev page, bottom centre; the built page shows none
+  - given the dev page is open, then the badge reads the checkout's branch
+  - given the built page at `http://localhost:7373`, then no badge shows
+  - decision: dev only, the kit's own rule (dima, 2026-11-23)
 
 ## / — board
 
@@ -189,6 +192,14 @@ claims: `hotkeys/serve.ts`
 
 ## scripts
 
+the daemon and its scripts live in frame; `hotkeys/…` paths here are frame's.
+
+- ⬜ `pnpm dev:chords` starts the dev page, and the daemon with it when none runs
+  - given nothing on 7373, then the daemon starts as the script's child and both stop together
+  - given the daemon on 7373, then the script says the api is already served and starts the page alone
+  - given anything else on 7373, then it says so, starts nothing and exits non-zero
+- ⬜ `pnpm --filter chords chords:build` builds the page the daemon serves
+  - makes: `apps/chords/dist/`, its `build-commit` meta naming the commit it came from
 - ✅ `pnpm hotkeys:scan` reads wispr flow, macos and `manual.ts`, and says nothing when all read
   - decision: cursor is not read — dima tracks none of its in-app shortcuts (2026-09-29)
   - makes: `hotkeys/hotkeys.json`, the snapshot the board draws

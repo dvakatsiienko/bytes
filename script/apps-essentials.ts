@@ -7,7 +7,7 @@
  *
  * One line per gap, stable for other tools to read: `<🔴|🟡> <app> <row> — <detail>`, then one
  * summary line. A 🔴 row exits 1; a 🟡 (a doc gone stale) never fails. An app outside this repo
- * (chords, from frame's hook) gets the app-local rows only; the root registrations are bytes'.
+ * gets the app-local rows only; the root registrations are bytes'.
  * An `--app` path counts as a bytes app only under THIS checkout's apps/ — a worktree path handed
  * to the main checkout's script loses its root rows, so call the script of the tree you check.
  *
@@ -52,6 +52,11 @@ const waivers: Record<string, Waiver> = {
     rows: ['launch-entry'],
     ticket: 'BYT-111',
     why: 'launchd serves it (x-atelier-live, :5180)',
+  },
+  chords: {
+    rows: ['launch-entry'],
+    ticket: 'BYT-111',
+    why: 'launchd serves it (x-monitor-hotkey-live, :7373)',
   },
   speak: {
     rows: ['launch-entry'],

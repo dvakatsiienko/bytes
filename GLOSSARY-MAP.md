@@ -26,6 +26,8 @@ Each app in this monorepo is a bounded context. Per-app `GLOSSARY.md` files are 
   - contract: none yet
 - [speak](./apps/speak/GLOSSARY.md) — read-aloud on the mac: the x-speak daemon behind F4 and its voice admin
   - contract: none yet
+- [chords](./apps/chords/GLOSSARY.md) — the hotkey map: bindings, presses, notes, rebinds
+  - contract: none yet
 
 A context's `contract:` line names the files its glossary defines: frame's `x lane gate` refuses a commit that changes one without the app's `GLOSSARY.md`, unless the message says «glossary: unchanged — <why>». «none yet» nudges on a touch, so the list fills as apps are worked.
 

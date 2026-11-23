@@ -12,21 +12,31 @@ export const layout = [
 ] as const satisfies readonly (readonly (readonly [string, number])[])[];
 
 // dima's reading order for the layer tabs (2026-09-29): hyper, then a group per leading modifier —
-// cmd, ctrl, opt, shift — each growing from its bare layer outward, and no modifier last. A rule,
-// not a list, so a layer that appears later sorts itself.
-const leadRank = ['hyper', 'cmd', 'ctrl', 'opt', 'shift'];
+// cmd, ctrl, opt, shift — each growing from its bare layer outward, and no modifier last. Derived
+// from the order the daemon sends, with cmd leading, so a layer that appears later sorts itself.
+const leadsOf = (modifierOrder: readonly string[]) => [
+  'hyper',
+  ...cmdFirst(modifierOrder.filter((mod) => mod !== 'hyper')),
+];
 
-const layerRank = (layer: string): [number, number, string] => {
-    if (layer === '') return [99, 0, ''];
-    const shown = layerName(layer).split('+');
-    const lead = leadRank.indexOf(shown[0] ?? '');
-    return [lead === -1 ? 50 : lead, shown.length, shown.join('+')];
+const layerRank = (
+  layer: string,
+  leads: readonly string[],
+): [number, number, string] => {
+  if (layer === '') return [99, 0, ''];
+  const shown = layerName(layer).split('+');
+  const lead = leads.indexOf(shown[0] ?? '');
+  return [lead === -1 ? 50 : lead, shown.length, shown.join('+')];
 };
 
-export const compareLayers = (a: string, z: string) => {
-    const [aLead, aSize, aName] = layerRank(a);
-    const [zLead, zSize, zName] = layerRank(z);
+export const compareLayers = (modifierOrder: readonly string[]) => {
+  const leads = leadsOf(modifierOrder);
+
+  return (a: string, z: string) => {
+    const [aLead, aSize, aName] = layerRank(a, leads);
+    const [zLead, zSize, zName] = layerRank(z, leads);
     return aLead - zLead || aSize - zSize || aName.localeCompare(zName);
+  };
 };
 
 // Reach, for the rebind advisor: how far a key sits from the resting hands. Rows away from the
@@ -36,47 +46,46 @@ const rowCost = [2.5, 2, 1, 0, 1, 1.5];
 const homeKeys = ['a', 's', 'd', 'f', 'j', 'k', 'l', ';'];
 
 const keyPlace = new Map<string, { row: number; x: number }>(
-    layout.flatMap((row, at) => {
-        let left = 0;
-        return row.map(([key, width]) => {
-            const place = [key, { row: at, x: left + width / 2 }] as const;
-            left += width;
-            return place;
-        });
-    }),
+  layout.flatMap((row, at) => {
+    let left = 0;
+    return row.map(([key, width]) => {
+      const place = [key, { row: at, x: left + width / 2 }] as const;
+      left += width;
+      return place;
+    });
+  }),
 );
 
 const homeX = homeKeys.flatMap((key) => keyPlace.get(key)?.x ?? []);
 
-export const reachOf = (key: string): number | undefined => {
-    const place = keyPlace.get(key);
-    if (!place || key === '') return undefined;
-    if (key === 'space') return 0.5;
-    const sideways = Math.min(...homeX.map((x) => Math.abs(place.x - x)));
-    return (rowCost[place.row] ?? 2) + (sideways / 4) * 0.5;
+const reachOf = (key: string): number | undefined => {
+  const place = keyPlace.get(key);
+  if (!place || key === '') return undefined;
+  if (key === 'space') return 0.5;
+  const sideways = Math.min(...homeX.map((x) => Math.abs(place.x - x)));
+  return (rowCost[place.row] ?? 2) + (sideways / 4) * 0.5;
 };
 
 export const chordCost = (mods: string, key: string): number | undefined => {
-    const reach = reachOf(key);
-    if (reach === undefined) return undefined;
-    const held =
-        mods === '' ? 0 : mods === 'hyper' ? 1 : mods.split('+').length;
-    return reach + held * 0.75;
+  const reach = reachOf(key);
+  if (reach === undefined) return undefined;
+  const held = mods.split('+').filter(Boolean).length;
+  return reach + held * 0.75;
 };
 
 export const layoutKeys = [...keyPlace.keys()].filter((key) => key !== '');
 
 export const modKeys = new Set([
-    'ctrl',
-    'opt',
-    'cmd',
-    'shift',
-    'fn',
-    'caps',
-    'rctrl',
-    'ropt',
-    'rcmd',
-    'rshift',
+  'ctrl',
+  'opt',
+  'cmd',
+  'shift',
+  'fn',
+  'caps',
+  'rctrl',
+  'ropt',
+  'rcmd',
+  'rshift',
 ]);
 
 // The right-hand modifiers need their own identity for the binding lookup — wispr's
@@ -86,16 +95,16 @@ export const modKeys = new Set([
 // cap and the text escaped the key. An Air75 prints an arrow there, and this board draws the
 // keyboard as the keyboard — the chord strings keep the words.
 export const capLabel: Record<string, string> = {
-    down: '↓',
-    left: '←',
-    pagedown: 'pgdn',
-    pageup: 'pgup',
-    rcmd: 'cmd',
-    rctrl: 'ctrl',
-    right: '→',
-    ropt: 'opt',
-    rshift: 'shift',
-    up: '↑',
+  down: '↓',
+  left: '←',
+  pagedown: 'pgdn',
+  pageup: 'pgup',
+  rcmd: 'cmd',
+  rctrl: 'ctrl',
+  right: '→',
+  ropt: 'opt',
+  rshift: 'shift',
+  up: '↑',
 };
 
 // The caps on dima's own board, from his photo: cream letters, a red number row, lavender
@@ -103,36 +112,36 @@ export const capLabel: Record<string, string> = {
 // FREE cap by its family — a bound cap stays white under its app bar, so bound and free still
 // read apart the way they always did.
 export const capFamily: Record<
-    string,
-    'esc' | 'fn' | 'num' | 'arrow' | 'help' | 'snip'
+  string,
+  'esc' | 'fn' | 'num' | 'arrow' | 'help' | 'snip'
 > = {
-    '-': 'num',
-    '=': 'num',
-    '`': 'fn',
-    down: 'arrow',
-    esc: 'esc',
-    help: 'help',
-    left: 'arrow',
-    right: 'arrow',
-    snip: 'snip',
-    up: 'arrow',
-    ...Object.fromEntries(
-        Array.from({ length: 12 }, (_, i) => [`f${i + 1}`, 'fn']),
-    ),
-    ...Object.fromEntries(
-        Array.from({ length: 10 }, (_, i) => [String(i), 'num']),
-    ),
+  '-': 'num',
+  '=': 'num',
+  '`': 'fn',
+  down: 'arrow',
+  esc: 'esc',
+  help: 'help',
+  left: 'arrow',
+  right: 'arrow',
+  snip: 'snip',
+  up: 'arrow',
+  ...Object.fromEntries(
+    Array.from({ length: 12 }, (_, i) => [`f${i + 1}`, 'fn']),
+  ),
+  ...Object.fromEntries(
+    Array.from({ length: 10 }, (_, i) => [String(i), 'num']),
+  ),
 };
 
 const appColor: Record<string, string> = {
-    '1password': 'var(--app-1password)',
-    bartender: 'var(--app-bartender)',
-    cleanshot: 'var(--app-cleanshot)',
-    cursor: 'var(--app-cursor)',
-    macos: 'var(--app-macos)',
-    magnet: 'var(--app-magnet)',
-    raycast: 'var(--app-raycast)',
-    'wispr flow': 'var(--app-wispr)',
+  '1password': 'var(--app-1password)',
+  bartender: 'var(--app-bartender)',
+  cleanshot: 'var(--app-cleanshot)',
+  cursor: 'var(--app-cursor)',
+  macos: 'var(--app-macos)',
+  magnet: 'var(--app-magnet)',
+  raycast: 'var(--app-raycast)',
+  'wispr flow': 'var(--app-wispr)',
 };
 
 // An app nobody has given a colour to reads as system grey rather than as nothing at all.
@@ -141,24 +150,22 @@ export const colorOf = (app: string) => appColor[app] ?? 'var(--app-macos)';
 // Which keycaps light up as held while a layer is shown. Hyper is one physical key — caps
 // lock, remapped — and not the four modifiers it stands for.
 export const layerMods = (layer: string) =>
-    layer === 'hyper'
-        ? new Set(['caps'])
-        : new Set(layer.split('+').filter(Boolean));
+  layer === 'hyper'
+    ? new Set(['caps'])
+    : new Set(layer.split('+').filter(Boolean));
 
 // ⌘ leads any modifier set it is part of — dima reads cmd+ctrl, not ctrl+cmd (2026-09-29). display
-// only: the log and the bindings key on the stored order (hotkeys/chord.ts), and renaming that
+// only: the log and the bindings key on the stored order (frame's hotkeys/chord.ts), and renaming that
 // would orphan every press already written
 const cmdFirst = (mods: string[]) =>
-    mods.includes('cmd')
-        ? ['cmd', ...mods.filter((mod) => mod !== 'cmd')]
-        : mods;
+  mods.includes('cmd') ? ['cmd', ...mods.filter((mod) => mod !== 'cmd')] : mods;
 
 export const showChord = (chord: string) => {
-    const tokens = chord.split('+');
-    return tokens.length < 2
-        ? chord
-        : [...cmdFirst(tokens.slice(0, -1)), tokens.at(-1)].join('+');
+  const tokens = chord.split('+');
+  return tokens.length < 2
+    ? chord
+    : [...cmdFirst(tokens.slice(0, -1)), tokens.at(-1)].join('+');
 };
 
 export const layerName = (layer: string) =>
-    layer === '' ? 'no modifier' : cmdFirst(layer.split('+')).join('+');
+  layer === '' ? 'no modifier' : cmdFirst(layer.split('+')).join('+');

@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+
+  // NOT redundant — do not delete. The root config extends
+  // `ultracite/biome/next`, whose Next.js-only rules fire on this Vite app.
+  "root": false,
+  "extends": "//",
+  "linter": {
+    "rules": {
+      // There is no next/image in a Vite app to prefer over <img>.
+      "performance": { "noImgElement": "off" }
+    }
+  }
+}

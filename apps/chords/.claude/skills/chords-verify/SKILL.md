@@ -1,6 +1,6 @@
 ---
 name: chords-verify
-description: Load AFTER any change under `hotkeys/chords/` or `hotkeys/serve.ts`, before its report or commit — «verify chords», «/verify», «prove the board», «check the cap renders», a sixth sense round on a chords pr.
+description: Load AFTER any change under `apps/chords/` or frame's `hotkeys/serve.ts`, before its report or commit — «verify chords», «/verify», «prove the board», «check the cap renders», a sixth sense round on a chords pr.
 ---
 
 # chords-verify
@@ -13,9 +13,9 @@ this skill never re-describes launching.
 - **:7373 is dima's page**, served by the launchd daemon `x-monitor-hotkey-live`. read it, never
   stop, restart or kickstart it.
 - **a worktree** runs its own pair from `chords-run` → «lane: worktree, second daemon»: the daemon
-  on `http://localhost:7383` (api + built `dist`), vite on `http://localhost:7384` (the page under
+  on `http://localhost:7383` (api + built `dist`), vite on the port its log prints (the page under
   test). every write in this skill goes to `:7383` — its `notes.json` and `manual.ts` are the
-  tree's own.
+  copy's own, and `<copy>` below is that `hotkeys` folder.
 - **the main checkout** uses vite on `:7374` over the live daemon: reads only. a save there writes
   dima's real files.
 
@@ -34,12 +34,12 @@ this skill never re-describes launching.
    (`{"key":"verify-probe","layer":"probe","text":"probe"}`): to `127.0.0.1:7383` → `200`, to
    the mac's wi-fi address (`ipconfig getifaddr en0`) → `403` with «writes are taken from this mac
    only»; a read on the wi-fi address → `200`. then the same body with `"text":""` deletes it, and
-   `git diff --stat hotkeys/notes.json` prints nothing. a real key here overwrites dima's note.
+   `cmp ~/frame/hotkeys/notes.json <copy>/notes.json` prints nothing. a real key here overwrites dima's note.
 2. **a cap renders from `manual.ts`** — plant a row on a free key of a layer (`hyper` has `q`
    free on main): `{ action: 'verify probe cap', app: 'raycast', key: 'q', mods: 'hyper' }`. the
    daemon's watch rescans within ~2 s: `/api/hotkeys` holds 1 row with that action, the page shows
    a button `q <n> verify probe cap`, and the `hyper` tab count grows by 1. remove the row after,
-   and prove `git diff --stat hotkeys/manual.ts` is empty — an edit that removes a line can eat its
+   and prove `cmp ~/frame/hotkeys/manual.ts <copy>/manual.ts` prints nothing — an edit that removes a line can eat its
    neighbour's newline.
 3. **no key name is clipped** — over the 84 caps, a key label (the cap's first text leaf) with
    `scrollWidth > clientWidth` counts `0`. action labels cut with an ellipsis are by design (10 on
@@ -83,4 +83,5 @@ main is ✅ with exactly those two (2026-09-29). a state the command does not op
   it changed
 - the check lines above, one each, and `errors: 0` from a fresh session
 - the line `essentials: <n> pass · <m> fail`, with the baseline fail named as baseline
-- `pnpm exec vitest run hotkeys` and `pnpm --filter chords typecheck`, read by exit code
+- `pnpm --filter chords test` and `pnpm --filter chords typecheck`, read by exit code; a `serve.ts` change adds
+  frame's `pnpm exec vitest run hotkeys`

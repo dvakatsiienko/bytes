@@ -1,50 +1,41 @@
 // The four things the daemon answers. Nothing here is cached: the scan is a file read, the
 // notes are a file read, and the presses arrive on their own.
-import type { Hotkey } from '@hotkeys/manual.ts';
-
 const json = async <T>(input: string, init?: RequestInit): Promise<T> => {
-    const response = await fetch(input, init);
+  const response = await fetch(input, init);
 
-    if (!response.ok) {
-        const body = (await response.json().catch(() => ({}))) as {
-            error?: string;
-        };
+  if (!response.ok) {
+    const body = (await response.json().catch(() => ({}))) as {
+      error?: string;
+    };
 
-        throw new Error(body.error ?? `${input} answered ${response.status}`);
-    }
+    throw new Error(body.error ?? `${input} answered ${response.status}`);
+  }
 
-    return response.json() as Promise<T>;
+  return response.json() as Promise<T>;
 };
 
 export const fetchScan = () => json<ScanPayload>('/api/hotkeys');
 
 export const fetchStats = (window: WindowName) =>
-    json<StatsReport>(`/api/stats?window=${window}`);
+  json<StatsReport>(`/api/stats?window=${window}`);
 
 export const fetchNotes = () => json<NoteStore>('/api/notes');
 
 export const putNote = (note: NoteInput) =>
-    json<NoteStore>('/api/notes', {
-        body: JSON.stringify(note),
-        headers: { 'content-type': 'application/json' },
-        method: 'PUT',
-    });
+  json<NoteStore>('/api/notes', {
+    body: JSON.stringify(note),
+    headers: { 'content-type': 'application/json' },
+    method: 'PUT',
+  });
 
 // A move is one request: the old row ends, the new one starts, and the daemon stamps the date
 // because a browser's clock is not a fact the server should take.
 export const postManualMove = (move: ManualMove) =>
-    json<{ ok: true }>('/api/manual', {
-        body: JSON.stringify({ ...move, op: 'move' }),
-        headers: { 'content-type': 'application/json' },
-        method: 'POST',
-    });
-
-export const postManualEdit = (edit: ManualEdit) =>
-    json<{ ok: true }>('/api/manual', {
-        body: JSON.stringify(edit),
-        headers: { 'content-type': 'application/json' },
-        method: 'POST',
-    });
+  json<{ ok: true }>('/api/manual', {
+    body: JSON.stringify({ ...move, op: 'move' }),
+    headers: { 'content-type': 'application/json' },
+    method: 'POST',
+  });
 
 // One stream, two kinds of news: a chord was pressed, or the bindings behind the board moved.
 // EventSource reconnects on its own, so a daemon restart costs the page a few seconds and no
@@ -59,27 +50,27 @@ let source: EventSource | undefined;
 let lastPresses: PressPayload | undefined;
 
 const openSource = () => {
-    const next = new EventSource('/api/presses');
-    next.addEventListener('presses', (event) => {
-        const presses: PressPayload = JSON.parse(
-            (event as MessageEvent<string>).data,
-        );
-        lastPresses = presses;
-        for (const l of listeners) l.onPresses(presses);
-    });
-    next.addEventListener('bindings', () => {
-        for (const l of listeners) l.onBindings();
-    });
-    return next;
+  const next = new EventSource('/api/presses');
+  next.addEventListener('presses', (event) => {
+    const presses: PressPayload = JSON.parse(
+      (event as MessageEvent<string>).data,
+    );
+    lastPresses = presses;
+    for (const l of listeners) l.onPresses(presses);
+  });
+  next.addEventListener('bindings', () => {
+    for (const l of listeners) l.onBindings();
+  });
+  return next;
 };
 
 export const subscribeLive = (handlers: LiveHandlers) => {
-    source ??= openSource();
-    listeners.add(handlers);
-    if (lastPresses) handlers.onPresses(lastPresses);
-    return () => {
-        listeners.delete(handlers);
-    };
+  source ??= openSource();
+  listeners.add(handlers);
+  if (lastPresses) handlers.onPresses(lastPresses);
+  return () => {
+    listeners.delete(handlers);
+  };
 };
 
 /* Types */
@@ -89,79 +80,92 @@ export const subscribeLive = (handlers: LiveHandlers) => {
 export const windowNames = ['all', 'month', 'week'] as const;
 export type WindowName = (typeof windowNames)[number];
 
-export interface ChordStat {
-    chord: string;
-    action: string | null;
-    app: string | null;
-    count: number;
+interface ChordStat {
+  action: string | null;
+  app: string | null;
+  chord: string;
+  count: number;
 }
 // one thing dima does, summed over every key it ever lived on — the chords say where it came from
 export interface FeatureStat {
-    feature: string;
-    count: number;
-    chords: { chord: string; count: number }[];
-    // presses from keys the feature no longer lives on
-    earlier: number;
-    // the last seven days and the seven before, whatever the window
-    thisWeek: number;
-    lastWeek: number;
+  chords: { chord: string; count: number }[];
+  count: number;
+  // presses from keys the feature no longer lives on
+  earlier: number;
+  feature: string;
+  lastWeek: number;
+  // the last seven days and the seven before, whatever the window
+  thisWeek: number;
 }
-export interface AppStat {
-    app: string;
-    bundleId: string;
-    count: number;
+interface AppStat {
+  app: string;
+  bundleId: string;
+  count: number;
 }
-export interface ColdStat {
-    chord: string;
-    action: string;
-    app: string;
+interface ColdStat {
+  action: string;
+  app: string;
+  chord: string;
 }
 export interface Span {
-    from: string;
-    to: string;
-    days: number;
-    asked: number | null;
+  asked: number | null;
+  days: number;
+  from: string;
+  to: string;
 }
 export interface StatsReport {
-    window: WindowName;
-    span: Span | null;
-    presses: number;
-    switches: number;
-    boundCount: number;
-    topChords: ChordStat[];
-    topFeatures: FeatureStat[];
-    switchesPerApp: AppStat[];
-    // count is minutes in front, an idle gap capped at 15
-    timePerApp: AppStat[];
-    neverPressed: ColdStat[];
+  boundCount: number;
+  neverPressed: ColdStat[];
+  presses: number;
+  span: Span | null;
+  switches: number;
+  switchesPerApp: AppStat[];
+  // count is minutes in front, an idle gap capped at 15
+  timePerApp: AppStat[];
+  topChords: ChordStat[];
+  topFeatures: FeatureStat[];
+  window: WindowName;
 }
 
-export interface ScanPayload {
-    hotkeys: Hotkey[];
-    scannedAt: string;
+// The wire shape of one binding, from /api/hotkeys; frame's `hotkeys/manual.ts` holds the hand-kept rows.
+export interface Hotkey {
+  action: string;
+  app: string;
+  // the chord as the daemon spells it
+  chord: string;
+  // what the binding does, named once for every key it ever lived on; unset, the action is the feature
+  feature?: string;
+  key: string;
+  mods: string;
+  note?: string;
+  // only a `manual` row can be edited from the ui: everything else is read out of its own app's config,
+  // so a write here would be a lie the next scan erases
+  source?: 'manual' | 'scan';
 }
-export interface PressPayload {
-    counts: Record<string, number>;
-    updatedAt: string | null;
+export interface ScanPayload {
+  hotkeys: Hotkey[];
+  // every modifier, in the order a chord spells them
+  modifierOrder: string[];
+  scannedAt: string;
+}
+interface PressPayload {
+  counts: Record<string, number>;
+  updatedAt: string | null;
 }
 export interface NoteInput {
-    key: string;
-    layer: string;
-    text: string;
+  key: string;
+  layer: string;
+  text: string;
 }
-export interface Note extends NoteInput {
-    updatedAt: string;
+interface Note extends NoteInput {
+  updatedAt: string;
 }
 export type NoteStore = Record<string, Note>;
-export interface ManualEdit {
-    from: { app: string; mods: string; key: string; action: string };
-    to: { mods: string; key: string; action: string };
-}
 export interface ManualMove {
-    from: { app: string; mods: string; key: string; action: string };
-    to: { mods: string; key: string; action: string };
+  from: { app: string; mods: string; key: string; action: string };
+  to: { mods: string; key: string; action: string };
 }
 interface LiveHandlers {
-    onBindings: () => void;
-    onPresses: (payload: PressPayload) => void;
+  onBindings: () => void;
+  onPresses: (payload: PressPayload) => void;
 }

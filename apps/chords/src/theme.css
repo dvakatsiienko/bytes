@@ -12,6 +12,11 @@
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "@fontsource/ibm-plex-mono/600.css";
 
+/* The kit's build badge, the one kit component here: tailwind scans its two files, and the kit's colour
+ * names below point at this palette. */
+@source "../../../packages/kit/src/components/build-badge.tsx";
+@source "../../../packages/kit/src/components/button.tsx";
+
 /*
  * The palette the page this replaced wore, carried over value for value — this was a port, and
  * has to come back looking like the keyboard.
@@ -42,6 +47,13 @@
   --color-cap-help: var(--p-cap-help);
   --color-cap-snip: var(--p-cap-snip);
   --color-knob: var(--p-knob);
+
+  --color-border: var(--p-line);
+  --color-foreground: var(--p-ink);
+  --color-muted: var(--p-sel);
+  --color-muted-foreground: var(--p-ink-2);
+  --color-popover: var(--p-cap);
+  --color-ring: var(--p-accent);
 
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;

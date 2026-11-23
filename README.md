@@ -109,6 +109,14 @@ local only | [source](apps/speak)
 
 <br clear="all">
 
+**chords** — the keyboard map: every binding on every modifier layer, how often each one fires, and which keys are free.
+
+local only | [source](apps/chords)
+
+<details><summary>peek</summary><img src="assets/apps/chords.webp" width="100%" alt="chords: the hyper layer on a NuPhy Air75, each bound key with its app and press count"></details>
+
+<br clear="all">
+
 ## 🧰 libraries
 
 - [`biome-config-polished`](packages/biome-config-polished) — the lint and format rules every app extends
