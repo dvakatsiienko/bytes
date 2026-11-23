@@ -10,19 +10,19 @@ import AppKit
 final class App {
     let arguments: Arguments
     let paths: Paths
-    let configFile: ConfigFile
+    let configStore: ConfigStore
     let keys: Keys
     let kokoro: KokoroServer
     // the audio engine and the pill are made once the app runs, so a slow audio device holds up neither the socket nor the keys
-    private(set) lazy var panel = Panel(settings: { [configFile] in configFile.current })
+    private(set) lazy var panel = Panel(settings: { [configStore] in configStore.current })
     private(set) lazy var speaker = Speaker(
         player: Player(), macVoice: MacVoice(), panel: panel, keys: keys, kokoro: kokoro,
-        settings: { [configFile] in configFile.current }
+        settings: { [configStore] in configStore.current }
     )
     private lazy var presses = PressSequencer(
-        grab: Grab(), target: speaker, refreshSettings: { [configFile] in configFile.refresh() }, log: log
+        grab: Grab(), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, log: log
     )
-    private lazy var commands = SocketCommands(speaker: speaker, panel: panel, configFile: configFile)
+    private lazy var commands = SocketCommands(speaker: speaker, panel: panel, configStore: configStore)
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })
     private let heartbeat = Heartbeat()
     private lazy var control = Control(
@@ -34,14 +34,14 @@ final class App {
         self.arguments = arguments
         let paths = Paths()
         self.paths = paths
-        let configFile = ConfigFile(URL(fileURLWithPath: arguments.configPath))
-        self.configFile = configFile
+        let configStore = ConfigStore(URL(fileURLWithPath: arguments.configPath))
+        self.configStore = configStore
         keys = Keys(run: arguments.keysRunPath)
-        kokoro = KokoroServer(paths: paths, mayStart: arguments.mayStartKokoro, voice: { configFile.current[.kokoro].voice(for: .en) })
+        kokoro = KokoroServer(paths: paths, mayStart: arguments.mayStartKokoro, voice: { configStore.current[.kokoro].voice(for: .en) })
     }
 
     func start(only: Engine?) {
-        configFile.refresh()
+        configStore.refresh()
         if arguments.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have no key") }
         arguments.text.isEmpty ? startDaemon() : startOneShot(only: only)
         // the app loop, for a one-shot too: the pill is a window, and under dispatchMain its first show landed off the

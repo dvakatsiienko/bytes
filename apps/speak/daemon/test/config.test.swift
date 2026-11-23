@@ -60,7 +60,7 @@ enum ConfigTest {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("x-speak-config-\(ProcessInfo.processInfo.processIdentifier).json")
         defer { try? FileManager.default.removeItem(at: url) }
         var lines: [String] = []
-        let settings = ConfigFile(url, log: { lines.append($0.replacingOccurrences(of: url.path, with: "PATH")) })
+        let settings = ConfigStore(url, log: { lines.append($0.replacingOccurrences(of: url.path, with: "PATH")) })
         let turn = {
             RunLoop.main.add(Timer(timeInterval: 0.001, repeats: false) { _ in }, forMode: .default)
             RunLoop.main.run(until: Date().addingTimeInterval(0.005))

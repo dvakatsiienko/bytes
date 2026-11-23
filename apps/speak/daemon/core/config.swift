@@ -1,5 +1,4 @@
-// config.json, at the path the launchd job hands in as --config: dima's knobs, re-read on the next F4 after a save. a bad edit logs one
-// line and the last good config stays; the daemon never dies on a typo.
+// config.json: dima's knobs, as the daemon reads them. its one reader and writer is config-store.swift
 import Foundation
 
 enum Engine: String, CaseIterable {
@@ -141,43 +140,5 @@ func configReason(_ error: Error) -> String {
     case DecodingError.keyNotFound(let key, let context): "missing «\((path(context).isEmpty ? "" : path(context) + ".") + key.stringValue)»"
     case DecodingError.typeMismatch(_, let context), DecodingError.valueNotFound(_, let context): "«\(path(context))» has the wrong type"
     default: "\(error)"
-    }
-}
-
-@MainActor
-final class ConfigFile {
-    private let url: URL
-    private var loadedStamp: Date?
-    private var lastError: String?
-    private var hasLoaded = false
-    private(set) var current = Config.fallback
-
-    private let write: (String) -> Void
-
-    init(_ url: URL, log write: @escaping (String) -> Void = log) {
-        self.url = url
-        self.write = write
-    }
-
-    // cheap enough for every press: one stat, and a parse only when the file changed. returns the reason the
-    // file on disk is not the one in use, if it is not
-    @discardableResult
-    func refresh() -> String? {
-        let stamp = try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
-        // a file that is not there has no stamp: it still gets its one «kept» line, or a wrong --config runs silent
-        guard stamp != loadedStamp || (stamp == nil && lastError == nil) else { return lastError }
-        loadedStamp = stamp
-        do {
-            current = try JSONDecoder().decode(Config.self, from: Data(contentsOf: url))
-            lastError = nil
-            hasLoaded = true
-            write("config: loaded \(url.path) — \(current.summary)")
-        } catch {
-            // the admin's status line gets the short name, the log the full path
-            let reason = stamp == nil ? "not readable" : configReason(error)
-            lastError = "\(url.lastPathComponent): \(reason)"
-            write("config: \(hasLoaded ? "kept the last good one" : "running on the built-in defaults") — \(url.path): \(reason)")
-        }
-        return lastError
     }
 }

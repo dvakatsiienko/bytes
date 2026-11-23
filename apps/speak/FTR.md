@@ -141,6 +141,11 @@
   - given an unsaved change
   - when the user presses save
   - then the file changes by exactly that edit, and the status line reads «saved · the daemon loaded it»
+- ⬜ the daemon writes the settings file, and a save lands whole or not at all
+  - given a save the daemon refuses, one that names no change, or one over settings that changed since
+  - then the file keeps every byte and the reply says why
+  - given an accepted save
+  - then the file's diff is that change only, a key the daemon does not read stays, and the log line «config: saved …» names the keys
 - ✅ reset drops every unsaved edit
   - given an unsaved change
   - when the user presses reset

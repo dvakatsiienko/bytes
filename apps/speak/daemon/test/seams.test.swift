@@ -24,11 +24,19 @@ enum SeamsTest {
             return ([json] + recorder.calls).joined(separator: " | ")
         }
         let plain = { (line: String) in ask(line, { _ in }) }
+        let settings = #"{"config":{"chain":{"en":["kokoro"]},"firstAudioMs":900},"ok":true,"version":"v2","was":"v1"}"#
         return check("op", [
             ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"speaking":true}"#),
             ("voices", plain(#"{"op":"voices"}"#), #"{"system":[{"id":"a"}]}"#),
             ("reload", plain(#"{"op":"reload"}"#), #"{"ok":true} | reload"#),
             ("reload with a bad file", ask(#"{"op":"reload"}"#) { $0.reloadError = "config.json: not readable" }, #"{"error":"config.json: not readable"} | reload"#),
+            ("config", plain(#"{"op":"config"}"#), settings + " | config"),
+            ("save", plain(#"{"op":"save","version":"v1","patch":{"engines":{"fish":{"gain":2,"model":null}}}}"#), settings + #" | save {"engines":{"fish":{"gain":2,"model":null}}} v1"#),
+            ("save with nothing", plain(#"{"op":"save"}"#), settings + " | save - -"),
+            ("a refused save", ask(#"{"op":"save"}"#) { $0.refusal = .stale }, #"{"error":"the settings changed since this page read them"} | save - -"#),
+            ("heart", plain(#"{"op":"heart","engine":"fish","voice":"x","on":true}"#), settings + " | heart fish x true"),
+            ("heart with nothing", plain(#"{"op":"heart"}"#), settings + " | heart - - -"),
+            ("a refused heart", ask(#"{"op":"heart"}"#) { $0.refusal = .heartless }, #"{"error":"a heart needs an engine it knows, a voice, and on or off"} | heart - - -"#),
             ("pause", plain(#"{"op":"pause"}"#), #"{"ok":true} | pause"#),
             ("stop", plain(#"{"op":"stop"}"#), #"{"ok":true} | stop"#),
             ("panel-demo", plain(#"{"op":"panel-demo"}"#), #"{"ok":true} | demo"#),
@@ -244,6 +252,19 @@ class Recorder: DaemonCommands {
     func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: false) }
     func voices() -> [[String: String]] { [["id": "a"]] }
     func reload() -> String? { calls.append("reload"); return reloadError }
+    var refusal: SaveError?
+    private func settings(_ call: String) throws -> SavedSettings {
+        calls.append(call)
+        if let refusal { throw refusal }
+        return SavedSettings(config: StoreTest.json(#"{"firstAudioMs":900,"chain":{"en":["kokoro"]}}"#), version: "v2", was: "v1")
+    }
+    func savedSettings() throws -> SavedSettings { try settings("config") }
+    func save(_ patch: Json?, over version: String?) throws -> SavedSettings {
+        try settings("save \(patch?.text().split(whereSeparator: \.isWhitespace).joined() ?? "-") \(version ?? "-")")
+    }
+    func heart(engine: String?, voice: String?, isOn: Bool?) throws -> SavedSettings {
+        try settings("heart \(engine ?? "-") \(voice ?? "-") \(isOn.map { "\($0)" } ?? "-")")
+    }
     func togglePause() { calls.append("pause") }
     func stop() { calls.append("stop") }
     func demoPill() { calls.append("demo") }

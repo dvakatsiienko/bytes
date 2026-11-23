@@ -22,7 +22,7 @@ are impeccable's files: change them through it, never by hand.
 ## the daemon
 
 the admin reaches x-speak only through `~/.local/share/x-speak/control.sock` — one json line each way: `status`,
-`voices`, `reload`, `preview`, `read`, `pause`, `stop`. `read` (a text, the F4 chain) is x-mod-stash orbit's 🔊.
+`voices`, `config`, `save`, `heart`, `reload`, `preview`, `read`, `pause`, `stop`. `save` takes the changed keys (null takes one out) and the version `config` gave; `heart` one voice, on or off. `read` (a text, the F4 chain) is x-mod-stash orbit's 🔊.
 the chain, voices, speed, gain and budget live in `daemon/config.json`; the page holds nothing else, and the daemon
 re-reads the file on the next F4 after a save.
 
