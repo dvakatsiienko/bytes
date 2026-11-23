@@ -59,7 +59,8 @@ this skill never re-describes launching.
    `CHORDS_DAEMON` a copy → the listener's parent is `script/dev.ts`, and a `kill` of the `with-port` pid
    leaves both ports free within 3 s; a daemon already there → «already served», the page alone, the
    listener's pid unchanged (with `CHORDS_DAEMON` set it refuses, exit 1); an html server there → exit 1; a
-   daemon whose answer lacks `modifierOrder` → «older than this page», exit 1.
+   served port with the page on another than frame's dev port → one line names the port saves are taken from; a
+  daemon whose answer lacks `modifierOrder` → «older than this page», exit 1.
 9. **the built page names its commit** — after `chords:build` on a clean tree, the `build-commit` meta in
    `dist/index.html` equals `git rev-parse HEAD`; with an app file edited it ends in `-dirty`.
 

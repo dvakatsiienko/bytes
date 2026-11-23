@@ -48,9 +48,12 @@ stop a browser page on this mac. the full reasoning is in `serve.ts`'s own heade
 📌 a `serve.ts` change in frame needs `pnpm -C ~/frame schedule:restart x-monitor-hotkey-live`; the page is
 dima's live tool, so the restart is announced first.
 
+📌 **the port pair has one home, frame's `hotkeys/ports.ts`**: the run script reads it from beside the daemon and
+hands the api's port to vite, so bare `vite` has no api. `7374` in the `dev` script is `with-port`'s base.
+
 📌 vite does not rewrite `Origin` when it proxies, so a dev page's origin is its own port. the daemon takes
-writes from 7373 and 7374 only: a worktree's dev page (an offset port) on the live daemon reads, and its
-writes answer 403. `CHORDS_PORT` + `CHORDS_DAEMON` give it a daemon of its own (`chords-run`).
+writes from that pair only: a worktree's dev page (an offset port) on the live daemon reads, its writes answer
+403, and the run script says so. `CHORDS_PORT` + `CHORDS_DAEMON` give it a daemon of its own (`chords-run`).
 
 ## conventions
 

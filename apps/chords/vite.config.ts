@@ -6,8 +6,6 @@ import { wgslVitePlugin } from '@vgpu/wgsl/loader-vite';
 import vitePluginReact from '@vitejs/plugin-react';
 import { type Plugin, defineConfig } from 'vite';
 
-import { chordsDevPort, chordsPort } from './ports.ts';
-
 // Two tabs, two pages, one name — dima keeps the built page and the dev server open beside
 // each other. `apply: 'serve'` is what keeps this out of the build: the shipped title stays
 // `chords` and only the dev one wears the marker.
@@ -67,10 +65,11 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   server: {
-    port: chordsDevPort,
+    // both ports come from the run script: its own from `with-port`, the api's from frame
+    port: Number(process.env.PORT),
     // Every api call goes to the daemon, dev or built — it is the only thing that can
     // read the press log and write manual.ts, and it is always running anyway.
-    proxy: { '/api': `http://localhost:${chordsPort}` },
+    proxy: { '/api': `http://localhost:${process.env.CHORDS_PORT}` },
     // Fail rather than auto-bump: a silent bump leaves the page talking to nothing.
     strictPort: true,
   },
