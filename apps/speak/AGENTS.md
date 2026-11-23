@@ -28,6 +28,7 @@ re-reads the file on the next F4 after a save.
 
 - **the binary lives outside every repo**: `pnpm --filter speak daemon:build` tests, compiles, signs with «x-speak local signing» and installs to `~/.local/libexec/x-speak/x-speak`, the path its Accessibility grant is given to; it never touches launchd. `pnpm --filter speak daemon:relaunch` restarts the job onto it, and refuses while the daemon is speaking
 - **the two launchd plists live in frame** (`~/frame/schedule/jobs/x-speak`, `x-speak-admin`), frame's one home for every launchd job; they point into this app
+- **a changed program in a job's plist costs one killed start at the next login** (a crash report, «Launch Constraint Violation», then the 30 s retry passes); a rebuild onto the same path costs none. the mechanics: `~/frame/schedule/AGENTS.md`
 - **no swift file names a repo path**: the launchd job hands the daemon its config as `--config <path>` and its keys runner as `--keys-run <path>` (frame's `script/op-run.sh`); `server.ts` builds the same config path from its own directory. with no `--config` the daemon exits with a usage line, and launchd restarts it every 30 s
 - **a second x-speak beside the live one is never started by hand**: it unlinks the live control socket and registers the same hotkeys
 - **the live daemon is dima's most-used tool** — a rebuild and relaunch cuts any read in progress; announce the swap
