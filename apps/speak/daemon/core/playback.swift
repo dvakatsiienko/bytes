@@ -1,4 +1,4 @@
-// what plays: nothing, or one numbered read. it changes by these events alone; the pill, the outputs and the status read it
+// what plays: nothing, or one numbered read. it changes by these events alone; the pill, the player and the status read it
 enum Playback: Equatable {
     case idle
     case reading(Int, isPaused: Bool)

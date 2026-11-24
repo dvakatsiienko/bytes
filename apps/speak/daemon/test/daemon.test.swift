@@ -48,8 +48,10 @@ struct DaemonTest {
             ("two languages", parts("Read it: «привіт» 🎉 and go."), "Read it: | привіт | and go."),
             ("a list whose lines were glued", parts("lane1. merge now.2. sleep well"), "lane | 1. merge now. | 2. sleep well"),
             ("a path, an id and a unit", parts("Open docs/test-drive/exa.md. Then FRM-266 in 5ms. Bye."), "Open docs/test-drive/exa.md. | Then FRM-266 in 5ms. | Bye."),
-            ("markdown around it", parts("## **One.**\n- [two](https://x.y/z). three"), "One. | [two](https://x.y/z). | three"),
+            ("markdown around it", parts("## **One.**\n- [two](https://x.y/z). three"), "One. | two](https://x.y/z). | three"),
             ("an end and a start that share one character", parts("a — b\n@tanstack/router"), "a — b\n | @tanstack/router"),
+            ("a link of three sentences", parts("see [first. second. third](https://example.com/very/long/path) and then. ok"), "see [first. | second. | third](https://example.com/very/long/path) and then. | ok"),
+            ("a code fence", parts("Look:\n```\nlet a = 1\n```\nDone. ok"), "Look:\n```\nlet a = 1\n``` | Done. | ok"),
             ("a long sentence, cut", parts("Hi. " + long), "Hi. | " + String(repeating: "word ", count: 60).dropLast() + " | " + String(repeating: "word ", count: 20) + "end."),
         ])
     }
@@ -68,6 +70,14 @@ struct DaemonTest {
             if !zip(sources, sources.dropFirst()).allSatisfy({ $0.upperBound <= $1.lowerBound }) || sources.contains(where: { $0.isEmpty || $0.upperBound > item.in.utf16.count }) {
                 failed += 1
                 print("✗ \(item.in)\n  sources \(sources)")
+            }
+            // and holds the words it says, those the text has
+            let words = { (text: String) in Set(text.lowercased().split { !$0.isLetter }.map(String.init).filter { $0.count > 3 }) }
+            for chunk in spokenChunks(of: item.in) {
+                let gone = words(chunk.text).intersection(words(item.in)).subtracting(words((item.in as NSString).substring(with: NSRange(chunk.source))))
+                if gone.isEmpty { continue }
+                failed += 1
+                print("✗ \(item.in)\n  «\(chunk.text)» without \(gone)")
             }
         }
         print("\(cases.count - failed)/\(cases.count) golden cases pass")

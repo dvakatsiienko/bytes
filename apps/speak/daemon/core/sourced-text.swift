@@ -39,42 +39,64 @@ struct SourcedText: Equatable {
     func split(at mark: Character) -> [SourcedText] { text.split(separator: mark).map { self[$0.startIndex..<$0.endIndex] } }
 
     func inserting(_ string: String, at index: String.Index) -> SourcedText {
-        var result = self
-        result.offsets.insert(contentsOf: spread(string, over: NSRange(index..<index, in: text)), at: NSRange(index..<index, in: text).location)
-        result.text.insert(contentsOf: string, at: index)
-        return result
+        var result = self[..<index]
+        result.add(string, over: NSRange(index..<index, in: text), of: self)
+        return result + self[index...]
     }
 
     // every match is handed to `replace` as [whole, group1, group2, …]; an unmatched group is ""
     func replacing(_ pattern: String, _ options: NSRegularExpression.Options = [], _ replace: ([String]) -> String) -> SourcedText {
-        replacing(pattern, options) { _, match in
-            replace((0..<match.numberOfRanges).map { i in Range(match.range(at: i), in: text).map { String(text[$0]) } ?? "" })
+        replacing(pattern, options) { match, units, result in
+            let groups = (0..<match.numberOfRanges).map { match.range(at: $0).location == NSNotFound ? "" : units.substring(with: match.range(at: $0)) }
+            result.add(replace(groups), over: match.range, of: self)
         }
     }
 
+    // «$1 dot $2»: a group keeps its own places, the words between come from what stands before them
     func replacing(_ pattern: String, _ template: String, _ options: NSRegularExpression.Options = []) -> SourcedText {
-        replacing(pattern, options) { regex, match in regex.replacementString(for: match, in: text, offset: 0, template: template) }
+        let parts = template.split(separator: "$", omittingEmptySubsequences: false).map(String.init)
+        let groups = parts.dropFirst().map { (number: $0.first!.wholeNumberValue!, rest: String($0.dropFirst())) }
+        return replacing(pattern, options) { match, units, result in
+            result.add(parts[0], over: match.range, of: self)
+            for group in groups {
+                let range = match.range(at: group.number)
+                let kept = range.location == NSNotFound ? NSRange(location: match.range.upperBound, length: 0) : range
+                result.add(kept, of: self, units)
+                result.add(group.rest, over: NSRange(location: kept.upperBound, length: 0), of: self)
+            }
+        }
     }
 
-    private func replacing(_ pattern: String, _ options: NSRegularExpression.Options, _ replacement: (NSRegularExpression, NSTextCheckingResult) -> String) -> SourcedText {
-        let regex = try! NSRegularExpression(pattern: pattern, options: options)
-        let matches = regex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+    private func replacing(_ pattern: String, _ options: NSRegularExpression.Options, _ replacement: (NSTextCheckingResult, NSString, inout SourcedText) -> Void) -> SourcedText {
+        let matches = try! NSRegularExpression(pattern: pattern, options: options).matches(in: text, range: NSRange(text.startIndex..., in: text))
         guard !matches.isEmpty else { return self }
         let units = text as NSString
-        var result = "", kept: [Int] = [], from = 0
+        var result = SourcedText(""), from = 0
         for match in matches {
-            let string = replacement(regex, match)
-            result += units.substring(with: NSRange(location: from, length: match.range.location - from)) + string
-            kept += offsets[from..<match.range.location] + spread(string, over: match.range)
+            result.add(NSRange(location: from, length: match.range.location - from), of: self, units)
+            replacement(match, units, &result)
             from = match.range.upperBound
         }
-        return SourcedText(result + units.substring(from: from), kept + offsets[from...])
+        result.add(NSRange(location: from, length: offsets.count - from), of: self, units)
+        return result
+    }
+
+    private mutating func add(_ range: NSRange, of other: SourcedText, _ units: NSString) {
+        text += units.substring(with: range)
+        offsets += other.offsets[range.location..<range.upperBound]
     }
 
     // a replacement's first unit comes from the match's first, its last from the last; an insertion from what stands before it
-    private func spread(_ string: String, over match: NSRange) -> [Int] {
+    private mutating func add(_ string: String, over match: NSRange, of other: SourcedText) {
         let count = string.utf16.count
-        guard match.length > 0 else { return Array(repeating: offsets[..<match.location].last ?? offsets.first ?? 0, count: count) }
-        return (0..<count).map { offsets[match.location + (count == 1 ? 0 : $0 * (match.length - 1) / (count - 1))] }
+        if count == 0 { return }
+        text += string
+        guard match.length > 0 else {
+            offsets += repeatElement(other.offsets[..<match.location].last ?? other.offsets.first ?? 0, count: count)
+            return
+        }
+        // the spaces around it take none of it
+        let before = string.utf16.prefix { $0 == 32 }.count, words = count - before - string.utf16.reversed().prefix { $0 == 32 }.count
+        offsets += (0..<count).map { other.offsets[match.location + (words < 2 ? 0 : min(max($0 - before, 0), words - 1) * (match.length - 1) / (words - 1))] }
     }
 }

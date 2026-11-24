@@ -23,7 +23,6 @@ struct Status {
     let isPaused: Bool
     // the read that plays
     let read: Int?
-    // the mac voice's way out: «player», the one output, or «synth», macos's own
     // where the settings are: a rollback reads it to know whether an older daemon looks elsewhere
     let settings: String
 

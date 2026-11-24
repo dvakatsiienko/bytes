@@ -74,7 +74,7 @@
 - ✅ a status badge per engine: live, benched until a time, no key, or no quota
 - 🧭 each provider card expresses its provider, and the controls read as part of the app
   - decision: dima, 2026-09-30 — «each card to represent the provider in a beautiful and expressive way»; the cards read heavy and the controls disconnected today. sharpened into given/when/then at the designer's pick
-- ✅ an engine out of quota locks its ▶ and says so on the card
+- ⬜ an engine out of quota locks its ▶ and says so on the card
   - given the daemon's quota probe finds elevenlabs under 100 credits — at daemon start, on a status older than 10 min, or right after a refused request
   - when the page shows its cards
   - then each elevenlabs card's badge reads «no quota» in a quiet colour and its ▶ is disabled
@@ -227,15 +227,16 @@
   - when the user presses F4
   - then the voice says «exa dot md» for `docs/test-drive/exa.md`, «a markdown file link», «pid», «a commit», «an id» — never a full path or the digits
 - ⬜ a word is taught in a file, with no rebuild
+  - given a word that is not letters a–z alone (a digit, a sign, cyrillic), then it is a bad edit: a read would never say it
   - makes: nothing; `~/Library/Application Support/speak/word-lists.json` is dima's own, absent until he writes one
   - given `{"words": {"speechify": "speech if I"}, "letters": ["rtk"]}` in it, when the next press reads «rtk in Speechify», then the voice says «R T K in speech if I», and every word that ships is said as before
   - given its `units`, `fileKinds` or `copyOnlyApps` (bundle ids whose selection comes by ⌘C), then they add to what ships, and what it says of a word that ships wins
   - given a bad edit, then the log says why once and the last good lists stay; given the file gone, then what ships is back
-- ✅ selected lines read as sentences
+- ⬜ selected lines read as sentences
   - given several selected lines with no end punctuation
   - when the user presses F4
   - then each line ends with a short pause, never one run-on sentence
-  - and a line that ends on a closing quote, a % or any sign but one that already pauses, a brace, an opener or a joining sign pauses too
+  - and a line that ends on a closing quote, a % or any sign but one that already pauses, an opener or a joining sign pauses too
   - given a long line with no end mark, then it is spoken in pieces of 300 characters at most, cut at a comma or a space
   - and a numbered line says its number first («one: merge»), even when the app hands its lines over glued together
   - and list markers («■», «•», «★») are never spoken; a bulleted item glued to the one above on an opening «/“ still gets its pause

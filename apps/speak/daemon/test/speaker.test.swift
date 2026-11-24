@@ -84,6 +84,14 @@ enum SpeakerTest {
             stage.audio.endsNext()
             try? await Task.sleep(for: .milliseconds(300))
         }, "«fish skipped: timeout» | system Bye. | «voice switch: kokoro → system mid-read» | drop ahead | rest | pill -")
+        await row("the output goes away under sound: the budget runs from there", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.failsLate(EngineError.timeout)]] }, { stage in
+            stage.read("Hello. Bye.")
+            await settle()
+            stage.audio.onGone("gone")
+            await settle()
+            stage.calls = []
+            try? await Task.sleep(for: .milliseconds(300))
+        }, "«fish skipped: timeout» | system Bye. | «voice switch: kokoro → system mid-read» | drop ahead | rest | pill -")
         await row("a cloud miss under sound leaves the next one the whole budget", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.fails(EngineError.status(500))]] }, { stage in
             stage.read("Hello. Bye.")
             await settle()
@@ -209,7 +217,7 @@ enum SpeakerTest {
         await row("a preview of a failing engine falls to nobody", { $0.voices.script[.kokoro] = [.fails(EngineError.status(500))] }, { stage in
             stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig())
         }, "drop ahead | stop | pill 1 | «read 1: chunk 1/1» | kokoro Sample. | «kokoro skipped: status(500), off for 60 s» | drop ahead | rest | pill - | rest")
-        await row("pause and resume reach both outputs", { $0.voices.script[.kokoro] = [.waits] }, { await $0.readThen("Hello.") { $0.togglePause(); $0.togglePause() } },
+        await row("pause and resume reach the player", { $0.voices.script[.kokoro] = [.waits] }, { await $0.readThen("Hello.") { $0.togglePause(); $0.togglePause() } },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | pause | pill 1 paused | pill 1")
         await row("a chunk that lands under a pause waits for the resume", { $0.voices.script[.kokoro] = [.waits] }, { stage in
             await stage.readThen("Hello.") { $0.togglePause() }

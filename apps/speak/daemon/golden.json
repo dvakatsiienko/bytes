@@ -410,5 +410,61 @@
   {
     "in": "foo {\n  bar: 1\n}\nend",
     "out": [["en", "foo bar: 1. end"]]
+  },
+  {
+    "in": "run foo \\\n  --bar baz",
+    "out": [["en", "run foo --bar baz"]]
+  },
+  {
+    "in": "map x ->\ny",
+    "out": [["en", "map x, y"]]
+  },
+  {
+    "in": "thanks :)\nnext line",
+    "out": [["en", "thanks:. next line"]]
+  },
+  {
+    "in": "Hello\n​\nWorld",
+    "out": [["en", "Hello. ​ World"]]
+  },
+  {
+    "in": "$\nls",
+    "out": [["en", "$ ls"]]
+  },
+  {
+    "in": "say «one,»\ntwo",
+    "out": [["en", "say one. two"]]
+  },
+  {
+    "in": "apps/\npackages/\ndocs",
+    "out": [["en", "apps. packages. docs"]]
+  },
+  {
+    "in": "C++\nnext",
+    "out": [["en", "C. next"]]
+  },
+  {
+    "in": "para one.\n────────\npara two",
+    "out": [["en", "para one. ──────── para two"]]
+  },
+  {
+    "in": "para one.\n***\npara two",
+    "out": [["en", "para one. para two"]]
+  },
+  {
+    "in": "one =>\ntwo",
+    "out": [["en", "one, two"]]
+  },
+  {
+    "in": "one ⇒\ntwo",
+    "out": [["en", "one, two"]]
+  },
+  {
+    "in": "one ·\ntwo",
+    "out": [["en", "one, two"]]
+  },
+  {
+    "in": "say ‘\nthen",
+    "out": [["en", "say ‘ then"]]
   }
 ]

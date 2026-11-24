@@ -36,7 +36,9 @@ final class Player {
     // what is scheduled waits for the resume
     private var isPaused = false
     // when the queue ran dry mid-read: the next buffer logs the silence the listener heard
-    private(set) var dryAt: ContinuousClock.Instant?
+    private var dryAt: ContinuousClock.Instant?
+    // since when nothing is scheduled, by itself or by a stop; a pause is not part of it
+    private(set) var quietSince: ContinuousClock.Instant?
 
     var isPlaying: Bool { pending > 0 }
 
@@ -59,6 +61,7 @@ final class Player {
         if !isPaused, !device.isPlaying { device.play() }
         if pending == 0, let dryAt { write("silence: \(elapsed(dryAt)) mid-read") }
         dryAt = nil
+        quietSince = nil
         pending += 1
         scheduled += 1
         let scheduledIn = generation
@@ -67,6 +70,7 @@ final class Player {
             self.pending -= 1
             if self.pending == 0 {
                 self.dryAt = .now
+                self.quietSince = .now
                 self.releaseWaiters()
             }
         }
@@ -82,6 +86,7 @@ final class Player {
         isPaused = false
         // a silence someone asked for is not a gap
         if dryAt != nil { dryAt = .now }
+        if quietSince != nil { quietSince = .now }
         if pending > 0 { device.play() }
     }
 
@@ -105,6 +110,7 @@ final class Player {
         device.stop()
         pending = 0
         dryAt = nil
+        quietSince = .now
         releaseWaiters()
         let stoppedAt = scheduled
         Task {

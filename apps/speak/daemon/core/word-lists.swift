@@ -21,19 +21,28 @@ extension WordLists {
     // a file names what it adds or says another way; the rest is what ships
     init(over shipped: WordLists, _ file: Data) throws {
         let added = try JSONDecoder().decode(File.self, from: file)
-        let over = { (old: [String: String], new: [String: String]?) in
-            old.merging((new ?? [:]).map { ($0.lowercased(), $1) }) { _, new in new }.filter { !$0.key.isEmpty }
-        }
+        let lowercased = { (new: [String: String]?) in Dictionary((new ?? [:]).map { ($0.lowercased(), $1) }) { _, last in last }.filter { !$0.key.isEmpty } }
+        let newWords = lowercased(added.words), newLetters = (added.letters ?? []).map { $0.lowercased() }
+        // a read asks for words of letters alone: any other would be taught and never said
+        if let never = (newWords.keys + newLetters).first(where: { $0.contains { !("a"..."z").contains($0) } }) { throw WordListError.notAWord(never) }
         self = shipped
-        letters.formUnion((added.letters ?? []).map { $0.lowercased() })
-        words = over(words, added.words)
-        units = over(units, added.units)
-        fileKinds = over(fileKinds, added.fileKinds)
+        letters.formUnion(newLetters)
+        words = words.filter { !newLetters.contains($0.key) }.merging(newWords) { _, new in new }
+        units.merge(lowercased(added.units)) { _, new in new }
+        fileKinds.merge(lowercased(added.fileKinds)) { _, new in new }
         copyOnlyApps.formUnion(added.copyOnlyApps ?? [])
     }
 
     private struct File: Decodable {
         let letters: [String]?, words: [String: String]?, units: [String: String]?, fileKinds: [String: String]?, copyOnlyApps: [String]?
+    }
+}
+
+enum WordListError: Error, CustomStringConvertible {
+    case notAWord(String)
+
+    var description: String {
+        switch self { case .notAWord(let word): "a word is letters a–z alone, «\(word)» is not" }
     }
 }
 

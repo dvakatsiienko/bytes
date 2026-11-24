@@ -81,7 +81,7 @@ enum SeamsTest {
             return json.map { String(decoding: $0, as: UTF8.self) } ?? "?"
         }
         let ask = { (answers: Answers, line: String) -> String in
-            raw(answers, line).replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
+            raw(answers, line).replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
         }
         let status = #"{"op":"status"}"#, stop = #"{"op":"stop"}"#
         var rows: [(name: String, got: String, want: String)] = []

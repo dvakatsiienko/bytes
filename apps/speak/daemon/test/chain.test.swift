@@ -169,6 +169,8 @@ enum ChainTest {
             ("no punctuation at all", cut([(.en, "just some words")]), ["en: just some words"]),
             ("a sentence over 300 characters is cut at its last comma past the half", cut([(.en, "Hi. " + thirty(8) + ", " + thirty(4))]), ["en: Hi.", "en: " + thirty(8) + ",", "en: " + thirty(4)]),
             ("a comma before the half cuts nothing", cut([(.en, "Hi. One, " + thirty(12))]), ["en: Hi.", "en: One, " + thirty(9) + " " + six(4), "en: " + six(1) + " " + thirty(2)]),
+            ("an opening whose first comma is past 300 characters", cut([(.en, long.dropLast(1600) + "here, then more.")]).map { "\($0.count - 4)" }, ["299", "115"]),
+            ("a comma with no space after it cuts too, one inside a number never", cut([(.en, "Hi. " + String(repeating: "x", count: 200) + ",1,000" + String(repeating: "y", count: 200))]).map { "\($0.count - 4)" }, ["3", "201", "205"]),
             ("300 characters are one", cut([(.en, "Hi. " + thirty(10) + "!")]), ["en: Hi.", "en: " + thirty(10) + "!"]),
             ("301 are two", cut([(.en, "Hi. " + thirty(10) + "e!")]), ["en: Hi.", "en: " + thirty(9) + " " + six(4), "en: abcdee!"]),
             ("a text with no space is cut hard", cut([(.en, String(repeating: "x", count: 700))]).map { "\($0.count - 4)" }, ["300", "300", "100"]),

@@ -31,7 +31,7 @@ func chunks(_ runs: [Run]) -> [Chunk] {
         }
         for sentence in run.spoken.replacing("([.!?…;])\\s+", "$1\0").split(at: "\0") {
             var rest = sentence
-            if result.isEmpty, rest.text.count > 100, let comma = rest.text.dropFirst(40).firstIndex(of: ",") {
+            if result.isEmpty, rest.text.count > 100, let comma = rest.text.prefix(longestChunk).dropFirst(40).firstIndex(of: ",") {
                 add(rest[...comma])
                 rest = rest[rest.text.index(after: comma)...].trimmed(.whitespaces)
             }
@@ -46,13 +46,13 @@ func chunks(_ runs: [Run]) -> [Chunk] {
     return result
 }
 
-// up to its last comma past the half, else its last space
+// up to its last comma past the half, one inside a number aside, else its last space
 private func endOfOpening(_ text: String) -> String.Index {
-    let window = text.prefix(longestChunk + 1)
-    if let comma = window.range(of: ", ", options: .backwards), window.distance(from: window.startIndex, to: comma.lowerBound) > longestChunk / 2 {
-        return window.index(after: comma.lowerBound)
+    let half = text.index(text.startIndex, offsetBy: longestChunk / 2), end = text.index(text.startIndex, offsetBy: longestChunk)
+    let comma = text[half..<end].indices.last { at in
+        text[at] == "," && !(text[text.index(before: at)].isNumber && text[text.index(after: at)].isNumber)
     }
-    return window.lastIndex(of: " ") ?? window.dropLast().endIndex
+    return comma.map(text.index(after:)) ?? text[...end].lastIndex(of: " ") ?? end
 }
 
 // `only` is --engine: one engine, no chain. the engine that played the read's first chunk leads every later one, so one

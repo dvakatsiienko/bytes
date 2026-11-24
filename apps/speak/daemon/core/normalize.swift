@@ -41,8 +41,9 @@ private func stripMarkdown(_ text: SourcedText) -> SourcedText {
     // bullets and geometric shapes: the Claude app hands nested list markers over as «■», read as «black square»
     t = t.replacing("[\\x{2022}\\x{2023}\\x{2043}\\x{25A0}-\\x{25FF}\\x{2605}\\x{2606}]", "")
     // a line that ends bare ends a sentence: several lines read as one run-on otherwise (dima: «it sounds like a single sentence»)
-    // a mark that already pauses, a brace, an opener or a joining sign ends none
-    return t.replacing("(?<=\\S)(?<![.!?…;:,][»”\"'’)*\\]]{0,2})(?<![({}\\[«“→|/&+=<\\-–—])[ \\t]*\\r?\\n", ".\n")
+    // a mark that already pauses, an opener or a joining sign ends none, and a line of signs alone is none
+    t = t.replacing("(?<=\\S)(?<![.!?…;:,]|[.!?…][»”\"'’)*\\]]{1,2})(?<![({\\[«“‘„<→⇒·|&=\\\\\\-–—]|[-=]>)[ \\t]*\\r?\\n", ".\n")
+    return t.replacing("^([^\\p{L}\\p{N}\\n]*)\\.\\n", "$1\n", .anchorsMatchLines)
 }
 
 private func rewriteLatin(_ text: SourcedText, _ lists: WordLists) -> SourcedText {
@@ -75,21 +76,27 @@ private func rewriteLatin(_ text: SourcedText, _ lists: WordLists) -> SourcedTex
         if g[0].hasPrefix("v") { return "version " + parts.joined(separator: " point ") }
         return parts.count > 2 ? parts.joined(separator: " point ") : g[0]
     }
-    let units = lists.units.keys.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern).joined(separator: "|")
-    t = t.replacing("(\\d)\\s?(\(units))\\b", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" }
+    let units = lists.units.keys.map(NSRegularExpression.escapedPattern).joined(separator: "|")
+    t = t.replacing("(\\d)\\s?(\(units))(?!\\w)", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" }
     // a path says only its last part; a bare «audio/video» is two words, not a path
     t = t.replacing("(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*") { g in
-        let parts = g[0].split(separator: "/").filter { !["~", ".", ".."].contains($0) }
+        // the dot a line end put after a folder is not a part of its path
+        let stop = g[0].split(separator: "/").last == "." ? "." : "", path = g[0].dropLast(stop.count)
+        let parts = path.split(separator: "/").filter { !["~", ".", ".."].contains($0) }
         // a file name has a word before its extension («exa.md»), a version has digits («24.x»); a sentence end the
         // line-break rule put on the leaf is not an extension either
         let hasExtension = parts.last?.range(of: "[A-Za-z][\\w-]*\\.[A-Za-z]\\w*\\.?$", options: .regularExpression) != nil
-        let isPath = g[0].first.map { "~./".contains($0) } == true || g[0].hasSuffix("/") || hasExtension
-        return isPath ? parts.last.map(String.init) ?? "" : parts.joined(separator: " ")
+        let isPath = path.first.map { "~./".contains($0) } == true || path.hasSuffix("/") || hasExtension
+        return (isPath ? parts.last.map(String.init) ?? "" : parts.joined(separator: " ")) + stop
     }
     t = t.replacing("\\b(\\w+)\\.(ts|tsx|js|md|json|sh|py|swift|go|yaml|toml)\\b", "$1 dot $2")
     t = t.replacing("\\b(\\w+)\\.([a-z]+[A-Z]\\w*)\\b", "$1 dot $2")
     t = t.replacing("([A-Za-z]):([A-Za-z])", "$1 $2")
-    t = t.replacing("([a-z])([A-Z])", "$1 $2")
+    // «GitHub» taught as a word is one
+    t = t.replacing("(?<![A-Za-z])[A-Za-z]*[a-z][A-Z][A-Za-z]*") { g in
+        let lower = g[0].lowercased()
+        return lists.words[lower] != nil || lists.letters.contains(lower) ? g[0] : g[0].replacingOccurrences(of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression)
+    }
     t = t.replacing("\\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\\b") { g in g[0].lowercased() }
     t = t.replacing("(\\w)_(?=\\w)", "$1 ")
     t = t.replacing("#(\\d+)", "number $1")

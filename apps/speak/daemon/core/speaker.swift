@@ -201,7 +201,7 @@ final class Speaker: ReadTarget {
                         if !isOnBudget(engine, lead: lead) {
                             budgetEnds = budgetEnds.map { $0 + (.now - asked) } ?? newBudget()
                         } else if budgetEnds == nil {
-                            budgetEnds = player.dryAt.map { $0 + .milliseconds(firstAudioMs) }
+                            budgetEnds = player.quietSince.map { $0 + .milliseconds(firstAudioMs) }
                         }
                     }
                 }
