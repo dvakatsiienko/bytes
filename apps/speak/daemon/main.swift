@@ -38,7 +38,7 @@ final class App {
         self.paths = paths
         let configStore = ConfigStore(URL(fileURLWithPath: arguments.settings(paths)))
         self.configStore = configStore
-        keys = Keys(run: arguments.keysRunPath.map { script in { await runWithKeys(script, $0) } }, log: log)
+        keys = Keys(run: arguments.keysRunPath.map { script in { try await runWithKeys(script, $0) } }, log: log)
         kokoro = KokoroServer(KokoroProcess(paths: paths), net: net, settings: { configStore.current[.kokoro] }, mayStart: arguments.mayStartKokoro, log: log)
     }
 
@@ -79,9 +79,11 @@ final class App {
     private func startDaemon() {
         Task {
             let speaker = speaker
+            // the one voice that needs no net waits for none
+            async let warm: Void = kokoro.warm()
             await keys.load()
             await speaker.probeQuota()
-            await kokoro.warm()
+            await warm
         }
         control.start()
         heartbeat.start()

@@ -3,6 +3,7 @@ import Foundation
 
 @MainActor
 protocol LocalServer: AnyObject {
+    var isRunning: Bool { get }
     func start() throws
 }
 
@@ -32,23 +33,43 @@ final class KokoroServer {
         guard !isWarming else { return }
         isWarming = true
         defer { isWarming = false }
-        if await isReady() { return }
-        guard mayStart else { return }
-        do {
-            try server.start()
-        } catch {
-            write("kokoro: server did not start — \(error)")
-            return
-        }
-        for _ in 0..<240 where !(await isReady()) { try? await Task.sleep(for: pause) }
-        guard await isReady() else {
-            write("kokoro: server not answering after 60 s")
-            return
+        if await isReady() {
+            // it was warmed by the daemon it belongs to
+            guard mayStart else { return }
+        } else {
+            guard mayStart, await starts() else { return }
         }
         // one word, so the model is loaded before a press asks for it
-        if let request = try? Kokoro.request("Ready.", settings()) { _ = try? await net.whole(request) }
+        do {
+            let (status, _) = try await net.whole(Kokoro.request("Ready.", settings()))
+            guard status == 200 else { throw EngineError.status(status) }
+        } catch {
+            return write("kokoro: its first word failed — \(error)")
+        }
         onWarm()
         write("kokoro: warm")
+    }
+
+    // answers once it is up. one still loading after 60 s is waited for again, never joined by a second
+    private func starts() async -> Bool {
+        if !server.isRunning {
+            do {
+                try server.start()
+            } catch {
+                write("kokoro: server did not start — \(error)")
+                return false
+            }
+        }
+        for _ in 0..<240 {
+            if await isReady() { return true }
+            guard server.isRunning else {
+                write("kokoro: server exited before it answered")
+                return false
+            }
+            try? await Task.sleep(for: pause)
+        }
+        write("kokoro: server not answering after 60 s")
+        return false
     }
 
     private func isReady() async -> Bool { (try? await net.whole(Kokoro.readyRequest()))?.status == 200 }

@@ -4,6 +4,7 @@ import Foundation
 final class KokoroProcess: LocalServer {
     private let paths: Paths
     private var process: Process?
+    var isRunning: Bool { process?.isRunning == true }
 
     init(paths: Paths) { self.paths = paths }
 
