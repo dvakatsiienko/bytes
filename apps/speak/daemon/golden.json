@@ -490,5 +490,9 @@
   {
     "in": "say [(«\n»)]\nthen",
     "out": [["en", "say, then"]]
+  },
+  {
+    "in": "cd ../.. now",
+    "out": [["en", "cd now"]]
   }
 ]
