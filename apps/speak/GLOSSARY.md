@@ -11,7 +11,7 @@
 - **preview** — the daemon speaking a sample line with a card's unsaved settings
 - **first audio budget** — how long a cloud engine may take to start speaking before the chain moves on
 - **benched** — an engine the daemon skips for a while after a quota, auth or network failure
-- **no quota** — an engine its provider reports out of credits, found by the daemon's quota probe (at start, on a status older than 10 min, right after a refused request); benched until the provider's refill date (elevenlabs) or for an hour (fish's api balance), and cleared when the probe sees more than at the refusal, once the refill passed, or when the engine next succeeds
+- **no quota** — an engine its provider reports out of credits, found by the daemon's quota probe (at start, on a status older than 10 min, right after a refused request); benched until the provider's refill date (elevenlabs) or for an hour (fish's api balance), and cleared once that time passed, when the probe sees more than at the refusal, or when the engine next succeeds
 - **x-speak** — the resident daemon (`daemon/`) that owns the hotkeys (F4 reads, or pauses / resumes with nothing selected; ⇧F4 pauses / resumes; F5 stops), the engines and the settings file
 - **one output** — the daemon's audio engine, which every voice plays through
 - **playback** — what the daemon plays: nothing, or one numbered read, running or paused; the pill, the player and `status` all read it

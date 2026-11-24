@@ -55,8 +55,9 @@ final class Speaker: ReadTarget {
         for engine in Engine.allCases {
             let needsKey = engine.isCloud && !voices.hasKey(engine)
             let until = skipUntil[engine].flatMap { $0 > Date() ? $0 : nil }
+            let hold = outOfQuota[engine].flatMap { $0.until > Date() ? $0 : nil }
             result[engine.rawValue] = needsKey ? ["state": "no key"]
-                : outOfQuota[engine].map { ["state": "no quota", "note": $0.note] }
+                : hold.map { ["state": "no quota", "note": $0.note] }
                 ?? until.map { ["state": "benched", "until": ISO8601DateFormatter().string(from: $0)] } ?? ["state": "live"]
         }
         return result

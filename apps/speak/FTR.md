@@ -82,8 +82,8 @@
   - and the daemon benches it until that refill date, so a press never waits on its refusal
   - given fish runs a paid model and its api balance is $0 → fish reads «no quota» the same way, benched for an hour
   - decision: quiet, not red — the chain already skips it; dima found the red line «a bit too much» (2026-09-29)
-  - given the provider refuses a sentence over its balance, with credits left (150 for a sentence of 203), then the engine sits out an hour, and the badge keeps the provider's words while the balance stays the same
-  - and the state clears when the probe sees more credits than at the refusal, when the refill date passed, or after the engine's next success
+  - given the provider refuses a sentence over its balance, with credits left (150 for a sentence of 203), then the engine sits out an hour, and the badge keeps the provider's words for that hour while the balance stays the same
+  - and the state clears when its time has passed (the hour, or the refill date), when the probe sees more credits than at the refusal, or after the engine's next success
   - decision: the chain already falls through on a quota refusal; the card only has to make it visible (dima, 2026-09-29)
 - ✅ the header shows the daemon's accessibility state and whether it is speaking
 - 🔎 «infinite waveform» plays the pill's wave with no voice, to tune glide and flow by eye

@@ -268,6 +268,11 @@ enum SpeakerTest {
                 await stage.speaker.probeQuota()
             }, .fish), "benched"),
             ("an empty balance", await state({ $0.voices.balance = [.fish: Balance(left: 0, empty: "$0")] }, { await $0.speaker.probeQuota() }, .fish), "no quota $0"),
+            ("an empty balance past its refill", await state({ $0.voices.balance = [.fish: Balance(left: 0, refills: Date() + 0.03, empty: "$0")] }, { stage in
+                await stage.speaker.probeQuota()
+                try? await Task.sleep(for: .milliseconds(60))
+            }, .fish), "live"),
+            ("an empty balance before its refill", await state({ $0.voices.balance = [.fish: Balance(left: 0, refills: Date() + 60, empty: "$0")] }, { await $0.speaker.probeQuota() }, .fish), "no quota $0"),
             ("a balance that came back", await state({ $0.voices.balance = [.fish: Balance(left: 0, empty: "$0")] }, { stage in
                 await stage.speaker.probeQuota()
                 stage.voices.balance = [.fish: Balance(left: 5)]
