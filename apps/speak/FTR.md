@@ -65,7 +65,7 @@
   - given a card's preview is speaking
   - when the user presses ⏸
   - then the speech pauses and the button reads ▶ (resume); ■ stops it, and the card shows ▶ again
-  - the controls also return to ▶ when the speech ends on its own
+  - the controls also return to ▶ when the speech ends on its own, when it never starts, and when another read takes over: the card plays exactly while the daemon names its read
 - ✅ a sample line per language, editable
 - ✅ a status badge per engine: live, benched until a time, no key, or no quota
 - 🧭 each provider card expresses its provider, and the controls read as part of the app

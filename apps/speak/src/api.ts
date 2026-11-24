@@ -64,7 +64,7 @@ export const api = {
   heart: (engine: Engine, voice: string, isOn: boolean) =>
     call<Saved>('PUT', '/api/favourites', { engine, on: isOn, voice }),
   pause: () => call('POST', '/api/pause'),
-  preview: (payload: Preview) => call('POST', '/api/preview', payload),
+  preview: (payload: Preview) => call<Started>('POST', '/api/preview', payload),
   save: (patch: Patch, version: string) =>
     call<Saved>('PUT', '/api/config', { patch, version }),
   status: () => read<Status>('/api/status'),
@@ -133,7 +133,14 @@ export interface Status {
     >
   >;
   paused?: boolean;
+  // the read that plays, if one does
+  read?: number;
   speaking?: boolean;
+}
+
+// a preview's answer: the read it began
+interface Started {
+  read: number;
 }
 
 interface SystemVoice {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { move } from '@dnd-kit/helpers';
 import { DragDropProvider } from '@dnd-kit/react';
 import { useQuery } from '@tanstack/react-query';
@@ -20,7 +20,9 @@ import {
   voiceOf,
 } from '@/api.ts';
 import { LIMITS } from '@/limits.ts';
+import { usePreview } from '@/usePreview.ts';
 import { useSettings } from '@/useSettings.ts';
+import { useWave } from '@/useWave.ts';
 
 export const App = () => {
   const settings = useSettings();
@@ -30,41 +32,9 @@ export const App = () => {
     queryKey: ['voices'],
     staleTime: Number.POSITIVE_INFINITY,
   });
-  // the card whose ▶ started the speech; its controls follow the daemon's status until the speech ends
-  const [playing, setPlaying] = useState<Playing>();
-  // polled while the tab is visible (react-query stops it with the tab); fast while a card plays
-  const status = useQuery({
-    queryFn: api.status,
-    queryKey: ['status'],
-    refetchInterval: playing ? 700 : 5000,
-  });
+  const { playing, status, ...speech } = usePreview();
   const [samples, setSamples] = useState<Record<Lang, string>>(SAMPLES);
   const dragStart = useRef<Config['chain']>(undefined);
-  // the pill's infinite waveform: it plays the draft's glide and flow live, re-arms the daemon's 5-minute deadline
-  // every minute, and turns off when toggled off, on unmount, or when the tab goes away
-  const [isWaveOn, setIsWaveOn] = useState(false);
-  const glide = draft?.meterGlideMs;
-  const flow = draft?.meterFlowMs;
-  useEffect(() => {
-    if (isWaveOn) void api.wave({ flow, glide, on: true });
-  }, [isWaveOn, glide, flow]);
-  useEffect(() => {
-    if (!isWaveOn) return;
-    const off = () =>
-      navigator.sendBeacon(
-        '/api/wave',
-        new Blob([JSON.stringify({ on: false })], {
-          type: 'application/json',
-        }),
-      );
-    const keepAlive = setInterval(() => void api.wave({ on: true }), 60_000);
-    window.addEventListener('pagehide', off);
-    return () => {
-      clearInterval(keepAlive);
-      window.removeEventListener('pagehide', off);
-      void api.wave({ on: false });
-    };
-  }, [isWaveOn]);
   const [message, setMessage] = useState<{
     text: string;
     kind?: 'ok' | 'error';
@@ -74,18 +44,12 @@ export const App = () => {
   const report = async (action: Promise<Answer>) => {
     const { error } = await action;
     if (error !== undefined) setMessage({ kind: 'error', text: error });
-    return error === undefined;
   };
 
-  // a preview counts as over once the daemon was seen speaking and then went quiet, or never started within 8 s
-  useEffect(() => {
-    if (!(playing && status.data)) return;
-    if (status.data.speaking) {
-      if (!playing.hasStarted) setPlaying({ ...playing, hasStarted: true });
-    } else if (playing.hasStarted || Date.now() - playing.since > 8000) {
-      setPlaying(undefined);
-    }
-  }, [status.data, playing]);
+  const wave = useWave(
+    { flow: draft?.meterFlowMs, glide: draft?.meterGlideMs },
+    (reason) => setMessage({ kind: 'error', text: reason }),
+  );
 
   if (!draft)
     return (
@@ -127,7 +91,7 @@ export const App = () => {
   };
   const preview = async (engine: Engine, lang: Lang) => {
     const voice = voiceOf(draft, engine, lang);
-    const reply = await api.preview({
+    const reply = await speech.preview(lang, {
       engine,
       settings: {
         ...draft.engines[engine],
@@ -137,14 +101,6 @@ export const App = () => {
     });
     if (reply.error) return setMessage({ kind: 'error', text: reply.error });
     setMessage({ text: `▶ ${engine} · ${lang}` });
-    setPlaying({ engine, hasStarted: false, lang, since: Date.now() });
-  };
-  const pause = async () => {
-    await report(api.pause());
-    await status.refetch();
-  };
-  const stop = async () => {
-    if (await report(api.stop())) setPlaying(undefined);
   };
   const reset = async () => {
     const { error } = await settings.reset();
@@ -188,11 +144,11 @@ export const App = () => {
           onFavourite={(engine, voice, isFavourite) =>
             void setFavourite(engine, voice, isFavourite)
           }
-          onPause={() => void pause()}
+          onPause={() => void report(speech.pause())}
           onPreview={(engine) => void preview(engine, lang)}
           onSample={(sample) => setSamples({ ...samples, [lang]: sample })}
           onSettings={setEngine}
-          onStop={() => void stop()}
+          onStop={() => void report(speech.stop())}
           onVoice={(engine, voice) => setVoice(engine, lang, voice)}
           playing={
             playing?.lang === lang
@@ -257,7 +213,7 @@ export const App = () => {
           </span>
           <button
             className={pillButtonClass}
-            onClick={() => void stop()}
+            onClick={() => void report(speech.stop())}
             type='button'>
             ■ stop
           </button>
@@ -307,10 +263,10 @@ export const App = () => {
           />
           <label className='flex min-h-8 cursor-pointer select-none items-center gap-2.5 text-sm text-muted'>
             <input
-              aria-checked={isWaveOn}
-              checked={isWaveOn}
+              aria-checked={wave.isOn}
+              checked={wave.isOn}
               className='size-4'
-              onChange={(event) => setIsWaveOn(event.target.checked)}
+              onChange={(event) => wave.setIsOn(event.target.checked)}
               role='switch'
               type='checkbox'
             />
@@ -423,11 +379,3 @@ const SAMPLES: Record<Lang, string> = {
   ru: 'Привет! Я прочитаю вслух всё, что ты выделишь, — спокойно, чётко и без спешки.',
   uk: 'Привіт! Я прочитаю вголос усе, що ти виділиш, — спокійно, чітко і без поспіху.',
 };
-
-/* Types */
-interface Playing {
-  engine: Engine;
-  hasStarted: boolean;
-  lang: Lang;
-  since: number;
-}
