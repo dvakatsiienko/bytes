@@ -264,6 +264,7 @@ enum SeamsTest {
             ("it talks", look { $0.follow(reading); $0.hasSignal = true }, talks + ", meter"),
             ("the mac voice talks", look { $0.follow(reading) }, talks),
             ("paused", look { $0.follow(reading); $0.hasSignal = true; $0.follow(paused) }, held),
+            ("resumed, its signal still counts", look { $0.follow(reading); $0.hasSignal = true; $0.follow(paused); $0.follow(reading) }, talks + ", meter"),
             ("a signal left over", look { $0.follow(reading); $0.hasSignal = true; $0.follow(.idle) }, idle),
             ("the next read waits for its own signal", look { $0.follow(reading); $0.hasSignal = true; $0.follow(.reading(2, isPaused: false)) }, talks),
             ("a pill that left", look { _ = $0.startWave(); $0.hasSignal = true; $0.leave() }, idle),
