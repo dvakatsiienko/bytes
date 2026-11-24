@@ -78,9 +78,19 @@ enum EnginesTest {
             settings.model = model
             return await engine(id, PlantedNet(body: [Data(body.utf8)])).balance(key: "k", settings)
         }
+        var asked: [(name: String, got: String, want: String)] = []
+        for (id, want) in [(Engine.elevenlabs, "GET https://api.elevenlabs.io/v1/user/subscription xi-api-key=k"), (.fish, "GET https://api.fish.audio/wallet/self/api-credit authorization=Bearer k"), (.gemini, ""), (.kokoro, ""), (.system, "")] {
+            for key in ["k", nil] {
+                let net = PlantedNet(body: [Data("{}".utf8)])
+                var paid = EngineConfig()
+                paid.model = "s2.1-pro"
+                _ = await engine(id, net).balance(key: key, paid)
+                asked.append(("\(id)\(key == nil ? ", no key" : "")", net.asked.joined(), key == nil ? "" : want))
+            }
+        }
         let reset = Date(timeIntervalSince1970: 1_790_000_000)
         let day = reset.formatted(.dateTime.month(.abbreviated).day())
-        return check("balance", [
+        return check("balance request", asked) + check("balance", [
             ("elevenlabs", await left(.elevenlabs, #"{"character_count":9000,"character_limit":10000,"next_character_count_reset_unix":1790000000}"#, nil), Balance(left: 1000, refills: reset)),
             ("elevenlabs under a sentence", await left(.elevenlabs, #"{"character_count":9901,"character_limit":10000,"next_character_count_reset_unix":1790000000}"#, nil), Balance(left: 99, refills: reset, empty: "99 of 10000 credits left, refills \(day)")),
             ("elevenlabs, 100 left", await left(.elevenlabs, #"{"character_count":9900,"character_limit":10000,"next_character_count_reset_unix":null}"#, nil), Balance(left: 100)),
@@ -180,13 +190,20 @@ enum EnginesTest {
 
     static func voicesFailures() async -> Int {
         var rows: [(name: String, got: String, want: String)] = []
+        var missing: Set<String> = [], later = PlantedRunner()
         let row = { (name: String, act: @MainActor (Voices, PlantedNet, Calls) async throws -> Void, want: String) in
             let calls = Calls(), net = PlantedNet(body: [Data([1, 2])])
+            let server = PlantedServer(calls)
+            server.readyAfter = 0
             net.call = { line in Task { @MainActor in calls.made.append(line) } }
             let player = Player(device: PlantedAudio { calls.made.append($0) }, settling: .seconds(60), log: { _ in })
-            let keys = Keys(run: { _ in "k\0k\0k\0" }, log: { _ in })
+            let runner = PlantedRunner()
+            runner.prefix = "k-"
+            runner.missing = missing
+            let keys = Keys(run: { try await runner.run($0) }, now: { runner.now }, log: { _ in })
             await keys.load()
-            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, macVoice: VoiceOutput(make: PlantedSynths(calls).make), keys: keys, servers: [:])
+            later = runner
+            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, macVoice: VoiceOutput(make: PlantedSynths(calls).make), keys: keys, servers: [.kokoro: KokoroServer(server, net: server, settings: { EngineConfig() }, mayStart: true, log: { _ in })])
             do { try await act(voices, net, calls) } catch { calls.made.append("\(error)") }
             await settle()
             rows.append((name, calls.made.filter { !["start", "play", "speed 1.0"].contains($0) }.joined(separator: " | "), want))
@@ -233,14 +250,15 @@ enum EnginesTest {
             await settle()
             calls.made.sort()
         }, "ask One. | ask Two. | dropped One. | dropped Two.")
-        await row("a second look ahead drops the first", { voices, net, _ in
+        await row("a second look ahead drops the first", { voices, net, calls in
             net.hangs = true
             voices.openAhead(chunk("One."), with: .fish, settings: named)
             await settle()
             voices.openAhead(chunk("Two."), with: .fish, settings: named)
             await settle()
             net.call = { _ in }
-        }, "ask One. | dropped One. | ask Two.")
+            calls.made.sort()
+        }, "ask One. | ask Two. | dropped One.")
         await row("the mac voice plays for itself until it is told to render", { voices, _, calls in
             let task = Task { try await say(voices, "One.", .system, calls) }
             await settle()
@@ -251,6 +269,36 @@ enum EnginesTest {
             one.oneOutput = true
             try await voices.speak(chunk("One."), with: .system, settings: { one }, deadline: nil) { calls.made.append("heard") }
         }, "sound | heard")
+        await row("each balance is asked with its engine's key and settings", { voices, net, calls in
+            net.call = { _ in }
+            _ = await voices.balances { engine in
+                var settings = EngineConfig()
+                settings.model = engine == .fish ? "s2.1-pro" : "s2.1-pro-free"
+                return settings
+            }
+            calls.made = net.asked.sorted()
+        }, "GET https://api.elevenlabs.io/v1/user/subscription xi-api-key=k-elevenlabs | GET https://api.fish.audio/wallet/self/api-credit authorization=Bearer k-fish")
+        await row("a chunk is asked with its engine's key", { voices, net, calls in
+            net.call = { _ in }
+            for engine in [Engine.elevenlabs, .fish, .gemini] { try? await say(voices, "One.", engine, calls) }
+            calls.made = net.asked.map { line in line.split(separator: " ").filter { $0.contains("k-") }.joined() }
+        }, "xi-api-key=k-elevenlabs | k-fish | x-goog-api-key=k-gemini")
+        await row("what it says of the keys", { voices, _, calls in calls.made = Engine.allCases.map { "\(voices.hasKey($0))" } }, "true | false | false | true | true")
+        await row("a server that stopped answering is warmed, and only its own", { voices, _, _ in
+            voices.restartServer(of: .fish)
+            voices.restartServer(of: .kokoro)
+            await settle()
+        }, "say Ready. af_heart")
+        missing = ["gemini"]
+        await row("a missing key is looked for", { voices, _, calls in
+            calls.made.append("\(voices.hasKey(.gemini))")
+            later.missing = []
+            later.now += 61
+            voices.reloadMissingKeys()
+            await settle()
+            calls.made.append("\(voices.hasKey(.gemini))")
+        }, "false | true")
+        missing = []
         await row("the mac voices: its own names, then the installed", { voices, _, calls in
             calls.made.append(voices.voices(of: .system).map { "\($0.name) \($0.lang?.rawValue ?? "-")" }.joined(separator: ", "))
         }, "Spoken Content voice (Siri) en, best installed uk, best installed ru, Planted uk")
@@ -288,11 +336,13 @@ final class PlantedNet: Net, @unchecked Sendable {
     }
 
     private func ask(_ request: URLRequest) async throws {
-        let headers = (request.allHTTPHeaderFields ?? [:]).map { ($0.key.lowercased(), $0.value) }.filter { $0.0 != "content-type" }.sorted { $0.0 < $1.0 }
+        let headers = (request.allHTTPHeaderFields ?? [:]).map { ($0.key.lowercased(), $0.value) }.filter { $0 != ("content-type", "application/json") }.sorted { $0.0 < $1.0 }
         let json = request.httpBody.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
         let sorted = json.flatMap { try? JSONSerialization.data(withJSONObject: $0, options: [.sortedKeys, .withoutEscapingSlashes]) }.map { String(decoding: $0, as: UTF8.self) }
         let parts = [request.httpMethod ?? "", request.url?.absoluteString ?? ""] + headers.map { "\($0.0)=\($0.1)" } + [sorted ?? ""]
-        lock.withLock { lines.append(parts.joined(separator: " ")) }
+        // every body is json, and says so
+        if json != nil, request.value(forHTTPHeaderField: "content-type") != "application/json" { throw EngineError.status(415) }
+        lock.withLock { lines.append(parts.filter { !$0.isEmpty }.joined(separator: " ")) }
         let text = (json?["text"] ?? json?["input"]) as? String ?? ""
         call("ask \(text)")
         guard hangs else { return }

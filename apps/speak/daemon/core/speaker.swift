@@ -184,8 +184,11 @@ final class Speaker: ReadTarget {
                         // the mac voice returns normally from a stop too
                         if Task.isCancelled { return }
                         outOfQuota[engine] = nil
-                        if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
-                        lead = engine
+                        // a cloud voice with nothing to say, «…», leads nothing
+                        if isHeard || !engine.isCloud {
+                            if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
+                            lead = engine
+                        }
                         break
                     } catch {
                         if Task.isCancelled { return }

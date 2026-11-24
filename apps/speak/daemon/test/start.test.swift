@@ -31,6 +31,27 @@ enum StartTest {
             return await group.next() ?? ""
         }
         rows.append(("24 that hang leave a task its thread", many, "free"))
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("x-speak-child-\(ProcessInfo.processInfo.processIdentifier)")
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let mark = folder.appendingPathComponent("mark").path
+        let cancelled = Task { try await output(of: "/bin/sh", ["-c", "echo > \(mark)"], environment: [:], within: .seconds(5)) }
+        cancelled.cancel()
+        _ = await cancelled.result
+        try? await Task.sleep(for: .milliseconds(150))
+        rows.append(("one cancelled before it ran never starts", "\(FileManager.default.fileExists(atPath: mark))", "false"))
+        _ = await shell("echo $$ > \(mark); exec sleep 5", .milliseconds(150))
+        let pid = (try? String(contentsOfFile: mark, encoding: .utf8)).flatMap { Int32($0.trimmingCharacters(in: .whitespacesAndNewlines)) } ?? 0
+        for _ in 0..<40 where kill(pid, 0) == 0 { try? await Task.sleep(for: .milliseconds(25)) }
+        rows.append(("a hang past its deadline is ended, not left", pid > 0 && kill(pid, 0) != 0 ? "ended" : "left", "ended"))
+        let open = { (try? FileManager.default.contentsOfDirectory(atPath: "/dev/fd").count) ?? -1 }
+        _ = await shell("exit 0", .seconds(5))
+        let before = open()
+        for _ in 0..<20 { _ = await shell("echo a", .seconds(5)) }
+        for _ in 0..<5 { _ = await shell("exec sleep 5", .milliseconds(20)) }
+        for _ in 0..<5 { _ = try? await output(of: "/nonexistent/program", [], environment: [:], within: .seconds(5)) }
+        for _ in 0..<40 where open() > before { try? await Task.sleep(for: .milliseconds(25)) }
+        rows.append(("no file stays open behind a run", "\(max(0, open() - before))", "0"))
         return check("child", rows)
     }
 
@@ -173,6 +194,7 @@ enum StartTest {
 final class PlantedRunner: @unchecked Sendable {
     var now = Date(timeIntervalSince1970: 1_000_000)
     var missing: Set<String> = []
+    var prefix = ""
     var fails = false
     var isHeld = false
     private(set) var asked = 0
@@ -183,7 +205,7 @@ final class PlantedRunner: @unchecked Sendable {
         if fails { throw EngineError.timeout }
         return line.split(separator: "\"").filter { $0.hasPrefix("${") }.map { name in
             let engine = name.dropFirst(2).prefix { $0 != "_" }.lowercased()
-            return missing.contains(engine) ? "\0" : engine + "\0"
+            return missing.contains(engine) ? "\0" : prefix + engine + "\0"
         }.joined()
     }
 }

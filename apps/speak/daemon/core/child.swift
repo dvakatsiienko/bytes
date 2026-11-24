@@ -10,10 +10,11 @@ func output(of program: String, _ arguments: [String], environment: [String: Str
     return try await answer(of: Task { try await child.run() }, within: deadline)
 }
 
+// everything but the launch happens on its queue
 private final class Child: @unchecked Sendable {
     let process = Process()
-    private let pipe = Pipe()
-    private let lock = NSLock()
+    private let queue = DispatchQueue(label: "x-speak.child")
+    private var source: DispatchSourceRead?
     private var printed = Data()
     private var waiter: CheckedContinuation<String, Error>?
     private var isOver = false
@@ -21,39 +22,44 @@ private final class Child: @unchecked Sendable {
     func run() async throws -> String {
         try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
-                lock.withLock { waiter = continuation }
-                start()
+                queue.async {
+                    self.waiter = continuation
+                    self.isOver ? self.end(with: CancellationError()) : self.start()
+                }
             }
         } onCancel: {
-            end(with: CancellationError())
+            queue.async { self.end(with: CancellationError()) }
         }
     }
 
     private func start() {
+        let pipe = Pipe()
+        let reading = pipe.fileHandleForReading
         process.standardOutput = pipe
         process.standardError = FileHandle.nullDevice
-        pipe.fileHandleForReading.readabilityHandler = { [self] handle in
-            let data = handle.availableData
-            lock.withLock { printed.append(data) }
-            if data.isEmpty { end(with: nil) }
+        let source = DispatchSource.makeReadSource(fileDescriptor: reading.fileDescriptor, queue: queue)
+        self.source = source
+        source.setEventHandler { [self] in
+            var buffer = [UInt8](repeating: 0, count: 65536)
+            let count = read(reading.fileDescriptor, &buffer, buffer.count)
+            if count > 0 { printed.append(contentsOf: buffer[..<count]) } else { end(with: nil) }
         }
-        do { try process.run() } catch { end(with: error) }
-        // cancelled before it ran
-        if lock.withLock({ isOver }) { end(with: CancellationError()) }
+        // its own end of the pipe is closed here alone, once nothing reads it
+        source.setCancelHandler { try? reading.close() }
+        source.resume()
+        do {
+            try process.run()
+        } catch {
+            end(with: error)
+        }
     }
 
     private func end(with error: Error?) {
-        pipe.fileHandleForReading.readabilityHandler = nil
-        let (waiter, printed) = lock.withLock {
-            isOver = true
-            defer { self.waiter = nil }
-            return (self.waiter, self.printed)
-        }
-        guard let error else {
-            waiter?.resume(returning: String(decoding: printed, as: UTF8.self))
-            return
-        }
-        if process.isRunning { process.terminate() }
-        waiter?.resume(throwing: error)
+        isOver = true
+        source?.cancel()
+        source = nil
+        if error != nil, process.isRunning { process.terminate() }
+        if let error { waiter?.resume(throwing: error) } else { waiter?.resume(returning: String(decoding: printed, as: UTF8.self)) }
+        waiter = nil
     }
 }

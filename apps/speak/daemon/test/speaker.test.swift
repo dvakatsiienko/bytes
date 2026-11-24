@@ -132,6 +132,10 @@ enum SpeakerTest {
             await settle()
             stage.calls = [stage.speaker.health()["elevenlabs"]?["note"] ?? "-"]
         }, "needs 203")
+        await row("a cloud voice with nothing to say leads nothing", { $0.chain = [.fish, .kokoro, .system]; $0.voices.script[.fish] = [.saysNothing] }, { $0.read("… Hello.") },
+                  "pill 1 | «read 1: chunk 1/2» | ahead kokoro … | fish … in 900 | «read 1: chunk 2/2» | ahead kokoro Hello. | fish Hello. in 900 | «first audio: fish N ms» | drop ahead | rest | pill -")
+        await row("the mac voice leads, a word heard or not", { $0.chain = [.fish, .system]; $0.voices.script = [.fish: [.fails(EngineError.timeout)], .system: [.saysNothing]] }, { $0.read("… Hello.") },
+                  "pill 1 | «read 1: chunk 1/2» | fish … in 900 | «fish skipped: timeout» | system … | «read 1: chunk 2/2» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
         await row("a refusal's own note is logged", { $0.chain = [.fish, .system]; $0.voices.script[.fish] = [.fails(EngineError.status(402))] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | fish Hello. in 900 | «fish skipped: status(402), off for 3600 s» | «⚠️ FISH REFUSED s2.1-pro-free (402): the free tier may have ended; the chain falls through for an hour; check fish.audio» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
         await row("of two balance calls at once the newer one's answer stays", { stage in
@@ -543,7 +547,7 @@ final class Stage {
     private func drop(_ call: String) { calls.removeAll { $0 == call } }
 }
 
-enum Step { case plays, waits, fails(Error), failsMidChunk(Error), ignoresStop, sounds, failsLate(Error) }
+enum Step { case plays, waits, fails(Error), failsMidChunk(Error), ignoresStop, sounds, saysNothing, failsLate(Error) }
 
 @MainActor
 final class PlantedVoices: ChunkVoices {
@@ -575,7 +579,8 @@ final class PlantedVoices: ChunkVoices {
         case .failsLate(let error):
             try? await Task.sleep(for: .milliseconds(150))
             throw error
-        case .ignoresStop: try? await Task.sleep(for: .milliseconds(20))
+        case .ignoresStop: try? await Task.sleep(for: .seconds(60))
+        case .saysNothing: break
         case .waits: try await Task.sleep(for: .seconds(60))
         }
     }
