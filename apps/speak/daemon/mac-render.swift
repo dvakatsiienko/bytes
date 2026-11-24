@@ -13,7 +13,7 @@ func renderedMacVoice(_ chunk: Chunk, _ settings: EngineConfig) -> AsyncThrowing
     }
     let synth = AVSpeechSynthesizer(), samples = Samples()
     return AsyncThrowingStream { continuation in
-        // a voice that stops calling back would hold the read for good
+        // a voice that stops calling back would hold the read for good; a night asleep is not its silence
         let watch = Task {
             while samples.silence < .seconds(5) { try await Task.sleep(for: .seconds(1)) }
             continuation.finish(throwing: EngineError.timeout)
@@ -38,9 +38,9 @@ func renderedMacVoice(_ chunk: Chunk, _ settings: EngineConfig) -> AsyncThrowing
 private final class Samples: @unchecked Sendable {
     private let format = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 24000, channels: 1, interleaved: true)!
     private var converter: AVAudioConverter?
-    private let lastCall = OSAllocatedUnfairLock(initialState: ContinuousClock.now)
+    private let lastCall = OSAllocatedUnfairLock(initialState: SuspendingClock.now)
 
-    var silence: Duration { ContinuousClock.now - lastCall.withLock { $0 } }
+    var silence: Duration { SuspendingClock.now - lastCall.withLock { $0 } }
 
     // nil: the voice is done, what the converter still holds comes out
     func take(_ buffer: AVAudioPCMBuffer?) -> Data? {
