@@ -250,6 +250,8 @@ is 'forward to a daemon that finds no settings: refused, the binaries back' '1 o
 says 'forward to a daemon that finds no settings: says so' 'no settings at'
 setup; build new; started; rollback
 is 'two daemons that read the new place: nothing is copied' '0 today' "$code $(cat "$place")"
+unmoved; rm "$libexec/x-speak.readers"; printf 'good' >"$libexec/x-speak.prev"; rollback
+is 'a rollback before the settings ever moved: nothing to copy, nothing in the way' '0 good/old tracked/none' "$code $(pair) $(places)"
 setup; build new; rm "$place"; relaunch
 is 'a relaunch with no settings: refused, nothing stopped' '3 running' "$code $(running)"
 setup; rm "$libexec/x-speak.readers" "$place"; relaunch
