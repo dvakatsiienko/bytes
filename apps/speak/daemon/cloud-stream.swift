@@ -15,7 +15,7 @@ private func failure(_ status: Int, _ bytes: URLSession.AsyncBytes) async -> Eng
 @MainActor
 func stream(_ open: Task<(URLSession.AsyncBytes, URLResponse), Error>, into player: Player, _ settings: EngineConfig, deadline: Duration?, onAudio: @escaping () -> Void) async throws {
     let state = OSAllocatedUnfairLock(initialState: StreamState.waiting)
-    try await withThrowingTaskGroup(of: Void.self) { group in
+    try await withThrowingTaskGroup(of: Bool.self) { group in
         group.addTask {
             let (bytes, response) = try await withTaskCancellationHandler { try await open.value } onCancel: { open.cancel() }
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
@@ -47,18 +47,22 @@ func stream(_ open: Task<(URLSession.AsyncBytes, URLResponse), Error>, into play
                 }
             }
             if buffer.count > 1 { try await flush() }
+            return true
         }
         if let deadline {
             group.addTask {
-                try await Task.sleep(for: deadline)
+                // cancelled: the stream ended first
+                do { try await Task.sleep(for: deadline) } catch { return false }
                 let isLate = state.withLock { current in
                     guard current == .waiting else { return false }
                     current = .timedOut
                     return true
                 }
                 if isLate { throw EngineError.timeout }
+                return false
             }
         }
-        try await group.waitForAll()
+        // a stream that ends inside its deadline does not wait the rest of it out
+        for try await isWhole in group where isWhole { group.cancelAll() }
     }
 }

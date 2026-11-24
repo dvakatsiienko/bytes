@@ -31,7 +31,13 @@ final class Answers: @unchecked Sendable {
         let turn = Turn()
         onMain {
             guard turn.begins() else { return }
-            turn.ends(with: runOp(request, with: self.commands()))
+            let commands = self.commands()
+            let object = runOp(request, with: commands)
+            // on main, so in the order things happened: an answer that leaves late is not the last status, and what an
+            // order changed is in it before the order's own answer leaves
+            let status = isStatus ? object : commands.status().reply
+            self.lock.withLock { self.lastStatus = status }
+            turn.ends(with: object)
         }
         guard let object = turn.object(within: budget(request.op)) else {
             let age = mainAge()
@@ -39,8 +45,8 @@ final class Answers: @unchecked Sendable {
             // a busy main that missed 50 ms is not a stall: the note starts where the watchdog's line does
             if isStatus, var last = lock.withLock({ lastStatus }) {
                 if age > .seconds(2) { last["main"] = note }
-                // every sound is started by main, a sentence at a time: past a minute nothing plays any more, and a
-                // relaunch, which waits for a read to end, is the way out
+                // past a minute no key reaches it, so nobody could stop what still sounds: a relaunch, which waits for
+                // a read to end, is the way out
                 if age > .seconds(60) {
                     last["speaking"] = false
                     last["paused"] = false
@@ -50,7 +56,6 @@ final class Answers: @unchecked Sendable {
             }
             return reply(["error": "main thread \(note), \(request.op) dropped", "main": note])
         }
-        if isStatus { lock.withLock { lastStatus = object } }
         return reply(object)
     }
 

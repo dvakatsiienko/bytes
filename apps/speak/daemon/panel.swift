@@ -226,6 +226,7 @@ final class Panel: SpeechPill {
         model.state.follow(playback)
         if playback == .idle { return leave() }
         guard isNew else { return }
+        if waveTimer != nil { model.meter.reset() }
         endWave()
         show()
     }
@@ -253,16 +254,16 @@ final class Panel: SpeechPill {
     private var waveTimer: Timer?
     private var waveDeadline = Date.distantPast
 
-    func wave(on: Bool, glide: Double?, flow: Double?) -> Bool {
+    func wave(on: Bool, glide: Double?, flow: Double?) -> String? {
         guard on else {
             stopWave()
-            return true
+            return nil
         }
-        guard model.state.startWave() else { return false }
+        if let refusal = model.state.startWave(isRenewal: glide == nil && flow == nil) { return refusal }
         let now = unsaved.tuning ?? (settings().meterGlideMs, settings().meterFlowMs)
         unsaved.tuning = (glide ?? now.glide, flow ?? now.flow)
         waveDeadline = Date().addingTimeInterval(300)
-        guard waveTimer == nil else { return true }
+        guard waveTimer == nil else { return nil }
         show()
         let start = Date()
         waveTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
@@ -273,7 +274,7 @@ final class Panel: SpeechPill {
                 self.model.push((0..<10).map { Float(speechLevel(at: t0 + Double($0) * 0.01)) }, spacing: 0.01)
             }
         }
-        return true
+        return nil
     }
 
     private func stopWave() {

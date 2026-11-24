@@ -47,8 +47,8 @@ protocol DaemonCommands: AnyObject {
     func togglePause()
     func stop()
     func demoPill()
-    // false while a read plays: the pill is its own
-    func wave(on: Bool, glide: Double?, flow: Double?) -> Bool
+    // why it does not run. «on» with nothing to tune renews the one that runs
+    func wave(on: Bool, glide: Double?, flow: Double?) -> String?
     func hidePill()
     func blockMain(for seconds: Double)
     func read(_ parts: [Chunk])
@@ -80,9 +80,7 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
     case "panel-demo":
         commands.demoPill()
     case "wave":
-        guard commands.wave(on: request.on ?? false, glide: request.glide, flow: request.flow) else {
-            return ["error": "the waveform waits: x-speak is reading aloud"]
-        }
+        if let refusal = commands.wave(on: request.on ?? false, glide: request.glide, flow: request.flow) { return ["error": refusal] }
     case "panel-hide":
         commands.hidePill()
     // a test hook: holds main for `seconds`, so the socket's answer under a blocked main can be measured

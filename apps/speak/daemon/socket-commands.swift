@@ -31,7 +31,7 @@ final class SocketCommands: DaemonCommands {
     func togglePause() { speaker.togglePause() }
     func stop() { speaker.silence() }
     func demoPill() { panel.demo() }
-    func wave(on: Bool, glide: Double?, flow: Double?) -> Bool { panel.wave(on: on, glide: glide, flow: flow) }
+    func wave(on: Bool, glide: Double?, flow: Double?) -> String? { panel.wave(on: on, glide: glide, flow: flow) }
     func hidePill() { panel.hide() }
     func blockMain(for seconds: Double) { DispatchQueue.main.async { Thread.sleep(forTimeInterval: seconds) } }
 

@@ -1,11 +1,15 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 
 import { type Wave, api } from '@/api.ts';
+import { LIMITS } from '@/limits.ts';
 
 // the pill's infinite waveform: it plays the draft's glide and flow live, re-arms the daemon's 5-minute deadline every
 // minute, and turns off when toggled off, on unmount, when the tab goes away, or when the daemon will not show it
 export const useWave = (
-  { flow, glide }: Omit<Wave, 'on'>,
+  {
+    flow = LIMITS.meterFlowMs.default,
+    glide = LIMITS.meterGlideMs.default,
+  }: Omit<Wave, 'on'>,
   onRefusal: (reason: string) => void,
 ) => {
   const [isOn, setIsOn] = useState(false);
@@ -27,7 +31,7 @@ export const useWave = (
           type: 'application/json',
         }),
       );
-    const keepAlive = setInterval(() => void api.wave({ on: true }), 60_000);
+    const keepAlive = setInterval(() => void show({ on: true }), 60_000);
     window.addEventListener('pagehide', off);
     return () => {
       clearInterval(keepAlive);

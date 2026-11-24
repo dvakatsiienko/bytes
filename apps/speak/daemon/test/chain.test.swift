@@ -61,7 +61,7 @@ enum ChainTest {
             ("kokoro behind a cloud engine gets 3 s", wait(.kokoro, [.fish, .kokoro, .system], nil, 900, false, 1500), .atMost(.seconds(3))),
             ("kokoro, a budget of zero", wait(.kokoro, [.kokoro, .fish], nil, 0, false, 0), .atMost(.seconds(3))),
             ("kokoro last waits as long as it takes", wait(.kokoro, [.fish, .kokoro], nil, 900, false, 1500), .asLongAsItTakes),
-            ("kokoro while audio plays", wait(.kokoro, [.kokoro, .fish], nil, 900, true, 0), .asLongAsItTakes),
+            ("kokoro while audio plays: its 3 s wait for the quiet", wait(.kokoro, [.kokoro, .fish], nil, 900, true, 0), .atMost(.seconds(3))),
             ("the mac voice has no budget", wait(.system, [.system, .fish], nil, 0, false, 0), .asLongAsItTakes),
         ])
     }

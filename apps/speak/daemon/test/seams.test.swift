@@ -102,12 +102,19 @@ enum SeamsTest {
         rows.append(("main stalled: its last status, with the note", ask(stalled, status), #"{… "main":"blocked for 3.0 s","paused":false,"speaking":true}"#))
         rows.append(("main stalled: another op is dropped", ask(stalled, stop), #"{"error":"main thread blocked for 3.0 s, stop dropped","main":"blocked for 3.0 s"}"#))
         main.isBlocked = false
+        rows.append(("a status from before an order", ask(busy, status), #"{… "paused":false,"speaking":false}"#))
         recorder.isSpeaking = true
+        rows.append(("the order", ask(busy, stop), #"{"ok":true}"#))
+        main.isBlocked = true
+        rows.append(("main busy right after it: the status as the order left it", ask(busy, status), #"{… "paused":false,"speaking":true}"#))
+        main.isBlocked = false
         let minute = age(60), more = age(61)
+        recorder.isPaused = true
         for answers in [minute, more] { _ = ask(answers, status) }
         main.isBlocked = true
-        rows.append(("a minute's stall in a read: it may still sound", ask(minute, status), #"{… "main":"blocked for 60.0 s","paused":false,"speaking":true}"#))
-        rows.append(("past a minute it plays no more", raw(more, status), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","main":"blocked for 61.0 s","paused":false,"settings":"at","speaking":false}"#))
+        rows.append(("a minute's stall in a read: it may still sound", ask(minute, status), #"{… "main":"blocked for 60.0 s","paused":true,"speaking":true}"#))
+        rows.append(("past a minute it is neither speaking nor paused", raw(more, status), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","main":"blocked for 61.0 s","paused":false,"settings":"at","speaking":false}"#))
+        recorder.isPaused = false
         main.isBlocked = false
         rows.append(("main answers again after that", ask(more, status), #"{… "paused":false,"speaking":true}"#))
         recorder.isSpeaking = false
@@ -258,11 +265,12 @@ enum SeamsTest {
             ("the mac voice talks", look { $0.follow(reading) }, talks),
             ("paused", look { $0.follow(reading); $0.hasSignal = true; $0.follow(paused) }, held),
             ("a signal left over", look { $0.follow(reading); $0.hasSignal = true; $0.follow(.idle) }, idle),
+            ("the next read waits for its own signal", look { $0.follow(reading); $0.hasSignal = true; $0.follow(.idle); $0.follow(.reading(2, isPaused: false)) }, talks),
             ("a pill that left", look { _ = $0.startWave(); $0.hasSignal = true; $0.leave() }, idle),
             ("the wave alone has no ⏸ to press", look { _ = $0.startWave(); $0.hasSignal = true }, idle + ", meter"),
             ("the wave before its first level", look { _ = $0.startWave() }, idle),
             ("the wave is off again", look { _ = $0.startWave(); $0.hasSignal = true; _ = $0.stopWave() }, idle),
-            ("a read over the wave", look { _ = $0.startWave(); $0.follow(reading) }, talks),
+            ("a read over the wave waits for its own signal", look { _ = $0.startWave(); $0.hasSignal = true; $0.follow(reading) }, talks),
             ("a read over the wave has ended", look { _ = $0.startWave(); $0.follow(reading); $0.follow(.idle); $0.hasSignal = true }, idle),
             ("a wave over a paused read", look { $0.follow(paused); _ = $0.startWave(); $0.hasSignal = true }, held),
             ("a sample", look { $0.showSample() }, talks),
@@ -272,7 +280,10 @@ enum SeamsTest {
             ("starts where nothing plays", pill { _ = $0.startWave() }.isWaveOn, true),
             ("never over a read", pill { $0.follow(reading); _ = $0.startWave() }.isWaveOn, false),
             ("a read that begins ends it", pill { _ = $0.startWave(); $0.follow(reading) }.isWaveOn, false),
-            ("says it did not start", { var state = pill { $0.follow(reading) }; return state.startWave() }(), false),
+            ("ends with the pill that leaves", pill { _ = $0.startWave(); $0.leave() }.isWaveOn, false),
+            ("says why it did not start", { var state = pill { $0.follow(reading) }; return state.startWave() != nil }(), true),
+            ("a renewal of one that runs", { var state = pill { _ = $0.startWave() }; return state.startWave(isRenewal: true) == nil }(), true),
+            ("a renewal never starts one", { var state = PillState(); return state.startWave(isRenewal: true) == nil || state.isWaveOn }(), false),
             ("its end lets the pill leave", { var state = pill { _ = $0.startWave() }; return state.stopWave() }(), true),
             ("an end under a read leaves the read its pill", { var state = pill { $0.follow(reading) }; return state.stopWave() }(), false),
             ("an end under a read leaves the read its meter", pill { $0.follow(reading); $0.hasSignal = true; _ = $0.stopWave() }.hasSignal, true),
@@ -367,7 +378,8 @@ class Recorder: DaemonCommands {
     var calls: [String] = []
     var reloadError: String?
     var isSpeaking = true
-    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: false, read: isSpeaking ? 7 : nil, macVoice: "synth", settings: "at") }
+    var isPaused = false
+    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, macVoice: "synth", settings: "at") }
     func voices() -> [[String: String]] { [["id": "a"]] }
     func reload() -> String? { calls.append("reload"); return reloadError }
     var refusal: SaveError?
@@ -387,9 +399,9 @@ class Recorder: DaemonCommands {
     func stop() { calls.append("stop") }
     func demoPill() { calls.append("demo") }
     var refusesWave = false
-    func wave(on: Bool, glide: Double?, flow: Double?) -> Bool {
+    func wave(on: Bool, glide: Double?, flow: Double?) -> String? {
         calls.append("wave \(on) \(glide.map { "\($0)" } ?? "-") \(flow.map { "\($0)" } ?? "-")")
-        return !refusesWave
+        return refusesWave ? "the waveform waits: x-speak is reading aloud" : nil
     }
     func hidePill() { calls.append("hide") }
     func blockMain(for seconds: Double) { calls.append("block \(seconds)") }
@@ -426,6 +438,7 @@ final class SlowGrab: SelectionGrab {
         return nil
     }
     func ends(_ text: String?) async {
+        for _ in 0..<200 where waiting.isEmpty { try? await Task.sleep(for: .milliseconds(5)) }
         if !waiting.isEmpty { waiting.removeFirst().resume(returning: text) }
         await settle()
     }

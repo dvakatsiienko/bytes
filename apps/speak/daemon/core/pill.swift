@@ -9,16 +9,17 @@ struct PillState: Equatable {
 
     // a read that begins takes the pill
     mutating func follow(_ playback: Playback) {
-        if let read = playback.read, read != self.playback.read { (isWaveOn, isSample) = (false, false) }
+        if let read = playback.read, read != self.playback.read { leave() }
         if playback == .idle { hasSignal = false }
         self.playback = playback
     }
 
-    // whether the waveform may run: never over a read
-    mutating func startWave() -> Bool {
-        guard playback == .idle else { return false }
+    // why the waveform does not run: never over a read, and a renewal never starts one that has ended
+    mutating func startWave(isRenewal: Bool = false) -> String? {
+        guard playback == .idle else { return "the waveform waits: x-speak is reading aloud" }
+        guard isWaveOn || !isRenewal else { return "the waveform has ended" }
         isWaveOn = true
-        return true
+        return nil
     }
 
     // whether the pill is free to leave: a read keeps it

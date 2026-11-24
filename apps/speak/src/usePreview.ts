@@ -20,7 +20,9 @@ export const usePreview = () => {
     refetchInterval: started ? 700 : 5000,
   });
   const playing = cardOf(started, status.isError ? undefined : status.data);
-  const isOver = started !== undefined && playing === undefined;
+  // a status that did not come says nothing of the read
+  const isOver =
+    started !== undefined && playing === undefined && !status.isError;
   // a restarted daemon counts its reads from one again: a card that went out stays out
   useEffect(() => {
     if (isOver) setStarted(undefined);

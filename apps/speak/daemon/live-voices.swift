@@ -53,15 +53,15 @@ final class LiveVoices: ChunkVoices {
         case .system where settings().oneOutput:
             let settings = settings()
             var isFirst = true
-            for await pcm in renderedMacVoice(chunk, settings) {
+            for try await pcm in renderedMacVoice(chunk, settings) {
                 // samples that land after a stop never reach the player
                 try Task.checkCancellation()
                 try player.schedule(pcm, settings)
                 if isFirst { onAudio() }
                 isFirst = false
             }
+            // a text with no sound in it, «…», is spoken: no other engine is asked for it
             try Task.checkCancellation()
-            if isFirst { throw EngineError.noVoice }
         case .system:
             await player.drained()
             try Task.checkCancellation()
@@ -78,7 +78,7 @@ final class LiveVoices: ChunkVoices {
             let prefetched = kokoroPrefetch.flatMap { $0.text == chunk.text ? $0.task : nil }
             kokoroPrefetch = nil
             let voice = settings().voice(for: .en)
-            let pcm = try await answer(of: prefetched ?? Task { try await kokoro.pcm(chunk.text, voice: voice) }, within: deadline)
+            let pcm = try await answer(of: prefetched ?? Task { try await kokoro.pcm(chunk.text, voice: voice) }, within: deadline, after: { [player] in await player.drained() })
             // a render that lands after a stop never reaches the player
             try Task.checkCancellation()
             try player.schedule(pcm, settings())

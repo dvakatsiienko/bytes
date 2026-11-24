@@ -183,6 +183,8 @@ final class Speaker: ReadTarget {
                             isHeard = true
                             if engine.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
                         }
+                        // the mac voice returns normally from a stop too
+                        if Task.isCancelled { return }
                         outOfQuota[engine] = nil
                         if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
                         lead = engine

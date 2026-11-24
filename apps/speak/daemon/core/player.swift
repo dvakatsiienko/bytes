@@ -45,10 +45,10 @@ final class Player: SpeechOutput {
         self.device = device
         self.settling = settling
         self.write = write
-        device.onGone = { [weak self] why in
+        device.onGone = { [weak self, weak device] why in
             write("audio: \(why), engine released")
             self?.stop()
-            device.release()
+            device?.release()
         }
     }
 
