@@ -167,7 +167,8 @@ final class Speaker: ReadTarget {
                 if rendersKokoroAhead(engines, lead: lead, isPlaying: player.isPlaying) {
                     voices.renderKokoroAhead(chunk, settings: settings(.kokoro))
                 }
-                let budgetEnds = firstAudioBudgetEnds(isPlaying: outputs.contains { $0.isBusy }, firstAudioMs: saved().firstAudioMs, now: .now)
+                let newBudget = { firstAudioBudgetEnds(isPlaying: self.outputs.contains { $0.isBusy }, firstAudioMs: self.saved().firstAudioMs, now: .now) }
+                var budgetEnds = newBudget()
                 for engine in engines {
                     var isHeard = false
                     let deadline: Duration?
@@ -195,6 +196,8 @@ final class Speaker: ReadTarget {
                         handle(error is CancellationError ? EngineError.timeout : error, from: engine)
                         // a chunk that was heard is never read again by the next engine
                         if isHeard { break }
+                        // a wait that was never the cloud's budget took none of it
+                        if !isOnBudget(engine, lead: lead) { budgetEnds = newBudget() }
                     }
                 }
             }

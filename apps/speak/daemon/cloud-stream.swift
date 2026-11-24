@@ -9,7 +9,7 @@ private func failure(_ status: Int, _ bytes: URLSession.AsyncBytes) async -> Eng
     return engineError(status: status, body: body)
 }
 
-// plays as bytes arrive; with a deadline, no audio by then throws before anything was heard
+// plays as bytes arrive; with a deadline, which runs from the moment nothing plays, no audio by then throws before anything was heard
 // the byte loop runs off the main actor: on it, a buffered response starved the deadline timer (fish
 // played at 604 ms under a 400 ms deadline). `state` settles the race — audio or timeout, never both.
 @MainActor
@@ -52,6 +52,7 @@ func stream(_ open: Task<(URLSession.AsyncBytes, URLResponse), Error>, into play
         if let deadline {
             group.addTask {
                 // cancelled: the stream ended first
+                await player.drained()
                 do { try await Task.sleep(for: deadline) } catch { return false }
                 let isLate = state.withLock { current in
                     guard current == .waiting else { return false }

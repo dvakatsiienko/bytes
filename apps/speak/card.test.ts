@@ -9,6 +9,7 @@ it.each([
   ['another read took over', card, { read: 8 }, undefined],
   ['nothing plays', card, {}, undefined],
   ['the daemon does not answer', card, undefined, undefined],
+  ['an older daemon numbers no read', {} as typeof card, {}, undefined],
   ['nothing was pressed', undefined, { read: 7 }, undefined],
   ['nothing was pressed and nothing plays', undefined, {}, undefined],
 ])('a card while %s', (_, started, status, lit) => {

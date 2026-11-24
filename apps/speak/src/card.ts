@@ -4,4 +4,7 @@ import type { Status } from '@/api.ts';
 export const cardOf = <T extends { read: number }>(
   started: T | undefined,
   status: Pick<Status, 'read'> | undefined,
-) => (started && status?.read === started.read ? started : undefined);
+) =>
+  started?.read !== undefined && status?.read === started.read
+    ? started
+    : undefined;

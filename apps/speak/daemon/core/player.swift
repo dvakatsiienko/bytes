@@ -29,7 +29,7 @@ final class Player: SpeechOutput {
     private let settling: Duration
     private let write: (String) -> Void
     private var pending = 0
-    private var drainWaiters: [CheckedContinuation<Void, Never>] = []
+    private var drainWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
     private var generation = 0
     // every buffer ever scheduled: a stop's delayed rest holds off once anything new was scheduled after it
     private var scheduled = 0
@@ -86,9 +86,16 @@ final class Player: SpeechOutput {
         if pending > 0 { device.play() }
     }
 
+    // or the wait was cancelled
     func drained() async {
         if pending == 0 { return }
-        await withCheckedContinuation { drainWaiters.append($0) }
+        let waiter = UUID()
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { drainWaiters[waiter] = $0 }
+        } onCancel: {
+            // on main, so never before the wait is stored
+            Task { @MainActor in drainWaiters.removeValue(forKey: waiter)?.resume() }
+        }
     }
 
     // the engine rests 2 s later, unless a new read scheduled audio meanwhile: one left running feeds the meter's tap
@@ -114,7 +121,7 @@ final class Player: SpeechOutput {
     }
 
     private func releaseWaiters() {
-        drainWaiters.forEach { $0.resume() }
-        drainWaiters = []
+        drainWaiters.values.forEach { $0.resume() }
+        drainWaiters = [:]
     }
 }
