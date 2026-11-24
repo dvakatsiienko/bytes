@@ -55,7 +55,8 @@ private func stripMarkdown(_ text: String) -> String {
     // bullets and geometric shapes: the Claude app hands nested list markers over as «■», read as «black square»
     t = sub(t, "[\\x{2022}\\x{2023}\\x{2043}\\x{25A0}-\\x{25FF}\\x{2605}\\x{2606}]", "")
     // a line that ends bare ends a sentence: several lines read as one run-on otherwise (dima: «it sounds like a single sentence»)
-    return sub(t, "(?<=[\\p{L}\\p{N})\\]])[ \\t]*\\r?\\n", ".\n")
+    // a mark that already pauses, a brace, an opener or a joining sign ends none
+    return sub(t, "(?<=\\S)(?<![.!?…;:,.][»”\"'’)*\\]]{0,2})(?<![({}\\[«“→|/&+=<\\-–—])[ \\t]*\\r?\\n", ".\n")
 }
 
 private func rewriteLatin(_ text: String) -> String {

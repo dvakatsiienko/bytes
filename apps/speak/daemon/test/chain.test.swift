@@ -6,7 +6,7 @@ enum ChainTest {
     static let start = ContinuousClock.now
 
     static func failures() -> Int {
-        candidateFailures() + firstAudioFailures() + kokoroWaitFailures() + kokoroAheadFailures() + benchFailures() + refusalNoteFailures() + quotaBodyFailures() + chunkFailures()
+        candidateFailures() + firstAudioFailures() + kokoroAheadFailures() + benchFailures() + refusalNoteFailures() + quotaBodyFailures() + chunkFailures()
     }
 
     static func candidateFailures() -> Int {
@@ -38,7 +38,7 @@ enum ChainTest {
         let chain: [Engine] = [.fish, .elevenlabs, .kokoro]
         let wait = { (engine: Engine, among: [Engine], lead: Engine?, budget: Int, isPlaying: Bool, passed: Int) in
             firstAudioWait(
-                for: engine, among: among, lead: lead, characters: 40, firstAudioMs: budget,
+                for: engine, among: among, lead: lead, firstAudioMs: budget,
                 budgetEnds: firstAudioBudgetEnds(isPlaying: isPlaying, firstAudioMs: budget, now: start),
                 now: start + .milliseconds(passed)
             )
@@ -65,15 +65,6 @@ enum ChainTest {
             ("kokoro last waits as long as it takes", wait(.kokoro, [.fish, .kokoro], nil, 900, false, 1500), .asLongAsItTakes),
             ("kokoro while audio plays: its 3 s wait for the quiet", wait(.kokoro, [.kokoro, .fish], nil, 900, true, 0), .atMost(.seconds(3))),
             ("the mac voice has no budget", wait(.system, [.system, .fish], nil, 0, false, 0), .asLongAsItTakes),
-        ])
-    }
-
-    static func kokoroWaitFailures() -> Int {
-        check("kokoro wait", [
-            ("a word", localServerWait(4), .seconds(3)),
-            ("300 characters", localServerWait(300), .seconds(3)),
-            ("301", localServerWait(301), .milliseconds(3010)),
-            ("1200", localServerWait(1200), .seconds(12)),
         ])
     }
 
@@ -148,6 +139,10 @@ enum ChainTest {
         let words = String(repeating: "word ", count: 24).trimmingCharacters(in: .whitespaces)
         let late = String(repeating: "word ", count: 12) + "here, " + String(repeating: "more ", count: 12) + "end."
         let hundred = String(repeating: "a", count: 50) + ", " + String(repeating: "b", count: 48)
+        let six = { (count: Int) in Array(repeating: "abcde", count: count).joined(separator: " ") }
+        // thirty characters with the space after
+        let thirty = { (count: Int) in six(count * 5) }
+        let long = String(repeating: "word ", count: 400).trimmingCharacters(in: .whitespaces)
         return check("chunk", [
             ("one sentence", cut([(.en, "Hello there.")]), ["en: Hello there."]),
             ("two sentences", cut([(.en, "Hello there. And bye!")]), ["en: Hello there.", "en: And bye!"]),
@@ -172,6 +167,12 @@ enum ChainTest {
             ("a long second sentence is whole", cut([(.en, "Hi. " + late)]), ["en: Hi.", "en: " + late]),
             ("several languages", cut([(.en, "Hello."), (.uk, "Привіт. Бувай."), (.ru, "Да")]), ["en: Hello.", "uk: Привіт.", "uk: Бувай.", "ru: Да"]),
             ("no punctuation at all", cut([(.en, "just some words")]), ["en: just some words"]),
+            ("a sentence over 300 characters is cut at its last comma past the half", cut([(.en, "Hi. " + thirty(8) + ", " + thirty(4))]), ["en: Hi.", "en: " + thirty(8) + ",", "en: " + thirty(4)]),
+            ("a comma before the half cuts nothing", cut([(.en, "Hi. One, " + thirty(12))]), ["en: Hi.", "en: One, " + thirty(9) + " " + six(4), "en: " + six(1) + " " + thirty(2)]),
+            ("300 characters are one", cut([(.en, "Hi. " + thirty(10) + "!")]), ["en: Hi.", "en: " + thirty(10) + "!"]),
+            ("301 are two", cut([(.en, "Hi. " + thirty(10) + "e!")]), ["en: Hi.", "en: " + thirty(9) + " " + six(4), "en: abcdee!"]),
+            ("a text with no space is cut hard", cut([(.en, String(repeating: "x", count: 700))]).map { "\($0.count - 4)" }, ["300", "300", "100"]),
+            ("2,000 characters with no comma, joined, are the text", [cut([(.en, long)]).map { String($0.dropFirst(4)) }.joined(separator: " ") == long ? "same" : "other", "\(cut([(.en, long)]).map { $0.count - 4 }.max() ?? 0 <= 300)"], ["same", "true"]),
             ("an empty text", cut([(.en, "")]), []),
             ("no run", cut([]), []),
         ])

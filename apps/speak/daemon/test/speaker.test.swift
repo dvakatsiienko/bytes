@@ -100,8 +100,6 @@ enum SpeakerTest {
                 try? await Task.sleep(for: .milliseconds(450))
             }, "pill 1 | «read 1: chunk 1/1» | ahead kokoro Hello. | elevenlabs Hello. in 100 | «elevenlabs skipped: timeout» | kokoro Hello. in 3000 | «kokoro skipped: \(words)» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
         }
-        await row("a long sentence gives kokoro longer", plain, { $0.read([Chunk(lang: .en, text: String(repeating: "a", count: 400))]) },
-                  "pill 1 | «read 1: chunk 1/1» | kokoro \(String(repeating: "a", count: 400)) in 4000 | «first audio: kokoro N ms» | drop ahead | rest | pill -")
         await row("a press looks for the keys that were missing", plain, { $0.speaker.read(Stage.chunks("Hello."), pressed: .now) },
                   "pill 1 | reload keys | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | drop ahead | rest | pill -")
         await row("a preview opens its own next chunk ahead, whatever the chain", plain, { _ = $0.speaker.preview("Hello there. Bye now.", with: .fish, settings: EngineConfig()) },

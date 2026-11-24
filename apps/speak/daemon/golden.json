@@ -366,5 +366,49 @@
   {
     "in": "… and then ⌥⇧P",
     "out": [["en", "and then option shift P"]]
+  },
+  {
+    "in": "say «done»\nthen go",
+    "out": [["en", "say done. then go"]]
+  },
+  {
+    "in": "cpu at 40%\nnext",
+    "out": [["en", "cpu at 40%. next"]]
+  },
+  {
+    "in": "it said 'done'\nthen go",
+    "out": [["en", "it said 'done'. then go"]]
+  },
+  {
+    "in": "it said «done.»\nthen go",
+    "out": [["en", "it said done. then go"]]
+  },
+  {
+    "in": "one —\ntwo",
+    "out": [["en", "one, two"]]
+  },
+  {
+    "in": "a list:\nfirst",
+    "out": [["en", "a list: first"]]
+  },
+  {
+    "in": "five * \nsix",
+    "out": [["en", "five. six"]]
+  },
+  {
+    "in": "open (\nthen",
+    "out": [["en", "open, then"]]
+  },
+  {
+    "in": "done 🎉\nthen go",
+    "out": [["en", "done. then go"]]
+  },
+  {
+    "in": "a;\nb",
+    "out": [["en", "a; b"]]
+  },
+  {
+    "in": "foo {\n  bar: 1\n}\nend",
+    "out": [["en", "foo bar: 1. end"]]
   }
 ]

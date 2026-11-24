@@ -167,7 +167,7 @@ final class Speaker: ReadTarget {
                 for engine in engines {
                     var isHeard = false
                     let deadline: Duration?
-                    switch firstAudioWait(for: engine, among: engines, lead: lead, characters: chunk.text.count, firstAudioMs: firstAudioMs, budgetEnds: budgetEnds, now: .now) {
+                    switch firstAudioWait(for: engine, among: engines, lead: lead, firstAudioMs: firstAudioMs, budgetEnds: budgetEnds, now: .now) {
                     case .skip: continue
                     case .asLongAsItTakes: deadline = nil
                     case .atMost(let wait): deadline = wait

@@ -13,6 +13,9 @@ enum EngineError: Error {
     case quota(String)
 }
 
+// a local server renders a chunk whole before its first sound, and a cloud engine may refuse a long one
+private let longestChunk = 300
+
 // sentences, and a long first sentence cut at its first comma past 40 chars, so audio starts early
 func chunks(_ runs: [Run]) -> [Chunk] {
     var result: [Chunk] = []
@@ -24,10 +27,24 @@ func chunks(_ runs: [Run]) -> [Chunk] {
                 result.append(Chunk(lang: run.lang, text: String(text[...comma])))
                 text = String(text[text.index(after: comma)...]).trimmingCharacters(in: .whitespaces)
             }
+            while text.count > longestChunk {
+                let piece = opening(of: text)
+                result.append(Chunk(lang: run.lang, text: String(piece)))
+                text = String(text[piece.endIndex...]).trimmingCharacters(in: .whitespaces)
+            }
             result.append(Chunk(lang: run.lang, text: text))
         }
     }
     return result
+}
+
+// up to its last comma past the half, else its last space
+private func opening(of text: String) -> Substring {
+    let window = text.prefix(longestChunk + 1)
+    if let comma = window.range(of: ", ", options: .backwards), window.distance(from: window.startIndex, to: comma.lowerBound) > longestChunk / 2 {
+        return window[...comma.lowerBound]
+    }
+    return window.lastIndex(of: " ").map { window[..<$0] } ?? window.dropLast()
 }
 
 // `only` is --engine: one engine, no chain. the engine that played the read's first chunk leads every later one, so one
@@ -53,20 +70,17 @@ func isOnBudget(_ engine: Engine, lead: Engine?) -> Bool { engine.isCloud && eng
 
 enum FirstAudioWait: Equatable { case asLongAsItTakes, atMost(Duration), skip }
 
-// a local server answers a chunk whole, and one that hangs never does: 3 s, far over kokoro's 0.8 s for 300 characters
-// (24 Nov), and 10 ms for each one past them. it runs from the moment nothing plays
-func localServerWait(_ characters: Int) -> Duration { .milliseconds(3000 + 10 * max(0, characters - 300)) }
-
-// the read's voice is not on the budget: a gap between chunks must not hand it to the next engine, only a hang may
-private let leadWait = Duration.seconds(3)
+// a local server, and the read's own voice, are not on the budget: only a hang hands their chunk on. far over kokoro's
+// 0.8 s for the longest chunk (24 Nov)
+private let hangWait = Duration.seconds(3)
 
 // the last candidate has nothing to yield to, so it waits as long as it takes. a local server's and the lead's waits run from the
 // moment nothing plays, the budget from its chunk's start or, under sound, from that moment too
-func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, characters: Int, firstAudioMs: Int, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
+func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, firstAudioMs: Int, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
     guard engine != candidates.last else { return .asLongAsItTakes }
-    if engine.facts.isLocalServer { return .atMost(localServerWait(characters)) }
+    if engine.facts.isLocalServer { return .atMost(hangWait) }
     guard engine.isCloud else { return .asLongAsItTakes }
-    if engine == lead { return .atMost(leadWait) }
+    if engine == lead { return .atMost(hangWait) }
     guard let budgetEnds else { return .atMost(.milliseconds(firstAudioMs)) }
     return budgetEnds > now ? .atMost(budgetEnds - now) : .skip
 }
