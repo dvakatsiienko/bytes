@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 enum SpeakerTest {
     static func failures() async -> Int {
-        await readFailures() + playerFailures()
+        await readFailures() + playerFailures() + voiceFailures()
     }
 
     static func readFailures() async -> Int {
@@ -46,7 +46,23 @@ enum SpeakerTest {
             stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig())
         }, "drop ahead | stop | mac stop | pill 1 | «read 1: chunk 1/1» | kokoro Sample. | «kokoro skipped: status(500), off for 60 s» | rest | pill - | rest")
         await row("pause and resume reach both outputs", { $0.voices.script[.kokoro] = [.waits] }, { await $0.readThen("Hello.") { $0.togglePause(); $0.togglePause() } },
-                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | play | mac resume | pill 1")
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | mac resume | pill 1")
+        await row("a chunk that lands under a pause waits for the resume", { $0.voices.script[.kokoro] = [.waits] }, { stage in
+            await stage.readThen("Hello.") { $0.togglePause() }
+            try? stage.player.schedule(pcm, EngineConfig())
+            stage.calls.append("\(stage.speaker.playback)")
+            stage.speaker.togglePause()
+        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | speed 1.0 | start | sound | reading(1, isPaused: true) | play | mac resume | pill 1")
+        await row("a read over a paused one is not paused", { $0.voices.script[.kokoro] = [.waits, .waits] }, { stage in
+            await stage.readThen("Hello.") { $0.togglePause(); $0.read(Stage.chunks("New."), pressed: .now) }
+            await settle()
+            try? stage.player.schedule(pcm, EngineConfig())
+        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | «read 1: stopped» | drop ahead | stop | mac stop | mac resume | pill 2 | «read 2: chunk 1/1» | kokoro New. | rest | speed 1.0 | start | play | sound")
+        await row("a stop under a pause leaves nothing paused", { $0.voices.script[.kokoro] = [.waits] }, { stage in
+            await stage.readThen("Hello.") { $0.togglePause(); $0.silence() }
+            await settle()
+            try? stage.player.schedule(pcm, EngineConfig())
+        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | «read 1: stopped» | drop ahead | stop | mac stop | mac resume | pill - | rest | speed 1.0 | start | play | sound")
         await row("pause with nothing playing", plain, { $0.speaker.togglePause() }, "")
         let orders = { (act: (Speaker) -> Void) -> Int in
             let stage = Stage()
@@ -132,7 +148,7 @@ enum SpeakerTest {
             audio.endsNext()
             await settle()
             try player.schedule(pcm, EngineConfig())
-        }, "speed 1.0 | start | play | sound | speed 1.0 | «silence: N ms mid-read» | sound")
+        }, "speed 1.0 | start | play | sound | speed 1.0 | «silence: N ms mid-read, under 20» | sound")
         await row("a gap between reads is not", { player, audio, _ in
             try player.schedule(pcm, EngineConfig())
             audio.endsNext()
@@ -158,7 +174,94 @@ enum SpeakerTest {
         await row("idle while something is scheduled holds on", { player, _, _ in try player.schedule(pcm, EngineConfig()); player.idle() }, "speed 1.0 | start | play | sound")
         await row("the output went away", { player, audio, _ in try player.schedule(pcm, EngineConfig()); audio.onGone("gone") },
                   "speed 1.0 | start | play | sound | «audio: gone, engine released» | stop | release | rest")
+        await row("paused mid-sound: the next one waits", { player, _, _ in
+            try player.schedule(pcm, EngineConfig())
+            player.pause()
+            try player.schedule(pcm, EngineConfig())
+            player.resume()
+        }, "speed 1.0 | start | play | sound | pause | speed 1.0 | sound | play")
+        await row("paused before the first sound", { player, _, _ in
+            player.pause()
+            try player.schedule(pcm, EngineConfig())
+            player.resume()
+        }, "pause | speed 1.0 | start | sound | play")
+        await row("resumed before the first sound: a resting device is not played", { player, _, _ in player.pause(); player.resume() }, "pause")
+        await row("a pause between two sounds is no gap", { player, audio, _ in
+            try player.schedule(pcm, EngineConfig())
+            audio.endsNext()
+            await settle()
+            player.pause()
+            try? await Task.sleep(for: .milliseconds(30))
+            player.resume()
+            try player.schedule(pcm, EngineConfig())
+        }, "speed 1.0 | start | play | sound | pause | speed 1.0 | play | «silence: N ms mid-read, under 20» | sound")
         return check("player", rows)
+    }
+
+    static func voiceFailures() async -> Int {
+        var rows: [(name: String, got: String, want: String)] = []
+        let row = { (name: String, act: (VoiceOutput, PlantedSynths, Calls) async -> Void, want: String) in
+            let calls = Calls(), synths = PlantedSynths(calls)
+            await act(VoiceOutput(make: synths.make), synths, calls)
+            await settle()
+            rows.append((name, calls.made.joined(separator: " | "), want))
+        }
+        let speak = { (voice: VoiceOutput, text: String, calls: Calls) in
+            Task {
+                await voice.speak(Chunk(lang: .en, text: text), EngineConfig()) { calls.made.append("first word") }
+                calls.made.append("over")
+            }
+            await settle()
+        }
+        await row("a text, to its end", { voice, synths, calls in
+            await speak(voice, "One.", calls)
+            calls.made.append("\(voice.isBusy)")
+            synths.made[0].onWord()
+            synths.made[0].onWord()
+            synths.made[0].onEnd()
+            await settle()
+            calls.made.append("\(voice.isBusy)")
+        }, "start One. | true | first word | over | false")
+        await row("an end with no word reported frees it", { voice, synths, calls in
+            await speak(voice, "—", calls)
+            synths.made[0].onEnd()
+            await settle()
+            calls.made.append("\(voice.isBusy)")
+        }, "start — | over | false")
+        await row("a synth that refuses", { voice, synths, calls in
+            synths.refuses = true
+            await speak(voice, "One.", calls)
+            calls.made.append("\(voice.isBusy)")
+        }, "start One. | stop One. | over | false")
+        await row("stopped", { voice, _, calls in await speak(voice, "One.", calls); voice.stop() }, "start One. | stop One. | over")
+        await row("a stopped one's late words are not the next one's", { voice, synths, calls in
+            await speak(voice, "One.", calls)
+            voice.stop()
+            await speak(voice, "Two.", calls)
+            synths.made[0].onWord()
+            synths.made[0].onEnd()
+            await settle()
+            calls.made.append("\(voice.isBusy)")
+        }, "start One. | stop One. | start Two. | over | true")
+        await row("a new text cuts the one that talks", { voice, _, calls in await speak(voice, "One.", calls); await speak(voice, "Two.", calls) },
+                  "start One. | stop One. | start Two. | over")
+        await row("paused and resumed mid-text", { voice, _, calls in await speak(voice, "One.", calls); voice.pause(); voice.resume() }, "start One. | pause One. | resume One.")
+        await row("a text that comes under a pause waits for the resume", { voice, _, calls in
+            voice.pause()
+            await speak(voice, "One.", calls)
+            calls.made.append("held")
+            voice.resume()
+        }, "held | start One.")
+        await row("a pause over a held text pauses nothing", { voice, _, calls in voice.pause(); await speak(voice, "One.", calls); voice.pause() }, "")
+        await row("a held text that is stopped never starts", { voice, _, calls in
+            voice.pause()
+            await speak(voice, "One.", calls)
+            voice.stop()
+            await settle()
+            voice.resume()
+        }, "stop One. | over")
+        await row("resume with nothing held", { voice, _, _ in voice.resume() }, "")
+        return check("voice", rows)
     }
 }
 
@@ -199,6 +302,7 @@ final class Stage {
 
     var transcript: String {
         calls.joined(separator: " | ")
+            .replacingOccurrences(of: "silence: 1?[0-9] ms mid-read", with: "silence: N ms mid-read, under 20", options: .regularExpression)
             .replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression)
             .replacingOccurrences(of: "in (8[0-9][0-9]|900)", with: "in 900", options: .regularExpression)
             .replacingOccurrences(of: "skipped: [^«»]*-1004[^«»]*, off", with: "skipped: URLError, off", options: .regularExpression)
@@ -287,6 +391,32 @@ final class PlantedOutput: SpeechOutput {
     func pause() { call("pause") }
     func resume() { call("resume") }
     func stop() { call("stop") }
+}
+
+@MainActor
+final class PlantedSynths {
+    private let calls: Calls
+    var refuses = false
+    private(set) var made: [PlantedSynth] = []
+    init(_ calls: Calls) { self.calls = calls }
+    func make(_ chunk: Chunk, _ settings: EngineConfig, _ onWord: @escaping @MainActor () -> Void, _ onEnd: @escaping @MainActor () -> Void) -> any Synth {
+        let synth = PlantedSynth(chunk.text, calls, refuses, onWord, onEnd)
+        made.append(synth)
+        return synth
+    }
+}
+
+@MainActor
+final class PlantedSynth: Synth {
+    private let text: String, calls: Calls, refuses: Bool
+    let onWord: @MainActor () -> Void, onEnd: @MainActor () -> Void
+    init(_ text: String, _ calls: Calls, _ refuses: Bool, _ onWord: @escaping @MainActor () -> Void, _ onEnd: @escaping @MainActor () -> Void) {
+        (self.text, self.calls, self.refuses, self.onWord, self.onEnd) = (text, calls, refuses, onWord, onEnd)
+    }
+    func start() -> Bool { calls.made.append("start \(text)"); return !refuses }
+    func pause() { calls.made.append("pause \(text)") }
+    func resume() { calls.made.append("resume \(text)") }
+    func stop() { calls.made.append("stop \(text)") }
 }
 
 @MainActor

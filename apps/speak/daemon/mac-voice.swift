@@ -13,57 +13,37 @@ func systemVoice(for lang: Lang, _ settings: EngineConfig) -> NSSpeechSynthesize
         .map { NSSpeechSynthesizer.VoiceName(rawValue: $0.identifier) }
 }
 
-// one synth at a time, and only its own callbacks count: a stopped synth's late «finished» once resumed the next
-// read's wait, that read moved on while its synth still talked, and F5 could no longer reach the orphan
 @MainActor
-final class MacVoice: NSObject, NSSpeechSynthesizerDelegate, SpeechOutput {
-    private var synth: NSSpeechSynthesizer?
-    private var done: CheckedContinuation<Void, Never>?
-    private var onFirstWord: (() -> Void)?
+final class MacSynth: NSObject, NSSpeechSynthesizerDelegate, Synth {
+    private let synth: NSSpeechSynthesizer
+    private let text: String
+    private let onWord: @MainActor () -> Void
+    private let onEnd: @MainActor () -> Void
 
-    var isBusy: Bool { onFirstWord != nil }
-
-    func speak(_ chunk: Chunk, _ settings: EngineConfig, onFirstWord: @escaping () -> Void) async {
-        stop()
-        let synth = systemVoice(for: chunk.lang, settings).flatMap { NSSpeechSynthesizer(voice: $0) } ?? NSSpeechSynthesizer()
-        synth.delegate = self
+    init(_ chunk: Chunk, _ settings: EngineConfig, onWord: @escaping @MainActor () -> Void, onEnd: @escaping @MainActor () -> Void) {
+        synth = systemVoice(for: chunk.lang, settings).flatMap { NSSpeechSynthesizer(voice: $0) } ?? NSSpeechSynthesizer()
         synth.rate *= Float(settings.speed)
-        self.synth = synth
-        self.onFirstWord = onFirstWord
-        await withCheckedContinuation { continuation in
-            done = continuation
-            // a synth that refuses to start never calls back, so the read would wait on it until the next press
-            if !synth.startSpeaking(chunk.text) { stop() }
-        }
+        text = chunk.text
+        self.onWord = onWord
+        self.onEnd = onEnd
+        super.init()
+        synth.delegate = self
     }
+
+    func start() -> Bool { synth.startSpeaking(text) }
+    func pause() { synth.pauseSpeaking(at: .immediateBoundary) }
+    func resume() { synth.continueSpeaking() }
 
     func stop() {
-        synth?.delegate = nil
-        synth?.stopSpeaking()
-        synth = nil
-        onFirstWord = nil
-        done?.resume()
-        done = nil
+        synth.delegate = nil
+        synth.stopSpeaking()
     }
 
-    func pause() { synth?.pauseSpeaking(at: .immediateBoundary) }
-    func resume() { synth?.continueSpeaking() }
-
     nonisolated func speechSynthesizer(_ sender: NSSpeechSynthesizer, willSpeakWord range: NSRange, of string: String) {
-        guard range.location == 0 else { return }
-        MainActor.assumeIsolated {
-            guard sender === synth else { return }
-            onFirstWord?()
-            onFirstWord = nil
-        }
+        MainActor.assumeIsolated { onWord() }
     }
 
     nonisolated func speechSynthesizer(_ sender: NSSpeechSynthesizer, didFinishSpeaking finishedSpeaking: Bool) {
-        MainActor.assumeIsolated {
-            guard sender === synth else { return }
-            synth = nil
-            done?.resume()
-            done = nil
-        }
+        MainActor.assumeIsolated { onEnd() }
     }
 }

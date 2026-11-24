@@ -48,7 +48,7 @@ final class App {
     }
 
     private func makeSpeaker() -> Speaker {
-        let audio = MacAudio(), macVoice = MacVoice(), panel = panel
+        let audio = MacAudio(), macVoice = VoiceOutput(make: MacSynth.init), panel = panel
         let player = Player(device: audio, log: log)
         let speaker = Speaker(
             player: player, macVoice: macVoice,

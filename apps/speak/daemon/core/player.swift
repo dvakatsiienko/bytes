@@ -19,7 +19,7 @@ protocol AudioDevice: AnyObject {
     // the engine ends; the next start takes the current output
     func release()
     func setSpeed(_ speed: Double)
-    // s16le mono 24 kHz, two bytes or more
+    // s16le mono 24 kHz, two bytes or more; `whenOver` once it was heard, not once it was taken
     func schedule(_ pcm: Data, gain: Double, whenOver: @escaping @MainActor () -> Void)
 }
 
@@ -33,6 +33,8 @@ final class Player: SpeechOutput {
     private var generation = 0
     // every buffer ever scheduled: a stop's delayed rest holds off once anything new was scheduled after it
     private var scheduled = 0
+    // what is scheduled waits for the resume
+    private var isPaused = false
     // when the queue ran dry mid-read: the next buffer logs the silence the listener heard
     private var dryAt: ContinuousClock.Instant?
 
@@ -55,7 +57,7 @@ final class Player: SpeechOutput {
         device.setSpeed(settings.speed)
         guard pcm.count > 1 else { return }
         if !device.isRunning { try device.start() }
-        if !device.isPlaying { device.play() }
+        if !isPaused, !device.isPlaying { device.play() }
         if pending == 0, let dryAt { write("silence: \(elapsed(dryAt)) mid-read") }
         dryAt = nil
         pending += 1
@@ -71,8 +73,18 @@ final class Player: SpeechOutput {
         }
     }
 
-    func pause() { device.pause() }
-    func resume() { device.play() }
+    func pause() {
+        isPaused = true
+        device.pause()
+    }
+
+    // with nothing scheduled there is nothing to play yet: the next sound starts the device
+    func resume() {
+        isPaused = false
+        // a silence someone asked for is not a gap
+        if dryAt != nil { dryAt = .now }
+        if pending > 0 { device.play() }
+    }
 
     func drained() async {
         if pending == 0 { return }

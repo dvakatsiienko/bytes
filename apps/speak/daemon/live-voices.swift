@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 final class LiveVoices: ChunkVoices {
     private let player: Player
-    private let macVoice: MacVoice
+    private let macVoice: VoiceOutput
     private let keys: Keys
     private let kokoro: KokoroServer
     private var kokoroPrefetch: (text: String, task: Task<Data, Error>)?
@@ -12,7 +12,7 @@ final class LiveVoices: ChunkVoices {
     // hides behind the audio instead of sitting between two sentences
     private var cloudPrefetch: (engine: Engine, text: String, task: Task<(URLSession.AsyncBytes, URLResponse), Error>)?
 
-    init(player: Player, macVoice: MacVoice, keys: Keys, kokoro: KokoroServer) {
+    init(player: Player, macVoice: VoiceOutput, keys: Keys, kokoro: KokoroServer) {
         self.player = player
         self.macVoice = macVoice
         self.keys = keys

@@ -71,6 +71,8 @@ final class MacAudio: AudioDevice {
             let samples = raw.bindMemory(to: Int16.self)
             for i in 0..<frames { out[i] = max(-1, min(1, Float(Int16(littleEndian: samples[i])) / 32768 * gain)) }
         }
-        node.scheduleBuffer(buffer) { Task { @MainActor in whenOver() } }
+        // «consumed» comes ~0.3 s before the last sample is heard: a read ended on it lost its tail, which then opened
+        // the next read (measured: 121 ms cut, 83 ms of it at the next start)
+        node.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) { _ in Task { @MainActor in whenOver() } }
     }
 }

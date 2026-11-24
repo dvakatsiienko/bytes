@@ -198,6 +198,7 @@
   - given speech playing
   - when the user presses ⇧F4
   - then the speech pauses and the pill's button reads ▶; ⇧F4 again resumes it where it stopped
+  - and nothing sounds until the resume, on any engine, whatever chunk arrives meanwhile; a pause before the first sound holds too
   - decision: pause has two doors — F4 on an empty selection and ⇧F4 always — so a selection left on screen never blocks a pause (dima, 2026-09-30)
 - ⬜ the control socket's `read` reads a given text the way F4 reads a selection
   - given the daemon runs
