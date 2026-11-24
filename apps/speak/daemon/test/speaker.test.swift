@@ -92,6 +92,24 @@ enum SpeakerTest {
             stage.calls = []
             try? await Task.sleep(for: .milliseconds(300))
         }, "«fish skipped: timeout» | system Bye. | «voice switch: kokoro → system mid-read» | drop ahead | rest | pill -")
+        await row("a stop before the read is not its quiet", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.fails(EngineError.status(500))]] }, { stage in
+            stage.speaker.silence()
+            try? await Task.sleep(for: .milliseconds(150))
+            stage.read("Hello. Bye.")
+            await settle()
+            stage.calls = [stage.calls.last { $0.hasPrefix("elevenlabs") } ?? "-"]
+        }, "elevenlabs Bye. in 100")
+        await row("a pause in the quiet is not part of the budget", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.failsLate(EngineError.status(500))]] }, { stage in
+            stage.read("Hello. Bye.")
+            await settle()
+            stage.audio.endsNext()
+            await settle()
+            stage.speaker.togglePause()
+            try? await Task.sleep(for: .milliseconds(120))
+            stage.speaker.togglePause()
+            try? await Task.sleep(for: .milliseconds(200))
+            stage.calls = [stage.calls.contains { $0.hasPrefix("elevenlabs") } ? "asked" : "skipped"]
+        }, "asked")
         await row("a cloud miss under sound leaves the next one the whole budget", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.fails(EngineError.status(500))]] }, { stage in
             stage.read("Hello. Bye.")
             await settle()

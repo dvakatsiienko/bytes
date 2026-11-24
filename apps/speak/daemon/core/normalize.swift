@@ -42,8 +42,7 @@ private func stripMarkdown(_ text: SourcedText) -> SourcedText {
     t = t.replacing("[\\x{2022}\\x{2023}\\x{2043}\\x{25A0}-\\x{25FF}\\x{2605}\\x{2606}]", "")
     // a line that ends bare ends a sentence: several lines read as one run-on otherwise (dima: «it sounds like a single sentence»)
     // a mark that already pauses, an opener or a joining sign ends none, and a line of signs alone is none
-    t = t.replacing("(?<=\\S)(?<![.!?…;:,]|[.!?…][»”\"'’)*\\]]{1,2})(?<![({\\[«“‘„<→⇒·|&=\\\\\\-–—]|[-=]>)[ \\t]*\\r?\\n", ".\n")
-    return t.replacing("^([^\\p{L}\\p{N}\\n]*)\\.\\n", "$1\n", .anchorsMatchLines)
+    return t.replacing("(?=[ \\t]*\\r?\\n)(?<=[\\p{L}\\p{N}][^\\p{L}\\p{N}\\n]{0,40})(?<![\\s.!?…;:,]|[.!?…][»”\"'’)*\\]]{1,2})(?<![({\\[«“‘„<→⇒·|&=\\\\\\-–—]|[-=]>)[ \\t]*\\r?\\n", ".\n")
 }
 
 private func rewriteLatin(_ text: SourcedText, _ lists: WordLists) -> SourcedText {
@@ -56,7 +55,7 @@ private func rewriteLatin(_ text: SourcedText, _ lists: WordLists) -> SourcedTex
         let isSpelled = lists.letters.contains(kind) || !kind.contains(where: "aeiou".contains)
         return ((isSpelled ? "aefhilmnorsx" : "aeiou").contains(first) ? "an " : "a ") + kind + " file link"
     }
-    t = t.replacing("\\bhttps?://(?:www\\.)?([^/\\s)]+)\\S*", "$1", .caseInsensitive)
+    t = t.replacing("\\bhttps?://(?:www\\.)?([^/\\s),;]+)\\S*?(?=[.,;:!?)]*(?:\\s|$))", "$1", .caseInsensitive)
     t = t.replacing("\\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\\b", "an id")
     t = t.replacing("\\b(pid)\\b\\s*[:=]?\\s*\\d+", "pid", .caseInsensitive)
     // two letters and two digits at least, so «1e10000» and «deadbeef» stay words; a «#» in front is a colour
@@ -76,12 +75,12 @@ private func rewriteLatin(_ text: SourcedText, _ lists: WordLists) -> SourcedTex
         if g[0].hasPrefix("v") { return "version " + parts.joined(separator: " point ") }
         return parts.count > 2 ? parts.joined(separator: " point ") : g[0]
     }
-    let units = lists.units.keys.map(NSRegularExpression.escapedPattern).joined(separator: "|")
+    let units = lists.units.keys.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern).joined(separator: "|")
     t = t.replacing("(\\d)\\s?(\(units))(?!\\w)", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" }
     // a path says only its last part; a bare «audio/video» is two words, not a path
     t = t.replacing("(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*") { g in
         // the dot a line end put after a folder is not a part of its path
-        let stop = g[0].split(separator: "/").last == "." ? "." : "", path = g[0].dropLast(stop.count)
+        let stop = g[0].last == "." && g[0].dropLast().last == "/" ? "." : "", path = g[0].dropLast(stop.count)
         let parts = path.split(separator: "/").filter { !["~", ".", ".."].contains($0) }
         // a file name has a word before its extension («exa.md»), a version has digits («24.x»); a sentence end the
         // line-break rule put on the leaf is not an extension either
@@ -112,7 +111,8 @@ private func rewriteSymbols(_ text: SourcedText) -> SourcedText {
     t = t.replacing("[⌘⌥⇧⌃]") { g in " " + ["⌘": "command", "⌥": "option", "⇧": "shift", "⌃": "control"][g[0]]! + " " }
     t = t.replacing("\\s*(?:→|->|=>|⇒|·|\\||—|–)\\s*", ", ")
     t = t.replacing("\\s&\\s", " and ")
-    t = t.replacing("\\s/\\s", ", ")
+    // the dot of a line end stays
+    t = t.replacing("\\s/(?:\\s|(?=\\.\\s))", ", ")
     t = t.replacing("\\s@(\\w)", " at $1")
     t = t.replacing("[«»\"“”]", "")
     t = t.replacing("[()\\[\\]]", ", ")

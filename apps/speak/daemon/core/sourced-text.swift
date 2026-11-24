@@ -57,7 +57,8 @@ struct SourcedText: Equatable {
         let parts = template.split(separator: "$", omittingEmptySubsequences: false).map(String.init)
         let groups = parts.dropFirst().map { (number: $0.first!.wholeNumberValue!, rest: String($0.dropFirst())) }
         return replacing(pattern, options) { match, units, result in
-            result.add(parts[0], over: match.range, of: self)
+            let before = groups.first.map { match.range(at: $0.number).location } ?? match.range.upperBound
+            result.add(parts[0], over: NSRange(location: match.range.location, length: before == NSNotFound ? 0 : before - match.range.location), of: self)
             for group in groups {
                 let range = match.range(at: group.number)
                 let kept = range.location == NSNotFound ? NSRange(location: match.range.upperBound, length: 0) : range

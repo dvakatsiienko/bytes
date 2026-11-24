@@ -466,5 +466,29 @@
   {
     "in": "say ‘\nthen",
     "out": [["en", "say ‘ then"]]
+  },
+  {
+    "in": "cp foo ./ and go",
+    "out": [["en", "cp foo and go"]]
+  },
+  {
+    "in": "a: 1,\n}).\nThen go on",
+    "out": [["en", "a: 1. Then go on"]]
+  },
+  {
+    "in": "pick read /\nwrite mode",
+    "out": [["en", "pick read. write mode"]]
+  },
+  {
+    "in": "see https://x.y/z\nnext",
+    "out": [["en", "see x.y. next"]]
+  },
+  {
+    "in": "see https://x.y/z, then go. ok",
+    "out": [["en", "see x.y, then go. ok"]]
+  },
+  {
+    "in": "say [(«\n»)]\nthen",
+    "out": [["en", "say, then"]]
   }
 ]
