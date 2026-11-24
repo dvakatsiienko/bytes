@@ -79,6 +79,7 @@ final class App {
     }
 
     private func startDaemon() {
+        ownerOnly(STDERR_FILENO)
         Task {
             let speaker = speaker
             // the one voice that needs no net waits for none

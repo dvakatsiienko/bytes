@@ -147,21 +147,30 @@ enum SeamsTest {
         let f4 = { (setup: @escaping (PlantedGrab, PlantedRead) -> Void) in await press(setup) { await $0.readPressed() } }
         var rows: [(name: String, got: String, want: String)] = []
         rows.append(("F4 on a selection", await f4 { grab, _ in grab.selected = ("Hello. Bye.", "ax") },
-                     "refresh | «press: grab ax N ms, normalize N ms, 2 chunks» | read Hello./Bye."))
+                     "refresh | «press: grab ax N ms, normalize N ms, 2 chunks, 11 characters «Hello. Bye.»» | read Hello./Bye."))
         rows.append(("F4 on a copied selection", await f4 { grab, _ in grab.selected = ("Hello.", "⌘C") },
-                     "refresh | «press: grab ⌘C N ms, normalize N ms, 1 chunks» | read Hello."))
+                     "refresh | «press: grab ⌘C N ms, normalize N ms, 1 chunks, 6 characters «Hello.»» | read Hello."))
         rows.append(("F4 while it speaks, on a selection", await f4 { grab, read in grab.selected = ("Hello.", "ax"); read.isSpeaking = true },
-                     "refresh | «press: grab ax N ms, normalize N ms, 1 chunks» | read Hello."))
+                     "refresh | «press: grab ax N ms, normalize N ms, 1 chunks, 6 characters «Hello.»» | read Hello."))
         rows.append(("F4 idle, accessibility empty: ⌘C gets a try", await f4 { grab, _ in grab.selected = (nil, "ax"); grab.copied = "Copied." },
-                     "refresh | «press: grab ax → ⌘C N ms, normalize N ms, 1 chunks» | read Copied."))
+                     "refresh | «press: grab ax → ⌘C N ms, normalize N ms, 1 chunks, 7 characters «Copied.»» | read Copied."))
         rows.append(("F4 idle, an empty string is no selection", await f4 { grab, _ in grab.selected = ("", "ax"); grab.copied = "Copied." },
-                     "refresh | «press: grab ax → ⌘C N ms, normalize N ms, 1 chunks» | read Copied."))
+                     "refresh | «press: grab ax → ⌘C N ms, normalize N ms, 1 chunks, 7 characters «Copied.»» | read Copied."))
         rows.append(("F4 idle, nothing anywhere", await f4 { grab, _ in grab.selected = (nil, "ax") },
                      "refresh | «press: nothing selected (grab ax → ⌘C N ms)» | toggle"))
         rows.append(("F4 while it speaks, accessibility empty: no ⌘C", await f4 { grab, read in grab.selected = (nil, "ax"); grab.copied = "Copied."; read.isSpeaking = true },
                      "refresh | «press: nothing selected (grab ax N ms) → pause / resume» | toggle"))
         rows.append(("F4 idle, ⌘C empty: no second ⌘C", await f4 { grab, _ in grab.selected = (nil, "⌘C"); grab.copied = "Copied." },
                      "refresh | «press: nothing selected (grab ⌘C N ms)» | toggle"))
+        let line = { (text: String) -> String in
+            let made = await f4 { grab, _ in grab.selected = (text, "ax") }
+            return made.replacingOccurrences(of: ".*chunks, ", with: "", options: .regularExpression).replacingOccurrences(of: "» \\| read.*", with: "", options: .regularExpression)
+        }
+        rows.append(("a grab of 80 characters is logged whole", await line(String(repeating: "word ", count: 16)), "80 characters «\(String(repeating: "word ", count: 16))»"))
+        rows.append(("a longer one by its two ends", await line("a" + String(repeating: "word ", count: 16)), "81 characters «a\(String(repeating: "word ", count: 7))word» … «\(String(repeating: "word ", count: 8))»"))
+        rows.append(("a grab of lines is one line", await line("one\ntwo\r\nthree\u{2028}four\tfive\u{0}\u{1B}[31m"), "29 characters «one⏎two⏎three⏎four·five··[31m»"))
+        rows.append(("a grab with nothing to say is logged too", await f4 { grab, _ in grab.selected = ("\n \n", "ax") },
+                     "refresh | «press: nothing selected (grab ax N ms), 3 characters «⏎ ⏎»» | toggle"))
         rows.append(("F4 with no grant", await f4 { grab, _ in grab.isTrusted = false; grab.selected = ("Hello.", "ax") },
                      "refresh | «press: accessibility missing — grant X-SPEAK in Privacy & Security»"))
         rows.append(("⇧F4 idle", await press({ _, _ in }) { $0.pausePressed() }, "«press: ⇧F4 → nothing playing» | toggle"))
@@ -190,7 +199,7 @@ enum SeamsTest {
             await settle()
         }
         await row("F4 alone", { _, _ in }, { presses, grab, _ in await press(presses); await grab.ends("One.") },
-                  "grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read One.")
+                  "grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks, 4 characters «One.»» | read One.")
         await row("F5 inside the grab: no read", { _, _ in }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends("One.") },
                   "grab | silence | ended | " + dropped)
         await row("two F4 inside the grab: one read, the newer", { _, _ in }, { presses, grab, _ in
@@ -198,19 +207,19 @@ enum SeamsTest {
             await press(presses)
             await grab.ends("One.")
             await grab.ends("Two.")
-        }, "grab | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Two.")
+        }, "grab | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks, 4 characters «Two.»» | read Two.")
         await row("twelve F4 at once: two grabs, one read", { _, _ in }, { presses, grab, _ in
             for _ in 0..<12 { await press(presses) }
             await grab.ends("One.")
             await grab.ends("Twelve.")
-        }, "grab | ended" + String(repeating: " | " + dropped, count: 11) + " | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Twelve.")
+        }, "grab | ended" + String(repeating: " | " + dropped, count: 11) + " | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks, 7 characters «Twelve.»» | read Twelve.")
         await row("F4, F5, F4: the last one reads", { _, _ in }, { presses, grab, _ in
             await press(presses)
             presses.stopPressed()
             await press(presses)
             await grab.ends("One.")
             await grab.ends("Two.")
-        }, "grab | silence | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Two.")
+        }, "grab | silence | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks, 4 characters «Two.»» | read Two.")
         await row("F4 then F5 before ⌘C's try: no ⌘C", { _, _ in }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends(nil) },
                   "grab | silence | ended | " + dropped)
         await row("an order from the socket inside the grab", { _, _ in }, { presses, grab, read in await press(presses); _ = read.takeOrder(); await grab.ends("One.") },
@@ -218,7 +227,7 @@ enum SeamsTest {
         await row("an overtaken F4 on nothing does not pause", { _, read in read.isSpeaking = true }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends(nil) },
                   "grab | silence | ended | " + dropped)
         await row("⇧F4 inside the grab pauses what plays, the grab goes on", { _, read in read.isSpeaking = true }, { presses, grab, _ in await press(presses); presses.pausePressed(); await grab.ends("One.") },
-                  "grab | «press: ⇧F4 → pause» | toggle | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read One.")
+                  "grab | «press: ⇧F4 → pause» | toggle | ended | «press: grab ax N ms, normalize N ms, 1 chunks, 4 characters «One.»» | read One.")
         await row("a press with no grant takes its order too", { grab, _ in grab.isTrusted = false }, { presses, _, read in await press(presses); read.calls.append("\(read.order)") },
                   "«press: accessibility missing — grant \(CommandLine.arguments[0]) in Privacy & Security» | 1")
         return check("overtaken press", rows)

@@ -12,6 +12,9 @@ is 'a build keeps the running binary it replaces' 'new/old' "$(pair)"
 is 'a build never relaunches' '' "$(relaunches)"
 is 'the kept binary carries the config argument it ran with' '/old/config.json' "$(content_of x-speak.prev.config)"
 
+setup; echo '2026-11-23 10:00:00.700 press: grab ax 9 ms, normalize 9 ms, 1 chunks, 40 characters «config: loaded /c.json — a selected text»' >>"$HOME/.local/share/x-speak/daemon.err.log"; build new
+is 'a selected text in the log is no settings line' 'loaded — same' "$(content_of x-speak.prev.settings)"
+
 setup; build two; build three
 is 'a build over a binary that never started keeps the one that did' 'three/old' "$(pair)"
 

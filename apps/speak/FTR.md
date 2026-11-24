@@ -304,6 +304,10 @@
 - ⬜ kokoro is ready before the first press
   - given the daemon starts, then kokoro's server is started when none answers, says one word unheard, and the log says «kokoro: warm»; no key and no balance is waited for first
   - given the server takes over a minute to load, then the daemon waits for it again and starts no second one
+- ⬜ the log says what a press took and who spoke it
+  - makes: lines in `~/.local/share/x-speak/daemon.err.log`, which dima alone may read once the daemon started
+  - given F4 on a selection, then its line ends with how many characters came and the first and last 40 of them, all of them up to 80, on one line
+  - given a chunk was spoken, then a line names its engine; given its voice broke off in mid-chunk, then the line says «cut off» and no other voice reads that chunk
 - ⬜ x-speak takes `--config <config.json>` (a one-shot's settings; the daemon's have one place) and `--keys-run <script>`
   - given the daemon started with `--config <path>` alone
   - then it stays up as the daemon, logs «config: loaded <the full path>» with each engine's voices, speed and gain, and speaks nothing

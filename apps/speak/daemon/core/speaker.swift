@@ -158,7 +158,8 @@ final class Speaker: ReadTarget {
             for (index, chunk) in parts.enumerated() {
                 // a stopped read ends here
                 if Task.isCancelled { return }
-                write("read \(read): chunk \(index + 1)/\(parts.count)")
+                let part = "read \(read): chunk \(index + 1)/\(parts.count)"
+                write(part)
                 let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: skipUntil, lead: lead, now: Date())
                 if let server = rendersAhead(engines, lead: lead, isPlaying: player.isPlaying) {
                     voices.openAhead(chunk, with: server, settings: settings(server))
@@ -190,9 +191,11 @@ final class Speaker: ReadTarget {
                             if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
                             lead = engine
                         }
+                        if isHeard { write("\(part) → \(engine.rawValue)") }
                         break
                     } catch {
                         if Task.isCancelled { return }
+                        if isHeard { write("\(part) → \(engine.rawValue), cut off") }
                         // a stream cut off by its own deadline can say «cancelled»: the read goes on
                         handle(error is CancellationError ? EngineError.timeout : error, from: engine)
                         // a chunk that was heard is never read again by the next engine

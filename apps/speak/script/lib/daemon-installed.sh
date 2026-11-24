@@ -44,8 +44,8 @@ running_inode() {
 # what the daemon last said of its settings: the values of a load, or why it kept or fell back. a load's path is
 # dropped, so the same values from another place read the same
 settings_line() {
-    grep -hE 'config: (loaded|kept|running)' "$HOME/.local/share/x-speak/daemon.err.log" 2>/dev/null | tail -1 \
-        | sed -E 's/^.* config: //; s/^loaded .* — /loaded — /'
+    grep -hE '^[0-9-]+ [0-9:.]+ config: (loaded|kept|running)' "$HOME/.local/share/x-speak/daemon.err.log" 2>/dev/null | tail -1 \
+        | sed -E 's/^[0-9-]+ [0-9:.]+ config: //; s/^loaded .* — /loaded — /'
 }
 
 # what the running process was started with: the plist may have moved on since

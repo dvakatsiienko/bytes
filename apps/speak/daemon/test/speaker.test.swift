@@ -19,6 +19,18 @@ enum SpeakerTest {
         let plain = { (_: Stage) in }
         await row("a read, chunk by chunk, then the pill leaves", plain, { $0.read("Hello. Bye.") },
                   "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «read 1: chunk 2/2» | kokoro Bye. in 3000 | drop ahead | rest | pill -")
+        let named = { (script: [Engine: [Step]]) in { (stage: Stage) in
+            stage.namesEngines = true
+            stage.voices.script = script
+        } }
+        await row("a chunk names its engine, once it spoke", named([:]), { $0.read("Hello. Bye.") },
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «read 1: chunk 1/2 → kokoro» | «read 1: chunk 2/2» | kokoro Bye. in 3000 | «read 1: chunk 2/2 → kokoro» | drop ahead | rest | pill -")
+        await row("a chunk that was cut off is one voice's, and no other's", named([.kokoro: [.failsMidChunk(EngineError.status(500))]]), { $0.read("Hello.") },
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «read 1: chunk 1/1 → kokoro, cut off» | «kokoro skipped: status(500), off for 60 s» | drop ahead | rest | pill -")
+        await row("a voice that failed unheard is not named", named([.kokoro: [.fails(EngineError.status(500))]]), { $0.read("Hello.") },
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: status(500), off for 60 s» | system Hello. | «first audio: system N ms» | «read 1: chunk 1/1 → system» | drop ahead | rest | pill -")
+        await row("nor one with nothing to say", named([.kokoro: [.saysNothing]]), { $0.read("….") },
+                  "pill 1 | «read 1: chunk 1/1» | kokoro …. in 3000 | drop ahead | rest | pill -")
         await row("an engine that fails before its first sound hands the chunk on", { $0.voices.script[.kokoro] = [.fails(EngineError.status(500))] }, { $0.read("Hello. Bye.") },
                   "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «kokoro skipped: status(500), off for 60 s» | system Hello. | «first audio: system N ms» | «read 1: chunk 2/2» | system Bye. | drop ahead | rest | pill -")
         await row("an engine that fails after its first sound ends the chunk: no second voice reads it", { $0.voices.script[.kokoro] = [.failsMidChunk(EngineError.status(500))] }, { $0.read("Hello. Bye.") },
@@ -487,8 +499,10 @@ final class Stage {
         )
     }
 
+    // the lines that name a chunk's engine: asked for by the rows about them alone
+    var namesEngines = false
     var transcript: String {
-        calls.joined(separator: " | ")
+        calls.filter { namesEngines || !$0.contains(" → ") || !$0.hasPrefix("«read ") }.joined(separator: " | ")
             .replacingOccurrences(of: "silence: ([3-9][0-9][0-9]|[0-9]{4,}) ms", with: "silence: LONG", options: .regularExpression)
             .replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression)
             .replacingOccurrences(of: "in ([5-9][0-9]|100) ", with: "in 100 ", options: .regularExpression)

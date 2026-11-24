@@ -62,14 +62,14 @@ final class PressSequencer {
             write("press: dropped, a newer order came")
             return
         }
-        let grabbed = elapsed(pressed)
+        let took = elapsed(pressed)
         let parts = toChunks(text ?? "")
         guard !parts.isEmpty else {
-            write("press: nothing selected (grab \(via) \(grabbed))\(target.isSpeaking ? " → pause / resume" : "")")
+            write("press: nothing selected (grab \(via) \(took))\(ends(of: text))\(target.isSpeaking ? " → pause / resume" : "")")
             target.togglePause()
             return
         }
-        write("press: grab \(via) \(grabbed), normalize \(elapsed(pressed)), \(parts.count) chunks")
+        write("press: grab \(via) \(took), normalize \(elapsed(pressed)), \(parts.count) chunks\(ends(of: text))")
         target.read(parts, pressed: pressed)
     }
 
@@ -90,4 +90,14 @@ final class PressSequencer {
 
     // F5
     func stopPressed() { target.silence() }
+}
+
+// a grab as one line of the log: the whole of a short one, the two ends of a long one
+private func ends(of text: String?) -> String {
+    guard let text, !text.isEmpty else { return "" }
+    let line = { (part: Substring) in
+        String(part.map { $0.isNewline ? "⏎" : $0.unicodeScalars.allSatisfy { $0.properties.generalCategory == .control } ? "·" : $0 })
+    }
+    let count = text.count
+    return ", \(count) characters " + (count > 80 ? "«\(line(text.prefix(40)))» … «\(line(text.suffix(40)))»" : "«\(line(text[...]))»")
 }

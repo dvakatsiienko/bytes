@@ -41,7 +41,7 @@ new mac copies there and the tests load: an edit of it changes nothing dima hear
   first and check the control socket's `status` is not speaking (live tests cut his reads twice on FRM-283)
 - **a normalizer rule starts from the real grab**, never a guessed input: the Claude app glues list items and drops
   line breaks, Slack's accessibility focus is the empty message box — one real F4 beat every guess (FRM-283, 10-01)
-- **the daemon logs to stderr**: `~/.local/share/x-speak/daemon.err.log`, one line per press
+- **the daemon logs to stderr**: `~/.local/share/x-speak/daemon.err.log`, one line per press (how the text came, its length and its first and last 40 characters), one per chunk as it begins and one naming the engine once it spoke. it holds what dima selects, so the daemon makes the file his alone at each start
 
 ## hazards
 
