@@ -1,17 +1,53 @@
-// what the pill's pause button and meter show, from the speech alone: ⏸ while it talks, ▶ while paused, a dim ▶ when
-// nothing plays. the mac voice plays outside the audio engine and sends no signal, so its speech never runs the meter
+// what the pill shows: the read that plays first; the admin's infinite waveform and a screenshot's sample only where
+// nothing plays
+struct PillState: Equatable {
+    private(set) var playback = Playback.idle
+    private(set) var isWaveOn = false
+    private(set) var isSample = false
+    // flips once per read, on the first audible reading
+    var hasSignal = false
+
+    // a read that begins takes the pill
+    mutating func follow(_ playback: Playback) {
+        if let read = playback.read, read != self.playback.read { (isWaveOn, isSample) = (false, false) }
+        if playback == .idle { hasSignal = false }
+        self.playback = playback
+    }
+
+    // whether the waveform may run: never over a read
+    mutating func startWave() -> Bool {
+        guard playback == .idle else { return false }
+        isWaveOn = true
+        return true
+    }
+
+    // whether the pill is free to leave: a read keeps it
+    mutating func stopWave() -> Bool {
+        isWaveOn = false
+        guard playback == .idle else { return false }
+        hasSignal = false
+        return true
+    }
+
+    mutating func showSample() { isSample = true }
+    mutating func leave() { (isWaveOn, isSample, hasSignal) = (false, false, false) }
+
+    // ⏸ while it talks, ▶ while paused, a dim ▶ when nothing plays. the mac voice plays outside the audio engine and
+    // sends no signal, so its speech never runs the meter
+    var look: PillLook {
+        let isSpeaking = playback != .idle || isSample
+        return PillLook(
+            symbol: isSpeaking && !playback.isPaused ? "pause.fill" : "play.fill",
+            label: !isSpeaking ? "Nothing playing" : playback.isPaused ? "Resume · F4" : "Pause · F4",
+            isDisabled: !isSpeaking,
+            isMeterRunning: (isSpeaking || isWaveOn) && !playback.isPaused && hasSignal
+        )
+    }
+}
+
 struct PillLook: Equatable {
     let symbol: String
     let label: String
     let isDisabled: Bool
     let isMeterRunning: Bool
-}
-
-func pillLook(isSpeaking: Bool, isPaused: Bool, hasSignal: Bool) -> PillLook {
-    PillLook(
-        symbol: isSpeaking && !isPaused ? "pause.fill" : "play.fill",
-        label: !isSpeaking ? "Nothing playing" : isPaused ? "Resume · F4" : "Pause · F4",
-        isDisabled: !isSpeaking,
-        isMeterRunning: isSpeaking && !isPaused && hasSignal
-    )
 }

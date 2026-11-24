@@ -86,6 +86,8 @@
   - when the user turns on infinite waveform
   - then the pill shows and animates speech-shaped levels, following the unsaved glide and flow as they change
   - and it stops when turned off, when the tab closes, when a real read starts, or after 5 minutes without an update
+  - given only the waveform runs, then the pill's ▶ stays dim: nothing plays
+  - given a read plays, when the user turns it on, then it does not start, the status line says why, and the read keeps its pill
 - 🔎 «pill glide» and «pill flow» tune the pill's wave, each a slider and a number box in ms
   - makes: `meterGlideMs` and `meterFlowMs` in the settings file
   - given the settings row under the header

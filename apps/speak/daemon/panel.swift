@@ -6,19 +6,14 @@ import SwiftUI
 
 @MainActor
 final class PanelModel: ObservableObject {
-    @Published var isPaused = false
-    @Published var isSpeaking = false
+    @Published var state = PillState()
     @Published var isSticky = UserDefaults.standard.bool(forKey: "panelSticky") {
         didSet { UserDefaults.standard.set(isSticky, forKey: "panelSticky") }
     }
     // read by the meter every frame, never observed: a new reading costs no view update
     let meter: Meter
-    // flips once per speech, on the first audible reading
-    @Published var hasSignal = false
     // which button the pointer is over; lives here because a plain swiftc build has no SwiftUI @State macro
     @Published var hovered: String?
-
-    var look: PillLook { pillLook(isSpeaking: isSpeaking, isPaused: isPaused, hasSignal: hasSignal) }
 
     init(tuning: @escaping @MainActor () -> (glide: Double, flow: Double)) { meter = Meter(tuning: tuning) }
 
@@ -30,14 +25,9 @@ final class PanelModel: ObservableObject {
     var onDragEnd: () -> Void = {}
 
     func push(_ levels: [Float], spacing: TimeInterval) {
-        guard !isPaused else { return }
+        guard !state.playback.isPaused else { return }
         meter.enqueue(levels, spacing: spacing)
-        if !hasSignal, levels.contains(where: { $0 > 0.04 }) { hasSignal = true }
-    }
-
-    func resetLevels() {
-        meter.reset()
-        hasSignal = false
+        if !state.hasSignal, levels.contains(where: { $0 > 0.04 }) { state.hasSignal = true }
     }
 }
 
@@ -46,15 +36,16 @@ struct PanelView: View {
     @ObservedObject var model: PanelModel
 
     var body: some View {
+        let look = model.state.look
         HStack(spacing: 2) {
             PillButton(model: model, symbol: "xmark", label: "Close the panel, keep speaking", action: model.onClose)
-            LevelMeter(meter: model.meter, isRunning: model.look.isMeterRunning)
+            LevelMeter(meter: model.meter, isRunning: look.isMeterRunning)
                 .frame(maxWidth: .infinity)
             PillButton(
                 model: model,
-                symbol: model.look.symbol,
-                label: model.look.label,
-                isDisabled: model.look.isDisabled,
+                symbol: look.symbol,
+                label: look.label,
+                isDisabled: look.isDisabled,
                 action: model.onPause,
             )
             PillButton(model: model, symbol: "stop.fill", label: "Stop · F5", hint: "F5", action: model.onStop)
@@ -164,10 +155,6 @@ struct VisualEffect: NSViewRepresentable {
 @MainActor
 final class Panel: SpeechPill {
     let model: PanelModel
-    var isPaused: Bool {
-        get { model.isPaused }
-        set { model.isPaused = newValue }
-    }
     private let settings: @MainActor () -> Config
     // the infinite waveform's unsaved glide and flow, in force only while it runs
     private final class Wave { var tuning: (glide: Double, flow: Double)? }
@@ -234,17 +221,31 @@ final class Panel: SpeechPill {
         return CGDisplayCreateUUIDFromDisplayID(number).map { CFUUIDCreateString(nil, $0.takeRetainedValue()) as String } ?? "\(number)"
     }
 
+    func follow(_ playback: Playback) {
+        let isNew = playback.read != model.state.playback.read
+        model.state.follow(playback)
+        if playback == .idle { return leave() }
+        guard isNew else { return }
+        endWave()
+        show()
+    }
 
-    func show() {
-        model.isPaused = false
-        model.isSpeaking = true
+    func leave() {
+        endWave()
+        model.state.leave()
+        model.meter.reset()
+        if !model.isSticky { hide() }
+    }
+
+    private func show() {
         if !window.isVisible { placeOnPointerScreen() }
         window.orderFrontRegardless()
     }
 
     func hide() {
         window.orderOut(nil)
-        model.resetLevels()
+        model.meter.reset()
+        model.state.hasSignal = false
     }
 
     // the admin's infinite waveform: speech-shaped levels with no audio, so glide and flow can be tuned by eye with
@@ -252,16 +253,17 @@ final class Panel: SpeechPill {
     private var waveTimer: Timer?
     private var waveDeadline = Date.distantPast
 
-    func wave(on: Bool, glide: Double?, flow: Double?) {
-        guard on else { return stopWave() }
+    func wave(on: Bool, glide: Double?, flow: Double?) -> Bool {
+        guard on else {
+            stopWave()
+            return true
+        }
+        guard model.state.startWave() else { return false }
         let now = unsaved.tuning ?? (settings().meterGlideMs, settings().meterFlowMs)
         unsaved.tuning = (glide ?? now.glide, flow ?? now.flow)
         waveDeadline = Date().addingTimeInterval(300)
-        guard waveTimer == nil else { return }
-        model.isPaused = false
-        model.isSpeaking = true
-        if !window.isVisible { placeOnPointerScreen() }
-        window.orderFrontRegardless()
+        guard waveTimer == nil else { return true }
+        show()
         let start = Date()
         waveTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated {
@@ -271,29 +273,24 @@ final class Panel: SpeechPill {
                 self.model.push((0..<10).map { Float(speechLevel(at: t0 + Double($0) * 0.01)) }, spacing: 0.01)
             }
         }
+        return true
     }
 
-    func stopWave() {
-        guard let timer = waveTimer else { return }
-        timer.invalidate()
+    private func stopWave() {
+        guard waveTimer != nil else { return }
+        endWave()
+        if model.state.stopWave() { leave() }
+    }
+
+    private func endWave() {
+        waveTimer?.invalidate()
         waveTimer = nil
         unsaved.tuning = nil
-        speechEnded()
     }
 
     func demo() {
         model.meter.show((0..<9).map { index in Float(0.85 - Double(index) * 0.08 + 0.12 * sin(Double(index) * 1.9)) })
-        model.isSpeaking = true
-        if !window.isVisible { placeOnPointerScreen() }
-        window.orderFrontRegardless()
-    }
-
-
-    // speech is over: the panel goes too, unless stick holds it
-    func speechEnded() {
-        model.isPaused = false
-        model.isSpeaking = false
-        model.resetLevels()
-        if !model.isSticky { hide() }
+        model.state.showSample()
+        show()
     }
 }

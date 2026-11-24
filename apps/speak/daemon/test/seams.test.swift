@@ -8,7 +8,7 @@ enum SeamsTest {
         var failed = opFailures()
         failed += await answerFailures()
         failed += await pressFailures()
-        failed += pillFailures()
+        failed += playbackFailures() + pillFailures()
         failed += meterFailures()
         failed += clockFailures()
         return failed
@@ -26,7 +26,8 @@ enum SeamsTest {
         let plain = { (line: String) in ask(line, { _ in }) }
         let settings = #"{"config":{"chain":{"en":["kokoro"]},"firstAudioMs":900},"ok":true,"version":"v2","was":"v1"}"#
         return check("op", [
-            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"settings":"at","speaking":true}"#),
+            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"read":7,"settings":"at","speaking":true}"#),
+            ("status, nothing playing", ask(#"{"op":"status"}"#) { $0.isSpeaking = false }, #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"settings":"at","speaking":false}"#),
             ("voices", plain(#"{"op":"voices"}"#), #"{"system":[{"id":"a"}]}"#),
             ("reload", plain(#"{"op":"reload"}"#), #"{"ok":true} | reload"#),
             ("reload with a bad file", ask(#"{"op":"reload"}"#) { $0.reloadError = "config.json: not readable" }, #"{"error":"config.json: not readable"} | reload"#),
@@ -43,13 +44,14 @@ enum SeamsTest {
             ("panel-hide", plain(#"{"op":"panel-hide"}"#), #"{"ok":true} | hide"#),
             ("wave on", plain(#"{"op":"wave","on":true,"glide":30,"flow":55}"#), #"{"ok":true} | wave true 30.0 55.0"#),
             ("wave with nothing named is off", plain(#"{"op":"wave"}"#), #"{"ok":true} | wave false - -"#),
+            ("wave on while a read plays", ask(#"{"op":"wave","on":true}"#) { $0.refusesWave = true }, #"{"error":"the waveform waits: x-speak is reading aloud"} | wave true - -"#),
             ("block-main", plain(#"{"op":"block-main","seconds":2}"#), #"{"ok":true} | block 2.0"#),
             ("block-main with no seconds", plain(#"{"op":"block-main"}"#), #"{"ok":true} | block 5.0"#),
             ("read", plain(#"{"op":"read","text":"Hello. Bye."}"#), #"{"ok":true} | read Hello./Bye."#),
             ("read with no text", plain(#"{"op":"read"}"#), #"{"error":"read needs text"}"#),
             ("read with an empty text", plain(#"{"op":"read","text":""}"#), #"{"error":"read: nothing to say"}"#),
-            ("preview", plain(#"{"op":"preview","engine":"kokoro","text":"Hi","settings":{"gain":2}}"#), #"{"ok":true} | preview kokoro Hi 2.0"#),
-            ("preview on the saved settings", plain(#"{"op":"preview","engine":"kokoro","text":"Hi"}"#), #"{"ok":true} | preview kokoro Hi saved"#),
+            ("preview", plain(#"{"op":"preview","engine":"kokoro","text":"Hi","settings":{"gain":2}}"#), #"{"ok":true,"read":7} | preview kokoro Hi 2.0"#),
+            ("preview on the saved settings", plain(#"{"op":"preview","engine":"kokoro","text":"Hi"}"#), #"{"ok":true,"read":7} | preview kokoro Hi saved"#),
             ("preview of an unknown engine", plain(#"{"op":"preview","engine":"nobody","text":"Hi"}"#), #"{"error":"preview needs engine and text"}"#),
             ("preview with no text", plain(#"{"op":"preview","engine":"kokoro"}"#), #"{"error":"preview needs engine and text"}"#),
             ("an unknown op", plain(#"{"op":"dance"}"#), #"{"error":"unknown op dance"}"#),
@@ -76,7 +78,7 @@ enum SeamsTest {
         let ask = { (answers: Answers, line: String) -> String in
             let object = try? JSONSerialization.jsonObject(with: answers.answer(Data(line.utf8)))
             let json = object.flatMap { try? JSONSerialization.data(withJSONObject: $0, options: .sortedKeys) }
-            return (json.map { String(decoding: $0, as: UTF8.self) } ?? "?").replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "")
+            return (json.map { String(decoding: $0, as: UTF8.self) } ?? "?").replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
         }
         let status = #"{"op":"status"}"#, stop = #"{"op":"stop"}"#
         var rows: [(name: String, got: String, want: String)] = []
@@ -150,14 +152,65 @@ enum SeamsTest {
         return check("press", rows)
     }
 
+    static func playbackFailures() -> Int {
+        let after = { (events: [PlaybackEvent]) in events.reduce(Playback.idle, next) }
+        return check("playback", [
+            ("nothing yet", after([]), .idle),
+            ("a read begins", after([.began(1)]), .reading(1, isPaused: false)),
+            ("paused", after([.began(1), .pausePressed]), .reading(1, isPaused: true)),
+            ("resumed", after([.began(1), .pausePressed, .pausePressed]), .reading(1, isPaused: false)),
+            ("pause with nothing playing", after([.pausePressed]), .idle),
+            ("it ends", after([.began(1), .ended(1)]), .idle),
+            ("it ends paused: nothing is left paused", after([.began(1), .pausePressed, .ended(1), .began(2)]), .reading(2, isPaused: false)),
+            ("a new read over a paused one", after([.began(1), .pausePressed, .began(2)]), .reading(2, isPaused: false)),
+            ("the cut read's late end", after([.began(1), .began(2), .ended(1)]), .reading(2, isPaused: false)),
+            ("the cut read's late end, paused", after([.began(1), .began(2), .pausePressed, .ended(1)]), .reading(2, isPaused: true)),
+            ("a late end after a stop", after([.began(1), .stopped, .ended(1)]), .idle),
+            ("stopped while paused, then the next", after([.began(1), .pausePressed, .stopped, .began(2)]), .reading(2, isPaused: false)),
+            ("a stop with nothing playing", after([.stopped]), .idle),
+        ]) + check("playback says", [
+            ("idle", "\(Playback.idle.read.map(String.init) ?? "-") \(Playback.idle.isPaused)", "- false"),
+            ("reading", "\(Playback.reading(3, isPaused: false).read ?? 0) \(Playback.reading(3, isPaused: false).isPaused)", "3 false"),
+            ("paused", "\(Playback.reading(3, isPaused: true).read ?? 0) \(Playback.reading(3, isPaused: true).isPaused)", "3 true"),
+        ])
+    }
+
     static func pillFailures() -> Int {
-        check("pill", [
-            ("nothing plays", pillLook(isSpeaking: false, isPaused: false, hasSignal: false), PillLook(symbol: "play.fill", label: "Nothing playing", isDisabled: true, isMeterRunning: false)),
-            ("it talks", pillLook(isSpeaking: true, isPaused: false, hasSignal: true), PillLook(symbol: "pause.fill", label: "Pause · F4", isDisabled: false, isMeterRunning: true)),
-            ("the mac voice talks", pillLook(isSpeaking: true, isPaused: false, hasSignal: false), PillLook(symbol: "pause.fill", label: "Pause · F4", isDisabled: false, isMeterRunning: false)),
-            ("paused", pillLook(isSpeaking: true, isPaused: true, hasSignal: true), PillLook(symbol: "play.fill", label: "Resume · F4", isDisabled: false, isMeterRunning: false)),
-            ("a signal left over", pillLook(isSpeaking: false, isPaused: false, hasSignal: true), PillLook(symbol: "play.fill", label: "Nothing playing", isDisabled: true, isMeterRunning: false)),
-            ("paused with nothing playing", pillLook(isSpeaking: false, isPaused: true, hasSignal: false), PillLook(symbol: "play.fill", label: "Nothing playing", isDisabled: true, isMeterRunning: false)),
+        let reading = Playback.reading(1, isPaused: false), paused = Playback.reading(1, isPaused: true)
+        let pill = { (steps: (inout PillState) -> Void) -> PillState in
+            var state = PillState()
+            steps(&state)
+            return state
+        }
+        let look = { (steps: (inout PillState) -> Void) -> String in
+            let look = pill(steps).look
+            return "\(look.symbol) \(look.label)\(look.isDisabled ? ", off" : "")\(look.isMeterRunning ? ", meter" : "")"
+        }
+        let idle = "play.fill Nothing playing, off", talks = "pause.fill Pause · F4", held = "play.fill Resume · F4"
+        return check("pill", [
+            ("nothing plays", look { _ in }, idle),
+            ("it talks", look { $0.follow(reading); $0.hasSignal = true }, talks + ", meter"),
+            ("the mac voice talks", look { $0.follow(reading) }, talks),
+            ("paused", look { $0.follow(reading); $0.hasSignal = true; $0.follow(paused) }, held),
+            ("a signal left over", look { $0.follow(reading); $0.hasSignal = true; $0.follow(.idle) }, idle),
+            ("a pill that left", look { _ = $0.startWave(); $0.hasSignal = true; $0.leave() }, idle),
+            ("the wave alone has no ⏸ to press", look { _ = $0.startWave(); $0.hasSignal = true }, idle + ", meter"),
+            ("the wave before its first level", look { _ = $0.startWave() }, idle),
+            ("the wave is off again", look { _ = $0.startWave(); $0.hasSignal = true; _ = $0.stopWave() }, idle),
+            ("a read over the wave", look { _ = $0.startWave(); $0.follow(reading) }, talks),
+            ("a read over the wave has ended", look { _ = $0.startWave(); $0.follow(reading); $0.follow(.idle); $0.hasSignal = true }, idle),
+            ("a wave over a paused read", look { $0.follow(paused); _ = $0.startWave(); $0.hasSignal = true }, held),
+            ("a sample", look { $0.showSample() }, talks),
+            ("a read over a sample has ended", look { $0.showSample(); $0.follow(reading); $0.follow(.idle) }, idle),
+            ("a sample that left", look { $0.showSample(); $0.leave() }, idle),
+        ]) + check("wave", [
+            ("starts where nothing plays", pill { _ = $0.startWave() }.isWaveOn, true),
+            ("never over a read", pill { $0.follow(reading); _ = $0.startWave() }.isWaveOn, false),
+            ("a read that begins ends it", pill { _ = $0.startWave(); $0.follow(reading) }.isWaveOn, false),
+            ("says it did not start", { var state = pill { $0.follow(reading) }; return state.startWave() }(), false),
+            ("its end lets the pill leave", { var state = pill { _ = $0.startWave() }; return state.stopWave() }(), true),
+            ("an end under a read leaves the read its pill", { var state = pill { $0.follow(reading) }; return state.stopWave() }(), false),
+            ("an end under a read leaves the read its meter", pill { $0.follow(reading); $0.hasSignal = true; _ = $0.stopWave() }.hasSignal, true),
         ])
     }
 
@@ -249,7 +302,7 @@ class Recorder: DaemonCommands {
     var calls: [String] = []
     var reloadError: String?
     var isSpeaking = true
-    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: false, settings: "at") }
+    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: false, read: isSpeaking ? 7 : nil, settings: "at") }
     func voices() -> [[String: String]] { [["id": "a"]] }
     func reload() -> String? { calls.append("reload"); return reloadError }
     var refusal: SaveError?
@@ -268,12 +321,17 @@ class Recorder: DaemonCommands {
     func togglePause() { calls.append("pause") }
     func stop() { calls.append("stop") }
     func demoPill() { calls.append("demo") }
-    func wave(on: Bool, glide: Double?, flow: Double?) { calls.append("wave \(on) \(glide.map { "\($0)" } ?? "-") \(flow.map { "\($0)" } ?? "-")") }
+    var refusesWave = false
+    func wave(on: Bool, glide: Double?, flow: Double?) -> Bool {
+        calls.append("wave \(on) \(glide.map { "\($0)" } ?? "-") \(flow.map { "\($0)" } ?? "-")")
+        return !refusesWave
+    }
     func hidePill() { calls.append("hide") }
     func blockMain(for seconds: Double) { calls.append("block \(seconds)") }
     func read(_ parts: [Chunk]) { calls.append("read " + parts.map(\.text).joined(separator: "/")) }
-    func preview(_ text: String, with engine: Engine, settings: EngineConfig?) {
+    func preview(_ text: String, with engine: Engine, settings: EngineConfig?) -> Int {
         calls.append("preview \(engine.rawValue) \(text) \(settings.map { "\($0.gain)" } ?? "saved")")
+        return 7
     }
 }
 

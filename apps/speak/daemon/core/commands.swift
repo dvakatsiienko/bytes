@@ -21,11 +21,15 @@ struct Status {
     let isTrusted: Bool
     let isSpeaking: Bool
     let isPaused: Bool
+    // the read that plays
+    let read: Int?
     // where the settings are: a rollback reads it to know whether an older daemon looks elsewhere
     let settings: String
 
     var reply: [String: Any] {
-        ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused, "settings": settings]
+        var reply: [String: Any] = ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused, "settings": settings]
+        reply["read"] = read
+        return reply
     }
 }
 
@@ -41,11 +45,13 @@ protocol DaemonCommands: AnyObject {
     func togglePause()
     func stop()
     func demoPill()
-    func wave(on: Bool, glide: Double?, flow: Double?)
+    // false while a read plays: the pill is its own
+    func wave(on: Bool, glide: Double?, flow: Double?) -> Bool
     func hidePill()
     func blockMain(for seconds: Double)
     func read(_ parts: [Chunk])
-    func preview(_ text: String, with engine: Engine, settings: EngineConfig?)
+    // the read's number
+    func preview(_ text: String, with engine: Engine, settings: EngineConfig?) -> Int
 }
 
 @MainActor
@@ -72,7 +78,9 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
     case "panel-demo":
         commands.demoPill()
     case "wave":
-        commands.wave(on: request.on ?? false, glide: request.glide, flow: request.flow)
+        guard commands.wave(on: request.on ?? false, glide: request.glide, flow: request.flow) else {
+            return ["error": "the waveform waits: x-speak is reading aloud"]
+        }
     case "panel-hide":
         commands.hidePill()
     // a test hook: holds main for `seconds`, so the socket's answer under a blocked main can be measured
@@ -86,7 +94,7 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
         commands.read(parts)
     case "preview":
         guard let engine = request.engine.flatMap(Engine.init), let text = request.text else { return ["error": "preview needs engine and text"] }
-        commands.preview(text, with: engine, settings: request.settings)
+        return ["ok": true, "read": commands.preview(text, with: engine, settings: request.settings)]
     default:
         return ["error": "unknown op \(request.op)"]
     }

@@ -61,7 +61,7 @@ final class App {
         panel.model.onPause = { [weak speaker] in speaker?.togglePause() }
         panel.model.onStop = { [weak speaker] in speaker?.silence() }
         panel.model.onUnstick = { [weak speaker, panel] in
-            if speaker?.isSpeaking == false { panel.hide() }
+            if speaker?.isSpeaking == false { panel.leave() }
         }
         return speaker
     }

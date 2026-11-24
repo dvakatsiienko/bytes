@@ -22,12 +22,10 @@ enum Quota {
 
 @MainActor
 protocol SpeechPill: AnyObject {
-    var isPaused: Bool { get set }
-    func show()
-    // speech is over: the pill goes too, unless stick holds it
-    func speechEnded()
-    // real speech ends the admin's infinite waveform: the meter goes back to the sound
-    func stopWave()
+    // a read that begins shows it; one that ends takes it along, unless stick holds it
+    func follow(_ playback: Playback)
+    // gone whatever it showed, unless stick holds it
+    func leave()
 }
 
 @MainActor
@@ -44,8 +42,9 @@ final class Speaker: ReadTarget {
     // engine → the provider's quota message; cleared by the engine's next success, so a monthly reset heals itself
     private var outOfQuota: [Engine: String] = [:]
     private var quotaProbedAt: Date?
+    private(set) var playback = Playback.idle
     private var job: Task<Void, Never>?
-    // numbers each read in the log, so two reads talking at once show as two numbers interleaved
+    // numbers each read: a log line and an ended read name theirs, so two at once show, and an old one ends nothing
     private var reads = 0
     // a preview's unsaved card settings, in force for that one job
     private var draft: (engine: Engine, settings: EngineConfig)?
@@ -80,41 +79,50 @@ final class Speaker: ReadTarget {
     // the next press can use it
     func kokoroIsWarm() { skipUntil[.kokoro] = nil }
 
-    func togglePause() {
-        guard isSpeaking else { return }
-        pill.isPaused.toggle()
-        outputs.forEach { if pill.isPaused { $0.pause() } else { $0.resume() } }
+    private func happened(_ event: PlaybackEvent) {
+        let before = playback
+        playback = next(before, event)
+        if playback.isPaused != before.isPaused { outputs.forEach { playback.isPaused ? $0.pause() : $0.resume() } }
+        if playback != before { pill.follow(playback) }
     }
 
-    func stop() {
-        if job != nil { write("read \(reads): stopped") }
+    func togglePause() { happened(.pausePressed) }
+
+    private func cut() {
+        if isSpeaking { write("read \(reads): stopped") }
         job?.cancel()
         voices.dropAhead()
         outputs.forEach { $0.stop() }
-        job = nil
         draft = nil
     }
 
     // a preview ignores the bench: dima asked to hear this engine, so it is tried even when benched
-    func preview(_ text: String, with engine: Engine, settings: EngineConfig) {
-        stop()
+    // answers the read's number
+    func preview(_ text: String, with engine: Engine, settings: EngineConfig) -> Int {
+        cut()
         draft = (engine, settings)
         skipUntil[engine] = nil
-        speak(chunks(normalize(text)), only: engine, pressed: .now)
+        return speak(chunks(normalize(text)), only: engine, pressed: .now)
     }
 
-    var isSpeaking: Bool { job != nil }
-    var isPaused: Bool { pill.isPaused }
+    var isSpeaking: Bool { playback != .idle }
+    var isPaused: Bool { playback.isPaused }
 
     func silence() {
-        stop()
-        pill.speechEnded()
+        cut()
+        isSpeaking ? happened(.stopped) : pill.leave()
     }
 
     func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) {
-        if job != nil { stop() }
+        if isSpeaking { cut() }
         speak(parts, only: nil, pressed: pressed)
         voices.reloadMissingKeys()
+    }
+
+    // the control socket's read: whatever sounds is cut, and no key is looked for
+    func readGiven(_ parts: [Chunk]) {
+        cut()
+        speak(parts, only: nil, pressed: .now)
     }
 
     // the providers' balance calls cost nothing: a card shows the real quota before a press finds it, and an empty
@@ -134,11 +142,11 @@ final class Speaker: ReadTarget {
         }
     }
 
-    func speak(_ parts: [Chunk], only: Engine?, pressed: ContinuousClock.Instant) {
-        pill.stopWave()
-        pill.show()
+    @discardableResult
+    func speak(_ parts: [Chunk], only: Engine?, pressed: ContinuousClock.Instant) -> Int {
         reads += 1
         let read = reads
+        happened(.began(read))
         job = Task {
             var isFirst = true
             // a cloud engine that missed chunk 1's budget never takes over mid-read once audio is playing
@@ -181,12 +189,12 @@ final class Speaker: ReadTarget {
             }
             await player.drained()
             if !Task.isCancelled {
-                job = nil
                 draft = nil
                 player.idle()
-                pill.speechEnded()
+                happened(.ended(read))
             }
         }
+        return read
     }
 
     private func handle(_ error: Error, from engine: Engine) {
