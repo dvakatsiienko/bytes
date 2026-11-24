@@ -226,7 +226,7 @@ final class Panel: SpeechPill {
         model.state.follow(playback)
         if playback == .idle { return leave() }
         guard isNew else { return }
-        if waveTimer != nil { model.meter.reset() }
+        model.meter.reset()
         endWave()
         show()
     }

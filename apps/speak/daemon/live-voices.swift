@@ -60,8 +60,9 @@ final class LiveVoices: ChunkVoices {
                 if isFirst { onAudio() }
                 isFirst = false
             }
-            // a text with no sound in it, «…», is spoken: no other engine is asked for it
             try Task.checkCancellation()
+            // a text with no word in it, «…», is spoken: no other engine is asked for it
+            if isFirst, chunk.text.contains(where: { $0.isLetter || $0.isNumber }) { throw EngineError.noVoice }
         case .system:
             await player.drained()
             try Task.checkCancellation()

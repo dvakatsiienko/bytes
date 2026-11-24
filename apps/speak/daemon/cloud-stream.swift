@@ -65,4 +65,9 @@ func stream(_ open: Task<(URLSession.AsyncBytes, URLResponse), Error>, into play
         // a stream that ends inside its deadline does not wait the rest of it out
         for try await isWhole in group where isWhole { group.cancelAll() }
     }
+    // an answer with no sound in it is no answer
+    if state.withLock({ $0 == .waiting }) {
+        try Task.checkCancellation()
+        throw EngineError.timeout
+    }
 }

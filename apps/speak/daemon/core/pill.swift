@@ -10,7 +10,6 @@ struct PillState: Equatable {
     // a read that begins takes the pill
     mutating func follow(_ playback: Playback) {
         if let read = playback.read, read != self.playback.read { leave() }
-        if playback == .idle { hasSignal = false }
         self.playback = playback
     }
 
