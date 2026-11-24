@@ -132,6 +132,21 @@ enum SpeakerTest {
             await settle()
             stage.calls = [stage.speaker.health()["elevenlabs"]?["note"] ?? "-"]
         }, "needs 203")
+        await row("a balance asked for before the engine spoke again holds nothing", { stage in
+            refused(stage)
+            stage.voices.balance = [:]
+        }, { stage in
+            stage.read("Hello.")
+            await settle()
+            stage.voices.balance = [.elevenlabs: Balance(left: 0, empty: "0 left")]
+            stage.voices.balanceWaits = [.milliseconds(60)]
+            let early = Task { await stage.speaker.probeQuota() }
+            await settle()
+            _ = stage.speaker.preview("Hi.", with: .elevenlabs, settings: EngineConfig())
+            await early.value
+            await settle()
+            stage.calls = [stage.speaker.health()["elevenlabs"]?["state"] ?? "-"]
+        }, "live")
         await row("kokoro's server gone is started again", { $0.voices.script[.kokoro] = [.fails(URLError(.cannotConnectToHost))] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | restart kokoro | «kokoro skipped: URLError, off for 60 s» | system Hello. | «first audio: system N ms» | rest | pill -")
         await row("every engine fails", { $0.voices.script = [.kokoro: [.fails(EngineError.timeout)], .system: [.fails(EngineError.noVoice)]] }, { $0.read("Hello.") },

@@ -183,7 +183,8 @@ final class Speaker: ReadTarget {
                         }
                         // the mac voice returns normally from a stop too
                         if Task.isCancelled { return }
-                        outOfQuota[engine] = nil
+                        // a balance asked for before it spoke is older than this
+                        if outOfQuota.removeValue(forKey: engine) != nil { probes += 1 }
                         if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
                         lead = engine
                         break

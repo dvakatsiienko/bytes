@@ -78,7 +78,8 @@ enum StartTest {
             await press(keys, runner, 61)
             calls.made.append("held")
             runner.isHeld = false
-            try? await Task.sleep(for: .milliseconds(30))
+            for _ in 0..<200 where calls.made.count < 3 { try? await Task.sleep(for: .milliseconds(5)) }
+            await settle()
             await press(keys, runner, 60)
             await press(keys, runner, 1)
         }, "keys: elevenlabs ok, fish missing, gemini ok | held | keys: elevenlabs ok, fish missing, gemini ok | keys: elevenlabs ok, fish missing, gemini ok | 3 asked")

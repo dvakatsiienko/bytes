@@ -68,6 +68,7 @@ enum EnginesTest {
         rows.append(("a stream that breaks off", await render(.fish, PlantedNet(body: [Data([1, 2])], breaks: EngineError.status(0))), "1.2 | \(EngineError.status(0))"))
         rows.append(("gemini's wav loses its header", await render(.gemini, net([gemini(Array("RIFF".utf8) + [UInt8](repeating: 0, count: 40) + [9, 9])], 200)), "9.9"))
         rows.append(("gemini with no audio in it has no sound", await render(.gemini, net([Data("{}".utf8)], 200)), ""))
+        rows.append(("gemini's audio that is no base64 has no sound", await render(.gemini, net([Data(#"{"candidates":[{"content":{"parts":[{"inlineData":{"data":"%%%"}}]}}]}"#.utf8)], 200)), ""))
         return check("engine render", rows)
     }
 
@@ -174,13 +175,15 @@ enum EnginesTest {
 
     static func voicesFailures() async -> Int {
         var rows: [(name: String, got: String, want: String)] = []
+        var mac: VoiceOutput!
         let row = { (name: String, act: @MainActor (Voices, PlantedNet, Calls) async throws -> Void, want: String) in
             let calls = Calls(), net = PlantedNet(body: [Data([1, 2])])
+            mac = VoiceOutput(make: PlantedSynths(calls).make)
             net.call = { line in Task { @MainActor in calls.made.append(line) } }
             let player = Player(device: PlantedAudio { calls.made.append($0) }, settling: .seconds(60), log: { _ in })
             let keys = Keys(run: { _ in "k\0k\0k\0" }, log: { _ in })
             await keys.load()
-            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, macVoice: VoiceOutput(make: PlantedSynths(calls).make), keys: keys, servers: [:])
+            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, macVoice: mac, keys: keys, servers: [:])
             do { try await act(voices, net, calls) } catch { calls.made.append("\(error)") }
             await settle()
             rows.append((name, calls.made.filter { !["start", "play", "speed 1.0"].contains($0) }.joined(separator: " | "), want))
@@ -242,6 +245,17 @@ enum EnginesTest {
             await settle()
             net.call = { _ in }
         }, "ask One. | dropped One. | ask Two.")
+        await row("a stopped mac voice's late end leaves the next read what it asked ahead", { voices, _, calls in
+            let task = Task { try await say(voices, "Old.", .system, calls) }
+            await settle()
+            task.cancel()
+            voices.dropAhead()
+            voices.openAhead(chunk("One."), with: .fish, settings: named)
+            await settle()
+            mac.stop()
+            await settle()
+            try await say(voices, "One.", .fish, calls)
+        }, "start Old. | ask One. | stop Old. | sound | heard")
         await row("the mac voice plays for itself until it is told to render", { voices, _, calls in
             let task = Task { try await say(voices, "One.", .system, calls) }
             await settle()
