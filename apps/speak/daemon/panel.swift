@@ -70,7 +70,7 @@ struct PanelView: View {
 
 // newest level in the centre, older ones moving outward on both sides. a 60 fps timeline while speech with a signal
 // plays — measured: +7 % of one core at 60, +11 % at 120, with the eased bars equally smooth to the eye; paused,
-// stopped, idle or on the mac voice it draws once and holds
+// stopped or idle it draws once and holds
 struct LevelMeter: View {
     // the one accent (Linear's indigo), on live bars only; at rest the bars are dim dots
     static let accent = Color(red: 0.56, green: 0.58, blue: 1.0)
@@ -78,7 +78,7 @@ struct LevelMeter: View {
     let isRunning: Bool
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 120, paused: !isRunning)) { context in
+        TimelineView(.animation(minimumInterval: 1.0 / 60, paused: !isRunning)) { context in
             Canvas { canvas, size in
                 let levels = meter.frame(at: context.date)
                 let width: CGFloat = 2.5

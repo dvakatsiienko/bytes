@@ -32,8 +32,7 @@ struct PillState: Equatable {
     mutating func showSample() { isSample = true }
     mutating func leave() { (isWaveOn, isSample, hasSignal) = (false, false, false) }
 
-    // ⏸ while it talks, ▶ while paused, a dim ▶ when nothing plays. the mac voice plays outside the audio engine and
-    // sends no signal, so its speech never runs the meter
+    // ⏸ while it talks, ▶ while paused, a dim ▶ when nothing plays; the meter runs once a sound was heard
     var look: PillLook {
         let isSpeaking = playback != .idle || isSample
         return PillLook(
