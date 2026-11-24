@@ -14,6 +14,8 @@ app() {
 }
 plant() { printf '%b\n' "$1" >"$root/app/daemon/core/Planted.swift"; }
 run() { out=$("$root/app/script/daemon-test.sh" 2>&1); code=$?; }
+# a whole run inside this one: its own red lines are the only clue
+passes() { is "$1" 0 "$code"; [ "$code" = 0 ] || printf '%s\n' "$out" | grep -A 2 -E '✗|error' >&2; }
 
 for line in 'import AppKit' '@preconcurrency import AVFoundation' 'import Carbon.HIToolbox' 'import class AppKit.NSColor' \
     'import Foundation; import AppKit' '@preconcurrency\nimport\n  Carbon' 'import SwiftUI'; do
@@ -45,10 +47,10 @@ for line in 'private let at = NSHomeDirectory()' 'private let at = "/Users/dima/
 done
 
 app; plant 'import Foundation\nprivate func at(_ p: Paths) { try? FileManager.default.createDirectory(atPath: p.settings, withIntermediateDirectories: true) }'; run
-is 'a folder made at one of the paths passes' 0 "$code"
+passes 'a folder made at one of the paths passes'
 
 app; plant 'protocol Planted {\n    static var planted: Int { get }\n}'; run
-is 'what a protocol of the core asks for passes' 0 "$code"
+passes 'what a protocol of the core asks for passes'
 app; plant 'enum Planted {\n    static var planted: Int { 1 }\n}'; run
 is 'a static var with a body fails the run' 1 "$code"
 

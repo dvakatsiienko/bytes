@@ -160,12 +160,13 @@ final class Speaker: ReadTarget {
                 if let server = rendersAhead(engines, lead: lead, isPlaying: player.isPlaying) {
                     voices.openAhead(chunk, with: server, settings: settings(server))
                 }
-                let newBudget = { firstAudioBudgetEnds(isPlaying: self.player.isPlaying, firstAudioMs: self.saved().firstAudioMs, now: .now) }
+                let firstAudioMs = saved().firstAudioMs
+                let newBudget = { firstAudioBudgetEnds(isPlaying: self.player.isPlaying, firstAudioMs: firstAudioMs, now: .now) }
                 var budgetEnds = newBudget()
                 for engine in engines {
                     var isHeard = false
                     let deadline: Duration?
-                    switch firstAudioWait(for: engine, among: engines, lead: lead, characters: chunk.text.count, budgetEnds: budgetEnds, now: .now) {
+                    switch firstAudioWait(for: engine, among: engines, lead: lead, characters: chunk.text.count, firstAudioMs: firstAudioMs, budgetEnds: budgetEnds, now: .now) {
                     case .skip: continue
                     case .asLongAsItTakes: deadline = nil
                     case .atMost(let wait): deadline = wait
@@ -194,7 +195,11 @@ final class Speaker: ReadTarget {
                         // a chunk that was heard is never read again by the next engine
                         if isHeard { break }
                         // a wait that was never the cloud's budget takes none of it and gives none back
-                        if !isOnBudget(engine, lead: lead) { budgetEnds = budgetEnds.map { $0 + (.now - asked) } ?? newBudget() }
+                        if !isOnBudget(engine, lead: lead) {
+                            budgetEnds = budgetEnds.map { $0 + (.now - asked) } ?? newBudget()
+                        } else if budgetEnds == nil {
+                            budgetEnds = player.dryAt.map { $0 + .milliseconds(firstAudioMs) }
+                        }
                     }
                 }
             }

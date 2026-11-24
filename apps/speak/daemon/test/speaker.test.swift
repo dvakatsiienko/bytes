@@ -75,6 +75,20 @@ enum SpeakerTest {
             stage.read("Hello. Bye.")
             try? await Task.sleep(for: .milliseconds(300))
         }, "pill 1 | «read 1: chunk 1/2» | fish Hello. in 100 | «first audio: fish N ms» | ahead fish Bye. | «read 1: chunk 2/2» | fish Bye. in 3000 | «fish skipped: timeout» | elevenlabs Bye. in 100 | «voice switch: fish → elevenlabs mid-read» | drop ahead | rest | pill -")
+        await row("a cloud voice behind the read's own, under sound, gets the budget", { $0.chain = [.kokoro, .fish, .system]; $0.budget = 100; $0.voices.script[.kokoro] = [.sounds, .fails(EngineError.status(500))] }, { $0.read("Hello. Bye.") },
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | speed 1.0 | start | play | sound | «first audio: kokoro N ms» | «read 1: chunk 2/2» | kokoro Bye. in 3000 | «kokoro skipped: status(500), off for 60 s» | fish Bye. in 100 | «voice switch: kokoro → fish mid-read»")
+        await row("two cloud misses under sound share one budget, from the moment nothing plays", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.failsLate(EngineError.timeout)]] }, { stage in
+            stage.read("Hello. Bye.")
+            await settle()
+            stage.calls = []
+            stage.audio.endsNext()
+            try? await Task.sleep(for: .milliseconds(300))
+        }, "«fish skipped: timeout» | system Bye. | «voice switch: kokoro → system mid-read» | drop ahead | rest | pill -")
+        await row("a cloud miss under sound leaves the next one the whole budget", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.fails(EngineError.status(500))]] }, { stage in
+            stage.read("Hello. Bye.")
+            await settle()
+            stage.calls = [stage.calls.last { $0.hasPrefix("elevenlabs") } ?? "-"]
+        }, "elevenlabs Bye. in 100")
         await row("two cloud misses share one budget", { $0.chain = [.elevenlabs, .fish, .system]; $0.budget = 100; $0.voices.script[.elevenlabs] = [.failsLate(EngineError.timeout)] }, { stage in
             stage.read("Hello.")
             try? await Task.sleep(for: .milliseconds(300))
@@ -362,13 +376,15 @@ enum SpeakerTest {
             player.idle()
             try player.schedule(pcm, EngineConfig())
         }, "speed 1.0 | start | play | sound | rest | speed 1.0 | start | play | sound")
-        await row("a stop ends the wait and drops what is scheduled", { player, audio, stage in
+        await row("a stop ends the wait and drops what is scheduled", { _, audio, stage in
+            // it rests after the row's end: the two orders of the rest and the wait's end are both right
+            let player = Player(device: audio, settling: .seconds(60), log: { _ in })
             try player.schedule(pcm, EngineConfig())
             Task { await player.drained(); stage.calls.append("drained") }
             await settle()
             player.stop()
             stage.calls.append("\(player.isPlaying)")
-        }, "speed 1.0 | start | play | sound | stop | false | drained | rest")
+        }, "speed 1.0 | start | play | sound | stop | false | drained")
         await row("a stopped sound's late end is not the next one's", { player, audio, stage in
             try player.schedule(pcm, EngineConfig())
             player.stop()

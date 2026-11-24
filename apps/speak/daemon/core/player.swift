@@ -36,7 +36,7 @@ final class Player {
     // what is scheduled waits for the resume
     private var isPaused = false
     // when the queue ran dry mid-read: the next buffer logs the silence the listener heard
-    private var dryAt: ContinuousClock.Instant?
+    private(set) var dryAt: ContinuousClock.Instant?
 
     var isPlaying: Bool { pending > 0 }
 

@@ -61,13 +61,13 @@ func localServerWait(_ characters: Int) -> Duration { .milliseconds(3000 + 10 * 
 private let leadWait = Duration.seconds(3)
 
 // the last candidate has nothing to yield to, so it waits as long as it takes. a local server's and the lead's waits run from the
-// moment nothing plays, the budget from its chunk's start
-func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, characters: Int, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
+// moment nothing plays, the budget from its chunk's start or, under sound, from that moment too
+func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, characters: Int, firstAudioMs: Int, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
     guard engine != candidates.last else { return .asLongAsItTakes }
     if engine.facts.isLocalServer { return .atMost(localServerWait(characters)) }
     guard engine.isCloud else { return .asLongAsItTakes }
     if engine == lead { return .atMost(leadWait) }
-    guard let budgetEnds else { return .asLongAsItTakes }
+    guard let budgetEnds else { return .atMost(.milliseconds(firstAudioMs)) }
     return budgetEnds > now ? .atMost(budgetEnds - now) : .skip
 }
 

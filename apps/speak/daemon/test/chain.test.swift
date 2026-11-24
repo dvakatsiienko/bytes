@@ -38,7 +38,7 @@ enum ChainTest {
         let chain: [Engine] = [.fish, .elevenlabs, .kokoro]
         let wait = { (engine: Engine, among: [Engine], lead: Engine?, budget: Int, isPlaying: Bool, passed: Int) in
             firstAudioWait(
-                for: engine, among: among, lead: lead, characters: 40,
+                for: engine, among: among, lead: lead, characters: 40, firstAudioMs: budget,
                 budgetEnds: firstAudioBudgetEnds(isPlaying: isPlaying, firstAudioMs: budget, now: start),
                 now: start + .milliseconds(passed)
             )
@@ -56,8 +56,8 @@ enum ChainTest {
             ("a lead that is the mac voice", wait(.system, [.system, .fish], .system, 900, false, 1500), .asLongAsItTakes),
             ("a cloud lead that is last", wait(.fish, [.kokoro, .fish], .fish, 900, false, 1500), .asLongAsItTakes),
             ("a non-cloud lead leaves the cloud its budget", wait(.fish, [.kokoro, .fish, .system], .kokoro, 900, false, 300), .atMost(.milliseconds(600))),
-            ("audio already playing", wait(.fish, chain, nil, 900, true, 0), .asLongAsItTakes),
-            ("audio already playing, a budget of zero", wait(.fish, chain, nil, 0, true, 0), .asLongAsItTakes),
+            ("audio already playing: the budget waits for the quiet", wait(.fish, chain, nil, 900, true, 0), .atMost(.milliseconds(900))),
+            ("audio already playing, the last candidate", wait(.fish, [.kokoro, .fish], nil, 900, true, 0), .asLongAsItTakes),
             ("kokoro first gets 3 s, never the budget", wait(.kokoro, [.kokoro, .fish], nil, 900, false, 0), .atMost(.seconds(3))),
             ("kokoro leading gets 3 s", wait(.kokoro, [.kokoro, .fish], .kokoro, 900, false, 1500), .atMost(.seconds(3))),
             ("kokoro behind a cloud engine gets 3 s", wait(.kokoro, [.fish, .kokoro, .system], nil, 900, false, 1500), .atMost(.seconds(3))),
