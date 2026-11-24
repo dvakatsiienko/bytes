@@ -22,10 +22,13 @@ export const EngineCard = (props: EngineCardProps) => {
   const quotaNote =
     props.status?.state === 'no quota' ? props.status.note : undefined;
   const sortable = useSortable({
+    // a card of another column is no target
+    accept: props.lang,
     disabled: !isOn,
     group: props.lang,
     id: `${props.lang}:${id}`,
     index: props.rank ?? -1,
+    type: props.lang,
   });
 
   // ▶ starts a preview; while this card plays, ⏸ / ▶ pause and resume it and ■ stops it

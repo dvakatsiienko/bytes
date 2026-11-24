@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { move } from '@dnd-kit/helpers';
 import { DragDropProvider } from '@dnd-kit/react';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -19,6 +18,7 @@ import {
   api,
   voiceOf,
 } from '@/api.ts';
+import { chainAfterDrag } from '@/chain.ts';
 import { LIMITS } from '@/limits.ts';
 import { usePreview } from '@/usePreview.ts';
 import { useSettings } from '@/useSettings.ts';
@@ -287,19 +287,7 @@ export const App = () => {
           dragStart.current = undefined;
         }}
         onDragOver={(event) => {
-          const ids = Object.fromEntries(
-            LANGS.map(([lang]) => [
-              lang,
-              (draft.chain[lang] ?? []).map((engine) => `${lang}:${engine}`),
-            ]),
-          );
-          const moved = move(ids, event);
-          const chain = Object.fromEntries(
-            Object.entries(moved).map(([lang, list]) => [
-              lang,
-              list.map((id) => String(id).split(':')[1] as Engine),
-            ]),
-          );
+          const chain = chainAfterDrag(draft.chain, event);
           if (JSON.stringify(chain) !== JSON.stringify(draft.chain))
             edit((config) => ({ ...config, chain }));
         }}
