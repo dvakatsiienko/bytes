@@ -15,10 +15,7 @@ final class App {
     let kokoro: KokoroServer
     // the audio engine and the pill are made once the app runs, so a slow audio device holds up neither the socket nor the keys
     private(set) lazy var panel = Panel(settings: { [configStore] in configStore.current })
-    private(set) lazy var speaker = Speaker(
-        player: Player(), macVoice: MacVoice(), panel: panel, keys: keys, kokoro: kokoro,
-        settings: { [configStore] in configStore.current }
-    )
+    private(set) lazy var speaker = makeSpeaker()
     private lazy var presses = PressSequencer(
         grab: Grab(), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, log: log
     )
@@ -48,6 +45,25 @@ final class App {
         // main thread and crashed every one-shot run
         NSApplication.shared.setActivationPolicy(.prohibited)
         NSApplication.shared.run()
+    }
+
+    private func makeSpeaker() -> Speaker {
+        let audio = MacAudio(), macVoice = MacVoice(), panel = panel
+        let player = Player(device: audio, log: log)
+        let speaker = Speaker(
+            player: player, macVoice: macVoice,
+            voices: LiveVoices(player: player, macVoice: macVoice, keys: keys, kokoro: kokoro),
+            pill: panel, settings: { [configStore] in configStore.current }, log: log
+        )
+        kokoro.onWarm = { [weak speaker] in speaker?.kokoroIsWarm() }
+        audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
+        panel.model.onClose = { [panel] in panel.hide() }
+        panel.model.onPause = { [weak speaker] in speaker?.togglePause() }
+        panel.model.onStop = { [weak speaker] in speaker?.silence() }
+        panel.model.onUnstick = { [weak speaker, panel] in
+            if speaker?.isSpeaking == false { panel.hide() }
+        }
+        return speaker
     }
 
     private func startOneShot(only: Engine?) {

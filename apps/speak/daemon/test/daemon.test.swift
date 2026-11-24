@@ -13,7 +13,7 @@ struct DaemonTest {
     @MainActor
     static func main() async throws {
         var failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3]) + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures()
-        failed += await SeamsTest.failures()
+        failed += await SeamsTest.failures() + SpeakerTest.failures()
         exit(failed == 0 ? 0 : 1)
     }
 

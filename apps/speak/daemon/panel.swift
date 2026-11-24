@@ -162,8 +162,12 @@ struct VisualEffect: NSViewRepresentable {
 }
 
 @MainActor
-final class Panel {
+final class Panel: SpeechPill {
     let model: PanelModel
+    var isPaused: Bool {
+        get { model.isPaused }
+        set { model.isPaused = newValue }
+    }
     private let settings: @MainActor () -> Config
     // the infinite waveform's unsaved glide and flow, in force only while it runs
     private final class Wave { var tuning: (glide: Double, flow: Double)? }
