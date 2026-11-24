@@ -176,6 +176,7 @@ final class Speaker: ReadTarget {
                     case .atMost(let wait): deadline = wait
                     }
                     let asked = ContinuousClock.now
+                    let stopped = { if isHeard { self.write("\(part) → \(engine.rawValue), stopped") } }
                     do {
                         try await voices.speak(chunk, with: engine, settings: { self.settings(engine) }, deadline: deadline) {
                             if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))") }
@@ -184,7 +185,7 @@ final class Speaker: ReadTarget {
                             if engine.facts.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
                         }
                         // a voice may return normally from a stop
-                        if Task.isCancelled { return }
+                        if Task.isCancelled { return stopped() }
                         outOfQuota[engine] = nil
                         // a cloud voice with nothing to say, «…», leads nothing
                         if isHeard || !engine.isCloud {
@@ -194,7 +195,7 @@ final class Speaker: ReadTarget {
                         if isHeard { write("\(part) → \(engine.rawValue)") }
                         break
                     } catch {
-                        if Task.isCancelled { return }
+                        if Task.isCancelled { return stopped() }
                         if isHeard { write("\(part) → \(engine.rawValue), cut off") }
                         // a stream cut off by its own deadline can say «cancelled»: the read goes on
                         handle(error is CancellationError ? EngineError.timeout : error, from: engine)

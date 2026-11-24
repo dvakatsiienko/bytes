@@ -27,6 +27,28 @@ enum SpeakerTest {
                   "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «read 1: chunk 1/2 → kokoro» | «read 1: chunk 2/2» | kokoro Bye. in 3000 | «read 1: chunk 2/2 → kokoro» | drop ahead | rest | pill -")
         await row("a chunk that was cut off is one voice's, and no other's", named([.kokoro: [.failsMidChunk(EngineError.status(500))]]), { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «read 1: chunk 1/1 → kokoro, cut off» | «kokoro skipped: status(500), off for 60 s» | drop ahead | rest | pill -")
+        await row("a chunk stopped in its sound names its engine too", named([.kokoro: [.soundsOn]]), { stage in
+            stage.read("Hello.")
+            await settle()
+            stage.calls = []
+            stage.speaker.silence()
+            await settle()
+            stage.calls.removeAll { !$0.hasPrefix("«") }
+        }, "«read 1: stopped» | «read 1: chunk 1/1 → kokoro, stopped»")
+        await row("and one whose voice returns normally from the stop", named([.kokoro: [.soundsIgnoringStop]]), { stage in
+            stage.read("Hello.")
+            await settle()
+            stage.calls = []
+            stage.speaker.silence()
+            await settle()
+            stage.calls.removeAll { !$0.hasPrefix("«") }
+        }, "«read 1: stopped» | «read 1: chunk 1/1 → kokoro, stopped»")
+        await row("a chunk stopped unheard names none", named([.kokoro: [.waits]]), { stage in
+            stage.read("Hello.")
+            await settle()
+            stage.calls = []
+            stage.speaker.silence()
+        }, "«read 1: stopped» | drop ahead | stop | pill - | rest")
         await row("a voice that failed unheard is not named", named([.kokoro: [.fails(EngineError.status(500))]]), { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: status(500), off for 60 s» | system Hello. | «first audio: system N ms» | «read 1: chunk 1/1 → system» | drop ahead | rest | pill -")
         await row("nor one with nothing to say", named([.kokoro: [.saysNothing]]), { $0.read("….") },
@@ -527,7 +549,7 @@ final class Stage {
     private func drop(_ call: String) { calls.removeAll { $0 == call } }
 }
 
-enum Step { case plays, waits, fails(Error), failsMidChunk(Error), ignoresStop, sounds, saysNothing, failsLate(Error), failsWhenTold(Error) }
+enum Step { case plays, waits, fails(Error), failsMidChunk(Error), ignoresStop, sounds, saysNothing, failsLate(Error), failsWhenTold(Error), soundsOn, soundsIgnoringStop }
 
 @MainActor
 final class PlantedVoices: ChunkVoices {
@@ -567,6 +589,12 @@ final class PlantedVoices: ChunkVoices {
         case .failsWhenTold(let error):
             await withCheckedContinuation { told = $0 }
             throw error
+        case .soundsOn:
+            onAudio()
+            try await Task.sleep(for: .seconds(60))
+        case .soundsIgnoringStop:
+            onAudio()
+            try? await Task.sleep(for: .seconds(60))
         case .ignoresStop: try? await Task.sleep(for: .seconds(60))
         case .saysNothing: break
         case .waits: try await Task.sleep(for: .seconds(60))

@@ -42,7 +42,7 @@ enum Request: Equatable {
 }
 
 extension Request: Decodable {
-    private enum Field: String, CodingKey { case op, patch, version, engine, voice, on, text, settings, glide, flow, seconds }
+    enum Field: String, CodingKey, CaseIterable { case op, patch, version, engine, voice, on, text, settings, glide, flow, seconds }
 
     init(from decoder: Decoder) throws {
         let fields = try decoder.container(keyedBy: Field.self)

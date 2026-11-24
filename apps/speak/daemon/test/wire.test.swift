@@ -16,6 +16,8 @@ enum WireTest {
             ("the ops", requests.keys.sorted().joined(separator: " "), Op.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("the states", states.sorted().joined(separator: " | "), Health.State.allCases.map(\.rawValue).sorted().joined(separator: " | ")),
         ]
+        let named = Set(requests.values.flatMap { ($0["properties"] as? [String: Any] ?? [:]).keys } + ["op"])
+        rows.append(("the fields", named.sorted().joined(separator: " "), Request.Field.allCases.map(\.rawValue).sorted().joined(separator: " ")))
         for (op, shape) in requests {
             let fields = (shape["properties"] as? [String: Any] ?? [:]).keys
             let named = samples.filter { fields.contains($0.key) }
@@ -46,6 +48,7 @@ enum WireTest {
         rows.append(("an engine's languages", ((fields(entry)["languages"]?["items"] as? [String: Any])?["enum"] as? [String] ?? []).joined(separator: " "), known))
         rows.append(("a voice's languages", (fields(voice)["lang"]?["enum"] as? [String] ?? []).joined(separator: " "), known))
         rows.append(("an engine's keys", keys(CatalogueEntry(id: "i", label: "l", languages: [], voices: [])), names(entry)))
+        rows.append(("the keys an engine always has", names(entry), required(entry).sorted().joined(separator: " ")))
         rows.append(("a voice's keys", keys(Voice(id: "i", name: "n", lang: .en)), names(voice)))
         rows.append(("the keys a voice always has", keys(Voice(id: "i", name: "n")), required(voice).sorted().joined(separator: " ")))
         rows.append(("a health's keys", keys(Health(state: .live, until: "u", note: "n")), names(defs["health"])))
