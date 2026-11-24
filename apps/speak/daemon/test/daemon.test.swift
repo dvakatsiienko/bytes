@@ -12,7 +12,7 @@ struct Case: Decodable {
 struct DaemonTest {
     @MainActor
     static func main() async throws {
-        var failed = try goldenFailures(CommandLine.arguments[1]) + argvFailures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3]) + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
+        var failed = try goldenFailures(CommandLine.arguments[1]) + sourceFailures() + argvFailures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3]) + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
         failed += await SeamsTest.failures() + SpeakerTest.failures() + EnginesTest.failures() + StartTest.failures()
         exit(failed == 0 ? 0 : 1)
     }
@@ -38,6 +38,22 @@ struct DaemonTest {
         return failed
     }
 
+    // each chunk's own part of the grabbed text
+    static func sourceFailures() -> Int {
+        let long = String(repeating: "word ", count: 80) + "end."
+        let parts = { (text: String) in spokenChunks(of: text).map { (text as NSString).substring(with: NSRange($0.source)) }.joined(separator: " | ") }
+        return check("source", [
+            ("two sentences", parts("Hello there.  And bye!"), "Hello there. | And bye!"),
+            ("a line end the voice gets a dot for", parts("say «done»\nthen go. ok"), "say «done»\n | then go. | ok"),
+            ("two languages", parts("Read it: «привіт» 🎉 and go."), "Read it: | привіт | and go."),
+            ("a list whose lines were glued", parts("lane1. merge now.2. sleep well"), "lane | 1. merge now. | 2. sleep well"),
+            ("a path, an id and a unit", parts("Open docs/test-drive/exa.md. Then FRM-266 in 5ms. Bye."), "Open docs/test-drive/exa.md. | Then FRM-266 in 5ms. | Bye."),
+            ("markdown around it", parts("## **One.**\n- [two](https://x.y/z). three"), "One. | [two](https://x.y/z). | three"),
+            ("an end and a start that share one character", parts("a — b\n@tanstack/router"), "a — b\n | @tanstack/router"),
+            ("a long sentence, cut", parts("Hi. " + long), "Hi. | " + String(repeating: "word ", count: 60).dropLast() + " | " + String(repeating: "word ", count: 20) + "end."),
+        ])
+    }
+
     static func goldenFailures(_ path: String) throws -> Int {
         let cases = try JSONDecoder().decode([Case].self, from: Data(contentsOf: URL(fileURLWithPath: path)))
         var failed = 0
@@ -46,6 +62,12 @@ struct DaemonTest {
             if got != item.out {
                 failed += 1
                 print("✗ \(item.in)\n  want \(item.out)\n  got  \(got)")
+            }
+            // a chunk comes from inside the text, after the one before it
+            let sources = spokenChunks(of: item.in).map(\.source)
+            if !zip(sources, sources.dropFirst()).allSatisfy({ $0.upperBound <= $1.lowerBound }) || sources.contains(where: { $0.isEmpty || $0.upperBound > item.in.utf16.count }) {
+                failed += 1
+                print("✗ \(item.in)\n  sources \(sources)")
             }
         }
         print("\(cases.count - failed)/\(cases.count) golden cases pass")

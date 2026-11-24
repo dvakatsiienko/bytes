@@ -5,6 +5,8 @@ import Foundation
 struct Chunk {
     let lang: Lang
     let text: String
+    // where in the grabbed text it came from, in utf-16 units
+    var source = 0..<0
 }
 
 enum EngineError: Error {
@@ -22,31 +24,35 @@ private let longestChunk = 300
 func chunks(_ runs: [Run]) -> [Chunk] {
     var result: [Chunk] = []
     for run in runs {
-        let marked = run.text.replacingOccurrences(of: "([.!?…;])\\s+", with: "$1\0", options: .regularExpression)
-        for sentence in marked.split(separator: "\0") {
-            var text = String(sentence)
-            if result.isEmpty, text.count > 100, let comma = text.dropFirst(40).firstIndex(of: ",") {
-                result.append(Chunk(lang: run.lang, text: String(text[...comma])))
-                text = String(text[text.index(after: comma)...]).trimmingCharacters(in: .whitespaces)
+        // a rewritten end of one and start of the next may come from the same character: it is the first one's
+        let add = { (piece: SourcedText) in
+            let from = max(piece.source.lowerBound, result.last?.source.upperBound ?? 0)
+            result.append(Chunk(lang: run.lang, text: piece.text, source: from..<max(from, piece.source.upperBound)))
+        }
+        for sentence in run.spoken.replacing("([.!?…;])\\s+", "$1\0").split(at: "\0") {
+            var rest = sentence
+            if result.isEmpty, rest.text.count > 100, let comma = rest.text.dropFirst(40).firstIndex(of: ",") {
+                add(rest[...comma])
+                rest = rest[rest.text.index(after: comma)...].trimmed(.whitespaces)
             }
-            while text.count > longestChunk {
-                let piece = opening(of: text)
-                result.append(Chunk(lang: run.lang, text: String(piece)))
-                text = String(text[piece.endIndex...]).trimmingCharacters(in: .whitespaces)
+            while rest.text.count > longestChunk {
+                let end = endOfOpening(rest.text)
+                add(rest[..<end])
+                rest = rest[end...].trimmed(.whitespaces)
             }
-            result.append(Chunk(lang: run.lang, text: text))
+            add(rest)
         }
     }
     return result
 }
 
 // up to its last comma past the half, else its last space
-private func opening(of text: String) -> Substring {
+private func endOfOpening(_ text: String) -> String.Index {
     let window = text.prefix(longestChunk + 1)
     if let comma = window.range(of: ", ", options: .backwards), window.distance(from: window.startIndex, to: comma.lowerBound) > longestChunk / 2 {
-        return window[...comma.lowerBound]
+        return window.index(after: comma.lowerBound)
     }
-    return window.lastIndex(of: " ").map { window[..<$0] } ?? window.dropLast()
+    return window.lastIndex(of: " ") ?? window.dropLast().endIndex
 }
 
 // `only` is --engine: one engine, no chain. the engine that played the read's first chunk leads every later one, so one
