@@ -227,6 +227,10 @@
 - ⬜ the pill floats while speech plays: its wave, ⏸ / ▶, ■, stick and close
   - then the ⏸ / ▶ button follows the speech, and the pill never takes focus from the app in front
   - and paused, the wave keeps its last shape in grey and the sentence line takes the same grey, the held word on its pad; only stopped is the wave flat (dima, 2026-10-01, merge v1.14)
+- ⬜ the mac voice can play through the one audio output, like every other voice
+  - given `"oneOutput": true` under `engines.system` in the settings file, when the mac voice reads, then it plays through the audio engine: its wave runs on the pill, its gain counts, and it starts no gap after the sentence before
+  - given the key is absent or false, then macos plays it itself, as before; `status` says which in `macVoice`: «player» or «synth»
+  - decision: the old way out stays until dima's ear says the Spoken Content voice sounds the same
 - ⬜ the pill drags anywhere and keeps its spot per display
   - given the pill dragged on one display
   - when speech next plays on that display

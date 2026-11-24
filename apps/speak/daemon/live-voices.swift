@@ -50,6 +50,18 @@ final class LiveVoices: ChunkVoices {
 
     func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping () -> Void) async throws {
         switch engine {
+        case .system where settings().oneOutput:
+            let settings = settings()
+            var isFirst = true
+            for await pcm in renderedMacVoice(chunk, settings) {
+                // samples that land after a stop never reach the player
+                try Task.checkCancellation()
+                try player.schedule(pcm, settings)
+                if isFirst { onAudio() }
+                isFirst = false
+            }
+            try Task.checkCancellation()
+            if isFirst { throw EngineError.noVoice }
         case .system:
             await player.drained()
             try Task.checkCancellation()

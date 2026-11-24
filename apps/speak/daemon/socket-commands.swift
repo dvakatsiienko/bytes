@@ -14,7 +14,10 @@ final class SocketCommands: DaemonCommands {
     }
 
     func status() -> Status {
-        Status(engines: speaker.health(), isTrusted: AXIsProcessTrusted(), isSpeaking: speaker.isSpeaking, isPaused: speaker.isPaused, read: speaker.playback.read, settings: configStore.path)
+        Status(
+            engines: speaker.health(), isTrusted: AXIsProcessTrusted(), isSpeaking: speaker.isSpeaking, isPaused: speaker.isPaused, read: speaker.playback.read,
+            macVoice: configStore.current[.system].oneOutput ? "player" : "synth", settings: configStore.path
+        )
     }
 
     func voices() -> [[String: String]] { installedVoices() }
