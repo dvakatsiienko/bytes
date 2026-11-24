@@ -1,10 +1,9 @@
-// each engine's chunk, from its render to the output it plays on
+// each engine's chunk, from its render to the player
 import Foundation
 
 @MainActor
 final class Voices: ChunkVoices {
     private let player: Player
-    private let macVoice: VoiceOutput
     private let keys: Keys
     private let servers: [Engine: KokoroServer]
     private let engines: [Engine: any VoiceEngine]
@@ -12,9 +11,8 @@ final class Voices: ChunkVoices {
     // behind the audio, or a local server's render of this one, while a cloud engine races its deadline
     private var ahead: [Engine: (text: String, pieces: Pieces)] = [:]
 
-    init(_ parts: EngineParts, player: Player, macVoice: VoiceOutput, keys: Keys, servers: [Engine: KokoroServer]) {
+    init(_ parts: EngineParts, player: Player, keys: Keys, servers: [Engine: KokoroServer]) {
         self.player = player
-        self.macVoice = macVoice
         self.keys = keys
         self.servers = servers
         engines = Dictionary(uniqueKeysWithValues: Engine.allCases.map { ($0, $0.type.init(parts)) })
@@ -45,12 +43,7 @@ final class Voices: ChunkVoices {
     func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping () -> Void) async throws {
         ahead = ahead.filter { $0.value.text == chunk.text }
         let opened = ahead.removeValue(forKey: engine)?.pieces
-        // the mac voice's own way out, until dima's ear picks the one output
-        if engine == .system, !settings().oneOutput {
-            await player.drained()
-            try Task.checkCancellation()
-            await macVoice.speak(chunk, settings(), onFirstWord: onAudio)
-        } else if let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) {
+        if let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) {
             try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline, onAudio: onAudio)
         }
     }

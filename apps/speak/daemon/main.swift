@@ -18,8 +18,7 @@ final class App {
     private(set) lazy var panel = Panel(settings: { [configStore] in configStore.current })
     private lazy var audio = MacAudio()
     private lazy var player = Player(device: audio, log: log)
-    private lazy var macVoice = VoiceOutput(make: MacSynth.init)
-    private lazy var voices = Voices(EngineParts(net: net, mac: MacRender()), player: player, macVoice: macVoice, keys: keys, servers: [.kokoro: kokoro])
+    private lazy var voices = Voices(EngineParts(net: net, mac: MacRender()), player: player, keys: keys, servers: [.kokoro: kokoro])
     private(set) lazy var speaker = makeSpeaker()
     private lazy var presses = PressSequencer(
         grab: Grab(), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, log: log
@@ -53,7 +52,7 @@ final class App {
     }
 
     private func makeSpeaker() -> Speaker {
-        let speaker = Speaker(player: player, macVoice: macVoice, voices: voices, pill: panel, settings: { [configStore] in configStore.current }, log: log)
+        let speaker = Speaker(player: player, voices: voices, pill: panel, settings: { [configStore] in configStore.current }, log: log)
         kokoro.onWarm = { [weak speaker] in speaker?.serverIsWarm(of: .kokoro) }
         audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
         panel.model.onClose = { [panel] in panel.hide() }

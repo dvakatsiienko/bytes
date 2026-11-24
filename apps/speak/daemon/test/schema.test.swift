@@ -30,10 +30,6 @@ enum SchemaTest {
             if let preset = rule["default"] as? Double { rows.append(("\(key) not named", value(key, json()), plain(preset))) }
         }
         rows.append(("an integer is not a half", value("firstAudioMs", json(top: "firstAudioMs", 900.5)), "«firstAudioMs» has the wrong type"))
-        let oneOutput = { (json: String) in "\((try? JSONDecoder().decode(Config.self, from: Data("{\"chain\":{},\"firstAudioMs\":900,\"engines\":{\"system\":{\(json)}}}".utf8)))?[.system].oneOutput as Any)" }
-        rows.append(("one output not named", oneOutput(""), "Optional(\((engine["oneOutput"]?["default"] as? Bool).map { "\($0)" } ?? "?"))"))
-        rows.append(("one output", oneOutput(#""oneOutput":true"#), "Optional(true)"))
-        rows.append(("one output is a yes or a no", oneOutput(#""oneOutput":"yes""#), "nil"))
         rows.append(("favourites are words", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"favourites":[1]}}}"#), "«engines.fish.favourites.Index 0» has the wrong type"))
         rows.append(("a voice's language is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"voice":{"de":"x"}}}}"#), "unknown name «de» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"))
         return check("schema", rows)

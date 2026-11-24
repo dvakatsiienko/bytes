@@ -83,7 +83,7 @@ the build knowledge for speak: the practices, the bar, the architecture calls an
 ## following along
 
 - word timings per source: kokoro computes them in mlx-audio's pipeline but `/v1/audio/speech` drops them (a server patch or in-process use); Speechify speech marks; Cartesia timestamps over SSE; `AVSpeechSynthesizer` range callbacks for the system voice ([pipeline.py](https://github.com/Neywa-Labs/mlx-audio/tree/c4c3cb82f0d53dd3f175aea77eb66238497ad845))
-- speak's system engine is `NSSpeechSynthesizer`, which has no ranges; `AVSpeechSynthesizer` has them ([apple](https://developer.apple.com/documentation/avfaudio/avspeechsynthesizerdelegate/speechsynthesizer(_:willspeakrangeofspeechstring:utterance:)))
+- speak's system engine is `AVSpeechSynthesizer`, which has ranges ([apple](https://developer.apple.com/documentation/avfaudio/avspeechsynthesizerdelegate/speechsynthesizer(_:willspeakrangeofspeechstring:utterance:)))
 - the normalizer changes the text, so keep a span map from spoken offsets back to screen offsets, then place the highlight with `kAXBoundsForRangeParameterizedAttribute` (pattern, no primary source)
 
 ## running it

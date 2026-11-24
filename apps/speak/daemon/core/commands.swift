@@ -24,12 +24,11 @@ struct Status {
     // the read that plays
     let read: Int?
     // the mac voice's way out: «player», the one output, or «synth», macos's own
-    let macVoice: String
     // where the settings are: a rollback reads it to know whether an older daemon looks elsewhere
     let settings: String
 
     var reply: [String: Any] {
-        var reply: [String: Any] = ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused, "macVoice": macVoice, "settings": settings]
+        var reply: [String: Any] = ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused, "settings": settings]
         reply["read"] = read
         return reply
     }

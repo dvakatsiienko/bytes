@@ -21,7 +21,7 @@ struct MacRender: MacVoices {
     func render(_ chunk: Chunk, _ settings: EngineConfig) -> Pieces {
         let utterance = AVSpeechUtterance(string: chunk.text)
         if let voice = systemVoice(for: chunk.lang, settings) {
-            utterance.voice = AVSpeechSynthesisVoice(identifier: voice.rawValue)
+            utterance.voice = AVSpeechSynthesisVoice(identifier: voice)
         } else {
             utterance.prefersAssistiveTechnologySettings = true
         }
@@ -47,6 +47,18 @@ struct MacRender: MacVoices {
             }
         }
     }
+}
+
+// a voice named in the settings wins; otherwise the best installed uk/ru voice, so an enhanced download is picked up
+// with no rebuild. en keeps the Spoken Content voice (siri voice 4), which no voice list exposes
+@MainActor
+private func systemVoice(for lang: Lang, _ settings: EngineConfig) -> String? {
+    if let named = settings.voice(for: lang) { return named }
+    guard lang != .en else { return nil }
+    return AVSpeechSynthesisVoice.speechVoices()
+        .filter { $0.language.hasPrefix(lang.rawValue) }
+        .max { $0.quality.rawValue < $1.quality.rawValue }?
+        .identifier
 }
 
 // one voice's buffers, in its own format, into the player's

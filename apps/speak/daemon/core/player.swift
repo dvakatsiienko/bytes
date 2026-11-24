@@ -24,7 +24,7 @@ protocol AudioDevice: AnyObject {
 }
 
 @MainActor
-final class Player: SpeechOutput {
+final class Player {
     private let device: any AudioDevice
     private let settling: Duration
     private let write: (String) -> Void
@@ -39,7 +39,6 @@ final class Player: SpeechOutput {
     private var dryAt: ContinuousClock.Instant?
 
     var isPlaying: Bool { pending > 0 }
-    var isBusy: Bool { isPlaying }
 
     init(device: any AudioDevice, settling: Duration = .seconds(2), log write: @escaping (String) -> Void) {
         self.device = device

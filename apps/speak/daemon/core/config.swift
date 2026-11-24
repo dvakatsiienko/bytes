@@ -81,8 +81,6 @@ struct EngineConfig: Decodable {
     // playback rate, pitch kept; 1 is the engine's own pace
     var speed: Double = 1
     var gain: Double = 1
-    // the mac voice alone asks it: true plays it through the audio engine, as every other voice; false leaves it to macos
-    var oneOutput = false
 
     func voice(for lang: Lang) -> String? { voice[lang.rawValue] ?? voice["*"] }
 
@@ -102,12 +100,11 @@ struct EngineConfig: Decodable {
         for name in voice.keys where name != "*" { _ = try Config.parse(name, Lang.init) }
         speed = try container.decodeIfPresent(Double.self, forKey: .speed) ?? 1
         gain = try container.decodeIfPresent(Double.self, forKey: .gain) ?? 1
-        oneOutput = try container.decodeIfPresent(Bool.self, forKey: .oneOutput) ?? false
         try inRange("speed", speed, 0.5...3)
         try inRange("gain", gain, 0...4)
     }
 
-    enum CodingKeys: String, CodingKey, CaseIterable { case favourites, model, voice, speed, gain, oneOutput }
+    enum CodingKeys: String, CodingKey, CaseIterable { case favourites, model, voice, speed, gain }
 }
 
 enum ConfigError: Error, CustomStringConvertible {

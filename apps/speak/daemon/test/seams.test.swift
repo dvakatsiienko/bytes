@@ -26,8 +26,8 @@ enum SeamsTest {
         let plain = { (line: String) in ask(line, { _ in }) }
         let settings = #"{"config":{"chain":{"en":["kokoro"]},"firstAudioMs":900},"ok":true,"version":"v2","was":"v1"}"#
         return check("op", [
-            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","paused":false,"read":7,"settings":"at","speaking":true}"#),
-            ("status, nothing playing", ask(#"{"op":"status"}"#) { $0.isSpeaking = false }, #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","paused":false,"settings":"at","speaking":false}"#),
+            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"read":7,"settings":"at","speaking":true}"#),
+            ("status, nothing playing", ask(#"{"op":"status"}"#) { $0.isSpeaking = false }, #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"settings":"at","speaking":false}"#),
             ("voices", plain(#"{"op":"voices"}"#), #"{"engines":[{"gain":true,"id":"elevenlabs","label":"ElevenLabs","languages":["en","uk","ru"],"voices":[]},{"gain":true,"id":"kokoro","label":"Kokoro (local)","languages":["en"],"voices":[]},{"gain":false,"id":"system","label":"macOS voice","languages":["en","uk","ru"],"voices":[{"id":"a","lang":"uk","name":"A"}]},{"gain":true,"id":"fish","label":"Fish","languages":["en","uk","ru"],"voices":[{"id":"f","name":"F"}]},{"gain":true,"id":"gemini","label":"Gemini","languages":["en","uk","ru"],"voices":[]}]}"#),
             ("reload", plain(#"{"op":"reload"}"#), #"{"ok":true} | reload"#),
             ("reload with a bad file", ask(#"{"op":"reload"}"#) { $0.reloadError = "config.json: not readable" }, #"{"error":"config.json: not readable"} | reload"#),
@@ -81,7 +81,7 @@ enum SeamsTest {
             return json.map { String(decoding: $0, as: UTF8.self) } ?? "?"
         }
         let ask = { (answers: Answers, line: String) -> String in
-            raw(answers, line).replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""macVoice":"synth","#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
+            raw(answers, line).replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
         }
         let status = #"{"op":"status"}"#, stop = #"{"op":"stop"}"#
         var rows: [(name: String, got: String, want: String)] = []
@@ -113,7 +113,7 @@ enum SeamsTest {
         for answers in [minute, more] { _ = ask(answers, status) }
         main.isBlocked = true
         rows.append(("a minute's stall in a read: it may still sound", ask(minute, status), #"{… "main":"blocked for 60.0 s","paused":true,"speaking":true}"#))
-        rows.append(("past a minute it is neither speaking nor paused", raw(more, status), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","main":"blocked for 61.0 s","paused":false,"settings":"at","speaking":false}"#))
+        rows.append(("past a minute it is neither speaking nor paused", raw(more, status), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"main":"blocked for 61.0 s","paused":false,"settings":"at","speaking":false}"#))
         recorder.isPaused = false
         main.isBlocked = false
         rows.append(("main answers again after that", ask(more, status), #"{… "paused":false,"speaking":true}"#))
@@ -380,7 +380,7 @@ class Recorder: DaemonCommands {
     var reloadError: String?
     var isSpeaking = true
     var isPaused = false
-    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, macVoice: "synth", settings: "at") }
+    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, settings: "at") }
     func voices(of engine: Engine) -> [Voice] { engine == .system ? [Voice(id: "a", name: "A", lang: .uk)] : engine == .fish ? [Voice(id: "f", name: "F")] : [] }
     func reload() -> String? { calls.append("reload"); return reloadError }
     var refusal: SaveError?

@@ -203,7 +203,7 @@ enum EnginesTest {
             let keys = Keys(run: { try await runner.run($0) }, now: { runner.now }, log: { _ in })
             await keys.load()
             later = runner
-            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, macVoice: VoiceOutput(make: PlantedSynths(calls).make), keys: keys, servers: [.kokoro: KokoroServer(server, net: server, settings: { EngineConfig() }, mayStart: true, log: { _ in })])
+            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, keys: keys, servers: [.kokoro: KokoroServer(server, net: server, settings: { EngineConfig() }, mayStart: true, log: { _ in })])
             do { try await act(voices, net, calls) } catch { calls.made.append("\(error)") }
             await settle()
             rows.append((name, calls.made.filter { !["start", "play", "speed 1.0"].contains($0) }.joined(separator: " | "), want))
@@ -259,16 +259,7 @@ enum EnginesTest {
             net.call = { _ in }
             calls.made.sort()
         }, "ask One. | ask Two. | dropped One.")
-        await row("the mac voice plays for itself until it is told to render", { voices, _, calls in
-            let task = Task { try await say(voices, "One.", .system, calls) }
-            await settle()
-            task.cancel()
-        }, "start One.")
-        await row("the mac voice through the player", { voices, _, calls in
-            var one = named
-            one.oneOutput = true
-            try await voices.speak(chunk("One."), with: .system, settings: { one }, deadline: nil) { calls.made.append("heard") }
-        }, "sound | heard")
+        await row("the mac voice through the player", { voices, _, calls in try await say(voices, "One.", .system, calls) }, "sound | heard")
         await row("each balance is asked with its engine's key and settings", { voices, net, calls in
             net.call = { _ in }
             _ = await voices.balances { engine in

@@ -104,8 +104,6 @@ export interface EngineSettings {
   favourites?: string[];
   gain?: number;
   model?: string;
-  // the mac voice's own: through the daemon's audio engine, or left to macos
-  oneOutput?: boolean;
   speed?: number;
   voice?: Partial<Record<Lang | '*', string>>;
 }

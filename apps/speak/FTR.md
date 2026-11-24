@@ -57,7 +57,7 @@
 - ✅ a voice list opens as a popover and closes on a pick, on Esc, or on a click outside
   - then focus returns to the voice button, which shows ♥ before a favourite
 - ✅ speed and gain sliders per engine, shared by every language
-  - decision: the macOS voice has no gain — its synthesizer cannot go above its own level
+  - decision: the macOS voice has no gain — decided while macos played it itself, which could not go above its own level
 - 🔎 an «i» beside every setting explains it in one line: what it does, which way to move it, a value to try
   - when the user hovers or focuses the «i» beside pill flow
   - then «how fast the wave travels outward. too fast → raise it first. try 70» shows, below the «i»
@@ -234,9 +234,9 @@
 - ⬜ the pill floats while speech plays: its wave, ⏸ / ▶, ■, stick and close
   - then the ⏸ / ▶ button follows the speech, and the pill never takes focus from the app in front
   - and paused, the wave keeps its last shape in grey and the sentence line takes the same grey, the held word on its pad; only stopped is the wave flat (dima, 2026-10-01, merge v1.14)
-- ⬜ the mac voice can play through the one audio output, like every other voice
-  - given `"oneOutput": true` under `engines.system` in the settings file, when the mac voice reads, then it plays through the audio engine: its wave runs on the pill, its gain counts, and it starts no gap after the sentence before
-  - given the key is absent or false, then macos plays it itself, as before; `status` says which in `macVoice`: «player» or «synth»
+- ⬜ the mac voice plays through the one audio output, like every other voice
+  - given the mac voice reads, then its wave runs on the pill, and it starts no gap after the sentence before
+  - decision: the old way out, macos playing it itself, is gone (dima's ear: «sound looks the same, speaking start feels faster, waves forms are visible now»)
 - ⬜ the pill drags anywhere and keeps its spot per display
   - given the pill dragged on one display
   - when speech next plays on that display
@@ -252,7 +252,7 @@
 - 🧭 the pill shows the sentence being read, the spoken word lit, in step with the audio
   - given speech playing through kokoro, elevenlabs or the macOS voice
   - then the pill shows the current sentence with the spoken word lit, in step with the audio
-  - decision: timings come from the engines — kokoro's word timestamps (mlx-audio drops them today), elevenlabs' stream/with-timestamps, the macOS voice's willSpeakWord; whisper alignment only as a last resort (the highlight research, 2026-09-30)
+  - decision: timings come from the engines — kokoro's word timestamps (mlx-audio drops them today), elevenlabs' stream/with-timestamps, the macOS voice's willSpeakRange; whisper alignment only as a last resort (the highlight research, 2026-09-30)
   - decision: the line shows the normalized text, so the lit word matches what is heard; an engine without word timings (kokoro today) gets a char-proportional estimate (dima, 2026-10-01)
 - 🧭 in native apps the spoken word gets a click-through highlight over the source text — an experiment
   - given text read from TextEdit, Notes or Safari

@@ -1,4 +1,4 @@
-// runs one read: each chunk through its candidates, onto the outputs. the engines, the outputs and the pill are handed in
+// runs one read: each chunk through its candidates, onto the player. the engines, the player and the pill are handed in
 import Foundation
 
 // the engines, as a read hears them
@@ -26,12 +26,10 @@ protocol SpeechPill: AnyObject {
 @MainActor
 final class Speaker: ReadTarget {
     private let player: Player
-    private let macVoice: any SpeechOutput
     private let voices: any ChunkVoices
     private let pill: any SpeechPill
     private let saved: () -> Config
     private let write: (String) -> Void
-    private var outputs: [any SpeechOutput] { [player, macVoice] }
     // engine → when it may be tried again; a failure costs its time once, then nothing until the reset
     private var skipUntil: [Engine: Date] = [:]
     // cleared by the engine's next success, so a monthly reset heals itself
@@ -64,9 +62,8 @@ final class Speaker: ReadTarget {
         return result
     }
 
-    init(player: Player, macVoice: any SpeechOutput, voices: any ChunkVoices, pill: any SpeechPill, settings saved: @escaping () -> Config, log write: @escaping (String) -> Void) {
+    init(player: Player, voices: any ChunkVoices, pill: any SpeechPill, settings saved: @escaping () -> Config, log write: @escaping (String) -> Void) {
         self.player = player
-        self.macVoice = macVoice
         self.voices = voices
         self.pill = pill
         self.saved = saved
@@ -79,7 +76,7 @@ final class Speaker: ReadTarget {
     private func happened(_ event: PlaybackEvent) {
         let before = playback
         playback = next(before, event)
-        if playback.isPaused != before.isPaused { outputs.forEach { playback.isPaused ? $0.pause() : $0.resume() } }
+        if playback.isPaused != before.isPaused { playback.isPaused ? player.pause() : player.resume() }
         if playback != before { pill.follow(playback) }
     }
 
@@ -96,7 +93,7 @@ final class Speaker: ReadTarget {
         if isSpeaking { write("read \(reads): stopped") }
         job?.cancel()
         voices.dropAhead()
-        outputs.forEach { $0.stop() }
+        player.stop()
         draft = nil
     }
 
@@ -156,14 +153,14 @@ final class Speaker: ReadTarget {
             // a cloud engine that missed chunk 1's budget never takes over mid-read once audio is playing
             var lead: Engine?
             for (index, chunk) in parts.enumerated() {
-                // the mac voice and kokoro finish a chunk normally even after a stop, so a stopped read ends here
+                // a stopped read ends here
                 if Task.isCancelled { return }
                 write("read \(read): chunk \(index + 1)/\(parts.count)")
                 let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: skipUntil, lead: lead, now: Date())
                 if let server = rendersAhead(engines, lead: lead, isPlaying: player.isPlaying) {
                     voices.openAhead(chunk, with: server, settings: settings(server))
                 }
-                let newBudget = { firstAudioBudgetEnds(isPlaying: self.outputs.contains { $0.isBusy }, firstAudioMs: self.saved().firstAudioMs, now: .now) }
+                let newBudget = { firstAudioBudgetEnds(isPlaying: self.player.isPlaying, firstAudioMs: self.saved().firstAudioMs, now: .now) }
                 var budgetEnds = newBudget()
                 for engine in engines {
                     var isHeard = false
@@ -181,7 +178,7 @@ final class Speaker: ReadTarget {
                             isHeard = true
                             if engine.facts.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
                         }
-                        // the mac voice returns normally from a stop too
+                        // a voice may return normally from a stop
                         if Task.isCancelled { return }
                         outOfQuota[engine] = nil
                         // a cloud voice with nothing to say, «…», leads nothing
