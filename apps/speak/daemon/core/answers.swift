@@ -39,6 +39,13 @@ final class Answers: @unchecked Sendable {
             // a busy main that missed 50 ms is not a stall: the note starts where the watchdog's line does
             if isStatus, var last = lock.withLock({ lastStatus }) {
                 if age > .seconds(2) { last["main"] = note }
+                // every sound is started by main, a sentence at a time: past a minute nothing plays any more, and a
+                // relaunch, which waits for a read to end, is the way out
+                if age > .seconds(60) {
+                    last["speaking"] = false
+                    last["paused"] = false
+                    last["read"] = nil
+                }
                 return reply(last)
             }
             return reply(["error": "main thread \(note), \(request.op) dropped", "main": note])

@@ -6,7 +6,7 @@ enum ChainTest {
     static let start = ContinuousClock.now
 
     static func failures() -> Int {
-        candidateFailures() + firstAudioFailures() + kokoroAheadFailures() + benchFailures() + quotaBodyFailures() + chunkFailures()
+        candidateFailures() + firstAudioFailures() + kokoroWaitFailures() + kokoroAheadFailures() + benchFailures() + quotaBodyFailures() + chunkFailures()
     }
 
     static func candidateFailures() -> Int {
@@ -38,7 +38,7 @@ enum ChainTest {
         let chain: [Engine] = [.fish, .elevenlabs, .kokoro]
         let wait = { (engine: Engine, among: [Engine], lead: Engine?, budget: Int, isPlaying: Bool, passed: Int) in
             firstAudioWait(
-                for: engine, among: among, lead: lead,
+                for: engine, among: among, lead: lead, characters: 40,
                 budgetEnds: firstAudioBudgetEnds(isPlaying: isPlaying, firstAudioMs: budget, now: start),
                 now: start + .milliseconds(passed)
             )
@@ -56,8 +56,22 @@ enum ChainTest {
             ("a non-cloud lead leaves the cloud its budget", wait(.fish, [.kokoro, .fish, .system], .kokoro, 900, false, 300), .atMost(.milliseconds(600))),
             ("audio already playing", wait(.fish, chain, nil, 900, true, 0), .asLongAsItTakes),
             ("audio already playing, a budget of zero", wait(.fish, chain, nil, 0, true, 0), .asLongAsItTakes),
-            ("kokoro has no budget", wait(.kokoro, [.kokoro, .fish], nil, 0, false, 0), .asLongAsItTakes),
+            ("kokoro first gets 3 s, never the budget", wait(.kokoro, [.kokoro, .fish], nil, 900, false, 0), .atMost(.seconds(3))),
+            ("kokoro leading gets 3 s", wait(.kokoro, [.kokoro, .fish], .kokoro, 900, false, 1500), .atMost(.seconds(3))),
+            ("kokoro behind a cloud engine gets 3 s", wait(.kokoro, [.fish, .kokoro, .system], nil, 900, false, 1500), .atMost(.seconds(3))),
+            ("kokoro, a budget of zero", wait(.kokoro, [.kokoro, .fish], nil, 0, false, 0), .atMost(.seconds(3))),
+            ("kokoro last waits as long as it takes", wait(.kokoro, [.fish, .kokoro], nil, 900, false, 1500), .asLongAsItTakes),
+            ("kokoro while audio plays", wait(.kokoro, [.kokoro, .fish], nil, 900, true, 0), .asLongAsItTakes),
             ("the mac voice has no budget", wait(.system, [.system, .fish], nil, 0, false, 0), .asLongAsItTakes),
+        ])
+    }
+
+    static func kokoroWaitFailures() -> Int {
+        check("kokoro wait", [
+            ("a word", kokoroWait(4), .seconds(3)),
+            ("300 characters", kokoroWait(300), .seconds(3)),
+            ("301", kokoroWait(301), .milliseconds(3010)),
+            ("1200", kokoroWait(1200), .seconds(12)),
         ])
     }
 

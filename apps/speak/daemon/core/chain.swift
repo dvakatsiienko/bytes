@@ -50,10 +50,16 @@ func firstAudioBudgetEnds(isPlaying: Bool, firstAudioMs: Int, now: ContinuousClo
 
 enum FirstAudioWait: Equatable { case asLongAsItTakes, atMost(Duration), skip }
 
-// the last candidate has nothing to yield to, so it waits as long as it takes; neither does the read's lead — a gap
+// kokoro answers a chunk whole, and a server that hangs never does: 3 s, far over its 0.8 s for 300 characters
+// (24 Nov), and 10 ms for each one past them
+func kokoroWait(_ characters: Int) -> Duration { .milliseconds(3000 + 10 * max(0, characters - 300)) }
+
+// the last candidate has nothing to yield to, so it waits as long as it takes; neither does a cloud lead — a gap
 // between chunks must not hand its voice to the next engine
-func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
-    guard engine.isCloud, engine != candidates.last, engine != lead, let budgetEnds else { return .asLongAsItTakes }
+func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, characters: Int, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
+    guard engine != candidates.last, let budgetEnds else { return .asLongAsItTakes }
+    if engine == .kokoro { return .atMost(kokoroWait(characters)) }
+    guard engine.isCloud, engine != lead else { return .asLongAsItTakes }
     return budgetEnds > now ? .atMost(budgetEnds - now) : .skip
 }
 

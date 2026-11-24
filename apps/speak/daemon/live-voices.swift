@@ -65,7 +65,8 @@ final class LiveVoices: ChunkVoices {
         case .kokoro:
             let prefetched = kokoroPrefetch.flatMap { $0.text == chunk.text ? $0.task : nil }
             kokoroPrefetch = nil
-            let pcm = if let prefetched { try await prefetched.value } else { try await kokoro.pcm(chunk.text, voice: settings().voice(for: .en)) }
+            let voice = settings().voice(for: .en)
+            let pcm = try await answer(of: prefetched ?? Task { try await kokoro.pcm(chunk.text, voice: voice) }, within: deadline)
             // a render that lands after a stop never reaches the player
             try Task.checkCancellation()
             try player.schedule(pcm, settings())

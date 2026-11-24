@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 enum SpeakerTest {
     static func failures() async -> Int {
-        await readFailures() + playerFailures() + voiceFailures()
+        await readFailures() + playerFailures() + voiceFailures() + deadlineFailures()
     }
 
     static func readFailures() async -> Int {
@@ -18,19 +18,25 @@ enum SpeakerTest {
         }
         let plain = { (_: Stage) in }
         await row("a read, chunk by chunk, then the pill leaves", plain, { $0.read("Hello. Bye.") },
-                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. | «first audio: kokoro N ms» | «read 1: chunk 2/2» | kokoro Bye. | rest | pill -")
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «read 1: chunk 2/2» | kokoro Bye. in 3000 | rest | pill -")
         await row("an engine that fails before its first sound hands the chunk on", { $0.voices.script[.kokoro] = [.fails(EngineError.status(500))] }, { $0.read("Hello. Bye.") },
-                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. | «kokoro skipped: status(500), off for 60 s» | system Hello. | «first audio: system N ms» | «read 1: chunk 2/2» | system Bye. | rest | pill -")
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «kokoro skipped: status(500), off for 60 s» | system Hello. | «first audio: system N ms» | «read 1: chunk 2/2» | system Bye. | rest | pill -")
+        await row("an engine that fails after its first sound ends the chunk: no second voice reads it", { $0.voices.script[.kokoro] = [.failsMidChunk(EngineError.status(500))] }, { $0.read("Hello. Bye.") },
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «kokoro skipped: status(500), off for 60 s» | «read 1: chunk 2/2» | system Bye. | rest | pill -")
+        await row("a stream that says «cancelled» on its own ends no read", { $0.voices.script[.kokoro] = [.fails(CancellationError())] }, { $0.read("Hello.") },
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: timeout» | system Hello. | «first audio: system N ms» | rest | pill -")
+        await row("nothing is opened ahead in a language the engine does not lead", { $0.chain = [.fish, .system] }, { $0.read([Chunk(lang: .en, text: "Hello."), Chunk(lang: .uk, text: "Привіт.")]) },
+                  "pill 1 | «read 1: chunk 1/2» | fish Hello. in 900 | «first audio: fish N ms» | «read 1: chunk 2/2» | system Привіт. | «voice switch: fish → system mid-read» | rest | pill -")
         await row("a quota refusal asks the provider", { $0.voices.script[.kokoro] = [.fails(EngineError.quota("14 left"))] }, { $0.read("Hello.") },
-                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | «kokoro skipped: quota(\"14 left\"), off for 3600 s» | system Hello. | «first audio: system N ms» | rest | pill - | quotas")
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: quota(\"14 left\"), off for 3600 s» | system Hello. | «first audio: system N ms» | rest | pill - | quotas")
         await row("kokoro's server gone is started again", { $0.voices.script[.kokoro] = [.fails(URLError(.cannotConnectToHost))] }, { $0.read("Hello.") },
-                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | restart kokoro | «kokoro skipped: URLError, off for 60 s» | system Hello. | «first audio: system N ms» | rest | pill -")
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | restart kokoro | «kokoro skipped: URLError, off for 60 s» | system Hello. | «first audio: system N ms» | rest | pill -")
         await row("every engine fails", { $0.voices.script = [.kokoro: [.fails(EngineError.timeout)], .system: [.fails(EngineError.noVoice)]] }, { $0.read("Hello.") },
-                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | «kokoro skipped: timeout» | system Hello. | «system skipped: noVoice» | rest | pill -")
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: timeout» | system Hello. | «system skipped: noVoice» | rest | pill -")
         await row("a stop while an engine works: nothing after it", { $0.voices.script[.kokoro] = [.waits] }, { await $0.readThen("Hello. Bye.") { $0.silence() } },
-                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. | «read 1: stopped» | drop ahead | stop | mac stop | pill - | rest")
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «read 1: stopped» | drop ahead | stop | mac stop | pill - | rest")
         await row("a new read cuts the one that plays", { $0.voices.script[.kokoro] = [.waits] }, { await $0.readThen("Hello. Bye.") { $0.read(Stage.chunks("New."), pressed: .now) } },
-                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. | «read 1: stopped» | drop ahead | stop | mac stop | pill 2 | «read 2: chunk 1/1» | kokoro New. | «first audio: kokoro N ms» | rest | pill - | rest")
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «read 1: stopped» | drop ahead | stop | mac stop | pill 2 | «read 2: chunk 1/1» | kokoro New. in 3000 | «first audio: kokoro N ms» | rest | pill - | rest")
         await row("a stop with nothing playing still silences and hides", plain, { $0.speaker.silence() }, "drop ahead | stop | mac stop | leave | rest")
         await row("a cloud engine that streams opens the next chunk ahead", { $0.chain = [.fish, .system] }, { $0.read("Hello. Bye.") },
                   "pill 1 | «read 1: chunk 1/2» | fish Hello. in 900 | «first audio: fish N ms» | ahead fish Bye. | «read 1: chunk 2/2» | fish Bye. | rest | pill -")
@@ -46,23 +52,23 @@ enum SpeakerTest {
             stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig())
         }, "drop ahead | stop | mac stop | pill 1 | «read 1: chunk 1/1» | kokoro Sample. | «kokoro skipped: status(500), off for 60 s» | rest | pill - | rest")
         await row("pause and resume reach both outputs", { $0.voices.script[.kokoro] = [.waits] }, { await $0.readThen("Hello.") { $0.togglePause(); $0.togglePause() } },
-                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | mac resume | pill 1")
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | pause | mac pause | pill 1 paused | mac resume | pill 1")
         await row("a chunk that lands under a pause waits for the resume", { $0.voices.script[.kokoro] = [.waits] }, { stage in
             await stage.readThen("Hello.") { $0.togglePause() }
             try? stage.player.schedule(pcm, EngineConfig())
             stage.calls.append("\(stage.speaker.playback)")
             stage.speaker.togglePause()
-        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | speed 1.0 | start | sound | reading(1, isPaused: true) | play | mac resume | pill 1")
+        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | pause | mac pause | pill 1 paused | speed 1.0 | start | sound | reading(1, isPaused: true) | play | mac resume | pill 1")
         await row("a read over a paused one is not paused", { $0.voices.script[.kokoro] = [.waits, .waits] }, { stage in
             await stage.readThen("Hello.") { $0.togglePause(); $0.read(Stage.chunks("New."), pressed: .now) }
             await settle()
             try? stage.player.schedule(pcm, EngineConfig())
-        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | «read 1: stopped» | drop ahead | stop | mac stop | mac resume | pill 2 | «read 2: chunk 1/1» | kokoro New. | rest | speed 1.0 | start | play | sound")
+        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | pause | mac pause | pill 1 paused | «read 1: stopped» | drop ahead | stop | mac stop | mac resume | pill 2 | «read 2: chunk 1/1» | kokoro New. in 3000 | rest | speed 1.0 | start | play | sound")
         await row("a stop under a pause leaves nothing paused", { $0.voices.script[.kokoro] = [.waits] }, { stage in
             await stage.readThen("Hello.") { $0.togglePause(); $0.silence() }
             await settle()
             try? stage.player.schedule(pcm, EngineConfig())
-        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | «read 1: stopped» | drop ahead | stop | mac stop | mac resume | pill - | rest | speed 1.0 | start | play | sound")
+        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | pause | mac pause | pill 1 paused | «read 1: stopped» | drop ahead | stop | mac stop | mac resume | pill - | rest | speed 1.0 | start | play | sound")
         await row("pause with nothing playing", plain, { $0.speaker.togglePause() }, "")
         let orders = { (act: (Speaker) -> Void) -> Int in
             let stage = Stage()
@@ -107,6 +113,27 @@ enum SpeakerTest {
                 stage.voices.quota = [(.fish, nil)]
                 await stage.speaker.probeQuota()
             }, .fish), "no quota $0"),
+        ])
+    }
+
+    static func deadlineFailures() async -> Int {
+        let outcome = { (deadline: Duration?, work: @escaping @Sendable () async throws -> Int) async -> String in
+            let task = Task { try await work() }
+            do { return "\(try await answer(of: task, within: deadline))" } catch {
+                return "\((error as? URLError)?.code == .timedOut ? "timed out" : "\(error)")\(task.isCancelled ? ", cancelled" : "")"
+            }
+        }
+        let cancelled = Task { try await Task.sleep(for: .seconds(60)); return 1 }
+        let waiter = Task { try await answer(of: cancelled, within: .seconds(60)) }
+        await settle()
+        waiter.cancel()
+        _ = try? await waiter.value
+        return check("deadline", [
+            ("an answer in time", await outcome(.seconds(60)) { 1 }, "1"),
+            ("no deadline", await outcome(nil) { 1 }, "1"),
+            ("too late: the task ends too", await outcome(.milliseconds(10)) { try await Task.sleep(for: .seconds(60)); return 1 }, "timed out, cancelled"),
+            ("a failure of its own", await outcome(.seconds(60)) { throw EngineError.status(500) }, "status(500)"),
+            ("a wait that is cancelled cancels the task", cancelled.isCancelled ? "cancelled" : "runs on", "cancelled"),
         ])
     }
 
@@ -310,10 +337,11 @@ final class Stage {
 
     static func config(_ chain: [Engine]) -> Config {
         let names = chain.map { "\"\($0.rawValue)\"" }.joined(separator: ",")
-        return try! JSONDecoder().decode(Config.self, from: Data(#"{"chain":{"en":[\#(names)]},"firstAudioMs":900,"engines":{}}"#.utf8))
+        return try! JSONDecoder().decode(Config.self, from: Data(#"{"chain":{"en":[\#(names)],"uk":["system"]},"firstAudioMs":900,"engines":{}}"#.utf8))
     }
     static func chunks(_ text: String) -> [Chunk] { text.split(separator: " ").map { Chunk(lang: .en, text: String($0)) } }
-    func read(_ text: String) { speaker.read(Stage.chunks(text), pressed: .now); drop("reload keys") }
+    func read(_ text: String) { read(Stage.chunks(text)) }
+    func read(_ parts: [Chunk]) { speaker.read(parts, pressed: .now); drop("reload keys") }
     func readThen(_ text: String, _ act: (Speaker) -> Void) async {
         read(text)
         await settle()
@@ -323,7 +351,7 @@ final class Stage {
     private func drop(_ call: String) { calls.removeAll { $0 == call } }
 }
 
-enum Step { case plays, waits, fails(Error) }
+enum Step { case plays, waits, fails(Error), failsMidChunk(Error) }
 
 @MainActor
 final class PlantedVoices: ChunkVoices {
@@ -343,6 +371,9 @@ final class PlantedVoices: ChunkVoices {
         switch step {
         case .plays: onAudio()
         case .fails(let error): throw error
+        case .failsMidChunk(let error):
+            onAudio()
+            throw error
         case .waits: try await Task.sleep(for: .seconds(60))
         }
     }

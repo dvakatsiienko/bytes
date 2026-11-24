@@ -169,8 +169,9 @@ final class Speaker: ReadTarget {
                 }
                 let budgetEnds = firstAudioBudgetEnds(isPlaying: outputs.contains { $0.isBusy }, firstAudioMs: saved().firstAudioMs, now: .now)
                 for engine in engines {
+                    var isHeard = false
                     let deadline: Duration?
-                    switch firstAudioWait(for: engine, among: engines, lead: lead, budgetEnds: budgetEnds, now: .now) {
+                    switch firstAudioWait(for: engine, among: engines, lead: lead, characters: chunk.text.count, budgetEnds: budgetEnds, now: .now) {
                     case .skip: continue
                     case .asLongAsItTakes: deadline = nil
                     case .atMost(let wait): deadline = wait
@@ -179,19 +180,19 @@ final class Speaker: ReadTarget {
                         try await voices.speak(chunk, with: engine, settings: { self.settings(engine) }, deadline: deadline) {
                             if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))") }
                             isFirst = false
-                            if engine.streams, parts.indices.contains(index + 1) {
-                                self.voices.openAhead(parts[index + 1], with: engine, settings: self.settings(engine))
-                            }
+                            isHeard = true
+                            if engine.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
                         }
                         outOfQuota[engine] = nil
                         if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
                         lead = engine
                         break
-                    } catch is CancellationError {
-                        return
                     } catch {
                         if Task.isCancelled { return }
-                        handle(error, from: engine)
+                        // a stream cut off by its own deadline can say «cancelled»: the read goes on
+                        handle(error is CancellationError ? EngineError.timeout : error, from: engine)
+                        // a chunk that was heard is never read again by the next engine
+                        if isHeard { break }
                     }
                 }
             }
@@ -203,6 +204,12 @@ final class Speaker: ReadTarget {
             }
         }
         return read
+    }
+
+    // only where the engine goes first on the next chunk too
+    private func openAhead(_ chunk: Chunk, with engine: Engine, only: Engine?) {
+        let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: skipUntil, lead: engine, now: Date())
+        if engines.first == engine { voices.openAhead(chunk, with: engine, settings: settings(engine)) }
     }
 
     private func handle(_ error: Error, from engine: Engine) {

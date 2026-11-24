@@ -75,10 +75,13 @@ enum SeamsTest {
     static func answerFailures() async -> Int {
         let main = PlantedMain(), recorder = Recorder()
         let age = { (seconds: Int) in Answers(commands: { recorder }, mainAge: { .seconds(seconds) }, budget: { _ in 0 }, onMain: main.run) }
-        let ask = { (answers: Answers, line: String) -> String in
+        let raw = { (answers: Answers, line: String) -> String in
             let object = try? JSONSerialization.jsonObject(with: answers.answer(Data(line.utf8)))
             let json = object.flatMap { try? JSONSerialization.data(withJSONObject: $0, options: .sortedKeys) }
-            return (json.map { String(decoding: $0, as: UTF8.self) } ?? "?").replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
+            return json.map { String(decoding: $0, as: UTF8.self) } ?? "?"
+        }
+        let ask = { (answers: Answers, line: String) -> String in
+            raw(answers, line).replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
         }
         let status = #"{"op":"status"}"#, stop = #"{"op":"stop"}"#
         var rows: [(name: String, got: String, want: String)] = []
@@ -99,6 +102,15 @@ enum SeamsTest {
         rows.append(("main stalled: its last status, with the note", ask(stalled, status), #"{… "main":"blocked for 3.0 s","paused":false,"speaking":true}"#))
         rows.append(("main stalled: another op is dropped", ask(stalled, stop), #"{"error":"main thread blocked for 3.0 s, stop dropped","main":"blocked for 3.0 s"}"#))
         main.isBlocked = false
+        recorder.isSpeaking = true
+        let minute = age(60), more = age(61)
+        for answers in [minute, more] { _ = ask(answers, status) }
+        main.isBlocked = true
+        rows.append(("a minute's stall in a read: it may still sound", ask(minute, status), #"{… "main":"blocked for 60.0 s","paused":false,"speaking":true}"#))
+        rows.append(("past a minute it plays no more", raw(more, status), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"main":"blocked for 61.0 s","paused":false,"settings":"at","speaking":false}"#))
+        main.isBlocked = false
+        rows.append(("main answers again after that", ask(more, status), #"{… "paused":false,"speaking":true}"#))
+        recorder.isSpeaking = false
         rows.append(("main answers again: the new status", ask(stalled, status), #"{… "paused":false,"speaking":false}"#))
         rows.append(("a stop does not become the last status", ask(stalled, stop), #"{"ok":true}"#))
         main.isBlocked = true
