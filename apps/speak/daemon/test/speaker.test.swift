@@ -457,7 +457,7 @@ final class Stage {
         voices.player = player
         speaker = Speaker(
             player: player, voices: voices, pill: PlantedPill(call),
-            settings: { [weak self] in Stage.config(self?.chain ?? [], self?.budget ?? 900) }, log: { call("«\($0)»") }
+            settings: { [weak self] in Stage.config(self?.chain ?? [], self?.budget ?? 900) }, toChunks: { spokenChunks(of: $0) }, log: { call("«\($0)»") }
         )
     }
 

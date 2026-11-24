@@ -226,6 +226,11 @@
   - given selected text holding a path, a file link, a pid, a git hash or a long id
   - when the user presses F4
   - then the voice says «exa dot md» for `docs/test-drive/exa.md`, «a markdown file link», «pid», «a commit», «an id» — never a full path or the digits
+- ⬜ a word is taught in a file, with no rebuild
+  - makes: nothing; `~/Library/Application Support/speak/word-lists.json` is dima's own, absent until he writes one
+  - given `{"words": {"speechify": "speech if I"}, "letters": ["rtk"]}` in it, when the next press reads «rtk in Speechify», then the voice says «R T K in speech if I», and every word that ships is said as before
+  - given its `units`, `fileKinds` or `copyOnlyApps` (bundle ids whose selection comes by ⌘C), then they add to what ships, and what it says of a word that ships wins
+  - given a bad edit, then the log says why once and the last good lists stay; given the file gone, then what ships is back
 - ✅ selected lines read as sentences
   - given several selected lines with no end punctuation
   - when the user presses F4

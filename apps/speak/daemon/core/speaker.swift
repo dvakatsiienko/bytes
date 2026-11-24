@@ -29,6 +29,7 @@ final class Speaker: ReadTarget {
     private let voices: any ChunkVoices
     private let pill: any SpeechPill
     private let saved: () -> Config
+    private let toChunks: (String) -> [Chunk]
     private let write: (String) -> Void
     // engine → when it may be tried again; a failure costs its time once, then nothing until the reset
     private var skipUntil: [Engine: Date] = [:]
@@ -63,11 +64,12 @@ final class Speaker: ReadTarget {
         return result
     }
 
-    init(player: Player, voices: any ChunkVoices, pill: any SpeechPill, settings saved: @escaping () -> Config, log write: @escaping (String) -> Void) {
+    init(player: Player, voices: any ChunkVoices, pill: any SpeechPill, settings saved: @escaping () -> Config, toChunks: @escaping (String) -> [Chunk], log write: @escaping (String) -> Void) {
         self.player = player
         self.voices = voices
         self.pill = pill
         self.saved = saved
+        self.toChunks = toChunks
         self.write = write
     }
 
@@ -104,7 +106,7 @@ final class Speaker: ReadTarget {
         cut()
         draft = (engine, settings)
         skipUntil[engine] = nil
-        return speak(chunks(normalize(text)), only: engine, pressed: .now)
+        return speak(toChunks(text), only: engine, pressed: .now)
     }
 
     var isSpeaking: Bool { playback != .idle }

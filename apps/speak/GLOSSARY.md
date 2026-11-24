@@ -19,6 +19,7 @@
 - **pill** — the small floating window x-speak shows while it speaks: its wave, ⏸ / ▶, ■, stick and close; it keeps its spot per display
 - **pill glide** — how long the pill's bars take to reach a new level, in ms (`meterGlideMs`)
 - **pill flow** — how long the pill's wave holds before moving one bar outward, in ms (`meterFlowMs`)
+- **word lists** — the words, letters, units, file kinds and ⌘C-only apps a read treats their own way: what ships in `core/word-lists.swift`, and dima's `word-lists.json` beside the settings file over it
 - **settings file** — dima's knobs on this mac, `~/Library/Application Support/speak/config.json`; the daemon alone writes it
 - **settings version** — the mark of the settings file's bytes; a save names the one it edits, and is refused when the file moved on
 - **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with

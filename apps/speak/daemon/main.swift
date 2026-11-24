@@ -11,6 +11,7 @@ final class App {
     let arguments: Arguments
     let paths: Paths
     let configStore: ConfigStore
+    let wordLists: WordListStore
     let keys: Keys
     let net = LiveNet()
     let kokoro: KokoroServer
@@ -20,10 +21,11 @@ final class App {
     private lazy var player = Player(device: audio, log: log)
     private lazy var voices = Voices(EngineParts(net: net, mac: MacRender()), player: player, keys: keys, servers: [.kokoro: kokoro])
     private(set) lazy var speaker = makeSpeaker()
+    private lazy var toChunks = { [wordLists] in spokenChunks(of: $0, wordLists.current) }
     private lazy var presses = PressSequencer(
-        grab: Grab(), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, log: log
+        grab: Grab(copyOnlyApps: { [wordLists] in wordLists.current.copyOnlyApps }), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, toChunks: toChunks, log: log
     )
-    private lazy var commands = SocketCommands(speaker: speaker, voices: voices, panel: panel, configStore: configStore)
+    private lazy var commands = SocketCommands(speaker: speaker, voices: voices, panel: panel, configStore: configStore, toChunks: toChunks)
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })
     private let heartbeat = Heartbeat()
     private lazy var control = Control(
@@ -37,6 +39,7 @@ final class App {
         self.paths = paths
         let configStore = ConfigStore(URL(fileURLWithPath: arguments.settings(paths)))
         self.configStore = configStore
+        wordLists = WordListStore(URL(fileURLWithPath: paths.wordLists))
         keys = Keys(run: arguments.keysRunPath.map { script in { try await runWithKeys(script, $0) } }, log: log)
         kokoro = KokoroServer(KokoroProcess(paths: paths), net: net, settings: { configStore.current[.kokoro] }, mayStart: arguments.mayStartKokoro, log: log)
     }
@@ -52,7 +55,7 @@ final class App {
     }
 
     private func makeSpeaker() -> Speaker {
-        let speaker = Speaker(player: player, voices: voices, pill: panel, settings: { [configStore] in configStore.current }, log: log)
+        let speaker = Speaker(player: player, voices: voices, pill: panel, settings: { [configStore] in configStore.current }, toChunks: toChunks, log: log)
         kokoro.onWarm = { [weak speaker] in speaker?.serverIsWarm(of: .kokoro) }
         audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
         panel.model.onClose = { [panel] in panel.hide() }
@@ -69,7 +72,7 @@ final class App {
             let speaker = speaker
             await keys.load()
             if only == nil || only == .kokoro { await kokoro.warm() }
-            speaker.speak(chunks(normalize(arguments.text.joined(separator: " "))), only: only, pressed: .now)
+            speaker.speak(toChunks(arguments.text.joined(separator: " ")), only: only, pressed: .now)
             while speaker.isSpeaking { try? await Task.sleep(for: .milliseconds(50)) }
             exit(0)
         }

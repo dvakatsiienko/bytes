@@ -10,10 +10,6 @@ struct Run: Equatable {
     var text: String
 }
 
-private let letterAcronyms: Set = ["api", "cli", "css", "html", "mcp", "npm", "pnpm", "pr", "sdk", "ssh", "tts", "ui", "url", "ux"]
-private let wordAcronyms = ["json": "jason", "sql": "sequel", "yaml": "yammel"]
-private let units = ["gb": "gigabytes", "s": "seconds", "hz": "hertz", "kb": "kilobytes", "khz": "kilohertz", "mb": "megabytes", "ms": "milliseconds", "px": "pixels"]
-private let fileKinds = ["htm": "html", "md": "markdown", "txt": "text"]
 private let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 private func spell(_ letters: String) -> String { letters.uppercased().map(String.init).joined(separator: " ") }
@@ -59,14 +55,14 @@ private func stripMarkdown(_ text: String) -> String {
     return sub(t, "(?<=\\S)(?<![.!?…;:,.][»”\"'’)*\\]]{0,2})(?<![({}\\[«“→|/&+=<\\-–—])[ \\t]*\\r?\\n", ".\n")
 }
 
-private func rewriteLatin(_ text: String) -> String {
+private func rewriteLatin(_ text: String, _ lists: WordLists) -> String {
     var t = text
     // ids carry nothing a listener can use: a file link names its kind, a hash, a uuid, a long token or a pid number is cut
     t = sub(t, "\\bfile://\\S*?(?:\\.(\\w+))?(?=[.,;:!?)]*(?:\\s|$))", .caseInsensitive) { g in
-        let kind = fileKinds[g[1].lowercased()] ?? g[1].lowercased()
+        let kind = lists.fileKinds[g[1].lowercased()] ?? g[1].lowercased()
         guard let first = kind.first else { return "a file link" }
         // «an html», «a pdf», «a markdown»: a kind read letter by letter takes its article from the letter's name
-        let isSpelled = letterAcronyms.contains(kind) || !kind.contains(where: "aeiou".contains)
+        let isSpelled = lists.letters.contains(kind) || !kind.contains(where: "aeiou".contains)
         return ((isSpelled ? "aefhilmnorsx" : "aeiou").contains(first) ? "an " : "a ") + kind + " file link"
     }
     t = sub(t, "\\bhttps?://(?:www\\.)?([^/\\s)]+)\\S*", "$1", .caseInsensitive)
@@ -89,7 +85,8 @@ private func rewriteLatin(_ text: String) -> String {
         if g[0].hasPrefix("v") { return "version " + parts.joined(separator: " point ") }
         return parts.count > 2 ? parts.joined(separator: " point ") : g[0]
     }
-    t = sub(t, "(\\d)\\s?(khz|hz|ms|kb|mb|gb|px|s)\\b", .caseInsensitive) { g in "\(g[1]) \(units[g[2].lowercased()]!)" }
+    let units = lists.units.keys.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern).joined(separator: "|")
+    t = sub(t, "(\\d)\\s?(\(units))\\b", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" }
     // a path says only its last part; a bare «audio/video» is two words, not a path
     t = sub(t, "(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*") { g in
         let parts = g[0].split(separator: "/").filter { !["~", ".", ".."].contains($0) }
@@ -108,8 +105,7 @@ private func rewriteLatin(_ text: String) -> String {
     t = sub(t, "#(\\d+)", "number $1")
     return sub(t, "\\b[A-Za-z]+\\b") { g in
         let lower = g[0].lowercased()
-        if letterAcronyms.contains(lower) { return spell(lower) }
-        return wordAcronyms[lower] ?? g[0]
+        return lists.words[lower] ?? (lists.letters.contains(lower) ? spell(lower) : g[0])
     }
 }
 
@@ -188,8 +184,8 @@ private func unglueLists(_ text: String) -> String {
     return t
 }
 
-func normalize(_ text: String) -> [Run] {
+func normalize(_ text: String, _ lists: WordLists = .shipped) -> [Run] {
     splitRuns(stripMarkdown(unglueLists(text)))
-        .map { Run(lang: $0.lang, text: rewriteSymbols($0.lang == .en ? rewriteLatin($0.text) : $0.text)) }
+        .map { Run(lang: $0.lang, text: rewriteSymbols($0.lang == .en ? rewriteLatin($0.text, lists) : $0.text)) }
         .filter { !$0.text.isEmpty }
 }

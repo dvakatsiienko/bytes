@@ -29,14 +29,16 @@ final class PressSequencer {
     private let grab: any SelectionGrab
     private let target: any ReadTarget
     private let refreshSettings: () -> Void
+    private let toChunks: (String) -> [Chunk]
     private let write: (String) -> Void
     // two ⌘C grabs at once read each other's restored clipboard, so each waits for the one before it
     private var lastGrab: Task<Void, Never>?
 
-    init(grab: any SelectionGrab, target: any ReadTarget, refreshSettings: @escaping () -> Void, log write: @escaping (String) -> Void) {
+    init(grab: any SelectionGrab, target: any ReadTarget, refreshSettings: @escaping () -> Void, toChunks: @escaping (String) -> [Chunk], log write: @escaping (String) -> Void) {
         self.grab = grab
         self.target = target
         self.refreshSettings = refreshSettings
+        self.toChunks = toChunks
         self.write = write
     }
 
@@ -61,7 +63,7 @@ final class PressSequencer {
             return
         }
         let grabbed = elapsed(pressed)
-        let parts = chunks(normalize(text ?? ""))
+        let parts = toChunks(text ?? "")
         guard !parts.isEmpty else {
             write("press: nothing selected (grab \(via) \(grabbed))\(target.isSpeaking ? " → pause / resume" : "")")
             target.togglePause()

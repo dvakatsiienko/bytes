@@ -8,8 +8,8 @@ struct Paths {
 
     // dima's knobs; the folder is this mac's own, outside every repo
     var settings: String { support + "/config.json" }
-    // the pronunciation and app word lists
-    var wordLists: String { support + "/word-lists" }
+    // dima's words and apps over what ships
+    var wordLists: String { support + "/word-lists.json" }
     var controlSocket: String { state + "/control.sock" }
     var kokoroServer: String { home + "/.local/bin/mlx_audio.server" }
     // kokoro makes a logs/ folder in the one it starts in

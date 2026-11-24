@@ -3,9 +3,9 @@ import Carbon.HIToolbox
 
 @MainActor
 final class Grab: SelectionGrab {
-    // apps whose accessibility focus is a different element from the selection: Slack reports its message box, empty,
-    // while the selected text sits in the message list (36 «nothing selected» presses, 2026-10-01)
-    private static let copyOnlyApps: Set<String> = ["com.tinyspeck.slackmacgap"]
+    private let copyOnlyApps: () -> Set<String>
+
+    init(copyOnlyApps: @escaping () -> Set<String>) { self.copyOnlyApps = copyOnlyApps }
 
     var isTrusted: Bool { AXIsProcessTrusted() }
 
@@ -13,7 +13,7 @@ final class Grab: SelectionGrab {
     // from accessibility is trusted as «nothing selected»: the ⌘C fallback waits ~300 ms for a copy that never comes,
     // and that wait was the delay on every pause / resume (dima, 2026-09-29)
     func selection() async -> (text: String?, via: String) {
-        if let id = NSWorkspace.shared.frontmostApplication?.bundleIdentifier, Self.copyOnlyApps.contains(id) {
+        if let id = NSWorkspace.shared.frontmostApplication?.bundleIdentifier, copyOnlyApps().contains(id) {
             return (await copy(), "⌘C")
         }
         // electron and chromium build their accessibility tree only when asked; the flag is per app and idempotent

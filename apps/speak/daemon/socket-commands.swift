@@ -7,12 +7,14 @@ final class SocketCommands: DaemonCommands {
     private let voices: Voices
     private let panel: Panel
     private let configStore: ConfigStore
+    private let toChunks: (String) -> [Chunk]
 
-    init(speaker: Speaker, voices: Voices, panel: Panel, configStore: ConfigStore) {
+    init(speaker: Speaker, voices: Voices, panel: Panel, configStore: ConfigStore, toChunks: @escaping (String) -> [Chunk]) {
         self.speaker = speaker
         self.voices = voices
         self.panel = panel
         self.configStore = configStore
+        self.toChunks = toChunks
     }
 
     func status() -> Status {
@@ -36,6 +38,8 @@ final class SocketCommands: DaemonCommands {
     func wave(on: Bool, glide: Double?, flow: Double?) -> String? { panel.wave(on: on, glide: glide, flow: flow) }
     func hidePill() { panel.hide() }
     func blockMain(for seconds: Double) { DispatchQueue.main.async { Thread.sleep(forTimeInterval: seconds) } }
+
+    func chunks(of text: String) -> [Chunk] { toChunks(text) }
 
     func read(_ parts: [Chunk]) {
         configStore.refresh()

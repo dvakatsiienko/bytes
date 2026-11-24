@@ -138,7 +138,7 @@ enum SeamsTest {
         let press = { (setup: (PlantedGrab, PlantedRead) -> Void, key: (PressSequencer) async -> Void) -> String in
             let grab = PlantedGrab(), read = PlantedRead(Calls())
             setup(grab, read)
-            let sequencer = PressSequencer(grab: grab, target: read, refreshSettings: { read.calls.append("refresh") }, log: { line in
+            let sequencer = PressSequencer(grab: grab, target: read, refreshSettings: { read.calls.append("refresh") }, toChunks: { spokenChunks(of: $0) }, log: { line in
                 read.calls.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
             })
             await key(sequencer)
@@ -177,7 +177,7 @@ enum SeamsTest {
         let row = { (name: String, setup: (SlowGrab, PlantedRead) -> Void, act: (PressSequencer, SlowGrab, PlantedRead) async -> Void, want: String) in
             let calls = Calls(), grab = SlowGrab(calls), read = PlantedRead(calls)
             setup(grab, read)
-            let presses = PressSequencer(grab: grab, target: read, refreshSettings: {}, log: { line in
+            let presses = PressSequencer(grab: grab, target: read, refreshSettings: {}, toChunks: { spokenChunks(of: $0) }, log: { line in
                 calls.made.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
             })
             await act(presses, grab, read)
@@ -381,6 +381,7 @@ class Recorder: DaemonCommands {
     var isSpeaking = true
     var isPaused = false
     func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, settings: "at") }
+    func chunks(of text: String) -> [Chunk] { spokenChunks(of: text) }
     func voices(of engine: Engine) -> [Voice] { engine == .system ? [Voice(id: "a", name: "A", lang: .uk)] : engine == .fish ? [Voice(id: "f", name: "F")] : [] }
     func reload() -> String? { calls.append("reload"); return reloadError }
     var refusal: SaveError?

@@ -50,6 +50,7 @@ protocol DaemonCommands: AnyObject {
     func wave(on: Bool, glide: Double?, flow: Double?) -> String?
     func hidePill()
     func blockMain(for seconds: Double)
+    func chunks(of text: String) -> [Chunk]
     func read(_ parts: [Chunk])
     // the read's number
     func preview(_ text: String, with engine: Engine, settings: EngineConfig?) -> Int
@@ -88,7 +89,7 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
     // a text read as F4 reads a selection: the per-language chain, cutting off whatever plays (a mod's 🔊, FRM-381)
     case "read":
         guard let text = request.text else { return ["error": "read needs text"] }
-        let parts = chunks(normalize(text))
+        let parts = commands.chunks(of: text)
         guard !parts.isEmpty else { return ["error": "read: nothing to say"] }
         commands.read(parts)
     case "preview":
