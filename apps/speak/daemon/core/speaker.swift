@@ -16,10 +16,6 @@ protocol ChunkVoices: AnyObject {
     func restartKokoro()
 }
 
-enum Quota {
-    case left, empty(String, until: Date)
-}
-
 @MainActor
 protocol SpeechPill: AnyObject {
     // a read that begins shows it; one that ends takes it along, unless stick holds it

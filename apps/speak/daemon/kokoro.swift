@@ -1,30 +1,19 @@
 import Foundation
 
 @MainActor
-final class KokoroServer {
+final class LiveKokoro: LocalServer {
     // :7385, clear of chords' worktree daemon on :7383
     nonisolated private static let url = URL(string: "http://127.0.0.1:7385")!
     private let paths: Paths
-    private let mayStart: Bool
     private let voice: () -> String?
-    // a finished warm-up
-    var onWarm: () -> Void = {}
     private var process: Process?
-    private var isWarming = false
 
-    init(paths: Paths, mayStart: Bool, voice: @escaping () -> String?) {
+    init(paths: Paths, voice: @escaping () -> String?) {
         self.paths = paths
-        self.mayStart = mayStart
         self.voice = voice
     }
 
-    // one warm-up at a time
-    func warm() async {
-        guard !isWarming else { return }
-        isWarming = true
-        defer { isWarming = false }
-        if await isReady() { return }
-        guard mayStart else { return }
+    func start() throws {
         let server = Process()
         server.executableURL = URL(fileURLWithPath: paths.kokoroServer)
         server.arguments = ["--host", "127.0.0.1", "--port", String(Self.url.port ?? 7385)]
@@ -36,22 +25,11 @@ final class KokoroServer {
         server.standardOutput = logFile ?? FileHandle.nullDevice
         server.standardError = logFile ?? FileHandle.nullDevice
         server.terminationHandler = { process in log("kokoro: server exited, status \(process.terminationStatus)") }
-        do {
-            try server.run()
-        } catch {
-            log("kokoro: server did not start — \(error)")
-            return
-        }
+        try server.run()
         process = server
-        for _ in 0..<240 where !(await isReady()) { try? await Task.sleep(for: .milliseconds(250)) }
-        guard await isReady() else {
-            log("kokoro: server not answering after 60 s")
-            return
-        }
-        _ = try? await URLSession.shared.data(for: request("Ready.", voice: voice()))
-        onWarm()
-        log("kokoro: warm")
     }
+
+    func speakFirst() async { _ = try? await URLSession.shared.data(for: request("Ready.", voice: voice())) }
 
     nonisolated private func request(_ text: String, voice: String?) -> URLRequest {
         var request = URLRequest(url: Self.url.appending(path: "v1/audio/speech"))
@@ -63,7 +41,7 @@ final class KokoroServer {
         return request
     }
 
-    nonisolated private func isReady() async -> Bool {
+    nonisolated func isReady() async -> Bool {
         var request = URLRequest(url: Self.url.appending(path: "docs"))
         request.timeoutInterval = 1
         return ((try? await URLSession.shared.data(for: request))?.1 as? HTTPURLResponse)?.statusCode == 200

@@ -12,7 +12,8 @@ final class App {
     let paths: Paths
     let configStore: ConfigStore
     let keys: Keys
-    let kokoro: KokoroServer
+    let kokoro: LiveKokoro
+    let kokoroServer: KokoroServer
     // the audio engine and the pill are made once the app runs, so a slow audio device holds up neither the socket nor the keys
     private(set) lazy var panel = Panel(settings: { [configStore] in configStore.current })
     private(set) lazy var speaker = makeSpeaker()
@@ -33,8 +34,9 @@ final class App {
         self.paths = paths
         let configStore = ConfigStore(URL(fileURLWithPath: arguments.settings(paths)))
         self.configStore = configStore
-        keys = Keys(run: arguments.keysRunPath)
-        kokoro = KokoroServer(paths: paths, mayStart: arguments.mayStartKokoro, voice: { configStore.current[.kokoro].voice(for: .en) })
+        keys = Keys(run: arguments.keysRunPath.map { script in { await runWithKeys(script, $0) } }, log: log)
+        kokoro = LiveKokoro(paths: paths, voice: { configStore.current[.kokoro].voice(for: .en) })
+        kokoroServer = KokoroServer(kokoro, mayStart: arguments.mayStartKokoro, log: log)
     }
 
     func start(only: Engine?) {
@@ -52,10 +54,10 @@ final class App {
         let player = Player(device: audio, log: log)
         let speaker = Speaker(
             player: player, macVoice: macVoice,
-            voices: LiveVoices(player: player, macVoice: macVoice, keys: keys, kokoro: kokoro),
+            voices: LiveVoices(player: player, macVoice: macVoice, keys: keys, kokoro: kokoro, kokoroServer: kokoroServer),
             pill: panel, settings: { [configStore] in configStore.current }, log: log
         )
-        kokoro.onWarm = { [weak speaker] in speaker?.kokoroIsWarm() }
+        kokoroServer.onWarm = { [weak speaker] in speaker?.kokoroIsWarm() }
         audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
         panel.model.onClose = { [panel] in panel.hide() }
         panel.model.onPause = { [weak speaker] in speaker?.togglePause() }
@@ -70,7 +72,7 @@ final class App {
         Task {
             let speaker = speaker
             await keys.load()
-            if only == nil || only == .kokoro { await kokoro.warm() }
+            if only == nil || only == .kokoro { await kokoroServer.warm() }
             speaker.speak(chunks(normalize(arguments.text.joined(separator: " "))), only: only, pressed: .now)
             while speaker.isSpeaking { try? await Task.sleep(for: .milliseconds(50)) }
             exit(0)
@@ -82,7 +84,7 @@ final class App {
             let speaker = speaker
             await keys.load()
             await speaker.probeQuota()
-            await kokoro.warm()
+            await kokoroServer.warm()
         }
         control.start()
         heartbeat.start()

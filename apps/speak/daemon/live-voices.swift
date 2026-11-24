@@ -6,27 +6,29 @@ final class LiveVoices: ChunkVoices {
     private let player: Player
     private let macVoice: VoiceOutput
     private let keys: Keys
-    private let kokoro: KokoroServer
+    private let kokoro: LiveKokoro
+    private let kokoroServer: KokoroServer
     private var kokoroPrefetch: (text: String, task: Task<Data, Error>)?
     // the next chunk's request, opened once this one is heard: its first-audio wait (0.5–3 s on fish's free tier)
     // hides behind the audio instead of sitting between two sentences
     private var cloudPrefetch: (engine: Engine, text: String, task: Task<(URLSession.AsyncBytes, URLResponse), Error>)?
 
-    init(player: Player, macVoice: VoiceOutput, keys: Keys, kokoro: KokoroServer) {
+    init(player: Player, macVoice: VoiceOutput, keys: Keys, kokoro: LiveKokoro, kokoroServer: KokoroServer) {
         self.player = player
         self.macVoice = macVoice
         self.keys = keys
         self.kokoro = kokoro
+        self.kokoroServer = kokoroServer
     }
 
     func hasKey(_ engine: Engine) -> Bool { keys[engine] != nil }
     func reloadMissingKeys() { keys.reloadIfMissing() }
-    func restartKokoro() { Task { await kokoro.warm() } }
+    func restartKokoro() { Task { await kokoroServer.warm() } }
 
     func quotas(fish settings: EngineConfig) async -> [(Engine, Quota?)] {
         let elevenKey = keys[.elevenlabs], fishKey = keys[.fish], fishModel = settings.model ?? "s2.1-pro-free"
-        async let eleven = Quota.elevenlabs(key: elevenKey)
-        async let fish = Quota.fish(key: fishKey, model: fishModel)
+        async let eleven = Quota.elevenlabs(key: elevenKey, fetch: fetched)
+        async let fish = Quota.fish(key: fishKey, model: fishModel, fetch: fetched)
         return [(.elevenlabs, await eleven), (.fish, await fish)]
     }
 
@@ -94,3 +96,6 @@ final class LiveVoices: ChunkVoices {
         }
     }
 }
+
+@Sendable
+private func fetched(_ request: URLRequest) async -> Data? { (try? await URLSession.shared.data(for: request))?.0 }
