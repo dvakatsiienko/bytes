@@ -134,11 +134,11 @@ final class Speaker: ReadTarget {
     func probeQuota() async {
         quotaProbedAt = Date()
         probes += 1
-        let mine = probes
+        let mine = probes, known = outOfQuota
         let balances = await voices.balances(settings)
-        // an answer asked for before a refusal says nothing of it
         guard mine == probes else { return }
-        for (engine, balance) in balances {
+        // an answer asked for before a refusal, or before the engine spoke again, says nothing of it
+        for (engine, balance) in balances where outOfQuota[engine] == known[engine] {
             let before = outOfQuota[engine]
             let hold = after(balance, before, now: Date())
             outOfQuota[engine] = hold
@@ -183,8 +183,7 @@ final class Speaker: ReadTarget {
                         }
                         // the mac voice returns normally from a stop too
                         if Task.isCancelled { return }
-                        // a balance asked for before it spoke is older than this
-                        if outOfQuota.removeValue(forKey: engine) != nil { probes += 1 }
+                        outOfQuota[engine] = nil
                         if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
                         lead = engine
                         break
@@ -202,6 +201,8 @@ final class Speaker: ReadTarget {
             await player.drained()
             if !Task.isCancelled {
                 draft = nil
+                // what was asked ahead and never played is for no one
+                voices.dropAhead()
                 player.idle()
                 happened(.ended(read))
             }

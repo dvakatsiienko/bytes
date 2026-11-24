@@ -50,7 +50,7 @@ final class KokoroServer {
         write("kokoro: warm")
     }
 
-    // answers once it is up. one still loading after 60 s is waited for again, never joined by a second
+    // answers once it is up. one still loading is waited for again, never joined by a second
     private func starts() async -> Bool {
         if !server.isRunning {
             do {
@@ -68,7 +68,7 @@ final class KokoroServer {
             }
             try? await Task.sleep(for: pause)
         }
-        write("kokoro: server not answering after 60 s")
+        write("kokoro: server not answering yet")
         return false
     }
 

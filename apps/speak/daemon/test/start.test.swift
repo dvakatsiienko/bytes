@@ -81,8 +81,9 @@ enum StartTest {
             for _ in 0..<200 where calls.made.count < 3 { try? await Task.sleep(for: .milliseconds(5)) }
             await settle()
             await press(keys, runner, 60)
+            calls.made.append("\(runner.asked) still")
             await press(keys, runner, 1)
-        }, "keys: elevenlabs ok, fish missing, gemini ok | held | keys: elevenlabs ok, fish missing, gemini ok | keys: elevenlabs ok, fish missing, gemini ok | 3 asked")
+        }, "keys: elevenlabs ok, fish missing, gemini ok | held | keys: elevenlabs ok, fish missing, gemini ok | 2 still | keys: elevenlabs ok, fish missing, gemini ok | 3 asked")
         await row("no press looks before the first load", { keys, runner, _ in await press(keys, runner, 600) }, "0 asked")
         // every keyed engine of the catalogue counts, however many there are
         let keyed = Engine.allCases.filter(\.isCloud)
@@ -137,11 +138,11 @@ enum StartTest {
             (server.readyAfter, server.wordFails) = (0, true)
             await kokoro.warm()
         }, "say Ready. af_sky | «kokoro: its first word failed — timeout»")
-        await row("one still loading after 60 s is never joined by a second", true, { kokoro, server in
+        await row("one still loading after a minute is never joined by a second", true, { kokoro, server in
             server.readyAfter = 300
             await kokoro.warm()
             await kokoro.warm()
-        }, "start | «kokoro: server not answering after 60 s» | say Ready. af_sky | warm | «kokoro: warm»")
+        }, "start | «kokoro: server not answering yet» | say Ready. af_sky | warm | «kokoro: warm»")
         await row("one that exits ends the wait, and the next warm-up starts another", true, { kokoro, server in
             server.readyAfter = 5
             server.exitsAfter = 2

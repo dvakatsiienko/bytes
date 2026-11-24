@@ -161,7 +161,12 @@ enum EnginesTest {
         }, "sound gain 2.0 | heard")
         await row("stopped before the first sound", "Hi", .seconds(5), { _, _, _ in }, { task, _ in task.cancel() }, "cancelled | stopped")
         await row("stopped in the middle: a piece that lands after it is never heard", "Hi", nil, { line, _, _ in line.yield(pcm) }, { task, line in task.cancel(); line.yield(pcm) }, "sound gain 2.0 | heard | cancelled | stopped")
-        await row("stopped as a piece landed: it is never heard", "Hi", nil, { _, _, _ in }, { task, line in line.yield(pcm); task.cancel() }, "cancelled | stopped")
+        await row("stopped as a piece landed: it is never heard", "Hi", nil, { _, _, _ in }, { task, line in
+            // the line ends when its reader goes, sooner or later
+            line.onTermination = nil
+            line.yield(pcm)
+            task.cancel()
+        }, "stopped")
         await row("stopped as the line ended with nothing", "Hi", nil, { _, _, _ in }, { task, line in line.finish(); task.cancel() }, "stopped")
         await row("stopped, though the line had ended", "Hi", nil, { _, _, _ in }, { task, line in task.cancel(); line.finish() }, "cancelled | stopped")
         // the wait runs from the moment nothing plays
@@ -175,15 +180,13 @@ enum EnginesTest {
 
     static func voicesFailures() async -> Int {
         var rows: [(name: String, got: String, want: String)] = []
-        var mac: VoiceOutput!
         let row = { (name: String, act: @MainActor (Voices, PlantedNet, Calls) async throws -> Void, want: String) in
             let calls = Calls(), net = PlantedNet(body: [Data([1, 2])])
-            mac = VoiceOutput(make: PlantedSynths(calls).make)
             net.call = { line in Task { @MainActor in calls.made.append(line) } }
             let player = Player(device: PlantedAudio { calls.made.append($0) }, settling: .seconds(60), log: { _ in })
             let keys = Keys(run: { _ in "k\0k\0k\0" }, log: { _ in })
             await keys.load()
-            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, macVoice: mac, keys: keys, servers: [:])
+            let voices = Voices(EngineParts(net: net, mac: PlantedMac()), player: player, macVoice: VoiceOutput(make: PlantedSynths(calls).make), keys: keys, servers: [:])
             do { try await act(voices, net, calls) } catch { calls.made.append("\(error)") }
             await settle()
             rows.append((name, calls.made.filter { !["start", "play", "speed 1.0"].contains($0) }.joined(separator: " | "), want))
@@ -214,13 +217,6 @@ enum EnginesTest {
             await settle()
             try await say(voices, "One.", .kokoro, calls)
         }, "ask One. | ask One. | dropped One. | sound | heard")
-        await row("a server's render the cloud beat is for no one, on the next read too", { voices, _, calls in
-            voices.openAhead(chunk("One."), with: .kokoro, settings: named)
-            await settle()
-            try await say(voices, "One.", .fish, calls)
-            calls.made = []
-            try await say(voices, "One.", .kokoro, calls)
-        }, "ask One. | sound | heard")
         await row("the next chunk's look ahead outlives this one, the same words too", { voices, _, calls in
             try await voices.speak(chunk("One."), with: .fish, settings: { named }, deadline: nil) { voices.openAhead(chunk("One."), with: .fish, settings: named) }
             await settle()
@@ -245,17 +241,6 @@ enum EnginesTest {
             await settle()
             net.call = { _ in }
         }, "ask One. | dropped One. | ask Two.")
-        await row("a stopped mac voice's late end leaves the next read what it asked ahead", { voices, _, calls in
-            let task = Task { try await say(voices, "Old.", .system, calls) }
-            await settle()
-            task.cancel()
-            voices.dropAhead()
-            voices.openAhead(chunk("One."), with: .fish, settings: named)
-            await settle()
-            mac.stop()
-            await settle()
-            try await say(voices, "One.", .fish, calls)
-        }, "start Old. | ask One. | stop Old. | sound | heard")
         await row("the mac voice plays for itself until it is told to render", { voices, _, calls in
             let task = Task { try await say(voices, "One.", .system, calls) }
             await settle()

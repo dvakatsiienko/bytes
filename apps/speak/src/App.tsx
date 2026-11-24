@@ -32,6 +32,7 @@ export const App = () => {
     queryKey: ['voices'],
     // a daemon that was away, or too old, is asked again until it names its engines
     refetchInterval: (query) => (query.state.data ? false : 5000),
+    retry: false,
     staleTime: Number.POSITIVE_INFINITY,
   });
   const { playing, status, ...speech } = usePreview();

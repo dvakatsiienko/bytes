@@ -53,9 +53,5 @@ final class Voices: ChunkVoices {
         } else if let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) {
             try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline, onAudio: onAudio)
         }
-        // a stopped read's call can end after the next read asked ahead
-        if Task.isCancelled { return }
-        // the chunk is spoken: what another engine rendered of it is for no one
-        ahead = ahead.filter { $0.key == engine }
     }
 }
