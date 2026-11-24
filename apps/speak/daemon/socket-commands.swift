@@ -14,7 +14,10 @@ final class SocketCommands: DaemonCommands {
     }
 
     func status() -> Status {
-        Status(engines: speaker.health(), isTrusted: AXIsProcessTrusted(), isSpeaking: speaker.isSpeaking, isPaused: speaker.isPaused, settings: configStore.path)
+        Status(
+            engines: speaker.health(), isTrusted: AXIsProcessTrusted(), isSpeaking: speaker.isSpeaking, isPaused: speaker.isPaused, read: speaker.playback.read,
+            macVoice: configStore.current[.system].oneOutput ? "player" : "synth", settings: configStore.path
+        )
     }
 
     func voices() -> [[String: String]] { installedVoices() }
@@ -28,17 +31,16 @@ final class SocketCommands: DaemonCommands {
     func togglePause() { speaker.togglePause() }
     func stop() { speaker.silence() }
     func demoPill() { panel.demo() }
-    func wave(on: Bool, glide: Double?, flow: Double?) { panel.wave(on: on, glide: glide, flow: flow) }
+    func wave(on: Bool, glide: Double?, flow: Double?) -> String? { panel.wave(on: on, glide: glide, flow: flow) }
     func hidePill() { panel.hide() }
     func blockMain(for seconds: Double) { DispatchQueue.main.async { Thread.sleep(forTimeInterval: seconds) } }
 
     func read(_ parts: [Chunk]) {
         configStore.refresh()
-        speaker.stop()
-        speaker.speak(parts, only: nil, pressed: .now)
+        speaker.readGiven(parts)
     }
 
-    func preview(_ text: String, with engine: Engine, settings: EngineConfig?) {
+    func preview(_ text: String, with engine: Engine, settings: EngineConfig?) -> Int {
         speaker.preview(text, with: engine, settings: settings ?? configStore.current[engine])
     }
 }

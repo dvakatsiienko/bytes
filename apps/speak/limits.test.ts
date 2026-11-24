@@ -17,6 +17,7 @@ const ENGINE = {
   favourites: true,
   gain: true,
   model: true,
+  oneOutput: true,
   speed: true,
   voice: true,
 } satisfies Record<keyof EngineSettings, true> &

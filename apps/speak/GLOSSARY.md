@@ -12,6 +12,9 @@
 - **benched** — an engine the daemon skips for a while after a quota, auth or network failure
 - **no quota** — an engine its provider reports out of credits, found by the daemon's quota probe (at start, on a status older than 10 min, right after a refused request); benched until the provider's refill date (elevenlabs) or for an hour (fish's api balance), and cleared when the probe sees credits again or the engine next succeeds
 - **x-speak** — the resident daemon (`daemon/`) that owns the hotkeys (F4 reads, or pauses / resumes with nothing selected; ⇧F4 pauses / resumes; F5 stops), the engines and the settings file
+- **one output** — the daemon's audio engine, which every voice plays through; the mac voice only where `oneOutput` is on
+- **playback** — what the daemon plays: nothing, or one numbered read, running or paused; the pill, the outputs and `status` all read it
+- **read** — one text spoken from its first chunk to its last; each has a number, and `status` names the one that plays
 - **pill** — the small floating window x-speak shows while it speaks: its wave, ⏸ / ▶, ■, stick and close; it keeps its spot per display
 - **pill glide** — how long the pill's bars take to reach a new level, in ms (`meterGlideMs`)
 - **pill flow** — how long the pill's wave holds before moving one bar outward, in ms (`meterFlowMs`)

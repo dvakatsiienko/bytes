@@ -65,7 +65,7 @@
   - given a card's preview is speaking
   - when the user presses ⏸
   - then the speech pauses and the button reads ▶ (resume); ■ stops it, and the card shows ▶ again
-  - the controls also return to ▶ when the speech ends on its own
+  - the controls also return to ▶ when the speech ends on its own, when it never starts, and when another read takes over: the card plays exactly while the daemon names its read
 - ✅ a sample line per language, editable
 - ✅ a status badge per engine: live, benched until a time, no key, or no quota
 - 🧭 each provider card expresses its provider, and the controls read as part of the app
@@ -86,6 +86,8 @@
   - when the user turns on infinite waveform
   - then the pill shows and animates speech-shaped levels, following the unsaved glide and flow as they change
   - and it stops when turned off, when the tab closes, when a real read starts, or after 5 minutes without an update
+  - given only the waveform runs, then the pill's ▶ stays dim: nothing plays
+  - given a read plays, when the user turns it on, then it does not start, the status line says why, and the read keeps its pill
 - 🔎 «pill glide» and «pill flow» tune the pill's wave, each a slider and a number box in ms
   - makes: `meterGlideMs` and `meterFlowMs` in the settings file
   - given the settings row under the header
@@ -94,6 +96,10 @@
   - glide: how long a bar takes to reach a new level (0 jumps). flow: how long the wave holds before moving one bar outward
   - decision: a slider, not a fixed number — dima tuned it by feel over six rounds (70 → 1 ms)
 - ✅ ■ stop ends any speech
+- ⬜ a voice that hangs or breaks off hands over once, and no sentence is read twice
+  - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on what its sentence has left of the first audio budget (kokoro gets more for a sentence over 300 characters); the last of a chain is waited for
+  - given a voice breaks off in the middle of a sentence, then the read goes on with the next sentence, and no other voice starts that one again
+  - given the daemon's main thread stuck for over a minute, then `status` no longer says speaking, so relaunch, rollback and try are open
 - ⬜ the first audio budget, in ms, 100 to 3000
   - given the budget reads 900
   - when the user clears its box, or types 0
@@ -184,6 +190,7 @@
   - given text selected in any app
   - when the user presses F4
   - then the daemon speaks it through the chain for its language, and the pill shows
+  - given two presses before the first one's selection came, then one read starts, the newer one's
   - and a read already playing stops before the new one's first audio, on every engine, with a clean hand-off: no stumble, no second voice
   - decision: Slack grabs with ⌘C, never accessibility — its focused element is the empty message box, not the selection (36 «nothing selected» presses, 2026-10-01); a read costs ~20–50 ms, F4-to-pause with nothing selected waits 300 ms there
   - decision: an empty accessibility answer means «nothing selected» only while something plays (F4 = pause, no wait); idle, F4 tries ⌘C — a selection inside a page's canvas or frame is not the focused element's (Chrome on a claude.ai artifact, 2026-10-01)
@@ -195,6 +202,7 @@
   - given speech playing
   - when the user presses ⇧F4
   - then the speech pauses and the pill's button reads ▶; ⇧F4 again resumes it where it stopped
+  - and nothing sounds until the resume, on any engine, whatever chunk arrives meanwhile; a pause before the first sound holds too
   - decision: pause has two doors — F4 on an empty selection and ⇧F4 always — so a selection left on screen never blocks a pause (dima, 2026-09-30)
 - ⬜ the control socket's `read` reads a given text the way F4 reads a selection
   - given the daemon runs
@@ -205,6 +213,7 @@
   - given a read playing on any engine
   - when the user presses F5
   - then every voice goes silent at once, and none keeps talking
+  - given an F4 whose selection is still being fetched, when the user presses F5, then no read starts
 - ✅ tech text reads as words: a path says its last part, ids are cut
   - given selected text holding a path, a file link, a pid, a git hash or a long id
   - when the user presses F4
@@ -218,6 +227,10 @@
 - ⬜ the pill floats while speech plays: its wave, ⏸ / ▶, ■, stick and close
   - then the ⏸ / ▶ button follows the speech, and the pill never takes focus from the app in front
   - and paused, the wave keeps its last shape in grey and the sentence line takes the same grey, the held word on its pad; only stopped is the wave flat (dima, 2026-10-01, merge v1.14)
+- ⬜ the mac voice can play through the one audio output, like every other voice
+  - given `"oneOutput": true` under `engines.system` in the settings file, when the mac voice reads, then it plays through the audio engine: its wave runs on the pill, its gain counts, and it starts no gap after the sentence before
+  - given the key is absent or false, then macos plays it itself, as before; `status` says which in `macVoice`: «player» or «synth»
+  - decision: the old way out stays until dima's ear says the Spoken Content voice sounds the same
 - ⬜ the pill drags anywhere and keeps its spot per display
   - given the pill dragged on one display
   - when speech next plays on that display

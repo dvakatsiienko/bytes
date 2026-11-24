@@ -8,7 +8,7 @@ enum SeamsTest {
         var failed = opFailures()
         failed += await answerFailures()
         failed += await pressFailures()
-        failed += pillFailures()
+        failed += playbackFailures() + pillFailures()
         failed += meterFailures()
         failed += clockFailures()
         return failed
@@ -26,7 +26,8 @@ enum SeamsTest {
         let plain = { (line: String) in ask(line, { _ in }) }
         let settings = #"{"config":{"chain":{"en":["kokoro"]},"firstAudioMs":900},"ok":true,"version":"v2","was":"v1"}"#
         return check("op", [
-            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"paused":false,"settings":"at","speaking":true}"#),
+            ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","paused":false,"read":7,"settings":"at","speaking":true}"#),
+            ("status, nothing playing", ask(#"{"op":"status"}"#) { $0.isSpeaking = false }, #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","paused":false,"settings":"at","speaking":false}"#),
             ("voices", plain(#"{"op":"voices"}"#), #"{"system":[{"id":"a"}]}"#),
             ("reload", plain(#"{"op":"reload"}"#), #"{"ok":true} | reload"#),
             ("reload with a bad file", ask(#"{"op":"reload"}"#) { $0.reloadError = "config.json: not readable" }, #"{"error":"config.json: not readable"} | reload"#),
@@ -43,13 +44,14 @@ enum SeamsTest {
             ("panel-hide", plain(#"{"op":"panel-hide"}"#), #"{"ok":true} | hide"#),
             ("wave on", plain(#"{"op":"wave","on":true,"glide":30,"flow":55}"#), #"{"ok":true} | wave true 30.0 55.0"#),
             ("wave with nothing named is off", plain(#"{"op":"wave"}"#), #"{"ok":true} | wave false - -"#),
+            ("wave on while a read plays", ask(#"{"op":"wave","on":true}"#) { $0.refusesWave = true }, #"{"error":"the waveform waits: x-speak is reading aloud"} | wave true - -"#),
             ("block-main", plain(#"{"op":"block-main","seconds":2}"#), #"{"ok":true} | block 2.0"#),
             ("block-main with no seconds", plain(#"{"op":"block-main"}"#), #"{"ok":true} | block 5.0"#),
             ("read", plain(#"{"op":"read","text":"Hello. Bye."}"#), #"{"ok":true} | read Hello./Bye."#),
             ("read with no text", plain(#"{"op":"read"}"#), #"{"error":"read needs text"}"#),
             ("read with an empty text", plain(#"{"op":"read","text":""}"#), #"{"error":"read: nothing to say"}"#),
-            ("preview", plain(#"{"op":"preview","engine":"kokoro","text":"Hi","settings":{"gain":2}}"#), #"{"ok":true} | preview kokoro Hi 2.0"#),
-            ("preview on the saved settings", plain(#"{"op":"preview","engine":"kokoro","text":"Hi"}"#), #"{"ok":true} | preview kokoro Hi saved"#),
+            ("preview", plain(#"{"op":"preview","engine":"kokoro","text":"Hi","settings":{"gain":2}}"#), #"{"ok":true,"read":7} | preview kokoro Hi 2.0"#),
+            ("preview on the saved settings", plain(#"{"op":"preview","engine":"kokoro","text":"Hi"}"#), #"{"ok":true,"read":7} | preview kokoro Hi saved"#),
             ("preview of an unknown engine", plain(#"{"op":"preview","engine":"nobody","text":"Hi"}"#), #"{"error":"preview needs engine and text"}"#),
             ("preview with no text", plain(#"{"op":"preview","engine":"kokoro"}"#), #"{"error":"preview needs engine and text"}"#),
             ("an unknown op", plain(#"{"op":"dance"}"#), #"{"error":"unknown op dance"}"#),
@@ -73,10 +75,13 @@ enum SeamsTest {
     static func answerFailures() async -> Int {
         let main = PlantedMain(), recorder = Recorder()
         let age = { (seconds: Int) in Answers(commands: { recorder }, mainAge: { .seconds(seconds) }, budget: { _ in 0 }, onMain: main.run) }
-        let ask = { (answers: Answers, line: String) -> String in
+        let raw = { (answers: Answers, line: String) -> String in
             let object = try? JSONSerialization.jsonObject(with: answers.answer(Data(line.utf8)))
             let json = object.flatMap { try? JSONSerialization.data(withJSONObject: $0, options: .sortedKeys) }
-            return (json.map { String(decoding: $0, as: UTF8.self) } ?? "?").replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "")
+            return json.map { String(decoding: $0, as: UTF8.self) } ?? "?"
+        }
+        let ask = { (answers: Answers, line: String) -> String in
+            raw(answers, line).replacingOccurrences(of: #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"#, with: "{… ").replacingOccurrences(of: #""settings":"at","#, with: "").replacingOccurrences(of: #""macVoice":"synth","#, with: "").replacingOccurrences(of: #""read":7,"#, with: "")
         }
         let status = #"{"op":"status"}"#, stop = #"{"op":"stop"}"#
         var rows: [(name: String, got: String, want: String)] = []
@@ -97,6 +102,22 @@ enum SeamsTest {
         rows.append(("main stalled: its last status, with the note", ask(stalled, status), #"{… "main":"blocked for 3.0 s","paused":false,"speaking":true}"#))
         rows.append(("main stalled: another op is dropped", ask(stalled, stop), #"{"error":"main thread blocked for 3.0 s, stop dropped","main":"blocked for 3.0 s"}"#))
         main.isBlocked = false
+        rows.append(("a status from before an order", ask(busy, status), #"{… "paused":false,"speaking":false}"#))
+        recorder.isSpeaking = true
+        rows.append(("the order", ask(busy, stop), #"{"ok":true}"#))
+        main.isBlocked = true
+        rows.append(("main busy right after it: the status as the order left it", ask(busy, status), #"{… "paused":false,"speaking":true}"#))
+        main.isBlocked = false
+        let minute = age(60), more = age(61)
+        recorder.isPaused = true
+        for answers in [minute, more] { _ = ask(answers, status) }
+        main.isBlocked = true
+        rows.append(("a minute's stall in a read: it may still sound", ask(minute, status), #"{… "main":"blocked for 60.0 s","paused":true,"speaking":true}"#))
+        rows.append(("past a minute it is neither speaking nor paused", raw(more, status), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","main":"blocked for 61.0 s","paused":false,"settings":"at","speaking":false}"#))
+        recorder.isPaused = false
+        main.isBlocked = false
+        rows.append(("main answers again after that", ask(more, status), #"{… "paused":false,"speaking":true}"#))
+        recorder.isSpeaking = false
         rows.append(("main answers again: the new status", ask(stalled, status), #"{… "paused":false,"speaking":false}"#))
         rows.append(("a stop does not become the last status", ask(stalled, stop), #"{"ok":true}"#))
         main.isBlocked = true
@@ -115,7 +136,7 @@ enum SeamsTest {
 
     static func pressFailures() async -> Int {
         let press = { (setup: (PlantedGrab, PlantedRead) -> Void, key: (PressSequencer) async -> Void) -> String in
-            let grab = PlantedGrab(), read = PlantedRead()
+            let grab = PlantedGrab(), read = PlantedRead(Calls())
             setup(grab, read)
             let sequencer = PressSequencer(grab: grab, target: read, refreshSettings: { read.calls.append("refresh") }, log: { line in
                 read.calls.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
@@ -147,17 +168,126 @@ enum SeamsTest {
         rows.append(("⇧F4 while it speaks", await press({ _, read in read.isSpeaking = true }) { $0.pausePressed() }, "«press: ⇧F4 → pause» | toggle"))
         rows.append(("⇧F4 while paused", await press({ _, read in read.isSpeaking = true; read.isPaused = true }) { $0.pausePressed() }, "«press: ⇧F4 → resume» | toggle"))
         rows.append(("F5", await press({ _, _ in }) { $0.stopPressed() }, "silence"))
-        return check("press", rows)
+        return await check("press", rows) + overtakenFailures()
+    }
+
+    // the grab window: every grab waits until the row lets it end
+    static func overtakenFailures() async -> Int {
+        var rows: [(name: String, got: String, want: String)] = []
+        let row = { (name: String, setup: (SlowGrab, PlantedRead) -> Void, act: (PressSequencer, SlowGrab, PlantedRead) async -> Void, want: String) in
+            let calls = Calls(), grab = SlowGrab(calls), read = PlantedRead(calls)
+            setup(grab, read)
+            let presses = PressSequencer(grab: grab, target: read, refreshSettings: {}, log: { line in
+                calls.made.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
+            })
+            await act(presses, grab, read)
+            await settle()
+            rows.append((name, calls.made.joined(separator: " | "), want))
+        }
+        let dropped = "«press: dropped, a newer order came»"
+        let press = { (presses: PressSequencer) in
+            Task { await presses.readPressed() }
+            await settle()
+        }
+        await row("F4 alone", { _, _ in }, { presses, grab, _ in await press(presses); await grab.ends("One.") },
+                  "grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read One.")
+        await row("F5 inside the grab: no read", { _, _ in }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends("One.") },
+                  "grab | silence | ended | " + dropped)
+        await row("two F4 inside the grab: one read, the newer", { _, _ in }, { presses, grab, _ in
+            await press(presses)
+            await press(presses)
+            await grab.ends("One.")
+            await grab.ends("Two.")
+        }, "grab | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Two.")
+        await row("twelve F4 at once: two grabs, one read", { _, _ in }, { presses, grab, _ in
+            for _ in 0..<12 { await press(presses) }
+            await grab.ends("One.")
+            await grab.ends("Twelve.")
+        }, "grab | ended" + String(repeating: " | " + dropped, count: 11) + " | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Twelve.")
+        await row("F4, F5, F4: the last one reads", { _, _ in }, { presses, grab, _ in
+            await press(presses)
+            presses.stopPressed()
+            await press(presses)
+            await grab.ends("One.")
+            await grab.ends("Two.")
+        }, "grab | silence | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Two.")
+        await row("F4 then F5 before ⌘C's try: no ⌘C", { _, _ in }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends(nil) },
+                  "grab | silence | ended | " + dropped)
+        await row("an order from the socket inside the grab", { _, _ in }, { presses, grab, read in await press(presses); _ = read.takeOrder(); await grab.ends("One.") },
+                  "grab | ended | " + dropped)
+        await row("an overtaken F4 on nothing does not pause", { _, read in read.isSpeaking = true }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends(nil) },
+                  "grab | silence | ended | " + dropped)
+        await row("⇧F4 inside the grab pauses what plays, the grab goes on", { _, read in read.isSpeaking = true }, { presses, grab, _ in await press(presses); presses.pausePressed(); await grab.ends("One.") },
+                  "grab | «press: ⇧F4 → pause» | toggle | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read One.")
+        await row("a press with no grant takes its order too", { grab, _ in grab.isTrusted = false }, { presses, _, read in await press(presses); read.calls.append("\(read.order)") },
+                  "«press: accessibility missing — grant \(CommandLine.arguments[0]) in Privacy & Security» | 1")
+        return check("overtaken press", rows)
+    }
+
+    static func playbackFailures() -> Int {
+        let after = { (events: [PlaybackEvent]) in events.reduce(Playback.idle, next) }
+        return check("playback", [
+            ("nothing yet", after([]), .idle),
+            ("a read begins", after([.began(1)]), .reading(1, isPaused: false)),
+            ("paused", after([.began(1), .pausePressed]), .reading(1, isPaused: true)),
+            ("resumed", after([.began(1), .pausePressed, .pausePressed]), .reading(1, isPaused: false)),
+            ("pause with nothing playing", after([.pausePressed]), .idle),
+            ("it ends", after([.began(1), .ended(1)]), .idle),
+            ("it ends paused: nothing is left paused", after([.began(1), .pausePressed, .ended(1), .began(2)]), .reading(2, isPaused: false)),
+            ("a new read over a paused one", after([.began(1), .pausePressed, .began(2)]), .reading(2, isPaused: false)),
+            ("the cut read's late end", after([.began(1), .began(2), .ended(1)]), .reading(2, isPaused: false)),
+            ("the cut read's late end, paused", after([.began(1), .began(2), .pausePressed, .ended(1)]), .reading(2, isPaused: true)),
+            ("a late end after a stop", after([.began(1), .stopped, .ended(1)]), .idle),
+            ("stopped while paused, then the next", after([.began(1), .pausePressed, .stopped, .began(2)]), .reading(2, isPaused: false)),
+            ("a stop with nothing playing", after([.stopped]), .idle),
+        ]) + check("playback says", [
+            ("idle", "\(Playback.idle.read.map(String.init) ?? "-") \(Playback.idle.isPaused)", "- false"),
+            ("reading", "\(Playback.reading(3, isPaused: false).read ?? 0) \(Playback.reading(3, isPaused: false).isPaused)", "3 false"),
+            ("paused", "\(Playback.reading(3, isPaused: true).read ?? 0) \(Playback.reading(3, isPaused: true).isPaused)", "3 true"),
+        ])
     }
 
     static func pillFailures() -> Int {
-        check("pill", [
-            ("nothing plays", pillLook(isSpeaking: false, isPaused: false, hasSignal: false), PillLook(symbol: "play.fill", label: "Nothing playing", isDisabled: true, isMeterRunning: false)),
-            ("it talks", pillLook(isSpeaking: true, isPaused: false, hasSignal: true), PillLook(symbol: "pause.fill", label: "Pause · F4", isDisabled: false, isMeterRunning: true)),
-            ("the mac voice talks", pillLook(isSpeaking: true, isPaused: false, hasSignal: false), PillLook(symbol: "pause.fill", label: "Pause · F4", isDisabled: false, isMeterRunning: false)),
-            ("paused", pillLook(isSpeaking: true, isPaused: true, hasSignal: true), PillLook(symbol: "play.fill", label: "Resume · F4", isDisabled: false, isMeterRunning: false)),
-            ("a signal left over", pillLook(isSpeaking: false, isPaused: false, hasSignal: true), PillLook(symbol: "play.fill", label: "Nothing playing", isDisabled: true, isMeterRunning: false)),
-            ("paused with nothing playing", pillLook(isSpeaking: false, isPaused: true, hasSignal: false), PillLook(symbol: "play.fill", label: "Nothing playing", isDisabled: true, isMeterRunning: false)),
+        let reading = Playback.reading(1, isPaused: false), paused = Playback.reading(1, isPaused: true)
+        let pill = { (steps: (inout PillState) -> Void) -> PillState in
+            var state = PillState()
+            steps(&state)
+            return state
+        }
+        let look = { (steps: (inout PillState) -> Void) -> String in
+            let look = pill(steps).look
+            return "\(look.symbol) \(look.label)\(look.isDisabled ? ", off" : "")\(look.isMeterRunning ? ", meter" : "")"
+        }
+        let idle = "play.fill Nothing playing, off", talks = "pause.fill Pause · F4", held = "play.fill Resume · F4"
+        return check("pill", [
+            ("nothing plays", look { _ in }, idle),
+            ("it talks", look { $0.follow(reading); $0.hasSignal = true }, talks + ", meter"),
+            ("the mac voice talks", look { $0.follow(reading) }, talks),
+            ("paused", look { $0.follow(reading); $0.hasSignal = true; $0.follow(paused) }, held),
+            ("resumed, its signal still counts", look { $0.follow(reading); $0.hasSignal = true; $0.follow(paused); $0.follow(reading) }, talks + ", meter"),
+            ("a signal left over", look { $0.follow(reading); $0.hasSignal = true; $0.follow(.idle) }, idle),
+            ("the next read waits for its own signal", look { $0.follow(reading); $0.hasSignal = true; $0.follow(.reading(2, isPaused: false)) }, talks),
+            ("a pill that left", look { _ = $0.startWave(); $0.hasSignal = true; $0.leave() }, idle),
+            ("the wave alone has no ⏸ to press", look { _ = $0.startWave(); $0.hasSignal = true }, idle + ", meter"),
+            ("the wave before its first level", look { _ = $0.startWave() }, idle),
+            ("the wave is off again", look { _ = $0.startWave(); $0.hasSignal = true; _ = $0.stopWave() }, idle),
+            ("a read over the wave waits for its own signal", look { _ = $0.startWave(); $0.hasSignal = true; $0.follow(reading) }, talks),
+            ("a read over the wave has ended", look { _ = $0.startWave(); $0.follow(reading); $0.follow(.idle); $0.hasSignal = true }, idle),
+            ("a wave over a paused read", look { $0.follow(paused); _ = $0.startWave(); $0.hasSignal = true }, held),
+            ("a sample", look { $0.showSample() }, talks),
+            ("a read over a sample has ended", look { $0.showSample(); $0.follow(reading); $0.follow(.idle) }, idle),
+            ("a sample that left", look { $0.showSample(); $0.leave() }, idle),
+        ]) + check("wave", [
+            ("starts where nothing plays", pill { _ = $0.startWave() }.isWaveOn, true),
+            ("never over a read", pill { $0.follow(reading); _ = $0.startWave() }.isWaveOn, false),
+            ("a read that begins ends it", pill { _ = $0.startWave(); $0.follow(reading) }.isWaveOn, false),
+            ("ends with the pill that leaves", pill { _ = $0.startWave(); $0.leave() }.isWaveOn, false),
+            ("says why it did not start", { var state = pill { $0.follow(reading) }; return state.startWave() != nil }(), true),
+            ("a renewal of one that runs", { var state = pill { _ = $0.startWave() }; return state.startWave(isRenewal: true) == nil }(), true),
+            ("a renewal never starts one", { var state = PillState(); return state.startWave(isRenewal: true) == nil || state.isWaveOn }(), false),
+            ("its end lets the pill leave", { var state = pill { _ = $0.startWave() }; return state.stopWave() }(), true),
+            ("an end under a read leaves the read its pill", { var state = pill { $0.follow(reading) }; return state.stopWave() }(), false),
+            ("an end under a read leaves the read its meter", pill { $0.follow(reading); $0.hasSignal = true; _ = $0.stopWave() }.hasSignal, true),
         ])
     }
 
@@ -249,7 +379,8 @@ class Recorder: DaemonCommands {
     var calls: [String] = []
     var reloadError: String?
     var isSpeaking = true
-    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: false, settings: "at") }
+    var isPaused = false
+    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, macVoice: "synth", settings: "at") }
     func voices() -> [[String: String]] { [["id": "a"]] }
     func reload() -> String? { calls.append("reload"); return reloadError }
     var refusal: SaveError?
@@ -268,12 +399,17 @@ class Recorder: DaemonCommands {
     func togglePause() { calls.append("pause") }
     func stop() { calls.append("stop") }
     func demoPill() { calls.append("demo") }
-    func wave(on: Bool, glide: Double?, flow: Double?) { calls.append("wave \(on) \(glide.map { "\($0)" } ?? "-") \(flow.map { "\($0)" } ?? "-")") }
+    var refusesWave = false
+    func wave(on: Bool, glide: Double?, flow: Double?) -> String? {
+        calls.append("wave \(on) \(glide.map { "\($0)" } ?? "-") \(flow.map { "\($0)" } ?? "-")")
+        return refusesWave ? "the waveform waits: x-speak is reading aloud" : nil
+    }
     func hidePill() { calls.append("hide") }
     func blockMain(for seconds: Double) { calls.append("block \(seconds)") }
     func read(_ parts: [Chunk]) { calls.append("read " + parts.map(\.text).joined(separator: "/")) }
-    func preview(_ text: String, with engine: Engine, settings: EngineConfig?) {
+    func preview(_ text: String, with engine: Engine, settings: EngineConfig?) -> Int {
         calls.append("preview \(engine.rawValue) \(text) \(settings.map { "\($0.gain)" } ?? "saved")")
+        return 7
     }
 }
 
@@ -285,11 +421,46 @@ final class PlantedGrab: SelectionGrab {
     func copy() async -> String? { copied }
 }
 
+// a selection that comes when the row says so
+@MainActor
+final class SlowGrab: SelectionGrab {
+    var isTrusted = true
+    private let calls: Calls
+    private var waiting: [CheckedContinuation<String?, Never>] = []
+    init(_ calls: Calls) { self.calls = calls }
+    func selection() async -> (text: String?, via: String) {
+        calls.made.append("grab")
+        let text = await withCheckedContinuation { waiting.append($0) }
+        calls.made.append("ended")
+        return (text, "ax")
+    }
+    func copy() async -> String? {
+        calls.made.append("copy")
+        return nil
+    }
+    func ends(_ text: String?) async {
+        for _ in 0..<200 where waiting.isEmpty { try? await Task.sleep(for: .milliseconds(5)) }
+        if !waiting.isEmpty { waiting.removeFirst().resume(returning: text) }
+        await settle()
+    }
+}
+
+@MainActor
 final class PlantedRead: ReadTarget {
-    var calls: [String] = []
+    private let log: Calls
+    init(_ log: Calls) { self.log = log }
+    var calls: [String] {
+        get { log.made }
+        set { log.made = newValue }
+    }
     var isSpeaking = false
     var isPaused = false
+    private(set) var order = 0
+    func takeOrder() -> Int {
+        order += 1
+        return order
+    }
     func togglePause() { calls.append("toggle") }
-    func silence() { calls.append("silence") }
-    func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) { calls.append("read " + parts.map(\.text).joined(separator: "/")) }
+    func silence() { _ = takeOrder(); calls.append("silence") }
+    func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) { _ = takeOrder(); calls.append("read " + parts.map(\.text).joined(separator: "/")) }
 }

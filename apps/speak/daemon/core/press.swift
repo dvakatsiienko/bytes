@@ -14,6 +14,9 @@ protocol SelectionGrab: AnyObject {
 protocol ReadTarget: AnyObject {
     var isSpeaking: Bool { get }
     var isPaused: Bool { get }
+    // the last order that decides what plays: a read, a preview or a stop, from a key, the pill or the socket
+    var order: Int { get }
+    func takeOrder() -> Int
     func togglePause()
     // silences every voice, even one no read owns any more, and the pill leaves unless stick holds it
     func silence()
@@ -27,6 +30,8 @@ final class PressSequencer {
     private let target: any ReadTarget
     private let refreshSettings: () -> Void
     private let write: (String) -> Void
+    // two ⌘C grabs at once read each other's restored clipboard, so each waits for the one before it
+    private var lastGrab: Task<Void, Never>?
 
     init(grab: any SelectionGrab, target: any ReadTarget, refreshSettings: @escaping () -> Void, log write: @escaping (String) -> Void) {
         self.grab = grab
@@ -36,21 +41,24 @@ final class PressSequencer {
     }
 
     // F4 reads the selection, cutting off what plays; with nothing selected it pauses / resumes what plays. ⇧F4 is
-    // pause's second door, selection or not (dima, 2026-09-30). F5 stops
+    // pause's second door, selection or not (dima, 2026-09-30). F5 stops. a grab that a newer order overtook is dropped
     func readPressed() async {
         let pressed = ContinuousClock.now
+        let order = target.takeOrder()
         refreshSettings()
         guard grab.isTrusted else {
             write("press: accessibility missing — grant \(CommandLine.arguments[0]) in Privacy & Security")
             return
         }
-        var (text, via) = await grab.selection()
-        // an empty accessibility answer is trusted only while something plays (F4 = pause, no 300 ms ⌘C wait);
-        // idle, F4 means «read», so ⌘C gets a try: a selection inside a canvas or a frame is not the focused
-        // element's (Chrome on a claude.ai artifact, 2026-10-01)
-        if (text ?? "").isEmpty, via == "ax", !target.isSpeaking {
-            text = await grab.copy()
-            via = "ax → ⌘C"
+        let earlier = lastGrab
+        let grabbing = Task {
+            await earlier?.value
+            return target.order == order ? await selection(order) : nil
+        }
+        lastGrab = Task { _ = await grabbing.value }
+        guard let (text, via) = await grabbing.value, target.order == order else {
+            write("press: dropped, a newer order came")
+            return
         }
         let grabbed = elapsed(pressed)
         let parts = chunks(normalize(text ?? ""))
@@ -61,6 +69,15 @@ final class PressSequencer {
         }
         write("press: grab \(via) \(grabbed), normalize \(elapsed(pressed)), \(parts.count) chunks")
         target.read(parts, pressed: pressed)
+    }
+
+    private func selection(_ order: Int) async -> (text: String?, via: String) {
+        let (text, via) = await grab.selection()
+        // an empty accessibility answer is trusted only while something plays (F4 = pause, no 300 ms ⌘C wait);
+        // idle, F4 means «read», so ⌘C gets a try: a selection inside a canvas or a frame is not the focused
+        // element's (Chrome on a claude.ai artifact, 2026-10-01)
+        guard (text ?? "").isEmpty, via == "ax", !target.isSpeaking, target.order == order else { return (text, via) }
+        return (await grab.copy(), "ax → ⌘C")
     }
 
     // ⇧F4: pause / resume what plays, whatever is selected

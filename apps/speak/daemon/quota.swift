@@ -1,8 +1,6 @@
 import Foundation
 
-enum Quota {
-    case left, empty(String, until: Date)
-
+extension Quota {
     // needs the key's «User» permission (user_read); a key without it answers 401 and the card keeps its last state
     static func elevenlabs(key: String?) async -> Quota? {
         guard let key else { return nil }
