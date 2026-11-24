@@ -28,7 +28,7 @@ enum SeamsTest {
         return check("op", [
             ("status", plain(#"{"op":"status"}"#), #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","paused":false,"read":7,"settings":"at","speaking":true}"#),
             ("status, nothing playing", ask(#"{"op":"status"}"#) { $0.isSpeaking = false }, #"{"accessibility":true,"engines":{"kokoro":{"state":"live"}},"macVoice":"synth","paused":false,"settings":"at","speaking":false}"#),
-            ("voices", plain(#"{"op":"voices"}"#), #"{"system":[{"id":"a"}]}"#),
+            ("voices", plain(#"{"op":"voices"}"#), #"{"engines":[{"gain":true,"id":"elevenlabs","label":"ElevenLabs","languages":["en","uk","ru"],"voices":[]},{"gain":true,"id":"kokoro","label":"Kokoro (local)","languages":["en"],"voices":[]},{"gain":false,"id":"system","label":"macOS voice","languages":["en","uk","ru"],"voices":[{"id":"a","lang":"uk","name":"A"}]},{"gain":true,"id":"fish","label":"Fish","languages":["en","uk","ru"],"voices":[{"id":"f","name":"F"}]},{"gain":true,"id":"gemini","label":"Gemini","languages":["en","uk","ru"],"voices":[]}]}"#),
             ("reload", plain(#"{"op":"reload"}"#), #"{"ok":true} | reload"#),
             ("reload with a bad file", ask(#"{"op":"reload"}"#) { $0.reloadError = "config.json: not readable" }, #"{"error":"config.json: not readable"} | reload"#),
             ("config", plain(#"{"op":"config"}"#), settings + " | config"),
@@ -381,7 +381,7 @@ class Recorder: DaemonCommands {
     var isSpeaking = true
     var isPaused = false
     func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, macVoice: "synth", settings: "at") }
-    func voices() -> [[String: String]] { [["id": "a"]] }
+    func voices(of engine: Engine) -> [Voice] { engine == .system ? [Voice(id: "a", name: "A", lang: .uk)] : engine == .fish ? [Voice(id: "f", name: "F")] : [] }
     func reload() -> String? { calls.append("reload"); return reloadError }
     var refusal: SaveError?
     private func settings(_ call: String) throws -> SavedSettings {

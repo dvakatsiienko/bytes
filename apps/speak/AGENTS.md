@@ -28,6 +28,7 @@ alone writes it, re-reads it on the next F4 after a hand edit, and names its pat
 new mac copies there and the tests load: an edit of it changes nothing dima hears.
 
 - **a rule lives in `daemon/core/`, what touches the mac lives beside it**: the core imports Foundation alone, the tests build all of it by glob, and `App` in `main.swift` makes every part and hands it what it needs. `daemon:test` fails on another import there, on a module-level value anywhere but a private constant of the core's, and on a place on this mac named outside `core/paths.swift`
+- **an engine is its file and its catalogue lines**: `core/engine-<id>.swift` holds what it asks, what it renders, its voices and its balance, `core/engine.swift` its case and its line in `type`; the read path names no engine. a voice id enters a list after a real call answered 200: a library voice answers 402 on a restricted key
 - **the mac voice has two ways out until dima's ear picks one**: `engines.system.oneOutput` true renders it into the player (`mac-render.swift`), false, the default, leaves it to macos (`mac-voice.swift`); `status` says which in `macVoice`
 - **the settings' shape, ranges and defaults are `contract/config.schema.json`'s**: the page reads its numbers from it, and the swift test drives each name, bound and default in it through the decoder; a new setting lands in the schema first
 - **the binary lives outside every repo**: `pnpm --filter speak daemon:build` tests, compiles, signs with «x-speak local signing» and installs to `~/.local/libexec/x-speak/x-speak`, the path its Accessibility grant is given to; it never touches launchd. `pnpm --filter speak daemon:relaunch` restarts the job onto it, and refuses while the daemon is speaking
@@ -51,6 +52,4 @@ new mac copies there and the tests load: an edit of it changes nothing dima hear
 - **a worktree's server never saves the live settings**: it plays through the live daemon, and takes a save only when started with a fake daemon's socket, `pnpm admin <socket>`
 - **the api answers to localhost's own names alone**: another page can point its name at 127.0.0.1 and pass as same-origin
 - **every write to the api carries `content-type: application/json`**, or the server answers 415: that header is what keeps another web page from driving the daemon; a `curl -X PUT` needs `-H 'content-type: application/json'`
-- the voice lists are data in `admin.ts`, each id proven by a real call (elevenlabs premades on the restricted key,
-  kokoro on the warm server); a library voice answers 402 on a restricted key
 - **the swift tests run only on the mac**: `pnpm --filter speak daemon:test`, run by lefthook on a commit under `daemon/` or `script/`; bytes' linux ci runs no swift

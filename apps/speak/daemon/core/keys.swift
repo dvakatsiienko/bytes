@@ -22,8 +22,8 @@ final class Keys {
     func load() async {
         guard let run else { return }
         loadedAt = now()
-        let names: [(Engine, String)] = [(.elevenlabs, "ELEVENLABS_API_KEY"), (.fish, "FISH_API_KEY"), (.gemini, "GEMINI_API_KEY")]
-        let output = await run("printf '%s\\0%s\\0%s' " + names.map { "\"$\($0.1)\"" }.joined(separator: " "))
+        let names = Engine.allCases.compactMap { engine in engine.facts.keyName.map { (engine, $0) } }
+        let output = await run("printf '%s\\0' " + names.map { "\"${\($0.1)}\"" }.joined(separator: " "))
         for (value, (engine, _)) in zip(output.split(separator: "\0", omittingEmptySubsequences: false), names) where !value.isEmpty {
             values[engine] = String(value)
         }

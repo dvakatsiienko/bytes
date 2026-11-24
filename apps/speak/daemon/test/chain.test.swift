@@ -6,7 +6,7 @@ enum ChainTest {
     static let start = ContinuousClock.now
 
     static func failures() -> Int {
-        candidateFailures() + firstAudioFailures() + kokoroWaitFailures() + kokoroAheadFailures() + benchFailures() + quotaBodyFailures() + chunkFailures()
+        candidateFailures() + firstAudioFailures() + kokoroWaitFailures() + kokoroAheadFailures() + benchFailures() + refusalNoteFailures() + quotaBodyFailures() + chunkFailures()
     }
 
     static func candidateFailures() -> Int {
@@ -70,22 +70,22 @@ enum ChainTest {
 
     static func kokoroWaitFailures() -> Int {
         check("kokoro wait", [
-            ("a word", kokoroWait(4), .seconds(3)),
-            ("300 characters", kokoroWait(300), .seconds(3)),
-            ("301", kokoroWait(301), .milliseconds(3010)),
-            ("1200", kokoroWait(1200), .seconds(12)),
+            ("a word", localServerWait(4), .seconds(3)),
+            ("300 characters", localServerWait(300), .seconds(3)),
+            ("301", localServerWait(301), .milliseconds(3010)),
+            ("1200", localServerWait(1200), .seconds(12)),
         ])
     }
 
     static func kokoroAheadFailures() -> Int {
         check("kokoro ahead", [
-            ("a cloud engine first, kokoro behind it", rendersKokoroAhead([.fish, .kokoro], lead: nil, isPlaying: false), true),
-            ("kokoro not among the candidates", rendersKokoroAhead([.fish, .system], lead: nil, isPlaying: false), false),
-            ("kokoro itself first", rendersKokoroAhead([.kokoro, .fish], lead: nil, isPlaying: false), false),
-            ("the mac voice first", rendersKokoroAhead([.system, .kokoro], lead: nil, isPlaying: false), false),
-            ("a lead is set", rendersKokoroAhead([.fish, .kokoro], lead: .fish, isPlaying: false), false),
-            ("audio already playing", rendersKokoroAhead([.fish, .kokoro], lead: nil, isPlaying: true), false),
-            ("no candidate", rendersKokoroAhead([], lead: nil, isPlaying: false), false),
+            ("a cloud engine first, kokoro behind it", rendersAhead([.fish, .kokoro], lead: nil, isPlaying: false), .kokoro),
+            ("kokoro not among the candidates", rendersAhead([.fish, .system], lead: nil, isPlaying: false), nil),
+            ("kokoro itself first", rendersAhead([.kokoro, .fish], lead: nil, isPlaying: false), nil),
+            ("the mac voice first", rendersAhead([.system, .kokoro], lead: nil, isPlaying: false), nil),
+            ("a lead is set", rendersAhead([.fish, .kokoro], lead: .fish, isPlaying: false), nil),
+            ("audio already playing", rendersAhead([.fish, .kokoro], lead: nil, isPlaying: true), nil),
+            ("no candidate", rendersAhead([], lead: nil, isPlaying: false), nil),
         ])
     }
 
@@ -93,31 +93,40 @@ enum ChainTest {
         let seconds = { (error: Error) in bench(for: error, from: .elevenlabs).seconds }
         let effects = { (error: Error, engine: Engine) in
             let decision = bench(for: error, from: engine)
-            return "\(decision.quota ?? "-") \(decision.restartsKokoro) \(decision.mayEndFishFreeTier)"
+            return "\(decision.quota ?? "-") \(decision.restartsServer)"
         }
         return check("bench", [
             ("no key", seconds(EngineError.noKey), nil),
             ("no voice", seconds(EngineError.noVoice), nil),
             ("timeout", seconds(EngineError.timeout), nil),
+            ("no sound", seconds(EngineError.noSound), nil),
+            ("404", seconds(EngineError.status(404)), 60),
             ("401", seconds(EngineError.status(401)), 3600),
             ("402", seconds(EngineError.status(402)), 3600),
             ("403", seconds(EngineError.status(403)), 3600),
             ("429", seconds(EngineError.status(429)), 3600),
-            ("400", seconds(EngineError.status(400)), 60),
-            ("422", seconds(EngineError.status(422)), 60),
+            ("400", seconds(EngineError.status(400)), nil),
+            ("422", seconds(EngineError.status(422)), nil),
             ("500", seconds(EngineError.status(500)), 60),
             ("no status", seconds(EngineError.status(0)), 60),
             ("offline", seconds(URLError(.notConnectedToInternet)), 60),
             ("a quota refusal", seconds(EngineError.quota("14 left")), 3600),
         ]) + check("bench effect", [
-            ("a quota refusal carries the provider's words", effects(EngineError.quota("14 left"), .elevenlabs), "14 left false false"),
-            ("kokoro's server gone", effects(URLError(.cannotConnectToHost), .kokoro), "- true false"),
-            ("kokoro slow", effects(URLError(.timedOut), .kokoro), "- false false"),
-            ("a cloud host gone", effects(URLError(.cannotConnectToHost), .fish), "- false false"),
-            ("fish 402", effects(EngineError.status(402), .fish), "- false true"),
-            ("fish 429", effects(EngineError.status(429), .fish), "- false true"),
-            ("fish 401", effects(EngineError.status(401), .fish), "- false false"),
-            ("elevenlabs 429", effects(EngineError.status(429), .elevenlabs), "- false false"),
+            ("a quota refusal carries the provider's words", effects(EngineError.quota("14 left"), .elevenlabs), "14 left false"),
+            ("kokoro's server gone", effects(URLError(.cannotConnectToHost), .kokoro), "- true"),
+            ("kokoro slow", effects(URLError(.timedOut), .kokoro), "- false"),
+            ("a cloud host gone", effects(URLError(.cannotConnectToHost), .fish), "- false"),
+        ])
+    }
+
+    static func refusalNoteFailures() -> Int {
+        let note = { (engine: Engine, status: Int, model: String?) in engine.type.refusalNote(status: status, model: model) ?? "-" }
+        let said = { (words: String) in "⚠️ FISH REFUSED \(words): the free tier may have ended; the chain falls through for an hour; check fish.audio" }
+        return check("refusal note", [
+            ("fish 402", note(.fish, 402, nil), said("s2.1-pro-free (402)")),
+            ("fish 429, another model", note(.fish, 429, "s2.1-pro"), said("s2.1-pro (429)")),
+            ("fish 401", note(.fish, 401, nil), "-"),
+            ("elevenlabs 429", note(.elevenlabs, 429, nil), "-"),
         ])
     }
 

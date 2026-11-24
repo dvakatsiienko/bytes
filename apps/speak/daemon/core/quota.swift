@@ -1,38 +1,40 @@
-// what is left at a provider, read from its own balance call; `fetch` is the net
+// what is left at a provider, and how long its refusal holds
 import Foundation
 
-enum Quota {
-    case left, empty(String, until: Date)
+struct Balance: Equatable {
+    // credits or dollars; infinite where the model draws on none
+    let left: Double
+    var refills: Date?
+    // what the card says when it is too little for a sentence
+    var empty: String?
 }
 
-// the answer's body
-typealias Fetch = @Sendable (URLRequest) async -> Data?
+func jsonObject(_ request: URLRequest, _ net: any Net) async -> [String: Any]? {
+    (try? await net.whole(request)).flatMap { try? JSONSerialization.jsonObject(with: $0.body) as? [String: Any] }
+}
 
-extension Quota {
-    // needs the key's «User» permission (user_read); a key without it answers 401 and the card keeps its last state
-    static func elevenlabs(key: String?, fetch: Fetch) async -> Quota? {
-        guard let key else { return nil }
-        var request = URLRequest(url: URL(string: "https://api.elevenlabs.io/v1/user/subscription")!)
-        request.setValue(key, forHTTPHeaderField: "xi-api-key")
-        guard let data = await fetch(request),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let used = json["character_count"] as? Int, let limit = json["character_limit"] as? Int,
-              let reset = json["next_character_count_reset_unix"] as? Double else { return nil }
-        // a sentence costs 30–200 credits, so under 100 left a press fails more often than it plays
-        guard limit - used < 100 else { return .left }
-        let refill = Date(timeIntervalSince1970: reset)
-        return .empty("\(limit - used) of \(limit) credits left, refills \(refill.formatted(.dateTime.month(.abbreviated).day()))", until: refill)
-    }
+// an engine out of quota: what its card says, and when it may be tried again
+struct QuotaHold: Equatable {
+    let note: String
+    let until: Date
+    // what was left when it held, once a balance told it
+    var left: Double?
+    var refills: Date?
+}
 
-    // the free model draws on no balance; a paid one spends the pay-as-you-go api credit, which has no refill date
-    static func fish(key: String?, model: String, fetch: Fetch) async -> Quota? {
-        guard model.hasSuffix("-free") == false else { return .left }
-        guard let key else { return nil }
-        var request = URLRequest(url: URL(string: "https://api.fish.audio/wallet/self/api-credit")!)
-        request.setValue("Bearer \(key)", forHTTPHeaderField: "authorization")
-        guard let data = await fetch(request),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let credit = (json["credit"] as? String).flatMap(Double.init) else { return nil }
-        return credit > 0 ? .left : .empty("api balance $0 — top up at fish.audio", until: Date().addingTimeInterval(3600))
+// the refusal knows no refill date
+func refused(_ note: String, now: Date) -> QuotaHold { QuotaHold(note: note, until: now.addingTimeInterval(3600)) }
+
+// a balance lifts a hold once it grew or the refill passed: 150 left refuse a sentence of 203 again and again
+func after(_ balance: Balance, _ hold: QuotaHold?, now: Date) -> QuotaHold? {
+    if let empty = balance.empty {
+        return QuotaHold(note: empty, until: balance.refills ?? now.addingTimeInterval(3600), left: balance.left, refills: balance.refills)
     }
+    guard var hold else { return nil }
+    if let refills = hold.refills, refills <= now { return nil }
+    guard let left = hold.left else {
+        (hold.left, hold.refills) = (balance.left, balance.refills)
+        return hold
+    }
+    return balance.left > left ? nil : hold
 }

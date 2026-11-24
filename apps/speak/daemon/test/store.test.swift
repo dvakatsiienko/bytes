@@ -62,7 +62,7 @@ enum StoreTest {
             ("a voice taken out", save(#"{"engines":{"elevenlabs":{"voice":{"en":null}}}}"#, at), "-        \"*\": \"EXAVITQu4vr4xnSDxMaL\", -        \"en\": \"cgSgspJ2msm6clMCkdW9\" +        \"*\": \"EXAVITQu4vr4xnSDxMaL\""),
             ("the value it has", save(#"{"firstAudioMs":900}"#, at), ""),
             ("out of range", save(#"{"firstAudioMs":0}"#, at), refused + "firstAudioMs 0 is out of range (100–3000)"),
-            ("an unknown engine", save(#"{"chain":{"en":["koko"]}}"#, at), refused + "unknown name «koko» — engines: elevenlabs, fish, kokoro, system, gemini; languages: en, uk, ru"),
+            ("an unknown engine", save(#"{"chain":{"en":["koko"]}}"#, at), refused + "unknown name «koko» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"),
             ("a wrong type", save(#"{"engines":{"fish":{"gain":"loud"}}}"#, at), refused + "«engines.fish.gain» has the wrong type"),
             ("a required key taken out", save(#"{"chain":null}"#, at), refused + "missing «chain»"),
             ("no patch", save(nil, at), "the save names no change"),

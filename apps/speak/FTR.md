@@ -78,7 +78,8 @@
   - and the daemon benches it until that refill date, so a press never waits on its refusal
   - given fish runs a paid model and its api balance is $0 → fish reads «no quota» the same way, benched for an hour
   - decision: quiet, not red — the chain already skips it; dima found the red line «a bit too much» (2026-09-29)
-  - and the state clears when the probe sees credits again, or after the engine's next success
+  - given the provider refuses a sentence over its balance, with credits left (150 for a sentence of 203), then the engine sits out an hour, and the badge keeps the provider's words while the balance stays the same
+  - and the state clears when the probe sees more credits than at the refusal, when the refill date passed, or after the engine's next success
   - decision: the chain already falls through on a quota refusal; the card only has to make it visible (dima, 2026-09-29)
 - ✅ the header shows the daemon's accessibility state and whether it is speaking
 - 🔎 «infinite waveform» plays the pill's wave with no voice, to tune glide and flow by eye
@@ -98,6 +99,8 @@
 - ✅ ■ stop ends any speech
 - ⬜ a voice that hangs or breaks off hands over once, and no sentence is read twice
   - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on what its sentence has left of the first audio budget (kokoro gets more for a sentence over 300 characters); the last of a chain is waited for
+  - given a cloud voice refuses one sentence (a 400 or a 422), or answers it with no sound, then the next voice reads that sentence, and the next one asks it again
+  - given gemini sits before another voice in a chain and has no sound within the first audio budget, then that voice reads the sentence, as for every cloud voice
   - given a voice breaks off in the middle of a sentence, then the read goes on with the next sentence, and no other voice starts that one again
   - given the daemon's main thread stuck for over a minute, then `status` no longer says speaking, so relaunch, rollback and try are open
 - ⬜ the first audio budget, in ms, 100 to 3000

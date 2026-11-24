@@ -36,7 +36,7 @@ enum SchemaTest {
         rows.append(("one output", oneOutput(#""oneOutput":true"#), "Optional(true)"))
         rows.append(("one output is a yes or a no", oneOutput(#""oneOutput":"yes""#), "nil"))
         rows.append(("favourites are words", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"favourites":[1]}}}"#), "«engines.fish.favourites.Index 0» has the wrong type"))
-        rows.append(("a voice's language is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"voice":{"de":"x"}}}}"#), "unknown name «de» — engines: elevenlabs, fish, kokoro, system, gemini; languages: en, uk, ru"))
+        rows.append(("a voice's language is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"voice":{"de":"x"}}}}"#), "unknown name «de» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"))
         return check("schema", rows)
     }
 

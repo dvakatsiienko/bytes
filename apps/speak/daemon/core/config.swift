@@ -1,14 +1,6 @@
 // config.json: dima's knobs, as the daemon reads them. its one reader and writer is config-store.swift
 import Foundation
 
-enum Engine: String, CaseIterable {
-    case elevenlabs, fish, kokoro, system, gemini
-
-    var isCloud: Bool { self != .kokoro && self != .system }
-    var streams: Bool { self == .elevenlabs || self == .fish }
-    func speaks(_ lang: Lang) -> Bool { self != .kokoro || lang == .en }
-}
-
 struct Config: Decodable {
     // per language, tried in order; an engine that fails or runs out of quota is skipped silently
     let chain: [Lang: [Engine]]
@@ -69,7 +61,7 @@ struct Config: Decodable {
     static let fallback = Config(
         chain: [.en: [.kokoro, .system], .uk: [.system], .ru: [.system]],
         firstAudioMs: 500,
-        engines: [.kokoro: EngineConfig(voice: ["en": "af_heart"], gain: 1.9)],
+        engines: [.kokoro: EngineConfig(gain: 1.9)],
     )
 
     enum CodingKeys: String, CodingKey, CaseIterable { case chain, firstAudioMs, meterGlideMs, meterFlowMs, engines }

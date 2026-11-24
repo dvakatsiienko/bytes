@@ -47,6 +47,11 @@ done
 app; plant 'import Foundation\nprivate func at(_ p: Paths) { try? FileManager.default.createDirectory(atPath: p.settings, withIntermediateDirectories: true) }'; run
 is 'a folder made at one of the paths passes' 0 "$code"
 
+app; plant 'protocol Planted {\n    static var planted: Int { get }\n}'; run
+is 'what a protocol of the core asks for passes' 0 "$code"
+app; plant 'enum Planted {\n    static var planted: Int { 1 }\n}'; run
+is 'a static var with a body fails the run' 1 "$code"
+
 app; plant 'enum Planted { static let planted: Int = "a word" }'; run
 is 'a core file with a wrong type fails the run' 1 "$code"
 says 'a core file with a wrong type is named' 'Planted.swift'

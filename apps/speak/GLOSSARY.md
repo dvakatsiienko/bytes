@@ -1,6 +1,7 @@
 # speak — glossary
 
 - **engine** — a way to turn text into speech: elevenlabs, kokoro, fish, gemini, or the macOS voice
+- **catalogue** — the daemon's list of its engines: each one's label, languages and voices
 - **chain** — one language's engines in the order the daemon tries them; a failing engine hands the line to the next
 - **voice** — the speaker an engine uses, chosen per language
 - **favourite** — a voice marked ♥ for an engine; favourites sort first in that engine's list; the daemon writes them on a heart, and no read asks them
@@ -10,7 +11,7 @@
 - **preview** — the daemon speaking a sample line with a card's unsaved settings
 - **first audio budget** — how long a cloud engine may take to start speaking before the chain moves on
 - **benched** — an engine the daemon skips for a while after a quota, auth or network failure
-- **no quota** — an engine its provider reports out of credits, found by the daemon's quota probe (at start, on a status older than 10 min, right after a refused request); benched until the provider's refill date (elevenlabs) or for an hour (fish's api balance), and cleared when the probe sees credits again or the engine next succeeds
+- **no quota** — an engine its provider reports out of credits, found by the daemon's quota probe (at start, on a status older than 10 min, right after a refused request); benched until the provider's refill date (elevenlabs) or for an hour (fish's api balance), and cleared when the probe sees more than at the refusal, once the refill passed, or when the engine next succeeds
 - **x-speak** — the resident daemon (`daemon/`) that owns the hotkeys (F4 reads, or pauses / resumes with nothing selected; ⇧F4 pauses / resumes; F5 stops), the engines and the settings file
 - **one output** — the daemon's audio engine, which every voice plays through; the mac voice only where `oneOutput` is on
 - **playback** — what the daemon plays: nothing, or one numbered read, running or paused; the pill, the outputs and `status` all read it

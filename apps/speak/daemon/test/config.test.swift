@@ -20,7 +20,7 @@ enum ConfigTest {
         } }
         let voice = { (voices: String, lang: Lang) in answer(file(engines: #"{"fish":{"voice":\#(voices)}}"#)) { $0[.fish].voice(for: lang) ?? "-" } }
         let range = { (field: String, value: String) in "\(field) \(value) is out of range (\(field == "speed" ? "0.5–3" : "0–4"))" }
-        let unknown = { (name: String) in "unknown name «\(name)» — engines: elevenlabs, fish, kokoro, system, gemini; languages: en, uk, ru" }
+        let unknown = { (name: String) in "unknown name «\(name)» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru" }
         return check("config decode", [
             ("an engine with nothing named", knobs("{}"), "- 1.0 1.0"),
             ("an engine with everything named", knobs(#"{"model":"s2","speed":1.5,"gain":2}"#), "s2 1.5 2.0"),
@@ -49,10 +49,10 @@ enum ConfigTest {
         let names = { (holds: (Engine) -> Bool) in Engine.allCases.filter(holds).map(\.rawValue).joined(separator: " ") }
         return check("engine table", [
             ("cloud", names { $0.isCloud }, "elevenlabs fish gemini"),
-            ("streams", names { $0.streams }, "elevenlabs fish"),
-            ("speaks english", names { $0.speaks(.en) }, "elevenlabs fish kokoro system gemini"),
-            ("speaks ukrainian", names { $0.speaks(.uk) }, "elevenlabs fish system gemini"),
-            ("speaks russian", names { $0.speaks(.ru) }, "elevenlabs fish system gemini"),
+            ("streams", names { $0.facts.streams }, "elevenlabs fish"),
+            ("speaks english", names { $0.speaks(.en) }, "elevenlabs kokoro system fish gemini"),
+            ("speaks ukrainian", names { $0.speaks(.uk) }, "elevenlabs system fish gemini"),
+            ("speaks russian", names { $0.speaks(.ru) }, "elevenlabs system fish gemini"),
         ])
     }
 
@@ -103,7 +103,7 @@ enum ConfigTest {
             ("english", chain(.en), "kokoro system"),
             ("ukrainian", chain(.uk), "system"),
             ("russian", chain(.ru), "system"),
-            ("the engines", fallback.summary, "kokoro: voice en=af_heart, speed 1.0, gain 1.9"),
+            ("the engines", fallback.summary, "kokoro: voice -, speed 1.0, gain 1.9"),
             ("the knobs", "\(fallback.firstAudioMs) \(fallback.meterGlideMs) \(fallback.meterFlowMs)", "500 30.0 40.0"),
         ])
     }
