@@ -104,7 +104,7 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
 private func entry(_ engine: Engine, _ voices: [Voice]) -> [String: Any] {
     let facts = engine.facts
     return [
-        "id": engine.rawValue, "label": facts.label, "languages": facts.languages.map(\.rawValue), "gain": facts.hasGain,
+        "id": engine.rawValue, "label": facts.label, "languages": facts.languages.map(\.rawValue),
         "voices": voices.map { ["id": $0.id, "name": $0.name].merging($0.lang.map { ["lang": $0.rawValue] } ?? [:]) { one, _ in one } },
     ]
 }

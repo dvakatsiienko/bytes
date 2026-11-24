@@ -16,7 +16,7 @@ import type {
 import { LIMITS, type Limit } from '@/limits.ts';
 
 export const EngineCard = (props: EngineCardProps) => {
-  const { gain: hasGain, id, label } = props.engine;
+  const { id, label } = props.engine;
   const isOn = props.rank !== undefined;
   // a quota refusal fails every preview until the credits come back, so ▶ is locked; the badge says why
   const quotaNote =
@@ -101,17 +101,15 @@ export const EngineCard = (props: EngineCardProps) => {
         step={0.05}
         value={props.settings.speed ?? LIMITS.speed.default}
       />
-      {hasGain && (
-        <Slider
-          info='how loud the voice is. too quiet → raise it. try 1.5'
-          label='gain'
-          limit={LIMITS.gain}
-          name={`${label} gain`}
-          onChange={(value) => props.onSettings({ gain: value })}
-          step={0.1}
-          value={props.settings.gain ?? LIMITS.gain.default}
-        />
-      )}
+      <Slider
+        info='how loud the voice is. too quiet → raise it. try 1.5'
+        label='gain'
+        limit={LIMITS.gain}
+        name={`${label} gain`}
+        onChange={(value) => props.onSettings({ gain: value })}
+        step={0.1}
+        value={props.settings.gain ?? LIMITS.gain.default}
+      />
     </div>
   );
 

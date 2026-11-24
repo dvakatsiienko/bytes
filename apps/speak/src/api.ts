@@ -9,7 +9,6 @@ export const LANGS = [
 // a chain may name an engine newer than the catalogue this page read
 export const entryOf = (engines: EngineEntry[], id: Engine): EngineEntry =>
   engines.find((entry) => entry.id === id) ?? {
-    gain: true,
     id,
     label: id,
     languages: [],
@@ -79,8 +78,6 @@ export type Engine = string;
 
 // an engine as the daemon's catalogue names it
 export interface EngineEntry {
-  // its loudness can be set
-  gain: boolean;
   id: Engine;
   label: string;
   languages: Lang[];

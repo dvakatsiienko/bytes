@@ -2,7 +2,7 @@ import Foundation
 
 struct MacVoice: VoiceEngine {
     // with none named, en is macos's Spoken Content voice, which no voice list exposes, and uk and ru the best installed
-    static let facts = EngineFacts(label: "macOS voice", hasGain: false, voices: Lang.allCases.map {
+    static let facts = EngineFacts(label: "macOS voice", voices: Lang.allCases.map {
         Voice(id: "", name: $0 == .en ? "Spoken Content voice (Siri)" : "best installed", lang: $0)
     })
     private let mac: any MacVoices

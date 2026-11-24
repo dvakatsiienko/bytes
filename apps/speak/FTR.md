@@ -58,7 +58,7 @@
 - ✅ a voice list opens as a popover and closes on a pick, on Esc, or on a click outside
   - then focus returns to the voice button, which shows ♥ before a favourite
 - ✅ speed and gain sliders per engine, shared by every language
-  - decision: the macOS voice has no gain — decided while macos played it itself, which could not go above its own level
+  - given the macOS voice, then its card has both too: it plays through the same player as every voice
 - 🔎 an «i» beside every setting explains it in one line: what it does, which way to move it, a value to try
   - when the user hovers or focuses the «i» beside pill flow
   - then «how fast the wave travels outward. too fast → raise it first. try 70» shows, below the «i»

@@ -29,8 +29,6 @@ struct EngineFacts {
     var streams = false
     // a server on this mac the daemon keeps alive, which answers a chunk whole
     var isLocalServer = false
-    // the page offers its loudness
-    var hasGain = true
     var voices: [Voice] = []
 }
 

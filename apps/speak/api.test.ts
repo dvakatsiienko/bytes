@@ -69,7 +69,6 @@ describe('M13: a failed request is no settings', () => {
 
   it('an engine the catalogue lacks has a bare entry', () => {
     expect(entryOf([], 'speechify')).toEqual({
-      gain: true,
       id: 'speechify',
       label: 'speechify',
       languages: [],
