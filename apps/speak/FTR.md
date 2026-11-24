@@ -186,6 +186,7 @@
   - given text selected in any app
   - when the user presses F4
   - then the daemon speaks it through the chain for its language, and the pill shows
+  - given two presses before the first one's selection came, then one read starts, the newer one's
   - and a read already playing stops before the new one's first audio, on every engine, with a clean hand-off: no stumble, no second voice
   - decision: Slack grabs with ⌘C, never accessibility — its focused element is the empty message box, not the selection (36 «nothing selected» presses, 2026-10-01); a read costs ~20–50 ms, F4-to-pause with nothing selected waits 300 ms there
   - decision: an empty accessibility answer means «nothing selected» only while something plays (F4 = pause, no wait); idle, F4 tries ⌘C — a selection inside a page's canvas or frame is not the focused element's (Chrome on a claude.ai artifact, 2026-10-01)
@@ -207,6 +208,7 @@
   - given a read playing on any engine
   - when the user presses F5
   - then every voice goes silent at once, and none keeps talking
+  - given an F4 whose selection is still being fetched, when the user presses F5, then no read starts
 - ✅ tech text reads as words: a path says its last part, ids are cut
   - given selected text holding a path, a file link, a pid, a git hash or a long id
   - when the user presses F4

@@ -43,6 +43,7 @@ final class Speaker: ReadTarget {
     private var outOfQuota: [Engine: String] = [:]
     private var quotaProbedAt: Date?
     private(set) var playback = Playback.idle
+    private(set) var order = 0
     private var job: Task<Void, Never>?
     // numbers each read: a log line and an ended read name theirs, so two at once show, and an old one ends nothing
     private var reads = 0
@@ -88,7 +89,14 @@ final class Speaker: ReadTarget {
 
     func togglePause() { happened(.pausePressed) }
 
+    @discardableResult
+    func takeOrder() -> Int {
+        order += 1
+        return order
+    }
+
     private func cut() {
+        takeOrder()
         if isSpeaking { write("read \(reads): stopped") }
         job?.cancel()
         voices.dropAhead()
@@ -114,7 +122,7 @@ final class Speaker: ReadTarget {
     }
 
     func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) {
-        if isSpeaking { cut() }
+        if isSpeaking { cut() } else { takeOrder() }
         speak(parts, only: nil, pressed: pressed)
         voices.reloadMissingKeys()
     }

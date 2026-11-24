@@ -48,7 +48,20 @@ enum SpeakerTest {
         await row("pause and resume reach both outputs", { $0.voices.script[.kokoro] = [.waits] }, { await $0.readThen("Hello.") { $0.togglePause(); $0.togglePause() } },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. | pause | mac pause | pill 1 paused | play | mac resume | pill 1")
         await row("pause with nothing playing", plain, { $0.speaker.togglePause() }, "")
-        var failed = check("read", rows)
+        let orders = { (act: (Speaker) -> Void) -> Int in
+            let stage = Stage()
+            act(stage.speaker)
+            return stage.speaker.order
+        }
+        let hello = Stage.chunks("Hello.")
+        var failed = check("read", rows) + check("order", [
+            ("a read takes one", orders { $0.read(hello, pressed: .now) }, 1),
+            ("a read over a read takes one more", orders { $0.read(hello, pressed: .now); $0.read(hello, pressed: .now) }, 2),
+            ("the socket's read", orders { $0.readGiven(hello) }, 1),
+            ("a preview", orders { _ = $0.preview("Hi.", with: .kokoro, settings: EngineConfig()) }, 1),
+            ("a stop with nothing playing", orders { $0.silence() }, 1),
+            ("a pause takes none", orders { $0.read(hello, pressed: .now); $0.togglePause() }, 1),
+        ])
         failed += await healthFailures()
         return failed
     }

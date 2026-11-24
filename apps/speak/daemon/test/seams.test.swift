@@ -117,7 +117,7 @@ enum SeamsTest {
 
     static func pressFailures() async -> Int {
         let press = { (setup: (PlantedGrab, PlantedRead) -> Void, key: (PressSequencer) async -> Void) -> String in
-            let grab = PlantedGrab(), read = PlantedRead()
+            let grab = PlantedGrab(), read = PlantedRead(Calls())
             setup(grab, read)
             let sequencer = PressSequencer(grab: grab, target: read, refreshSettings: { read.calls.append("refresh") }, log: { line in
                 read.calls.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
@@ -149,7 +149,60 @@ enum SeamsTest {
         rows.append(("⇧F4 while it speaks", await press({ _, read in read.isSpeaking = true }) { $0.pausePressed() }, "«press: ⇧F4 → pause» | toggle"))
         rows.append(("⇧F4 while paused", await press({ _, read in read.isSpeaking = true; read.isPaused = true }) { $0.pausePressed() }, "«press: ⇧F4 → resume» | toggle"))
         rows.append(("F5", await press({ _, _ in }) { $0.stopPressed() }, "silence"))
-        return check("press", rows)
+        return await check("press", rows) + overtakenFailures()
+    }
+
+    // the grab window: every grab waits until the row lets it end
+    static func overtakenFailures() async -> Int {
+        var rows: [(name: String, got: String, want: String)] = []
+        let row = { (name: String, setup: (SlowGrab, PlantedRead) -> Void, act: (PressSequencer, SlowGrab, PlantedRead) async -> Void, want: String) in
+            let calls = Calls(), grab = SlowGrab(calls), read = PlantedRead(calls)
+            setup(grab, read)
+            let presses = PressSequencer(grab: grab, target: read, refreshSettings: {}, log: { line in
+                calls.made.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
+            })
+            await act(presses, grab, read)
+            await settle()
+            rows.append((name, calls.made.joined(separator: " | "), want))
+        }
+        let dropped = "«press: dropped, a newer order came»"
+        let press = { (presses: PressSequencer) in
+            Task { await presses.readPressed() }
+            await settle()
+        }
+        await row("F4 alone", { _, _ in }, { presses, grab, _ in await press(presses); await grab.ends("One.") },
+                  "grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read One.")
+        await row("F5 inside the grab: no read", { _, _ in }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends("One.") },
+                  "grab | silence | ended | " + dropped)
+        await row("two F4 inside the grab: one read, the newer", { _, _ in }, { presses, grab, _ in
+            await press(presses)
+            await press(presses)
+            await grab.ends("One.")
+            await grab.ends("Two.")
+        }, "grab | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Two.")
+        await row("twelve F4 at once: two grabs, one read", { _, _ in }, { presses, grab, _ in
+            for _ in 0..<12 { await press(presses) }
+            await grab.ends("One.")
+            await grab.ends("Twelve.")
+        }, "grab | ended" + String(repeating: " | " + dropped, count: 11) + " | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Twelve.")
+        await row("F4, F5, F4: the last one reads", { _, _ in }, { presses, grab, _ in
+            await press(presses)
+            presses.stopPressed()
+            await press(presses)
+            await grab.ends("One.")
+            await grab.ends("Two.")
+        }, "grab | silence | ended | \(dropped) | grab | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read Two.")
+        await row("F4 then F5 before ⌘C's try: no ⌘C", { _, _ in }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends(nil) },
+                  "grab | silence | ended | " + dropped)
+        await row("an order from the socket inside the grab", { _, _ in }, { presses, grab, read in await press(presses); _ = read.takeOrder(); await grab.ends("One.") },
+                  "grab | ended | " + dropped)
+        await row("an overtaken F4 on nothing does not pause", { _, read in read.isSpeaking = true }, { presses, grab, _ in await press(presses); presses.stopPressed(); await grab.ends(nil) },
+                  "grab | silence | ended | " + dropped)
+        await row("⇧F4 inside the grab pauses what plays, the grab goes on", { _, read in read.isSpeaking = true }, { presses, grab, _ in await press(presses); presses.pausePressed(); await grab.ends("One.") },
+                  "grab | «press: ⇧F4 → pause» | toggle | ended | «press: grab ax N ms, normalize N ms, 1 chunks» | read One.")
+        await row("a press with no grant takes its order too", { grab, _ in grab.isTrusted = false }, { presses, _, read in await press(presses); read.calls.append("\(read.order)") },
+                  "«press: accessibility missing — grant \(CommandLine.arguments[0]) in Privacy & Security» | 1")
+        return check("overtaken press", rows)
     }
 
     static func playbackFailures() -> Int {
@@ -343,11 +396,45 @@ final class PlantedGrab: SelectionGrab {
     func copy() async -> String? { copied }
 }
 
+// a selection that comes when the row says so
+@MainActor
+final class SlowGrab: SelectionGrab {
+    var isTrusted = true
+    private let calls: Calls
+    private var waiting: [CheckedContinuation<String?, Never>] = []
+    init(_ calls: Calls) { self.calls = calls }
+    func selection() async -> (text: String?, via: String) {
+        calls.made.append("grab")
+        let text = await withCheckedContinuation { waiting.append($0) }
+        calls.made.append("ended")
+        return (text, "ax")
+    }
+    func copy() async -> String? {
+        calls.made.append("copy")
+        return nil
+    }
+    func ends(_ text: String?) async {
+        if !waiting.isEmpty { waiting.removeFirst().resume(returning: text) }
+        await settle()
+    }
+}
+
+@MainActor
 final class PlantedRead: ReadTarget {
-    var calls: [String] = []
+    private let log: Calls
+    init(_ log: Calls) { self.log = log }
+    var calls: [String] {
+        get { log.made }
+        set { log.made = newValue }
+    }
     var isSpeaking = false
     var isPaused = false
+    private(set) var order = 0
+    func takeOrder() -> Int {
+        order += 1
+        return order
+    }
     func togglePause() { calls.append("toggle") }
-    func silence() { calls.append("silence") }
-    func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) { calls.append("read " + parts.map(\.text).joined(separator: "/")) }
+    func silence() { _ = takeOrder(); calls.append("silence") }
+    func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) { _ = takeOrder(); calls.append("read " + parts.map(\.text).joined(separator: "/")) }
 }
