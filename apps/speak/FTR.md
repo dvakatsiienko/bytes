@@ -20,7 +20,7 @@
 - ✅ one column per language, in the order english, українська, русский
   - decision: the order is dima's; it lives in an array so a key sort cannot reorder it
 - ✅ a chain card per engine, in the order the daemon tries them
-  - given a language's chain in config.json
+  - given a language's chain in the settings file
   - when the page loads
   - then its cards show in that order, each labelled «1st / 2nd / … in the <lang> chain», and the engines outside the chain follow as dashed cards
 - ✅ a toggle puts an engine in or out of a chain
@@ -39,11 +39,12 @@
   - given the macOS voice card
   - then its list holds only installed female voices of that language, «Spoken Content voice (Siri)» for en, «best installed» for uk and ru
 - ✅ a ♥ on each voice marks it a favourite, per engine
-  - makes: a `favourites` list per engine in config.json
+  - makes: a `favourites` list per engine in the settings file
   - given the voice list of a card is open
   - when the user presses ♡ beside a voice
   - then it turns ♥ and the voice moves to the top of that engine's list in every language
   - and it is saved at once, outside the save button: pending edits stay unsaved, and save does not light up
+  - and two quick ♥ both land, and a slider moved meanwhile stays where it is
   - decision: a ♥ is a bookmark, not a setting — dima wants it kept the moment he clicks
 - ✅ «only ♥ favourites» filters a voice list to the favourites
   - given an engine with at least one favourite
@@ -86,14 +87,20 @@
   - then the pill shows and animates speech-shaped levels, following the unsaved glide and flow as they change
   - and it stops when turned off, when the tab closes, when a real read starts, or after 5 minutes without an update
 - 🔎 «pill glide» and «pill flow» tune the pill's wave, each a slider and a number box in ms
-  - makes: `meterGlideMs` and `meterFlowMs` in config.json
+  - makes: `meterGlideMs` and `meterFlowMs` in the settings file
   - given the settings row under the header
   - when the user types 55 in the pill flow box and saves
-  - then config.json reads meterFlowMs 55, the slider moves to 55, and the daemon reloads
+  - then the settings file reads meterFlowMs 55, the slider moves to 55, and the daemon reloads
   - glide: how long a bar takes to reach a new level (0 jumps). flow: how long the wave holds before moving one bar outward
   - decision: a slider, not a fixed number — dima tuned it by feel over six rounds (70 → 1 ms)
 - ✅ ■ stop ends any speech
-- ✅ the first audio budget, in ms
+- ⬜ the first audio budget, in ms, 100 to 3000
+  - given the budget reads 900
+  - when the user clears its box, or types 0
+  - then the setting stays 900, and the box reads 900 again when the caret leaves it
+- ⬜ a number the daemon refuses cannot be set in the page: the sliders and boxes take their ranges and defaults from `contract/config.schema.json`
+  - given the speed slider
+  - then it runs from 0.5 to 3, as the daemon does
 
 - ⬜ the logo goes home without a reload
   - given the page scrolled down, with an unsaved edit
@@ -130,15 +137,30 @@
 
 > states: clean, unsaved (save lit), rejected
 
-- ✅ save writes config.json
-  - makes: `daemon/config.json`, in biome's own format with its keys sorted
+- ⬜ save writes the settings file
+  - makes: `~/Library/Application Support/speak/config.json`, in biome's own format with its keys sorted; bytes stays clean
   - given an unsaved change
   - when the user presses save
   - then the file changes by exactly that edit, and the status line reads «saved · the daemon loaded it»
+- ⬜ the daemon writes the settings file, and a save lands whole or not at all
+  - given a save the daemon refuses, one that names no change, or one over settings that changed since
+  - then the file keeps every byte and the reply says why
+  - given an accepted save
+  - then the file's diff is that change only, a key the daemon does not read stays, and the log line «config: saved …» names the keys
+- ⬜ a page left open never writes over newer settings
+  - given the settings changed since the page read them: a hand edit, a save or a ♥ from another tab
+  - when the page saves
+  - then the status line reads «rejected — the settings changed since this page read them · reset loads them» and the file keeps every byte
+- ⬜ a request that fails says why
+  - given the admin server is down
+  - when the user presses save, ♥, ▶, ⏸ or ■
+  - then the status line reads «the admin server is not answering — …», and an unsaved edit stays
+  - given the settings file cannot be read when the page opens
+  - then the page shows the daemon's reason in place of the columns
 - ✅ reset drops every unsaved edit
   - given an unsaved change
   - when the user presses reset
-  - then the page shows the saved config again, save and reset disable, and nothing is written
+  - then the page shows the settings as they are on disk now, save and reset disable, and nothing is written
 - ✅ a rejected save shows the daemon's own line
   - given a config the daemon cannot read
   - when it is saved
@@ -147,6 +169,12 @@
 - ✅ only the admin page can write: another web page's request is refused
   - given a POST or PUT to the api without `content-type: application/json`
   - then the server answers 415, nothing is saved and the daemon hears nothing
+  - given a request under a name that is not this mac's own (a page that points its name at 127.0.0.1)
+  - then the server answers 403 and the daemon hears nothing
+- ⬜ a worktree's server plays but never saves
+  - given the admin started from a worktree with no socket of its own
+  - when the page saves or hearts
+  - then the status line reads «… a worktree never saves the live settings …»
 
 ## x-speak — hotkey + pill
 
@@ -218,22 +246,30 @@
 - ✅ `x-speak-admin` (launchd, always on) serves the built page and the api on 127.0.0.1:7386; `pnpm --filter speak admin` runs the same server by hand when the job is stopped
 - ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386
 - ✅ `pnpm --filter speak admin:build` builds `dist/`
-- ✅ `pnpm --filter speak test` runs the admin server's tests over a scratch settings file and a fake daemon: the write guard, the page folder's jail, each route
+- ✅ `pnpm --filter speak test` runs the admin server's tests over a fake daemon: the write guard, the host, the page folder's jail, each route, the page's requests and its draft
 - ✅ `pnpm --filter speak daemon:build` installs the signed daemon to `~/.local/libexec/x-speak/x-speak`, with no launchd change
   - makes: `~/.local/libexec/x-speak/x-speak`, signed «x-speak local signing»
+  - given no settings file at its place, or a change in the old file since the move, then it refuses in one line and installs nothing
+- ⬜ `apps/speak/script/settings-move.sh <sha256>` copies the settings out of the tracked tree
+  - makes: the settings file, and `config.json.moved-from` beside it (the old path and its hash)
+  - given the file the launchd job names has that hash, when it runs, then the copy has it too and the old file is untouched
+  - given a change the old file got since, when it runs with that file's hash, then the change is brought and the settings it went over are kept as `config.json.before-move`; with `seen` nothing is copied
+  - given another hash, a copy that differs, or settings there with a change of their own, then it refuses in one line and nothing moves
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
+  - given no settings at their place, or a change in the old file since they moved that nobody brought, then it refuses in one line, names the way, and stops nothing
 - ✅ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
   - makes: `~/.local/libexec/x-speak/x-speak.prev`, kept by each build from the binary that was running (the installed one, when nothing is kept yet)
   - given a build that was relaunched, when the rollback runs, then the daemon that ran before it answers `status`, named by its hash, with its settings and config argument held against the ones it ran with at the build
+  - given a kept daemon from before the settings moved, then the file its argument names gets today's settings, only while it is as the move left it; changed since, the rollback refuses before anything moves
   - given nothing kept, a kept binary with another signature, a daemon reading aloud, or another build or rollback running, then it refuses in one line and the binaries stay as they were
 - ✅ `pnpm speak:try "<text>"` (`daemon:try`) speaks one text with this tree's daemon, built beside the live one
   - makes: `daemon/build/x-speak-try`, in the tree
-  - given the live daemon quiet, when it runs, then the text is heard, and the live daemon answers `status` before and after and keeps its keys
+  - given the live daemon quiet, when it runs, then the text is heard with this mac's live settings (the tracked seed, when it has none), and the live daemon answers `status` before and after and keeps its keys
   - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
   - given no text, an empty one or one that opens with a dash, then it refuses in one line and starts nothing
   - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)
-- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings file, the read path's rules, the presses, the socket's ops, the pill and the meter, the core's imports, the module-level values, the build's way back and the try run on stubs, after a typecheck of the whole daemon
-- ⬜ x-speak takes its paths as flags: `--config <config.json>`, `--keys-run <script>`
+- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings' schema and store, the read path's rules, the presses, the socket's ops, the pill and the meter, the core's imports, the module-level values, the places named outside `core/paths.swift`, the build's way back and the try run on stubs, after a typecheck of the whole daemon
+- ⬜ x-speak takes `--config <config.json>` (a one-shot's settings; the daemon's have one place) and `--keys-run <script>`
   - given the daemon started with `--config <path>` alone
   - then it stays up as the daemon, logs «config: loaded <the full path>» with each engine's voices, speed and gain, and speaks nothing
   - and with no `--config`, an empty one or a flag it does not know, it exits at once with one usage line

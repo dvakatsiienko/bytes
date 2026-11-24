@@ -10,6 +10,10 @@ struct Request: Decodable {
     let glide: Double?
     let flow: Double?
     let seconds: Double?
+    // a save's changed keys and the version it edits; a heart's voice
+    let patch: Json?
+    let version: String?
+    let voice: String?
 }
 
 struct Status {
@@ -17,9 +21,11 @@ struct Status {
     let isTrusted: Bool
     let isSpeaking: Bool
     let isPaused: Bool
+    // where the settings are: a rollback reads it to know whether an older daemon looks elsewhere
+    let settings: String
 
     var reply: [String: Any] {
-        ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused]
+        ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused, "settings": settings]
     }
 }
 
@@ -29,6 +35,9 @@ protocol DaemonCommands: AnyObject {
     func voices() -> [[String: String]]
     // the reason the file on disk is not the one in use, if it is not
     func reload() -> String?
+    func savedSettings() throws -> SavedSettings
+    func save(_ patch: Json?, over version: String?) throws -> SavedSettings
+    func heart(engine: String?, voice: String?, isOn: Bool?) throws -> SavedSettings
     func togglePause()
     func stop()
     func demoPill()
@@ -48,6 +57,12 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
         return ["system": commands.voices()]
     case "reload":
         return commands.reload().map { ["error": $0] } ?? ["ok": true]
+    case "config":
+        return settingsReply { try commands.savedSettings() }
+    case "save":
+        return settingsReply { try commands.save(request.patch, over: request.version) }
+    case "heart":
+        return settingsReply { try commands.heart(engine: request.engine, voice: request.voice, isOn: request.on) }
     // pause and resume, the pill's ⏸ from the admin
     case "pause":
         commands.togglePause()
@@ -76,4 +91,15 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
         return ["error": "unknown op \(request.op)"]
     }
     return ["ok": true]
+}
+
+private func settingsReply(_ ask: () throws -> SavedSettings) -> [String: Any] {
+    do {
+        let saved = try ask()
+        return ["ok": true, "config": saved.config.any, "version": saved.version, "was": saved.was]
+    } catch SaveError.stale {
+        return ["error": "\(SaveError.stale)", "stale": true]
+    } catch {
+        return ["error": "\(error)"]
+    }
 }

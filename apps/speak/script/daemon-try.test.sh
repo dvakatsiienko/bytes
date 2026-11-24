@@ -19,16 +19,18 @@ child_state() { # the stub's process, given a moment to end
 }
 argv() { cat "$state/argv" 2>/dev/null || printf none; }
 built() { [ -f "$root/app/daemon/build/x-speak-try" ] && echo yes || echo no; }
-argv_config() { argv | sed "s|\[[^]]*/app/daemon/config.json\]|[CONFIG]|"; }
+argv_config() { argv | sed "s|\[$place\]|[CONFIG]|"; }
 
 app; try 'a first line'
 is 'a text is spoken by the built binary, with the config and no keys runner' '[--config][CONFIG][a first line]' "$(argv_config)"
 is 'a spoken text ends well' 0 "$code"
-is 'the built binary stays out of the install folder' old "$(ls "$libexec" | grep -vx x-speak)$(content_of x-speak)"
+is 'the built binary stays out of the install folder' old "$(ls "$libexec" | grep -vxE 'x-speak(\.readers)?')$(content_of x-speak)"
 is 'the built binary is in the tree' yes "$(built)"
 is 'the live daemon is not relaunched' '' "$(relaunches)"
 is 'the launchd job is not touched' "$(stat -f %i "$libexec/x-speak")" "$(cat "$state/inode")"
 
+app; rm "$place"; try 'a first line'
+is 'a mac with no settings of its own: the tree'"'"'s seed' '[--config][SEED][a first line]' "$(argv | sed "s|\[[^]]*/app/daemon/config.json\]|[SEED]|")"
 app; try two words
 is 'words join into one text' '[--config][CONFIG][two words]' "$(argv_config)"
 app; try 'it - is'

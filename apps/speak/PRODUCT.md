@@ -25,7 +25,7 @@ dima, 2026-09-30: «I use it to hear 90% of text instead of reading … the read
 across my whole system.»
 
 one page to set, per language, which engines read aloud and in what order, and how each sounds — and to hear a
-change before saving it. success: the next F4 sounds the way dima wants, without editing config.json by hand.
+change before saving it. success: the next F4 sounds the way dima wants, without editing the settings file by hand.
 
 ## Positioning
 
@@ -37,8 +37,8 @@ change before saving it. success: the next F4 sounds the way dima wants, without
 
 ## Operating Context
 
-- x-speak, a swift daemon under launchd, does the reading; this page reaches it only over its control socket and
-  edits its config.json.
+- x-speak, a swift daemon under launchd, does the reading; this page reaches it only over its control socket, which
+  holds the settings.
 - the pill: a floating dark-glass capsule with a live level meter, shown while x-speak speaks. it is the product's
   most-seen surface.
 - engines: elevenlabs (10k free credits a month), fish (free tier until 2026-11-30), kokoro (local, unlimited),
@@ -47,7 +47,7 @@ change before saving it. success: the next F4 sounds the way dima wants, without
 ## Capabilities and Constraints
 
 - female voices only; no emoji read aloud.
-- a preview uses the card's unsaved settings; a ♥ saves at once; save writes config.json through biome.
+- a preview uses the card's unsaved settings; a ♥ saves at once; save asks the daemon, which writes the settings file or says why not.
 - an engine out of quota is skipped by the chain and shown as such until its next success.
 - the glossary is `GLOSSARY.md`; the feature map is `FTR.md`.
 - the cut (the 2026-09-30 re-shape). in: the keys, the pill's volume and speed controls, the pill's word highlight,

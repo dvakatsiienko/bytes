@@ -3,7 +3,7 @@ import vitePluginTailwind from '@tailwindcss/vite';
 import vitePluginReact from '@vitejs/plugin-react';
 import { type Plugin, defineConfig } from 'vite';
 
-import { speakDevPort, speakPort } from './ports.ts';
+import { adminUrl, speakDevPort, speakPort } from './ports.ts';
 
 // the dev tab wears a marker so it never reads as the served page beside it
 const devTitle = (): Plugin => ({
@@ -13,15 +13,22 @@ const devTitle = (): Plugin => ({
     html.replace('<title>speak</title>', '<title>speak: dev</title>'),
 });
 
+// every api call goes to the admin server: it alone reaches the daemon. a build calls nobody, so it asks for no ports
+const devProxy = (): Plugin => ({
+  apply: 'serve',
+  config: () => ({
+    server: { proxy: { '/api': adminUrl(import.meta.dirname, speakPort) } },
+  }),
+  name: 'speak-dev-proxy',
+});
+
 export default defineConfig({
-  plugins: [vitePluginReact(), vitePluginTailwind(), devTitle()],
+  plugins: [vitePluginReact(), vitePluginTailwind(), devTitle(), devProxy()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   server: {
     port: Number(process.env.PORT ?? speakDevPort),
-    // every api call goes to the admin server: it alone writes config.json and reaches the daemon
-    proxy: { '/api': `http://127.0.0.1:${speakPort}` },
     strictPort: true,
   },
 });

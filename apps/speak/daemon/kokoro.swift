@@ -4,6 +4,7 @@ import Foundation
 final class KokoroServer {
     // :7385, clear of chords' worktree daemon on :7383
     nonisolated private static let url = URL(string: "http://127.0.0.1:7385")!
+    private let paths: Paths
     private let mayStart: Bool
     private let voice: () -> String?
     // a finished warm-up
@@ -11,7 +12,8 @@ final class KokoroServer {
     private var process: Process?
     private var isWarming = false
 
-    init(mayStart: Bool, voice: @escaping () -> String?) {
+    init(paths: Paths, mayStart: Bool, voice: @escaping () -> String?) {
+        self.paths = paths
         self.mayStart = mayStart
         self.voice = voice
     }
@@ -24,14 +26,13 @@ final class KokoroServer {
         if await isReady() { return }
         guard mayStart else { return }
         let server = Process()
-        server.executableURL = URL(fileURLWithPath: NSHomeDirectory() + "/.local/bin/mlx_audio.server")
+        server.executableURL = URL(fileURLWithPath: paths.kokoroServer)
         server.arguments = ["--host", "127.0.0.1", "--port", String(Self.url.port ?? 7385)]
         // launchd starts us in /, read-only, and the server makes a logs/ dir in its working directory
-        server.currentDirectoryURL = URL(fileURLWithPath: NSHomeDirectory() + "/.local/share/x-speak")
+        server.currentDirectoryURL = URL(fileURLWithPath: paths.kokoroFolder)
         // its own log, beside the daemon's: a server that dies at start says why here
-        let logPath = NSHomeDirectory() + "/.local/share/x-speak/kokoro.log"
-        FileManager.default.createFile(atPath: logPath, contents: nil)
-        let logFile = FileHandle(forWritingAtPath: logPath)
+        FileManager.default.createFile(atPath: paths.kokoroLog, contents: nil)
+        let logFile = FileHandle(forWritingAtPath: paths.kokoroLog)
         server.standardOutput = logFile ?? FileHandle.nullDevice
         server.standardError = logFile ?? FileHandle.nullDevice
         server.terminationHandler = { process in log("kokoro: server exited, status \(process.terminationStatus)") }

@@ -5,20 +5,26 @@ import Foundation
 final class SocketCommands: DaemonCommands {
     private let speaker: Speaker
     private let panel: Panel
-    private let configFile: ConfigFile
+    private let configStore: ConfigStore
 
-    init(speaker: Speaker, panel: Panel, configFile: ConfigFile) {
+    init(speaker: Speaker, panel: Panel, configStore: ConfigStore) {
         self.speaker = speaker
         self.panel = panel
-        self.configFile = configFile
+        self.configStore = configStore
     }
 
     func status() -> Status {
-        Status(engines: speaker.health(), isTrusted: AXIsProcessTrusted(), isSpeaking: speaker.isSpeaking, isPaused: speaker.isPaused)
+        Status(engines: speaker.health(), isTrusted: AXIsProcessTrusted(), isSpeaking: speaker.isSpeaking, isPaused: speaker.isPaused, settings: configStore.path)
     }
 
     func voices() -> [[String: String]] { installedVoices() }
-    func reload() -> String? { configFile.refresh() }
+    func reload() -> String? { configStore.refresh() }
+    func savedSettings() throws -> SavedSettings { try configStore.saved() }
+    func save(_ patch: Json?, over version: String?) throws -> SavedSettings { try configStore.save(patch, over: version) }
+    func heart(engine: String?, voice: String?, isOn: Bool?) throws -> SavedSettings {
+        try configStore.heart(engine: engine, voice: voice, isOn: isOn)
+    }
+
     func togglePause() { speaker.togglePause() }
     func stop() { speaker.silence() }
     func demoPill() { panel.demo() }
@@ -27,12 +33,12 @@ final class SocketCommands: DaemonCommands {
     func blockMain(for seconds: Double) { DispatchQueue.main.async { Thread.sleep(forTimeInterval: seconds) } }
 
     func read(_ parts: [Chunk]) {
-        configFile.refresh()
+        configStore.refresh()
         speaker.stop()
         speaker.speak(parts, only: nil, pressed: .now)
     }
 
     func preview(_ text: String, with engine: Engine, settings: EngineConfig?) {
-        speaker.preview(text, with: engine, settings: settings ?? configFile.current[engine])
+        speaker.preview(text, with: engine, settings: settings ?? configStore.current[engine])
     }
 }

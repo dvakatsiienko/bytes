@@ -9,6 +9,7 @@ app() {
     mkdir -p "$root/app"
     cp -R "$here" "$root/app/script"
     cp -R "$here/../daemon" "$root/app/daemon"
+    cp -R "$here/../contract" "$root/app/contract"
     for later in swap try core; do stub_file "$root/app/script/daemon-$later.test.sh" ':'; done
 }
 plant() { printf '%b\n' "$1" >"$root/app/daemon/core/Planted.swift"; }
@@ -33,6 +34,18 @@ app; plant 'var counter = 1'; run
 is 'a module-level variable in the core fails the run' 1 "$code"
 says 'a module-level variable in the core is named' 'core/Planted.swift'
 says 'a module-level variable in the core is named for what it is' 'a module-level value'
+
+for line in 'private let at = NSHomeDirectory()' 'private let at = "/Users/dima/x"' 'private let at = "/.local/share/x"' 'private let at = "/tmp/x"' \
+    'private let at = "~/x"' 'private let at = "file:///tmp/x"' 'private let at = FileManager.default.homeDirectoryForCurrentUser' \
+    'private func at(_ p: Process) { p.currentDirectoryURL = FileManager.default.homeDirectoryForCurrentUser }' 'private let at = ["/bin/sh", "/tmp/x"]' \
+    'private let at = FileManager.default.temporaryDirectory' 'private let at = URL.applicationSupportDirectory' 'private let at = FileManager.SearchPathDirectory.libraryDirectory'; do
+    app; plant "$line"; run
+    is "«${line}» outside the paths fails the run" 1 "$code"
+    says "«${line}» outside the paths is named for what it is" 'a place named outside core/paths.swift'
+done
+
+app; plant 'import Foundation\nprivate func at(_ p: Paths) { try? FileManager.default.createDirectory(atPath: p.settings, withIntermediateDirectories: true) }'; run
+is 'a folder made at one of the paths passes' 0 "$code"
 
 app; plant 'enum Planted { static let planted: Int = "a word" }'; run
 is 'a core file with a wrong type fails the run' 1 "$code"

@@ -1,13 +1,13 @@
 # speak's voice admin is a local vite + react app, served by its own node server
 
-the admin edits x-speak's config.json and previews through the running daemon, so it runs where both live and
+the admin edits x-speak's settings and previews through the running daemon, so it runs where both live and
 nowhere else. it is a vite + react + tailwind single page, built to `dist/` and served with its api by
 `server.ts` on 127.0.0.1:7386 (`pnpm --filter speak admin`). no deploy target.
 
 - data: `@tanstack/react-query` over the server's routes; the status poll stops with the tab
 - reorder: `@dnd-kit` (dima's pick), react owning the order through the drag with `move()` on every drag-over
 - sections: `react-error-boundary` around each language column and the root
-- the server reaches the daemon only through its unix control socket; config.json is written in biome's format
+- the server reaches the daemon only through its unix control socket; the daemon alone writes the settings file (FRM-683)
 
 ## considered options
 

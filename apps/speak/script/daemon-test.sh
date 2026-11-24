@@ -13,9 +13,12 @@ done
 # each part is handed what it needs: no module-level value, a `static var` included, but a private constant of the core's
 globals=$(grep -nE '^(@[A-Za-z_]+(\([^)]*\))? +|[a-z]+(\([a-z]+\))? +|import [A-Za-z.]+; *)*(let|var) |(^|[ {;])static (weak )?var ' ./*.swift core/*.swift | grep -vE '^core/[^:]*:[0-9]+:private let ' || true)
 [ -z "$globals" ] || { printf 'daemon-test: a module-level value\n%s\n' "$globals" >&2; exit 1; }
+place='NS[A-Za-z]*Director|(home|temporary|applicationSupport|library|documents?|desktop|downloads|caches|user|shared|trash|movies|music|pictures)Directory|currentDirectoryPath|"(/[^"]|~/|file:)'
+places=$(grep -nE "$place" ./*.swift core/*.swift | grep -v '^core/paths\.swift:' | sed 's#"/bin/sh"##g' | grep -E "$place" || true)
+[ -z "$places" ] || { printf 'daemon-test: a place named outside core/paths.swift\n%s\n' "$places" >&2; exit 1; }
 ../script/daemon-compile.sh -typecheck
 swiftc -parse-as-library -swift-version 5 core/*.swift test/*.swift -o build/daemon-test
-./build/daemon-test golden.json config.json
+./build/daemon-test golden.json config.json ../contract/config.schema.json
 ../script/daemon-core.test.sh
 ../script/daemon-swap.test.sh
 ../script/daemon-try.test.sh

@@ -5,40 +5,43 @@
 import AppKit
 
 // the one value that hands each part what it needs. chain, voices, speed, gain and the first-audio budget live in
-// config.json, read again on the next F4 after a save; the paths come in on argv (core/arguments.swift)
+// the settings file (core/config-store.swift), read again on the next F4 after a hand edit
 @MainActor
 final class App {
     let arguments: Arguments
-    let configFile: ConfigFile
+    let paths: Paths
+    let configStore: ConfigStore
     let keys: Keys
     let kokoro: KokoroServer
     // the audio engine and the pill are made once the app runs, so a slow audio device holds up neither the socket nor the keys
-    private(set) lazy var panel = Panel(settings: { [configFile] in configFile.current })
+    private(set) lazy var panel = Panel(settings: { [configStore] in configStore.current })
     private(set) lazy var speaker = Speaker(
         player: Player(), macVoice: MacVoice(), panel: panel, keys: keys, kokoro: kokoro,
-        settings: { [configFile] in configFile.current }
+        settings: { [configStore] in configStore.current }
     )
     private lazy var presses = PressSequencer(
-        grab: Grab(), target: speaker, refreshSettings: { [configFile] in configFile.refresh() }, log: log
+        grab: Grab(), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, log: log
     )
-    private lazy var commands = SocketCommands(speaker: speaker, panel: panel, configFile: configFile)
+    private lazy var commands = SocketCommands(speaker: speaker, panel: panel, configStore: configStore)
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })
     private let heartbeat = Heartbeat()
     private lazy var control = Control(
-        socket: NSHomeDirectory() + "/.local/share/x-speak/control.sock",
+        socket: paths.controlSocket,
         answers: Answers(commands: { [unowned self] in commands }, mainAge: { [heartbeat] in heartbeat.age })
     )
 
     init(_ arguments: Arguments) {
         self.arguments = arguments
-        let configFile = ConfigFile(URL(fileURLWithPath: arguments.configPath))
-        self.configFile = configFile
+        let paths = Paths()
+        self.paths = paths
+        let configStore = ConfigStore(URL(fileURLWithPath: arguments.settings(paths)))
+        self.configStore = configStore
         keys = Keys(run: arguments.keysRunPath)
-        kokoro = KokoroServer(mayStart: arguments.mayStartKokoro, voice: { configFile.current[.kokoro].voice(for: .en) })
+        kokoro = KokoroServer(paths: paths, mayStart: arguments.mayStartKokoro, voice: { configStore.current[.kokoro].voice(for: .en) })
     }
 
     func start(only: Engine?) {
-        configFile.refresh()
+        configStore.refresh()
         if arguments.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have no key") }
         arguments.text.isEmpty ? startDaemon() : startOneShot(only: only)
         // the app loop, for a one-shot too: the pill is a window, and under dispatchMain its first show landed off the
@@ -70,6 +73,7 @@ final class App {
         let registered = hotkeys.register()
         // with the prompt option macos itself asks for the grant, naming this exact process — no guessing which entry
         let isTrusted = AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
+        if arguments.configPath != paths.settings { log("config: --config names \(arguments.configPath), the settings are at \(paths.settings)") }
         log("daemon: \(registered), accessibility \(isTrusted ? "granted" : "missing — macos shows its grant prompt")")
     }
 }
