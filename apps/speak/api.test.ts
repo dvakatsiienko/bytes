@@ -55,6 +55,18 @@ describe('M13: a failed request is no settings', () => {
     await expect(api.voices()).rejects.toThrow(reason);
   });
 
+  it('engines are the daemon’s', async () => {
+    answers(200, '{"engines":[{"id":"speechify"}]}');
+
+    expect(await api.voices()).toEqual([{ id: 'speechify' }]);
+  });
+
+  it('a daemon that names no engines says why', async () => {
+    answers(200, '{"system":[]}');
+
+    await expect(api.voices()).rejects.toThrow('older than this page');
+  });
+
   it('settings are settings', async () => {
     answers(200, '{"config":{"firstAudioMs":900},"version":"v"}');
 

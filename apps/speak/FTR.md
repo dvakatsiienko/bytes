@@ -23,6 +23,9 @@
   - given a language's chain in the settings file
   - when the page loads
   - then its cards show in that order, each labelled «1st / 2nd / … in the <lang> chain», and the engines outside the chain follow as dashed cards
+- ⬜ the cards, their labels, their languages and their voices are the daemon's catalogue
+  - given an engine the daemon's catalogue names and the page has no mark for, then its card carries a plain sound wave on the ink hue
+  - given the daemon that runs is older than the page and names no engines, then the page says so in place of the cards
 - ✅ a toggle puts an engine in or out of a chain
   - given an engine outside the en chain
   - when the user ticks «in the en chain»

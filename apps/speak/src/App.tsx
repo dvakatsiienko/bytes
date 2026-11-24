@@ -51,12 +51,14 @@ export const App = () => {
     (reason) => setMessage({ kind: 'error', text: reason }),
   );
 
-  if (!draft)
+  if (!(draft && voices.data))
     return (
       <p className='p-4 text-muted'>
-        {settings.error ? settings.error.message : 'reading the settings…'}
+        {(settings.error ?? voices.error)?.message ?? 'reading the settings…'}
       </p>
     );
+
+  const { data: engines } = voices;
 
   const edit = (change: (config: Config) => Config) => {
     settings.edit(change);
@@ -134,6 +136,7 @@ export const App = () => {
         resetKeys={[lang]}>
         <Column
           config={draft}
+          engines={engines}
           lang={lang}
           onChain={(chain) =>
             edit((config) => ({
@@ -161,7 +164,6 @@ export const App = () => {
           sample={samples[lang]}
           status={statusData}
           title={title}
-          voices={voices.data}
         />
       </ErrorBoundary>
     );

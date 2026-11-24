@@ -6,24 +6,8 @@ export const LANGS = [
   ['ru', 'русский'],
 ] as const;
 
-export const ENGINES = [
-  'elevenlabs',
-  'kokoro',
-  'system',
-  'fish',
-  'gemini',
-] as const;
-
-export const ENGINE_LABELS: Record<Engine, string> = {
-  elevenlabs: 'ElevenLabs',
-  fish: 'Fish',
-  gemini: 'Gemini',
-  kokoro: 'Kokoro (local)',
-  system: 'macOS voice',
-};
-
-export const speaks = (engine: Engine, lang: Lang) =>
-  engine !== 'kokoro' || lang === 'en';
+export const entryOf = (engines: EngineEntry[], id: Engine) =>
+  engines.find((entry) => entry.id === id);
 
 export const voiceOf = (config: Config, engine: Engine, lang: Lang) => {
   const voice = config.engines[engine]?.voice ?? {};
@@ -69,14 +53,44 @@ export const api = {
     call<Saved>('PUT', '/api/config', { patch, version }),
   status: () => read<Status>('/api/status'),
   stop: () => call('POST', '/api/stop'),
-  voices: () => read<Voices>('/api/voices'),
+  voices: async () => {
+    const { engines } = await read<Catalogue>('/api/voices');
+    if (!engines)
+      throw new Error(
+        'the x-speak that runs names no engines — it is older than this page',
+      );
+    return engines;
+  },
   wave: (payload: Wave) => call('POST', '/api/wave', payload),
 };
 
 /* Types */
 
 export type Lang = (typeof LANGS)[number][0];
-export type Engine = (typeof ENGINES)[number];
+// an id of the daemon's catalogue
+export type Engine = string;
+
+// an engine as the daemon's catalogue names it
+export interface EngineEntry {
+  // its loudness can be set
+  gain: boolean;
+  id: Engine;
+  label: string;
+  languages: Lang[];
+  voices: Voice[];
+}
+
+// no language: it speaks every one its engine does
+interface Voice {
+  id: string;
+  lang?: Lang;
+  name: string;
+}
+
+// a daemon from before the catalogue names none
+interface Catalogue {
+  engines?: EngineEntry[];
+}
 
 export interface EngineSettings {
   // voice ids dima hearted; the daemon ignores them, the admin sorts them to the top
@@ -144,17 +158,6 @@ export interface Status {
 interface Started {
   read: number;
 }
-
-interface SystemVoice {
-  id: string;
-  lang: string;
-  name: string;
-  quality: string;
-}
-
-export type Voices = Record<Exclude<Engine, 'system'>, [string, string][]> & {
-  system: SystemVoice[];
-};
 
 export interface Preview {
   engine: Engine;

@@ -12,7 +12,6 @@ enum SchemaTest {
         var rows: [(name: String, got: String, want: String)] = [
             ("the settings' names", top.keys.sorted().joined(separator: " "), Config.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("an engine's names", engine.keys.sorted().joined(separator: " "), EngineConfig.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
-            ("the engines", names(defs["engine"]), Engine.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("the languages", names(top["chain"]), Lang.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a voice's languages", names(engine["voice"]), "* " + names(top["chain"])),
         ]

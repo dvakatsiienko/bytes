@@ -6,7 +6,7 @@ import type { Engine } from '@/api.ts';
 // never on a control (DESIGN.md, the one voice rule)
 export const EngineMark = (props: EngineMarkProps) => {
   const id = useId();
-  const glyphJSX = GLYPHS[props.engine](id);
+  const glyphJSX = (GLYPHS[props.engine] ?? unknownGlyph)(id);
 
   return (
     <svg
@@ -18,8 +18,11 @@ export const EngineMark = (props: EngineMarkProps) => {
   );
 };
 
-// the hue each card's top wash takes; elevenlabs is monochrome, so it takes the ink
-export const BRAND_HUE: Record<Engine, string> = {
+// the hue each card's top wash takes; elevenlabs is monochrome, so it takes the ink, as one with no look here does
+export const brandHue = (engine: Engine) =>
+  BRAND_HUE[engine] ?? 'var(--color-ink)';
+
+const BRAND_HUE: Record<Engine, string> = {
   elevenlabs: 'var(--color-ink)',
   fish: '#0e8fd6',
   gemini: '#6f8cf2',
@@ -115,6 +118,21 @@ const GLYPHS: Record<Engine, (id: string) => ReactNode> = {
       </>
     );
   },
+};
+
+// an engine the catalogue names before its look is drawn: a plain sound wave
+const unknownGlyph = () => {
+  return (
+    <>
+      <rect fill='var(--color-muted)' height='24' width='24' />
+      <path
+        d='M6 10.5v3M9 8v8M12 5.5v13M15 8v8M18 10.5v3'
+        stroke='var(--color-bg)'
+        strokeLinecap='round'
+        strokeWidth='1.6'
+      />
+    </>
+  );
 };
 
 /* Types */
