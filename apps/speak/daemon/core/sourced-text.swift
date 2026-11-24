@@ -52,7 +52,8 @@ struct SourcedText: Equatable {
         }
     }
 
-    // «$1 dot $2»: a group keeps its own places, the words between come from what stands before them
+    // «$1 dot $2»: a group keeps its own places, the words between come from what stands before them, and one that ends
+    // it takes what the match drops after it
     func replacing(_ pattern: String, _ template: String, _ options: NSRegularExpression.Options = []) -> SourcedText {
         let parts = template.split(separator: "$", omittingEmptySubsequences: false).map(String.init)
         let groups = parts.dropFirst().map { (number: $0.first!.wholeNumberValue!, rest: String($0.dropFirst())) }
@@ -65,6 +66,7 @@ struct SourcedText: Equatable {
                 result.add(kept, of: self, units)
                 result.add(group.rest, over: NSRange(location: kept.upperBound, length: 0), of: self)
             }
+            if groups.last?.rest.isEmpty == true, !result.offsets.isEmpty { result.offsets[result.offsets.count - 1] = offsets[match.range.upperBound - 1] }
         }
     }
 

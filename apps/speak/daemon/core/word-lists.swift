@@ -20,6 +20,8 @@ struct WordLists: Equatable {
 extension WordLists {
     // a file names what it adds or says another way; the rest is what ships
     init(over shipped: WordLists, _ file: Data) throws {
+        let names = try JSONDecoder().decode([String: Json].self, from: file).keys
+        if let odd = names.first(where: { File.CodingKeys(rawValue: $0) == nil }) { throw WordListError.notAList(odd) }
         let added = try JSONDecoder().decode(File.self, from: file)
         let lowercased = { (new: [String: String]?) in Dictionary((new ?? [:]).map { ($0.lowercased(), $1) }) { _, last in last }.filter { !$0.key.isEmpty } }
         let newWords = lowercased(added.words), newLetters = (added.letters ?? []).map { $0.lowercased() }
@@ -35,14 +37,19 @@ extension WordLists {
 
     private struct File: Decodable {
         let letters: [String]?, words: [String: String]?, units: [String: String]?, fileKinds: [String: String]?, copyOnlyApps: [String]?
+
+        enum CodingKeys: String, CodingKey { case letters, words, units, fileKinds, copyOnlyApps }
     }
 }
 
 enum WordListError: Error, CustomStringConvertible {
-    case notAWord(String)
+    case notAWord(String), notAList(String)
 
     var description: String {
-        switch self { case .notAWord(let word): "a word is letters a–z alone, «\(word)» is not" }
+        switch self {
+        case .notAWord(let word): "a word is letters a–z alone, «\(word)» is not"
+        case .notAList(let name): "no list is called «\(name)»"
+        }
     }
 }
 
@@ -51,6 +58,8 @@ final class WordListStore {
     private let url: URL
     private let write: (String) -> Void
     private var loadedStamp: Date?
+    // asked again on each read, a change of its rights moves no stamp
+    private var isUnread = false
     private var lists = WordLists.shipped
 
     init(_ url: URL, log write: @escaping (String) -> Void = log) {
@@ -61,11 +70,15 @@ final class WordListStore {
     // one stat a read, a parse only when the file changed; a bad edit logs one line and the last good lists stay
     var current: WordLists {
         let stamp = (try? FileManager.default.attributesOfItem(atPath: url.resolvingSymlinksInPath().path))?[.modificationDate] as? Date
-        guard stamp != loadedStamp else { return lists }
+        guard stamp != loadedStamp || isUnread else { return lists }
+        let data = stamp == nil ? nil : try? Data(contentsOf: url)
+        // one line for a file that stays as it is
+        if stamp == loadedStamp, data == nil { return lists }
         loadedStamp = stamp
+        isUnread = stamp != nil && data == nil
         do {
-            lists = try stamp == nil ? .shipped : WordLists(over: .shipped, Data(contentsOf: url))
-            write("word lists: \(stamp == nil ? "what ships" : "loaded \(url.path)")")
+            lists = try data.map { try WordLists(over: .shipped, $0) } ?? (isUnread ? lists : .shipped)
+            write(isUnread ? "word lists: kept the last good ones — \(url.path): not readable" : "word lists: \(data == nil ? "what ships" : "loaded \(url.path)")")
         } catch {
             write("word lists: kept the last good ones — \(url.path): \(configReason(error))")
         }

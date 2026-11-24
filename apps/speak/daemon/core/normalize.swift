@@ -42,7 +42,7 @@ private func stripMarkdown(_ text: SourcedText) -> SourcedText {
     t = t.replacing("[\\x{2022}\\x{2023}\\x{2043}\\x{25A0}-\\x{25FF}\\x{2605}\\x{2606}]", "")
     // a line that ends bare ends a sentence: several lines read as one run-on otherwise (dima: «it sounds like a single sentence»)
     // a mark that already pauses, an opener or a joining sign ends none, and a line of signs alone is none
-    return t.replacing("(?=[ \\t]*\\r?\\n)(?<=[\\p{L}\\p{N}][^\\p{L}\\p{N}\\n]{0,40})(?<![\\s.!?…;:,]|[.!?…][»”\"'’)*\\]]{1,2})(?<![({\\[«“‘„<→⇒·|&=\\\\\\-–—]|[-=]>)[ \\t]*\\r?\\n", ".\n")
+    return t.replacing("(?<!\\s)(?=\\h*\\R)(?<=[\\p{L}\\p{N}][^\\p{L}\\p{N}\\v]{0,40})(?<![.!?…;:,]|[.!?…][»”\"'’)*\\]]{1,2})(?<![({\\[«“‘„<→⇒·|&=\\\\\\-–—]|[-=]>)\\h*\\R", ".\n")
 }
 
 private func rewriteLatin(_ text: SourcedText, _ lists: WordLists) -> SourcedText {
@@ -153,7 +153,7 @@ private func splitRuns(_ spoken: SourcedText) -> [Run] {
 // line that ends in a digit («pr #522. sleep now3.») is tried too, once no cleaner match exists, and kept only when
 // the next number follows it: «node to 22. done» keeps its 22. U+FFFC stands in for an inline image or icon
 private func unglueLists(_ text: SourcedText) -> SourcedText {
-    var t = text.replacing("\\x{FFFC}", "")
+    var t = text.replacing("[\\x{FFFC}\\x{0}]", "")
     // a bulleted item glued to the one above opens on a quote that touches the last word: «… stays open«a gui …»
     t = t.replacing("(?<=[\\p{L}\\p{N}])(?=[«“])", "\n")
     let glued = t.text

@@ -42,6 +42,9 @@ struct DaemonTest {
     static func sourceFailures() -> Int {
         let long = String(repeating: "word ", count: 80) + "end."
         let parts = { (text: String) in spokenChunks(of: text).map { (text as NSString).substring(with: NSRange($0.source)) }.joined(separator: " | ") }
+        let nul = "one.\u{0} " + String(repeating: "x", count: 310)
+        let began = ContinuousClock.now
+        _ = normalize(String(repeating: " ", count: 20_000))
         return check("source", [
             ("two sentences", parts("Hello there.  And bye!"), "Hello there. | And bye!"),
             ("a line end the voice gets a dot for", parts("say «done»\nthen go. ok"), "say «done»\n | then go. | ok"),
@@ -51,6 +54,9 @@ struct DaemonTest {
             ("markdown around it", parts("## **One.**\n- [two](https://x.y/z). three"), "One. | two](https://x.y/z). | three"),
             ("an end and a start that share one character", parts("a — b\n@tanstack/router"), "a — b\n | @tanstack/router"),
             ("a link of three sentences", parts("see [first. second. third](https://example.com/very/long/path) and then. ok"), "see [first. | second. | third](https://example.com/very/long/path) and then. | ok"),
+            ("a url at the end is whole", parts("Docs at https://x.y/very/long/path"), "Docs at https://x.y/very/long/path"),
+            ("a NUL before a sentence makes no empty chunk", "\(spokenChunks(of: nul).filter(\.text.isEmpty).count)", "0"),
+            ("a blank grab is quick", ContinuousClock.now - began < .seconds(1) ? "quick" : "slow", "quick"),
             ("a code fence first", parts("```\nlet a = 1\n```\nDone. ok"), "```\nlet a = 1\n``` | Done. | ok"),
             ("a code fence", parts("Look:\n```\nlet a = 1\n```\nDone. ok"), "Look:\n```\nlet a = 1\n``` | Done. | ok"),
             ("a cut between «number» and its digits", parts("Hi. " + String(repeating: "abcdefgh ", count: 32) + "aaaaa #123456 tail here and more words"), "Hi. | " + String(repeating: "abcdefgh ", count: 32) + "aaaaa # | 123456 tail here and more words"),

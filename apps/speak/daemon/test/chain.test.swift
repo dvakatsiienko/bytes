@@ -173,6 +173,7 @@ enum ChainTest {
             ("a comma with no space after it cuts too, one inside a number never", cut([(.en, "Hi. " + String(repeating: "x", count: 200) + ",1,000" + String(repeating: "y", count: 200))]).map { "\($0.count - 4)" }, ["3", "201", "205"]),
             ("an opening is never cut inside a number", cut([(.en, String(repeating: "x", count: 50) + " 1,000 " + String(repeating: "y", count: 60) + ", z")]).map { "\($0.count - 4)" }, ["118", "1"]),
             ("an opening that ends on a digit and a comma", cut([(.en, words + " 5,")]).prefix(1).map { $0 }, ["en: " + words + " 5,"]),
+            ("a comma that is the 150th character cuts nothing, the 151st cuts", [149, 150].map { at in "\(cut([(.en, "Hi. " + String(repeating: "x", count: at) + ", " + String(repeating: "y ", count: 99))])[1].count - 4)" }, ["300", "151"]),
             ("300 characters are one", cut([(.en, "Hi. " + thirty(10) + "!")]), ["en: Hi.", "en: " + thirty(10) + "!"]),
             ("a space right after the 300th", cut([(.en, "Hi. x" + thirty(10) + " tail")]).map { "\($0.count - 4)" }, ["3", "300", "4"]),
             ("301 are two", cut([(.en, "Hi. " + thirty(10) + "e!")]), ["en: Hi.", "en: " + thirty(9) + " " + six(4), "en: abcdee!"]),

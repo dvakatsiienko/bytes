@@ -227,7 +227,7 @@
   - when the user presses F4
   - then the voice says «exa dot md» for `docs/test-drive/exa.md`, «a markdown file link», «pid», «a commit», «an id» — never a full path or the digits
 - ⬜ a word is taught in a file, with no rebuild
-  - given a word that is not letters a–z alone (a digit, a sign, cyrillic), then it is a bad edit: a read would never say it
+  - given a word that is not letters a–z alone (a digit, a sign, cyrillic), or a list it does not know, then it is a bad edit: a read would never say it
   - makes: nothing; `~/Library/Application Support/speak/word-lists.json` is dima's own, absent until he writes one
   - given `{"words": {"speechify": "speech if I"}, "letters": ["rtk"]}` in it, when the next press reads «rtk in Speechify», then the voice says «R T K in speech if I», and every word that ships is said as before
   - given its `units`, `fileKinds` or `copyOnlyApps` (bundle ids whose selection comes by ⌘C), then they add to what ships, and what it says of a word that ships wins

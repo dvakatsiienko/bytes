@@ -494,5 +494,37 @@
   {
     "in": "cd ../.. now",
     "out": [["en", "cd now"]]
+  },
+  {
+    "in": "cpu at 40%\u00a0\nnext",
+    "out": [["en", "cpu at 40%. next"]]
+  },
+  {
+    "in": "one\u00a0\ntwo",
+    "out": [["en", "one. two"]]
+  },
+  {
+    "in": "one\u2028two",
+    "out": [["en", "one. two"]]
+  },
+  {
+    "in": "one\rtwo",
+    "out": [["en", "one. two"]]
+  },
+  {
+    "in": "say %%%%%%%%%%%%\nnext",
+    "out": [["en", "say %%%%%%%%%%%%. next"]]
+  },
+  {
+    "in": "it said “done.”\nthen go",
+    "out": [["en", "it said done. then go"]]
+  },
+  {
+    "in": "it said “ok?”)\nthen go",
+    "out": [["en", "it said ok? then go"]]
+  },
+  {
+    "in": "a\u0000 b",
+    "out": [["en", "a b"]]
   }
 ]

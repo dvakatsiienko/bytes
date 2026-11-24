@@ -24,6 +24,7 @@ enum ConfigTest {
         return check("config decode", [
             ("an engine with nothing named", knobs("{}"), "- 1.0 1.0"),
             ("an engine with everything named", knobs(#"{"model":"s2","speed":1.5,"gain":2}"#), "s2 1.5 2.0"),
+            ("a name an older daemon kept", knobs(#"{"oneOutput":true,"speed":1.5}"#), "- 1.5 1.0"),
             ("an engine that is not there", answer(file()) { "\($0[.gemini].speed) \($0[.gemini].gain) \($0[.gemini].voices)" }, "1.0 1.0 -"),
             ("the lowest speed", knobs(#"{"speed":0.5}"#), "- 0.5 1.0"),
             ("a speed under it", knobs(#"{"speed":0.49}"#), range("speed", "0.49")),
