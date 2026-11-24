@@ -79,6 +79,13 @@ enum SpeakerTest {
             stage.read("Hello.")
             try? await Task.sleep(for: .milliseconds(300))
         }, "pill 1 | «read 1: chunk 1/1» | elevenlabs Hello. in 100 | «elevenlabs skipped: timeout» | system Hello. | «first audio: system N ms» | rest | pill -")
+        for (name, step) in [("refusal", Step.fails(EngineError.status(500))), ("hang", .failsLate(EngineError.timeout))] {
+            let words = name == "hang" ? "timeout" : "status(500), off for 60 s"
+            await row("a spent budget stays spent after kokoro's \(name)", { $0.chain = [.elevenlabs, .kokoro, .fish, .system]; $0.budget = 100; $0.voices.script = [.elevenlabs: [.failsLate(EngineError.timeout)], .kokoro: [step]] }, { stage in
+                stage.read("Hello.")
+                try? await Task.sleep(for: .milliseconds(450))
+            }, "pill 1 | «read 1: chunk 1/1» | kokoro ahead Hello. | elevenlabs Hello. in 100 | «elevenlabs skipped: timeout» | kokoro Hello. in 3000 | «kokoro skipped: \(words)» | system Hello. | «first audio: system N ms» | rest | pill -")
+        }
         await row("a long sentence gives kokoro longer", plain, { $0.read([Chunk(lang: .en, text: String(repeating: "a", count: 400))]) },
                   "pill 1 | «read 1: chunk 1/1» | kokoro \(String(repeating: "a", count: 400)) in 4000 | «first audio: kokoro N ms» | rest | pill -")
         await row("a press looks for the keys that were missing", plain, { $0.speaker.read(Stage.chunks("Hello."), pressed: .now) },

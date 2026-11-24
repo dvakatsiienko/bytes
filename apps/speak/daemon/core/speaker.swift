@@ -177,6 +177,7 @@ final class Speaker: ReadTarget {
                     case .asLongAsItTakes: deadline = nil
                     case .atMost(let wait): deadline = wait
                     }
+                    let asked = ContinuousClock.now
                     do {
                         try await voices.speak(chunk, with: engine, settings: { self.settings(engine) }, deadline: deadline) {
                             if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))") }
@@ -196,8 +197,8 @@ final class Speaker: ReadTarget {
                         handle(error is CancellationError ? EngineError.timeout : error, from: engine)
                         // a chunk that was heard is never read again by the next engine
                         if isHeard { break }
-                        // a wait that was never the cloud's budget took none of it
-                        if !isOnBudget(engine, lead: lead) { budgetEnds = newBudget() }
+                        // a wait that was never the cloud's budget takes none of it and gives none back
+                        if !isOnBudget(engine, lead: lead) { budgetEnds = budgetEnds.map { $0 + (.now - asked) } ?? newBudget() }
                     }
                 }
             }

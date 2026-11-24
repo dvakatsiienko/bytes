@@ -97,7 +97,7 @@
   - decision: a slider, not a fixed number — dima tuned it by feel over six rounds (70 → 1 ms)
 - ✅ ■ stop ends any speech
 - ⬜ a voice that hangs or breaks off hands over once, and no sentence is read twice
-  - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on its own first audio budget (kokoro gets more for a sentence over 300 characters); the last of a chain is waited for
+  - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on what its sentence has left of the first audio budget (kokoro gets more for a sentence over 300 characters); the last of a chain is waited for
   - given a voice breaks off in the middle of a sentence, then the read goes on with the next sentence, and no other voice starts that one again
   - given the daemon's main thread stuck for over a minute, then `status` no longer says speaking, so relaunch, rollback and try are open
 - ⬜ the first audio budget, in ms, 100 to 3000
