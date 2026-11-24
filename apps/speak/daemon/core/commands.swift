@@ -1,37 +1,5 @@
-// the control socket's ops, as commands it is handed: one json line in, one object out
+// the control socket's ops, as commands it is handed
 import Foundation
-
-struct Request: Decodable {
-    let op: String
-    let engine: String?
-    let text: String?
-    let settings: EngineConfig?
-    let on: Bool?
-    let glide: Double?
-    let flow: Double?
-    let seconds: Double?
-    // a save's changed keys and the version it edits; a heart's voice
-    let patch: Json?
-    let version: String?
-    let voice: String?
-}
-
-struct Status {
-    let engines: [String: [String: String]]
-    let isTrusted: Bool
-    let isSpeaking: Bool
-    let isPaused: Bool
-    // the read that plays
-    let read: Int?
-    // where the settings are: a rollback reads it to know whether an older daemon looks elsewhere
-    let settings: String
-
-    var reply: [String: Any] {
-        var reply: [String: Any] = ["engines": engines, "accessibility": isTrusted, "speaking": isSpeaking, "paused": isPaused, "settings": settings]
-        reply["read"] = read
-        return reply
-    }
-}
 
 @MainActor
 protocol DaemonCommands: AnyObject {
@@ -56,66 +24,42 @@ protocol DaemonCommands: AnyObject {
 }
 
 @MainActor
-func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: Any] {
-    switch request.op {
-    case "status":
-        return commands.status().reply
-    case "voices":
-        return ["engines": Engine.allCases.map { entry($0, commands.voices(of: $0)) }]
-    case "reload":
-        return commands.reload().map { ["error": $0] } ?? ["ok": true]
-    case "config":
-        return settingsReply { try commands.savedSettings() }
-    case "save":
-        return settingsReply { try commands.save(request.patch, over: request.version) }
-    case "heart":
-        return settingsReply { try commands.heart(engine: request.engine, voice: request.voice, isOn: request.on) }
+func run(_ request: Request, with commands: any DaemonCommands) -> Reply {
+    switch request {
+    case .status: return .status(commands.status())
+    case .voices: return .voices(Engine.allCases.map { entry($0, commands.voices(of: $0)) })
+    case .reload: return commands.reload().map(Reply.error) ?? .ok
+    case .config: return settingsReply { try commands.savedSettings() }
+    case .save(let patch, let version): return settingsReply { try commands.save(patch, over: version) }
+    case .heart(let engine, let voice, let isOn): return settingsReply { try commands.heart(engine: engine, voice: voice, isOn: isOn) }
     // pause and resume, the pill's ⏸ from the admin
-    case "pause":
-        commands.togglePause()
-    case "stop":
-        commands.stop()
-    // shows the pill with sample levels, for screenshots of a design take
-    case "panel-demo":
-        commands.demoPill()
-    case "wave":
-        if let refusal = commands.wave(on: request.on ?? false, glide: request.glide, flow: request.flow) { return ["error": refusal] }
-    case "panel-hide":
-        commands.hidePill()
-    // a test hook: holds main for `seconds`, so the socket's answer under a blocked main can be measured
-    case "block-main":
-        commands.blockMain(for: request.seconds ?? 5)
+    case .pause: commands.togglePause()
+    case .stop: commands.stop()
+    case .panelDemo: commands.demoPill()
+    case .panelHide: commands.hidePill()
+    case .wave(let isOn, let glide, let flow):
+        if let refusal = commands.wave(on: isOn, glide: glide, flow: flow) { return .error(refusal) }
+    case .blockMain(let seconds): commands.blockMain(for: seconds)
     // a text read as F4 reads a selection: the per-language chain, cutting off whatever plays (a mod's 🔊, FRM-381)
-    case "read":
-        guard let text = request.text else { return ["error": "read needs text"] }
+    case .read(let text):
         let parts = commands.chunks(of: text)
-        guard !parts.isEmpty else { return ["error": "read: nothing to say"] }
+        guard !parts.isEmpty else { return .error("read: nothing to say") }
         commands.read(parts)
-    case "preview":
-        guard let engine = request.engine.flatMap(Engine.init), let text = request.text else { return ["error": "preview needs engine and text"] }
-        return ["ok": true, "read": commands.preview(text, with: engine, settings: request.settings)]
-    default:
-        return ["error": "unknown op \(request.op)"]
+    case .preview(let text, let engine, let settings): return .began(read: commands.preview(text, with: engine, settings: settings))
     }
-    return ["ok": true]
+    return .ok
 }
 
-// an engine as the page draws it
-private func entry(_ engine: Engine, _ voices: [Voice]) -> [String: Any] {
-    let facts = engine.facts
-    return [
-        "id": engine.rawValue, "label": facts.label, "languages": facts.languages.map(\.rawValue),
-        "voices": voices.map { ["id": $0.id, "name": $0.name].merging($0.lang.map { ["lang": $0.rawValue] } ?? [:]) { one, _ in one } },
-    ]
+private func entry(_ engine: Engine, _ voices: [Voice]) -> CatalogueEntry {
+    CatalogueEntry(id: engine.rawValue, label: engine.facts.label, languages: engine.facts.languages, voices: voices)
 }
 
-private func settingsReply(_ ask: () throws -> SavedSettings) -> [String: Any] {
+private func settingsReply(_ ask: () throws -> SavedSettings) -> Reply {
     do {
-        let saved = try ask()
-        return ["ok": true, "config": saved.config.any, "version": saved.version, "was": saved.was]
+        return .settings(try ask())
     } catch SaveError.stale {
-        return ["error": "\(SaveError.stale)", "stale": true]
+        return .refused(Refusal(error: "\(SaveError.stale)", stale: true))
     } catch {
-        return ["error": "\(error)"]
+        return .error("\(error)")
     }
 }

@@ -111,15 +111,16 @@ enum SpeakerTest {
             await settle()
             stage.calls = [stage.calls.last { $0.hasPrefix("elevenlabs") } ?? "-"]
         }, "elevenlabs Bye. in 100")
-        await row("a pause in the quiet is not part of the budget", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.failsLate(EngineError.status(500))]] }, { stage in
+        await row("a pause in the quiet is not part of the budget", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 900; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.failsWhenTold(EngineError.status(500))]] }, { stage in
             stage.read("Hello. Bye.")
             await settle()
             stage.audio.endsNext()
             await settle()
             stage.speaker.togglePause()
-            try? await Task.sleep(for: .milliseconds(120))
+            try? await Task.sleep(for: .milliseconds(1000))
             stage.speaker.togglePause()
-            try? await Task.sleep(for: .milliseconds(200))
+            stage.voices.tellToFail()
+            await settle()
             stage.calls = [stage.calls.contains { $0.hasPrefix("elevenlabs") } ? "asked" : "skipped"]
         }, "asked")
         await row("a cloud miss under sound leaves the next one the whole budget", { $0.chain = [.kokoro, .fish, .elevenlabs, .system]; $0.budget = 100; $0.voices.script = [.kokoro: [.sounds, .fails(EngineError.status(500))], .fish: [.fails(EngineError.status(500))]] }, { stage in
@@ -180,7 +181,7 @@ enum SpeakerTest {
             stage.read("Hello.")
             await early.value
             await settle()
-            stage.calls = [stage.speaker.health()["elevenlabs"]?["note"] ?? "-"]
+            stage.calls = [stage.speaker.health()["elevenlabs"]?.note ?? "-"]
         }, "needs 203")
         await row("a cloud voice with nothing to say leads nothing", { $0.chain = [.fish, .kokoro, .system]; $0.voices.script[.fish] = [.saysNothing] }, { $0.read("… Hello.") },
                   "pill 1 | «read 1: chunk 1/2» | ahead kokoro … | fish … in 900 | «read 1: chunk 2/2» | ahead kokoro Hello. | fish Hello. in 900 | «first audio: fish N ms» | drop ahead | rest | pill -")
@@ -197,7 +198,7 @@ enum SpeakerTest {
             stage.voices.balance = [.fish: Balance(left: 5)]
             await stage.speaker.probeQuota()
             await early.value
-            stage.calls = [stage.speaker.health()["fish"]?["state"] ?? "-"]
+            stage.calls = [stage.speaker.health()["fish"]?.state.rawValue ?? "-"]
         }, "live")
         await row("one engine's refusal leaves the other its balance", { stage in
             refused(stage)
@@ -208,7 +209,7 @@ enum SpeakerTest {
             await settle()
             _ = stage.speaker.preview("Hi.", with: .elevenlabs, settings: EngineConfig())
             try? await Task.sleep(for: .milliseconds(120))
-            stage.calls = [.elevenlabs, .fish].map { (engine: Engine) in stage.speaker.health()[engine.rawValue]?["state"] ?? "-" }
+            stage.calls = [.elevenlabs, .fish].map { (engine: Engine) in stage.speaker.health()[engine.rawValue]?.state.rawValue ?? "-" }
         }, "live | no quota")
         await row("a balance asked for before the engine spoke again holds nothing", { stage in
             refused(stage)
@@ -223,7 +224,7 @@ enum SpeakerTest {
             _ = stage.speaker.preview("Hi.", with: .elevenlabs, settings: EngineConfig())
             await early.value
             await settle()
-            stage.calls = [stage.speaker.health()["elevenlabs"]?["state"] ?? "-"]
+            stage.calls = [stage.speaker.health()["elevenlabs"]?.state.rawValue ?? "-"]
         }, "live")
         await row("kokoro's server gone is started again", { $0.voices.script[.kokoro] = [.fails(URLError(.cannotConnectToHost))] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | restart kokoro | «kokoro skipped: URLError, off for 60 s» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
@@ -290,8 +291,8 @@ enum SpeakerTest {
             setup(stage)
             await act(stage)
             await settle()
-            let health = stage.speaker.health()[engine.rawValue] ?? [:]
-            return [health["state"], health["note"]].compactMap { $0 }.joined(separator: " ")
+            let health = stage.speaker.health()[engine.rawValue]
+            return [health?.state.rawValue, health?.note].compactMap { $0 }.joined(separator: " ")
         }
         return check("health", [
             ("untouched", await state({ _ in }, { _ in }, .kokoro), "live"),
@@ -526,7 +527,7 @@ final class Stage {
     private func drop(_ call: String) { calls.removeAll { $0 == call } }
 }
 
-enum Step { case plays, waits, fails(Error), failsMidChunk(Error), ignoresStop, sounds, saysNothing, failsLate(Error) }
+enum Step { case plays, waits, fails(Error), failsMidChunk(Error), ignoresStop, sounds, saysNothing, failsLate(Error), failsWhenTold(Error) }
 
 @MainActor
 final class PlantedVoices: ChunkVoices {
@@ -537,6 +538,11 @@ final class PlantedVoices: ChunkVoices {
     // how long the next balance calls take, in order
     var balanceWaits: [Duration] = []
     var player: Player?
+    private var told: CheckedContinuation<Void, Never>?
+    func tellToFail() {
+        told?.resume()
+        told = nil
+    }
     private let call: (String) -> Void
     init(_ call: @escaping (String) -> Void) { self.call = call }
 
@@ -557,6 +563,9 @@ final class PlantedVoices: ChunkVoices {
             onAudio()
         case .failsLate(let error):
             try? await Task.sleep(for: .milliseconds(150))
+            throw error
+        case .failsWhenTold(let error):
+            await withCheckedContinuation { told = $0 }
             throw error
         case .ignoresStop: try? await Task.sleep(for: .seconds(60))
         case .saysNothing: break

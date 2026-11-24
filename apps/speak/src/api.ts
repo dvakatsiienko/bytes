@@ -6,6 +6,9 @@ export const LANGS = [
   ['ru', 'русский'],
 ] as const;
 
+// how an engine stands; contract/wire.schema.json holds the list
+export const STATES = ['live', 'benched', 'no key', 'no quota'] as const;
+
 // a chain may name an engine newer than the catalogue this page read
 export const entryOf = (engines: EngineEntry[], id: Engine): EngineEntry =>
   engines.find((entry) => entry.id === id) ?? {
@@ -52,11 +55,15 @@ const read = async <T extends object>(path: string): Promise<T> => {
 export const api = {
   config: () => read<Settings>('/api/config'),
   heart: (engine: Engine, voice: string, isOn: boolean) =>
-    call<Saved>('PUT', '/api/favourites', { engine, on: isOn, voice }),
+    call<Saved>('PUT', '/api/favourites', {
+      engine,
+      on: isOn,
+      voice,
+    } satisfies Heart),
   pause: () => call('POST', '/api/pause'),
   preview: (payload: Preview) => call<Started>('POST', '/api/preview', payload),
   save: (patch: Patch, version: string) =>
-    call<Saved>('PUT', '/api/config', { patch, version }),
+    call<Saved>('PUT', '/api/config', { patch, version } satisfies Save),
   status: () => read<Status>('/api/status'),
   stop: () => call('POST', '/api/stop'),
   voices: async () => {
@@ -85,7 +92,7 @@ export interface EngineEntry {
 }
 
 // no language: it speaks every one its engine does
-interface Voice {
+export interface Voice {
   id: string;
   lang?: Lang;
   name: string;
@@ -132,24 +139,23 @@ export type Answer<T extends object = object> =
   | Refusal;
 
 // stale: the settings file moved on since this page read it
-interface Refusal {
+export interface Refusal {
   error: string;
   stale?: boolean;
 }
 
+export type State = (typeof STATES)[number];
+
+export interface Health {
+  // the provider's own words on a quota refusal
+  note?: string;
+  state: State;
+  until?: string;
+}
+
 export interface Status {
   accessibility?: boolean;
-  engines?: Partial<
-    Record<
-      Engine,
-      {
-        state: 'live' | 'benched' | 'no key' | 'no quota';
-        until?: string;
-        // the provider's own words on a quota refusal
-        note?: string;
-      }
-    >
-  >;
+  engines?: Partial<Record<Engine, Health>>;
   paused?: boolean;
   // the read that plays, if one does
   read?: number;
@@ -157,7 +163,7 @@ export interface Status {
 }
 
 // a preview's answer: the read it began
-interface Started {
+export interface Started {
   read: number;
 }
 
@@ -165,6 +171,17 @@ export interface Preview {
   engine: Engine;
   settings: EngineSettings;
   text: string;
+}
+
+export interface Heart {
+  engine: Engine;
+  on: boolean;
+  voice: string;
+}
+
+export interface Save {
+  patch: Patch;
+  version: string;
 }
 
 // the pill's infinite waveform: on with the draft's glide and flow, off to hand the meter back

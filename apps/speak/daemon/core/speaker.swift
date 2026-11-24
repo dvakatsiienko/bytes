@@ -50,16 +50,16 @@ final class Speaker: ReadTarget {
     }
 
     // the admin asks every few seconds: a status older than 10 min refreshes the quota behind this answer
-    func health() -> [String: [String: String]] {
+    func health() -> [String: Health] {
         if quotaProbedAt.map({ Date().timeIntervalSince($0) > 600 }) ?? true { Task { await probeQuota() } }
-        var result: [String: [String: String]] = [:]
+        var result: [String: Health] = [:]
         for engine in Engine.allCases {
             let needsKey = engine.isCloud && !voices.hasKey(engine)
             let until = skipUntil[engine].flatMap { $0 > Date() ? $0 : nil }
             let hold = outOfQuota[engine].flatMap { $0.until > Date() ? $0 : nil }
-            result[engine.rawValue] = needsKey ? ["state": "no key"]
-                : hold.map { ["state": "no quota", "note": $0.note] }
-                ?? until.map { ["state": "benched", "until": ISO8601DateFormatter().string(from: $0)] } ?? ["state": "live"]
+            result[engine.rawValue] = needsKey ? Health(state: .noKey)
+                : hold.map { Health(state: .noQuota, note: $0.note) }
+                ?? until.map { Health(state: .benched, until: ISO8601DateFormatter().string(from: $0)) } ?? Health(state: .live)
         }
         return result
     }

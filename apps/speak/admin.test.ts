@@ -16,6 +16,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { adminPaths, createAdmin } from './admin.ts';
+import wire from './contract/wire.schema.json';
 import { adminUrl } from './ports.ts';
 
 const SETTINGS = {
@@ -50,9 +51,11 @@ beforeEach(async () => {
     connection.once('data', (sent) => {
       const line = JSON.parse(sent.toString());
       asked.push(line);
-      connection.end(
-        rawReply ?? `${JSON.stringify(replies[line.op] ?? { ok: true })}\n`,
-      );
+      const isKnown = line.op in wire.$defs.request;
+      const reply = isKnown
+        ? (replies[line.op] ?? { ok: true })
+        : { error: `unknown op ${line.op}` };
+      connection.end(rawReply ?? `${JSON.stringify(reply)}\n`);
     });
   });
   await new Promise<void>((resolve) => fakeDaemon.listen(socket, resolve));

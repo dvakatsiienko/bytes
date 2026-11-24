@@ -19,7 +19,7 @@ places=$(grep -nE "$place" ./*.swift core/*.swift | grep -v '^core/paths\.swift:
 [ -z "$places" ] || { printf 'daemon-test: a place named outside core/paths.swift\n%s\n' "$places" >&2; exit 1; }
 ../script/daemon-compile.sh -typecheck
 swiftc -parse-as-library -swift-version 5 core/*.swift test/*.swift -o build/daemon-test
-./build/daemon-test golden.json config.json ../contract/config.schema.json
+./build/daemon-test golden.json config.json ../contract
 ../script/daemon-core.test.sh
 ../script/daemon-swap.test.sh
 ../script/daemon-try.test.sh

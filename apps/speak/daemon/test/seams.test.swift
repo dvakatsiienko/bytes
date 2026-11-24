@@ -18,9 +18,15 @@ enum SeamsTest {
         let ask = { (line: String, setup: (Recorder) -> Void) -> String in
             let recorder = Recorder()
             setup(recorder)
-            guard let request = try? JSONDecoder().decode(Request.self, from: Data(line.utf8)) else { return "bad request" }
-            let reply = runOp(request, with: recorder)
-            let json = (try? JSONSerialization.data(withJSONObject: reply, options: .sortedKeys)).map { String(decoding: $0, as: UTF8.self) } ?? "?"
+            let request: Request
+            do {
+                request = try JSONDecoder().decode(Request.self, from: Data(line.utf8))
+            } catch {
+                return error is RequestError ? "\(error)" : "bad request"
+            }
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .sortedKeys
+            let json = (try? encoder.encode(run(request, with: recorder))).map { String(decoding: $0, as: UTF8.self) } ?? "?"
             return ([json] + recorder.calls).joined(separator: " | ")
         }
         let plain = { (line: String) in ask(line, { _ in }) }
@@ -48,13 +54,13 @@ enum SeamsTest {
             ("block-main", plain(#"{"op":"block-main","seconds":2}"#), #"{"ok":true} | block 2.0"#),
             ("block-main with no seconds", plain(#"{"op":"block-main"}"#), #"{"ok":true} | block 5.0"#),
             ("read", plain(#"{"op":"read","text":"Hello. Bye."}"#), #"{"ok":true} | read Hello./Bye."#),
-            ("read with no text", plain(#"{"op":"read"}"#), #"{"error":"read needs text"}"#),
+            ("read with no text", plain(#"{"op":"read"}"#), "read needs text"),
             ("read with an empty text", plain(#"{"op":"read","text":""}"#), #"{"error":"read: nothing to say"}"#),
             ("preview", plain(#"{"op":"preview","engine":"kokoro","text":"Hi","settings":{"gain":2}}"#), #"{"ok":true,"read":7} | preview kokoro Hi 2.0"#),
             ("preview on the saved settings", plain(#"{"op":"preview","engine":"kokoro","text":"Hi"}"#), #"{"ok":true,"read":7} | preview kokoro Hi saved"#),
-            ("preview of an unknown engine", plain(#"{"op":"preview","engine":"nobody","text":"Hi"}"#), #"{"error":"preview needs engine and text"}"#),
-            ("preview with no text", plain(#"{"op":"preview","engine":"kokoro"}"#), #"{"error":"preview needs engine and text"}"#),
-            ("an unknown op", plain(#"{"op":"dance"}"#), #"{"error":"unknown op dance"}"#),
+            ("preview of an unknown engine", plain(#"{"op":"preview","engine":"nobody","text":"Hi"}"#), "preview needs engine and text"),
+            ("preview with no text", plain(#"{"op":"preview","engine":"kokoro"}"#), "preview needs engine and text"),
+            ("an unknown op", plain(#"{"op":"dance"}"#), "unknown op dance"),
             ("no op", plain("{}"), "bad request"),
         ])
     }
@@ -86,6 +92,10 @@ enum SeamsTest {
         let status = #"{"op":"status"}"#, stop = #"{"op":"stop"}"#
         var rows: [(name: String, got: String, want: String)] = []
         rows.append(("not a request", ask(age(0), "hello"), #"{"error":"bad request"}"#))
+        rows.append(("a status is asked for once", "\(ask(age(0), status)) \(recorder.statuses)", #"{… "paused":false,"speaking":true} 1"#))
+        rows.append(("an op it does not know", ask(age(0), #"{"op":"dance"}"#), #"{"error":"unknown op dance"}"#))
+        rows.append(("an op without what it needs", ask(age(0), #"{"op":"read"}"#), #"{"error":"read needs text"}"#))
+        rows.append(("a field of the wrong kind", ask(age(0), #"{"op":"read","text":5}"#), #"{"error":"bad request"}"#))
         main.isBlocked = true
         rows.append(("a status before main ever answered", ask(age(3), status), #"{"error":"main thread blocked for 3.0 s, status dropped","main":"blocked for 3.0 s"}"#))
         rows.append(("a stop main never began", ask(age(3), stop), #"{"error":"main thread blocked for 3.0 s, stop dropped","main":"blocked for 3.0 s"}"#))
@@ -131,7 +141,7 @@ enum SeamsTest {
             DispatchQueue.global().async { done.resume(returning: String(decoding: begun.answer(Data(stop.utf8)), as: UTF8.self)) }
         }
         rows.append(("a stop main had begun when the budget ended", late, #"{"ok":true}"#))
-        return check("answer", rows) + check("budget", [("status", mainBudget("status"), 0.05), ("any other op", mainBudget("read"), 2)])
+        return check("answer", rows) + check("budget", [("status", mainBudget(.status), 0.05), ("any other op", mainBudget(.stop), 2)])
     }
 
     static func pressFailures() async -> Int {
@@ -160,6 +170,8 @@ enum SeamsTest {
                      "refresh | «press: nothing selected (grab ax → ⌘C N ms)» | toggle"))
         rows.append(("F4 while it speaks, accessibility empty: no ⌘C", await f4 { grab, read in grab.selected = (nil, "ax"); grab.copied = "Copied."; read.isSpeaking = true },
                      "refresh | «press: nothing selected (grab ax N ms) → pause / resume» | toggle"))
+        rows.append(("F4 idle, ⌘C an empty string", await f4 { grab, _ in grab.selected = ("", "⌘C") },
+                     "refresh | «press: nothing selected (grab ⌘C N ms)» | toggle"))
         rows.append(("F4 idle, ⌘C empty: no second ⌘C", await f4 { grab, _ in grab.selected = (nil, "⌘C"); grab.copied = "Copied." },
                      "refresh | «press: nothing selected (grab ⌘C N ms)» | toggle"))
         let line = { (text: String) -> String in
@@ -389,7 +401,11 @@ class Recorder: DaemonCommands {
     var reloadError: String?
     var isSpeaking = true
     var isPaused = false
-    func status() -> Status { Status(engines: ["kokoro": ["state": "live"]], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, settings: "at") }
+    var statuses = 0
+    func status() -> Status {
+        statuses += 1
+        return Status(engines: ["kokoro": Health(state: .live)], isTrusted: true, isSpeaking: isSpeaking, isPaused: isPaused, read: isSpeaking ? 7 : nil, settings: "at")
+    }
     func chunks(of text: String) -> [Chunk] { spokenChunks(of: text) }
     func voices(of engine: Engine) -> [Voice] { engine == .system ? [Voice(id: "a", name: "A", lang: .uk)] : engine == .fish ? [Voice(id: "f", name: "F")] : [] }
     func reload() -> String? { calls.append("reload"); return reloadError }

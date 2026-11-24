@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "health": {
+      "properties": {
+        "note": { "type": "string" },
+        "state": { "enum": ["live", "benched", "no key", "no quota"] },
+        "until": { "type": "string" }
+      },
+      "required": ["state"],
+      "type": "object"
+    },
+    "reply": {
+      "began": {
+        "properties": {
+          "ok": { "const": true },
+          "read": { "type": "integer" }
+        },
+        "required": ["ok", "read"],
+        "type": "object"
+      },
+      "ok": {
+        "properties": { "ok": { "const": true } },
+        "required": ["ok"],
+        "type": "object"
+      },
+      "refused": {
+        "properties": {
+          "error": { "type": "string" },
+          "main": { "type": "string" },
+          "stale": { "const": true }
+        },
+        "required": ["error"],
+        "type": "object"
+      },
+      "settings": {
+        "properties": {
+          "config": { "$ref": "config.schema.json" },
+          "ok": { "const": true },
+          "version": { "type": "string" },
+          "was": { "type": "string" }
+        },
+        "required": ["config", "ok", "version", "was"],
+        "type": "object"
+      },
+      "status": {
+        "properties": {
+          "accessibility": { "type": "boolean" },
+          "engines": {
+            "additionalProperties": { "$ref": "#/$defs/health" },
+            "type": "object"
+          },
+          "main": { "type": "string" },
+          "paused": { "type": "boolean" },
+          "read": { "type": "integer" },
+          "settings": { "type": "string" },
+          "speaking": { "type": "boolean" }
+        },
+        "required": [
+          "accessibility",
+          "engines",
+          "paused",
+          "settings",
+          "speaking"
+        ],
+        "type": "object"
+      },
+      "voices": {
+        "properties": {
+          "engines": {
+            "items": {
+              "properties": {
+                "id": { "type": "string" },
+                "label": { "type": "string" },
+                "languages": {
+                  "items": { "enum": ["en", "uk", "ru"] },
+                  "type": "array"
+                },
+                "voices": {
+                  "items": {
+                    "properties": {
+                      "id": { "type": "string" },
+                      "lang": { "enum": ["en", "uk", "ru"] },
+                      "name": { "type": "string" }
+                    },
+                    "required": ["id", "name"],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": ["id", "label", "languages", "voices"],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["engines"],
+        "type": "object"
+      }
+    },
+    "request": {
+      "block-main": { "properties": { "seconds": { "type": "number" } } },
+      "config": { "properties": {} },
+      "heart": {
+        "properties": {
+          "engine": { "type": "string" },
+          "on": { "type": "boolean" },
+          "voice": { "type": "string" }
+        }
+      },
+      "panel-demo": { "properties": {} },
+      "panel-hide": { "properties": {} },
+      "pause": { "properties": {} },
+      "preview": {
+        "properties": {
+          "engine": { "type": "string" },
+          "settings": { "$ref": "config.schema.json#/$defs/settings" },
+          "text": { "type": "string" }
+        },
+        "required": ["engine", "text"]
+      },
+      "read": {
+        "properties": { "text": { "type": "string" } },
+        "required": ["text"]
+      },
+      "reload": { "properties": {} },
+      "save": {
+        "properties": {
+          "patch": { "type": "object" },
+          "version": { "type": "string" }
+        }
+      },
+      "status": { "properties": {} },
+      "stop": { "properties": {} },
+      "voices": { "properties": {} },
+      "wave": {
+        "properties": {
+          "flow": { "type": "number" },
+          "glide": { "type": "number" },
+          "on": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

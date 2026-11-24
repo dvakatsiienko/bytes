@@ -6,13 +6,7 @@ import { Info } from '@/components/Info.tsx';
 import { StateBadge } from '@/components/StateBadge.tsx';
 import { VoicePicker } from '@/components/VoicePicker.tsx';
 
-import type {
-  Engine,
-  EngineEntry,
-  EngineSettings,
-  Lang,
-  Status,
-} from '@/api.ts';
+import type { EngineEntry, EngineSettings, Health, Lang } from '@/api.ts';
 import { LIMITS, type Limit } from '@/limits.ts';
 
 export const EngineCard = (props: EngineCardProps) => {
@@ -207,7 +201,7 @@ interface EngineCardProps {
   playState?: 'playing' | 'paused';
   rank?: number;
   settings: EngineSettings;
-  status?: NonNullable<Status['engines']>[Engine];
+  status?: Health;
   voice: string;
   voiceOptions: [string, string][];
 }

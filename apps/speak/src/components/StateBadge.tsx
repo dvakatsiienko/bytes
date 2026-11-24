@@ -1,24 +1,24 @@
-import type { Engine, Status } from '@/api.ts';
+import type { Health, State } from '@/api.ts';
 
 // state by word and border, never by colour alone
 export const StateBadge = (props: StateBadgeProps) => {
-  const state = props.state?.state ?? 'unknown';
+  const state = props.state?.state;
   const until = props.state?.until
     ? ` until ${new Date(props.state.until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
     : '';
 
   return (
     <span
-      className={`rounded border border-current px-2 text-sm ${stateColour[state] ?? 'text-muted'}`}
+      className={`rounded border border-current px-2 text-sm ${(state && stateColour[state]) ?? 'text-muted'}`}
       title={props.state?.note && quotaTitle(props.state.note)}>
-      {state}
+      {state ?? 'unknown'}
       {until}
     </span>
   );
 };
 
 /* Helpers */
-const stateColour: Record<string, string> = {
+const stateColour: Record<State, string> = {
   benched: 'text-warn',
   live: 'text-ok',
   'no key': 'text-bad',
@@ -40,5 +40,5 @@ const quotaTitle = (note: string) => {
 
 /* Types */
 interface StateBadgeProps {
-  state?: NonNullable<Status['engines']>[Engine];
+  state?: Health;
 }

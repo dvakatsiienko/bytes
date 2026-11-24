@@ -1,7 +1,7 @@
 // the settings file as it stands, the keys the daemon does not decode included, and the layout it is printed in
 import Foundation
 
-enum Json: Equatable, Decodable {
+enum Json: Equatable, Codable {
     case null, bool(Bool), number(Double), string(String), array([Json]), object([String: Json])
 
     init(from decoder: Decoder) throws {
@@ -18,6 +18,18 @@ enum Json: Equatable, Decodable {
             self = .array(array)
         } else {
             self = .object(try value.decode([String: Json].self))
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var value = encoder.singleValueContainer()
+        switch self {
+        case .null: try value.encodeNil()
+        case .bool(let bool): try value.encode(bool)
+        case .number(let number): try value.encode(number)
+        case .string(let string): try value.encode(string)
+        case .array(let items): try value.encode(items)
+        case .object(let pairs): try value.encode(pairs)
         }
     }
 
@@ -64,18 +76,6 @@ enum Json: Equatable, Decodable {
                 return name + value.text(indent: inner, lead: name.count, tail: key == last ? 0 : 1)
             }
             return "{\n" + lines.joined(separator: ",\n") + "\n\(indent)}"
-        }
-    }
-
-    // what JSONSerialization sends down the socket
-    var any: Any {
-        switch self {
-        case .null: NSNull()
-        case .bool(let bool): bool
-        case .number(let number): number
-        case .string(let string): string
-        case .array(let items): items.map(\.any)
-        case .object(let pairs): pairs.mapValues(\.any)
         }
     }
 

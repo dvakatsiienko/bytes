@@ -4,6 +4,7 @@ import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { createConnection } from 'node:net';
 import { extname, join, normalize, resolve } from 'node:path';
 
+import type wire from './contract/wire.schema.json';
 import { isWorktree } from './ports.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
@@ -19,7 +20,7 @@ const TYPES: Record<string, string> = {
 const NO_ANSWER = { error: 'x-speak closed the line before it answered' };
 
 // a status and the voices are their own answer; any other op says ok or why not
-function answerOf(line: string, op: string): Record<string, unknown> {
+function answerOf(line: string, op: Op): Record<string, unknown> {
   try {
     const reply = JSON.parse(line);
     const says =
@@ -32,7 +33,7 @@ function answerOf(line: string, op: string): Record<string, unknown> {
   }
 }
 
-function askDaemon(socketPath: string, request: { op: string }) {
+function askDaemon(socketPath: string, request: { op: Op }) {
   return new Promise<Record<string, unknown>>((answer) => {
     const socket = createConnection(socketPath);
     let reply = '';
@@ -94,11 +95,11 @@ function sendStatic(response: ServerResponse, dist: string, url: string) {
 const OWN_HOST = /^(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/u;
 
 export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
-  const daemon = (op: string, request: object = {}) =>
+  const daemon = (op: Op, request: object = {}) =>
     askDaemon(socket, { ...request, op });
-  const ask = (op: string) => async (request: IncomingMessage) =>
+  const ask = (op: Op) => async (request: IncomingMessage) =>
     daemon(op, await body(request));
-  const save = (op: string) => async (request: IncomingMessage) =>
+  const save = (op: Op) => async (request: IncomingMessage) =>
     canSave ? ask(op)(request) : { error: WORKTREE };
 
   const routes: Record<string, (request: IncomingMessage) => Promise<unknown>> =
@@ -155,6 +156,9 @@ export const adminPaths = ({ app, home, own }: AdminPlace): AdminPaths => {
 };
 
 /* Types */
+// an op the daemon's socket takes
+type Op = keyof typeof wire.$defs.request;
+
 interface AdminPlace {
   app: string;
   home: string;

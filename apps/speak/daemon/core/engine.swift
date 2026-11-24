@@ -33,7 +33,7 @@ struct EngineFacts {
 }
 
 // a voice one can pick; no language: it speaks every one its engine does
-struct Voice: Equatable {
+struct Voice: Equatable, Encodable {
     let id: String
     let name: String
     var lang: Lang?

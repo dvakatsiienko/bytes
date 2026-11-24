@@ -72,7 +72,7 @@ private func inRange(_ field: String, _ value: Double, _ range: ClosedRange<Doub
     guard range.contains(value) else { throw ConfigError.outOfRange(field, value, range) }
 }
 
-struct EngineConfig: Decodable {
+struct EngineConfig: Decodable, Equatable {
     // the voices dima hearted: the page sorts by them, a heart writes them, no read asks them
     var favourites: [String] = []
     var model: String?
