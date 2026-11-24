@@ -15,7 +15,7 @@ import {
 export const Column = (props: ColumnProps) => {
   const chain = props.config.chain[props.lang] ?? [];
   const order = [
-    ...chain.flatMap((engine) => entryOf(props.engines, engine) ?? []),
+    ...chain.map((engine) => entryOf(props.engines, engine)),
     ...props.engines.filter(
       (entry) =>
         entry.languages.includes(props.lang) && !chain.includes(entry.id),

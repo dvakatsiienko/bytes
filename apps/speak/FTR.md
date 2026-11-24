@@ -25,7 +25,8 @@
   - then its cards show in that order, each labelled «1st / 2nd / … in the <lang> chain», and the engines outside the chain follow as dashed cards
 - ⬜ the cards, their labels, their languages and their voices are the daemon's catalogue
   - given an engine the daemon's catalogue names and the page has no mark for, then its card carries a plain sound wave on the ink hue
-  - given the daemon that runs is older than the page and names no engines, then the page says so in place of the cards
+  - given a chain names an engine the page's catalogue lacks, then it draws a bare card by its id, so every rank is true and it can be switched off
+  - given the daemon that runs is older than the page and names no engines, then the page says so in place of the cards and asks again every 5 s, and the stop, the settings and the save bar work on
 - ✅ a toggle puts an engine in or out of a chain
   - given an engine outside the en chain
   - when the user ticks «in the en chain»
@@ -102,7 +103,7 @@
 - ✅ ■ stop ends any speech
 - ⬜ a voice that hangs or breaks off hands over once, and no sentence is read twice
   - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on what its sentence has left of the first audio budget (kokoro gets more for a sentence over 300 characters); the last of a chain is waited for
-  - given a cloud voice refuses one sentence (a 400 or a 422), or answers it with no sound, then the next voice reads that sentence, and the next one asks it again
+  - given a cloud voice refuses one sentence (a 400 or a 422), or answers it with no sound, then the next voice reads on, and the next press asks the refuser again
   - given gemini sits before another voice in a chain and has no sound within the first audio budget, then that voice reads the sentence, as for every cloud voice
   - given a voice breaks off in the middle of a sentence, then the read goes on with the next sentence, and no other voice starts that one again
   - given the daemon's main thread stuck for over a minute, then `status` no longer says speaking, so relaunch, rollback and try are open

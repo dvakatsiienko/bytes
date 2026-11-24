@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { type Config, api } from './src/api.ts';
+import { type Config, api, entryOf } from './src/api.ts';
 import {
   afterHeart,
   changesOf,
@@ -65,6 +65,16 @@ describe('M13: a failed request is no settings', () => {
     answers(200, '{"system":[]}');
 
     await expect(api.voices()).rejects.toThrow('older than this page');
+  });
+
+  it('an engine the catalogue lacks has a bare entry', () => {
+    expect(entryOf([], 'speechify')).toEqual({
+      gain: true,
+      id: 'speechify',
+      label: 'speechify',
+      languages: [],
+      voices: [],
+    });
   });
 
   it('settings are settings', async () => {

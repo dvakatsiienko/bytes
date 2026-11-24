@@ -49,9 +49,11 @@ final class Voices: ChunkVoices {
         if engine == .system, !settings().oneOutput {
             await player.drained()
             try Task.checkCancellation()
-            return await macVoice.speak(chunk, settings(), onFirstWord: onAudio)
+            await macVoice.speak(chunk, settings(), onFirstWord: onAudio)
+        } else if let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) {
+            try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline, onAudio: onAudio)
         }
-        guard let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) else { return }
-        try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline, onAudio: onAudio)
+        // the chunk is spoken: what another engine rendered of it is for no one
+        ahead = ahead.filter { $0.key == engine }
     }
 }

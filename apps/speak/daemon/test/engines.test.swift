@@ -64,10 +64,10 @@ enum EnginesTest {
         rows.append(("a sample cut between two pieces", await render(.fish, net([Data([1, 2, 3]), Data([4, 5])], 200)), "1.2 | 3.4"))
         rows.append(("a piece of half a sample", await render(.fish, net([Data([1]), Data([2, 3, 4])], 200)), "1.2.3.4"))
         rows.append(("a quota refusal, in pieces", await render(.elevenlabs, net([Data(#"{"detail":{"status":"quota_exc"#.utf8), Data(#"eeded","message":"14 left"}}"#.utf8)], 401)), #"quota("14 left")"#))
-        rows.append(("a refusal that never ends is cut", await render(.elevenlabs, net([Data(repeating: 32, count: 5000), Data("x".utf8)], 500)), "status(500)"))
+        rows.append(("a refusal that never ends is cut", await render(.elevenlabs, net([Data(repeating: 32, count: 5000), Data(#"{"detail":{"status":"quota_exceeded"}}"#.utf8)], 500)), "status(500)"))
         rows.append(("a stream that breaks off", await render(.fish, PlantedNet(body: [Data([1, 2])], breaks: EngineError.status(0))), "1.2 | \(EngineError.status(0))"))
         rows.append(("gemini's wav loses its header", await render(.gemini, net([gemini(Array("RIFF".utf8) + [UInt8](repeating: 0, count: 40) + [9, 9])], 200)), "9.9"))
-        rows.append(("gemini with no audio in it", await render(.gemini, net([Data("{}".utf8)], 200)), "status(0)"))
+        rows.append(("gemini with no audio in it has no sound", await render(.gemini, net([Data("{}".utf8)], 200)), ""))
         return check("engine render", rows)
     }
 
@@ -87,6 +87,7 @@ enum EnginesTest {
             ("elevenlabs, empty with no refill date", await left(.elevenlabs, #"{"character_count":10000,"character_limit":10000}"#, nil), Balance(left: 0, empty: "0 of 10000 credits left")),
             ("elevenlabs, a key that may not ask", await left(.elevenlabs, #"{"detail":{"status":"missing_permissions"}}"#, nil), nil),
             ("fish, the free model", await left(.fish, "{}", nil), Balance(left: .infinity)),
+            ("fish, the free model by name", await left(.fish, "{}", "s2.1-pro-free"), Balance(left: .infinity)),
             ("fish, a paid one", await left(.fish, #"{"credit":"4.5"}"#, "s2.1-pro"), Balance(left: 4.5)),
             ("fish, a paid one, empty", await left(.fish, #"{"credit":"0"}"#, "s2.1-pro"), Balance(left: 0, empty: "api balance $0 — top up at fish.audio")),
             ("fish, no number", await left(.fish, #"{"credit":null}"#, "s2.1-pro"), nil),
@@ -123,7 +124,13 @@ enum EnginesTest {
             line.onTermination = { if case .cancelled = $0 { Task { @MainActor in calls.made.append("cancelled") } } }
             try? await act(line, audio, player)
             calls.made = []
-            let task = Task { try await play(pieces, of: Chunk(lang: .en, text: text), into: player, settings: { EngineConfig(gain: 2) }, deadline: deadline) { calls.made.append("heard") } }
+            var gain = 1.0
+            let task = Task {
+                try await play(pieces, of: Chunk(lang: .en, text: text), into: player, settings: { gain += 1; return EngineConfig(gain: gain) }, deadline: deadline) { calls.made.append("heard") }
+            }
+            // no row waits for good
+            let limit = Task { try await Task.sleep(for: .seconds(1)); line.finish() }
+            defer { limit.cancel() }
             await settle()
             await after(task, line)
             let end = await task.result
@@ -153,6 +160,8 @@ enum EnginesTest {
         }, "sound gain 2.0 | heard")
         await row("stopped before the first sound", "Hi", .seconds(5), { _, _, _ in }, { task, _ in task.cancel() }, "cancelled | stopped")
         await row("stopped in the middle: a piece that lands after it is never heard", "Hi", nil, { line, _, _ in line.yield(pcm) }, { task, line in task.cancel(); line.yield(pcm) }, "sound gain 2.0 | heard | cancelled | stopped")
+        await row("stopped as a piece landed: it is never heard", "Hi", nil, { _, _, _ in }, { task, line in line.yield(pcm); task.cancel() }, "cancelled | stopped")
+        await row("stopped as the line ended with nothing", "Hi", nil, { _, _, _ in }, { task, line in line.finish(); task.cancel() }, "stopped")
         await row("stopped, though the line had ended", "Hi", nil, { _, _, _ in }, { task, line in task.cancel(); line.finish() }, "cancelled | stopped")
         // the wait runs from the moment nothing plays
         await row("under sound the deadline holds", "Hi", .milliseconds(30), { _, _, player in try player.schedule(Data([1, 2]), EngineConfig()) }, { _, line in
@@ -194,13 +203,27 @@ enum EnginesTest {
             net.hangs = false
             try await say(voices, "Two.", .fish, calls)
         }, "ask One. | dropped One. | ask Two. | sound | heard")
-        await row("a server's render of this chunk outlives the cloud's turn", { voices, _, calls in
+        await row("a server's render of this chunk outlives the cloud's miss", { voices, net, calls in
+            voices.openAhead(chunk("One."), with: .kokoro, settings: named)
+            await settle()
+            net.hangs = true
+            try? await voices.speak(chunk("One."), with: .fish, settings: { named }, deadline: .milliseconds(20)) {}
+            await settle()
+            try await say(voices, "One.", .kokoro, calls)
+        }, "ask One. | ask One. | dropped One. | sound | heard")
+        await row("a server's render the cloud beat is for no one, on the next read too", { voices, _, calls in
             voices.openAhead(chunk("One."), with: .kokoro, settings: named)
             await settle()
             try await say(voices, "One.", .fish, calls)
-            await settle()
+            calls.made = []
             try await say(voices, "One.", .kokoro, calls)
-        }, "ask One. | ask One. | sound | heard | sound | heard")
+        }, "ask One. | sound | heard")
+        await row("the next chunk's look ahead outlives this one, the same words too", { voices, _, calls in
+            try await voices.speak(chunk("One."), with: .fish, settings: { named }, deadline: nil) { voices.openAhead(chunk("One."), with: .fish, settings: named) }
+            await settle()
+            calls.made = []
+            try await say(voices, "One.", .fish, calls)
+        }, "sound | heard")
         await row("a stop drops what was asked ahead", { voices, net, calls in
             net.hangs = true
             voices.openAhead(chunk("One."), with: .fish, settings: named)
@@ -275,7 +298,7 @@ final class PlantedNet: Net, @unchecked Sendable {
         call("ask \(text)")
         guard hangs else { return }
         let call = call
-        do { try await Task.sleep(for: .seconds(60)) } catch {
+        do { try await Task.sleep(for: .seconds(1)) } catch {
             call("dropped \(text)")
             throw error
         }

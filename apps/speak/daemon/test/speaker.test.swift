@@ -247,6 +247,10 @@ enum SpeakerTest {
             ("an answer in time", await outcome(.seconds(60), {}) { 1 }, "1"),
             ("no deadline", await outcome(nil, {}) { 1 }, "1"),
             ("too late: the task ends too", await outcome(.milliseconds(10), {}) { try await Task.sleep(for: .seconds(60)); return 1 }, "timeout, cancelled"),
+            ("an answer that came after it was cut is late", await outcome(.milliseconds(10), {}) {
+                await withCheckedContinuation { done in DispatchQueue.global().asyncAfter(deadline: .now() + 0.06) { done.resume() } }
+                return 1
+            }, "timeout, cancelled"),
             ("the deadline waits for the quiet", await outcome(.milliseconds(1), { try? await Task.sleep(for: .seconds(60)) }) { try await Task.sleep(for: .milliseconds(30)); return 1 }, "1"),
             ("a failure before the quiet does not wait for it", "\(await outcome(.seconds(60), longQuiet) { throw EngineError.status(500) }), \(ContinuousClock.now - began < .seconds(2) ? "at once" : "late")", "status(500), at once"),
             ("a failure of its own", await outcome(.seconds(60), {}) { throw EngineError.status(500) }, "status(500)"),

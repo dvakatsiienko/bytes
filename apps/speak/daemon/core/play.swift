@@ -17,6 +17,7 @@ func play(_ pieces: Pieces, of chunk: Chunk, into player: Player, settings: () -
         held = settings
         next = try await line.next()
     }
+    // a cancelled line ends like a whole one
     try Task.checkCancellation()
     // an answer with no sound in it is no answer, unless there is no word to say, «…»
     if held == nil, chunk.text.contains(where: { $0.isLetter || $0.isNumber }) { throw EngineError.noSound }
@@ -33,8 +34,6 @@ private final class PieceLine: @unchecked Sendable {
         while let piece = try await pieces.next() {
             if piece.pcm.count > 1 { return piece }
         }
-        // a cancelled line ends like a whole one
-        try Task.checkCancellation()
         return nil
     }
 }

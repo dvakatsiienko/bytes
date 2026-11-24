@@ -10,10 +10,15 @@ final class Keys {
     private var values: [Engine: String] = [:]
     private var loadedAt: Date?
     private var isLoading = false
-    private let names = Engine.allCases.compactMap { engine in engine.facts.keyName.map { (engine, $0) } }
+    private let names: [(Engine, String)]
 
-    init(run: (@Sendable (String) async throws -> String)?, now: @escaping () -> Date = { Date() }, log write: @escaping (String) -> Void) {
+    init(
+        run: (@Sendable (String) async throws -> String)?,
+        names: [(Engine, String)] = Engine.allCases.compactMap { engine in engine.facts.keyName.map { (engine, $0) } },
+        now: @escaping () -> Date = { Date() }, log write: @escaping (String) -> Void
+    ) {
         self.run = run
+        self.names = names
         self.now = now
         self.write = write
     }

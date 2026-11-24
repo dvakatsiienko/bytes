@@ -30,6 +30,8 @@ export const App = () => {
   const voices = useQuery({
     queryFn: api.voices,
     queryKey: ['voices'],
+    // a daemon that was away, or too old, is asked again until it names its engines
+    refetchInterval: (query) => (query.state.data ? false : 5000),
     staleTime: Number.POSITIVE_INFINITY,
   });
   const { playing, status, ...speech } = usePreview();
@@ -51,14 +53,12 @@ export const App = () => {
     (reason) => setMessage({ kind: 'error', text: reason }),
   );
 
-  if (!(draft && voices.data))
+  if (!draft)
     return (
       <p className='p-4 text-muted'>
-        {(settings.error ?? voices.error)?.message ?? 'reading the settings…'}
+        {settings.error ? settings.error.message : 'reading the settings…'}
       </p>
     );
-
-  const { data: engines } = voices;
 
   const edit = (change: (config: Config) => Config) => {
     settings.edit(change);
@@ -136,7 +136,7 @@ export const App = () => {
         resetKeys={[lang]}>
         <Column
           config={draft}
-          engines={engines}
+          engines={voices.data ?? []}
           lang={lang}
           onChain={(chain) =>
             edit((config) => ({
@@ -306,7 +306,13 @@ export const App = () => {
           dragStart.current = draft.chain;
         }}>
         <main className='mx-auto grid max-w-[1280px] grid-cols-1 gap-x-6 gap-y-10 px-4 pt-8 pb-28 min-[900px]:grid-cols-3'>
-          {columnListJSX}
+          {voices.data ? (
+            columnListJSX
+          ) : (
+            <p className='text-muted'>
+              {voices.error ? voices.error.message : 'reading the engines…'}
+            </p>
+          )}
         </main>
       </DragDropProvider>
       <div className='sticky bottom-3 z-30 mx-auto max-w-[1280px] px-4'>

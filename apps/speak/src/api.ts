@@ -6,8 +6,15 @@ export const LANGS = [
   ['ru', 'русский'],
 ] as const;
 
-export const entryOf = (engines: EngineEntry[], id: Engine) =>
-  engines.find((entry) => entry.id === id);
+// a chain may name an engine newer than the catalogue this page read
+export const entryOf = (engines: EngineEntry[], id: Engine): EngineEntry =>
+  engines.find((entry) => entry.id === id) ?? {
+    gain: true,
+    id,
+    label: id,
+    languages: [],
+    voices: [],
+  };
 
 export const voiceOf = (config: Config, engine: Engine, lang: Lang) => {
   const voice = config.engines[engine]?.voice ?? {};
@@ -57,7 +64,7 @@ export const api = {
     const { engines } = await read<Catalogue>('/api/voices');
     if (!engines)
       throw new Error(
-        'the x-speak that runs names no engines — it is older than this page',
+        'x-speak or its admin server is older than this page: it names no engines',
       );
     return engines;
   },

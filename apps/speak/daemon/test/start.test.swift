@@ -93,6 +93,12 @@ enum StartTest {
                 calls.made = []
             }, "2 asked")
         }
+        let four = PlantedRunner()
+        four.missing = ["kokoro"]
+        let keys = Keys(run: { try await four.run($0) }, names: Engine.allCases.filter { $0 != .system }.map { ($0, "\($0.rawValue.uppercased())_API_KEY") }, now: { four.now }, log: { _ in })
+        await keys.load()
+        await press(keys, four, 61)
+        rows.append(("a fourth keyed engine's missing key is looked for", "\(four.asked) asked", "2 asked"))
         let none = Keys(run: nil, log: { _ in })
         await none.load()
         none.reloadIfMissing()
