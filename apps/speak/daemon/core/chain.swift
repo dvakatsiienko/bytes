@@ -8,7 +8,7 @@ struct Chunk {
 }
 
 enum EngineError: Error {
-    case noKey, noVoice, status(Int), timeout
+    case noKey, noVoice, noSound, status(Int), timeout
     // the provider's own words, e.g. «you have 14 credits remaining, while 203 are required»
     case quota(String)
 }
@@ -38,9 +38,10 @@ func candidates(chain: [Lang: [Engine]], lang: Lang, only: Engine?, benched: [En
     return result
 }
 
-// a cloud engine racing its deadline: kokoro renders the same chunk meanwhile, so a miss costs nothing
-func rendersKokoroAhead(_ candidates: [Engine], lead: Engine?, isPlaying: Bool) -> Bool {
-    lead == nil && candidates.first?.isCloud == true && candidates.contains(.kokoro) && !isPlaying
+// a cloud engine racing its deadline: a local server renders the same chunk meanwhile, so a miss costs nothing
+func rendersAhead(_ candidates: [Engine], lead: Engine?, isPlaying: Bool) -> Engine? {
+    guard lead == nil, candidates.first?.isCloud == true, !isPlaying else { return nil }
+    return candidates.first { $0.facts.isLocalServer }
 }
 
 // one first-audio budget per chunk, shared by every cloud engine: misses never stack
@@ -52,18 +53,18 @@ func isOnBudget(_ engine: Engine, lead: Engine?) -> Bool { engine.isCloud && eng
 
 enum FirstAudioWait: Equatable { case asLongAsItTakes, atMost(Duration), skip }
 
-// kokoro answers a chunk whole, and a server that hangs never does: 3 s, far over its 0.8 s for 300 characters
+// a local server answers a chunk whole, and one that hangs never does: 3 s, far over kokoro's 0.8 s for 300 characters
 // (24 Nov), and 10 ms for each one past them. it runs from the moment nothing plays
-func kokoroWait(_ characters: Int) -> Duration { .milliseconds(3000 + 10 * max(0, characters - 300)) }
+func localServerWait(_ characters: Int) -> Duration { .milliseconds(3000 + 10 * max(0, characters - 300)) }
 
 // the read's voice is not on the budget: a gap between chunks must not hand it to the next engine, only a hang may
 private let leadWait = Duration.seconds(3)
 
-// the last candidate has nothing to yield to, so it waits as long as it takes. kokoro's and the lead's waits run from the
+// the last candidate has nothing to yield to, so it waits as long as it takes. a local server's and the lead's waits run from the
 // moment nothing plays, the budget from its chunk's start
 func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, characters: Int, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
     guard engine != candidates.last else { return .asLongAsItTakes }
-    if engine == .kokoro { return .atMost(kokoroWait(characters)) }
+    if engine.facts.isLocalServer { return .atMost(localServerWait(characters)) }
     guard engine.isCloud else { return .asLongAsItTakes }
     if engine == lead { return .atMost(leadWait) }
     guard let budgetEnds else { return .asLongAsItTakes }
@@ -75,25 +76,23 @@ struct BenchDecision: Equatable {
     var seconds: TimeInterval?
     // the provider's words for an empty balance
     var quota: String?
-    var restartsKokoro = false
-    var mayEndFishFreeTier = false
+    var restartsServer = false
 }
 
-// quota or auth → an hour off; 5xx or offline → a minute off. a slow start and a missing key cost only this
-// press: benching on a slow start turned one miss into a minute of kokoro (dima, 2026-09-29)
+// quota or auth → an hour off; 5xx or offline → a minute off. a refused text costs only this chunk; a slow start and
+// a missing key only this press: benching on a slow start turned one miss into a minute of kokoro (dima, 2026-09-29)
 func bench(for error: Error, from engine: Engine) -> BenchDecision {
     var decision = BenchDecision()
     decision.seconds = switch error {
-    case EngineError.noKey, EngineError.noVoice, EngineError.timeout: nil
+    case EngineError.noKey, EngineError.noVoice, EngineError.noSound, EngineError.timeout: nil
+    case EngineError.status(400), EngineError.status(422): nil
     case EngineError.status(let code) where [401, 402, 403, 429].contains(code): 3600
     case EngineError.quota: 3600
     default: 60
     }
     if case EngineError.quota(let message) = error { decision.quota = message }
-    // the kokoro server is ours to keep alive: one that stops answering is started again
-    decision.restartsKokoro = engine == .kokoro && (error as? URLError)?.code == .cannotConnectToHost
-    // fish's free model ends on a date its blog names twice (11-30, 08-31): its refusal reads as the tier's end
-    if engine == .fish, case EngineError.status(let code) = error { decision.mayEndFishFreeTier = [402, 429].contains(code) }
+    // a local server is ours to keep alive: one that stops answering is started again
+    decision.restartsServer = engine.facts.isLocalServer && (error as? URLError)?.code == .cannotConnectToHost
     return decision
 }
 

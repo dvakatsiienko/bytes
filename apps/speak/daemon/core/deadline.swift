@@ -13,7 +13,10 @@ func answer<T: Sendable>(of task: Task<T, Error>, within deadline: Duration?, af
             task.cancel()
         }
         defer { timer.cancel() }
-        do { return try await task.value } catch { throw late.isSet ? EngineError.timeout : error }
+        let result = await task.result
+        // one that came as the deadline cut it may be half an answer
+        if late.isSet { throw EngineError.timeout }
+        return try result.get()
     } onCancel: {
         task.cancel()
     }

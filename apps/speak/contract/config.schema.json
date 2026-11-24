@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
-    "engine": { "enum": ["elevenlabs", "fish", "kokoro", "system", "gemini"] },
     "settings": {
       "properties": {
         "favourites": { "items": { "type": "string" }, "type": "array" },
@@ -26,7 +25,7 @@
   "properties": {
     "chain": {
       "additionalProperties": {
-        "items": { "$ref": "#/$defs/engine" },
+        "items": { "type": "string" },
         "type": "array"
       },
       "propertyNames": { "enum": ["en", "uk", "ru"] },
@@ -34,7 +33,6 @@
     },
     "engines": {
       "additionalProperties": { "$ref": "#/$defs/settings" },
-      "propertyNames": { "$ref": "#/$defs/engine" },
       "type": "object"
     },
     "firstAudioMs": { "maximum": 3000, "minimum": 100, "type": "integer" },

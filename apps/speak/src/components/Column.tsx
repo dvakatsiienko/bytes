@@ -2,13 +2,12 @@ import { EngineCard } from '@/components/EngineCard.tsx';
 
 import {
   type Config,
-  ENGINES,
   type Engine,
+  type EngineEntry,
   type EngineSettings,
   type Lang,
   type Status,
-  type Voices,
-  speaks,
+  entryOf,
   voiceOf,
 } from '@/api.ts';
 
@@ -16,17 +15,19 @@ import {
 export const Column = (props: ColumnProps) => {
   const chain = props.config.chain[props.lang] ?? [];
   const order = [
-    ...chain,
-    ...ENGINES.filter(
-      (engine) => speaks(engine, props.lang) && !chain.includes(engine),
+    ...chain.map((engine) => entryOf(props.engines, engine)),
+    ...props.engines.filter(
+      (entry) =>
+        entry.languages.includes(props.lang) && !chain.includes(entry.id),
     ),
   ];
 
-  const cardListJSX = order.map((engine) => {
+  const cardListJSX = order.map((entry) => {
+    const engine = entry.id;
     const rank = chain.indexOf(engine);
     return (
       <EngineCard
-        engine={engine}
+        engine={entry}
         isLast={rank === chain.length - 1}
         key={engine}
         lang={props.lang}
@@ -53,7 +54,7 @@ export const Column = (props: ColumnProps) => {
         settings={props.config.engines[engine] ?? {}}
         status={props.status.engines?.[engine]}
         voice={voiceOf(props.config, engine, props.lang)}
-        voiceOptions={voiceOptions(props.voices, engine, props.lang)}
+        voiceOptions={voiceOptions(entry, props.lang)}
       />
     );
   });
@@ -84,29 +85,15 @@ const swap = (chain: Engine[], from: number, to: number) => {
   return next;
 };
 
-// every engine's voices; the mac voice lists the installed female voices of this language
-const voiceOptions = (
-  voices: Voices | undefined,
-  engine: Engine,
-  lang: Lang,
-): [string, string][] => {
-  if (!voices) return [];
-  if (engine !== 'system') return voices[engine];
-  const installed = voices.system
-    .filter((voice) => voice.lang === lang)
-    .map((voice): [string, string] => [
-      voice.id,
-      `${voice.name} · ${voice.quality}`,
-    ]);
-  return [
-    ['', lang === 'en' ? 'Spoken Content voice (Siri)' : 'best installed'],
-    ...installed,
-  ];
-};
+const voiceOptions = (entry: EngineEntry, lang: Lang) =>
+  entry.voices
+    .filter((voice) => !voice.lang || voice.lang === lang)
+    .map((voice): [string, string] => [voice.id, voice.name]);
 
 /* Types */
 interface ColumnProps {
   config: Config;
+  engines: EngineEntry[];
   lang: Lang;
   onChain: (chain: Engine[]) => void;
   onFavourite: (engine: Engine, voice: string, isFavourite: boolean) => void;
@@ -120,5 +107,4 @@ interface ColumnProps {
   sample: string;
   status: Status;
   title: string;
-  voices?: Voices;
 }

@@ -11,7 +11,8 @@ for module in $(swiftc -frontend -emit-imported-modules core/*.swift -module-nam
     [ "$module" = Foundation ] || { echo "daemon-test: daemon/core imports $module" >&2; exit 1; }
 done
 # each part is handed what it needs: no module-level value, a `static var` included, but a private constant of the core's
-globals=$(grep -nE '^(@[A-Za-z_]+(\([^)]*\))? +|[a-z]+(\([a-z]+\))? +|import [A-Za-z.]+; *)*(let|var) |(^|[ {;])static (weak )?var ' ./*.swift core/*.swift | grep -vE '^core/[^:]*:[0-9]+:private let ' || true)
+# and what a protocol of the core's asks for
+globals=$(grep -nE '^(@[A-Za-z_]+(\([^)]*\))? +|[a-z]+(\([a-z]+\))? +|import [A-Za-z.]+; *)*(let|var) |(^|[ {;])static (weak )?var ' ./*.swift core/*.swift | grep -vE '^core/[^:]*:[0-9]+:(private let | +static var [A-Za-z]+: [A-Za-z]+ \{ get \}$)' || true)
 [ -z "$globals" ] || { printf 'daemon-test: a module-level value\n%s\n' "$globals" >&2; exit 1; }
 place='NS[A-Za-z]*Director|(home|temporary|applicationSupport|library|documents?|desktop|downloads|caches|user|shared|trash|movies|music|pictures)Directory|currentDirectoryPath|"(/[^"]|~/|file:)'
 places=$(grep -nE "$place" ./*.swift core/*.swift | grep -v '^core/paths\.swift:' | sed 's#"/bin/sh"##g' | grep -E "$place" || true)

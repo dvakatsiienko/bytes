@@ -23,6 +23,10 @@
   - given a language's chain in the settings file
   - when the page loads
   - then its cards show in that order, each labelled «1st / 2nd / … in the <lang> chain», and the engines outside the chain follow as dashed cards
+- ⬜ the cards, their labels, their languages and their voices are the daemon's catalogue
+  - given an engine the daemon's catalogue names and the page has no mark for, then its card carries a plain sound wave on the ink hue
+  - given a chain names an engine the page's catalogue lacks, then it draws a bare card by its id, so every rank is true and it can be switched off
+  - given the daemon that runs is older than the page and names no engines, then the page says so in place of the cards and asks again every 5 s, and the stop, the settings and the save bar work on
 - ✅ a toggle puts an engine in or out of a chain
   - given an engine outside the en chain
   - when the user ticks «in the en chain»
@@ -78,7 +82,8 @@
   - and the daemon benches it until that refill date, so a press never waits on its refusal
   - given fish runs a paid model and its api balance is $0 → fish reads «no quota» the same way, benched for an hour
   - decision: quiet, not red — the chain already skips it; dima found the red line «a bit too much» (2026-09-29)
-  - and the state clears when the probe sees credits again, or after the engine's next success
+  - given the provider refuses a sentence over its balance, with credits left (150 for a sentence of 203), then the engine sits out an hour, and the badge keeps the provider's words while the balance stays the same
+  - and the state clears when the probe sees more credits than at the refusal, when the refill date passed, or after the engine's next success
   - decision: the chain already falls through on a quota refusal; the card only has to make it visible (dima, 2026-09-29)
 - ✅ the header shows the daemon's accessibility state and whether it is speaking
 - 🔎 «infinite waveform» plays the pill's wave with no voice, to tune glide and flow by eye
@@ -98,6 +103,8 @@
 - ✅ ■ stop ends any speech
 - ⬜ a voice that hangs or breaks off hands over once, and no sentence is read twice
   - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on what its sentence has left of the first audio budget (kokoro gets more for a sentence over 300 characters); the last of a chain is waited for
+  - given a cloud voice refuses one sentence (a 400 or a 422), or answers it with no sound, then the next voice reads on, and the next press asks the refuser again
+  - given gemini sits before another voice in a chain and has no sound within the first audio budget, then that voice reads the sentence, as for every cloud voice
   - given a voice breaks off in the middle of a sentence, then the read goes on with the next sentence, and no other voice starts that one again
   - given the daemon's main thread stuck for over a minute, then `status` no longer says speaking, so relaunch, rollback and try are open
 - ⬜ the first audio budget, in ms, 100 to 3000
@@ -282,6 +289,12 @@
   - given no text, an empty one or one that opens with a dash, then it refuses in one line and starts nothing
   - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)
 - ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings' schema and store, the read path's rules, the presses, the socket's ops, the pill and the meter, the core's imports, the module-level values, the places named outside `core/paths.swift`, the build's way back and the try run on stubs, after a typecheck of the whole daemon
+- ⬜ a cloud key pasted later, or one a dead network kept back, is found with no restart
+  - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time, and the log names each key «ok» or «missing»
+  - given the key script hangs, then the look ends after 15 s and the log says «keys: not loaded», and F4 reads on meanwhile
+- ⬜ kokoro is ready before the first press
+  - given the daemon starts, then kokoro's server is started when none answers, says one word unheard, and the log says «kokoro: warm»; no key and no balance is waited for first
+  - given the server takes over a minute to load, then the daemon waits for it again and starts no second one
 - ⬜ x-speak takes `--config <config.json>` (a one-shot's settings; the daemon's have one place) and `--keys-run <script>`
   - given the daemon started with `--config <path>` alone
   - then it stays up as the daemon, logs «config: loaded <the full path>» with each engine's voices, speed and gain, and speaks nothing

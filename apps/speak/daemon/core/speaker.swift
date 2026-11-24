@@ -6,18 +6,13 @@ import Foundation
 protocol ChunkVoices: AnyObject {
     // returns once the chunk is played or on its way to the player; `onAudio` once, at its first sound
     func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping () -> Void) async throws
-    func renderKokoroAhead(_ chunk: Chunk, settings: EngineConfig)
     func openAhead(_ chunk: Chunk, with engine: Engine, settings: EngineConfig)
     // what was asked ahead and not used yet
     func dropAhead()
     func hasKey(_ engine: Engine) -> Bool
     func reloadMissingKeys()
-    func quotas(fish: EngineConfig) async -> [(Engine, Quota?)]
-    func restartKokoro()
-}
-
-enum Quota {
-    case left, empty(String, until: Date)
+    func balances(_ settings: (Engine) -> EngineConfig) async -> [Engine: Balance]
+    func restartServer(of engine: Engine)
 }
 
 @MainActor
@@ -39,9 +34,10 @@ final class Speaker: ReadTarget {
     private var outputs: [any SpeechOutput] { [player, macVoice] }
     // engine → when it may be tried again; a failure costs its time once, then nothing until the reset
     private var skipUntil: [Engine: Date] = [:]
-    // engine → the provider's quota message; cleared by the engine's next success, so a monthly reset heals itself
-    private var outOfQuota: [Engine: String] = [:]
+    // cleared by the engine's next success, so a monthly reset heals itself
+    private var outOfQuota: [Engine: QuotaHold] = [:]
     private var quotaProbedAt: Date?
+    private var probes = 0
     private(set) var playback = Playback.idle
     private(set) var order = 0
     private var job: Task<Void, Never>?
@@ -62,7 +58,7 @@ final class Speaker: ReadTarget {
             let needsKey = engine.isCloud && !voices.hasKey(engine)
             let until = skipUntil[engine].flatMap { $0 > Date() ? $0 : nil }
             result[engine.rawValue] = needsKey ? ["state": "no key"]
-                : outOfQuota[engine].map { ["state": "no quota", "note": $0] }
+                : outOfQuota[engine].map { ["state": "no quota", "note": $0.note] }
                 ?? until.map { ["state": "benched", "until": ISO8601DateFormatter().string(from: $0)] } ?? ["state": "live"]
         }
         return result
@@ -78,7 +74,7 @@ final class Speaker: ReadTarget {
     }
 
     // the next press can use it
-    func kokoroIsWarm() { skipUntil[.kokoro] = nil }
+    func serverIsWarm(of engine: Engine) { skipUntil[engine] = nil }
 
     private func happened(_ event: PlaybackEvent) {
         let before = playback
@@ -137,16 +133,16 @@ final class Speaker: ReadTarget {
     // engine sits benched until its refill instead of spending ~1 s of every press on a refusal
     func probeQuota() async {
         quotaProbedAt = Date()
-        for (engine, quota) in await voices.quotas(fish: settings(.fish)) {
-            switch quota {
-            case .empty(let message, let until)?:
-                outOfQuota[engine] = message
-                skipUntil[engine] = until
-            case .left? where outOfQuota[engine] != nil:
-                outOfQuota[engine] = nil
-                skipUntil[engine] = nil
-            default: break
-            }
+        probes += 1
+        let mine = probes, known = outOfQuota
+        let balances = await voices.balances(settings)
+        guard mine == probes else { return }
+        // an answer asked for before a refusal, or before the engine spoke again, says nothing of it
+        for (engine, balance) in balances where outOfQuota[engine] == known[engine] {
+            let before = outOfQuota[engine]
+            let hold = after(balance, before, now: Date())
+            outOfQuota[engine] = hold
+            if balance.empty != nil || hold == nil && before != nil { skipUntil[engine] = hold?.until }
         }
     }
 
@@ -164,8 +160,8 @@ final class Speaker: ReadTarget {
                 if Task.isCancelled { return }
                 write("read \(read): chunk \(index + 1)/\(parts.count)")
                 let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: skipUntil, lead: lead, now: Date())
-                if rendersKokoroAhead(engines, lead: lead, isPlaying: player.isPlaying) {
-                    voices.renderKokoroAhead(chunk, settings: settings(.kokoro))
+                if let server = rendersAhead(engines, lead: lead, isPlaying: player.isPlaying) {
+                    voices.openAhead(chunk, with: server, settings: settings(server))
                 }
                 let newBudget = { firstAudioBudgetEnds(isPlaying: self.outputs.contains { $0.isBusy }, firstAudioMs: self.saved().firstAudioMs, now: .now) }
                 var budgetEnds = newBudget()
@@ -183,13 +179,16 @@ final class Speaker: ReadTarget {
                             if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))") }
                             isFirst = false
                             isHeard = true
-                            if engine.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
+                            if engine.facts.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
                         }
                         // the mac voice returns normally from a stop too
                         if Task.isCancelled { return }
                         outOfQuota[engine] = nil
-                        if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
-                        lead = engine
+                        // a cloud voice with nothing to say, «…», leads nothing
+                        if isHeard || !engine.isCloud {
+                            if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }
+                            lead = engine
+                        }
                         break
                     } catch {
                         if Task.isCancelled { return }
@@ -205,6 +204,8 @@ final class Speaker: ReadTarget {
             await player.drained()
             if !Task.isCancelled {
                 draft = nil
+                // what was asked ahead and never played is for no one
+                voices.dropAhead()
                 player.idle()
                 happened(.ended(read))
             }
@@ -222,15 +223,13 @@ final class Speaker: ReadTarget {
         let decision = bench(for: error, from: engine)
         if let seconds = decision.seconds { skipUntil[engine] = Date().addingTimeInterval(seconds) }
         if let message = decision.quota {
-            outOfQuota[engine] = message
+            outOfQuota[engine] = refused(message, now: Date())
             // the refusal knows no refill date; the probe does, and benches the engine until then instead of for an hour
             Task { await probeQuota() }
         }
         // off the hot path
-        if decision.restartsKokoro { voices.restartKokoro() }
+        if decision.restartsServer { voices.restartServer(of: engine) }
         write("\(engine.rawValue) skipped: \(error)\(decision.seconds.map { ", off for \(Int($0)) s" } ?? "")")
-        if decision.mayEndFishFreeTier, case EngineError.status(let code) = error {
-            write("⚠️ FISH REFUSED \(settings(.fish).model ?? "s2.1-pro-free") (\(code)): the free tier may have ended; the chain falls through for an hour; check fish.audio")
-        }
+        if case EngineError.status(let code) = error, let note = engine.type.refusalNote(status: code, model: settings(engine).model) { write(note) }
     }
 }

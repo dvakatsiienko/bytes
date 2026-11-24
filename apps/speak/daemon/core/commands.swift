@@ -38,7 +38,7 @@ struct Status {
 @MainActor
 protocol DaemonCommands: AnyObject {
     func status() -> Status
-    func voices() -> [[String: String]]
+    func voices(of engine: Engine) -> [Voice]
     // the reason the file on disk is not the one in use, if it is not
     func reload() -> String?
     func savedSettings() throws -> SavedSettings
@@ -62,7 +62,7 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
     case "status":
         return commands.status().reply
     case "voices":
-        return ["system": commands.voices()]
+        return ["engines": Engine.allCases.map { entry($0, commands.voices(of: $0)) }]
     case "reload":
         return commands.reload().map { ["error": $0] } ?? ["ok": true]
     case "config":
@@ -99,6 +99,15 @@ func runOp(_ request: Request, with commands: any DaemonCommands) -> [String: An
         return ["error": "unknown op \(request.op)"]
     }
     return ["ok": true]
+}
+
+// an engine as the page draws it
+private func entry(_ engine: Engine, _ voices: [Voice]) -> [String: Any] {
+    let facts = engine.facts
+    return [
+        "id": engine.rawValue, "label": facts.label, "languages": facts.languages.map(\.rawValue), "gain": facts.hasGain,
+        "voices": voices.map { ["id": $0.id, "name": $0.name].merging($0.lang.map { ["lang": $0.rawValue] } ?? [:]) { one, _ in one } },
+    ]
 }
 
 private func settingsReply(_ ask: () throws -> SavedSettings) -> [String: Any] {

@@ -3,33 +3,48 @@
 import AVFoundation
 import os
 
-@MainActor
-func renderedMacVoice(_ chunk: Chunk, _ settings: EngineConfig) -> AsyncThrowingStream<Data, Error> {
-    let utterance = AVSpeechUtterance(string: chunk.text)
-    if let voice = systemVoice(for: chunk.lang, settings) {
-        utterance.voice = AVSpeechSynthesisVoice(identifier: voice.rawValue)
-    } else {
-        utterance.prefersAssistiveTechnologySettings = true
-    }
-    let synth = AVSpeechSynthesizer(), samples = Samples()
-    return AsyncThrowingStream { continuation in
-        // a voice that stops calling back would hold the read for good; a night asleep is not its silence
-        let watch = Task {
-            while samples.silence < .seconds(5) { try await Task.sleep(for: .seconds(1)) }
-            continuation.finish(throwing: EngineError.timeout)
-        }
-        // the synth lives as long as the stream
-        continuation.onTermination = { _ in
-            watch.cancel()
-            Task { @MainActor in synth.stopSpeaking(at: .immediate) }
-        }
-        synth.write(utterance) { buffer in
-            guard let buffer = buffer as? AVAudioPCMBuffer, buffer.frameLength > 0 else {
-                if let tail = samples.take(nil), !tail.isEmpty { continuation.yield(tail) }
-                continuation.finish()
-                return
+struct MacRender: MacVoices {
+    // every installed en/uk/ru voice, best quality first
+    @MainActor
+    func installed() -> [Voice] {
+        AVSpeechSynthesisVoice.speechVoices()
+            .filter { $0.gender == .female }
+            .sorted { $0.quality.rawValue > $1.quality.rawValue }
+            .compactMap { voice in
+                Lang(rawValue: String(voice.language.prefix(2))).map {
+                    Voice(id: voice.identifier, name: "\(voice.name) · \(["", "default", "enhanced", "premium"][voice.quality.rawValue])", lang: $0)
+                }
             }
-            if let data = samples.take(buffer), !data.isEmpty { continuation.yield(data) }
+    }
+
+    @MainActor
+    func render(_ chunk: Chunk, _ settings: EngineConfig) -> Pieces {
+        let utterance = AVSpeechUtterance(string: chunk.text)
+        if let voice = systemVoice(for: chunk.lang, settings) {
+            utterance.voice = AVSpeechSynthesisVoice(identifier: voice.rawValue)
+        } else {
+            utterance.prefersAssistiveTechnologySettings = true
+        }
+        let synth = AVSpeechSynthesizer(), samples = Samples()
+        return Pieces { continuation in
+            // a voice that stops calling back would hold the read for good; a night asleep is not its silence
+            let watch = Task {
+                while samples.silence < .seconds(5) { try await Task.sleep(for: .seconds(1)) }
+                continuation.finish(throwing: EngineError.timeout)
+            }
+            // the synth lives as long as the stream
+            continuation.onTermination = { _ in
+                watch.cancel()
+                Task { @MainActor in synth.stopSpeaking(at: .immediate) }
+            }
+            synth.write(utterance) { buffer in
+                guard let buffer = buffer as? AVAudioPCMBuffer, buffer.frameLength > 0 else {
+                    if let tail = samples.take(nil), !tail.isEmpty { continuation.yield(Rendered(pcm: tail)) }
+                    continuation.finish()
+                    return
+                }
+                if let data = samples.take(buffer), !data.isEmpty { continuation.yield(Rendered(pcm: data)) }
+            }
         }
     }
 }

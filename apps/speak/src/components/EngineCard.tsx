@@ -1,22 +1,22 @@
 import type { CSSProperties } from 'react';
 import { useSortable } from '@dnd-kit/react/sortable';
 
-import { BRAND_HUE, EngineMark } from '@/components/EngineMark.tsx';
+import { EngineMark, brandHue } from '@/components/EngineMark.tsx';
 import { Info } from '@/components/Info.tsx';
 import { StateBadge } from '@/components/StateBadge.tsx';
 import { VoicePicker } from '@/components/VoicePicker.tsx';
 
-import {
-  ENGINE_LABELS,
-  type Engine,
-  type EngineSettings,
-  type Lang,
-  type Status,
+import type {
+  Engine,
+  EngineEntry,
+  EngineSettings,
+  Lang,
+  Status,
 } from '@/api.ts';
 import { LIMITS, type Limit } from '@/limits.ts';
 
 export const EngineCard = (props: EngineCardProps) => {
-  const label = ENGINE_LABELS[props.engine];
+  const { gain: hasGain, id, label } = props.engine;
   const isOn = props.rank !== undefined;
   // a quota refusal fails every preview until the credits come back, so ▶ is locked; the badge says why
   const quotaNote =
@@ -24,7 +24,7 @@ export const EngineCard = (props: EngineCardProps) => {
   const sortable = useSortable({
     disabled: !isOn,
     group: props.lang,
-    id: `${props.lang}:${props.engine}`,
+    id: `${props.lang}:${id}`,
     index: props.rank ?? -1,
   });
 
@@ -98,7 +98,7 @@ export const EngineCard = (props: EngineCardProps) => {
         step={0.05}
         value={props.settings.speed ?? LIMITS.speed.default}
       />
-      {props.engine !== 'system' && (
+      {hasGain && (
         <Slider
           info='how loud the voice is. too quiet → raise it. try 1.5'
           label='gain'
@@ -115,10 +115,10 @@ export const EngineCard = (props: EngineCardProps) => {
   return (
     <li
       className={`grid gap-3 rounded-2xl p-4 ${isOn ? 'brand-wash border border-line' : 'border border-dashed border-line'} ${sortable.isDropTarget ? 'outline-2 outline-accent' : ''}`}
-      data-engine={props.engine}
+      data-engine={id}
       // only a chain card is sortable: dnd-kit stamps role and a tab stop on what it registers
       ref={isOn ? sortable.ref : undefined}
-      style={{ '--brand': BRAND_HUE[props.engine] } as CSSProperties}>
+      style={{ '--brand': brandHue(id) } as CSSProperties}>
       <div className='flex items-center gap-2.5'>
         {isOn && (
           // dnd-kit's keyboard handle too: space picks the card up, arrows move it, space drops
@@ -131,7 +131,7 @@ export const EngineCard = (props: EngineCardProps) => {
             ⠿
           </button>
         )}
-        <EngineMark engine={props.engine} isDim={!isOn} />
+        <EngineMark engine={id} isDim={!isOn} />
         <span className='flex-1 font-semibold'>{label}</span>
         <StateBadge state={props.status} />
       </div>
@@ -192,7 +192,7 @@ const ordinal = (n: number) => `${n}${['st', 'nd', 'rd'][n - 1] ?? 'th'}`;
 
 /* Types */
 interface EngineCardProps {
-  engine: Engine;
+  engine: EngineEntry;
   isLast: boolean;
   lang: Lang;
   onFavourite: (voice: string, isFavourite: boolean) => void;

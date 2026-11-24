@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import schema from './contract/config.schema.json';
-import { type Config, ENGINES, type EngineSettings, LANGS } from './src/api.ts';
+import { type Config, type EngineSettings, LANGS } from './src/api.ts';
 import { LIMITS, typed } from './src/limits.ts';
 
 // a name in one and not the other is a type error
@@ -33,8 +33,7 @@ describe('the page and the schema', () => {
     );
   });
 
-  it('name the same engines and languages', () => {
-    expect([...schema.$defs.engine.enum].sort()).toEqual([...ENGINES].sort());
+  it('name the same languages', () => {
     expect(schema.properties.chain.propertyNames.enum).toEqual(
       LANGS.map(([lang]) => lang),
     );

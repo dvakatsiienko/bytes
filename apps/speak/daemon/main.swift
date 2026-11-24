@@ -12,14 +12,19 @@ final class App {
     let paths: Paths
     let configStore: ConfigStore
     let keys: Keys
+    let net = LiveNet()
     let kokoro: KokoroServer
     // the audio engine and the pill are made once the app runs, so a slow audio device holds up neither the socket nor the keys
     private(set) lazy var panel = Panel(settings: { [configStore] in configStore.current })
+    private lazy var audio = MacAudio()
+    private lazy var player = Player(device: audio, log: log)
+    private lazy var macVoice = VoiceOutput(make: MacSynth.init)
+    private lazy var voices = Voices(EngineParts(net: net, mac: MacRender()), player: player, macVoice: macVoice, keys: keys, servers: [.kokoro: kokoro])
     private(set) lazy var speaker = makeSpeaker()
     private lazy var presses = PressSequencer(
         grab: Grab(), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, log: log
     )
-    private lazy var commands = SocketCommands(speaker: speaker, panel: panel, configStore: configStore)
+    private lazy var commands = SocketCommands(speaker: speaker, voices: voices, panel: panel, configStore: configStore)
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })
     private let heartbeat = Heartbeat()
     private lazy var control = Control(
@@ -33,8 +38,8 @@ final class App {
         self.paths = paths
         let configStore = ConfigStore(URL(fileURLWithPath: arguments.settings(paths)))
         self.configStore = configStore
-        keys = Keys(run: arguments.keysRunPath)
-        kokoro = KokoroServer(paths: paths, mayStart: arguments.mayStartKokoro, voice: { configStore.current[.kokoro].voice(for: .en) })
+        keys = Keys(run: arguments.keysRunPath.map { script in { try await runWithKeys(script, $0) } }, log: log)
+        kokoro = KokoroServer(KokoroProcess(paths: paths), net: net, settings: { configStore.current[.kokoro] }, mayStart: arguments.mayStartKokoro, log: log)
     }
 
     func start(only: Engine?) {
@@ -48,14 +53,8 @@ final class App {
     }
 
     private func makeSpeaker() -> Speaker {
-        let audio = MacAudio(), macVoice = VoiceOutput(make: MacSynth.init), panel = panel
-        let player = Player(device: audio, log: log)
-        let speaker = Speaker(
-            player: player, macVoice: macVoice,
-            voices: LiveVoices(player: player, macVoice: macVoice, keys: keys, kokoro: kokoro),
-            pill: panel, settings: { [configStore] in configStore.current }, log: log
-        )
-        kokoro.onWarm = { [weak speaker] in speaker?.kokoroIsWarm() }
+        let speaker = Speaker(player: player, macVoice: macVoice, voices: voices, pill: panel, settings: { [configStore] in configStore.current }, log: log)
+        kokoro.onWarm = { [weak speaker] in speaker?.serverIsWarm(of: .kokoro) }
         audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
         panel.model.onClose = { [panel] in panel.hide() }
         panel.model.onPause = { [weak speaker] in speaker?.togglePause() }
@@ -80,9 +79,11 @@ final class App {
     private func startDaemon() {
         Task {
             let speaker = speaker
+            // the one voice that needs no net waits for none
+            async let warm: Void = kokoro.warm()
             await keys.load()
             await speaker.probeQuota()
-            await kokoro.warm()
+            await warm
         }
         control.start()
         heartbeat.start()

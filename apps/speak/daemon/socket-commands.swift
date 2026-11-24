@@ -4,11 +4,13 @@ import Foundation
 
 final class SocketCommands: DaemonCommands {
     private let speaker: Speaker
+    private let voices: Voices
     private let panel: Panel
     private let configStore: ConfigStore
 
-    init(speaker: Speaker, panel: Panel, configStore: ConfigStore) {
+    init(speaker: Speaker, voices: Voices, panel: Panel, configStore: ConfigStore) {
         self.speaker = speaker
+        self.voices = voices
         self.panel = panel
         self.configStore = configStore
     }
@@ -20,7 +22,7 @@ final class SocketCommands: DaemonCommands {
         )
     }
 
-    func voices() -> [[String: String]] { installedVoices() }
+    func voices(of engine: Engine) -> [Voice] { voices.voices(of: engine) }
     func reload() -> String? { configStore.refresh() }
     func savedSettings() throws -> SavedSettings { try configStore.saved() }
     func save(_ patch: Json?, over version: String?) throws -> SavedSettings { try configStore.save(patch, over: version) }

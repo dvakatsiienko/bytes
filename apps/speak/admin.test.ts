@@ -199,14 +199,11 @@ describe('the routes over a daemon', () => {
     expect((await ask('GET', '/api/status')).body).toEqual({ speaking: true });
   });
 
-  it('voices carry the mac’s beside the engines’', async () => {
-    replies.voices = { system: [{ id: 'mac' }] };
+  it('voices are the daemon’s own', async () => {
+    replies.voices = { engines: [{ id: 'speechify' }] };
 
-    const { body } = await ask('GET', '/api/voices');
-
-    expect(body).toMatchObject({
-      fish: [['933563129e564b19a115bedd57b7406a', 'Sarah']],
-      system: [{ id: 'mac' }],
+    expect((await ask('GET', '/api/voices')).body).toEqual({
+      engines: [{ id: 'speechify' }],
     });
   });
 
@@ -447,10 +444,10 @@ describe('the routes with no daemon', () => {
     expect((body as { error: string }).error).toContain('not reachable');
   });
 
-  it('voices come without the mac’s', async () => {
-    expect((await ask('GET', '/api/voices')).body).toMatchObject({
-      system: [],
-    });
+  it('voices say it is not reachable', async () => {
+    const { body } = await ask('GET', '/api/voices');
+
+    expect((body as { error: string }).error).toContain('not reachable');
   });
 });
 

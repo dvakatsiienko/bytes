@@ -7,45 +7,6 @@ import { extname, join, normalize, resolve } from 'node:path';
 import { isWorktree } from './ports.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-// female only (dima's blind test). elevenlabs premades answered 200 on the restricted key; charlotte and aria are
-// library voices (402). kokoro: every af_/bf_ voice answered on the warm server (2026-09-29)
-const VOICES = {
-  elevenlabs: [
-    ['EXAVITQu4vr4xnSDxMaL', 'Sarah'],
-    ['FGY2WhTYpPnrIDTdsKH5', 'Laura'],
-    ['Xb7hH8MSUJpSbSDYk0k2', 'Alice'],
-    ['XrExE9yKIg1WjnnlVkGX', 'Matilda'],
-    ['cgSgspJ2msm6clMCkdW9', 'Jessica'],
-    ['pFZP5JQG7iQjIQuC4Bku', 'Lily'],
-  ],
-  // fish's library is community clones, only as good as the uploaded clip; dima kept Sarah alone after a listen
-  // (2026-09-29). s2 reads any language in her voice
-  fish: [['933563129e564b19a115bedd57b7406a', 'Sarah']],
-  gemini: [
-    ['Kore', 'Kore'],
-    ['Aoede', 'Aoede'],
-    ['Leda', 'Leda'],
-    ['Zephyr', 'Zephyr'],
-  ],
-  kokoro: [
-    'af_heart',
-    'af_bella',
-    'af_nicole',
-    'af_sarah',
-    'af_sky',
-    'af_nova',
-    'af_river',
-    'af_jessica',
-    'af_alloy',
-    'af_aoede',
-    'af_kore',
-    'bf_emma',
-    'bf_isabella',
-    'bf_alice',
-    'bf_lily',
-  ].map((id) => [id, id]),
-} satisfies Record<string, string[][]>;
-
 const TYPES: Record<string, string> = {
   '.css': 'text/css',
   '.html': 'text/html; charset=utf-8',
@@ -144,10 +105,7 @@ export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
     {
       'GET /api/config': async () => daemon('config'),
       'GET /api/status': async () => daemon('status'),
-      'GET /api/voices': async () => ({
-        ...VOICES,
-        system: (await daemon('voices')).system ?? [],
-      }),
+      'GET /api/voices': async () => daemon('voices'),
       'POST /api/pause': ask('pause'),
       'POST /api/preview': ask('preview'),
       'POST /api/stop': ask('stop'),

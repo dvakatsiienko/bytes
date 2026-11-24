@@ -12,7 +12,6 @@ enum SchemaTest {
         var rows: [(name: String, got: String, want: String)] = [
             ("the settings' names", top.keys.sorted().joined(separator: " "), Config.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("an engine's names", engine.keys.sorted().joined(separator: " "), EngineConfig.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
-            ("the engines", names(defs["engine"]), Engine.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("the languages", names(top["chain"]), Lang.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a voice's languages", names(engine["voice"]), "* " + names(top["chain"])),
         ]
@@ -36,7 +35,7 @@ enum SchemaTest {
         rows.append(("one output", oneOutput(#""oneOutput":true"#), "Optional(true)"))
         rows.append(("one output is a yes or a no", oneOutput(#""oneOutput":"yes""#), "nil"))
         rows.append(("favourites are words", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"favourites":[1]}}}"#), "«engines.fish.favourites.Index 0» has the wrong type"))
-        rows.append(("a voice's language is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"voice":{"de":"x"}}}}"#), "unknown name «de» — engines: elevenlabs, fish, kokoro, system, gemini; languages: en, uk, ru"))
+        rows.append(("a voice's language is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"voice":{"de":"x"}}}}"#), "unknown name «de» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"))
         return check("schema", rows)
     }
 
