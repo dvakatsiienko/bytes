@@ -47,7 +47,7 @@ enum WordListsTest {
         rows.append(("one that is not a set of lists", try { _ = try after("[]")(""); return logged.joined() }(), "word lists: kept the last good ones — FILE: «» has the wrong type"))
         let locked = try after(#"{"letters":["zed"]}"#)
         try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: file.path)
-        rows.append(("a file it may not read", locked("zed") + locked("zed") + " \(logged.count)", "zedzed 1"))
+        rows.append(("a file it may not read", locked("zed rtk") + locked("zed") + " \(logged.joined())", "zed R T Kzed word lists: kept the last good ones — FILE: not readable"))
         try FileManager.default.setAttributes([.posixPermissions: 0o600, .modificationDate: Date(timeIntervalSince1970: Double(edits))], ofItemAtPath: file.path)
         rows.append(("the same file, readable again", locked("zed"), "Z E D"))
         let link = file.appendingPathExtension("link")
@@ -57,7 +57,8 @@ enum WordListsTest {
         _ = linked.current
         _ = try after(#"{"letters":["yes"]}"#)
         rows.append(("an edit of the file a link leads to", linked.current.letters.contains("yes") ? "read" : "missed", "read"))
-        rows.append(("the file taken out: what ships", try after(nil)("rtk API"), "rtk A P I"))
+        rows.append(("the file taken out: what ships", try after(nil)("zed rtk API"), "zed rtk A P I"))
+        rows.append(("the file taken out says so", logged.joined(separator: " | "), "word lists: what ships"))
         return check("word list", rows)
     }
 }

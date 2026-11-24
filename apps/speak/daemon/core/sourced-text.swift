@@ -3,32 +3,32 @@ import Foundation
 
 struct SourcedText: Equatable {
     private(set) var text: String
-    // one offset into the grabbed text for each utf-16 unit, never falling
-    private var offsets: [Int]
+    // the part of the grabbed text each utf-16 unit came from, never falling
+    private var places: [Range<Int>]
 
     init(_ text: String) {
         self.text = text
-        offsets = Array(0..<text.utf16.count)
+        places = (0..<text.utf16.count).map { $0..<$0 + 1 }
     }
 
-    private init(_ text: String, _ offsets: [Int]) {
+    private init(_ text: String, _ places: [Range<Int>]) {
         self.text = text
-        self.offsets = offsets
+        self.places = places
     }
 
     // the part of the grabbed text it came from, in utf-16 units; empty for a text with nothing in it
     var source: Range<Int> {
-        guard let first = offsets.first, let last = offsets.last else { return 0..<0 }
-        return first..<last + 1
+        guard let first = places.first, let last = places.last else { return 0..<0 }
+        return first.lowerBound..<last.upperBound
     }
 
     subscript(range: some RangeExpression<String.Index>) -> SourcedText {
         let bounds = range.relative(to: text)
         let units = NSRange(bounds, in: text)
-        return SourcedText(String(text[bounds]), Array(offsets[units.location..<units.upperBound]))
+        return SourcedText(String(text[bounds]), Array(places[units.location..<units.upperBound]))
     }
 
-    static func + (one: SourcedText, other: SourcedText) -> SourcedText { SourcedText(one.text + other.text, one.offsets + other.offsets) }
+    static func + (one: SourcedText, other: SourcedText) -> SourcedText { SourcedText(one.text + other.text, one.places + other.places) }
 
     func trimmed(_ set: CharacterSet) -> SourcedText {
         let kept = text.unicodeScalars
@@ -66,7 +66,9 @@ struct SourcedText: Equatable {
                 result.add(kept, of: self, units)
                 result.add(group.rest, over: NSRange(location: kept.upperBound, length: 0), of: self)
             }
-            if groups.last?.rest.isEmpty == true, !result.offsets.isEmpty { result.offsets[result.offsets.count - 1] = offsets[match.range.upperBound - 1] }
+            if groups.last?.rest.isEmpty == true, let last = result.places.last {
+                result.places[result.places.count - 1] = last.lowerBound..<places[match.range.upperBound - 1].upperBound
+            }
         }
     }
 
@@ -80,13 +82,13 @@ struct SourcedText: Equatable {
             replacement(match, units, &result)
             from = match.range.upperBound
         }
-        result.add(NSRange(location: from, length: offsets.count - from), of: self, units)
+        result.add(NSRange(location: from, length: places.count - from), of: self, units)
         return result
     }
 
     private mutating func add(_ range: NSRange, of other: SourcedText, _ units: NSString) {
         text += units.substring(with: range)
-        offsets += other.offsets[range.location..<range.upperBound]
+        places += other.places[range.location..<range.upperBound]
     }
 
     // a replacement's first unit comes from the match's first, its last from the last; an insertion from what stands before it
@@ -95,11 +97,11 @@ struct SourcedText: Equatable {
         if count == 0 { return }
         text += string
         guard match.length > 0 else {
-            offsets += repeatElement(other.offsets[..<match.location].last ?? other.offsets.first ?? 0, count: count)
+            places += repeatElement(other.places[..<match.location].last ?? other.places.first ?? 0..<0, count: count)
             return
         }
         // the spaces around it take none of it
         let before = string.utf16.prefix { $0 == 32 }.count, words = count - before - string.utf16.reversed().prefix { $0 == 32 }.count
-        offsets += (0..<count).map { other.offsets[match.location + (words < 2 ? 0 : min(max($0 - before, 0), words - 1) * (match.length - 1) / (words - 1))] }
+        places += (0..<count).map { other.places[match.location + (words < 2 ? 0 : min(max($0 - before, 0), words - 1) * (match.length - 1) / (words - 1))] }
     }
 }

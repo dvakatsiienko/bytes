@@ -524,6 +524,10 @@
     "out": [["en", "it said ok? then go"]]
   },
   {
+    "in": "one\u2028%%%\ntwo",
+    "out": [["en", "one. %%% two"]]
+  },
+  {
     "in": "a\u0000 b",
     "out": [["en", "a b"]]
   }
