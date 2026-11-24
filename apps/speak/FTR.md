@@ -290,7 +290,7 @@
   - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)
 - ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings' schema and store, the read path's rules, the presses, the socket's ops, the pill and the meter, the core's imports, the module-level values, the places named outside `core/paths.swift`, the build's way back and the try run on stubs, after a typecheck of the whole daemon
 - ⬜ a cloud key pasted later, or one a dead network kept back, is found with no restart
-  - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time, and the log names each key «ok» or «missing»
+  - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time (a child of the key script that ignores its end runs on beside the next look), and the log names each key «ok» or «missing»
   - given the key script hangs, then the look ends after 15 s and the log says «keys: not loaded», and F4 reads on meanwhile
 - ⬜ kokoro is ready before the first press
   - given the daemon starts, then kokoro's server is started when none answers, says one word unheard, and the log says «kokoro: warm»; no key and no balance is waited for first
