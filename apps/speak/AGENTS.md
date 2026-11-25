@@ -17,7 +17,7 @@ not deployed anywhere, and it carries no `vercel.json`: it talks to this mac's d
 are impeccable's files: change them through it, never by hand.
 📌 before a design or build change, read `docs/readaloud-playbook.md`: the read-aloud practices, the bar and the voice safety rule.
 
-📌 **kit**: speak's controls are its own until its v2 redesign ([FRM-288](https://linear.app/x-com/issue/FRM-288)), which adopts `@ui/kit`; it moved into bytes as it was.
+📌 **kit**: speak's controls are its own until its v2 redesign ([FRM-288](https://linear.app/x-com/issue/FRM-288)), which adopts `@ui/kit`; only the build badge is the kit's.
 
 ## the daemon
 

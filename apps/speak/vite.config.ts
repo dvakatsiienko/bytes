@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import vitePluginTailwind from '@tailwindcss/vite';
+import { buildBadgeVite } from '@ui/kit/lib/build-server';
 import vitePluginReact from '@vitejs/plugin-react';
 import { type Plugin, defineConfig } from 'vite';
 
@@ -23,9 +24,17 @@ const devProxy = (): Plugin => ({
 });
 
 export default defineConfig({
-  plugins: [vitePluginReact(), vitePluginTailwind(), devTitle(), devProxy()],
+  plugins: [
+    vitePluginReact(),
+    vitePluginTailwind(),
+    devTitle(),
+    buildBadgeVite(),
+    devProxy(),
+  ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    // `@ui/kit` is consumed as source, so its React import must be the app's own
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     port: Number(process.env.PORT ?? speakDevPort),

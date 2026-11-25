@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { DragDropProvider } from '@dnd-kit/react';
 import { useQuery } from '@tanstack/react-query';
+import { BuildBadge } from '@ui/kit/components/build-badge';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { Column } from '@/components/Column.tsx';
@@ -338,6 +339,8 @@ export const App = () => {
             role='status'>
             {line.text}
           </span>
+          {/* biome-ignore lint/suspicious/noUndeclaredEnvVars: vite's own build flag, never read from the shell */}
+          {import.meta.env.DEV && <BuildBadge placement='inline' />}
         </footer>
       </div>
     </>

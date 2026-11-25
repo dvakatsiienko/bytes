@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* the kit's build badge, the one kit component here: tailwind scans its two files, and its colour names get the pill's
+ * colours on the badge alone, where `muted` would be this page's text colour */
+@source "../../../packages/kit/src/components/build-badge.tsx";
+@source "../../../packages/kit/src/components/button.tsx";
+@theme inline {
+  --color-foreground: var(--color-pill-ink);
+  --color-muted-foreground: var(--color-pill-muted);
+  --color-ring: var(--color-pill-accent);
+}
+
 /* tokens, light first; dark redefines them. the voice admin keeps one accent, the pill's indigo */
 @theme {
   --color-bg: #f6f5f2;
@@ -95,4 +105,9 @@
       var(--color-surface) 56px
     );
   }
+}
+
+[data-slot="build-badge"] {
+  --color-muted: var(--color-pill-line);
+  margin-left: auto;
 }

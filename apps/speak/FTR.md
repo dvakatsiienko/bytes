@@ -275,7 +275,7 @@
 ## scripts
 
 - ✅ `x-speak-admin` (launchd, always on) serves the built page and the api on 127.0.0.1:7386; `pnpm --filter speak admin` runs the same server by hand when the job is stopped
-- ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386
+- ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386, with the branch and a ⇆ jump to the other checkout's dev page in the save bar; the served page shows neither
 - ✅ `pnpm --filter speak admin:build` builds `dist/`
 - ✅ `pnpm --filter speak test` runs the admin server's tests over a fake daemon: the write guard, the host, the page folder's jail, each route, the page's requests and its draft
 - ✅ `pnpm --filter speak daemon:build` installs the signed daemon to `~/.local/libexec/x-speak/x-speak`, with no launchd change
