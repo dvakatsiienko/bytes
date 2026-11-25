@@ -1,7 +1,7 @@
 #!/bin/sh
 # puts back the daemon the last build replaced, and starts it: the kept binary and the installed one change places, so
 # a second run comes forward again. the relaunch refuses while the daemon reads aloud, and nothing here writes the launchd plist.
-# usage: script/daemon-rollback.sh
+# usage: script/daemon-rollback.sh [--from <hash>], which refuses when another binary is installed by now
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib/daemon-installed.sh"
@@ -43,6 +43,7 @@ report_change() { # label, now, recorded at the build
 }
 
 lock_binaries
+[ "${1:-}" != --from ] || [ "$(sha_of "$installed" 2>/dev/null)" = "${2:-}" ] || refuse "another binary was installed meanwhile, nothing goes back"
 [ -f "$kept" ] || refuse "nothing to go back to: no build has kept a binary at $kept"
 [ -f "$installed" ] || refuse "no binary at $installed"
 # the grant is pinned to what the installed binary is signed with, down to the certificate's hash
@@ -56,7 +57,7 @@ ran_settings=$(cat "$kept.settings" 2>/dev/null || true)
 carry_settings
 swap "$(running_argument)" "$(settings_line)"
 code=0
-"$here/daemon-relaunch.sh" || code=$?
+"$here/daemon-relaunch.sh" --unwatched || code=$?
 if [ "$code" -eq 3 ]; then
     swap "$ran_with" "$ran_settings"
     [ -z "$old_place" ] || place "$settings.old-place"

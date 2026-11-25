@@ -34,11 +34,20 @@ setup() {
     stub codesign 'case "$*" in *-r-*) [ -f "$state/no-grant" ] || echo "designated => the grant" ;; *--verify*) case "$*" in *"-R=the grant"*) ;; *) exit 1 ;; esac; for last in "$@"; do :; done; [ "$(cat "$last")" != unsigned ] ;; *) [ ! -f "$state/sign-fails" ] ;; esac'
     stub nc 'cat >/dev/null; [ -f "$state/status" ] && cat "$state/status"'
     stub sleep ':'
+    stub mark 'echo "ok $(shasum -a 256 "$libexec/x-speak" | cut -d" " -f1) 2026-11-23T10:00:01Z" >"$HOME/.local/share/x-speak/start-mark"'
     stub lsof '[ -f "$state/inode" ] && printf "p1\nftxt\ni9\nn/usr/lib/dyld\nftxt\ni%s\nn%s\n" "$(cat "$state/inode")" "$libexec/x-speak"'
     stub launchctl 'case "$1" in
         bootout) rm -f "$state/inode" ;;
         print) [ -f "$state/inode" ] && printf "\tstate = running\n\targuments = {\n\t\tx\n\t\t--config\n\t\t%s\n\t}\n\tpid = 1\n" "$(cat "$state/argument")" ;;
         bootstrap) plutil -extract ProgramArguments.2 raw "$HOME/Library/LaunchAgents/com.dima.x-speak.plist" >"$state/argument"; echo relaunch >>"$state/relaunches"; [ -f "$state/bootstrap-fails" ] && exit 5; [ -f "$state/bootstrap-refuses" ] && exit 3; stat -f %i "$libexec/x-speak" >"$state/inode"; [ -f "$state/other" ] && echo 7 >"$state/inode"
+            # `old` is from before the start mark, `mute` hangs on its way up, `broken` never runs, `dying` dies once it is up
+            case "$(cat "$libexec/x-speak")" in
+                broken) rm -f "$state/inode" "$state/status" ;;
+                dying) mark; rm -f "$state/inode" "$state/status" ;;
+                old) [ -f "$state/dies" ] || printf "{\"speaking\":false}" >"$state/status" ;;
+                mute) ;;
+                *) mark ;;
+            esac
             [ -f "$state/dies" ] && rm -f "$state/status"
             echo "2026-11-23 10:00:01.000 config: $(cat "$state/settings")" >>"$HOME/.local/share/x-speak/daemon.err.log" ;;
     esac'

@@ -16,7 +16,7 @@ final class Control: @unchecked Sendable {
         self.answers = answers
     }
 
-    func start() {
+    func start(onReady: @escaping @Sendable () -> Void) {
         unlink(socket)
         let parameters = NWParameters.tcp
         parameters.requiredLocalEndpoint = NWEndpoint.unix(path: socket)
@@ -27,6 +27,7 @@ final class Control: @unchecked Sendable {
                 read(connection, into: Data())
             }
             listener.stateUpdateHandler = { state in
+                if case .ready = state { onReady() }
                 if case .failed(let error) = state { log("control: listener failed — \(error)") }
             }
             listener.start(queue: queue)

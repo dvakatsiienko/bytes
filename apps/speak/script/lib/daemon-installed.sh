@@ -4,6 +4,9 @@ installed="$install_dir/x-speak"
 kept="$install_dir/x-speak.prev"
 rolled_back="$kept.rolled-back"
 label=com.dima.x-speak
+# the hash of the build that has not come up yet, and the line a daemon writes when it has: `ok <hash> <time>`
+unstarted="$install_dir/x-speak.unstarted"
+start_mark="$HOME/.local/share/x-speak/start-mark"
 # the daemon's own place for its settings (daemon/core/paths.swift), and the file they were moved from with its hash
 settings="$HOME/Library/Application Support/speak/config.json"
 moved_from="$settings.moved-from"

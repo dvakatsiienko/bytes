@@ -260,10 +260,59 @@ is 'a relaunch with no settings: refused, nothing stopped' '3 running' "$code $(
 setup; rm "$libexec/x-speak.readers" "$place"; relaunch
 is 'a daemon from before the move relaunches with no settings there' 0 "$code"
 
+# a build that never comes up goes back by itself
+marked() { cut -d' ' -f1,2 "$HOME/.local/share/x-speak/start-mark" 2>/dev/null; }
+setup; build new; relaunch
+is 'a build that comes up stays' '0 new/old 1' "$code $(pair) $(relaunches)"
+says 'a build that comes up is named' "$(printf new | shasum -a 256 | cut -c1-12) is up"
+stub mark ':'; relaunch
+is 'a build that came up once is not watched again' '0 new/old' "$code $(pair)"
+printf mute >"$libexec/x-speak"; relaunch
+is 'a relaunch of what no build put there is not watched' '0 mute/old' "$code $(pair)"
+for bad in broken mute dying; do
+    setup; build "$bad"; relaunch
+    is "a $bad build goes back by itself" '1 old/'"$bad running" "$code $(pair) $(running)"
+    is "a $bad build: launchd runs the one put back" "$(stat -f %i "$libexec/x-speak")" "$(cat "$state/inode" 2>/dev/null)"
+    is "a $bad build: one start each" 2 "$(relaunches)"
+    is "a $bad build: no ok line stands" '' "$(marked)"
+    says "a $bad build is named" "$(printf "$bad" | shasum -a 256 | cut -c1-12) did not come up in 45 s"
+    says "a $bad build: says what runs now" "rollback: running $(printf old | shasum -a 256 | cut -c1-12)"
+done
+relaunch
+is 'a relaunch after it, onto a daemon that writes no mark, stays there' '0 old/dying' "$code $(pair)"
+setup; build mute; echo "ok $(sha "$libexec/x-speak") 2026-11-23T09:00:00Z" >"$HOME/.local/share/x-speak/start-mark"; relaunch
+is 'a mark from an earlier start is none' '1 old/mute' "$code $(pair)"
+setup; build mute; stub sleep 'echo "ok 0000 2026-11-23T10:00:00Z" >"$HOME/.local/share/x-speak/start-mark"'; relaunch
+is 'the mark of another build is none' '1 old/mute' "$code $(pair)"
+setup; build mute; stub sleep 'echo . >>"$state/slept"; [ "$(wc -l <"$state/slept")" -lt 44 ] || mark'; relaunch
+is 'a start launchd tries again inside the window stays' '0 mute/old' "$code $(pair)"
+setup; build mute; stub sleep 'echo . >>"$state/slept"; [ "$(wc -l <"$state/slept")" -lt 46 ] || mark'; relaunch
+is 'a start past the window goes back' '1 old/mute' "$code $(pair)"
+setup; build mute; stub sleep 'printf three >"$libexec/x-speak"'; relaunch
+is 'a build installed inside the window is not taken back' '1 three/old' "$code $(pair)"
+is 'a build installed inside the window leaves no lock' free "$([ -d "$libexec/x-speak.lock" ] && echo locked || echo free)"
+for end in HUP INT TERM; do
+    setup; build mute; echo "$end" >"$state/end"; stub sleep 'kill "-$(cat "$state/end")" "$PPID"'; relaunch
+    is "a watch that $end would end goes back all the same" '1 old/mute' "$code $(pair)"
+done
+setup; build new; touch "$state/bootstrap-fails"; relaunch
+is 'a build launchd would not start goes back' '1 old/new 2' "$code $(pair) $(relaunches)"
+setup; build mute; stub nc 'cat >/dev/null; if [ -f "$state/relaunches" ]; then echo "{\"speaking\":true}"; else echo "{\"speaking\":false}"; fi'; relaunch
+is 'a build with no mark that reads aloud is left to read' '1 mute/old' "$code $(pair)"
+says 'a build with no mark that reads aloud: says so' 'reading aloud now'
+setup; rm "$libexec/x-speak" "$state/inode" "$state/status"; build mute; relaunch
+is 'a first build that never comes up has nothing to go back to' '1 mute/none' "$code $(pair)"
+says 'a first build that never comes up: says so' 'nothing to go back to'
+setup; build broken; rollback; rollback
+is 'forward by hand to a build that never came up is not taken back' '1 broken/old' "$code $(pair)"
+is 'and its relaunch watched nothing' '' "$(printf '%s\n' "$out" | grep 'did not come up')"
+relaunch
+is 'but its relaunch is' '1 old/broken' "$code $(pair)"
+
 # the first run stays inside its relaunch until `go` appears
 held() {
     cp "$root/app/script/daemon-relaunch.sh" "$root/app/script/real-relaunch.sh"
-    stub_file "$root/app/script/daemon-relaunch.sh" 'echo $$ >"$state/held"; touch "$state/inside"; n=0; until [ -f "$state/go" ] || [ $n -gt 200 ]; do n=$((n + 1)); /bin/sleep 0.02; done; exec "$(dirname "$0")/real-relaunch.sh"'
+    stub_file "$root/app/script/daemon-relaunch.sh" 'echo $$ >"$state/held"; touch "$state/inside"; n=0; until [ -f "$state/go" ] || [ $n -gt 200 ]; do n=$((n + 1)); /bin/sleep 0.02; done; exec "$(dirname "$0")/real-relaunch.sh" "$@"'
     "$root/app/script/daemon-rollback.sh" >"$state/first" 2>&1 &
     first=$!
     n=0; until [ -f "$state/inside" ] || [ $n -gt 200 ]; do n=$((n + 1)); /bin/sleep 0.02; done

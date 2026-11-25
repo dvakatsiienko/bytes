@@ -3,6 +3,7 @@
 // usage: x-speak --config <path> [--keys-run <script>]         the daemon (launchd)
 //        x-speak --config <path> [--keys-run <script>] [--engine <name>] text   one-shot, for listening tests; it never starts the kokoro server
 import AppKit
+import CryptoKit
 
 // the one value that hands each part what it needs. chain, voices, speed, gain and the first-audio budget live in
 // the settings file (core/config-store.swift), read again on the next F4 after a hand edit
@@ -89,13 +90,24 @@ final class App {
             await speaker.probeQuota()
             await warm
         }
-        control.start()
+        // written by main's own loop, so a main that never runs leaves none
+        control.start { [paths] in DispatchQueue.main.async { markStart(at: paths.startMark) } }
         heartbeat.start()
         let registered = hotkeys.register()
         // with the prompt option macos itself asks for the grant, naming this exact process — no guessing which entry
         let isTrusted = AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
         if arguments.configPath != paths.settings { log("config: --config names \(arguments.configPath), the settings are at \(paths.settings)") }
         log("daemon: \(registered), accessibility \(isTrusted ? "granted" : "missing — macos shows its grant prompt")")
+    }
+}
+
+private func markStart(at path: String) {
+    do {
+        guard let binary = Bundle.main.executableURL else { throw CocoaError(.fileNoSuchFile) }
+        let build = SHA256.hash(data: try Data(contentsOf: binary)).map { String(format: "%02x", $0) }.joined()
+        try startMark(build: build, at: Date()).write(toFile: path, atomically: true, encoding: .utf8)
+    } catch {
+        log("start mark: not written — \(error)")
     }
 }
 

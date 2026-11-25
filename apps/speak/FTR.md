@@ -287,6 +287,9 @@
   - given a change the old file got since, when it runs with that file's hash, then the change is brought and the settings it went over are kept as `config.json.before-move`; with `seen` nothing is copied
   - given another hash, a copy that differs, or settings there with a change of their own, then it refuses in one line and nothing moves
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
+  - makes: `~/.local/share/x-speak/start-mark`, written by each daemon that came up: `ok <its binary's hash> <time>`
+  - given a build that was just installed, when it is relaunched, then the relaunch waits until that build is up and names it; one that is not up in 45 s, or is gone 5 s later, goes back through the rollback by itself, and the relaunch fails with a line that says so
+  - given the rollback's own relaunch, a build that came up before, or a login's start, then nothing is watched
   - given no settings at their place, or a change in the old file since they moved that nobody brought, then it refuses in one line, names the way, and stops nothing
 - ✅ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
   - makes: `~/.local/libexec/x-speak/x-speak.prev`, kept by each build from the binary that was running (the installed one, when nothing is kept yet)

@@ -37,5 +37,6 @@ if [ "$runs" = yes ] || { [ -f "$installed" ] && [ ! -f "$kept" ]; }; then
     if [ "$runs" = yes ]; then record_kept "$(running_argument)" "$(settings_line)"; else record_kept '' ''; fi
 fi
 sha_of build/x-speak >>"$readers"
+sha_of build/x-speak >"$unstarted"
 mv -f build/x-speak "$installed"
 echo "installed $installed — script/daemon-relaunch.sh starts it"

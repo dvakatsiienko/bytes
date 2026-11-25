@@ -24,4 +24,5 @@
 - **settings version** — the mark of the settings file's bytes; a save names the one it edits, and is refused when the file moved on
 - **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with
 - **rollback** — the kept binary and the installed one change places and the daemon restarts; a second one comes forward again
+- **start mark** — the line a daemon writes once its settings are loaded and its socket and main loop run: its build's hash and the time
 - **try run** — one text spoken by a tree's own daemon build, beside the live daemon
