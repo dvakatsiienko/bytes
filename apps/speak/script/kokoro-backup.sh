@@ -124,9 +124,16 @@ backup() {
     mv "$scratch/clone" "$clones/$date"
     mv "$scratch/backup" "$backups/$date"
     dates | sort -r >"$scratch/dates"
+    # the newest two for their voices, the newest two whole ones for the way back: the same two, but for a clone that is gone
+    seen=0
     whole=0
     while read -r old; do
-        if [ "$whole" -lt 2 ] && is_whole "$old"; then whole=$((whole + 1)); else rm -rf "${backups:?}/$old" "${clones:?}/$old"; fi
+        seen=$((seen + 1))
+        if [ "$whole" -lt 2 ] && is_whole "$old"; then
+            whole=$((whole + 1))
+        elif [ "$seen" -gt 2 ]; then
+            rm -rf "${backups:?}/$old" "${clones:?}/$old"
+        fi
     done <"$scratch/dates"
     echo "backup: $backups/$date — mlx-audio $(version "$backups/$date/freeze.txt"), model $rev"
 }

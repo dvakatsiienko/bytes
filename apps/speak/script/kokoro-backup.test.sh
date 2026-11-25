@@ -102,7 +102,7 @@ esac'
     sed -n "s/.*install-path = \"\([^\"]*\)\".*/\1/p" "$dir/uv-receipt.toml" 2>/dev/null | while read -r command; do rm -f "$command"; done
     rm -rf "$dir"
     [ -z "$pin" ] || [ ! -f "$state/reads-in-install" ] || printf "{\"speaking\":true}" >"$state/status"
-    [ -z "$pin" ] || [ ! -f "$state/ended-in-install" ] || { kill -TERM "$PPID"; exit 143; }
+    [ -z "$pin" ] || [ ! -f "$state/ended-in-install" ] || { kill "-$(cat "$state/ended-in-install")" "$PPID"; exit 143; }
     [ -z "$pin" ] || [ ! -f "$state/install-fails" ] || exit 2
     [ -z "$pin" ] || [ ! -f "$state/puts-command-elsewhere" ] || UV_TOOL_BIN_DIR="${state%/state}/elsewhere"
     . "$state/hub.sh"; fill_tool "$dir" "$(cat "$state/newest")" "${UV_TOOL_BIN_DIR:-$HOME/.local/bin}"
@@ -156,6 +156,11 @@ is 'a third backup: the newest two stay, and what is not a backup' '0 notes 2026
 is 'and their tools' '2026-11-25T000002 2026-11-25T000003 ' "$(only kokoro-tool)"
 rm -rf "$data/kokoro-tool/2026-11-25T000003"; run --backup
 is 'a backup whose tool is gone is none: another is made, and the older whole one stays' '2026-11-25T000002 2026-11-25T000004 ' "$(only kokoro-tool)"
+app; run --backup; fill_hub "$hub" "$rev2" heart-2; run --backup; rm -rf "$data/kokoro-tool"; echo other==1 >>"$tool/packages"; run --backup
+is 'clones that are gone take no voices along: the newest two stay' '2026-11-25T000002 2026-11-25T000003 ' "$(only kokoro-backup)"
+app; stub rmdir 'kill -TERM "$PPID"; exec /bin/rmdir "$@"'; run --backup
+is 'a signal on the way out ends nothing half done' '0 no' "$code $([ -d "$data/kokoro-backup.lock" ] && echo yes || echo no)"
+rm "$root/bin/rmdir"
 app; run --backup; fill_hub "$hub" "$rev2" heart-2; run --backup
 is 'a model that moved is another backup' '2026-11-25T000001 2026-11-25T000002 ' "$(only kokoro-backup)"
 app; : >"$hub/refs/main"; run --backup
@@ -263,6 +268,11 @@ says 'and it says the way' 'not put back — --rollback 2026-11-25T000001'
 rm "$root/bin/cp"; run --rollback 2026-11-25T000001
 is 'which is whole' '0 same' "$code $(same_tool)"
 checked; run --switch; tool_after=$(sum_of "$tool")
+stub mv 'case "$*" in */kokoro-backup.*/tool\ *) exit 1 ;; esac; exec /bin/mv "$@"'; run --rollback 2026-11-25T000001
+is 'a put back that stops half way keeps the tool that was there' "1 $tool_after" "$code $(sum_of "$(echo "$TMPDIR"/kokoro-backup.*/old-tool)")"
+rm "$root/bin/mv"; rm -rf "$TMPDIR"/kokoro-backup.*; run --rollback 2026-11-25T000001
+is 'and the next one is whole' '0 same' "$code $(same_tool)"
+checked; run --switch; tool_after=$(sum_of "$tool")
 stub cp 'case "$*" in *kokoro-backup/*/snapshot*) exit 1 ;; esac; exec /bin/cp "$@"'; run --rollback 2026-11-25T000001
 is 'a rollback with no room moves nothing' '1 moved same' "$code $(same_tool) $([ "$(sum_of "$tool")" = "$tool_after" ] && echo same)"
 rm "$root/bin/cp"
@@ -282,8 +292,8 @@ sed "s|install-path = \"[^\"]*\"|install-path = \"$root/elsewhere/mlx_audio.serv
 is 'a receipt that names commands elsewhere, as a copied tool has: no install' '1 0 there' "$code $(switched) $([ -f "$root/elsewhere/mlx_audio.server" ] && echo there)"
 says 'and it says which tool' 'names commands outside'
 rm -rf "$root/elsewhere"
-for end in install-fails ended-in-install; do
-    checked; touch "$state/$end" "$state/reads-in-install"; run --switch
+for end in install-fails 'ended-in-install HUP' 'ended-in-install INT' 'ended-in-install TERM'; do
+    checked; touch "$state/reads-in-install"; echo "${end#* }" >"$state/${end% *}"; run --switch
     is "$end, with a read begun meanwhile: all of it is put back" 'same live bin/mlx_audio.server' "$(same_tool) $(command_is)"
     is "$end: is an error" yes "$([ "$code" -ne 0 ] && echo yes)"
 done
