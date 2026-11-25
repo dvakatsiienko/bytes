@@ -11,6 +11,7 @@ const SETTINGS = {
   firstAudioMs: true,
   meterFlowMs: true,
   meterGlideMs: true,
+  volume: true,
 } satisfies Record<keyof Config, true> &
   Record<keyof typeof schema.properties, true>;
 const ENGINE = {

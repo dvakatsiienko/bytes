@@ -321,6 +321,9 @@
   - given a pause, then its time is not heard; given 1.5×, then ten seconds heard are fifteen of the sound
   - given a stop inside a sentence, then its words count by the share of its sound that was heard, rounded down
   - given a preview, a try run or a pill state, then no line is written
+- ⬜ one master volume, `volume` in the settings file, 0 to 100 percent on top of every engine's gain
+  - given 50 on an engine's gain of 0.8, then the sound is scaled by 0.4, a preview's too; given none named, then 100
+  - given a value outside its range, then the save is refused
 - ⬜ a sentence read again by the same engine, voice and model begins at once
   - given a sentence that was read whole, when it is read again, then its sound comes from memory, the engine is not asked and the log says «first audio: … ms, kept»; another speed or gain still comes from memory, another voice, model, language or engine does not
   - given more than 32 MB of sound, then the oldest goes first; given a restart, then nothing is kept; no file but the press line holds audio or text of it

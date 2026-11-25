@@ -10,6 +10,8 @@ struct Config: Decodable {
     let meterGlideMs: Double
     // the pill's wave: how long each reading holds the centre before it moves one bar outward
     let meterFlowMs: Double
+    // the master volume, in percent, on top of each engine's gain
+    let volume: Double
     let engines: [Engine: EngineConfig]
 
     subscript(engine: Engine) -> EngineConfig { engines[engine] ?? EngineConfig() }
@@ -33,9 +35,11 @@ struct Config: Decodable {
         firstAudioMs = budget
         meterGlideMs = try container.decodeIfPresent(Double.self, forKey: .meterGlideMs) ?? 30
         meterFlowMs = try container.decodeIfPresent(Double.self, forKey: .meterFlowMs) ?? 40
+        volume = try container.decodeIfPresent(Double.self, forKey: .volume) ?? 100
         try inRange("firstAudioMs", Double(firstAudioMs), 100...3000)
         try inRange("meterGlideMs", meterGlideMs, 0...200)
         try inRange("meterFlowMs", meterFlowMs, 0...200)
+        try inRange("volume", volume, 0...100)
         engines = try Self.keyed(container.decode([String: EngineConfig].self, forKey: .engines), Engine.init) { $0 }
     }
 
@@ -44,6 +48,7 @@ struct Config: Decodable {
         self.firstAudioMs = firstAudioMs
         meterGlideMs = 30
         meterFlowMs = 40
+        volume = 100
         self.engines = engines
     }
 
@@ -64,7 +69,7 @@ struct Config: Decodable {
         engines: [.kokoro: EngineConfig(gain: 1.9)],
     )
 
-    enum CodingKeys: String, CodingKey, CaseIterable { case chain, firstAudioMs, meterGlideMs, meterFlowMs, engines }
+    enum CodingKeys: String, CodingKey, CaseIterable { case chain, firstAudioMs, meterGlideMs, meterFlowMs, volume, engines }
 }
 
 // the bounds and defaults here are contract/config.schema.json's; its test drives each one through this decoder

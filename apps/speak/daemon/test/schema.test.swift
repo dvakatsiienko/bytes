@@ -53,7 +53,7 @@ enum SchemaTest {
         do {
             let config = try JSONDecoder().decode(Config.self, from: Data(json.utf8))
             let known = [
-                "firstAudioMs": Double(config.firstAudioMs), "meterGlideMs": config.meterGlideMs, "meterFlowMs": config.meterFlowMs,
+                "firstAudioMs": Double(config.firstAudioMs), "meterGlideMs": config.meterGlideMs, "meterFlowMs": config.meterFlowMs, "volume": config.volume,
                 "speed": config[.fish].speed, "gain": config[.fish].gain,
             ]
             return known[key].map(plain) ?? "ok"

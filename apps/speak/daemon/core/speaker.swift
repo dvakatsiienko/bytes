@@ -50,7 +50,9 @@ final class Speaker: ReadTarget {
     private var draft: (engine: Engine, settings: EngineConfig)?
 
     private func settings(_ engine: Engine) -> EngineConfig {
-        draft.flatMap { $0.engine == engine ? $0.settings : nil } ?? saved()[engine]
+        var settings = draft.flatMap { $0.engine == engine ? $0.settings : nil } ?? saved()[engine]
+        settings.gain *= saved().volume / 100
+        return settings
     }
 
     // the admin asks every few seconds: a status older than 10 min refreshes the quota behind this answer

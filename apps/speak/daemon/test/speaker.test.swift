@@ -295,6 +295,10 @@ enum SpeakerTest {
         }, "drop ahead | stop | pill 2 | «read 2: chunk 1/1» | kokoro Sample. gain 3.0 | «first audio: kokoro N ms» | drop ahead | rest | pill - | rest")
         await row("a sentence kept from before is named", { $0.voices.script[.kokoro] = [.kept] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «first audio: kokoro N ms, kept» | drop ahead | rest | pill -")
+        await row("a master volume of 50 on a gain of 0.8", { $0.volume = 50; $0.gain = 0.8 }, { $0.read("Hello.") },
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 gain 0.4 | «first audio: kokoro N ms» | drop ahead | rest | pill -")
+        await row("a master volume on a preview's own gain", { $0.volume = 50 }, { _ = $0.speaker.preview("Hello.", with: .kokoro, settings: EngineConfig(gain: 3)) },
+                  "drop ahead | stop | pill 1 | «read 1: chunk 1/1» | kokoro Hello. gain 1.5 | «first audio: kokoro N ms» | drop ahead | rest | pill - | rest")
         await row("a preview of a failing engine falls to nobody", { $0.voices.script[.kokoro] = [.fails(EngineError.status(500))] }, { stage in
             stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig())
         }, "drop ahead | stop | pill 1 | «read 1: chunk 1/1» | kokoro Sample. | «kokoro skipped: status(500), off for 60 s» | drop ahead | rest | pill - | rest")
@@ -678,6 +682,8 @@ final class Stage {
     let log = Calls()
     var chain: [Engine] = [.kokoro, .system]
     var budget = 900
+    var volume = 100.0
+    var gain = 1.0
     // the second hand a row moves; nil is the real one
     final class Hand { var passed: Double? }
     let hand = Hand()
@@ -699,7 +705,7 @@ final class Stage {
         voices.player = player
         speaker = Speaker(
             player: player, voices: voices, pill: PlantedPill(call),
-            settings: { [weak self] in Stage.config(self?.chain ?? [], self?.budget ?? 900) }, toChunks: { spokenChunks(of: $0) },
+            settings: { [weak self] in Stage.config(self?.chain ?? [], self?.budget ?? 900, volume: self?.volume ?? 100, gain: self?.gain ?? 1) }, toChunks: { spokenChunks(of: $0) },
             onRead: { [weak self] in self?.records.append($0) }, log: { call("«\($0)»") }
         )
     }
@@ -715,9 +721,9 @@ final class Stage {
             .replacingOccurrences(of: "skipped: [^«»]*-1004[^«»]*, off", with: "skipped: URLError, off", options: .regularExpression)
     }
 
-    static func config(_ chain: [Engine], _ budget: Int) -> Config {
+    static func config(_ chain: [Engine], _ budget: Int, volume: Double, gain: Double) -> Config {
         let names = chain.map { "\"\($0.rawValue)\"" }.joined(separator: ",")
-        return try! JSONDecoder().decode(Config.self, from: Data(#"{"chain":{"en":[\#(names)],"uk":["system"]},"firstAudioMs":\#(budget),"engines":{}}"#.utf8))
+        return try! JSONDecoder().decode(Config.self, from: Data(#"{"chain":{"en":[\#(names)],"uk":["system"]},"firstAudioMs":\#(budget),"volume":\#(volume),"engines":{"kokoro":{"gain":\#(gain)}}}"#.utf8))
     }
     static func chunks(_ text: String) -> [Chunk] { text.split(separator: " ").map { Chunk(lang: .en, text: String($0)) } }
     func read(_ text: String) { read(Stage.chunks(text)) }

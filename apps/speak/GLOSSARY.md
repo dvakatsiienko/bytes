@@ -27,6 +27,7 @@
 - **start mark** — the line a daemon writes once its settings are loaded and its socket and main loop run: its build's hash and the time
 - **read record** — the line a finished read leaves: when, from which app, words and seconds heard, the engines, how it ended; no word of the read
 - **heard / position** — how long a read was listened to, and how far into its sound it is; at 1.5× the second runs faster
+- **master volume** — one share, 0 to 100 percent, over every engine's gain
 - **kept sound** — a sentence's rendered sound, held in the daemon's memory to be heard again with no render
 - **hot / cold read** — a cold one is the first after 5 idle minutes or the daemon's start; the rest are hot
 - **pill state** — one of the ten fixed things a pill can show, behind its sealed boards; a try run shows one or prints it

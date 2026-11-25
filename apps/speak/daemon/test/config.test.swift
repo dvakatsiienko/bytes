@@ -105,7 +105,7 @@ enum ConfigTest {
             ("ukrainian", chain(.uk), "system"),
             ("russian", chain(.ru), "system"),
             ("the engines", fallback.summary, "kokoro: voice -, speed 1.0, gain 1.9"),
-            ("the knobs", "\(fallback.firstAudioMs) \(fallback.meterGlideMs) \(fallback.meterFlowMs)", "500 30.0 40.0"),
+            ("the knobs", "\(fallback.firstAudioMs) \(fallback.meterGlideMs) \(fallback.meterFlowMs) \(fallback.volume)", "500 30.0 40.0 100.0"),
         ])
     }
 }

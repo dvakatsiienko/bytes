@@ -46,7 +46,8 @@
       "maximum": 200,
       "minimum": 0,
       "type": "number"
-    }
+    },
+    "volume": { "default": 100, "maximum": 100, "minimum": 0, "type": "number" }
   },
   "required": ["chain", "engines", "firstAudioMs"],
   "type": "object"

@@ -118,6 +118,8 @@ export interface Config {
   firstAudioMs: number;
   meterFlowMs?: number;
   meterGlideMs?: number;
+  // the master volume, in percent
+  volume?: number;
 }
 
 // the settings file and the mark of its bytes; a save names the mark it edits
