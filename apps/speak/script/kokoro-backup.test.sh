@@ -163,7 +163,7 @@ for fault in silent half; do
     app; echo "$fault" >"$state/after-af_nova"; run --candidate
     is "a $fault render is named, the good ones too" '1 af_nova: failed 4' "$code $(echo "$out" | grep -o 'af_nova: failed') $(echo "$out" | grep -c ': good')"
     is "a $fault render: nothing is played" none "$(played)"
-    run --switch
+    run --switch --unheard
     is "a $fault render: no switch" '1 0 0.6.6' "$code $(switched) $(live)"
 done
 app; touch "$state/reads-after-af_alloy"; run --candidate
@@ -209,7 +209,7 @@ for end in install-fails ended-in-install; do
     is "$end, with a read begun meanwhile: all of it is put back" 'same live bin/mlx_audio.server' "$(same_tool) $(command_is)"
     is "$end: is an error" yes "$([ "$code" -ne 0 ] && echo yes)"
 done
-app; run --candidate; echo other==1 >>"$data/kokoro-candidate/tools/mlx-audio/packages"; run --check --silent; echo mlx==9 >>"$data/kokoro-candidate/freeze.txt"; run --switch
+app; run --candidate; echo other==1 >>"$data/kokoro-candidate/tools/mlx-audio/packages"; run --check --silent; echo mlx==9 >>"$data/kokoro-candidate/freeze.txt"; run --switch --unheard
 is 'a candidate that is not the checked one: no switch' '1 0.6.6' "$code $(live)"
 app; run --candidate; echo newer==1 >>"$tool/packages"; run --switch
 is 'a live tool that moved since its backup: no switch' '1 0' "$code $(switched)"
