@@ -7,6 +7,7 @@ final class Grab: SelectionGrab {
 
     init(copyOnlyApps: @escaping () -> Set<String>) { self.copyOnlyApps = copyOnlyApps }
 
+    var app: String? { NSWorkspace.shared.frontmostApplication?.bundleIdentifier }
     var isTrusted: Bool { AXIsProcessTrusted() }
 
     // the focused element's selected text through accessibility; ⌘C only where an app exposes none. an empty answer

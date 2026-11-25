@@ -30,7 +30,10 @@ final class Speaker: ReadTarget {
     private let pill: any SpeechPill
     private let saved: () -> Config
     private let toChunks: (String) -> [Chunk]
+    private let onRead: (ReadRecord) -> Void
     private let write: (String) -> Void
+    // the read that plays, unless it is a preview or a one-shot
+    private var tally: ReadTally?
     // engine → when it may be tried again; a failure costs its time once, then nothing until the reset
     private var skipUntil: [Engine: Date] = [:]
     // cleared by the engine's next success, so a monthly reset heals itself
@@ -64,12 +67,13 @@ final class Speaker: ReadTarget {
         return result
     }
 
-    init(player: Player, voices: any ChunkVoices, pill: any SpeechPill, settings saved: @escaping () -> Config, toChunks: @escaping (String) -> [Chunk], log write: @escaping (String) -> Void) {
+    init(player: Player, voices: any ChunkVoices, pill: any SpeechPill, settings saved: @escaping () -> Config, toChunks: @escaping (String) -> [Chunk], onRead: @escaping (ReadRecord) -> Void = { _ in }, log write: @escaping (String) -> Void) {
         self.player = player
         self.voices = voices
         self.pill = pill
         self.saved = saved
         self.toChunks = toChunks
+        self.onRead = onRead
         self.write = write
     }
 
@@ -92,8 +96,9 @@ final class Speaker: ReadTarget {
         return order
     }
 
-    private func cut() {
+    private func cut(_ outcome: ReadRecord.Outcome) {
         takeOrder()
+        record(outcome)
         if isSpeaking { write("read \(reads): stopped") }
         job?.cancel()
         voices.dropAhead()
@@ -104,7 +109,7 @@ final class Speaker: ReadTarget {
     // a preview ignores the bench: dima asked to hear this engine, so it is tried even when benched
     // answers the read's number
     func preview(_ text: String, with engine: Engine, settings: EngineConfig) -> Int {
-        cut()
+        cut(.overtaken)
         draft = (engine, settings)
         skipUntil[engine] = nil
         return speak(toChunks(text), only: engine, pressed: .now)
@@ -114,20 +119,28 @@ final class Speaker: ReadTarget {
     var isPaused: Bool { playback.isPaused }
 
     func silence() {
-        cut()
+        cut(.stopped)
         isSpeaking ? happened(.stopped) : pill.leave()
     }
 
-    func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) {
-        if isSpeaking { cut() } else { takeOrder() }
+    func read(_ parts: [Chunk], from app: String?, pressed: ContinuousClock.Instant) {
+        if isSpeaking { cut(.overtaken) } else { takeOrder() }
+        tally = ReadTally(time: Date(), app: app)
         speak(parts, only: nil, pressed: pressed)
         voices.reloadMissingKeys()
     }
 
     // the control socket's read: whatever sounds is cut, and no key is looked for
     func readGiven(_ parts: [Chunk]) {
-        cut()
+        cut(.overtaken)
+        tally = ReadTally(time: Date(), app: nil)
         speak(parts, only: nil, pressed: .now)
+    }
+
+    private func record(_ outcome: ReadRecord.Outcome) {
+        guard let tally else { return }
+        self.tally = nil
+        onRead(tally.record(outcome, heard: player.played.heard, position: player.played.position, sound: player.sound))
     }
 
     // the providers' balance calls cost nothing: a card shows the real quota before a press finds it, and an empty
@@ -161,6 +174,7 @@ final class Speaker: ReadTarget {
                 if Task.isCancelled { return }
                 let part = "read \(read): chunk \(index + 1)/\(parts.count)"
                 write(part)
+                tally?.began(chunk.text, start: player.sound)
                 let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: skipUntil, lead: lead, now: Date())
                 if let server = rendersAhead(engines, lead: lead, isPlaying: player.isPlaying) {
                     voices.openAhead(chunk, with: server, settings: settings(server))
@@ -183,6 +197,8 @@ final class Speaker: ReadTarget {
                             if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))") }
                             isFirst = false
                             isHeard = true
+                            // a late first sound of a read that was cut is not the next one's
+                            if self.reads == read { self.tally?.heard(engine) }
                             if engine.facts.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
                         }
                         // a voice may return normally from a stop
@@ -211,9 +227,11 @@ final class Speaker: ReadTarget {
                         }
                     }
                 }
+                tally?.ended(end: player.sound)
             }
             await player.drained()
             if !Task.isCancelled {
+                record(.finished)
                 draft = nil
                 // what was asked ahead and never played is for no one
                 voices.dropAhead()

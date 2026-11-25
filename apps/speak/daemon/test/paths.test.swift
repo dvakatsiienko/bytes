@@ -8,6 +8,7 @@ enum PathsTest {
         return check("paths", [
             ("the word lists", paths.wordLists, "/h/Library/Application Support/speak/word-lists.json"),
             ("the control socket", paths.controlSocket, "/h/.local/share/x-speak/control.sock"),
+            ("the read record", paths.readRecord, "/h/.local/share/x-speak/reads.jsonl"),
             ("the start mark", paths.startMark, "/h/.local/share/x-speak/start-mark"),
             ("the start mark's line", startMark(build: "ab12", at: Date(timeIntervalSince1970: 0)), "ok ab12 1970-01-01T00:00:00Z\n"),
             ("kokoro's server", paths.kokoroServer, "/h/.local/bin/mlx_audio.server"),

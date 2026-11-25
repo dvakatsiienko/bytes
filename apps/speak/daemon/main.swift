@@ -58,7 +58,7 @@ final class App {
     }
 
     private func makeSpeaker() -> Speaker {
-        let speaker = Speaker(player: player, voices: voices, pill: panel, settings: { [configStore] in configStore.current }, toChunks: toChunks, log: log)
+        let speaker = Speaker(player: player, voices: voices, pill: panel, settings: { [configStore] in configStore.current }, toChunks: toChunks, onRead: ReadRecords(path: paths.readRecord, log: log).add, log: log)
         kokoro.onWarm = { [weak speaker] in speaker?.serverIsWarm(of: .kokoro) }
         audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
         panel.model.onClose = { [panel] in panel.hide() }

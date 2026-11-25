@@ -156,6 +156,9 @@ enum SeamsTest {
         }
         let f4 = { (setup: @escaping (PlantedGrab, PlantedRead) -> Void) in await press(setup) { await $0.readPressed() } }
         var rows: [(name: String, got: String, want: String)] = []
+        var reader: PlantedRead?
+        _ = await f4 { grab, read in grab.selected = ("Hello.", "ax"); reader = read }
+        rows.append(("a read knows the app in front", reader?.app ?? "-", "com.example.app"))
         rows.append(("F4 on a selection", await f4 { grab, _ in grab.selected = ("Hello. Bye.", "ax") },
                      "refresh | «press: grab ax N ms, normalize N ms, 2 chunks, 11 characters «Hello. Bye.»» | read Hello./Bye."))
         rows.append(("F4 on a copied selection", await f4 { grab, _ in grab.selected = ("Hello.", "⌘C") },
@@ -490,6 +493,7 @@ final class PlantedGrab: SelectionGrab {
     var selected: (text: String?, via: String) = (nil, "ax")
     var marker: String?
     var copied: String?
+    let app: String? = "com.example.app"
     func selection() async -> (text: String?, via: String, marker: String?) { (selected.text, selected.via, marker) }
     func copy() async -> String? { copied }
 }
@@ -500,6 +504,7 @@ final class SlowGrab: SelectionGrab {
     var isTrusted = true
     private let calls: Calls
     private var waiting: [CheckedContinuation<String?, Never>] = []
+    let app: String? = nil
     init(_ calls: Calls) { self.calls = calls }
     func selection() async -> (text: String?, via: String, marker: String?) {
         calls.made.append("grab")
@@ -535,5 +540,6 @@ final class PlantedRead: ReadTarget {
     }
     func togglePause() { calls.append("toggle") }
     func silence() { _ = takeOrder(); calls.append("silence") }
-    func read(_ parts: [Chunk], pressed: ContinuousClock.Instant) { _ = takeOrder(); calls.append("read " + parts.map(\.text).joined(separator: "/")) }
+    private(set) var app: String?
+    func read(_ parts: [Chunk], from app: String?, pressed: ContinuousClock.Instant) { _ = takeOrder(); self.app = app; calls.append("read " + parts.map(\.text).joined(separator: "/")) }
 }

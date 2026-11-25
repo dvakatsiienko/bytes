@@ -314,6 +314,12 @@
   - given the live daemon reading aloud, then nothing is rendered or played and nothing is switched
 - ⬜ kokoro's server loads its saved model and fetches nothing: a voice it has not saved is a failure, never a download
 - ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings' schema and store, the read path's rules, the presses, the socket's ops against `contract/wire.schema.json`, the pill and the meter, the core's imports, the module-level values, the places named outside `core/paths.swift`, the build's way back, the try run and kokoro's backup on stubs, after a typecheck of the whole daemon
+- ⬜ each finished read leaves one record, with no word of it
+  - makes: a json line in `~/.local/share/x-speak/reads.jsonl`, dima's alone: `schema` 1, `time` (the read's start), `app` (the one in front at F4, none for the socket's read), `wordsHeard`, `charsCut` (by kind, empty until the cleaner has named rules), `secondsHeard`, `engines` in the order they were heard, `outcome`
+  - given a read that ends by itself, a stop, a newer read or a preview over it, or no engine that spoke, then `outcome` is finished, stopped, overtaken or unspoken
+  - given a pause, then its time is not heard; given 1.5×, then ten seconds heard are fifteen of the sound
+  - given a stop inside a sentence, then its words count by the share of its sound that was heard, rounded down
+  - given a preview, a try run or a pill state, then no line is written
 - ⬜ a cloud key pasted later, or one a dead network kept back, is found with no restart
   - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time (a child of the key script that ignores its end runs on beside the next look), and the log names each key «ok» or «missing»
   - given the key script hangs, then the look ends after 15 s and the log says «keys: not loaded», and F4 reads on meanwhile

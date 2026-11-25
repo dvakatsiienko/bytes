@@ -30,6 +30,8 @@ final class Player {
     private let now: () -> ContinuousClock.Instant
     private let write: (String) -> Void
     private var clock = PlayClock()
+    // seconds of sound scheduled since the read began, at 1×
+    private(set) var sound = 0.0
     private var pending = 0
     private var drainWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
     private var generation = 0
@@ -59,7 +61,10 @@ final class Player {
     // seconds heard, and seconds into the sound, since the read began
     var played: (heard: Double, position: Double) { clock.reading(at: now()) }
 
-    func readBegan() { clock = PlayClock() }
+    func readBegan() {
+        clock = PlayClock()
+        sound = 0
+    }
 
     // with the engine's gain and speed
     func schedule(_ pcm: Data, _ settings: EngineConfig) throws {
@@ -72,6 +77,7 @@ final class Player {
         dryAt = nil
         quietSince = nil
         pending += 1
+        sound += Double(pcm.count / 2) / 24000
         scheduled += 1
         if !isPaused { clock.runs(at: now()) }
         let scheduledIn = generation
@@ -124,6 +130,8 @@ final class Player {
         generation += 1
         device.stop()
         clock.holds(at: now())
+        // the rest of it will never sound
+        sound = min(sound, played.position)
         pending = 0
         dryAt = nil
         quietSince = .now

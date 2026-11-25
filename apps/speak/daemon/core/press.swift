@@ -7,6 +7,8 @@ protocol SelectionGrab: AnyObject {
     var isTrusted: Bool { get }
     // the selected text, the way it came («ax» or «⌘C»), and the list marker right before the selection's end
     func selection() async -> (text: String?, via: String, marker: String?)
+    // the app in front
+    var app: String? { get }
     func copy() async -> String?
 }
 
@@ -21,7 +23,7 @@ protocol ReadTarget: AnyObject {
     // silences every voice, even one no read owns any more, and the pill leaves unless stick holds it
     func silence()
     // cuts off what plays
-    func read(_ parts: [Chunk], pressed: ContinuousClock.Instant)
+    func read(_ parts: [Chunk], from app: String?, pressed: ContinuousClock.Instant)
 }
 
 @MainActor
@@ -48,6 +50,7 @@ final class PressSequencer {
     func readPressed() async {
         let pressed = ContinuousClock.now
         let order = target.takeOrder()
+        let app = grab.app
         refreshSettings()
         guard grab.isTrusted else {
             write("press: accessibility missing — grant \(CommandLine.arguments[0]) in Privacy & Security")
@@ -71,7 +74,7 @@ final class PressSequencer {
             return
         }
         write("press: grab \(via) \(took), normalize \(elapsed(pressed)), \(parts.count) chunks\(ends(of: text))\(marker.map { ", before the marker «\($0)»" } ?? "")")
-        target.read(parts, pressed: pressed)
+        target.read(parts, from: app, pressed: pressed)
     }
 
     private func selection(_ order: Int) async -> (text: String?, via: String, marker: String?) {

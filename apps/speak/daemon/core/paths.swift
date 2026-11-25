@@ -11,6 +11,8 @@ struct Paths {
     // dima's words and apps over what ships
     var wordLists: String { support + "/word-lists.json" }
     var controlSocket: String { state + "/control.sock" }
+    // one line per read
+    var readRecord: String { state + "/reads.jsonl" }
     // the relaunch waits for this line (script/daemon-relaunch.sh)
     var startMark: String { state + "/start-mark" }
     var kokoroServer: String { home + "/.local/bin/mlx_audio.server" }
