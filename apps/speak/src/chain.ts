@@ -28,3 +28,22 @@ export const chainAfterDrag = (
     ]),
   );
 };
+
+// the order moves while the card is carried, so a card that left its column has left a trace there: such a drop
+// puts the column back, as a cancel does
+export const isDropUndone = (event: Drop, columnUnderPointer?: string) => {
+  const { source, target } = event.operation;
+  if (event.canceled) return true;
+  return columnUnderPointer
+    ? !String(source?.id).startsWith(`${columnUnderPointer}:`)
+    : !target;
+};
+
+/* Types */
+interface Drop {
+  canceled: boolean;
+  operation: {
+    source: { id: string | number } | null;
+    target: { id: string | number } | null;
+  };
+}

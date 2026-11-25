@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 
-import { chainAfterDrag } from './src/chain.ts';
+import { chainAfterDrag, isDropUndone } from './src/chain.ts';
 
 const chain = {
   en: ['kokoro', 'fish', 'system', 'elevenlabs'],
@@ -72,4 +72,40 @@ it('a drag over nothing changes no chain', () => {
       operation: { ...event.operation, target: null },
     } as typeof event),
   ).toEqual(chain);
+});
+
+it.each([
+  // the pointer's column, the card under it, undone
+  ["over another column's card", 'uk', null, true],
+  [
+    "over another column's card, its own still under the held card's edge",
+    'uk',
+    'en:fish',
+    true,
+  ],
+  ['outside every column, over nothing', undefined, null, true],
+  [
+    "beside its column, the held card's edge over its own cards",
+    undefined,
+    'en:fish',
+    false,
+  ],
+  ['over a card of its own column', 'en', 'en:system', false],
+  ['over nothing in its own column, a gap or the off cards', 'en', null, false],
+])('a drop %s', (_, column, target, isUndone) => {
+  const operation = {
+    source: { id: 'en:kokoro' },
+    target: target ? { id: target } : null,
+  };
+  expect(isDropUndone({ canceled: false, operation }, column)).toBe(isUndone);
+});
+
+it('a cancel is undone wherever it comes', () => {
+  const card = { id: 'en:kokoro' };
+  expect(
+    isDropUndone(
+      { canceled: true, operation: { source: card, target: card } },
+      'en',
+    ),
+  ).toBe(true);
 });

@@ -18,7 +18,7 @@ import {
   api,
   voiceOf,
 } from '@/api.ts';
-import { chainAfterDrag } from '@/chain.ts';
+import { chainAfterDrag, isDropUndone } from '@/chain.ts';
 import { LIMITS } from '@/limits.ts';
 import { usePreview } from '@/usePreview.ts';
 import { useSettings } from '@/useSettings.ts';
@@ -279,11 +279,13 @@ export const App = () => {
       </div>
       <DragDropProvider
         // react owns the order through the whole drag: move() on every drag-over, the snapshot back on a
-        // cancel. applying it only on drop fought dnd-kit's optimistic dom reorder (the page and the ranks
+        // cancel or a drop out of the column. applying it only on drop fought dnd-kit's optimistic dom reorder (the page and the ranks
         // disagreed after a keyboard drag)
         onDragEnd={(event) => {
           const { current: chain } = dragStart;
-          if (event.canceled && chain) edit((config) => ({ ...config, chain }));
+          const column = columnAt(event.operation.position.current);
+          if (chain && isDropUndone(event, column))
+            edit((config) => ({ ...config, chain }));
           dragStart.current = undefined;
         }}
         onDragOver={(event) => {
@@ -371,6 +373,19 @@ const messageColour = {
 } as const;
 
 /* Helpers */
+// by the sections' own boxes: the card in hand covers what lies under the pointer
+const columnAt = (point: { x: number; y: number }) =>
+  LANGS.find(([lang]) => {
+    const box = document.querySelector(`#col-${lang}`)?.getBoundingClientRect();
+    return (
+      box &&
+      box.left <= point.x &&
+      point.x <= box.right &&
+      box.top <= point.y &&
+      point.y <= box.bottom
+    );
+  })?.[0];
+
 const SAMPLES: Record<Lang, string> = {
   en: 'FRM-266 shipped in v0.3.85 → see `speak/`',
   ru: 'Привет! Я прочитаю вслух всё, что ты выделишь, — спокойно, чётко и без спешки.',
