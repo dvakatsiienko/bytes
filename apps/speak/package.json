@@ -12,6 +12,7 @@
     "daemon:rollback": "script/daemon-rollback.sh",
     "daemon:test": "script/daemon-test.sh",
     "daemon:try": "script/daemon-try.sh",
+    "kokoro:backup": "script/kokoro-backup.sh",
     "lint": "biome lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

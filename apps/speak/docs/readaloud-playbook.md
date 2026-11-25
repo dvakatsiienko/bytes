@@ -35,7 +35,7 @@ the build knowledge for speak: the practices, the bar, the architecture calls an
 ## kokoro and the voice safety rule
 
 - before any kokoro engine or model change, the model snapshot and all its voices are backed up; a new version replaces the old one only after dima hears af_heart on it ([FRM-669](https://linear.app/x-com/issue/FRM-669))
-- the engine is `mlx-audio`, a `uv` tool; evergreen's `uv tool upgrade --all` moves it (0.6.4 → 0.6.6 on 2026-11-18) and prints kokoro every run (`clio:evergreen`)
+- the engine is `mlx-audio`, a `uv` tool; only `pnpm speak:kokoro-backup` moves it (a backup, a candidate beside it, a check, then the switch); evergreen prints kokoro every run (`clio:evergreen`)
 - the model `mlx-community/Kokoro-82M-bf16` at a71e4d38 (2025-12-02) is upstream's latest; it holds all 54 voices, af_heart included, as safetensors and pt ([hf api at the revision](https://huggingface.co/api/models/mlx-community/Kokoro-82M-bf16/revision/a71e4d38b236d968966a2002c4c895dbd12b1c3c))
 - kokoro itself has not moved since 2025-04 (hexgrad/Kokoro-82M f3ff3571); no release stream, so pinning the revision matters more than watching a version ([hf](https://huggingface.co/api/models/hexgrad/Kokoro-82M))
 - mlx-audio moved from Blaizzy to Neywa-Labs in v0.6.5 ([repo](https://github.com/Neywa-Labs/mlx-audio)); v0.6.2 fixed named voices fetched from an unpinned repo, failing offline ([#1041](https://github.com/Neywa-Labs/mlx-audio/issues/1041)); kokoro vocoder speedups sit on main for the next release (0fed32ac, 13f280ef)

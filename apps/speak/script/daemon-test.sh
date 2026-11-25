@@ -23,3 +23,4 @@ swiftc -parse-as-library -swift-version 5 core/*.swift test/*.swift -o build/dae
 ../script/daemon-core.test.sh
 ../script/daemon-swap.test.sh
 ../script/daemon-try.test.sh
+../script/kokoro-backup.test.sh

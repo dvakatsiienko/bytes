@@ -275,7 +275,7 @@
 ## scripts
 
 - ✅ `x-speak-admin` (launchd, always on) serves the built page and the api on 127.0.0.1:7386; `pnpm --filter speak admin` runs the same server by hand when the job is stopped
-- ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386, with the branch and a ⇆ jump to the other checkout's dev page in the save bar; the served page shows neither
+- ✅ `pnpm dev:speak` runs vite on 7387, proxying /api to 7386, with the branch and a ⇆ jump to the other checkout's dev page in the save bar (from 640 px wide); the served page shows neither
 - ✅ `pnpm --filter speak admin:build` builds `dist/`
 - ✅ `pnpm --filter speak test` runs the admin server's tests over a fake daemon: the write guard, the host, the page folder's jail, each route, the page's requests and its draft
 - ✅ `pnpm --filter speak daemon:build` installs the signed daemon to `~/.local/libexec/x-speak/x-speak`, with no launchd change
@@ -299,8 +299,14 @@
   - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
   - given no text, an empty one or one that opens with a dash, then it refuses in one line and starts nothing
   - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)
+- ⬜ `pnpm speak:kokoro-backup` (`kokoro:backup`) keeps the kokoro model and its voices, tries a new engine beside the live one, restarts the live server only on dima's tick, and rolls back
+  - makes: `~/.local/share/x-speak/kokoro-backup/<date>`, the newest two, with the tool's clone of that date in `kokoro-tool/`; a candidate in `kokoro-candidate/`, and its sounds beside the live tool's in `kokoro-pairs/<old> to <new>/`
+  - given `--candidate`, then the model, its voices and the live tool are backed up, the newest mlx-audio is installed beside it and renders the five favourites; a silent one, one 15 % off in length or a voice the new model lost is named and no switch is taken; af_heart is played once, and a switch to one nobody could hear wants `--unheard`
+  - given a passed check, when `--switch` runs, then the live tool is the checked one from the live server's next start; one that came out another, broke off or was ended is put back, commands and all; a receipt that names commands outside `~/.local/bin` is never installed over
+  - given `--rollback <date>`, then the tool and the model are as that backup found them
+  - given the live daemon reading aloud, then nothing is rendered or played and nothing is switched
 - ⬜ kokoro's server loads its saved model and fetches nothing: a voice it has not saved is a failure, never a download
-- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings' schema and store, the read path's rules, the presses, the socket's ops against `contract/wire.schema.json`, the pill and the meter, the core's imports, the module-level values, the places named outside `core/paths.swift`, the build's way back and the try run on stubs, after a typecheck of the whole daemon
+- ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings' schema and store, the read path's rules, the presses, the socket's ops against `contract/wire.schema.json`, the pill and the meter, the core's imports, the module-level values, the places named outside `core/paths.swift`, the build's way back, the try run and kokoro's backup on stubs, after a typecheck of the whole daemon
 - ⬜ a cloud key pasted later, or one a dead network kept back, is found with no restart
   - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time (a child of the key script that ignores its end runs on beside the next look), and the log names each key «ok» or «missing»
   - given the key script hangs, then the look ends after 15 s and the log says «keys: not loaded», and F4 reads on meanwhile
