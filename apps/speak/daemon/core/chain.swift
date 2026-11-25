@@ -15,7 +15,7 @@ enum EngineError: Error {
     case quota(String)
 }
 
-func spokenChunks(of text: String, _ lists: WordLists = .shipped) -> [Chunk] { chunks(normalize(text, lists)) }
+func spokenChunks(of text: String, _ lists: WordLists = .shipped, nextMarker: String? = nil) -> [Chunk] { chunks(normalize(text, lists, nextMarker: nextMarker)) }
 
 // a local server renders a chunk whole before its first sound, and a cloud engine may refuse a long one
 private let longestChunk = 300

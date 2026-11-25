@@ -173,8 +173,12 @@ private func unglueLists(_ text: SourcedText) -> SourcedText {
     return breaks.reversed().reduce(t) { $0.inserting("\n", at: $1.index) }
 }
 
-func normalize(_ text: String, _ lists: WordLists = .shipped) -> [Run] {
-    splitRuns(stripMarkdown(unglueLists(SourcedText(text))))
+// accessibility's text runs on past the marker of a list item the selection's end only touches: a triple-click on
+// «commit» ends at the start of item 3, and answers «commit3. ». the lines come back first: that marker proves the list
+func normalize(_ text: String, _ lists: WordLists = .shipped, nextMarker: String? = nil) -> [Run] {
+    let lines = unglueLists(SourcedText(text))
+    let selected = nextMarker.map { lines.replacing("\\n?\(NSRegularExpression.escapedPattern(for: $0))\\z", "") } ?? lines
+    return splitRuns(stripMarkdown(selected))
         .map { Run(lang: $0.lang, spoken: rewriteSymbols($0.lang == .en ? rewriteLatin($0.spoken, lists) : $0.spoken)) }
         .filter { !$0.text.isEmpty }
 }

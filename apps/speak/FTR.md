@@ -241,6 +241,7 @@
   - and a line that ends on a closing quote, a % or any sign but one that already pauses, an opener or a joining sign pauses too
   - given a long line with no end mark, then it is spoken in pieces of 300 characters at most, cut at a comma or a space
   - and a numbered line says its number first («one: merge»), even when the app hands its lines over glued together
+  - and a selection that ends at a list item's end never reads the next item's number
   - and list markers («■», «•», «★») are never spoken; a bulleted item glued to the one above on an opening «/“ still gets its pause
 - ⬜ the pill floats while speech plays: its wave, ⏸ / ▶, ■, stick and close
   - then the ⏸ / ▶ button follows the speech, and the pill never takes focus from the app in front

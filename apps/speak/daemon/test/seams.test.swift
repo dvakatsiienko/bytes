@@ -148,7 +148,7 @@ enum SeamsTest {
         let press = { (setup: (PlantedGrab, PlantedRead) -> Void, key: (PressSequencer) async -> Void) -> String in
             let grab = PlantedGrab(), read = PlantedRead(Calls())
             setup(grab, read)
-            let sequencer = PressSequencer(grab: grab, target: read, refreshSettings: { read.calls.append("refresh") }, toChunks: { spokenChunks(of: $0) }, log: { line in
+            let sequencer = PressSequencer(grab: grab, target: read, refreshSettings: { read.calls.append("refresh") }, toChunks: { spokenChunks(of: $0, nextMarker: $1) }, log: { line in
                 read.calls.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
             })
             await key(sequencer)
@@ -183,6 +183,21 @@ enum SeamsTest {
         rows.append(("a grab of lines is one line", await line("one\ntwo\r\nthree\u{2028}four\tfive\u{0}\u{1B}[31m"), "29 characters «one⏎two⏎three⏎four·five··[31m»"))
         rows.append(("a grab with nothing to say is logged too", await f4 { grab, _ in grab.selected = ("\n \n", "ax") },
                      "refresh | «press: nothing selected (grab ax N ms), 3 characters «⏎ ⏎»» | toggle"))
+        // chromium's answers to a list line selected whole (Chrome and the Claude app, 25 Nov)
+        let read = { (text: String, marker: String?) -> String in
+            let made = await f4 { grab, _ in grab.selected = (text, "ax"); grab.marker = marker }
+            return made.replacingOccurrences(of: ".*» \\| ", with: "", options: .regularExpression)
+        }
+        rows.append(("a list item reads without the next one's number", await read("commit3. ", "3. "), "read commit"))
+        rows.append(("so does one that ends a sentence", await read("a count must dedupe.5. ", "5. "), "read a count must dedupe."))
+        rows.append(("whole items keep their own", await read("steps1. build it2. ship it3. ", "3. "), "read steps./1: build it./2: ship it"))
+        rows.append(("one that ends in a digit too", await read("lane1. merge pr #522. sleep now3. ", "3. "), "read lane./1: merge P R number 52./2: sleep now"))
+        rows.append(("and one item under its lead line", await read("steps1. build it2. ", "2. "), "read steps./1: build it"))
+        rows.append(("a double-clicked word", await read("commit", nil), "read commit"))
+        rows.append(("a word's own number stays", await read("then python3.", nil), "read then python3."))
+        rows.append(("and before a space too", await read("then python3. ", nil), "read then python3."))
+        rows.append(("a marker the text does not end in cuts nothing", await read("then python3. ", "4. "), "read then python3."))
+        rows.append(("only a marker touched: nothing to read", await read("3. ", "3. "), "toggle"))
         rows.append(("F4 with no grant", await f4 { grab, _ in grab.isTrusted = false; grab.selected = ("Hello.", "ax") },
                      "refresh | «press: accessibility missing — grant X-SPEAK in Privacy & Security»"))
         rows.append(("⇧F4 idle", await press({ _, _ in }) { $0.pausePressed() }, "«press: ⇧F4 → nothing playing» | toggle"))
@@ -198,7 +213,7 @@ enum SeamsTest {
         let row = { (name: String, setup: (SlowGrab, PlantedRead) -> Void, act: (PressSequencer, SlowGrab, PlantedRead) async -> Void, want: String) in
             let calls = Calls(), grab = SlowGrab(calls), read = PlantedRead(calls)
             setup(grab, read)
-            let presses = PressSequencer(grab: grab, target: read, refreshSettings: {}, toChunks: { spokenChunks(of: $0) }, log: { line in
+            let presses = PressSequencer(grab: grab, target: read, refreshSettings: {}, toChunks: { spokenChunks(of: $0, nextMarker: $1) }, log: { line in
                 calls.made.append("«" + line.replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression) + "»")
             })
             await act(presses, grab, read)
@@ -442,8 +457,9 @@ class Recorder: DaemonCommands {
 final class PlantedGrab: SelectionGrab {
     var isTrusted = true
     var selected: (text: String?, via: String) = (nil, "ax")
+    var marker: String?
     var copied: String?
-    func selection() async -> (text: String?, via: String) { selected }
+    func selection() async -> (text: String?, via: String, marker: String?) { (selected.text, selected.via, marker) }
     func copy() async -> String? { copied }
 }
 
@@ -454,11 +470,11 @@ final class SlowGrab: SelectionGrab {
     private let calls: Calls
     private var waiting: [CheckedContinuation<String?, Never>] = []
     init(_ calls: Calls) { self.calls = calls }
-    func selection() async -> (text: String?, via: String) {
+    func selection() async -> (text: String?, via: String, marker: String?) {
         calls.made.append("grab")
         let text = await withCheckedContinuation { waiting.append($0) }
         calls.made.append("ended")
-        return (text, "ax")
+        return (text, "ax", nil)
     }
     func copy() async -> String? {
         calls.made.append("copy")

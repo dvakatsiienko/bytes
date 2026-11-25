@@ -23,7 +23,8 @@ final class App {
     private(set) lazy var speaker = makeSpeaker()
     private lazy var toChunks = { [wordLists] in spokenChunks(of: $0, wordLists.current) }
     private lazy var presses = PressSequencer(
-        grab: Grab(copyOnlyApps: { [wordLists] in wordLists.current.copyOnlyApps }), target: speaker, refreshSettings: { [configStore] in configStore.refresh() }, toChunks: toChunks, log: log
+        grab: Grab(copyOnlyApps: { [wordLists] in wordLists.current.copyOnlyApps }), target: speaker, refreshSettings: { [configStore] in configStore.refresh() },
+        toChunks: { [wordLists] in spokenChunks(of: $0, wordLists.current, nextMarker: $1) }, log: log
     )
     private lazy var commands = SocketCommands(speaker: speaker, voices: voices, panel: panel, configStore: configStore, toChunks: toChunks)
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })
