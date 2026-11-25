@@ -11,6 +11,8 @@ struct Kokoro: VoiceEngine {
     )
     // clear of chords' worktree daemon on :7383
     static let port = 7385
+    // the saved model only: a miss in its cache never pulls another revision
+    static let serverEnvironment = ["HF_HUB_OFFLINE": "1"]
     private static let url = "http://127.0.0.1:\(port)"
     private let net: any Net
 

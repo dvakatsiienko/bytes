@@ -142,6 +142,11 @@ enum StartTest {
             server.readyAfter = 3
             await kokoro.warm()
         }, "start | say Ready. af_sky | warm | «kokoro: warm»")
+        await row("it loads its saved model, and fetches nothing", true, { kokoro, server in
+            server.readyAfter = 3
+            await kokoro.warm()
+            server.calls.made = ["HF_HUB_OFFLINE=\(server.startedWith["HF_HUB_OFFLINE"] ?? "")"]
+        }, "HF_HUB_OFFLINE=1")
         await row("one that answers is asked for a word", true, { kokoro, server in
             server.readyAfter = 0
             await kokoro.warm()
@@ -215,6 +220,7 @@ final class PlantedRunner: @unchecked Sendable {
 final class PlantedServer: LocalServer, Net {
     let calls: Calls
     private(set) var isRunning = false
+    private(set) var startedWith: [String: String] = [:]
     var readyAfter = Int.max
     var exitsAfter: Int?
     var refuses = false
@@ -225,7 +231,8 @@ final class PlantedServer: LocalServer, Net {
 
     init(_ calls: Calls) { self.calls = calls }
 
-    func start() throws {
+    func start(with environment: [String: String]) throws {
+        startedWith = environment
         calls.made.append("start")
         if refuses { throw EngineError.timeout }
         isRunning = true

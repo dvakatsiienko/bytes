@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 protocol LocalServer: AnyObject {
     var isRunning: Bool { get }
-    func start() throws
+    func start(with environment: [String: String]) throws
 }
 
 @MainActor
@@ -54,7 +54,7 @@ final class KokoroServer {
     private func starts() async -> Bool {
         if !server.isRunning {
             do {
-                try server.start()
+                try server.start(with: Kokoro.serverEnvironment)
             } catch {
                 write("kokoro: server did not start — \(error)")
                 return false
