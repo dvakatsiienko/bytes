@@ -294,7 +294,6 @@ export const App = () => {
           );
           if (!(chain && isDropUndone(event, column))) return;
           const undo = () => edit((config) => ({ ...config, chain }));
-          if (event.canceled) return undo();
           // the last move may still wait for its render: undone before it, react sees no change and dnd-kit's stays
           const { resume } = event.suspend();
           void manager.renderer.rendering.then(() => {
