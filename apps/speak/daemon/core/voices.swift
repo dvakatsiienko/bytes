@@ -10,7 +10,7 @@ final class Voices: ChunkVoices {
     private var cache = SoundCache()
     // asked before its turn: the next chunk, whose wait for the first sound (0.5–3 s on fish's free tier) then hides
     // behind the audio, or a local server's render of this one, while a cloud engine races its deadline
-    private var ahead: [Engine: (text: String, pieces: Pieces)] = [:]
+    private var ahead: [Engine: (text: String, key: SoundCache.Key?, pieces: Pieces)] = [:]
 
     init(_ parts: EngineParts, player: Player, keys: Keys, servers: [Engine: KokoroServer]) {
         self.player = player
@@ -38,14 +38,16 @@ final class Voices: ChunkVoices {
     func dropAhead() { ahead = [:] }
 
     func openAhead(_ chunk: Chunk, with engine: Engine, settings: EngineConfig) {
-        guard cache[SoundCache.Key(chunk, engine, settings)] == nil else { return }
-        ahead[engine] = (try? engines[engine]?.render(chunk, settings, key: keys[engine])).map { (chunk.text, $0) }
+        let key = SoundCache.Key(chunk, engine, settings)
+        guard cache[key] == nil else { return }
+        ahead[engine] = (try? engines[engine]?.render(chunk, settings, key: keys[engine])).map { (chunk.text, key, $0) }
     }
 
     func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping (_ isCached: Bool) -> Void) async throws {
         ahead = ahead.filter { $0.value.text == chunk.text }
-        let opened = ahead.removeValue(forKey: engine)?.pieces
         let key = SoundCache.Key(chunk, engine, settings())
+        // a voice changed since is asked anew
+        let opened = ahead.removeValue(forKey: engine).flatMap { $0.key == key ? $0.pieces : nil }
         if let sound = cache[key] {
             let pieces = Pieces { line in
                 sound.forEach { line.yield($0) }

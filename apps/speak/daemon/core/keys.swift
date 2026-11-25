@@ -9,6 +9,8 @@ final class Keys {
     private let now: () -> Date
     private let write: (String) -> Void
     private var values: [Engine: String] = [:]
+    // once a keychain's, never the runner's: a keychain that does not answer later takes nothing back
+    private var inKeychain: Set<Engine> = []
     private var loadedAt: Date?
     private var isLoading = false
     private let names: [(Engine, String)]
@@ -38,7 +40,6 @@ final class Keys {
         let engines = names.map(\.0)
         // the keychain may wait on a lock, so never on main
         let own = await Task.detached { [keychain] in engines.map { keychain?($0) } }.value
-        var inKeychain: Set<Engine> = []
         for case (let engine, let value?) in zip(engines, own) {
             values[engine] = value
             inKeychain.insert(engine)

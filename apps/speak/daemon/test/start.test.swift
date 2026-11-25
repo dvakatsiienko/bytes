@@ -64,6 +64,11 @@ enum StartTest {
             await settle()
             rows.append((name, (calls.made + ["\(runner.asked) asked"]).joined(separator: " | "), want))
         }
+        let press: @MainActor (Keys, PlantedRunner, TimeInterval) async -> Void = { keys, runner, seconds in
+            runner.now += seconds
+            keys.reloadIfMissing()
+            await settle()
+        }
         let keychain = { (name: String, held: [Engine: String], act: @MainActor (Keys, PlantedRunner) async -> Void, want: String) in
             let calls = Calls(), runner = PlantedRunner()
             let keys = Keys(run: { try await runner.run($0) }, keychain: { held[$0] }, now: { runner.now }, log: { calls.made.append($0) })
@@ -79,14 +84,18 @@ enum StartTest {
                        "keys: elevenlabs keychain, fish keychain, gemini keychain | a b c | 0 asked")
         await keychain("a runner that fails leaves the keychain's", [.fish: "mine"], { keys, runner in runner.fails = true; await keys.load() },
                        "keys: not loaded — timeout | keys: elevenlabs missing, fish keychain, gemini missing | - mine - | 1 asked")
+        let slow = PlantedRunner()
+        slow.missing = ["gemini"]
+        let open = NSLock()
+        nonisolated(unsafe) var isOpen = true
+        let locked = Keys(run: { try await slow.run($0) }, keychain: { engine in open.withLock { isOpen && engine == .fish ? "mine" : nil } }, now: { slow.now }, log: { _ in })
+        await locked.load()
+        open.withLock { isOpen = false }
+        await press(locked, slow, 61)
+        rows.append(("a keychain locked later takes no key back", "\(locked[.fish] ?? "-") \(slow.asked) asked", "mine 2 asked"))
         let alone = Keys(run: nil, keychain: { $0 == .gemini ? "mine" : nil }, log: { _ in })
         await alone.load()
         rows.append(("the keychain alone, with no runner", "\(alone[.gemini] ?? "-") \(alone[.fish] ?? "-")", "mine -"))
-        let press: @MainActor (Keys, PlantedRunner, TimeInterval) async -> Void = { keys, runner, seconds in
-            runner.now += seconds
-            keys.reloadIfMissing()
-            await settle()
-        }
         await row("every key there", { keys, runner, calls in
             await keys.load()
             calls.made.append("\(keys[.elevenlabs] ?? "-") \(keys[.fish] ?? "-") \(keys[.gemini] ?? "-") \(keys[.kokoro] ?? "-")")

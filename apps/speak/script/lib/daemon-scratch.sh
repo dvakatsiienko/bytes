@@ -34,7 +34,7 @@ setup() {
     stub codesign 'case "$*" in *-r-*) [ -f "$state/no-grant" ] || echo "designated => the grant" ;; *--verify*) case "$*" in *"-R=the grant"*) ;; *) exit 1 ;; esac; for last in "$@"; do :; done; [ "$(cat "$last")" != unsigned ] ;; *) [ ! -f "$state/sign-fails" ] ;; esac'
     stub nc 'cat >/dev/null; [ -f "$state/status" ] && cat "$state/status"'
     stub sleep ':'
-    stub mark 'echo "ok $(shasum -a 256 "$libexec/x-speak" | cut -d" " -f1) 2026-11-23T10:00:01Z" >"$HOME/.local/share/x-speak/start-mark"'
+    stub mark 'echo "${1:-ok} $(shasum -a 256 "$libexec/x-speak" | cut -d" " -f1) 2026-11-23T10:00:01Z" >"$HOME/.local/share/x-speak/start-mark"'
     stub lsof '[ -f "$state/inode" ] && printf "p1\nftxt\ni9\nn/usr/lib/dyld\nftxt\ni%s\nn%s\n" "$(cat "$state/inode")" "$libexec/x-speak"'
     stub launchctl 'case "$1" in
         bootout) rm -f "$state/inode" ;;
@@ -46,6 +46,10 @@ setup() {
                 dying) mark; rm -f "$state/inode" "$state/status" ;;
                 old) [ -f "$state/dies" ] || printf "{\"speaking\":false}" >"$state/status" ;;
                 mute) ;;
+                # up, and then silent, or another binary
+                unread) mark no-settings ;;
+                silent) mark; rm -f "$state/status" ;;
+                other) mark; echo 7 >"$state/inode" ;;
                 *) mark ;;
             esac
             [ -f "$state/dies" ] && rm -f "$state/status"

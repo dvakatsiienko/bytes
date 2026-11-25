@@ -26,45 +26,83 @@ if reads_settings "$installed" || [ "$(config_argument)" = "$settings" ]; then
         exit 3
     fi
 fi
+# a file nobody can read takes no build back: the one that runs is asked while it can be
+was_read=no
+case "$(printf '%s\n' '{"op":"reload"}' | nc -U -w 2 "$HOME/.local/share/x-speak/control.sock" 2>/dev/null || true)" in *'"ok":true'*) was_read=yes ;; esac
 build=$(sha_of "$installed")
 name=$(printf %s "$build" | cut -c1-12)
 watched=no
 if [ "${1:-}" != --unwatched ] && [ "$(cat "$unstarted" 2>/dev/null)" = "$build" ]; then
     watched=yes
-    # an ended watch would leave a build that never comes up where it is
-    trap '' HUP INT TERM
+    # an ended watch would leave a build that never comes up where it is, and so would a word nobody is there to read
+    trap '' HUP INT TERM PIPE
+fi
+# what an earlier start wrote; nothing is stopped yet
+if ! rm -f "$start_mark"; then
+    echo "relaunch: $start_mark cannot be taken away, so no start can be told from it" >&2
+    exit 3
 fi
 launchctl bootout "$domain/$label" 2>/dev/null || true
 # bootout returns before the teardown ends, and a bootstrap inside that window fails with «5: Input/output error»
 tries=0
 while launchctl print "$domain/$label" >/dev/null 2>&1; do
     tries=$((tries + 1))
-    if [ "$tries" -gt 50 ]; then
-        echo "relaunch: $label still loaded after 10 s" >&2
-        exit 1
+    # launchd ends what does not stop by itself in 20 s
+    if [ "$tries" -gt 300 ]; then
+        echo "relaunch: $label still loaded after 60 s" >&2 || true
+        break
     fi
     sleep 0.2
 done
-rm -f "$start_mark"
+# the build that stopped may have come up once more on its way out
+rm -f "$start_mark" || true
 code=0
 launchctl bootstrap "$domain" "$HOME/Library/LaunchAgents/$label.plist" || code=1
 [ "$watched" = yes ] || exit "$code"
+[ "$code" -eq 0 ] || why='was not started by launchd'
 # longer than launchd's 30 s retry of a start that died
 tries=0
-while [ "$code" -eq 0 ] && [ "$(cut -d' ' -f1,2 "$start_mark" 2>/dev/null)" != "ok $build" ]; do
+while [ "$code" -eq 0 ]; do
+    case "$(cut -d' ' -f1,2 "$start_mark" 2>/dev/null)" in
+    "ok $build") break ;;
+    "no-settings $build")
+        [ "$was_read" = yes ] || break
+        code=1
+        why='does not read the settings the one before it reads'
+        break
+        ;;
+    esac
     tries=$((tries + 1))
-    [ "$tries" -le 45 ] || code=1
+    if [ "$tries" -gt 45 ]; then
+        code=1
+        why='did not come up in 45 s'
+    fi
     sleep 1
 done
 if [ "$code" -eq 0 ]; then
     # up, and still there
     sleep 5
-    if [ "$(running_inode)" = "$(stat -f %i "$installed")" ] && daemon_answers; then
-        rm -f "$unstarted"
-        echo "relaunch: $name is up"
-        exit 0
-    fi
+    # a main thread busy for a moment is asked again
+    for _ in 1 2 3; do
+        if [ "$(running_inode)" = "$(stat -f %i "$installed")" ] && daemon_answers; then
+            rm -f "$unstarted"
+            echo "relaunch: $name is up" || true
+            exit 0
+        fi
+        sleep 1
+    done
+    why='came up and did not stay'
 fi
-echo "relaunch: $name did not come up in 45 s, the daemon before it goes back" >&2
-"$here/daemon-rollback.sh" --from "$build" || true
+echo "relaunch: $name $why, the daemon before it goes back" >&2 || true
+# its words are in a file too: the rollback goes on when nobody is there to read them
+# a build that installs now holds the binaries for a moment; what it installs is not taken back
+tries=0
+while [ -d "$install_dir/x-speak.lock" ] && [ "$tries" -lt 30 ]; do
+    tries=$((tries + 1))
+    sleep 1
+done
+words="$install_dir/x-speak.went-back"
+(: >"$words") 2>/dev/null || words=/dev/null
+"$here/daemon-rollback.sh" --from "$build" >"$words" 2>&1 || true
+cat "$words" >&2 || true
 exit 1

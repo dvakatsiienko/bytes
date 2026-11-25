@@ -99,7 +99,7 @@ export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
     askDaemon(socket, { ...request, op });
   const ask = (op: Op) => async (request: IncomingMessage) =>
     daemon(op, await body(request));
-  const save = (op: Op) => async (request: IncomingMessage) =>
+  const own = (op: Op) => async (request: IncomingMessage) =>
     canSave ? ask(op)(request) : { error: WORKTREE };
 
   const routes: Record<string, (request: IncomingMessage) => Promise<unknown>> =
@@ -109,11 +109,11 @@ export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
       'GET /api/voices': async () => daemon('voices'),
       'POST /api/pause': ask('pause'),
       'POST /api/preview': ask('preview'),
-      'POST /api/restart': ask('restart'),
+      'POST /api/restart': own('restart'),
       'POST /api/stop': ask('stop'),
       'POST /api/wave': ask('wave'),
-      'PUT /api/config': save('save'),
-      'PUT /api/favourites': save('heart'),
+      'PUT /api/config': own('save'),
+      'PUT /api/favourites': own('heart'),
     };
 
   return async (request: IncomingMessage, response: ServerResponse) => {
@@ -143,7 +143,7 @@ export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
 };
 
 const WORKTREE =
-  'a worktree never saves the live settings — start its server with a socket of its own';
+  'a worktree neither saves the live settings nor restarts the live daemon — start its server with a socket of its own';
 
 // a link to the live socket is the live socket
 const canonical = (path: string) =>

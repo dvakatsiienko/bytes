@@ -46,6 +46,17 @@ for line in 'private let at = NSHomeDirectory()' 'private let at = "/Users/dima/
     says "«${line}» outside the paths is named for what it is" 'a place named outside core/paths.swift'
 done
 
+for line in 'pill-run.swift App(arguments)' 'pill-run.swift Player(device: MacAudio())' 'pill-run.swift ReadRecords(path: "x", log: { _ in })' \
+    'core/sound-cache.swift try? Data().write(to: at)' 'core/sound-cache.swift FileManager.default'; do
+    app; printf '%s\n' "// ${line#* }" >>"$root/app/daemon/${line%% *}"; run
+    is "«${line#* }» in ${line%% *} fails the run" 1 "$code"
+    says "«${line#* }» in ${line%% *} is named for what it is" 'reaches past its part'
+done
+
+app; mv "$root/app/daemon/core/sound-cache.swift" "$root/app/daemon/core/kept-sounds.swift"; run
+is 'a file held to its part that moved fails the run' 1 "$code"
+says 'a file held to its part that moved is named' 'core/sound-cache.swift to hold to its part'
+
 app; plant 'import Foundation\nprivate func at(_ p: Paths) { try? FileManager.default.createDirectory(atPath: p.settings, withIntermediateDirectories: true) }'; run
 passes 'a folder made at one of the paths passes'
 

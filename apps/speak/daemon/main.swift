@@ -48,9 +48,9 @@ final class App {
     }
 
     func start(only: Engine?) {
-        configStore.refresh()
+        let settingsError = configStore.refresh()
         if arguments.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have the keychain's alone") }
-        arguments.text.isEmpty ? startDaemon() : startOneShot(only: only)
+        arguments.text.isEmpty ? startDaemon(hasSettings: settingsError == nil) : startOneShot(only: only)
         // the app loop, for a one-shot too: the pill is a window, and under dispatchMain its first show landed off the
         // main thread and crashed every one-shot run
         NSApplication.shared.setActivationPolicy(.prohibited)
@@ -81,7 +81,7 @@ final class App {
         }
     }
 
-    private func startDaemon() {
+    private func startDaemon(hasSettings: Bool) {
         ownerOnly(STDERR_FILENO)
         withNoKeychainWindows()
         Task {
@@ -93,7 +93,7 @@ final class App {
             await warm
         }
         // written by main's own loop, so a main that never runs leaves none
-        control.start { [paths, job] in DispatchQueue.main.async { markStart(of: job.build, at: paths.startMark) } }
+        control.start { [paths, job] in DispatchQueue.main.async { markStart(of: job.build, hasSettings: hasSettings, at: paths.startMark) } }
         heartbeat.start()
         let registered = hotkeys.register()
         // with the prompt option macos itself asks for the grant, naming this exact process — no guessing which entry
@@ -103,10 +103,10 @@ final class App {
     }
 }
 
-private func markStart(of build: String?, at path: String) {
+private func markStart(of build: String?, hasSettings: Bool, at path: String) {
     do {
         guard let build else { throw CocoaError(.fileReadUnknown) }
-        try startMark(build: build, at: Date()).write(toFile: path, atomically: true, encoding: .utf8)
+        try startMark(build: build, hasSettings: hasSettings, at: Date()).write(toFile: path, atomically: true, encoding: .utf8)
     } catch {
         log("start mark: not written — \(error)")
     }
@@ -120,7 +120,7 @@ struct XSpeak {
     static func main() {
         do {
             let arguments = try Arguments.parse(Array(CommandLine.arguments.dropFirst()))
-            if let pill = arguments.pill { return arguments.printsModel ? print(pill.model.json) : show(pill) }
+            if let pill = arguments.pill { return arguments.printsModel ? print(pill.model.json) : showPill(pill) }
             var only: Engine?
             if let name = arguments.engine {
                 guard let engine = Engine(rawValue: name) else { usageExit("unknown engine «\(name)»") }
@@ -130,19 +130,6 @@ struct XSpeak {
         } catch {
             usageExit("\(error)")
         }
-    }
-
-    // the pill alone: no app part that reads a key, a socket or a sound is made
-    @MainActor
-    private static func show(_ fixture: PillFixture) {
-        // read by the panel and never saved: stick is this run's own
-        UserDefaults.standard.setVolatileDomain(["panelSticky": fixture.model.isStuck], forName: UserDefaults.argumentDomain)
-        let panel = Panel(settings: { .fallback })
-        panel.model.onClose = { exit(0) }
-        Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { _ in exit(0) }
-        NSApplication.shared.setActivationPolicy(.prohibited)
-        panel.show(fixture.model)
-        withExtendedLifetime(panel) { NSApplication.shared.run() }
     }
 
     // a bad argv ends the process with one usage line

@@ -11,11 +11,19 @@ const KINDS = ['hot', 'cold', 'kept'] as const;
 const LINE =
   /^(?<day>\d{4}-\d\d-\d\d) (?<time>\d\d:\d\d:\d\d\.\d{3}) (?<says>.*)$/u;
 const BEGUN = /^read \d+: chunk 1\/\d+$/u;
+const ENDED = /^\S+ \S+ read \d+: ended$/mu;
+const SAID = /^read \d+: /u;
+const START = /^(?=\S+ \S+ daemon: )/mu;
 const OVER = /^read \d+: (?:ended|stopped)$/u;
 const HEARD = /^first audio: (?<engine>\w+) (?<ms>\d+) ms(?<kept>, kept)?$/u;
 
-export const firstAudios = (log: string): FirstAudio[] => {
+// one daemon's lines at a time: one from before «ended» was logged knows a read's end only by its last line
+export const firstAudios = (log: string): FirstAudio[] =>
+  log.split(START).flatMap(ofOneDaemon);
+
+const ofOneDaemon = (log: string): FirstAudio[] => {
   const found: FirstAudio[] = [];
+  const namesEnds = ENDED.test(log);
   let isPressed = false;
   let isRead = false;
   let isCold = true;
@@ -25,20 +33,16 @@ export const firstAudios = (log: string): FirstAudio[] => {
     const { day, time, says = '' } = LINE.exec(line)?.groups ?? {};
     if (!(day && time)) continue;
     const at = Date.parse(`${day}T${time}`);
-    if (says.startsWith('daemon: ')) {
-      isPlaying = false;
-      quietSince = Number.NEGATIVE_INFINITY;
-    }
     if (says.startsWith('press: grab ')) {
       isPressed = true;
       isCold = !isPlaying && at - quietSince > IDLE_MS;
     }
     if (BEGUN.test(says)) {
-      isPlaying = true;
+      isPlaying = namesEnds;
       isRead = isPressed;
       isPressed = false;
     }
-    if (OVER.test(says)) {
+    if (OVER.test(says) || (!namesEnds && SAID.test(says))) {
       isPlaying = false;
       quietSince = at;
     }

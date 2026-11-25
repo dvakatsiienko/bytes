@@ -285,6 +285,15 @@ enum EnginesTest {
             }
             calls.made = calls.made.filter { $0 == "kept" || $0 == "rendered" }
         }, "rendered | rendered | rendered | rendered")
+        await row("a voice changed since the look ahead is asked anew, and nothing is kept as it", { voices, net, calls in
+            voices.openAhead(chunk("One."), with: .fish, settings: EngineConfig(voice: ["*": "old"]))
+            await settle()
+            net.call = { _ in }
+            for settings in [named, named, EngineConfig(voice: ["*": "old"])] {
+                try await voices.speak(chunk("One."), with: .fish, settings: { settings }, deadline: nil) { calls.made.append($0 ? "kept" : "asked") }
+            }
+            calls.made = calls.made.filter { $0 == "kept" || $0 == "asked" } + ["\(net.asked.count)"]
+        }, "asked | kept | asked | 3")
         await row("the mac voice is never kept", { voices, _, calls in
             for _ in 0..<2 { try await say(voices, "One.", .system, calls) }
         }, "sound | heard | sound | heard")

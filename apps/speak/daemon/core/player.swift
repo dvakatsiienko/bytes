@@ -27,11 +27,12 @@ protocol AudioDevice: AnyObject {
 final class Player {
     private let device: any AudioDevice
     private let settling: Duration
-    private let now: () -> ContinuousClock.Instant
+    private let now: () -> SuspendingClock.Instant
     private let write: (String) -> Void
     private var clock = PlayClock()
-    // seconds of sound scheduled since the read began, at 1×
+    // seconds of sound scheduled since the read began, at 1×, and the stretches of it a device dropped
     private(set) var sound = 0.0
+    private(set) var dropped: [Range<Double>] = []
     private var pending = 0
     private var drainWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
     private var generation = 0
@@ -46,7 +47,7 @@ final class Player {
 
     var isPlaying: Bool { pending > 0 }
 
-    init(device: any AudioDevice, settling: Duration = .seconds(2), now: @escaping () -> ContinuousClock.Instant = { .now }, log write: @escaping (String) -> Void) {
+    init(device: any AudioDevice, settling: Duration = .seconds(2), now: @escaping () -> SuspendingClock.Instant = { .now }, log write: @escaping (String) -> Void) {
         self.device = device
         self.settling = settling
         self.now = now
@@ -64,6 +65,7 @@ final class Player {
     func readBegan() {
         clock = PlayClock()
         sound = 0
+        dropped = []
     }
 
     // with the engine's gain and speed
@@ -130,8 +132,8 @@ final class Player {
         generation += 1
         device.stop()
         clock.holds(at: now())
-        // the rest of it will never sound
-        sound = min(sound, played.position)
+        let head = dropped.reduce(played.position) { $0 + $1.upperBound - $1.lowerBound }
+        if head < sound { dropped.append(head..<sound) }
         pending = 0
         dryAt = nil
         quietSince = .now

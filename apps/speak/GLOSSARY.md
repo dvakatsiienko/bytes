@@ -29,6 +29,6 @@
 - **heard / position** — how long a read was listened to, and how far into its sound it is; at 1.5× the second runs faster
 - **master volume** — one share, 0 to 100 percent, over every engine's gain
 - **kept sound** — a sentence's rendered sound, held in the daemon's memory to be heard again with no render
-- **hot / cold read** — a cold one is the first after 5 idle minutes or the daemon's start; the rest are hot
+- **hot / cold read** — a cold one is the first 5 minutes or more after the last one's end, or after the daemon's start; the rest are hot
 - **pill state** — one of the ten fixed things a pill can show, behind its sealed boards; a try run shows one or prints it
 - **try run** — one text spoken by a tree's own daemon build, beside the live daemon

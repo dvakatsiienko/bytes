@@ -49,6 +49,25 @@ describe('the first audio of his reads', () => {
     ]);
   });
 
+  it("counts from a read's last line in a log from before ends were named", () => {
+    const old = (time: string, n: number) =>
+      read(time, n, 'kokoro 140 ms').slice(0, 4);
+    expect(
+      found(
+        ...old('09:00:10', 1),
+        ...old('09:01:10', 2),
+        ...old('11:00:10', 3),
+        '2026-11-26 12:00:00.000 daemon: F4 registered, F5 registered',
+        ...read('12:00:10', 1, 'kokoro 900 ms'),
+      ),
+    ).toEqual([
+      ['kokoro', 'cold', 140],
+      ['kokoro', 'hot', 140],
+      ['kokoro', 'cold', 140],
+      ['kokoro', 'cold', 900],
+    ]);
+  });
+
   it("leaves a preview and the socket's read out, though a press came before", () => {
     const [press = '', chunk = '', ...rest] = read('09:00:10', 1, 'fish 1 ms');
     expect(

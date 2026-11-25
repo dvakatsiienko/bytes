@@ -269,17 +269,18 @@ stub mark ':'; relaunch
 is 'a build that came up once is not watched again' '0 new/old' "$code $(pair)"
 printf mute >"$libexec/x-speak"; relaunch
 is 'a relaunch of what no build put there is not watched' '0 mute/old' "$code $(pair)"
-for bad in broken mute dying; do
+for bad in broken mute dying silent other; do
     setup; build "$bad"; relaunch
     is "a $bad build goes back by itself" '1 old/'"$bad running" "$code $(pair) $(running)"
     is "a $bad build: launchd runs the one put back" "$(stat -f %i "$libexec/x-speak")" "$(cat "$state/inode" 2>/dev/null)"
     is "a $bad build: one start each" 2 "$(relaunches)"
     is "a $bad build: no ok line stands" '' "$(marked)"
-    says "a $bad build is named" "$(printf "$bad" | shasum -a 256 | cut -c1-12) did not come up in 45 s"
+    case "$bad" in broken | mute) why='did not come up in 45 s' ;; *) why='came up and did not stay' ;; esac
+    says "a $bad build is named, and why" "$(printf "$bad" | shasum -a 256 | cut -c1-12) $why"
     says "a $bad build: says what runs now" "rollback: running $(printf old | shasum -a 256 | cut -c1-12)"
 done
 relaunch
-is 'a relaunch after it, onto a daemon that writes no mark, stays there' '0 old/dying' "$code $(pair)"
+is 'a relaunch after it, onto a daemon that writes no mark, stays there' '0 old/other' "$code $(pair)"
 setup; build mute; echo "ok $(sha "$libexec/x-speak") 2026-11-23T09:00:00Z" >"$HOME/.local/share/x-speak/start-mark"; relaunch
 is 'a mark from an earlier start is none' '1 old/mute' "$code $(pair)"
 setup; build mute; stub sleep 'echo "ok 0000 2026-11-23T10:00:00Z" >"$HOME/.local/share/x-speak/start-mark"'; relaunch
@@ -297,6 +298,18 @@ for end in HUP INT TERM; do
 done
 setup; build new; touch "$state/bootstrap-fails"; relaunch
 is 'a build launchd would not start goes back' '1 old/new 2' "$code $(pair) $(relaunches)"
+says 'a build launchd would not start: says so' 'was not started by launchd'
+setup; build mute; "$root/app/script/daemon-relaunch.sh" 2>&1 | true; n=0; while [ "$(pair)" != old/mute ] && [ $n -lt 100 ]; do n=$((n + 1)); /bin/sleep 0.05; done
+is 'a watch nobody reads goes back all the same' old/mute "$(pair)"
+says_file() { grep -q "$2" "$libexec/x-speak.went-back" && got=yes || got=no; is "$1" yes "$got"; }
+says_file 'a watch nobody reads leaves its words' 'rollback: running'
+n=0; while locked_now=$([ -d "$libexec/x-speak.lock" ] && echo locked) && [ $n -lt 100 ]; do n=$((n + 1)); /bin/sleep 0.05; done
+setup; build new; stub nc 'cat >/dev/null; if [ -f "$state/relaunches" ] && [ ! -f "$state/asked" ]; then touch "$state/asked"; echo "{\"error\":\"x\",\"main\":\"blocked for 0.1 s\"}"; else echo "{\"speaking\":false}"; fi'; relaunch
+is 'a build busy for a moment stays' '0 new/old' "$code $(pair)"
+setup; build new; mkdir -p "$HOME/.local/share/x-speak/start-mark/held"; relaunch
+is 'a mark that cannot be taken away: refused, nothing stopped' '3 new/old running' "$code $(pair) $(running)"
+setup; build new; cp "$root/bin/launchctl" "$state/launchctl"; stub launchctl 'case "$1" in print) if [ -f "$state/booted-out" ]; then n=$(cat "$state/left"); [ "$n" -gt 0 ] && echo $((n - 1)) >"$state/left" && exit 0; fi ;; bootout) touch "$state/booted-out" ;; esac; exec "$state/launchctl" "$@"'; echo 90 >"$state/left"; chmod +x "$state/launchctl"; relaunch
+is 'a watched job that takes 18 s to stop is waited for' '0 new/old' "$code $(pair)"
 setup; build mute; stub nc 'cat >/dev/null; if [ -f "$state/relaunches" ]; then echo "{\"speaking\":true}"; else echo "{\"speaking\":false}"; fi'; relaunch
 is 'a build with no mark that reads aloud is left to read' '1 mute/old' "$code $(pair)"
 says 'a build with no mark that reads aloud: says so' 'reading aloud now'
@@ -308,6 +321,26 @@ is 'forward by hand to a build that never came up is not taken back' '1 broken/o
 is 'and its relaunch watched nothing' '' "$(printf '%s\n' "$out" | grep 'did not come up')"
 relaunch
 is 'but its relaunch is' '1 old/broken' "$code $(pair)"
+
+# it answers a reload as it answers a status: yes to one, no to the other
+reads_file() { stub nc 'case "$(cat)" in *reload*) echo "'"$1"'" ;; *) [ -f "$state/status" ] && cat "$state/status" ;; esac'; }
+setup; build unread; reads_file '{\"ok\":true}'; relaunch
+is 'a build that does not read the settings the one before it reads goes back' '1 old/unread' "$code $(pair)"
+says 'a build that does not read them: says so' 'does not read the settings the one before it reads'
+setup; build unread; reads_file '{\"error\":\"config.json: not readable\"}'; relaunch
+is 'settings nobody can read take no build back' '0 unread/old' "$code $(pair)"
+setup; build new; stub sleep '[ "$1" != 5 ] || rm -f "$state/inode" "$state/status"'; relaunch
+is 'a build that dies in its first 5 s goes back' '1 old/new' "$code $(pair)"
+setup; build mute; mkdir "$libexec/x-speak.lock"; stub sleep 'echo . >>"$state/slept"; [ "$(wc -l <"$state/slept")" -ne 60 ] || rmdir "$libexec/x-speak.lock"'; relaunch
+is 'binaries another build holds for a moment are waited for' '1 old/mute' "$code $(pair)"
+setup; build mute; mkdir -p "$libexec/x-speak.went-back"; relaunch
+is 'words that cannot be written hold no rollback up' '1 old/mute' "$code $(pair)"
+for stays in 18 90; do
+    setup; build mute; cp "$root/bin/launchctl" "$state/launchctl"
+    stub launchctl 'case "$1" in print) n=$(cat "$state/left" 2>/dev/null || echo 0); [ "$n" -gt 0 ] && echo $((n - 1)) >"$state/left" && exit 0 ;; bootout) cat "$state/stays" >"$state/left" ;; esac; exec "$state/launchctl" "$@"'
+    echo $((stays * 5)) >"$state/stays"; relaunch
+    is "a job that takes $stays s to stop, twice: the one before it runs" '1 old/mute running' "$code $(pair) $(running)"
+done
 
 # the first run stays inside its relaunch until `go` appears
 held() {

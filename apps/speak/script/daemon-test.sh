@@ -17,6 +17,13 @@ globals=$(grep -nE '^(@[A-Za-z_]+(\([^)]*\))? +|[a-z]+(\([a-z]+\))? +|import [A-
 place='NS[A-Za-z]*Director|(home|temporary|applicationSupport|library|documents?|desktop|downloads|caches|user|shared|trash|movies|music|pictures)Directory|currentDirectoryPath|"(/[^"]|~/|file:)'
 places=$(grep -nE "$place" ./*.swift core/*.swift | grep -v '^core/paths\.swift:' | sed 's#"/bin/sh"##g' | grep -E "$place" || true)
 [ -z "$places" ] || { printf 'daemon-test: a place named outside core/paths.swift\n%s\n' "$places" >&2; exit 1; }
+# a pill state is the panel alone, with nothing that sounds, answers or records; a kept sound is in memory alone
+for rule in 'pill-run.swift (^|[^A-Za-z])(App|Player|MacAudio|Speaker|Voices|Keys|Control|Hotkeys|KokoroServer|ReadRecords)(\.init)?\(' \
+    'core/sound-cache.swift FileManager|FileHandle|UserDefaults|OutputStream|write\(|open\(|URL'; do
+    [ -f "${rule%% *}" ] || { echo "daemon-test: no ${rule%% *} to hold to its part" >&2; exit 1; }
+    broken=$(grep -nE "${rule#* }" "${rule%% *}" || true)
+    [ -z "$broken" ] || { printf 'daemon-test: %s reaches past its part\n%s\n' "${rule%% *}" "$broken" >&2; exit 1; }
+done
 ../script/daemon-compile.sh -typecheck
 swiftc -parse-as-library -swift-version 5 core/*.swift test/*.swift -o build/daemon-test
 ./build/daemon-test golden.json config.json ../contract

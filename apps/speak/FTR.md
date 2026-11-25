@@ -135,10 +135,13 @@
 
 > states: the week strip in the save bar, the week hover, the per-app hover, the cut hover, the detail on click
 
-- 🧭 every read leaves one record
-  - makes: `~/.local/share/x-speak/reads.jsonl`, one line per read: time, source app, words, characters the normalizer cut, seconds listened, engine
-  - given a read that plays to its end, or is stopped by F5 or a new F4
-  - then one line lands with the seconds actually heard
+- ⬜ each finished read leaves one record, with no word of it
+  - makes: a json line in `~/.local/share/x-speak/reads.jsonl`, dima's alone: `schema` 1, `time` (the read's start), `app` (the one in front at F4, none for the socket's read), `wordsHeard`, `charsCut` (by kind, empty until the cleaner has named rules), `secondsHeard`, `engines` in the order they were heard, `outcome`
+  - given a read that ends by itself, a stop, a newer read or a preview over it, or no engine that spoke, then `outcome` is finished, stopped, overtaken or unspoken
+  - given a pause, then its time is not heard; given 1.5×, then ten seconds heard are fifteen of the sound
+  - given a stop inside a sentence, then its words count by the share heard of the sound it had got by then, rounded down
+  - given a preview, a try run or a pill state, then no line is written
+  - given a day of his reads, then each `press: grab` line that a `read <n>: chunk 1/` line follows has its record: a preview and the socket's read have no press line, and the read numbers start again at each start
   - decision: every stat derives from this one record, nothing is stored twice (shape-lite, 2026-10-01)
 - 🧭 one compact quick view shows the stats in the admin
   - given a week of records
@@ -288,8 +291,8 @@
   - given a change the old file got since, when it runs with that file's hash, then the change is brought and the settings it went over are kept as `config.json.before-move`; with `seen` nothing is copied
   - given another hash, a copy that differs, or settings there with a change of their own, then it refuses in one line and nothing moves
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
-  - makes: `~/.local/share/x-speak/start-mark`, written by each daemon that came up: `ok <its binary's hash> <time>`
-  - given a build that was just installed, when it is relaunched, then the relaunch waits until that build is up and names it; one that is not up in 45 s, or is gone 5 s later, goes back through the rollback by itself, and the relaunch fails with a line that says so
+  - makes: `~/.local/share/x-speak/start-mark`, written by each daemon that came up: `ok <its binary's hash> <time>`, or `no-settings …` when it came up on the built-in defaults
+  - given a build that was just installed, when it is relaunched, then the relaunch waits until that build is up and names it; one that is not up in 45 s, does not read the settings the one before it reads, or does not answer 5 s later, goes back through the rollback by itself; the relaunch fails with a line that says why, and the rollback's words are in `x-speak.went-back` beside the binaries
   - given the rollback's own relaunch, a build that came up before, or a login's start, then nothing is watched
   - given no settings at their place, or a change in the old file since they moved that nobody brought, then it refuses in one line, names the way, and stops nothing
 - ✅ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
@@ -301,7 +304,7 @@
   - makes: `daemon/build/x-speak-try`, in the tree
   - given the live daemon quiet, when it runs, then the text is heard with this mac's live settings (the tracked seed, when it has none), and the live daemon answers `status` before and after and keeps its keys
   - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
-  - given no text, an empty one or one that opens with a dash, then it refuses in one line and starts nothing
+  - given no text, an empty one or one that opens with a dash and is not `--pill`, then it refuses in one line and starts nothing
   - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)
 - ⬜ `pnpm speak:try --pill <state>` shows one of the pill's ten fixed states for 20 s, as far as today's pill draws it: `reading`, `volume-row`, `speed-row`, `paused`, `fell-through`, `hover`, `long-line`, `idle-stuck`, `no-word-timings`, `code-block`
   - given `--print-model` beside it, then the state is printed as json and nothing is shown
@@ -315,12 +318,6 @@
   - given the live daemon reading aloud, then nothing is rendered or played and nothing is switched
 - ⬜ kokoro's server loads its saved model and fetches nothing: a voice it has not saved is a failure, never a download
 - ✅ `pnpm --filter speak daemon:test` runs the daemon's tests on the mac: the normalizer's golden cases, the argv parser, the settings' schema and store, the read path's rules, the presses, the socket's ops against `contract/wire.schema.json`, the pill and the meter, the core's imports, the module-level values, the places named outside `core/paths.swift`, the build's way back, the try run and kokoro's backup on stubs, after a typecheck of the whole daemon
-- ⬜ each finished read leaves one record, with no word of it
-  - makes: a json line in `~/.local/share/x-speak/reads.jsonl`, dima's alone: `schema` 1, `time` (the read's start), `app` (the one in front at F4, none for the socket's read), `wordsHeard`, `charsCut` (by kind, empty until the cleaner has named rules), `secondsHeard`, `engines` in the order they were heard, `outcome`
-  - given a read that ends by itself, a stop, a newer read or a preview over it, or no engine that spoke, then `outcome` is finished, stopped, overtaken or unspoken
-  - given a pause, then its time is not heard; given 1.5×, then ten seconds heard are fifteen of the sound
-  - given a stop inside a sentence, then its words count by the share of its sound that was heard, rounded down
-  - given a preview, a try run or a pill state, then no line is written
 - ⬜ one master volume, `volume` in the settings file, 0 to 100 percent on top of every engine's gain
   - given 50 on an engine's gain of 0.8, then the sound is scaled by 0.4, a preview's too; given none named, then 100
   - given a value outside its range, then the save is refused
@@ -329,7 +326,7 @@
   - given more than 32 MB of sound, then the oldest goes first; given a restart, then nothing is kept; no file but the press line holds audio or text of it
   - given the macOS voice, then nothing is kept: its Spoken Content voice changes in System Settings
 - ⬜ `pnpm --filter speak daemon:first-audio [reads] [since]` prints how soon his reads began to sound: each engine's median and 95th percentile, hot and cold apart
-  - given the first read after 5 idle minutes or the daemon's start, then it is cold; a kept sentence, a preview and the socket's read are in neither
+  - given the first read 5 minutes or more after the last one's end, or after the daemon's start, then it is cold; a kept sentence, a preview and the socket's read are in neither
 - ⬜ an engine's key in the macOS keychain wins over the key script's
   - given an item of service `x-speak` and account the engine's id, when the daemon starts, then that key is used and the log says «<engine> keychain»; with every key there the script is not run
   - given an item it may not read without a window, then it counts as none, and no window opens

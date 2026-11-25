@@ -64,15 +64,18 @@ struct ReadTally {
         if let last = chunks.indices.last { chunks[last].end = end }
     }
 
-    // a sentence stopped in the middle counts by the share of its sound that was heard; `sound` is how much there is
-    func record(_ outcome: ReadRecord.Outcome, heard: Double, position: Double, sound: Double) -> ReadRecord {
+    // a sentence stopped in the middle counts by the share of its sound that was heard. `position` is how much sounded,
+    // `sound` how much there is, `dropped` the stretches of it that never sounded
+    func record(_ outcome: ReadRecord.Outcome, heard: Double, position: Double, sound: Double, dropped: [Range<Double>] = []) -> ReadRecord {
         // an end that came by itself is a moment early or late on the clock
-        let position = outcome == .finished ? position + 1 : position
+        let head = dropped.reduce(outcome == .finished ? position + 1 : position) { $0 + $1.upperBound - $1.lowerBound }
         let words = chunks.reduce(0) { sum, chunk in
             let end = chunk.end ?? sound
             guard end > chunk.start else { return sum }
-            if position >= end { return sum + chunk.words }
-            return sum + Int(Double(chunk.words) * max(0, position - chunk.start) / (end - chunk.start))
+            let heard = dropped.reduce(max(0, min(head, end) - chunk.start)) { left, gap in
+                left - max(0, min(gap.upperBound, end, head) - max(gap.lowerBound, chunk.start))
+            }
+            return sum + Int(Double(chunk.words) * max(0, heard) / (end - chunk.start))
         }
         return ReadRecord(
             time: time, app: app, wordsHeard: words, secondsHeard: heard, engines: engines,

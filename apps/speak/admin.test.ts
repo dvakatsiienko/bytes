@@ -377,7 +377,7 @@ describe('a worktree’s server', () => {
 
     const refused = {
       error:
-        'a worktree never saves the live settings — start its server with a socket of its own',
+        'a worktree neither saves the live settings nor restarts the live daemon — start its server with a socket of its own',
     };
     expect((await ask('PUT', '/api/config', JSON_TYPE, '{}')).body).toEqual(
       refused,

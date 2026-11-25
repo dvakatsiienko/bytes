@@ -7,14 +7,13 @@ set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib/daemon-installed.sh"
 
-
-# with no text the binary is a daemon: a second one, which takes the live one's socket and hotkeys
 if [ "${1:-}" = --pill ]; then
     cd "$here/../daemon"
     mkdir -p build
     "$here/daemon-compile.sh" -O -o build/x-speak-try
     exec build/x-speak-try "$@"
 fi
+# with no text the binary is a daemon: a second one, which takes the live one's socket and hotkeys
 text=$*
 case "$text" in
 -*) refuse 'a text never starts with a dash — usage: script/daemon-try.sh <text …>' ;;

@@ -293,8 +293,25 @@ enum SpeakerTest {
             stage.calls = []
             stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig(gain: 3))
         }, "drop ahead | stop | pill 2 | «read 2: chunk 1/1» | kokoro Sample. gain 3.0 | «first audio: kokoro N ms» | drop ahead | rest | pill - | rest")
+        await row("a read's end is named, a stopped one's is not", { $0.namesEnds = true; $0.voices.script[.kokoro] = [.plays, .waits] }, { stage in
+            stage.read("Hello.")
+            await settle()
+            await stage.readThen("Bye.") { $0.silence() }
+        }, "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «read 1: ended» | drop ahead | rest | pill - | pill 2 | «read 2: chunk 1/1» | kokoro Bye. in 3000 | «read 2: stopped» | drop ahead | stop | pill - | rest")
         await row("a sentence kept from before is named", { $0.voices.script[.kokoro] = [.kept] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «first audio: kokoro N ms, kept» | drop ahead | rest | pill -")
+        await row("a cloud voice heard from before leads nothing", { $0.chain = [.fish, .kokoro]; $0.voices.script[.fish] = [.kept, .fails(EngineError.timeout)] }, { $0.read("Hello. Bye.") },
+                  "pill 1 | «read 1: chunk 1/2» | ahead kokoro Hello. | fish Hello. in 900 | «first audio: fish N ms, kept» | ahead fish Bye. | «read 1: chunk 2/2» | ahead kokoro Bye. | fish Bye. in 900 | «fish skipped: timeout» | kokoro Bye. | «voice switch: fish → kokoro mid-read» | drop ahead | rest | pill -")
+        await row("a cloud voice heard from before keeps the read from the one that missed", { $0.chain = [.elevenlabs, .fish, .kokoro]; $0.voices.script = [.elevenlabs: [.fails(EngineError.timeout)], .fish: [.kept]] }, { $0.read("Hello. Bye.") },
+                  "pill 1 | «read 1: chunk 1/2» | ahead kokoro Hello. | elevenlabs Hello. in 900 | «elevenlabs skipped: timeout» | fish Hello. in 900 | «first audio: fish N ms, kept» | ahead fish Bye. | «read 1: chunk 2/2» | ahead kokoro Bye. | fish Bye. in 900 | drop ahead | rest | pill -")
+        await row("a cloud voice that answered and is then heard from before leads on", { $0.chain = [.fish, .kokoro]; $0.voices.script[.fish] = [.plays, .kept, .fails(EngineError.timeout)] }, { $0.read("Hello. Bye. End.") },
+                  "pill 1 | «read 1: chunk 1/3» | ahead kokoro Hello. | fish Hello. in 900 | «first audio: fish N ms» | ahead fish Bye. | «read 1: chunk 2/3» | fish Bye. in 3000 | ahead fish End. | «read 1: chunk 3/3» | fish End. in 3000 | «fish skipped: timeout» | kokoro End. | «voice switch: fish → kokoro mid-read» | drop ahead | rest | pill -")
+        await row("a preview of a benched engine looks ahead, and its refusal ends it", { $0.chain = [.fish, .system]; $0.voices.script[.fish] = [.fails(EngineError.status(500)), .plays, .fails(EngineError.status(500))] }, { stage in
+            stage.read("Hello.")
+            await settle()
+            stage.calls = []
+            _ = stage.speaker.preview("One. Two. Three.", with: .fish, settings: EngineConfig())
+        }, "drop ahead | stop | pill 2 | «read 2: chunk 1/3» | fish One. | «first audio: fish N ms» | ahead fish Two. | «read 2: chunk 2/3» | fish Two. | «fish skipped: status(500), off for 60 s» | «read 2: chunk 3/3» | drop ahead | rest | pill - | rest")
         await row("a master volume of 50 on a gain of 0.8", { $0.volume = 50; $0.gain = 0.8 }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 gain 0.4 | «first audio: kokoro N ms» | drop ahead | rest | pill -")
         await row("a master volume on a preview's own gain", { $0.volume = 50 }, { _ = $0.speaker.preview("Hello.", with: .kokoro, settings: EngineConfig(gain: 3)) },
@@ -380,9 +397,19 @@ enum SpeakerTest {
                 await stage.speaker.probeQuota()
                 _ = stage.speaker.preview("Hi.", with: .fish, settings: EngineConfig())
             }, .fish), "no quota $0"),
-            ("a sentence kept from before lifts no server's bench", await state({ $0.chain = [.kokoro]; $0.voices.script = [.kokoro: [.fails(EngineError.status(500)), .fails(EngineError.status(500)), .kept], .system: [.fails(EngineError.noVoice), .fails(EngineError.noVoice)]] }, { stage in
+            ("a sentence kept from before lifts no server's bench", await state({ $0.chain = [.kokoro]; $0.voices.script = [.kokoro: [.fails(EngineError.status(500)), .kept]] }, { stage in
                 stage.read("Hello. Bye.")
             }, .kokoro), "benched"),
+            ("a preview kept from before lifts no bench", await state({ $0.chain = [.fish, .system]; $0.voices.script[.fish] = [.fails(EngineError.status(402)), .kept] }, { stage in
+                stage.read("Hello.")
+                await settle()
+                _ = stage.speaker.preview("Hi.", with: .fish, settings: EngineConfig())
+            }, .fish), "benched"),
+            ("a preview that was asked and spoke does", await state({ $0.chain = [.fish, .system]; $0.voices.script[.fish] = [.fails(EngineError.status(402))] }, { stage in
+                stage.read("Hello.")
+                await settle()
+                _ = stage.speaker.preview("Hi.", with: .fish, settings: EngineConfig())
+            }, .fish), "live"),
             ("a provider that did not answer keeps its last word", await state({ $0.voices.balance = [.fish: Balance(left: 0, empty: "$0")] }, { stage in
                 await stage.speaker.probeQuota()
                 stage.voices.balance = [:]
@@ -450,6 +477,7 @@ enum SpeakerTest {
         await row("to its end", [.kokoro: [.soundsLasting(5), .soundsLasting(5)]], [short, sentence], { stage, wait in
             wait(5); stage.audio.endsNext(); await settle(); wait(5); stage.audio.endsNext()
         }, "com.example.app 12 10.0 kokoro finished")
+        await row("an end a moment early on the clock has every word", [.kokoro: [.soundsLasting(5)]], [short], { stage, wait in wait(4.6); stage.audio.endsNext() }, "com.example.app 4 4.6 kokoro finished")
         await row("stopped before a sound", [.kokoro: [.waits]], [sentence], { stage, wait in wait(2); stage.speaker.silence() }, "com.example.app 0 0.0  stopped")
         await row("no engine spoke", [.kokoro: [.fails(EngineError.status(500))], .system: [.fails(EngineError.noVoice)]], [sentence], { _, _ in }, "com.example.app 0 0.0  unspoken")
         await row("two engines, in the order they were heard", [.kokoro: [.soundsLasting(5), .fails(EngineError.status(500))], .system: [.soundsLasting(8)]], [short, sentence], { stage, wait in wait(9); stage.speaker.silence() }, "com.example.app 8 9.0 kokoro,system stopped")
@@ -473,6 +501,37 @@ enum SpeakerTest {
         await row("the output went away: what never sounded is not heard", [.kokoro: [.soundsLasting(20), .soundsLasting(4)]], [sentence], { stage, wait in
             wait(5); stage.audio.onGone("gone")
         }, "com.example.app 2 5.0 kokoro finished")
+        await row("a sentence with nothing to say before a device that goes", [.kokoro: [.soundsLasting(20), .saysNothing, .soundsLasting(4)]], [sentence, Chunk(lang: .en, text: "…"), short], { stage, wait in
+            wait(5); stage.audio.onGone("gone")
+        }, "com.example.app 2 5.0 kokoro finished")
+        // a sentence still on its way when the device went: all of it sounds
+        let start = SuspendingClock.now
+        var passed = 0.0
+        let audio = PlantedAudio { _ in }
+        let player = Player(device: audio, settling: .seconds(60), now: { start + .milliseconds(Int(passed * 1000)) }, log: { _ in })
+        var tally = ReadTally(time: Date(), app: nil)
+        player.readBegan()
+        tally.began(sentence.text, start: player.sound)
+        try? player.schedule(Data(count: 20 * 48000), EngineConfig())
+        tally.ended(end: player.sound)
+        tally.began(short.text, start: player.sound)
+        passed = 5
+        audio.onGone("gone")
+        try? player.schedule(Data(count: 4 * 48000), EngineConfig())
+        tally.ended(end: player.sound)
+        tally.began(sentence.text, start: player.sound)
+        let words = { (seconds: Double) -> String in
+            passed = 5 + seconds
+            return "\(tally.record(.stopped, heard: 0, position: player.played.position, sound: player.sound, dropped: player.dropped).wordsHeard)"
+        }
+        rows.append(("the device gone: what it had", words(0), "2"))
+        rows.append(("the one on its way, by half", words(2), "4"))
+        rows.append(("the one on its way, whole", words(4), "6"))
+        try? player.schedule(Data(count: 8 * 48000), EngineConfig())
+        tally.ended(end: player.sound)
+        passed += 1
+        player.stop()
+        rows.append(("a second one that goes takes its own alone", "\(tally.record(.stopped, heard: 0, position: player.played.position, sound: player.sound, dropped: player.dropped).wordsHeard) \(player.dropped)", "7 [Range(5.0..<20.0), Range(25.0..<32.0)]"))
         return check("read record", rows) + recordFileFailures()
     }
 
@@ -603,7 +662,7 @@ enum SpeakerTest {
     static func playClockFailures() async -> Int {
         var rows: [(name: String, got: String, want: String)] = []
         func row(_ name: String, _ act: (Player, PlantedAudio, (Double) -> Void) async throws -> Void, _ want: String) async {
-            let start = ContinuousClock.now
+            let start = SuspendingClock.now
             var passed = 0.0
             let audio = PlantedAudio { _ in }
             let player = Player(device: audio, settling: .seconds(60), now: { start + .milliseconds(Int(passed * 1000)) }, log: { _ in })
@@ -628,6 +687,7 @@ enum SpeakerTest {
             wait(3); player.resume(); wait(2)
         }, "2.0 2.0")
         await row("nothing scheduled: a resume starts no clock", { player, _, wait in player.pause(); player.resume(); wait(3) }, "0.0 0.0")
+        await row("a resume of what plays loses nothing", { player, _, wait in try player.schedule(pcm, at(1)); wait(3); player.resume(); wait(2) }, "5.0 5.0")
         await row("a gap between two sounds is not heard", { player, audio, wait in
             try player.schedule(pcm, at(1))
             wait(2); audio.endsNext(); await settle(); wait(7)
@@ -700,7 +760,7 @@ final class Stage {
         let call = { (call: String) in log.made.append(call) }
         audio = PlantedAudio(call)
         voices = PlantedVoices(call)
-        let start = ContinuousClock.now
+        let start = SuspendingClock.now
         player = Player(device: audio, settling: .zero, now: { [hand] in hand.passed.map { start + .milliseconds(Int($0 * 1000)) } ?? .now }, log: { call("«\($0)»") })
         voices.player = player
         speaker = Speaker(
@@ -712,8 +772,9 @@ final class Stage {
 
     // the lines that name a chunk's engine: asked for by the rows about them alone
     var namesEngines = false
+    var namesEnds = false
     var transcript: String {
-        calls.filter { namesEngines || !$0.contains(" → ") || !$0.hasPrefix("«read ") }.joined(separator: " | ")
+        calls.filter { namesEnds || !$0.hasPrefix("«read ") || !$0.hasSuffix(": ended»") }.filter { namesEngines || !$0.contains(" → ") || !$0.hasPrefix("«read ") }.joined(separator: " | ")
             .replacingOccurrences(of: "silence: ([3-9][0-9][0-9]|[0-9]{4,}) ms", with: "silence: LONG", options: .regularExpression)
             .replacingOccurrences(of: "[0-9]+ ms", with: "N ms", options: .regularExpression)
             .replacingOccurrences(of: "in ([5-9][0-9]|100) ", with: "in 100 ", options: .regularExpression)
