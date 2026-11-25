@@ -187,6 +187,7 @@ final class Speaker: ReadTarget {
                         // a voice may return normally from a stop
                         if Task.isCancelled { return stopped() }
                         outOfQuota[engine] = nil
+                        if isHeard, engine.facts.isLocalServer { skipUntil[engine] = nil }
                         // a cloud voice with nothing to say, «…», leads nothing
                         if isHeard || !engine.isCloud {
                             if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }

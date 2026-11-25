@@ -174,13 +174,19 @@ enum SpeakerTest {
             stage.read("Bye.")
         }, "pill 2 | «read 2: chunk 1/1» | system Bye. | «first audio: system N ms» | drop ahead | rest | pill -")
         await row("a benched kokoro is asked once no other voice spoke", { $0.voices.script = [.kokoro: [.fails(EngineError.timeout)], .system: [.fails(EngineError.noVoice), .fails(EngineError.noVoice)]] }, { $0.read("Hello. Bye.") },
-                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «kokoro skipped: timeout, off for 60 s» | system Hello. | «system skipped: noVoice» | «read 1: chunk 2/2» | system Bye. | «system skipped: noVoice» | kokoro Bye. | «first audio: kokoro N ms» | drop ahead | rest | pill -")
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «kokoro skipped: timeout, off for 60 s» | system Hello. | «system skipped: noVoice» | «read 1: chunk 2/2» | system Bye. | «system skipped: noVoice» | kokoro Bye. in 3000 | «first audio: kokoro N ms» | drop ahead | rest | pill -")
         await row("on the next press too", { $0.chain = [.kokoro, .fish]; $0.voices.script = [.kokoro: [.fails(EngineError.timeout)], .fish: [.fails(EngineError.noKey), .fails(EngineError.noKey)]] }, { stage in
             stage.read("Hello.")
             await settle()
             stage.calls = []
             stage.read("Bye.")
-        }, "pill 2 | «read 2: chunk 1/1» | fish Bye. | «fish skipped: noKey» | kokoro Bye. | «first audio: kokoro N ms» | drop ahead | rest | pill -")
+        }, "pill 2 | «read 2: chunk 1/1» | fish Bye. | «fish skipped: noKey» | kokoro Bye. in 3000 | «first audio: kokoro N ms» | drop ahead | rest | pill -")
+        await row("a benched kokoro that spoke leads the read, live again", { $0.chain = [.kokoro, .fish]; $0.voices.script = [.kokoro: [.fails(EngineError.timeout)], .fish: [.fails(EngineError.status(422)), .fails(EngineError.status(422))]] }, { stage in
+            stage.read("Hello.")
+            await settle()
+            stage.calls = []
+            stage.read("One. Two.")
+        }, "pill 2 | «read 2: chunk 1/2» | fish One. | «fish skipped: status(422)» | kokoro One. in 3000 | «first audio: kokoro N ms» | «read 2: chunk 2/2» | kokoro Two. in 3000 | drop ahead | rest | pill -")
         await row("a kokoro whose wait ran out hands its chunk on", { $0.voices.script[.kokoro] = [.fails(EngineError.timeout)] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: timeout, off for 60 s» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
         await row("a quota refusal asks the provider", { $0.voices.script[.kokoro] = [.fails(EngineError.quota("14 left"))] }, { $0.read("Hello.") },

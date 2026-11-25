@@ -22,6 +22,8 @@ enum ChainTest {
             ("an engine that does not speak the language", row(.uk, [:], nil, nil), [.elevenlabs, .system]),
             ("every engine benched", row(.en, [.fish: later, .kokoro: later, .system: later], nil, nil), []),
             ("a last resort is a local server, never a benched cloud voice", lastResorts(chain: chain, lang: .en, only: nil, after: [.system]), [.kokoro]),
+            ("a last resort speaks the language", lastResorts(chain: chain, lang: .uk, only: nil, after: []), []),
+            ("--engine has no other last resort", lastResorts(chain: chain, lang: .en, only: .fish, after: []), []),
             ("a bench that ended", row(.en, [.fish: past], nil, nil), [.fish, .kokoro, .system]),
             ("a bench that ends this moment still holds", row(.en, [.fish: now], nil, nil), [.kokoro, .system]),
             ("the lead goes first, the rest keep their order", row(.en, [:], .system, nil), [.system, .fish, .kokoro]),
