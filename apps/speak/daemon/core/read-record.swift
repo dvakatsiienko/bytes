@@ -75,7 +75,8 @@ struct ReadTally {
             let heard = dropped.reduce(max(0, min(head, end) - chunk.start)) { left, gap in
                 left - max(0, min(gap.upperBound, end, head) - max(gap.lowerBound, chunk.start))
             }
-            return sum + Int(Double(chunk.words) * max(0, heard) / (end - chunk.start))
+            // a whole sentence's share is a hair under one now and then
+            return sum + Int(Double(chunk.words) * max(0, heard) / (end - chunk.start) + 1e-6)
         }
         return ReadRecord(
             time: time, app: app, wordsHeard: words, secondsHeard: heard, engines: engines,

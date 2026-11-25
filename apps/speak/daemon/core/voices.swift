@@ -53,7 +53,12 @@ final class Voices: ChunkVoices {
                 sound.forEach { line.yield($0) }
                 line.finish()
             }
-            try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline) { onAudio(true) }
+            do {
+                try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline) { onAudio(true) }
+            } catch where !(error is CancellationError) {
+                // the output's failure, never the engine's: it was not asked
+                throw EngineError.noSound
+            }
         } else if let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) {
             let sound = try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline) { onAudio(false) }
             cache.keep(sound, as: key)

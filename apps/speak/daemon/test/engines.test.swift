@@ -212,13 +212,16 @@ enum EnginesTest {
 
     static func voicesFailures() async -> Int {
         var rows: [(name: String, got: String, want: String)] = []
-        var missing: Set<String> = [], later = PlantedRunner()
+        var missing: Set<String> = [], later = PlantedRunner(), output: (device: PlantedAudio, player: Player)?
+        let audio = { output!.device }, player = { output!.player }
         let row = { (name: String, act: @MainActor (Voices, PlantedNet, Calls) async throws -> Void, want: String) in
             let calls = Calls(), net = PlantedNet(body: [Data([1, 2])])
             let server = PlantedServer(calls)
             server.readyAfter = 0
             net.call = { line in Task { @MainActor in calls.made.append(line) } }
-            let player = Player(device: PlantedAudio { calls.made.append($0) }, settling: .seconds(60), log: { _ in })
+            let device = PlantedAudio { calls.made.append($0) }
+            let player = Player(device: device, settling: .seconds(60), log: { _ in })
+            output = (device, player)
             let runner = PlantedRunner()
             runner.prefix = "k-"
             runner.missing = missing
@@ -294,6 +297,18 @@ enum EnginesTest {
             }
             calls.made = calls.made.filter { $0 == "kept" || $0 == "asked" } + ["\(net.asked.count)"]
         }, "asked | kept | asked | 3")
+        await row("a sentence of several pieces is kept whole", { voices, net, calls in
+            net.body = [Data([1, 2]), Data([3, 4]), Data([5, 6])]
+            for _ in 0..<2 { try await say(voices, "One.", .fish, calls) }
+        }, "ask One. | sound | heard | sound | sound | sound | heard again | sound | sound")
+        await row("a kept sentence the output refuses is no failure of the engine", { voices, _, calls in
+            try await say(voices, "One.", .fish, calls)
+            player().stop()
+            audio().refuses = true
+            audio().rest()
+            calls.made = []
+            try await say(voices, "One.", .fish, calls)
+        }, "noSound")
         await row("the mac voice is never kept", { voices, _, calls in
             for _ in 0..<2 { try await say(voices, "One.", .system, calls) }
         }, "sound | heard | sound | heard")
@@ -364,7 +379,7 @@ enum EnginesTest {
 final class PlantedNet: Net, @unchecked Sendable {
     private let lock = NSLock()
     var status: Int
-    private let body: [Data]
+    var body: [Data]
     private let breaks: Error?
     var hangs = false
     var call: @Sendable (String) -> Void = { _ in }

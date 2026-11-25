@@ -332,7 +332,7 @@
   - given an item it may not read without a window, then it counts as none, and no window opens
   - given a try run, then the keychain is not read
 - ⬜ the socket's `restart`, and `POST /api/restart`, restart the daemon through launchd
-  - given a read that plays or is paused, a daemon launchd does not run, or an installed build that has not run yet, then it refuses with the reason and nothing restarts
+  - given a read that plays or is paused, a daemon launchd does not run, an installed build that has not run yet, or a restart asked for in the last 30 s, then it refuses with the reason and nothing restarts
 - ⬜ a cloud key pasted later, or one a dead network kept back, is found with no restart
   - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time (a child of the key script that ignores its end runs on beside the next look), and the log names each key «ok» or «missing»
   - given the key script hangs, then the look ends after 15 s and the log says «keys: not loaded», and F4 reads on meanwhile

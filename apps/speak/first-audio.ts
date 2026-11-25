@@ -35,7 +35,7 @@ const ofOneDaemon = (log: string): FirstAudio[] => {
     const at = Date.parse(`${day}T${time}`);
     if (says.startsWith('press: grab ')) {
       isPressed = true;
-      isCold = !isPlaying && at - quietSince > IDLE_MS;
+      isCold = !isPlaying && at - quietSince >= IDLE_MS;
     }
     if (BEGUN.test(says)) {
       isPlaying = namesEnds;

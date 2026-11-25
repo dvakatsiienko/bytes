@@ -69,8 +69,9 @@ enum SeamsTest {
 
     static func restartFailures() -> Int {
         let ask = { (isSpeaking: Bool, job: String?, runs: String?, installed: String?) in
-            restartRefusal(isSpeaking: isSpeaking, job: job, runs: runs, installed: installed) ?? "restarts"
+            restartRefusal(isSpeaking: isSpeaking, sinceAsked: nil, job: job, runs: runs, installed: installed) ?? "restarts"
         }
+        let again = { (seconds: TimeInterval) in restartRefusal(isSpeaking: false, sinceAsked: seconds, job: "com.x", runs: "a", installed: "a") ?? "restarts" }
         let newer = "another build is installed and has not run yet: daemon:relaunch starts it", alone = "launchd does not run this daemon"
         return check("restart", [
             ("quiet, on the installed build", ask(false, "com.x", "a", "a"), "restarts"),
@@ -78,6 +79,8 @@ enum SeamsTest {
             ("a build that never ran", ask(false, "com.x", "a", "b"), newer),
             ("no binary at its place", ask(false, "com.x", "a", nil), newer),
             ("a binary never read", ask(false, "com.x", nil, nil), newer),
+            ("asked again at once", again(0.1), "a restart is on its way"),
+            ("asked again, the first one failed long ago", again(31), "restarts"),
             ("by hand", ask(false, nil, "a", "a"), alone),
             ("from a terminal", ask(false, "0", "a", "a"), alone),
         ])

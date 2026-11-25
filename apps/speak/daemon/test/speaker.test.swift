@@ -306,6 +306,12 @@ enum SpeakerTest {
                   "pill 1 | «read 1: chunk 1/2» | ahead kokoro Hello. | elevenlabs Hello. in 900 | «elevenlabs skipped: timeout» | fish Hello. in 900 | «first audio: fish N ms, kept» | ahead fish Bye. | «read 1: chunk 2/2» | ahead kokoro Bye. | fish Bye. in 900 | drop ahead | rest | pill -")
         await row("a cloud voice that answered and is then heard from before leads on", { $0.chain = [.fish, .kokoro]; $0.voices.script[.fish] = [.plays, .kept, .fails(EngineError.timeout)] }, { $0.read("Hello. Bye. End.") },
                   "pill 1 | «read 1: chunk 1/3» | ahead kokoro Hello. | fish Hello. in 900 | «first audio: fish N ms» | ahead fish Bye. | «read 1: chunk 2/3» | fish Bye. in 3000 | ahead fish End. | «read 1: chunk 3/3» | fish End. in 3000 | «fish skipped: timeout» | kokoro End. | «voice switch: fish → kokoro mid-read» | drop ahead | rest | pill -")
+        await row("a voice heard from before after another answered is not trusted as that one", { $0.chain = [.fish, .elevenlabs, .kokoro]; $0.voices.script = [.fish: [.plays, .fails(EngineError.timeout)], .elevenlabs: [.kept, .plays]] }, { $0.read("Hello. Bye. End.") },
+                  "pill 1 | «read 1: chunk 1/3» | ahead kokoro Hello. | fish Hello. in 900 | «first audio: fish N ms» | ahead fish Bye. | «read 1: chunk 2/3» | fish Bye. in 3000 | «fish skipped: timeout» | elevenlabs Bye. in 900 | ahead elevenlabs End. | «voice switch: fish → elevenlabs mid-read» | «read 1: chunk 3/3» | ahead kokoro End. | elevenlabs End. in 900 | drop ahead | rest | pill -")
+        await row("a voice heard from before that misses spends the budget of the next", { $0.budget = 100; $0.chain = [.fish, .elevenlabs, .kokoro]; $0.voices.script[.fish] = [.kept, .failsLate(EngineError.timeout)] }, { stage in
+            stage.read("Hello. Bye.")
+            try? await Task.sleep(for: .milliseconds(250))
+        }, "pill 1 | «read 1: chunk 1/2» | ahead kokoro Hello. | fish Hello. in 100 | «first audio: fish N ms, kept» | ahead fish Bye. | «read 1: chunk 2/2» | ahead kokoro Bye. | fish Bye. in 100 | «fish skipped: timeout» | kokoro Bye. | «voice switch: fish → kokoro mid-read» | drop ahead | rest | pill -")
         await row("a preview of a benched engine looks ahead, and its refusal ends it", { $0.chain = [.fish, .system]; $0.voices.script[.fish] = [.fails(EngineError.status(500)), .plays, .fails(EngineError.status(500))] }, { stage in
             stage.read("Hello.")
             await settle()
@@ -484,6 +490,9 @@ enum SpeakerTest {
         await row("a newer read takes over", [.kokoro: [.soundsLasting(20), .soundsLasting(20)]], [sentence], { stage, wait in
             wait(10); stage.read([sentence]); await settle(); wait(5); stage.speaker.silence()
         }, "com.example.app 4 10.0 kokoro overtaken | com.example.app 2 5.0 kokoro stopped")
+        await row("the socket's read takes over", [.kokoro: [.soundsLasting(20), .soundsLasting(20)]], [sentence], { stage, wait in
+            wait(10); stage.speaker.readGiven([sentence]); await settle(); wait(5); stage.speaker.silence()
+        }, "com.example.app 4 10.0 kokoro overtaken | - 2 5.0 kokoro stopped")
         await row("a preview takes over, and leaves none", [.kokoro: [.soundsLasting(20), .soundsLasting(20)]], [sentence], { stage, wait in
             wait(10); _ = stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig()); await settle(); wait(5); stage.speaker.silence()
         }, "com.example.app 4 10.0 kokoro overtaken")
@@ -531,6 +540,19 @@ enum SpeakerTest {
         tally.ended(end: player.sound)
         passed += 1
         player.stop()
+        var short12 = 0
+        for seed in 1...2000 {
+            var whole = ReadTally(time: Date(), app: nil), at = 0.0, said = 0
+            for index in 0..<12 {
+                let count = 1 + (seed * 7 + index * 13) % 40
+                whole.began(Array(repeating: "word", count: count).joined(separator: " "), start: at)
+                at += Double(1 + (seed * 7919 + index * 104_729) % 240_000) / 24000
+                whole.ended(end: at)
+                said += count
+            }
+            if whole.record(.finished, heard: at, position: at, sound: at).wordsHeard != said { short12 += 1 }
+        }
+        rows.append(("2000 reads to their end, every word", "\(short12) short", "0 short"))
         rows.append(("a second one that goes takes its own alone", "\(tally.record(.stopped, heard: 0, position: player.played.position, sound: player.sound, dropped: player.dropped).wordsHeard) \(player.dropped)", "7 [Range(5.0..<20.0), Range(25.0..<32.0)]"))
         return check("read record", rows) + recordFileFailures()
     }
