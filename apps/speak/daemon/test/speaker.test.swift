@@ -181,6 +181,12 @@ enum SpeakerTest {
             stage.calls = []
             stage.read("Bye.")
         }, "pill 2 | «read 2: chunk 1/1» | fish Bye. | «fish skipped: noKey» | kokoro Bye. in 3000 | «first audio: kokoro N ms» | drop ahead | rest | pill -")
+        await row("every voice benched: kokoro is waited for", { $0.chain = [.kokoro, .fish]; $0.voices.script = [.kokoro: [.fails(EngineError.timeout)], .fish: [.fails(EngineError.status(500))]] }, { stage in
+            stage.read("Hello.")
+            await settle()
+            stage.calls = []
+            stage.read("Bye.")
+        }, "pill 2 | «read 2: chunk 1/1» | kokoro Bye. | «first audio: kokoro N ms» | drop ahead | rest | pill -")
         await row("a benched kokoro that spoke leads the read, live again", { $0.chain = [.kokoro, .fish]; $0.voices.script = [.kokoro: [.fails(EngineError.timeout)], .fish: [.fails(EngineError.status(422)), .fails(EngineError.status(422))]] }, { stage in
             stage.read("Hello.")
             await settle()
