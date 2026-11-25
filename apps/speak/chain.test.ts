@@ -109,3 +109,18 @@ it('a cancel is undone wherever it comes', () => {
     ),
   ).toBe(true);
 });
+
+it.each([
+  ['uk', { id: 'en:system' }],
+  [undefined, null],
+])(
+  'a key drop stays, wherever the page scrolled under it (%s)',
+  (column, target) => {
+    const operation = {
+      activatorEvent: { type: 'keydown' },
+      source: { id: 'en:kokoro' },
+      target,
+    };
+    expect(isDropUndone({ canceled: false, operation }, column)).toBe(false);
+  },
+);

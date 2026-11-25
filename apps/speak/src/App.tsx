@@ -281,12 +281,25 @@ export const App = () => {
         // react owns the order through the whole drag: move() on every drag-over, the snapshot back on a
         // cancel or a drop out of the column. applying it only on drop fought dnd-kit's optimistic dom reorder (the page and the ranks
         // disagreed after a keyboard drag)
-        onDragEnd={(event) => {
+        onDragEnd={(event, manager) => {
           const { current: chain } = dragStart;
-          const column = columnAt(event.operation.position.current);
-          if (chain && isDropUndone(event, column))
-            edit((config) => ({ ...config, chain }));
           dragStart.current = undefined;
+          const { nativeEvent: drop, operation } = event;
+          // dnd-kit's own point is a frame behind a quick release
+          const column = columnAt(
+            drop instanceof PointerEvent
+              ? { x: drop.clientX, y: drop.clientY }
+              : operation.position.current,
+          );
+          if (!(chain && isDropUndone(event, column))) return;
+          const undo = () => edit((config) => ({ ...config, chain }));
+          if (event.canceled) return undo();
+          // the last move may still wait for its render: undone before it, react sees no change and dnd-kit's stays
+          const { resume } = event.suspend();
+          void manager.renderer.rendering.then(() => {
+            undo();
+            resume();
+          });
         }}
         onDragOver={(event) => {
           const chain = chainAfterDrag(draft.chain, event);
