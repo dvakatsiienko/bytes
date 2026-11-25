@@ -104,6 +104,7 @@
 - ✅ ■ stop ends any speech
 - ⬜ a voice that hangs or breaks off hands over once, and no sentence is read twice
   - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on what its sentence has left of the first audio budget; the last of a chain is waited for
+  - given kokoro answered nothing for its 3 s, then it is benched for a minute and the presses in it start on the next voice at once; a preview of it, or its warm-up, ends the bench; with every voice of the chain benched, it is asked all the same
   - given a cloud voice that did not begin the read gets a sentence while another plays, then its first audio budget runs from the moment nothing plays, one budget for every cloud voice of that sentence
   - given a cloud voice refuses one sentence (a 400 or a 422), or answers it with no sound, then the next voice reads on, and the next press asks the refuser again
   - given gemini sits before another voice in a chain and has no sound within the first audio budget, then that voice reads the sentence, as for every cloud voice

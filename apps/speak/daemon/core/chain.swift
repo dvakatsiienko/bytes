@@ -61,7 +61,10 @@ private func endOfOpening(_ text: String) -> String.Index {
 // `only` is --engine: one engine, no chain. the engine that played the read's first chunk leads every later one, so one
 // read keeps one voice
 func candidates(chain: [Lang: [Engine]], lang: Lang, only: Engine?, benched: [Engine: Date], lead: Engine?, now: Date) -> [Engine] {
-    var result = (only.map { [$0] } ?? chain[lang] ?? []).filter { $0.speaks(lang) && (benched[$0] ?? .distantPast) < now }
+    let able = (only.map { [$0] } ?? chain[lang] ?? []).filter { $0.speaks(lang) }
+    var result = able.filter { (benched[$0] ?? .distantPast) < now }
+    // a local server that may answer again beats a silent read
+    if result.isEmpty { result = able.filter(\.facts.isLocalServer) }
     if let lead, let at = result.firstIndex(of: lead) { result.insert(result.remove(at: at), at: 0) }
     return result
 }
@@ -105,10 +108,12 @@ struct BenchDecision: Equatable {
 }
 
 // quota or auth → an hour off; 5xx or offline → a minute off. a refused text costs only this chunk; a slow start and
-// a missing key only this press: benching on a slow start turned one miss into a minute of kokoro (dima, 2026-09-29)
+// a missing key only this press: benching on a slow start turned one miss into a minute of kokoro (dima, 2026-09-29).
+// a local server that ran out its wait hangs: a minute off, so the presses after it go past it
 func bench(for error: Error, from engine: Engine) -> BenchDecision {
     var decision = BenchDecision()
     decision.seconds = switch error {
+    case EngineError.timeout where engine.facts.isLocalServer: 60
     case EngineError.noKey, EngineError.noVoice, EngineError.noSound, EngineError.timeout: nil
     case EngineError.status(400), EngineError.status(422): nil
     case EngineError.status(let code) where [401, 402, 403, 429].contains(code): 3600

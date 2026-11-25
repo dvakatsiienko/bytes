@@ -8,7 +8,8 @@ func answer<T: Sendable>(of task: Task<T, Error>, within deadline: Duration?, af
         let late = Late()
         let timer = Task {
             await quiet()
-            try await Task.sleep(for: deadline)
+            // a mac asleep is no hang
+            try await Task.sleep(for: deadline, clock: .suspending)
             late.set()
             task.cancel()
         }
