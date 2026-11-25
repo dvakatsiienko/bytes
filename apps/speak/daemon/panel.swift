@@ -289,8 +289,22 @@ final class Panel: SpeechPill {
         unsaved.tuning = nil
     }
 
-    func demo() {
+    // what today's pill has of a model: its buttons, its stick, its wave at a standstill
+    func show(_ fixture: PillModel) {
+        if fixture.isReading {
+            showSampleLevels()
+            model.state.follow(.reading(1, isPaused: fixture.isPaused))
+        }
+        if fixture.hint?.control == .stop { model.hovered = "Stop · F5" }
+        show()
+    }
+
+    private func showSampleLevels() {
         model.meter.show((0..<9).map { index in Float(0.85 - Double(index) * 0.08 + 0.12 * sin(Double(index) * 1.9)) })
+    }
+
+    func demo() {
+        showSampleLevels()
         model.state.showSample()
         show()
     }

@@ -12,7 +12,7 @@ struct Case: Decodable {
 struct DaemonTest {
     @MainActor
     static func main() async throws {
-        var failed = try goldenFailures(CommandLine.arguments[1]) + sourceFailures() + argvFailures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
+        var failed = try goldenFailures(CommandLine.arguments[1]) + sourceFailures() + argvFailures() + PillTest.failures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
         failed += try WireTest.failures(CommandLine.arguments[3] + "/wire.schema.json")
         failed += await SeamsTest.failures() + SpeakerTest.failures() + EnginesTest.failures() + StartTest.failures()
         exit(failed == 0 ? 0 : 1)
@@ -113,6 +113,13 @@ struct DaemonTest {
             (["--config", "/c.json", "--engine", "kokoro"], .failure(.engineWithoutText)),
             (["--config", "/c.json", "-keys-run", "/op-run.sh"], .failure(.unknownFlag("-keys-run"))),
             (["--config", ""], .failure(.missingValue("--config"))),
+            (["--pill", "paused"], .success(Arguments(configPath: "", pill: .paused))),
+            (["--pill", "long-line", "--print-model"], .success(Arguments(configPath: "", pill: .longLine, printsModel: true))),
+            (["--pill"], .failure(.missingValue("--pill"))),
+            (["--pill", "nope"], .failure(.unknownPill("nope"))),
+            (["--pill", "paused", "hello"], .failure(.pillWithMore)),
+            (["--pill", "paused", "--config", "/c.json"], .failure(.pillWithMore)),
+            (["--config", "/c.json", "--print-model"], .failure(.modelWithoutPill)),
         ]
         var failed = 0
         for item in cases {
@@ -133,6 +140,7 @@ struct DaemonTest {
             (["--config", "/c.json", "hello"], false),
             (["--config", "/c.json", "--keys-run", "/op-run.sh", "hello"], false),
             (["--config", "/c.json", "--engine", "kokoro", "hello"], false),
+            (["--pill", "reading"], false),
         ]
         let failing = cases.filter { (try? Arguments.parse($0.argv))?.mayStartKokoro != $0.want }
         for item in failing { print("✗ kokoro start \(item.argv)\n  want \(item.want)") }

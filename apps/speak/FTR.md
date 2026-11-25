@@ -302,6 +302,10 @@
   - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
   - given no text, an empty one or one that opens with a dash, then it refuses in one line and starts nothing
   - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)
+- ⬜ `pnpm speak:try --pill <state>` shows one of the pill's ten fixed states for 20 s, as far as today's pill draws it: `reading`, `volume-row`, `speed-row`, `paused`, `fell-through`, `hover`, `long-line`, `idle-stuck`, `no-word-timings`, `code-block`
+  - given `--print-model` beside it, then the state is printed as json and nothing is shown
+  - given a state it does not know, then it fails and names the ten
+  - given the live daemon, reading or not, then it answers `status` before and after under the same pid, and the state makes no sound
 - ⬜ `pnpm speak:kokoro-backup` (`kokoro:backup`) keeps the kokoro model and its voices, tries a new engine beside the live one, restarts the live server only on dima's tick, and rolls back
   - makes: `~/.local/share/x-speak/kokoro-backup/<date>`, the newest two, with the tool's clone of that date in `kokoro-tool/`; a candidate in `kokoro-candidate/`, and its sounds beside the live tool's in `kokoro-pairs/<old> to <new>/`
   - given `--candidate`, then the model, its voices and the live tool are backed up, the newest mlx-audio is installed beside it and renders the five favourites; a silent one, one 15 % off in length or a voice the new model lost is named and no switch is taken; af_heart is played once, and a switch to one nobody could hear wants `--unheard`

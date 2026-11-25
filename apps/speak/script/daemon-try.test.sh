@@ -72,4 +72,13 @@ is 'no live daemon: it speaks' '0 [--config][CONFIG][hello]' "$code $(argv_confi
 app; touch "$state/compile-fails"; try hello
 is 'a build that fails starts nothing' '1 none' "$code $(argv)"
 
+app; printf '{"paused":false,"speaking":true}' >"$state/status"; try --pill paused --print-model
+is 'a pill state is the binary'"'"'s own, whatever plays' '0 [--pill][paused][--print-model]' "$code $(argv)"
+app; echo 2 >"$state/child-exit"; try --pill nope
+is 'a pill state the binary refuses is an error' '2 [--pill][nope]' "$code $(argv)"
+for words in '--print-model' '--pills reading' '-p'; do
+    app; try $words
+    is "«${words}» is refused" '1 none' "$code $(argv)"
+done
+
 passed try

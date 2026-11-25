@@ -2,6 +2,7 @@
 // pays no boot, no key fetch and no player spawn (the node version paid ~1.2 s, measured 2026-09-29).
 // usage: x-speak --config <path> [--keys-run <script>]         the daemon (launchd)
 //        x-speak --config <path> [--keys-run <script>] [--engine <name>] text   one-shot, for listening tests; it never starts the kokoro server
+//        x-speak --pill <state> [--print-model]   one fixed state of the pill, shown or printed
 import AppKit
 import CryptoKit
 
@@ -119,6 +120,7 @@ struct XSpeak {
     static func main() {
         do {
             let arguments = try Arguments.parse(Array(CommandLine.arguments.dropFirst()))
+            if let pill = arguments.pill { return arguments.printsModel ? print(pill.model.json) : show(pill) }
             var only: Engine?
             if let name = arguments.engine {
                 guard let engine = Engine(rawValue: name) else { usageExit("unknown engine «\(name)»") }
@@ -128,6 +130,19 @@ struct XSpeak {
         } catch {
             usageExit("\(error)")
         }
+    }
+
+    // the pill alone: no app part that reads a key, a socket or a sound is made
+    @MainActor
+    private static func show(_ fixture: PillFixture) {
+        // read by the panel and never saved: stick is this run's own
+        UserDefaults.standard.setVolatileDomain(["panelSticky": fixture.model.isStuck], forName: UserDefaults.argumentDomain)
+        let panel = Panel(settings: { .fallback })
+        panel.model.onClose = { exit(0) }
+        Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { _ in exit(0) }
+        NSApplication.shared.setActivationPolicy(.prohibited)
+        panel.show(fixture.model)
+        withExtendedLifetime(panel) { NSApplication.shared.run() }
     }
 
     // a bad argv ends the process with one usage line

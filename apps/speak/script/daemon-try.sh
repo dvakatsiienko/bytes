@@ -1,13 +1,20 @@
 #!/bin/sh
 # speaks one text with this tree's daemon, built beside the installed one: it takes neither the hotkeys nor the control
 # socket, has no cloud keys, never starts the kokoro server, and goes quiet when the live daemon starts a read.
-# usage: script/daemon-try.sh <text …>
+# with --pill it shows one fixed state of the pill for 20 s instead, or prints it as json: nothing is read and nothing sounds.
+# usage: script/daemon-try.sh <text …> | --pill <state> [--print-model]
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib/daemon-installed.sh"
 
 
 # with no text the binary is a daemon: a second one, which takes the live one's socket and hotkeys
+if [ "${1:-}" = --pill ]; then
+    cd "$here/../daemon"
+    mkdir -p build
+    "$here/daemon-compile.sh" -O -o build/x-speak-try
+    exec build/x-speak-try "$@"
+fi
 text=$*
 case "$text" in
 -*) refuse 'a text never starts with a dash — usage: script/daemon-try.sh <text …>' ;;
