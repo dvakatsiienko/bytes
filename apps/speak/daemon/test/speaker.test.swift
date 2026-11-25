@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 enum SpeakerTest {
     static func failures() async -> Int {
-        await readFailures() + playerFailures() + deadlineFailures()
+        await readFailures() + playerFailures() + playClockFailures() + deadlineFailures()
     }
 
     static func readFailures() async -> Int {
@@ -508,6 +508,71 @@ enum SpeakerTest {
             try player.schedule(pcm, EngineConfig())
         }, "speed 1.0 | start | play | sound | pause | speed 1.0 | play | «silence: N ms mid-read» | sound")
         return check("player", rows)
+    }
+
+    // a planted second hand: the sounds below last as long as it is moved between their start and their end
+    static func playClockFailures() async -> Int {
+        var rows: [(name: String, got: String, want: String)] = []
+        func row(_ name: String, _ act: (Player, PlantedAudio, (Double) -> Void) async throws -> Void, _ want: String) async {
+            let start = ContinuousClock.now
+            var passed = 0.0
+            let audio = PlantedAudio { _ in }
+            let player = Player(device: audio, settling: .seconds(60), now: { start + .milliseconds(Int(passed * 1000)) }, log: { _ in })
+            player.readBegan()
+            do { try await act(player, audio) { passed += $0 } } catch { rows.append((name, "\(error)", want)); return }
+            rows.append((name, String(format: "%.1f %.1f", player.played.heard, player.played.position), want))
+        }
+        let at = { (speed: Double) in
+            var settings = EngineConfig()
+            settings.speed = speed
+            return settings
+        }
+        await row("ten seconds", { player, _, wait in try player.schedule(pcm, at(1)); wait(10) }, "10.0 10.0")
+        await row("ten seconds at 1.5×", { player, _, wait in try player.schedule(pcm, at(1.5)); wait(10) }, "10.0 15.0")
+        await row("a pause of 5 s inside is not heard", { player, _, wait in
+            try player.schedule(pcm, at(1))
+            wait(4); player.pause(); wait(5); player.resume(); wait(6)
+        }, "10.0 10.0")
+        await row("what is scheduled in a pause is not heard yet", { player, _, wait in
+            player.pause()
+            try player.schedule(pcm, at(1))
+            wait(3); player.resume(); wait(2)
+        }, "2.0 2.0")
+        await row("nothing scheduled: a resume starts no clock", { player, _, wait in player.pause(); player.resume(); wait(3) }, "0.0 0.0")
+        await row("a gap between two sounds is not heard", { player, audio, wait in
+            try player.schedule(pcm, at(1))
+            wait(2); audio.endsNext(); await settle(); wait(7)
+            try player.schedule(pcm, at(1))
+            wait(3)
+        }, "5.0 5.0")
+        await row("two sounds in a row are one run", { player, audio, wait in
+            try player.schedule(pcm, at(1)); try player.schedule(pcm, at(1))
+            wait(2); audio.endsNext(); await settle(); wait(2); audio.endsNext(); await settle(); wait(9)
+        }, "4.0 4.0")
+        await row("a speed changed on the way counts from there", { player, _, wait in
+            try player.schedule(pcm, at(1))
+            wait(4)
+            try player.schedule(pcm, at(2))
+            wait(3)
+        }, "7.0 10.0")
+        await row("a speed set in a gap runs nothing", { player, audio, wait in
+            try player.schedule(pcm, at(1))
+            wait(1); audio.endsNext(); await settle(); wait(5)
+            try player.schedule(Data(), at(2))
+            wait(5)
+        }, "1.0 1.0")
+        await row("a stop holds it", { player, _, wait in try player.schedule(pcm, at(1)); wait(4); player.stop(); wait(6) }, "4.0 4.0")
+        await row("an output that went away holds it", { player, audio, wait in try player.schedule(pcm, at(1)); wait(4); audio.onGone("gone"); wait(6) }, "4.0 4.0")
+        await row("a read that begins starts over", { player, _, wait in try player.schedule(pcm, at(1)); wait(4); player.stop(); player.readBegan() }, "0.0 0.0")
+        let stage = Stage()
+        stage.voices.script[.kokoro] = [.sounds]
+        stage.read("Hello.")
+        await settle()
+        try? await Task.sleep(for: .milliseconds(30))
+        let first = stage.player.played.heard
+        stage.read("Bye.")
+        rows.append(("a read that takes over starts over", "\(first > 0.02) \(stage.player.played.heard < first)", "true true"))
+        return check("play clock", rows)
     }
 }
 

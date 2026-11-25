@@ -27,7 +27,9 @@ protocol AudioDevice: AnyObject {
 final class Player {
     private let device: any AudioDevice
     private let settling: Duration
+    private let now: () -> ContinuousClock.Instant
     private let write: (String) -> Void
+    private var clock = PlayClock()
     private var pending = 0
     private var drainWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
     private var generation = 0
@@ -42,9 +44,10 @@ final class Player {
 
     var isPlaying: Bool { pending > 0 }
 
-    init(device: any AudioDevice, settling: Duration = .seconds(2), log write: @escaping (String) -> Void) {
+    init(device: any AudioDevice, settling: Duration = .seconds(2), now: @escaping () -> ContinuousClock.Instant = { .now }, log write: @escaping (String) -> Void) {
         self.device = device
         self.settling = settling
+        self.now = now
         self.write = write
         device.onGone = { [weak self, weak device] why in
             write("audio: \(why), engine released")
@@ -53,9 +56,15 @@ final class Player {
         }
     }
 
+    // seconds heard, and seconds into the sound, since the read began
+    var played: (heard: Double, position: Double) { clock.reading(at: now()) }
+
+    func readBegan() { clock = PlayClock() }
+
     // with the engine's gain and speed
     func schedule(_ pcm: Data, _ settings: EngineConfig) throws {
         device.setSpeed(settings.speed)
+        clock.setSpeed(settings.speed, at: now())
         guard pcm.count > 1 else { return }
         if !device.isRunning { try device.start() }
         if !isPaused, !device.isPlaying { device.play() }
@@ -64,11 +73,13 @@ final class Player {
         quietSince = nil
         pending += 1
         scheduled += 1
+        if !isPaused { clock.runs(at: now()) }
         let scheduledIn = generation
         device.schedule(pcm, gain: settings.gain) { [weak self] in
             guard let self, self.generation == scheduledIn else { return }
             self.pending -= 1
             if self.pending == 0 {
+                self.clock.holds(at: self.now())
                 self.dryAt = .now
                 self.quietSince = .now
                 self.releaseWaiters()
@@ -78,6 +89,7 @@ final class Player {
 
     func pause() {
         isPaused = true
+        clock.holds(at: now())
         device.pause()
     }
 
@@ -87,7 +99,10 @@ final class Player {
         // a silence someone asked for is not a gap
         if dryAt != nil { dryAt = .now }
         if quietSince != nil { quietSince = .now }
-        if pending > 0 { device.play() }
+        if pending > 0 {
+            clock.runs(at: now())
+            device.play()
+        }
     }
 
     // or the wait was cancelled
@@ -108,6 +123,7 @@ final class Player {
     func stop() {
         generation += 1
         device.stop()
+        clock.holds(at: now())
         pending = 0
         dryAt = nil
         quietSince = .now

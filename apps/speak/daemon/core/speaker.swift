@@ -79,6 +79,7 @@ final class Speaker: ReadTarget {
     private func happened(_ event: PlaybackEvent) {
         let before = playback
         playback = next(before, event)
+        if case .began = event { player.readBegan() }
         if playback.isPaused != before.isPaused { playback.isPaused ? player.pause() : player.resume() }
         if playback != before { pill.follow(playback) }
     }
