@@ -109,6 +109,7 @@ export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
       'GET /api/voices': async () => daemon('voices'),
       'POST /api/pause': ask('pause'),
       'POST /api/preview': ask('preview'),
+      'POST /api/restart': ask('restart'),
       'POST /api/stop': ask('stop'),
       'POST /api/wave': ask('wave'),
       'PUT /api/config': save('save'),
@@ -118,6 +119,10 @@ export const createAdmin = ({ canSave, dist, socket }: AdminPaths) => {
   return async (request: IncomingMessage, response: ServerResponse) => {
     if (!OWN_HOST.test(request.headers.host ?? ''))
       return send(response, 403, { error: 'this server answers on localhost' });
+    // a page's own write names this server as its origin; a curl or the daemon's own callers name none
+    const { host, origin } = request.headers;
+    if (request.method !== 'GET' && origin && origin !== `http://${host}`)
+      return send(response, 403, { error: 'this server takes its own page' });
     // a write must say it is json: a browser sends that header cross-origin only after a preflight, which this
     // server never answers, so no other page can drive the daemon or save the config
     if (

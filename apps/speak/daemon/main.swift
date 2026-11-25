@@ -4,7 +4,6 @@
 //        x-speak --config <path> [--keys-run <script>] [--engine <name>] text   one-shot, for listening tests; it never starts the kokoro server
 //        x-speak --pill <state> [--print-model]   one fixed state of the pill, shown or printed
 import AppKit
-import CryptoKit
 
 // the one value that hands each part what it needs. chain, voices, speed, gain and the first-audio budget live in
 // the settings file (core/config-store.swift), read again on the next F4 after a hand edit
@@ -28,9 +27,10 @@ final class App {
         grab: Grab(copyOnlyApps: { [wordLists] in wordLists.current.copyOnlyApps }), target: speaker, refreshSettings: { [configStore] in configStore.refresh() },
         toChunks: { [wordLists] in spokenChunks(of: $0, wordLists.current, nextMarker: $1) }, log: log
     )
-    private lazy var commands = SocketCommands(speaker: speaker, voices: voices, panel: panel, configStore: configStore, toChunks: toChunks)
+    private lazy var commands = SocketCommands(speaker: speaker, voices: voices, panel: panel, configStore: configStore, toChunks: toChunks, job: job)
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })
     private let heartbeat = Heartbeat()
+    private let job = LaunchdJob()
     private lazy var control = Control(
         socket: paths.controlSocket,
         answers: Answers(commands: { [unowned self] in commands }, mainAge: { [heartbeat] in heartbeat.age })
@@ -43,13 +43,13 @@ final class App {
         let configStore = ConfigStore(URL(fileURLWithPath: arguments.settings(paths)))
         self.configStore = configStore
         wordLists = WordListStore(URL(fileURLWithPath: paths.wordLists))
-        keys = Keys(run: arguments.keysRunPath.map { script in { try await runWithKeys(script, $0) } }, log: log)
+        keys = Keys(run: arguments.keysRunPath.map { script in { try await runWithKeys(script, $0) } }, keychain: arguments.text.isEmpty ? keychainKey : nil, log: log)
         kokoro = KokoroServer(KokoroProcess(paths: paths), net: net, settings: { configStore.current[.kokoro] }, mayStart: arguments.mayStartKokoro, log: log)
     }
 
     func start(only: Engine?) {
         configStore.refresh()
-        if arguments.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have no key") }
+        if arguments.keysRunPath == nil { log("keys: no --keys-run, the cloud engines have the keychain's alone") }
         arguments.text.isEmpty ? startDaemon() : startOneShot(only: only)
         // the app loop, for a one-shot too: the pill is a window, and under dispatchMain its first show landed off the
         // main thread and crashed every one-shot run
@@ -83,6 +83,7 @@ final class App {
 
     private func startDaemon() {
         ownerOnly(STDERR_FILENO)
+        withNoKeychainWindows()
         Task {
             let speaker = speaker
             // the one voice that needs no net waits for none
@@ -92,7 +93,7 @@ final class App {
             await warm
         }
         // written by main's own loop, so a main that never runs leaves none
-        control.start { [paths] in DispatchQueue.main.async { markStart(at: paths.startMark) } }
+        control.start { [paths, job] in DispatchQueue.main.async { markStart(of: job.build, at: paths.startMark) } }
         heartbeat.start()
         let registered = hotkeys.register()
         // with the prompt option macos itself asks for the grant, naming this exact process — no guessing which entry
@@ -102,10 +103,9 @@ final class App {
     }
 }
 
-private func markStart(at path: String) {
+private func markStart(of build: String?, at path: String) {
     do {
-        guard let binary = Bundle.main.executableURL else { throw CocoaError(.fileNoSuchFile) }
-        let build = SHA256.hash(data: try Data(contentsOf: binary)).map { String(format: "%02x", $0) }.joined()
+        guard let build else { throw CocoaError(.fileReadUnknown) }
         try startMark(build: build, at: Date()).write(toFile: path, atomically: true, encoding: .utf8)
     } catch {
         log("start mark: not written — \(error)")

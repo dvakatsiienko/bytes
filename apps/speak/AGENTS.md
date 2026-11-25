@@ -22,7 +22,7 @@ are impeccable's files: change them through it, never by hand.
 ## the daemon
 
 the admin reaches x-speak only through `~/.local/share/x-speak/control.sock` — one json line each way: `status`,
-`voices`, `config`, `save`, `heart`, `reload`, `preview`, `read`, `pause`, `stop`, `wave`, and for a look `panel-demo`, `panel-hide`, for a test `block-main`. `save` takes the changed keys (null takes one out) and the version `config` gave; `heart` one voice, on or off. `preview` answers its read's number, and `status` names the read that plays. `read` (a text, the F4 chain) is x-mod-stash orbit's 🔊.
+`voices`, `config`, `save`, `heart`, `reload`, `preview`, `read`, `pause`, `stop`, `wave`, `restart`, and for a look `panel-demo`, `panel-hide`, for a test `block-main`. `save` takes the changed keys (null takes one out) and the version `config` gave; `heart` one voice, on or off. `preview` answers its read's number, and `status` names the read that plays. `read` (a text, the F4 chain) is x-mod-stash orbit's 🔊.
 the chain, voices, speed, gain and budget live in `~/Library/Application Support/speak/config.json`, outside every repo; the daemon
 alone writes it, re-reads it on the next F4 after a hand edit, and names its path in `status`. 📌 `daemon/config.json` here is the tracked seed a
 new mac copies there and the tests load: an edit of it changes nothing dima hears.
@@ -53,5 +53,7 @@ new mac copies there and the tests load: an edit of it changes nothing dima hear
   the list semantics on the cards outside the chain
 - **a worktree's server never saves the live settings**: it plays through the live daemon, and takes a save only when started with a fake daemon's socket, `pnpm admin <socket>`
 - **the api answers to localhost's own names alone**: another page can point its name at 127.0.0.1 and pass as same-origin
+- **a write's `Origin`, when it has one, is the server's own**: the vite proxy keeps the page's host (`changeOrigin: false`) so the dev page passes
+- **an engine's key in the keychain** is made with `security add-generic-password -s x-speak -a <engine> -T ~/.local/libexec/x-speak/x-speak -w`; one without the `-T` reads as missing, never a window
 - **every write to the api carries `content-type: application/json`**, or the server answers 415: that header is what keeps another web page from driving the daemon; a `curl -X PUT` needs `-H 'content-type: application/json'`
 - **the swift tests run only on the mac**: `pnpm --filter speak daemon:test`, run by lefthook on a commit under `daemon/` or `script/`; bytes' linux ci runs no swift

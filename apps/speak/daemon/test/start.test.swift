@@ -64,6 +64,24 @@ enum StartTest {
             await settle()
             rows.append((name, (calls.made + ["\(runner.asked) asked"]).joined(separator: " | "), want))
         }
+        let keychain = { (name: String, held: [Engine: String], act: @MainActor (Keys, PlantedRunner) async -> Void, want: String) in
+            let calls = Calls(), runner = PlantedRunner()
+            let keys = Keys(run: { try await runner.run($0) }, keychain: { held[$0] }, now: { runner.now }, log: { calls.made.append($0) })
+            await act(keys, runner)
+            await settle()
+            rows.append((name, (calls.made + ["\(keys[.elevenlabs] ?? "-") \(keys[.fish] ?? "-") \(keys[.gemini] ?? "-")", "\(runner.asked) asked"]).joined(separator: " | "), want))
+        }
+        await keychain("a key in the keychain wins over the runner's", [.fish: "mine"], { keys, _ in await keys.load() },
+                       "keys: elevenlabs ok, fish keychain, gemini ok | elevenlabs mine gemini | 1 asked")
+        await keychain("one the runner has none of", [.fish: "mine"], { keys, runner in runner.missing = ["fish"]; await keys.load() },
+                       "keys: elevenlabs ok, fish keychain, gemini ok | elevenlabs mine gemini | 1 asked")
+        await keychain("every key in the keychain asks no runner", [.elevenlabs: "a", .fish: "b", .gemini: "c"], { keys, _ in await keys.load() },
+                       "keys: elevenlabs keychain, fish keychain, gemini keychain | a b c | 0 asked")
+        await keychain("a runner that fails leaves the keychain's", [.fish: "mine"], { keys, runner in runner.fails = true; await keys.load() },
+                       "keys: not loaded — timeout | keys: elevenlabs missing, fish keychain, gemini missing | - mine - | 1 asked")
+        let alone = Keys(run: nil, keychain: { $0 == .gemini ? "mine" : nil }, log: { _ in })
+        await alone.load()
+        rows.append(("the keychain alone, with no runner", "\(alone[.gemini] ?? "-") \(alone[.fish] ?? "-")", "mine -"))
         let press: @MainActor (Keys, PlantedRunner, TimeInterval) async -> Void = { keys, runner, seconds in
             runner.now += seconds
             keys.reloadIfMissing()

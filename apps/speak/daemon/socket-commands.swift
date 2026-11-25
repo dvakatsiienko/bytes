@@ -8,13 +8,15 @@ final class SocketCommands: DaemonCommands {
     private let panel: Panel
     private let configStore: ConfigStore
     private let toChunks: (String) -> [Chunk]
+    private let job: LaunchdJob
 
-    init(speaker: Speaker, voices: Voices, panel: Panel, configStore: ConfigStore, toChunks: @escaping (String) -> [Chunk]) {
+    init(speaker: Speaker, voices: Voices, panel: Panel, configStore: ConfigStore, toChunks: @escaping (String) -> [Chunk], job: LaunchdJob) {
         self.speaker = speaker
         self.voices = voices
         self.panel = panel
         self.configStore = configStore
         self.toChunks = toChunks
+        self.job = job
     }
 
     func status() -> Status {
@@ -34,6 +36,10 @@ final class SocketCommands: DaemonCommands {
 
     func togglePause() { speaker.togglePause() }
     func stop() { speaker.silence() }
+    func restart() -> String? {
+        if let refusal = restartRefusal(isSpeaking: speaker.isSpeaking, job: job.label, runs: job.build, installed: LaunchdJob.installedBuild()) { return refusal }
+        return job.restart()
+    }
     func demoPill() { panel.demo() }
     func wave(on: Bool, glide: Double?, flow: Double?) -> String? { panel.wave(on: on, glide: glide, flow: flow) }
     func hidePill() { panel.hide() }

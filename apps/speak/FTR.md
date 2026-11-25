@@ -187,6 +187,7 @@
   - then the server answers 415, nothing is saved and the daemon hears nothing
   - given a request under a name that is not this mac's own (a page that points its name at 127.0.0.1)
   - then the server answers 403 and the daemon hears nothing
+  - given a write whose `Origin` is another page, another port or `null`, then the server answers 403 and the daemon hears nothing; one with no `Origin` passes
 - ⬜ a worktree's server plays but never saves
   - given the admin started from a worktree with no socket of its own
   - when the page saves or hearts
@@ -320,6 +321,12 @@
   - given a pause, then its time is not heard; given 1.5×, then ten seconds heard are fifteen of the sound
   - given a stop inside a sentence, then its words count by the share of its sound that was heard, rounded down
   - given a preview, a try run or a pill state, then no line is written
+- ⬜ an engine's key in the macOS keychain wins over the key script's
+  - given an item of service `x-speak` and account the engine's id, when the daemon starts, then that key is used and the log says «<engine> keychain»; with every key there the script is not run
+  - given an item it may not read without a window, then it counts as none, and no window opens
+  - given a try run, then the keychain is not read
+- ⬜ the socket's `restart`, and `POST /api/restart`, restart the daemon through launchd
+  - given a read that plays or is paused, a daemon launchd does not run, or an installed build that has not run yet, then it refuses with the reason and nothing restarts
 - ⬜ a cloud key pasted later, or one a dead network kept back, is found with no restart
   - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time (a child of the key script that ignores its end runs on beside the next look), and the log names each key «ok» or «missing»
   - given the key script hangs, then the look ends after 15 s and the log says «keys: not loaded», and F4 reads on meanwhile

@@ -18,7 +18,15 @@ const devTitle = (): Plugin => ({
 const devProxy = (): Plugin => ({
   apply: 'serve',
   config: () => ({
-    server: { proxy: { '/api': adminUrl(import.meta.dirname, speakPort) } },
+    server: {
+      proxy: {
+        // the host stays the page's own, which is what the admin holds a write's origin against
+        '/api': {
+          changeOrigin: false,
+          target: adminUrl(import.meta.dirname, speakPort),
+        },
+      },
+    },
   }),
   name: 'speak-dev-proxy',
 });

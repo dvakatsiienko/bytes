@@ -125,6 +125,7 @@
         "required": ["text"]
       },
       "reload": { "properties": {} },
+      "restart": { "properties": {} },
       "save": {
         "properties": {
           "patch": { "type": "object" },

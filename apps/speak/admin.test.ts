@@ -119,6 +119,41 @@ describe('the write guard', () => {
   });
 });
 
+describe('the origin', () => {
+  it('its own page writes', async () => {
+    const headers = {
+      ...JSON_TYPE,
+      host: 'localhost:7387',
+      origin: 'http://localhost:7387',
+    };
+    expect((await ask('POST', '/api/stop', headers)).status).toBe(200);
+    expect(asked).toEqual([{ op: 'stop' }]);
+  });
+
+  it.each([
+    'https://evil.example',
+    'http://localhost:3000',
+    'http://localhost',
+    'http://127.0.0.1:7387',
+    'https://localhost:7387',
+    'http://localhost:7387.evil.example',
+    'null',
+  ])('a write from «%s» reaches nothing', async (origin) => {
+    const answer = await ask('POST', '/api/restart', {
+      ...JSON_TYPE,
+      host: 'localhost:7387',
+      origin,
+    });
+    expect(answer.status).toBe(403);
+    expect(asked).toEqual([]);
+  });
+
+  it('a foreign page reads nothing it could not before', async () => {
+    const headers = { host: 'localhost:7387', origin: 'https://evil.example' };
+    expect((await ask('GET', '/api/status', headers)).status).toBe(200);
+  });
+});
+
 describe('the host', () => {
   it.each(['127.0.0.1', '127.0.0.1:7386', 'localhost:7387', '[::1]:7386'])(
     '%s is this server',

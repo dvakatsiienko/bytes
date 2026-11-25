@@ -2,7 +2,7 @@
 import Foundation
 
 enum Op: String, Decodable, CaseIterable {
-    case status, voices, reload, config, save, heart, pause, stop, read, preview, wave
+    case status, voices, reload, config, save, heart, pause, stop, read, preview, wave, restart
     // shows the pill with sample levels, for screenshots of a design take
     case panelDemo = "panel-demo"
     case panelHide = "panel-hide"
@@ -12,7 +12,7 @@ enum Op: String, Decodable, CaseIterable {
 
 // an op with what it takes
 enum Request: Equatable {
-    case status, voices, reload, config, pause, stop, panelDemo, panelHide
+    case status, voices, reload, config, pause, stop, restart, panelDemo, panelHide
     // the changed keys and the version they were made on
     case save(patch: Json?, version: String?)
     case heart(engine: String?, voice: String?, isOn: Bool?)
@@ -29,6 +29,7 @@ enum Request: Equatable {
         case .config: .config
         case .pause: .pause
         case .stop: .stop
+        case .restart: .restart
         case .panelDemo: .panelDemo
         case .panelHide: .panelHide
         case .save: .save
@@ -56,6 +57,7 @@ extension Request: Decodable {
         case .config: self = .config
         case .pause: self = .pause
         case .stop: self = .stop
+        case .restart: self = .restart
         case .panelDemo: self = .panelDemo
         case .panelHide: self = .panelHide
         case .save: self = .save(patch: try field(.patch), version: try field(.version))

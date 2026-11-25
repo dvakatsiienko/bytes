@@ -12,6 +12,8 @@ protocol DaemonCommands: AnyObject {
     func heart(engine: String?, voice: String?, isOn: Bool?) throws -> SavedSettings
     func togglePause()
     func stop()
+    // why it does not; the answer leaves before the daemon does
+    func restart() -> String?
     func demoPill()
     // why it does not run. «on» with nothing to tune renews the one that runs
     func wave(on: Bool, glide: Double?, flow: Double?) -> String?
@@ -35,6 +37,7 @@ func run(_ request: Request, with commands: any DaemonCommands) -> Reply {
     // pause and resume, the pill's ⏸ from the admin
     case .pause: commands.togglePause()
     case .stop: commands.stop()
+    case .restart: return commands.restart().map(Reply.error) ?? .ok
     case .panelDemo: commands.demoPill()
     case .panelHide: commands.hidePill()
     case .wave(let isOn, let glide, let flow):
@@ -62,4 +65,13 @@ private func settingsReply(_ ask: () throws -> SavedSettings) -> Reply {
     } catch {
         return .error("\(error)")
     }
+}
+
+// a restart right after a swap died on its signature and sat out launchd's 30 s, so a build that never ran is the
+// relaunch script's. `runs` and `installed` are the hashes of the binary that runs and of the one launchd would start
+func restartRefusal(isSpeaking: Bool, job: String?, runs: String?, installed: String?) -> String? {
+    if isSpeaking { return "x-speak is reading aloud" }
+    guard let job, job != "0" else { return "launchd does not run this daemon" }
+    guard let runs, runs == installed else { return "another build is installed and has not run yet: daemon:relaunch starts it" }
+    return nil
 }

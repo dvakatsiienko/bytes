@@ -10,7 +10,7 @@ enum SeamsTest {
         failed += await pressFailures()
         failed += playbackFailures() + pillFailures()
         failed += meterFailures()
-        failed += clockFailures()
+        failed += clockFailures() + restartFailures()
         return failed
     }
 
@@ -46,6 +46,8 @@ enum SeamsTest {
             ("a refused heart", ask(#"{"op":"heart"}"#) { $0.refusal = .heartless }, #"{"error":"a heart needs an engine it knows, a voice, and on or off"} | heart - - -"#),
             ("pause", plain(#"{"op":"pause"}"#), #"{"ok":true} | pause"#),
             ("stop", plain(#"{"op":"stop"}"#), #"{"ok":true} | stop"#),
+            ("restart", plain(#"{"op":"restart"}"#), #"{"ok":true} | restart"#),
+            ("a refused restart", ask(#"{"op":"restart"}"#) { $0.restartRefusal = "x-speak is reading aloud" }, #"{"error":"x-speak is reading aloud"} | restart"#),
             ("panel-demo", plain(#"{"op":"panel-demo"}"#), #"{"ok":true} | demo"#),
             ("panel-hide", plain(#"{"op":"panel-hide"}"#), #"{"ok":true} | hide"#),
             ("wave on", plain(#"{"op":"wave","on":true,"glide":30,"flow":55}"#), #"{"ok":true} | wave true 30.0 55.0"#),
@@ -62,6 +64,22 @@ enum SeamsTest {
             ("preview with no text", plain(#"{"op":"preview","engine":"kokoro"}"#), "preview needs engine and text"),
             ("an unknown op", plain(#"{"op":"dance"}"#), "unknown op dance"),
             ("no op", plain("{}"), "bad request"),
+        ])
+    }
+
+    static func restartFailures() -> Int {
+        let ask = { (isSpeaking: Bool, job: String?, runs: String?, installed: String?) in
+            restartRefusal(isSpeaking: isSpeaking, job: job, runs: runs, installed: installed) ?? "restarts"
+        }
+        let newer = "another build is installed and has not run yet: daemon:relaunch starts it", alone = "launchd does not run this daemon"
+        return check("restart", [
+            ("quiet, on the installed build", ask(false, "com.x", "a", "a"), "restarts"),
+            ("reading, or paused in a read", ask(true, "com.x", "a", "a"), "x-speak is reading aloud"),
+            ("a build that never ran", ask(false, "com.x", "a", "b"), newer),
+            ("no binary at its place", ask(false, "com.x", "a", nil), newer),
+            ("a binary never read", ask(false, "com.x", nil, nil), newer),
+            ("by hand", ask(false, nil, "a", "a"), alone),
+            ("from a terminal", ask(false, "0", "a", "a"), alone),
         ])
     }
 
@@ -459,6 +477,8 @@ class Recorder: DaemonCommands {
     }
     func togglePause() { calls.append("pause") }
     func stop() { calls.append("stop") }
+    var restartRefusal: String?
+    func restart() -> String? { calls.append("restart"); return restartRefusal }
     func demoPill() { calls.append("demo") }
     var refusesWave = false
     func wave(on: Bool, glide: Double?, flow: Double?) -> String? {
