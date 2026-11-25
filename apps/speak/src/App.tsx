@@ -37,11 +37,9 @@ export const App = () => {
   });
   const { playing, status, ...speech } = usePreview();
   const [samples, setSamples] = useState<Record<Lang, string>>(SAMPLES);
-  const dragStart = useRef<Config['chain']>(undefined);
-  const [message, setMessage] = useState<{
-    text: string;
-    kind?: 'ok' | 'error';
-  }>({ text: 'no changes' });
+  // the order before a drag moved anything; undefined: nothing moved yet
+  const chainBefore = useRef<Config['chain']>(undefined);
+  const [message, setMessage] = useState<Message>(CLEAN);
 
   // an action that did not happen says why in the save line
   const report = async (action: Promise<Answer>) => {
@@ -63,7 +61,7 @@ export const App = () => {
 
   const edit = (change: (config: Config) => Config) => {
     settings.edit(change);
-    setMessage({ text: 'unsaved changes' });
+    setMessage(UNSAVED);
   };
   const editEngine = (
     engine: Engine,
@@ -128,6 +126,9 @@ export const App = () => {
   const healthText = status.error
     ? status.error.message
     : `daemon up${statusData.accessibility === false ? ' · accessibility missing' : ''}${statusData.speaking ? ' · speaking' : ''}`;
+
+  // an edit taken back leaves nothing to save
+  const line = message === UNSAVED && !settings.isDirty ? CLEAN : message;
 
   const columnListJSX = LANGS.map(([lang, title]) => {
     return (
@@ -279,11 +280,11 @@ export const App = () => {
       </div>
       <DragDropProvider
         // react owns the order through the whole drag: move() on every drag-over, the snapshot back on a
-        // cancel or a drop out of the column. applying it only on drop fought dnd-kit's optimistic dom reorder (the page and the ranks
-        // disagreed after a keyboard drag)
+        // cancel or an undone drop. applying it only on drop fought dnd-kit's optimistic dom reorder (the page and the
+        // ranks disagreed after a keyboard drag)
         onDragEnd={(event, manager) => {
-          const { current: chain } = dragStart;
-          dragStart.current = undefined;
+          const { current: chain } = chainBefore;
+          chainBefore.current = undefined;
           const { nativeEvent: drop, operation } = event;
           // dnd-kit's own point is a frame behind a quick release
           const column = columnAt(
@@ -303,11 +304,9 @@ export const App = () => {
         }}
         onDragOver={(event) => {
           const chain = chainAfterDrag(draft.chain, event);
-          if (JSON.stringify(chain) !== JSON.stringify(draft.chain))
-            edit((config) => ({ ...config, chain }));
-        }}
-        onDragStart={() => {
-          dragStart.current = draft.chain;
+          if (JSON.stringify(chain) === JSON.stringify(draft.chain)) return;
+          chainBefore.current ??= draft.chain;
+          edit((config) => ({ ...config, chain }));
         }}>
         <main className='mx-auto grid max-w-[1280px] grid-cols-1 gap-x-6 gap-y-10 px-4 pt-8 pb-28 min-[900px]:grid-cols-3'>
           {voices.data ? (
@@ -336,9 +335,9 @@ export const App = () => {
             reset
           </button>
           <span
-            className={`select-text px-2 text-sm ${message.kind ? messageColour[message.kind] : 'text-pill-muted'}`}
+            className={`select-text px-2 text-sm ${line.kind ? messageColour[line.kind] : 'text-pill-muted'}`}
             role='status'>
-            {message.text}
+            {line.text}
           </span>
         </footer>
       </div>
@@ -386,6 +385,9 @@ const messageColour = {
 } as const;
 
 /* Helpers */
+const CLEAN: Message = { text: 'no changes' };
+const UNSAVED: Message = { text: 'unsaved changes' };
+
 // by the sections' own boxes: the card in hand covers what lies under the pointer
 const columnAt = (point: { x: number; y: number }) =>
   LANGS.find(([lang]) => {
@@ -404,3 +406,9 @@ const SAMPLES: Record<Lang, string> = {
   ru: 'Привет! Я прочитаю вслух всё, что ты выделишь, — спокойно, чётко и без спешки.',
   uk: 'Привіт! Я прочитаю вголос усе, що ти виділиш, — спокійно, чітко і без поспіху.',
 };
+
+/* Types */
+interface Message {
+  kind?: 'ok' | 'error';
+  text: string;
+}

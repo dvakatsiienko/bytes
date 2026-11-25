@@ -46,7 +46,7 @@ new mac copies there and the tests load: an edit of it changes nothing dima hear
 
 ## hazards
 
-- **a dnd-kit reorder applies `move()` on every drag-over**, with the snapshot back on a cancel or a drop out of its column — applying it only
+- **a dnd-kit reorder applies `move()` on every drag-over**, with the snapshot back on a cancel or an undone drop (`src/chain.ts`) — applying it only
   on drop fought dnd-kit's optimistic dom move, and the page and the ranks disagreed after a keyboard drag
 - **only a chain card registers with dnd-kit** — it stamps `role` and a tab stop on what it registers, which broke
   the list semantics on the cards outside the chain

@@ -38,7 +38,7 @@
   - given the chain elevenlabs, kokoro, macOS voice
   - when the user drags elevenlabs's handle onto the macOS voice card
   - then the chain reads kokoro, macOS voice, elevenlabs
-  - given a card dragged over another language's column, then no card moves there, and a drop outside its own column puts that column back as it was
+  - given a card dragged over another language's column, then no card moves there, and a drop over another column, or beside every column clear of its own cards, puts its column back as it was
   - decision: the handle is also a keyboard drag (space, arrows, space; esc cancels); ↑ / ↓ stay for one-press moves
 - ✅ a voice per engine and language
   - given the macOS voice card

@@ -29,8 +29,8 @@ export const chainAfterDrag = (
   );
 };
 
-// the order moves while the card is carried, so a card that left its column has left a trace there: such a drop
-// puts the column back, as a cancel does
+// the order moves while the card is carried, so a card that left its column has left a trace there: a drop over
+// another column, or clear of its own cards beside every column, is undone, as a cancel is
 export const isDropUndone = (event: Drop, columnUnderPointer?: string) => {
   const { activatorEvent, source, target } = event.operation;
   if (event.canceled) return true;

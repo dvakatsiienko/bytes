@@ -94,6 +94,7 @@ it.each([
   ['over nothing in its own column, a gap or the off cards', 'en', null, false],
 ])('a drop %s', (_, column, target, isUndone) => {
   const operation = {
+    activatorEvent: { type: 'pointerdown' },
     source: { id: 'en:kokoro' },
     target: target ? { id: target } : null,
   };
