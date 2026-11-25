@@ -4,8 +4,9 @@ import Foundation
 // the engines, as a read hears them
 @MainActor
 protocol ChunkVoices: AnyObject {
-    // returns once the chunk is played or on its way to the player; `onAudio` once, at its first sound
-    func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping () -> Void) async throws
+    // returns once the chunk is played or on its way to the player; `onAudio` once, at its first sound, told whether the
+    // engine was asked for it or it was kept from before
+    func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping (_ isCached: Bool) -> Void) async throws
     func openAhead(_ chunk: Chunk, with engine: Engine, settings: EngineConfig)
     // what was asked ahead and not used yet
     func dropAhead()
@@ -184,6 +185,8 @@ final class Speaker: ReadTarget {
                 var budgetEnds = newBudget()
                 for engine in engines + lastResorts(chain: saved().chain, lang: chunk.lang, only: only, after: engines) {
                     var isHeard = false
+                    // a sound kept from before says nothing of the engine's health
+                    var wasAsked = true
                     let deadline: Duration?
                     switch firstAudioWait(for: engine, among: engines, lead: lead, firstAudioMs: firstAudioMs, budgetEnds: budgetEnds, now: .now) {
                     case .skip: continue
@@ -193,18 +196,19 @@ final class Speaker: ReadTarget {
                     let asked = ContinuousClock.now
                     let stopped = { if isHeard { self.write("\(part) → \(engine.rawValue), stopped") } }
                     do {
-                        try await voices.speak(chunk, with: engine, settings: { self.settings(engine) }, deadline: deadline) {
-                            if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))") }
+                        try await voices.speak(chunk, with: engine, settings: { self.settings(engine) }, deadline: deadline) { isCached in
+                            if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))\(isCached ? ", kept" : "")") }
                             isFirst = false
                             isHeard = true
+                            wasAsked = !isCached
                             // a late first sound of a read that was cut is not the next one's
                             if self.reads == read { self.tally?.heard(engine) }
                             if engine.facts.streams, parts.indices.contains(index + 1) { self.openAhead(parts[index + 1], with: engine, only: only) }
                         }
                         // a voice may return normally from a stop
                         if Task.isCancelled { return stopped() }
-                        outOfQuota[engine] = nil
-                        if isHeard, engine.facts.isLocalServer { skipUntil[engine] = nil }
+                        if wasAsked { outOfQuota[engine] = nil }
+                        if isHeard, wasAsked, engine.facts.isLocalServer { skipUntil[engine] = nil }
                         // a cloud voice with nothing to say, «…», leads nothing
                         if isHeard || !engine.isCloud {
                             if let lead, lead != engine { write("voice switch: \(lead.rawValue) → \(engine.rawValue) mid-read") }

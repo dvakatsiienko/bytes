@@ -321,6 +321,12 @@
   - given a pause, then its time is not heard; given 1.5×, then ten seconds heard are fifteen of the sound
   - given a stop inside a sentence, then its words count by the share of its sound that was heard, rounded down
   - given a preview, a try run or a pill state, then no line is written
+- ⬜ a sentence read again by the same engine, voice and model begins at once
+  - given a sentence that was read whole, when it is read again, then its sound comes from memory, the engine is not asked and the log says «first audio: … ms, kept»; another speed or gain still comes from memory, another voice, model, language or engine does not
+  - given more than 32 MB of sound, then the oldest goes first; given a restart, then nothing is kept; no file but the press line holds audio or text of it
+  - given the macOS voice, then nothing is kept: its Spoken Content voice changes in System Settings
+- ⬜ `pnpm --filter speak daemon:first-audio [reads] [since]` prints how soon his reads began to sound: each engine's median and 95th percentile, hot and cold apart
+  - given the first read after 5 idle minutes or the daemon's start, then it is cold; a kept sentence, a preview and the socket's read are in neither
 - ⬜ an engine's key in the macOS keychain wins over the key script's
   - given an item of service `x-speak` and account the engine's id, when the daemon starts, then that key is used and the log says «<engine> keychain»; with every key there the script is not run
   - given an item it may not read without a window, then it counts as none, and no window opens

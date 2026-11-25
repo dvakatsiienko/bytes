@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 enum EnginesTest {
     static func failures() async -> Int {
-        await requestFailures() + renderFailures() + balanceFailures() + holdFailures() + playFailures() + voicesFailures()
+        await requestFailures() + renderFailures() + balanceFailures() + holdFailures() + playFailures() + cacheFailures() + voicesFailures()
     }
 
     static func engine(_ id: Engine, _ net: PlantedNet) -> any VoiceEngine { id.type.init(EngineParts(net: net, mac: PlantedMac())) }
@@ -137,7 +137,7 @@ enum EnginesTest {
             calls.made = []
             var gain = 1.0
             let task = Task {
-                try await play(pieces, of: Chunk(lang: .en, text: text), into: player, settings: { gain += 1; return EngineConfig(gain: gain) }, deadline: deadline) { calls.made.append("heard") }
+                _ = try await play(pieces, of: Chunk(lang: .en, text: text), into: player, settings: { gain += 1; return EngineConfig(gain: gain) }, deadline: deadline) { calls.made.append("heard") }
             }
             // no row waits for good
             let limit = Task { try await Task.sleep(for: .seconds(1)); line.finish() }
@@ -188,6 +188,28 @@ enum EnginesTest {
         return check("play", rows)
     }
 
+    static func cacheFailures() -> Int {
+        let key = { (text: String) in SoundCache.Key(Chunk(lang: .en, text: text), .fish, EngineConfig()) }
+        let sound = { (bytes: Int) in [Rendered(pcm: Data(count: bytes / 2)), Rendered(pcm: Data(count: bytes - bytes / 2))] }
+        let held = { (sizes: [(String, Int)]) -> String in
+            var cache = SoundCache(cap: 100)
+            for (text, size) in sizes { cache.keep(sound(size), as: key(text)) }
+            return ["a", "b", "c", "d"].filter { cache[key($0)] != nil }.joined() + " \(cache.bytes)"
+        }
+        var cache = SoundCache()
+        for index in 0..<40 { cache.keep(sound(1 << 20), as: key("\(index)")) }
+        return check("sound cache", [
+            ("under the cap", held([("a", 40), ("b", 60)]), "ab 100"),
+            ("past the cap the oldest goes", held([("a", 40), ("b", 60), ("c", 1)]), "bc 61"),
+            ("as many as it takes", held([("a", 20), ("b", 20), ("c", 60), ("d", 70)]), "d 70"),
+            ("one too big for it is not kept, and takes none along", held([("a", 40), ("b", 101)]), "a 40"),
+            ("one kept twice is counted once", held([("a", 40), ("a", 40)]), "a 40"),
+            ("no sound is not kept", held([("a", 0)]), " 0"),
+            ("the cap is 32 MB", "\(cache.bytes >> 20)", "32"),
+            ("a key holds no text", "\(key("Purple kettles whistle.")!)".contains("ettle") ? "text" : "no text", "no text"),
+        ])
+    }
+
     static func voicesFailures() async -> Int {
         var rows: [(name: String, got: String, want: String)] = []
         var missing: Set<String> = [], later = PlantedRunner()
@@ -211,7 +233,7 @@ enum EnginesTest {
         let chunk = { (text: String) in Chunk(lang: .en, text: text) }
         let named = EngineConfig(voice: ["*": "v"])
         let say = { (voices: Voices, text: String, engine: Engine, calls: Calls) async throws in
-            try await voices.speak(chunk(text), with: engine, settings: { named }, deadline: nil) { calls.made.append("heard") }
+            try await voices.speak(chunk(text), with: engine, settings: { named }, deadline: nil) { calls.made.append($0 ? "heard again" : "heard") }
         }
         await row("a chunk asked ahead is asked once", { voices, _, calls in
             voices.openAhead(chunk("One."), with: .fish, settings: named)
@@ -230,16 +252,48 @@ enum EnginesTest {
             voices.openAhead(chunk("One."), with: .kokoro, settings: named)
             await settle()
             net.hangs = true
-            try? await voices.speak(chunk("One."), with: .fish, settings: { named }, deadline: .milliseconds(20)) {}
+            try? await voices.speak(chunk("One."), with: .fish, settings: { named }, deadline: .milliseconds(20)) { _ in }
             await settle()
             try await say(voices, "One.", .kokoro, calls)
         }, "ask One. | ask One. | dropped One. | sound | heard")
-        await row("the next chunk's look ahead outlives this one, the same words too", { voices, _, calls in
-            try await voices.speak(chunk("One."), with: .fish, settings: { named }, deadline: nil) { voices.openAhead(chunk("One."), with: .fish, settings: named) }
+        await row("the next chunk's look ahead outlives this one", { voices, _, calls in
+            try await voices.speak(chunk("One."), with: .fish, settings: { named }, deadline: nil) { _ in voices.openAhead(chunk("Two."), with: .fish, settings: named) }
             await settle()
             calls.made = []
-            try await say(voices, "One.", .fish, calls)
+            try await say(voices, "Two.", .fish, calls)
         }, "sound | heard")
+        await row("a sentence read twice is rendered once", { voices, _, calls in
+            for _ in 0..<2 { try await say(voices, "One.", .fish, calls) }
+        }, "ask One. | sound | heard | sound | heard again")
+        await row("the same words are not asked ahead either", { voices, _, calls in
+            try await say(voices, "One.", .fish, calls)
+            voices.openAhead(chunk("One."), with: .fish, settings: named)
+        }, "ask One. | sound | heard")
+        await row("another speed or gain is the player's: kept", { voices, _, calls in
+            try await say(voices, "One.", .fish, calls)
+            var faster = named
+            (faster.speed, faster.gain) = (2, 3)
+            try await voices.speak(chunk("One."), with: .fish, settings: { faster }, deadline: nil) { _ in }
+        }, "ask One. | sound | heard | speed 2.0 | sound gain 3.0")
+        await row("another voice, model, language or engine is rendered", { voices, _, calls in
+            try await say(voices, "One.", .fish, calls)
+            calls.made = []
+            var model = named
+            model.model = "other"
+            for (text, engine, settings) in [(chunk("One."), Engine.fish, EngineConfig(voice: ["*": "w"])), (chunk("One."), .fish, model), (Chunk(lang: .uk, text: "One."), .fish, named), (chunk("One."), .kokoro, named)] {
+                try await voices.speak(text, with: engine, settings: { settings }, deadline: nil) { calls.made.append($0 ? "kept" : "rendered") }
+            }
+            calls.made = calls.made.filter { $0 == "kept" || $0 == "rendered" }
+        }, "rendered | rendered | rendered | rendered")
+        await row("the mac voice is never kept", { voices, _, calls in
+            for _ in 0..<2 { try await say(voices, "One.", .system, calls) }
+        }, "sound | heard | sound | heard")
+        await row("a sentence that was refused is asked again", { voices, net, calls in
+            net.status = 500
+            try? await say(voices, "One.", .fish, calls)
+            net.status = 200
+            try await say(voices, "One.", .fish, calls)
+        }, "ask One. | ask One. | sound | heard")
         await row("a stop drops what was asked ahead", { voices, net, calls in
             net.hangs = true
             voices.openAhead(chunk("One."), with: .fish, settings: named)
@@ -300,7 +354,7 @@ enum EnginesTest {
 // answers every request the same; `call` hears each one asked and each one dropped
 final class PlantedNet: Net, @unchecked Sendable {
     private let lock = NSLock()
-    private let status: Int
+    var status: Int
     private let body: [Data]
     private let breaks: Error?
     var hangs = false

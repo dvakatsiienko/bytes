@@ -293,6 +293,8 @@ enum SpeakerTest {
             stage.calls = []
             stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig(gain: 3))
         }, "drop ahead | stop | pill 2 | «read 2: chunk 1/1» | kokoro Sample. gain 3.0 | «first audio: kokoro N ms» | drop ahead | rest | pill - | rest")
+        await row("a sentence kept from before is named", { $0.voices.script[.kokoro] = [.kept] }, { $0.read("Hello.") },
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «first audio: kokoro N ms, kept» | drop ahead | rest | pill -")
         await row("a preview of a failing engine falls to nobody", { $0.voices.script[.kokoro] = [.fails(EngineError.status(500))] }, { stage in
             stage.speaker.preview("Sample.", with: .kokoro, settings: EngineConfig())
         }, "drop ahead | stop | pill 1 | «read 1: chunk 1/1» | kokoro Sample. | «kokoro skipped: status(500), off for 60 s» | drop ahead | rest | pill - | rest")
@@ -370,6 +372,13 @@ enum SpeakerTest {
                 stage.speaker.silence()
                 try? await Task.sleep(for: .milliseconds(60))
             }, .fish), "no quota $0"),
+            ("a sentence kept from before lifts no quota", await state({ $0.voices.balance = [.fish: Balance(left: 0, empty: "$0")]; $0.voices.script[.fish] = [.kept] }, { stage in
+                await stage.speaker.probeQuota()
+                _ = stage.speaker.preview("Hi.", with: .fish, settings: EngineConfig())
+            }, .fish), "no quota $0"),
+            ("a sentence kept from before lifts no server's bench", await state({ $0.chain = [.kokoro]; $0.voices.script = [.kokoro: [.fails(EngineError.status(500)), .fails(EngineError.status(500)), .kept], .system: [.fails(EngineError.noVoice), .fails(EngineError.noVoice)]] }, { stage in
+                stage.read("Hello. Bye.")
+            }, .kokoro), "benched"),
             ("a provider that did not answer keeps its last word", await state({ $0.voices.balance = [.fish: Balance(left: 0, empty: "$0")] }, { stage in
                 await stage.speaker.probeQuota()
                 stage.voices.balance = [:]
@@ -722,7 +731,7 @@ final class Stage {
     private func drop(_ call: String) { calls.removeAll { $0 == call } }
 }
 
-enum Step { case plays, waits, soundsLasting(Double, speed: Double = 1), fails(Error), failsMidChunk(Error), ignoresStop, sounds, saysNothing, failsLate(Error), failsWhenTold(Error), soundsOn, soundsIgnoringStop }
+enum Step { case plays, kept, waits, soundsLasting(Double, speed: Double = 1), fails(Error), failsMidChunk(Error), ignoresStop, sounds, saysNothing, failsLate(Error), failsWhenTold(Error), soundsOn, soundsIgnoringStop }
 
 @MainActor
 final class PlantedVoices: ChunkVoices {
@@ -741,26 +750,27 @@ final class PlantedVoices: ChunkVoices {
     private let call: (String) -> Void
     init(_ call: @escaping (String) -> Void) { self.call = call }
 
-    func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping () -> Void) async throws {
+    func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping (_ isCached: Bool) -> Void) async throws {
         let wait = deadline.map { " in \($0.components.seconds * 1000 + $0.components.attoseconds / 1_000_000_000_000_000)" } ?? ""
         let gain = settings().gain == 1 ? "" : " gain \(settings().gain)"
         call("\(engine.rawValue) \(chunk.text)\(wait)\(gain)")
         let step = script[engine].flatMap { $0.first } ?? .plays
         if script[engine]?.isEmpty == false { script[engine]?.removeFirst() }
         switch step {
-        case .plays: onAudio()
+        case .plays: onAudio(false)
+        case .kept: onAudio(true)
         case .fails(let error): throw error
         case .failsMidChunk(let error):
-            onAudio()
+            onAudio(false)
             throw error
         case .sounds:
             try player?.schedule(SpeakerTest.pcm, EngineConfig())
-            onAudio()
+            onAudio(false)
         case .soundsLasting(let seconds, let speed):
             var settings = EngineConfig()
             settings.speed = speed
             try player?.schedule(Data(count: Int(seconds * 48000)), settings)
-            onAudio()
+            onAudio(false)
         case .failsLate(let error):
             try? await Task.sleep(for: .milliseconds(150))
             throw error
@@ -768,10 +778,10 @@ final class PlantedVoices: ChunkVoices {
             await withCheckedContinuation { told = $0 }
             throw error
         case .soundsOn:
-            onAudio()
+            onAudio(false)
             try await Task.sleep(for: .seconds(60))
         case .soundsIgnoringStop:
-            onAudio()
+            onAudio(false)
             try? await Task.sleep(for: .seconds(60))
         case .ignoresStop: try? await Task.sleep(for: .seconds(60))
         case .saysNothing: break

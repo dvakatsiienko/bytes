@@ -7,6 +7,7 @@ final class Voices: ChunkVoices {
     private let keys: Keys
     private let servers: [Engine: KokoroServer]
     private let engines: [Engine: any VoiceEngine]
+    private var cache = SoundCache()
     // asked before its turn: the next chunk, whose wait for the first sound (0.5–3 s on fish's free tier) then hides
     // behind the audio, or a local server's render of this one, while a cloud engine races its deadline
     private var ahead: [Engine: (text: String, pieces: Pieces)] = [:]
@@ -37,14 +38,23 @@ final class Voices: ChunkVoices {
     func dropAhead() { ahead = [:] }
 
     func openAhead(_ chunk: Chunk, with engine: Engine, settings: EngineConfig) {
+        guard cache[SoundCache.Key(chunk, engine, settings)] == nil else { return }
         ahead[engine] = (try? engines[engine]?.render(chunk, settings, key: keys[engine])).map { (chunk.text, $0) }
     }
 
-    func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping () -> Void) async throws {
+    func speak(_ chunk: Chunk, with engine: Engine, settings: @escaping () -> EngineConfig, deadline: Duration?, onAudio: @escaping (_ isCached: Bool) -> Void) async throws {
         ahead = ahead.filter { $0.value.text == chunk.text }
         let opened = ahead.removeValue(forKey: engine)?.pieces
-        if let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) {
-            try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline, onAudio: onAudio)
+        let key = SoundCache.Key(chunk, engine, settings())
+        if let sound = cache[key] {
+            let pieces = Pieces { line in
+                sound.forEach { line.yield($0) }
+                line.finish()
+            }
+            try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline) { onAudio(true) }
+        } else if let pieces = try opened ?? engines[engine]?.render(chunk, settings(), key: keys[engine]) {
+            let sound = try await play(pieces, of: chunk, into: player, settings: settings, deadline: deadline) { onAudio(false) }
+            cache.keep(sound, as: key)
         }
     }
 }
