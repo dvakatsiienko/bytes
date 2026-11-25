@@ -197,6 +197,10 @@ enum SeamsTest {
         rows.append(("a word's own number stays", await read("then python3.", nil), "read then python3."))
         rows.append(("and before a space too", await read("then python3. ", nil), "read then python3."))
         rows.append(("a marker the text does not end in cuts nothing", await read("then python3. ", "4. "), "read then python3."))
+        rows.append(("an earlier marker stays", await read("see 3. then commit3. ", "3. "), "read see 3./then commit"))
+        rows.append(("a marker of any sign", await read("commit3) ", "3) "), "read commit"))
+        rows.append(("the log names the marker it read up to", await f4 { grab, _ in grab.selected = ("commit3. ", "ax"); grab.marker = "3. " },
+                     "refresh | «press: grab ax N ms, normalize N ms, 1 chunks, 9 characters «commit3. », before the marker «3. »» | read commit"))
         rows.append(("only a marker touched: nothing to read", await read("3. ", "3. "), "toggle"))
         rows.append(("F4 with no grant", await f4 { grab, _ in grab.isTrusted = false; grab.selected = ("Hello.", "ax") },
                      "refresh | «press: accessibility missing — grant X-SPEAK in Privacy & Security»"))
@@ -204,7 +208,20 @@ enum SeamsTest {
         rows.append(("⇧F4 while it speaks", await press({ _, read in read.isSpeaking = true }) { $0.pausePressed() }, "«press: ⇧F4 → pause» | toggle"))
         rows.append(("⇧F4 while paused", await press({ _, read in read.isSpeaking = true; read.isPaused = true }) { $0.pausePressed() }, "«press: ⇧F4 → resume» | toggle"))
         rows.append(("F5", await press({ _, _ in }) { $0.stopPressed() }, "silence"))
-        return await check("press", rows) + overtakenFailures()
+        return await check("press", rows) + overtakenFailures() + markerFailures()
+    }
+
+    // «commit», the marker «3. », «push», by their places
+    static func markerFailures() -> Int {
+        let marker = { (from: Int?, to: Int) in markerBeforeEnd(of: PlantedPlaces(selected: from.map { ($0, to) })) }
+        return check("marker", [
+            ("a line selected to the next item's start", marker(0, 9), "3. "),
+            ("made backwards", marker(9, 0), "3. "),
+            ("a word, its end inside the item", marker(0, 6), nil),
+            ("an end inside the next item", marker(0, 11), nil),
+            ("an end at the text's own start", marker(0, 0), nil),
+            ("an app with no places", marker(nil, 0), nil),
+        ])
     }
 
     // the grab window: every grab waits until the row lets it end
@@ -451,6 +468,20 @@ class Recorder: DaemonCommands {
     func preview(_ text: String, with engine: Engine, settings: EngineConfig?) -> Int {
         calls.append("preview \(engine.rawValue) \(text) \(settings.map { "\($0.gain)" } ?? "saved")")
         return 7
+    }
+}
+
+struct PlantedPlaces: SelectionPlaces {
+    var selected: (Int, Int)?
+    func ends() -> (Int, Int)? { selected }
+    func later(_ one: Int, _ other: Int) -> Int? { max(one, other) }
+    func before(_ place: Int) -> Int? { place > 0 ? place - 1 : nil }
+    func element(at place: Int) -> (role: String?, value: String?)? {
+        switch place {
+        case 0..<6: ("AXStaticText", "commit")
+        case 6..<9: ("AXListMarker", "3. ")
+        default: ("AXStaticText", "push")
+        }
     }
 }
 

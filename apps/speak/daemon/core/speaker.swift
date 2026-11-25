@@ -167,7 +167,7 @@ final class Speaker: ReadTarget {
                 let firstAudioMs = saved().firstAudioMs
                 let newBudget = { firstAudioBudgetEnds(isPlaying: self.player.isPlaying, firstAudioMs: firstAudioMs, now: .now) }
                 var budgetEnds = newBudget()
-                for engine in engines {
+                for engine in engines + lastResorts(chain: saved().chain, lang: chunk.lang, only: only, after: engines) {
                     var isHeard = false
                     let deadline: Duration?
                     switch firstAudioWait(for: engine, among: engines, lead: lead, firstAudioMs: firstAudioMs, budgetEnds: budgetEnds, now: .now) {

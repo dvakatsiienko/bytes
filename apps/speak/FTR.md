@@ -104,7 +104,7 @@
 - ✅ ■ stop ends any speech
 - ⬜ a voice that hangs or breaks off hands over once, and no sentence is read twice
   - given kokoro, or a cloud voice that began the read, answers nothing while nothing plays, then after 3 s the next voice of the chain reads the sentence, a cloud one on what its sentence has left of the first audio budget; the last of a chain is waited for
-  - given kokoro answered nothing for its 3 s, then it is benched for a minute and the presses in it start on the next voice at once; a preview of it, or its warm-up, ends the bench; with every voice of the chain benched, it is asked all the same
+  - given kokoro answered nothing for its 3 s, then it is benched for a minute and the presses in it start on the next voice at once; a preview of it, or its warm-up, ends the bench; a sentence no other voice of the chain speaks is still asked of it
   - given a cloud voice that did not begin the read gets a sentence while another plays, then its first audio budget runs from the moment nothing plays, one budget for every cloud voice of that sentence
   - given a cloud voice refuses one sentence (a 400 or a 422), or answers it with no sound, then the next voice reads on, and the next press asks the refuser again
   - given gemini sits before another voice in a chain and has no sound within the first audio budget, then that voice reads the sentence, as for every cloud voice
@@ -241,7 +241,7 @@
   - and a line that ends on a closing quote, a % or any sign but one that already pauses, an opener or a joining sign pauses too
   - given a long line with no end mark, then it is spoken in pieces of 300 characters at most, cut at a comma or a space
   - and a numbered line says its number first («one: merge»), even when the app hands its lines over glued together
-  - and a selection that ends at a list item's end never reads the next item's number
+  - and a selection that ends at the start of the next list item never reads that item's number, unless that item opens on a checkbox or a list of its own
   - and list markers («■», «•», «★») are never spoken; a bulleted item glued to the one above on an opening «/“ still gets its pause
 - ⬜ the pill floats while speech plays: its wave, ⏸ / ▶, ■, stick and close
   - then the ⏸ / ▶ button follows the speech, and the pill never takes focus from the app in front

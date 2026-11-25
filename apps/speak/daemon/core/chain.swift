@@ -61,12 +61,14 @@ private func endOfOpening(_ text: String) -> String.Index {
 // `only` is --engine: one engine, no chain. the engine that played the read's first chunk leads every later one, so one
 // read keeps one voice
 func candidates(chain: [Lang: [Engine]], lang: Lang, only: Engine?, benched: [Engine: Date], lead: Engine?, now: Date) -> [Engine] {
-    let able = (only.map { [$0] } ?? chain[lang] ?? []).filter { $0.speaks(lang) }
-    var result = able.filter { (benched[$0] ?? .distantPast) < now }
-    // a local server that may answer again beats a silent read
-    if result.isEmpty { result = able.filter(\.facts.isLocalServer) }
+    var result = (only.map { [$0] } ?? chain[lang] ?? []).filter { $0.speaks(lang) && (benched[$0] ?? .distantPast) < now }
     if let lead, let at = result.firstIndex(of: lead) { result.insert(result.remove(at: at), at: 0) }
     return result
+}
+
+// a benched local server that may answer again beats a silent chunk: asked once every candidate failed
+func lastResorts(chain: [Lang: [Engine]], lang: Lang, only: Engine?, after candidates: [Engine]) -> [Engine] {
+    (only.map { [$0] } ?? chain[lang] ?? []).filter { $0.speaks(lang) && $0.facts.isLocalServer && !candidates.contains($0) }
 }
 
 // a cloud engine racing its deadline: a local server renders the same chunk meanwhile, so a miss costs nothing
@@ -91,7 +93,7 @@ private let hangWait = Duration.seconds(3)
 // the last candidate has nothing to yield to, so it waits as long as it takes. a local server's and the lead's waits run from the
 // moment nothing plays, the budget from its chunk's start or, under sound, from that moment too
 func firstAudioWait(for engine: Engine, among candidates: [Engine], lead: Engine?, firstAudioMs: Int, budgetEnds: ContinuousClock.Instant?, now: ContinuousClock.Instant) -> FirstAudioWait {
-    guard engine != candidates.last else { return .asLongAsItTakes }
+    guard engine != candidates.last, candidates.contains(engine) else { return .asLongAsItTakes }
     if engine.facts.isLocalServer { return .atMost(hangWait) }
     guard engine.isCloud else { return .asLongAsItTakes }
     if engine == lead { return .atMost(hangWait) }
