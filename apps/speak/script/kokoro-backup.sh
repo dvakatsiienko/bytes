@@ -38,15 +38,31 @@ stop_server() {
 }
 # the backup a switch that is under way goes back to, however it ends
 switching=
+deaf() { trap '' HUP INT PIPE TERM; }
+# a put back that began and did not end
+undone=
 leave() {
+    deaf
     stop_server
-    [ -z "$switching" ] || put_back "$switching"
-    rm -rf "$scratch"
+    [ -z "$switching" ] || put_back "$switching" || true
+    [ -z "$undone" ] || echo "kokoro-backup: not put back — --rollback $undone" >&2 || true
+    # the tool that was there stays where it was moved to, until the one put back is whole
+    [ -n "$undone" ] && [ -d "$scratch/old-tool" ] || rm -rf "$scratch"
+    rmdir "$lock"
 }
+mkdir -p "$data"
+# two runs at once share the port, the candidate and the clones
+lock="$data/kokoro-backup.lock"
+if ! mkdir "$lock" 2>/dev/null; then
+    rmdir "$scratch"
+    refuse "another run is under way; none running: rmdir $lock"
+fi
 trap leave EXIT
-trap 'exit 130' INT TERM
+trap 'deaf; exit 130' HUP INT PIPE TERM
 
-newest() { ls -1 "$1" 2>/dev/null | sort | tail -1; }
+# the dates of the backups, oldest first; anything else in their folder is not this script's
+dates() { ls -1 "$backups" 2>/dev/null | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6}$' | sort || true; }
+newest() { dates | tail -1; }
 freeze() { uv pip freeze --quiet --python "$1/bin/python"; }
 version() { sed -n 's/^mlx-audio==//p' "$1"; }
 is_silent() { daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'; return 0; }
@@ -85,13 +101,14 @@ render() { # tool, hub, out
 
 backup() {
     rev=$(rev_of "$hub")
-    kept=$(newest "$backups")
+    kept=$(newest)
     # a second one of the same tool would push the one before it out
-    if [ -n "$kept" ] && is_live "$kept"; then
+    if is_live "$kept"; then
         echo "backup: $backups/$kept holds the live tool already"
         return 0
     fi
     snapshot="$hub/$model/snapshots/$rev"
+    [ -n "$rev" ] && [ -d "$snapshot" ] || refuse "no saved model at $snapshot"
     date=$(date +%Y-%m-%dT%H%M%S)
     rm -rf "$scratch/backup"
     mkdir -p "$scratch/backup" "$backups" "$clones"
@@ -106,21 +123,32 @@ backup() {
     cp -Rc "$tool" "$scratch/clone"
     mv "$scratch/clone" "$clones/$date"
     mv "$scratch/backup" "$backups/$date"
-    ls -1 "$backups" | sort -r | tail -n +3 | while read -r old; do rm -rf "${backups:?}/$old" "${clones:?}/$old"; done
+    dates | sort -r >"$scratch/dates"
+    whole=0
+    while read -r old; do
+        if [ "$whole" -lt 2 ] && is_whole "$old"; then whole=$((whole + 1)); else rm -rf "${backups:?}/$old" "${clones:?}/$old"; fi
+    done <"$scratch/dates"
     echo "backup: $backups/$date — mlx-audio $(version "$backups/$date/freeze.txt"), model $rev"
 }
 
-# $1 is the date of a backup: the live tool and model are the ones it holds
-is_live() { [ "$(freeze "$tool")" = "$(cat "$backups/$1/freeze.txt")" ] && [ "$(rev_of "$hub")" = "$(cat "$backups/$1/refs-main")" ]; }
+# $1 is a backup with all its parts
+is_whole() { dates | grep -qxF -- "$1" && [ -s "$backups/$1/refs-main" ] && [ -d "$backups/$1/snapshot" ] && [ -x "$clones/$1/bin/python" ]; }
+# $1 holds the live tool and model
+is_live() { is_whole "$1" && [ "$(freeze "$tool")" = "$(cat "$backups/$1/freeze.txt")" ] && [ "$(rev_of "$hub")" = "$(cat "$backups/$1/refs-main")" ]; }
 
 # what a receipt asks for, one a line: name[extra], or name @ url. a switched tool's receipt also names its constraints, in a list of their own
 requirements() {
-    sed '/^]/q' "$1" | sed -nE -e 's/^ *\{ name = "([^"]+)", extras = \["([^"]+)"\].*/\1[\2]/p' -e 's/^ *\{ name = "([^"]+)", url = "([^"]+)".*/\1 @ \2/p' \
-        -e 's/^ *\{ name = "([^"]+)" \}.*/\1/p'
+    sed '/^]/q' "$1" | sed -nE -e 's/^ *\{ name = "([^"]+)", extras = \[([^]]*)\] \}.*/\1[\2]/p' -e 's/^ *\{ name = "([^"]+)", url = "([^"]+)" \}.*/\1 @ \2/p' \
+        -e 's/^ *\{ name = "([^"]+)" \}.*/\1/p' | tr -d '"'
 }
-install_tool() { # receipt, more words for uv
+install_tool() { # receipt, the tools' folder, the commands' folder, more words for uv
     requirements "$1" >"$scratch/requirements"
-    shift
+    [ "$(wc -l <"$scratch/requirements")" -eq "$(sed '/^]/q' "$1" | grep -c '{ name = ')" ] || refuse "$1 asks for something in a shape not known here"
+    # named, or uv would go where the shell's own variables say
+    UV_TOOL_DIR=$2
+    UV_TOOL_BIN_DIR=$3
+    export UV_TOOL_DIR UV_TOOL_BIN_DIR
+    shift 3
     first=$(head -1 "$scratch/requirements")
     sed 1d "$scratch/requirements" >"$scratch/with"
     uv tool install --quiet --force --python 3.12 --with-requirements "$scratch/with" "$@" "$first"
@@ -130,8 +158,13 @@ try_candidate() { # yes for a moved model, yes for no sound
     backup
     rm -rf "$candidate"
     mkdir -p "$candidate"
-    UV_TOOL_DIR="$candidate/tools" UV_TOOL_BIN_DIR="$candidate/bin" install_tool "$tool/uv-receipt.toml"
-    if [ -n "$1" ]; then HF_HUB_CACHE="$candidate/hub" "$new_tool/bin/hf" download "$repo" >/dev/null; fi
+    install_tool "$tool/uv-receipt.toml" "$candidate/tools" "$candidate/bin"
+    # its folder first: a download that is ended leaves a candidate with no model, never one with the live one
+    [ -z "$1" ] || mkdir "$candidate/hub"
+    if [ -n "$1" ] && ! HF_HUB_CACHE="$candidate/hub" "$new_tool/bin/hf" download "$repo" >/dev/null; then
+        rm -rf "$candidate"
+        refuse 'the new model did not come, so there is no candidate'
+    fi
     check "$2"
 }
 
@@ -159,7 +192,7 @@ for (const voice of voices) {
 '
 check() { # yes for no sound
     [ -d "$new_tool" ] || refuse 'no candidate: --candidate makes one'
-    kept="$backups/$(newest "$backups")"
+    kept="$backups/$(newest)"
     rm -rf "$candidate/passed" "$candidate/heard" "$candidate/renders"
     freeze "$new_tool" >"$candidate/freeze.txt"
     old=$(version "$kept/freeze.txt")
@@ -200,16 +233,16 @@ check() { # yes for no sound
         stamp >"$candidate/heard"
     fi
 }
-# what was checked: the packages and the model
-stamp() { cat "$candidate/freeze.txt"; rev_of "$(candidate_hub)"; }
+# what was checked: the packages and the model, against which backup
+stamp() { newest; cat "$candidate/freeze.txt"; rev_of "$(candidate_hub)"; }
 
 is_stamped() { [ -f "$candidate/$1" ] && [ "$(cat "$candidate/$1")" = "$(stamp)" ]; }
 
 switch() { # yes for one that was not heard
     is_stamped passed || refuse 'no passed check of this candidate: --check'
     [ -n "$1" ] || is_stamped heard || refuse 'its af_heart was not played: --check plays it, --switch --unheard goes without'
-    kept=$(newest "$backups")
-    is_live "$kept" || refuse 'the live tool moved since its backup: --candidate again'
+    kept=$(newest)
+    is_live "$kept" || refuse 'no whole backup of the live tool as it is now: --candidate again'
     # uv deletes the commands a receipt names, wherever they are: a copied tool's are another tool's
     if sed -n 's/.*install-path = "\([^"]*\)".*/\1/p' "$tool/uv-receipt.toml" | grep -qvF "$bin/"; then
         refuse "the receipt of $tool names commands outside $bin, and the install would delete them"
@@ -218,8 +251,10 @@ switch() { # yes for one that was not heard
     # the files behind its links, whole before anything moves
     if [ "$rev" != "$(rev_of "$hub")" ]; then cp -RLc "$candidate/hub/$model/snapshots/$rev" "$scratch/new-snapshot"; fi
     is_silent
+    echo "switching; cut off before its last line: --rollback $kept"
     switching=$kept
-    if ! install_tool "$new_tool/uv-receipt.toml" --constraints "$candidate/freeze.txt" || [ "$(freeze "$tool")" != "$(cat "$candidate/freeze.txt")" ]; then
+    if ! install_tool "$new_tool/uv-receipt.toml" "${tool%/*}" "$bin" --constraints "$candidate/freeze.txt" \
+        || [ "$(freeze "$tool")" != "$(cat "$candidate/freeze.txt")" ] || ! [ "$bin/mlx_audio.server" -ef "$tool/bin/mlx_audio.server" ]; then
         refuse 'the live tool is not the checked one, it goes back'
     fi
     if [ -d "$scratch/new-snapshot" ]; then
@@ -233,34 +268,32 @@ switch() { # yes for one that was not heard
 }
 
 rollback() {
-    [ -n "$1" ] && [ -d "$clones/$1" ] && [ -d "$backups/$1" ] || refuse "no backup «$1»; there are: $(ls -1 "$backups" 2>/dev/null | tr '\n' ' ')"
+    is_whole "$1" || refuse "no whole backup «$1»; there are: $(dates | tr '\n' ' ')"
     is_silent
     put_back "$1"
 }
-# a read never holds it back: it ends a switch that broke off
+# no read and no signal holds it back: it ends a switch that broke off. both copies are whole before anything moves
 put_back() {
+    deaf
+    undone=$1
     rev=$(cat "$backups/$1/refs-main")
     snapshot="$hub/$model/snapshots/$rev"
-    # each whole before it takes its place
     rm -rf "$scratch/tool" "$scratch/snapshot"
-    cp -Rc "$clones/$1" "$scratch/tool"
-    if ! diff -rq "$backups/$1/snapshot" "$snapshot" >/dev/null 2>&1; then
-        mkdir -p "$hub/$model/snapshots"
-        cp -Rc "$backups/$1/snapshot" "$scratch/snapshot"
-        [ ! -d "$snapshot" ] || mv "$snapshot" "$scratch/old-snapshot"
-        mv "$scratch/snapshot" "$snapshot"
-    fi
-    mkdir -p "$hub/$model/refs"
-    cp "$backups/$1/refs-main" "$hub/$model/refs/main"
-    [ ! -d "$tool" ] || mv "$tool" "$scratch/old-tool"
-    mv "$scratch/tool" "$tool"
+    cp -Rc "$clones/$1" "$scratch/tool" && cp -Rc "$backups/$1/snapshot" "$scratch/snapshot" || return 1
+    mkdir -p "$bin" "$hub/$model/snapshots" "$hub/$model/refs" || return 1
+    [ ! -d "$tool" ] || mv "$tool" "$scratch/old-tool" || return 1
+    mv "$scratch/tool" "$tool" || return 1
     # its commands, which an install that broke off took away
-    mkdir -p "$bin"
-    sed -nE 's/^ *\{ name = "([^"]+)", install-path = .*/\1/p' "$tool/uv-receipt.toml" | while read -r name; do ln -sf "$tool/bin/$name" "$bin/$name"; done
-    echo "rolled back: mlx-audio $(version "$backups/$1/freeze.txt"), model $rev, from the live server's next start"
+    sed -nE 's/^ *\{ name = "([^"]+)", install-path = .*/\1/p' "$tool/uv-receipt.toml" | while read -r name; do ln -sf "$tool/bin/$name" "$bin/$name"; done || return 1
+    if ! diff -rq "$scratch/snapshot" "$snapshot" >/dev/null 2>&1; then
+        [ ! -d "$snapshot" ] || mv "$snapshot" "$scratch/old-snapshot" || return 1
+        mv "$scratch/snapshot" "$snapshot" || return 1
+    fi
+    cp "$backups/$1/refs-main" "$hub/$model/refs/main" || return 1
+    undone=
+    echo "rolled back: mlx-audio $(version "$backups/$1/freeze.txt"), model $rev, from the live server's next start" || true
 }
 
-mkdir -p "$data"
 verb=${1:-}
 [ $# -eq 0 ] || shift
 date=

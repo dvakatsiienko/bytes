@@ -6,7 +6,9 @@ here=$(cd "$(dirname "$0")" && pwd)
 [ "${1:-}" = --real ] && exec "$here/lib/kokoro-real.sh"
 . "$here/lib/daemon-scratch.sh"
 
-mkdir -p "$root/wav"
+mkdir -p "$root/wav" "$root/tmp"
+TMPDIR="$root/tmp"
+export TMPDIR
 node -e '
 const { writeFileSync } = require("node:fs");
 const wav = (name, seconds, peak) => {
@@ -50,7 +52,8 @@ echo "offline=$HF_HUB_OFFLINE hub=$HF_HUB_CACHE rev=$(cat "$HF_HUB_CACHE"/*/refs
 trap "rm -f \"$state/up\"; exit 0" TERM
 echo "$0" >"$state/up"
 left=2000; while [ "$left" -gt 0 ]; do left=$((left - 1)); /bin/sleep 0.01; done'
-    stub_file "$1/bin/hf" '. "$state/hub.sh"; fill_hub "$HF_HUB_CACHE/models--mlx-community--Kokoro-82M-bf16" b82f5e49 heart-2'
+    stub_file "$1/bin/hf" '[ -f "$state/ended-in-download" ] && { kill -TERM "$PPID"; exit 143; }
+[ -f "$state/no-model" ] && exit 1; . "$state/hub.sh"; fill_hub "$HF_HUB_CACHE/models--mlx-community--Kokoro-82M-bf16" b82f5e49 heart-2'
     cat >"$1/uv-receipt.toml" <<TOML
 [tool]
 requirements = [
@@ -101,6 +104,7 @@ esac'
     [ -z "$pin" ] || [ ! -f "$state/reads-in-install" ] || printf "{\"speaking\":true}" >"$state/status"
     [ -z "$pin" ] || [ ! -f "$state/ended-in-install" ] || { kill -TERM "$PPID"; exit 143; }
     [ -z "$pin" ] || [ ! -f "$state/install-fails" ] || exit 2
+    [ -z "$pin" ] || [ ! -f "$state/puts-command-elsewhere" ] || UV_TOOL_BIN_DIR="${state%/state}/elsewhere"
     . "$state/hub.sh"; fill_tool "$dir" "$(cat "$state/newest")" "${UV_TOOL_BIN_DIR:-$HOME/.local/bin}"
     [ -z "$pin" ] || cp "$pin" "$dir/packages"
     [ -z "$pin" ] || [ ! -f "$state/drifts" ] || echo drifted==1 >>"$dir/packages" ;;
@@ -110,6 +114,19 @@ esac'
     sed -n '/^blob() {/,/^}/p; /^fill_hub() {/,/^}/p; /^fill_tool() {/,/^}/p' "$here/kokoro-backup.test.sh" >>"$state/hub.sh"
     wav="$root/wav"
     export wav
+}
+# a home with a candidate that passed and was played, made once
+checked() {
+    app
+    if [ ! -d "$root/checked" ]; then
+        run --candidate
+        mkdir "$root/checked"
+        cp -Rc "$HOME" "$root/checked/home" && cp -Rc "$state" "$root/checked/state"
+    else
+        rm -rf "$HOME" "$state"
+        cp -Rc "$root/checked/home" "$HOME" && cp -Rc "$root/checked/state" "$state"
+        tool_before=$(sum_of "$tool")
+    fi
 }
 run() { out=$("$root/app/script/kokoro-backup.sh" "$@" 2>&1); code=$?; }
 sum_of() { (cd "$1" && find . -type f -exec shasum {} + | sort | shasum); }
@@ -131,11 +148,26 @@ is 'the five favourites, rendered' 'af_alloy.wav af_bella.wav af_heart.wav af_je
 is 'the saved model, offline, on a port of its own' "offline=1 hub=$HOME/.cache/huggingface/hub rev=$rev1 $tool/bin/mlx_audio.server --host 127.0.0.1 --port 7395" "$(cat "$state/starts")"
 is 'its server is gone' no "$([ -f "$state/up" ] && echo yes || echo no)"
 is 'the tool is cloned beside it, its links kept' "same $(readlink "$tool/bin/python3")" "$([ "$(sum_of "$data/kokoro-tool/2026-11-25T000001")" = "$tool_before" ] && echo same) $(readlink "$data/kokoro-tool/2026-11-25T000001/bin/python3")"
+mkdir "$data/kokoro-backup/0 notes" "$data/kokoro-backup/zz"
 run --backup
-is 'the live tool did not move: its backup stays the one' '0 2026-11-25T000001 ' "$code $(only kokoro-backup)"
+is 'the live tool did not move: its backup stays the one' '0 1' "$code $(only kokoro-backup | grep -o 2026 | wc -l | tr -d ' ')"
 for n in 2 3; do echo "other==$n" >>"$tool/packages"; run --backup; done
-is 'a third backup: the newest two stay' '2026-11-25T000002 2026-11-25T000003 ' "$(only kokoro-backup)"
+is 'a third backup: the newest two stay, and what is not a backup' '0 notes 2026-11-25T000002 2026-11-25T000003 zz ' "$(only kokoro-backup)"
 is 'and their tools' '2026-11-25T000002 2026-11-25T000003 ' "$(only kokoro-tool)"
+rm -rf "$data/kokoro-tool/2026-11-25T000003"; run --backup
+is 'a backup whose tool is gone is none: another is made, and the older whole one stays' '2026-11-25T000002 2026-11-25T000004 ' "$(only kokoro-tool)"
+app; run --backup; fill_hub "$hub" "$rev2" heart-2; run --backup
+is 'a model that moved is another backup' '2026-11-25T000001 2026-11-25T000002 ' "$(only kokoro-backup)"
+app; : >"$hub/refs/main"; run --backup
+is 'a model with no name: no backup' '1 ' "$code $(only kokoro-backup)"
+app; stub cp '/bin/cp "$@" || exit; case "$*" in -RLc*) for last; do :; done; echo spoiled >"$last/config.json" ;; esac'; run --backup
+is 'a copy that came out another: no backup' '1 ' "$code $(only kokoro-backup)"
+rm "$root/bin/cp"
+app; mkdir -p "$data/kokoro-backup.lock"; run --backup
+is 'another run under way: refused, its lock stays' '1  lock' "$code $(only kokoro-backup) $([ -d "$data/kokoro-backup.lock" ] && echo lock)"
+app; touch "$state/reads-before-af_heart"; stub sleep 'printf "{\"speaking\":false}" >"$state/status"'; run --backup
+is 'a read that starts between two voices is waited out' '0 {"speaking":false}' "$code $(cat "$state/status")"
+is 'a run leaves no lock' no "$([ -d "$data/kokoro-backup.lock" ] && echo yes || echo no)"
 app; touch "$state/no-af_nova"; run --backup
 is 'a voice that does not render: no backup' '1 ' "$code $(only kokoro-backup)"
 says 'and it names the voice' 'af_nova was not rendered'
@@ -149,7 +181,7 @@ is 'reading aloud: no server is started' '1 no' "$code $([ -f "$state/starts" ] 
 
 app; echo near >"$state/after-af_bella"; run --candidate
 is 'five good renders pass' '0 5' "$code $(echo "$out" | grep -c ': good')"
-is 'the live tool is untouched' same "$(same_tool)"
+is 'the live tool and its command are untouched' 'same live bin/mlx_audio.server' "$(same_tool) $(command_is)"
 is 'a candidate asks for what the live receipt does, and never its pins' "mlx-audio[server] misaki[en] en-core-web-sm @ https://x.test/sm.whl " \
     "$(sed -nE 's/^tool install .* ([^ ]+)$/\1/; p' "$state/installs" | tr '\n' ' ')"
 is 'the candidate serves from its own folder' 1 "$(grep -cF " $data/kokoro-candidate/tools/mlx-audio/bin/mlx_audio.server --host" "$state/starts")"
@@ -159,6 +191,12 @@ run --check --silent
 is 'a silent check plays nothing more' '0 af_heart.wav' "$code $(played)"
 echo other >"$data/kokoro-backup/2026-11-25T000001/snapshot/voices/af_heart.safetensors"; run --check --silent
 is 'with no model move, no voice is compared' '0 0' "$code $(echo "$out" | grep -c changed)"
+checked; run --check --silent; run --switch
+is 'a check nobody could hear takes the hearing back' '1 0.6.6' "$code $(live)"
+echo silent >"$state/after-af_nova"; run --check --silent; run --switch --unheard
+is 'a failed check takes the passed one back' '1 0.6.6' "$code $(live)"
+checked; echo newer==1 >>"$tool/packages"; run --backup; run --switch
+is 'a check against an older backup: no switch' '1 0' "$code $(switched)"
 for fault in silent half; do
     app; echo "$fault" >"$state/after-af_nova"; run --candidate
     is "a $fault render is named, the good ones too" '1 af_nova: failed 4' "$code $(echo "$out" | grep -o 'af_nova: failed') $(echo "$out" | grep -c ': good')"
@@ -181,60 +219,107 @@ app; run --candidate --silent --model
 is 'no sound and a moved model, in either order' "0 none yes" "$code $(played) $([ -d "$data/kokoro-candidate/hub" ] && echo yes)"
 rm "$data/kokoro-candidate/hub"/*/snapshots/*/voices/af_heart.safetensors; run --check --silent
 is 'a voice the new model lost fails the check' '1 af_heart.safetensors: failed' "$code $(echo "$out" | grep -o 'af_heart.safetensors: failed')"
+app; touch "$state/no-model"; run --candidate --model --silent; run --check --silent
+is 'a model that did not come: no candidate' '1 no' "$code $([ -d "$data/kokoro-candidate" ] && echo yes || echo no)"
+app; touch "$state/ended-in-download"; run --candidate --model --silent; run --check --silent
+is 'a download that was ended: no candidate with the live model' '1 0' "$code $(echo "$out" | grep -c passed)"
+app; sed 's/extras = \["server"\]/extras = ["server", "tts"]/' "$tool/uv-receipt.toml" >"$state/receipt"; cp "$state/receipt" "$tool/uv-receipt.toml"; run --candidate --silent
+is 'two extras are asked for' '0 mlx-audio[server, tts]' "$code $(sed -nE 's/^tool install .* (mlx-audio.*)$/\1/p' "$state/installs")"
+app; sed 's/{ name = "misaki", extras/{ name = "misaki", specifier = "==1", extras/' "$tool/uv-receipt.toml" >"$state/receipt"; cp "$state/receipt" "$tool/uv-receipt.toml"; run --candidate --silent
+is 'a requirement in another shape is never dropped: refused' '1 no' "$code $([ -f "$state/installs" ] && echo yes || echo no)"
 app; run --check
 is 'no candidate: nothing to check' 1 "$code"
 
 app; run --candidate --silent; run --switch
 is 'a candidate nobody could hear: no switch' '1 0.6.6' "$code $(live)"
+mkdir "$root/elsewhere"
+UV_TOOL_DIR="$root/elsewhere"; UV_TOOL_BIN_DIR="$root/elsewhere"; export UV_TOOL_DIR UV_TOOL_BIN_DIR
 run --switch --unheard
-is 'and one on a word' '0 0.6.8' "$code $(live)"
-app; run --candidate; run --switch
+unset UV_TOOL_DIR UV_TOOL_BIN_DIR
+is 'and one on a word, where the live tool is, whatever the shell says of uv' '0 0.6.8 live bin/mlx_audio.server 0' "$code $(live) $(command_is) $(ls "$root/elsewhere" | wc -l | tr -d ' ')"
+checked; touch "$state/puts-command-elsewhere"; run --switch
+is 'an install that leaves no command is put back' '1 same live bin/mlx_audio.server' "$code $(same_tool) $(command_is)"
+rm -rf "$root/elsewhere"
+checked; echo "$rev2" >"$hub/refs/main"; run --switch
+is 'a live model that moved since its backup: no switch' '1 0' "$code $(switched)"
+checked; rm -rf "$data/kokoro-tool/2026-11-25T000001"; run --switch
+is 'no clone to go back to: no switch' '1 0' "$code $(switched)"
+run --rollback 2026-11-25T000001
+is 'and no rollback' '1 same' "$code $(same_tool)"
+for signal in HUP INT TERM; do
+    checked; touch "$state/install-fails"
+    stub cp 'case "$*" in *kokoro-tool*) kill -'$signal' "$PPID" ;; esac; exec /bin/cp "$@"'; run --switch
+    is "a $signal while it puts back: all of it is back" 'same live bin/mlx_audio.server' "$(same_tool) $(command_is)"
+    rm "$root/bin/cp"
+    checked; run --switch
+    stub cp 'case "$*" in *kokoro-tool*) kill -'$signal' "$PPID" ;; esac; exec /bin/cp "$@"'; run --rollback 2026-11-25T000001
+    is "a $signal in a rollback: all of it is back" 'same live bin/mlx_audio.server' "$(same_tool) $(command_is)"
+    rm "$root/bin/cp"
+done
+checked; touch "$state/install-fails"
+stub cp 'case "$*" in *kokoro-tool*) exit 1 ;; esac; exec /bin/cp "$@"'; run --switch
+is 'a put back with no room: an error, and no lock left' '1 no' "$code $([ -d "$data/kokoro-backup.lock" ] && echo yes || echo no)"
+says 'and it says the way' 'not put back — --rollback 2026-11-25T000001'
+rm "$root/bin/cp"; run --rollback 2026-11-25T000001
+is 'which is whole' '0 same' "$code $(same_tool)"
+checked; run --switch; tool_after=$(sum_of "$tool")
+stub cp 'case "$*" in *kokoro-backup/*/snapshot*) exit 1 ;; esac; exec /bin/cp "$@"'; run --rollback 2026-11-25T000001
+is 'a rollback with no room moves nothing' '1 moved same' "$code $(same_tool) $([ "$(sum_of "$tool")" = "$tool_after" ] && echo same)"
+rm "$root/bin/cp"
+checked; run --switch
 is 'its command is the live one' 'live bin/mlx_audio.server' "$(command_is)"
 run --candidate --silent; run --candidate --silent
 is 'the way back outlives the candidates after it' yes "$([ -d "$data/kokoro-backup/2026-11-25T000001" ] && echo yes)"
-app; run --candidate; run --switch
+checked; run --switch
 is 'a checked candidate becomes the live tool' '0 0.6.8' "$code $(live)"
 is 'the switch installs what was heard' "misaki==0.9 mlx-audio==0.6.8 " "$(tr '\n' ' ' <"$tool/packages")"
 run --rollback 2026-11-25T000001
 is 'a rollback puts the whole tool back' '0 same' "$code $(same_tool)"
 rm "$HOME/.local/bin/mlx_audio.server"; run --rollback 2026-11-25T000001
 is 'and its commands' 'live bin/mlx_audio.server' "$(command_is)"
-app; run --candidate; mkdir "$root/elsewhere"; touch "$root/elsewhere/mlx_audio.server"
+checked; mkdir "$root/elsewhere"; touch "$root/elsewhere/mlx_audio.server"
 sed "s|install-path = \"[^\"]*\"|install-path = \"$root/elsewhere/mlx_audio.server\"|" "$tool/uv-receipt.toml" >"$state/receipt"; cp "$state/receipt" "$tool/uv-receipt.toml"; run --switch
 is 'a receipt that names commands elsewhere, as a copied tool has: no install' '1 0 there' "$code $(switched) $([ -f "$root/elsewhere/mlx_audio.server" ] && echo there)"
 says 'and it says which tool' 'names commands outside'
 rm -rf "$root/elsewhere"
 for end in install-fails ended-in-install; do
-    app; run --candidate; touch "$state/$end" "$state/reads-in-install"; run --switch
+    checked; touch "$state/$end" "$state/reads-in-install"; run --switch
     is "$end, with a read begun meanwhile: all of it is put back" 'same live bin/mlx_audio.server' "$(same_tool) $(command_is)"
     is "$end: is an error" yes "$([ "$code" -ne 0 ] && echo yes)"
 done
-app; run --candidate; echo other==1 >>"$data/kokoro-candidate/tools/mlx-audio/packages"; run --check --silent; echo mlx==9 >>"$data/kokoro-candidate/freeze.txt"; run --switch --unheard
+checked; echo other==1 >>"$data/kokoro-candidate/tools/mlx-audio/packages"; run --check --silent; echo mlx==9 >>"$data/kokoro-candidate/freeze.txt"; run --switch --unheard
 is 'a candidate that is not the checked one: no switch' '1 0.6.6' "$code $(live)"
-app; run --candidate; echo newer==1 >>"$tool/packages"; run --switch
+checked; echo newer==1 >>"$tool/packages"; run --switch
 is 'a live tool that moved since its backup: no switch' '1 0' "$code $(switched)"
-app; run --candidate; touch "$state/drifts"; run --switch
+checked; touch "$state/drifts"; run --switch
 is 'an install that is not the checked one is put back' '1 same' "$code $(same_tool)"
-app; run --candidate; printf '{"speaking":true}' >"$state/status"; run --switch
+checked; printf '{"speaking":true}' >"$state/status"; run --switch
 is 'reading aloud: no switch' '1 0.6.6' "$code $(live)"
 run --rollback 2026-11-25T000001
 is 'reading aloud: no rollback' 1 "$code"
-app; run --candidate --model; run --switch
+app; run --candidate --model; mkdir -p "$hub/snapshots/$rev2/voices"; echo junk >"$hub/snapshots/$rev2/voices/af_heart.safetensors"; run --switch
 is 'a moved model is the live one after a switch' "0 $rev2 heart-2" "$code $(cat "$hub/refs/main") $(cat "$hub/snapshots/$rev2/voices/af_heart.safetensors")"
 rm -rf "$hub/snapshots/$rev1"; run --rollback 2026-11-25T000001
 is 'a rollback brings the old model back, whole' "0 $rev1 heart same" "$code $(cat "$hub/refs/main") $(cat "$hub/snapshots/$rev1/voices/af_heart.safetensors") $(same_tool)"
+rm -rf "$tool"; run --rollback 2026-11-25T000001
+is 'a tool that is gone comes back' '0 same' "$code $(same_tool)"
+: >"$data/kokoro-backup/2026-11-25T000001/refs-main"; run --rollback 2026-11-25T000001
+is 'a backup that names no model: refused' 1 "$code"
 app; run --backup; run --rollback 2026-11-24T000000
 is 'an unknown date: refused' '1 same' "$code $(same_tool)"
 says 'and it names the ones there are' '2026-11-25T000001'
 run --rollback
 is 'no date: refused' '1 same' "$code $(same_tool)"
-run --rollback ../kokoro-backup
-is 'a path is no date' '1 same' "$code $(same_tool)"
-app; run --candidate; run --drop
+for path in ../kokoro-backup 2026-11-25T000001/../2026-11-25T000001; do
+    run --rollback "$path"
+    is "$path is no date" '1 same' "$code $(same_tool)"
+done
+checked; run --drop
 is 'a dropped candidate leaves the live tool and the backup' '0 no same 2026-11-25T000001 ' "$code $([ -d "$data/kokoro-candidate" ] && echo yes || echo no) $(same_tool) $(only kokoro-backup)"
 for word in '' --restart; do
     app; run $word
     is "«${word}» is no verb" 1 "$code"
     says "«${word}»: says how" usage
 done
+is 'no run leaves its scratch behind' '' "$(ls "$TMPDIR")"
 passed kokoro
