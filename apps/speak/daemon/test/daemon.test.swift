@@ -16,7 +16,7 @@ struct Case: Decodable {
 struct DaemonTest {
     @MainActor
     static func main() async throws {
-        var failed = try goldenFailures(CommandLine.arguments[1]) + DictionaryTest.failures(JSONDecoder().decode([Case].self, from: Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1])))) + sourceFailures() + argvFailures() + PillTest.failures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
+        var failed = try goldenFailures(CommandLine.arguments[1]) + DictionaryTest.failures(JSONDecoder().decode([Case].self, from: Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1])))) + sourceFailures() + growthFailures() + argvFailures() + PillTest.failures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
         failed += try WireTest.failures(CommandLine.arguments[3] + "/wire.schema.json")
         failed += await SeamsTest.failures() + SpeakerTest.failures() + EnginesTest.failures() + StartTest.failures()
         exit(failed == 0 ? 0 : 1)
@@ -69,6 +69,25 @@ struct DaemonTest {
             ("a code fence", parts("Look:\n```\nlet a = 1\n```\nDone. ok"), "Look: | ```\nlet a = 1\n``` | Done. | ok"),
             ("a cut between «number» and its digits", parts("Hi. " + String(repeating: "abcdefgh ", count: 32) + "aaaaa #123456 tail here and more words"), "Hi. | " + String(repeating: "abcdefgh ", count: 32) + "aaaaa # | 123456 tail here and more words"),
             ("a long sentence, cut", parts("Hi. " + long), "Hi. | " + String(repeating: "word ", count: 60).dropLast() + " | " + String(repeating: "word ", count: 20) + "end."),
+        ])
+    }
+
+    // a long grab costs in step with its length: twice the text, at most three times the time (the best of three)
+    static func growthFailures() -> Int {
+        let time = { (text: String) in (0..<3).map { _ in
+            let began = ContinuousClock.now
+            _ = normalize(text)
+            return ContinuousClock.now - began
+        }.min()! }
+        let grows = { (make: (Int) -> String, length: Int) in
+            let whole = time(make(length)), half = time(make(length / 2))
+            return whole <= half * 3 ? "in step" : "\(whole) for the whole, \(half) for half"
+        }
+        return check("growth", [
+            ("a 20,000-letter word", grows({ String(repeating: "a", count: $0) }, 20_000), "in step"),
+            ("a 20,000-letter word of dots", grows({ String(repeating: "a.", count: $0 / 2) }, 20_000), "in step"),
+            ("8,000 line ends", grows({ String(repeating: "\n", count: $0) }, 8_000), "in step"),
+            ("8,000 lines", grows({ String(repeating: "x\n", count: $0) }, 8_000), "in step"),
         ])
     }
 

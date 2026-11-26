@@ -42,10 +42,10 @@ private func markdown(_ text: SourcedText) -> SourcedText {
     t = t.replacing("!\\[[^\\]]*\\]\\([^)]*\\)", "")
     t = t.replacing("\\[([^\\]]+)\\]\\([^)]*\\)", "$1")
     t = t.replacing("^\\s{0,3}#{1,6}\\s+", "", .anchorsMatchLines)
-    t = t.replacing("^\\s*[-*+]\\s+", "", .anchorsMatchLines)
+    t = t.replacing("^\\h*[-*+]\\s+", "", .anchorsMatchLines)
     // a numbered line says its number, then a short pause: «1. merge» → «1: merge», read «one: merge»
-    t = t.replacing("^\\s*(\\d{1,2})\\.\\s+", "$1: ", .anchorsMatchLines)
-    t = t.replacing("^\\s*>\\s?", "", .anchorsMatchLines)
+    t = t.replacing("^\\h*(\\d{1,2})\\.\\s+", "$1: ", .anchorsMatchLines)
+    t = t.replacing("^\\h*>\\s?", "", .anchorsMatchLines)
     t = t.replacing("(\\*\\*|__|~~|`)", "")
     t = t.replacing("(^|\\s)[*_]([^*_\\n]+)[*_](?=\\s|[.,!?]|$)", "$1$2")
     // bullets and geometric shapes: the Claude app hands nested list markers over as «■», read as «black square»
@@ -105,7 +105,7 @@ private func cutLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleane
     }
     if cleaner.on(.addresses) { t = t.replacing("\\b127\\.0\\.0\\.1\\b", "localhost") }
     if cleaner.on(.addresses) { t = t.replacing("\\b(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\b", "$1 dot $2 dot $3 dot $4") }
-    if cleaner.on(.addresses) { t = t.replacing("\\b([A-Za-z0-9][\\w.-]*):(\\d{2,5})\\b", "$1 port $2") }
+    if cleaner.on(.addresses) { t = t.replacing("(?<![\\w.-])([A-Za-z0-9][\\w.-]*):(\\d{2,5})\\b", "$1 port $2") }
     if cleaner.on(.ticketIds) { t = t.replacing("\\b([A-Z]{2,6})-(\\d+)\\b") { g in "\(spell(g[1])) \(g[2])" } }
     if cleaner.on(.versions) {
         t = t.replacing("\\bv?(\\d+(?:\\.\\d+){1,3})\\b") { g in
@@ -204,25 +204,38 @@ private func splitRuns(_ spoken: SourcedText) -> [Run] {
 // line above: «lane1. merge now2. sleep». numbers that run 1, 2, … right after a non-digit get their lines back; a
 // lone glued «3.» (FRM-283.) is never a list, and an id's own digits after «-» or «#» never start one. from 2 on, a
 // line that ends in a digit («pr #522. sleep now3.») is tried too, once no cleaner match exists, and kept only when
-// the next number follows it: «node to 22. done» keeps its 22
+// the next number follows it: «node to 22. done» keeps its 22. a selection from inside a list starts at its first
+// number past 1, and the marker of the next item that ends the text is the one the selection only touched
 private func unglueLists(_ text: SourcedText) -> SourcedText {
     // a bulleted item glued to the one above opens on a quote that touches the last word: «… stays open«a gui …»
     let t = text.replacing("(?<=[\\p{L}\\p{N}])(?=[«“])", "\n")
     let glued = t.text
-    var breaks: [(index: String.Index, afterDigit: Bool)] = []
-    var from = glued.startIndex
-    for number in 1... {
-        let clean = "(?<=[^\\s\\d#-])\(number)\\. ", afterDigit = "(?<=\\d)\(number)\\. "
-        let search = { (pattern: String) in glued.range(of: pattern, options: .regularExpression, range: from..<glued.endIndex) }
-        let cleanFound = search(clean)
-        guard let found = cleanFound ?? (number > 1 ? search(afterDigit) : nil) else { break }
-        breaks.append((found.lowerBound, cleanFound == nil))
-        from = found.upperBound
+    // the numbers from `first` on, and the glued marker of the next one that ends the text, if one does
+    let list = { (first: Int) -> (breaks: [String.Index], end: String.Index?) in
+        var breaks: [(index: String.Index, afterDigit: Bool)] = []
+        var from = glued.startIndex, number = first
+        while true {
+            let clean = "(?<=[^\\s\\d#-])\(number)\\. (?=\\s*\\S)", afterDigit = "(?<=\\d)\(number)\\. (?=\\s*\\S)"
+            let search = { (pattern: String) in glued.range(of: pattern, options: .regularExpression, range: from..<glued.endIndex) }
+            let cleanFound = search(clean)
+            guard let found = cleanFound ?? (number > first ? search(afterDigit) : nil) else { break }
+            breaks.append((found.lowerBound, cleanFound == nil))
+            from = found.upperBound
+            number += 1
+        }
+        let end = breaks.isEmpty ? nil : glued.range(of: "(?<=[^\\s\\d#-])\(number)\\.\\s*\\z", options: .regularExpression, range: from..<glued.endIndex)?.lowerBound
+        // a line that ends in a digit stays a break only when the next number follows it
+        if end == nil { while breaks.last?.afterDigit == true { breaks.removeLast() } }
+        return (breaks.map(\.index), end)
     }
-    while breaks.last?.afterDigit == true { breaks.removeLast() }
-    guard breaks.count >= 2 else { return t }
-    // from the end, so each place still points where it did
-    return breaks.reversed().reduce(t) { $0.inserting("\n", at: $1.index) }
+    // a list from 1, or the items a selection holds from inside one: «merge2. commit3.» is items 2 and the start of 3
+    var (breaks, end) = list(1)
+    if breaks.count + (end == nil ? 0 : 1) < 2 {
+        guard let part = (2...9).lazy.map(list).first(where: { $0.end != nil && !$0.breaks.isEmpty }) else { return t }
+        (breaks, end) = part
+    }
+    // the next item's marker the selection only touched is not read; then from the end, so each place still points where it did
+    return breaks.reversed().reduce(end.map { t[..<$0] } ?? t) { $0.inserting("\n", at: $1) }
 }
 
 // accessibility's text runs on past the marker of a list item the selection's end only touches: a triple-click on

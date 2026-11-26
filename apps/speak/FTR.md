@@ -260,6 +260,8 @@
   - given a long line with no end mark, then it is spoken in pieces of 300 characters at most, cut at a comma or a space
   - and a numbered line says its number first («one: merge»), even when the app hands its lines over glued together
   - and a selection that ends at the start of the next list item never reads that item's number, unless that item opens on a checkbox or a list of its own
+  - and items grabbed from the middle of a glued list read as items: «merge2. commit3.» says «merge», then «2: commit», never the 3; the 1 it never held stays unsaid
+  - and a 20,000-letter word or 8,000 line ends clean in step with their length
   - and list markers («■», «•», «★») are never spoken; a bulleted item glued to the one above on an opening «/“ still gets its pause
 - ⬜ the pill floats while speech plays: its wave, ⏸ / ▶, ■, stick and close
   - then the ⏸ / ▶ button follows the speech, and the pill never takes focus from the app in front

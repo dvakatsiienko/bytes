@@ -615,5 +615,9 @@
     "in": "a → b & c",
     "off": ["symbols"],
     "out": [["en", "a → b & c"]]
+  },
+  {
+    "in": "merge2. commit3.",
+    "out": [["en", "merge. 2: commit"]]
   }
 ]
