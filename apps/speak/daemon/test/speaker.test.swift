@@ -221,6 +221,8 @@ enum SpeakerTest {
         }, "pill 2 | «read 2: chunk 1/2» | fish One. | «fish skipped: status(422)» | kokoro One. in 3000 | «first audio: kokoro N ms» | «read 2: chunk 2/2» | kokoro Two. in 3000 | drop ahead | rest | pill -")
         await row("a kokoro whose wait ran out hands its chunk on", { $0.voices.script[.kokoro] = [.fails(EngineError.timeout)] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: timeout, off for 60 s» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
+        await row("a fall-through is said once a voice, not each chunk", { $0.voices.script[.kokoro] = [.fails(EngineError.quota("14 left"))] }, { $0.read("Hello. Bye.") },
+                  "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «kokoro skipped: quota(\"14 left\"), off for 3600 s» | system Hello. | «first audio: system N ms» | pill: kokoro is out of quota. system reads. | «read 1: chunk 2/2» | system Bye. | drop ahead | rest | pill - | balances")
         await row("a quota refusal asks the provider", { $0.voices.script[.kokoro] = [.fails(EngineError.quota("14 left"))] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: quota(\"14 left\"), off for 3600 s» | system Hello. | «first audio: system N ms» | pill: kokoro is out of quota. system reads. | drop ahead | rest | pill - | balances")
         let refused = { (stage: Stage) in
@@ -969,4 +971,5 @@ final class PlantedPill: SpeechPill {
     func noticed(_ notice: PillModel.Notice) { call("pill: \(notice.line)") }
     private(set) var queued: [String] = []
     func queues(_ text: String, from start: Double) { queued.append("\(text) @\(String(format: "%.5f", start))") }
+    func heard(_ engine: Engine) {}
 }

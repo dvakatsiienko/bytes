@@ -54,7 +54,8 @@ struct PillState: Equatable {
     // the sound heard so far brings up each sentence it reached; a notice stands until a sentence queued after it comes
     // up, whichever comes up first in time
     mutating func advance(to position: Double) {
-        while let next = ahead.first, next.start <= position {
+        // past its start, never at it: the position holds still at a start while nothing sounds yet
+        while let next = ahead.first, next.start < position {
             sentence = next.sentence
             if next.isAfterNotice { notice = nil }
             ahead.removeFirst()

@@ -207,7 +207,7 @@
 
 ## x-speak — hotkey + pill
 
-> states: reading, the word highlight, paused, idle with stick on, a long line, no word timings, fell through to the next engine, the code block cue, hover tooltips, the volume popover, the speed popover, on a light and a dark desktop
+> states: reading, the word highlight, paused, idle with stick on, a long line, no word timings, fell through to the next engine, the code block cue, hover tooltips, the volume row, the speed row, on a light and a dark desktop
 
 - ✅ F4 reads the selected text aloud, cutting off whatever plays
   - given text selected in any app
@@ -258,7 +258,6 @@
   - decision: a word lights the whole grabbed word around it, between spaces, so «dot» in «exa dot md» lights `exa.md`; the pill lights words through this map (the pill chunk)
 - ⬜ a code block is skipped, and the pill says so in its place
   - given a sentence, a ``` block and a sentence, when F4 reads them, then the first sentence is heard to its end, the pill is handed its notice «a code block. skipped.» and the log reads «a code block, skipped», then the second is asked for and heard
-  - decision: today's pill holds the notice and draws none of it; drawing it is the pill chunk's (FRM-290)
   - given a code block in the read, then the sentence row says “a code block. skipped.” in the fall-through line's style, led by a small code glyph, with no line count
   - given a text that is only a block, then no engine is asked and the read ends as any read does; leading, trailing and two side-by-side blocks each keep their place; a stop before a block's turn tells nothing
   - given `codeBlocks` off, then the block's text is read as words, as before the rule
@@ -291,15 +290,18 @@
   - when speech next plays on that display
   - then the pill opens at the same spot; a display it never sat on gets bottom centre, above the dock
 - ⬜ stick keeps the pill up after speech ends; unstick lets it go
-- 🧭 the pill's volume and speed icons open a slider and a number box
+- ⬜ the pill's volume and speed open a row in its body: a slider and a number box
   - given the pill showing
-  - when the user clicks its volume or its speed icon
-  - then a slider and a number box open; a typed value applies on Enter; ↑ / ↓ step by 1, ⇧ by 4, ⌥ fine
+  - when the user clicks its volume or its speed
+  - then a row opens under the sentence row, the sentence never moving: an icon, a slider, a number box and the keys; a typed value applies on Enter
+  - and ↑ / ↓ step the volume by 1, ⇧ by 4, ⌥ by 0.1; the speed by 0.01, ⇧ 0.04, ⌥ fine
+  - and the app in front keeps its focus; Enter, esc or closing the row gives the keyboard back
   - and the next F4 keeps the value
-  - decision: two icons, not a panel — the pill stays a pill (dima, 2026-09-30 re-shape)
+  - decision: the row opens inside the body, the pill stays one body (the sealed design v1.26, dima 2026-11-23; was a popover per icon)
   - decision: the volume is a master level, a config key on top of each engine's gain (dima, 2026-10-01)
 - 🧭 the pill shows the sentence being read, the spoken word lit, in step with the audio
   - given speech playing through kokoro, elevenlabs or the macOS voice
+  - ⬜ and each chunk's sentence comes up as its sound starts, today with no word lit; the lit word follows the engines' marks (FRM-290 slice 62)
   - then the pill shows the current sentence with the spoken word lit, in step with the audio
   - decision: timings come from the engines — kokoro's word timestamps (mlx-audio drops them today), elevenlabs' stream/with-timestamps, the macOS voice's willSpeakRange; whisper alignment only as a last resort (the highlight research, 2026-09-30)
   - decision: the line shows the normalized text, so the lit word matches what is heard (dima, 2026-10-01)

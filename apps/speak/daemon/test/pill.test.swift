@@ -49,12 +49,13 @@ enum PillTest {
             ("a word typed", "\(PillModel.OpenRow.Control.volume.typed("loud") ?? -1)", "-1.0"),
         ]) + check("the sentence comes up with its sound", [
             ("before its sound, none", shown(at: -1), "-"),
-            ("at its start, the first", shown(at: 0), "One."),
+            ("at its start, before a sound, none", shown(at: 0), "-"),
+            ("just past its start, the first", shown(at: 0.01), "One."),
             ("between, still the first", shown(at: 1.9), "One."),
             ("past both starts, the last", shown(at: 5), "Two."),
-            ("a notice stands over the sentences queued before it", shown(at: 0, notice: true, then: 5), "a code block. skipped."),
-            ("a sentence queued after a notice takes its place", shown(at: 0, notice: true, queuedAfter: ("Three.", 4), then: 5), "Three."),
-            ("a read's end clears what is queued", shown(at: 0, leave: true), "-"),
+            ("a notice stands over the sentences queued before it", shown(at: 0.01, notice: true, then: 5), "a code block. skipped."),
+            ("a sentence queued after a notice takes its place", shown(at: 0.01, notice: true, queuedAfter: ("Three.", 4), then: 5), "Three."),
+            ("a read's end clears what is queued", shown(at: 0.01, leave: true), "-"),
         ])
     }
 

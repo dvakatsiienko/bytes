@@ -26,6 +26,8 @@ protocol SpeechPill: AnyObject {
     func noticed(_ notice: PillModel.Notice)
     // a chunk handed to the player, its sound starting at `start` seconds into the read at 1×
     func queues(_ text: String, from start: Double)
+    // the engine whose sound is heard now: the pill's speed is its own
+    func heard(_ engine: Engine)
 }
 
 @MainActor
@@ -174,6 +176,8 @@ final class Speaker: ReadTarget {
         happened(.began(read))
         job = Task {
             var isFirst = true
+            // the engine the pill last said reads in the chain's first one's place
+            var toldFellThrough: Engine?
             // a cloud engine that missed chunk 1's budget never takes over mid-read once audio is playing
             var lead: Engine?
             // the lead, once it answered itself: one heard from before alone may still hang
@@ -217,13 +221,13 @@ final class Speaker: ReadTarget {
                     let stopped = { if isHeard { self.write("\(part) → \(engine.rawValue), stopped") } }
                     do {
                         try await voices.speak(chunk, with: engine, settings: { self.settings(engine) }, deadline: deadline) { isCached in
-                            if isFirst {
-                                self.write("first audio: \(engine.rawValue) \(elapsed(pressed))\(isCached ? ", kept" : "")")
-                                // the chain's own first voice out of quota: the pill says who reads instead
-                                if let first = self.saved().chain[chunk.lang]?.first, first != engine, only == nil,
-                                   self.outOfQuota[first].map({ $0.until > Date() }) == true {
-                                    self.pill.noticed(.fellThrough(from: first, to: engine))
-                                }
+                            if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))\(isCached ? ", kept" : "")") }
+                            self.pill.heard(engine)
+                            // the chain's own first voice out of quota: the pill says who reads instead, once per voice
+                            if let first = self.saved().chain[chunk.lang]?.first, first != engine, only == nil, toldFellThrough != engine,
+                               self.outOfQuota[first].map({ $0.until > Date() }) == true {
+                                self.pill.noticed(.fellThrough(from: first, to: engine))
+                                toldFellThrough = engine
                             }
                             isFirst = false
                             isHeard = true

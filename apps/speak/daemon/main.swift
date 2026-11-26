@@ -64,11 +64,11 @@ final class App {
         panel.model.onClose = { [panel] in panel.hide() }
         panel.position = { [player] in player.played.position }
         // the pill's volume and speed rows save like the page: the changed key over the version read
-        panel.model.onSet = { [configStore] control, value in
-            let current = configStore.current
+        panel.model.onSet = { [configStore, panel] control, value in
             let patch: Json? = switch control {
             case .volume: .object(["volume": .number(value)])
-            case .speed: current.chain[.en]?.first.map { .object(["engines": .object([$0.rawValue: .object(["speed": .number(value)])])]) }
+            // the engine heard last, the one whose speed the row shows
+            case .speed: panel.model.speedEngine.map { .object(["engines": .object([$0.rawValue: .object(["speed": .number(value)])])]) }
             }
             do { _ = try configStore.save(patch, over: configStore.saved().version) } catch { log("pill: \(control.rawValue) \(value) not saved — \(error)") }
         }
