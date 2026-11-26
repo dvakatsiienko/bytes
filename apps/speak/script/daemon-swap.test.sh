@@ -269,13 +269,13 @@ stub mark ':'; relaunch
 is 'a build that came up once is not watched again' '0 new/old' "$code $(pair)"
 printf mute >"$libexec/x-speak"; relaunch
 is 'a relaunch of what no build put there is not watched' '0 mute/old' "$code $(pair)"
-for bad in broken mute dying silent other; do
+for bad in broken mute dying silent keyless other; do
     setup; build "$bad"; relaunch
     is "a $bad build goes back by itself" '1 old/'"$bad running" "$code $(pair) $(running)"
     is "a $bad build: launchd runs the one put back" "$(stat -f %i "$libexec/x-speak")" "$(cat "$state/inode" 2>/dev/null)"
     is "a $bad build: one start each" 2 "$(relaunches)"
     is "a $bad build: no ok line stands" '' "$(marked)"
-    case "$bad" in broken | mute) why='did not come up in 45 s' ;; *) why='came up and did not stay' ;; esac
+    case "$bad" in broken | mute) why='did not come up in 45 s' ;; keyless) why='came up without F4' ;; *) why='came up and did not stay' ;; esac
     says "a $bad build is named, and why" "$(printf "$bad" | shasum -a 256 | cut -c1-12) $why"
     says "a $bad build: says what runs now" "rollback: running $(printf old | shasum -a 256 | cut -c1-12)"
 done

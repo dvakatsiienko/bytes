@@ -24,7 +24,7 @@
 - **settings version** — the mark of the settings file's bytes; a save names the one it edits, and is refused when the file moved on
 - **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with
 - **rollback** — the kept binary and the installed one change places and the daemon restarts; a second one comes forward again
-- **start mark** — the line a daemon writes once its settings are loaded and its socket and main loop run: its build's hash and the time
+- **start mark** — the line a daemon writes once its settings are loaded and its socket and main loop run: `ok`, `no-settings` or `no-f4` (macos refused it F4), its build's hash and the time
 - **read record** — the line a finished read leaves: when, from which app, words and seconds heard, the engines, how it ended; no word of the read
 - **heard / position** — how long a read was listened to, and how far into its sound it is; at 1.5× the second runs faster
 - **master volume** — one share, 0 to 100 percent, over every engine's gain

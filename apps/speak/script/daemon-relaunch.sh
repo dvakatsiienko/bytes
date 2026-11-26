@@ -3,7 +3,7 @@
 # right after a swap died with OS_REASON_CODESIGNING and sat out the 30 s throttle (3 of 3, 2026-09-30).
 # a relaunch cuts a read in progress, so it refuses while the daemon is speaking, and while the daemon it would start
 # finds no settings, or older ones; one too stuck to answer in 2 s is relaunched. exit 3 is a refusal, with nothing stopped; any other failure comes after the bootout.
-# the first relaunch onto a build waits until it is up, and one that does not come up in 45 s goes back by itself
+# the first relaunch onto a build waits until it is up, and one that does not come up in 45 s, or comes up without F4, goes back by itself
 # (daemon-rollback.sh): launchd alone would start it again each 30 s, with no F4 in between. what no build left here, or
 # what came up before, is not watched, and neither is a start of the rollback's own (--unwatched).
 # usage: script/daemon-relaunch.sh — the plist is ~/Library/LaunchAgents/com.dima.x-speak.plist (frame's schedule/)
@@ -69,6 +69,11 @@ while [ "$code" -eq 0 ]; do
         [ "$was_read" = yes ] || break
         code=1
         why='does not read the settings the one before it reads'
+        break
+        ;;
+    "no-f4 $build")
+        code=1
+        why='came up without F4'
         break
         ;;
     esac

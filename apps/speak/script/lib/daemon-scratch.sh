@@ -48,6 +48,7 @@ setup() {
                 mute) ;;
                 # up, and then silent, or another binary
                 unread) mark no-settings ;;
+                keyless) mark no-f4 ;;
                 silent) mark; rm -f "$state/status" ;;
                 other) mark; echo 7 >"$state/inode" ;;
                 *) mark ;;

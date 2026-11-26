@@ -92,21 +92,21 @@ final class App {
             await speaker.probeQuota()
             await warm
         }
-        // written by main's own loop, so a main that never runs leaves none
-        control.start { [paths, job] in DispatchQueue.main.async { markStart(of: job.build, hasSettings: hasSettings, at: paths.startMark) } }
-        heartbeat.start()
         let registered = hotkeys.register()
+        // written by main's own loop, so a main that never runs leaves none
+        control.start { [paths, job] in DispatchQueue.main.async { markStart(of: job.build, hasSettings: hasSettings, hasF4: registered.hasF4, at: paths.startMark) } }
+        heartbeat.start()
         // with the prompt option macos itself asks for the grant, naming this exact process — no guessing which entry
         let isTrusted = AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
         if arguments.configPath != paths.settings { log("config: --config names \(arguments.configPath), the settings are at \(paths.settings)") }
-        log("daemon: \(registered), accessibility \(isTrusted ? "granted" : "missing — macos shows its grant prompt")")
+        log("daemon: \(registered.words), accessibility \(isTrusted ? "granted" : "missing — macos shows its grant prompt")")
     }
 }
 
-private func markStart(of build: String?, hasSettings: Bool, at path: String) {
+private func markStart(of build: String?, hasSettings: Bool, hasF4: Bool, at path: String) {
     do {
         guard let build else { throw CocoaError(.fileReadUnknown) }
-        try startMark(build: build, hasSettings: hasSettings, at: Date()).write(toFile: path, atomically: true, encoding: .utf8)
+        try startMark(build: build, hasSettings: hasSettings, hasF4: hasF4, at: Date()).write(toFile: path, atomically: true, encoding: .utf8)
     } catch {
         log("start mark: not written — \(error)")
     }

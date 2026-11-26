@@ -291,8 +291,8 @@
   - given a change the old file got since, when it runs with that file's hash, then the change is brought and the settings it went over are kept as `config.json.before-move`; with `seen` nothing is copied
   - given another hash, a copy that differs, or settings there with a change of their own, then it refuses in one line and nothing moves
 - ⬜ `pnpm --filter speak daemon:relaunch` restarts the launchd job onto the installed binary, and refuses while the daemon is speaking
-  - makes: `~/.local/share/x-speak/start-mark`, written by each daemon that came up: `ok <its binary's hash> <time>`, or `no-settings …` when it came up on the built-in defaults
-  - given a build that was just installed, when it is relaunched, then the relaunch waits until that build is up and names it; one that is not up in 45 s, does not read the settings the one before it reads, or does not answer 5 s later, goes back through the rollback by itself; the relaunch fails with a line that says why, and the rollback's words are in `x-speak.went-back` beside the binaries
+  - makes: `~/.local/share/x-speak/start-mark`, written by each daemon that came up: `ok <its binary's hash> <time>`, `no-settings …` when it came up on the built-in defaults, or `no-f4 …` when macos refused it F4
+  - given a build that was just installed, when it is relaunched, then the relaunch waits until that build is up and names it; one that is not up in 45 s, came up without F4, does not read the settings the one before it reads, or does not answer 5 s later, goes back through the rollback by itself; the relaunch fails with a line that says why, and the rollback's words are in `x-speak.went-back` beside the binaries
   - given the rollback's own relaunch, a build that came up before, or a login's start, then nothing is watched
   - given no settings at their place, or a change in the old file since they moved that nobody brought, then it refuses in one line, names the way, and stops nothing
 - ✅ `pnpm speak:rollback` (`daemon:rollback`) puts back the daemon the last build replaced and starts it; a second run comes forward again
@@ -333,6 +333,7 @@
   - given a try run, then the keychain is not read
 - ⬜ the socket's `restart`, and `POST /api/restart`, restart the daemon through launchd
   - given a read that plays or is paused, a daemon launchd does not run, an installed build that has not run yet, or a restart asked for in the last 30 s, then it refuses with the reason and nothing restarts
+  - decision: an F4 pressed in the 0.3 s between the answer and launchd's restart starts a read the restart then cuts — left as is, the restart was asked for (clio, 26 Nov)
 - ⬜ a cloud key pasted later, or one a dead network kept back, is found with no restart
   - given a key missing at the daemon's last look, when F4 is pressed a minute or more after it, then the daemon looks again, one look at a time (a child of the key script that ignores its end runs on beside the next look), and the log names each key «ok» or «missing»
   - given the key script hangs, then the look ends after 15 s and the log says «keys: not loaded», and F4 reads on meanwhile
