@@ -7,6 +7,8 @@ struct Chunk {
     let text: String
     // where in the grabbed text it came from, in utf-16 units
     var source = 0..<0
+    // a code block cut from the text: no engine reads it, the pill tells of it in its place
+    var isCodeBlock = false
 }
 
 enum EngineError: Error {
@@ -26,6 +28,10 @@ private let longestChunk = 300
 func chunks(_ runs: [Run]) -> [Chunk] {
     var result: [Chunk] = []
     for run in runs {
+        if let block = run.block {
+            result.append(Chunk(lang: run.lang, text: "", source: block, isCodeBlock: true))
+            continue
+        }
         // a rewritten end of one and start of the next may come from the same character: it is the first one's
         let add = { (piece: SourcedText) in
             let from = max(piece.source.lowerBound, result.last?.source.upperBound ?? 0)

@@ -242,6 +242,10 @@
   - given the word inside another («account»), in another case («CC»), inside a file link, a path or an id, then it is left as before; `{"say": "Claude Code", "anyCase": true}` matches any case
   - given an entry's spoken words, then no later rule reads them again: «api» there is never spelled out
   - given an entry for a file name, a path or an id, then the save is refused with the line why, since a cut rule takes those first
+- ⬜ a code block is skipped, and the pill says so in its place
+  - given a sentence, a ``` block and a sentence, when F4 reads them, then the first sentence is heard to its end, the pill's notice reads «a code block. skipped.», then the second is asked for and heard
+  - given a text that is only a block, then no engine is asked and the read ends as any read does; leading, trailing and two side-by-side blocks each keep their place; a stop before a block's turn tells nothing
+  - given `codeBlocks` off, then the block's text is read as words, as before the rule
 - ⬜ a word is taught in a file, with no rebuild
   - given a word that is not letters a–z alone (a digit, a sign, cyrillic), or a list it does not know, then it is a bad edit: a read would never say it
   - makes: nothing; `~/Library/Application Support/speak/word-lists.json` is dima's own, absent until he writes one

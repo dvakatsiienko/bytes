@@ -22,6 +22,8 @@ protocol SpeechPill: AnyObject {
     func follow(_ playback: Playback)
     // gone whatever it showed, unless stick holds it
     func leave()
+    // a line in its own voice where the sentence stands, until the next one or the read's end
+    func noticed(_ notice: PillModel.Notice)
 }
 
 @MainActor
@@ -181,6 +183,14 @@ final class Speaker: ReadTarget {
                 // a stopped read ends here
                 if Task.isCancelled { return }
                 let part = "read \(read): chunk \(index + 1)/\(parts.count)"
+                if chunk.isCodeBlock {
+                    // told once the sound before it is heard, before the next chunk is asked for
+                    await player.drained()
+                    if Task.isCancelled { return }
+                    write("\(part): a code block, skipped")
+                    pill.noticed(.codeBlock)
+                    continue
+                }
                 write(part)
                 tally?.began(chunk.text, start: player.sound)
                 let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: benched(), lead: lead, now: Date())
@@ -256,6 +266,7 @@ final class Speaker: ReadTarget {
 
     // only where the engine goes first on the next chunk too
     private func openAhead(_ chunk: Chunk, with engine: Engine, only: Engine?, benched: [Engine: Date]) {
+        guard !chunk.isCodeBlock else { return }
         let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: benched, lead: engine, now: Date())
         if engines.first == engine { voices.openAhead(chunk, with: engine, settings: settings(engine)) }
     }

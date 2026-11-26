@@ -66,7 +66,7 @@ struct DaemonTest {
             ("a NUL before a sentence makes no empty chunk", "\(spokenChunks(of: nul).filter(\.text.isEmpty).count)", "0"),
             ("a blank grab is quick", ContinuousClock.now - began < .seconds(1) ? "quick" : "slow", "quick"),
             ("a code fence first", parts("```\nlet a = 1\n```\nDone. ok"), "```\nlet a = 1\n``` | Done. | ok"),
-            ("a code fence", parts("Look:\n```\nlet a = 1\n```\nDone. ok"), "Look:\n```\nlet a = 1\n``` | Done. | ok"),
+            ("a code fence", parts("Look:\n```\nlet a = 1\n```\nDone. ok"), "Look: | ```\nlet a = 1\n``` | Done. | ok"),
             ("a cut between «number» and its digits", parts("Hi. " + String(repeating: "abcdefgh ", count: 32) + "aaaaa #123456 tail here and more words"), "Hi. | " + String(repeating: "abcdefgh ", count: 32) + "aaaaa # | 123456 tail here and more words"),
             ("a long sentence, cut", parts("Hi. " + long), "Hi. | " + String(repeating: "word ", count: 60).dropLast() + " | " + String(repeating: "word ", count: 20) + "end."),
         ])

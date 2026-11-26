@@ -8,7 +8,15 @@ enum Lang: String, Codable, CaseIterable { case en, uk, ru }
 struct Run: Equatable {
     var lang: Lang
     var spoken: SourcedText
+    // a code block cut from the text: where it stood, and nothing to say
+    var block: Range<Int>?
     var text: String { spoken.text }
+
+    static func codeBlock(_ source: Range<Int>) -> Run {
+        var run = Run(lang: .en, text: "")
+        run.block = source
+        return run
+    }
 
     init(lang: Lang, spoken: SourcedText) {
         self.lang = lang
@@ -24,7 +32,6 @@ private func spell(_ letters: String) -> String { letters.uppercased().map(Strin
 
 private func stripMarkdown(_ text: SourcedText, _ cleaner: Cleaner) -> SourcedText {
     var t = text
-    if cleaner.on(.codeBlocks) { t = t.replacing("```[\\s\\S]*?```", " code block. ") }
     if cleaner.on(.markdown) { t = markdown(t) }
     if cleaner.on(.emoji) { t = emoji(t) }
     return cleaner.on(.lineEnds) ? lineEnds(t) : t
@@ -225,7 +232,18 @@ func normalize(_ text: String, _ lists: WordLists = .shipped, _ cleaner: Cleaner
     let grabbed = SourcedText(text).replacing("[\\x{FFFC}\\x{0}\(standIns)]", "")
     let lines = cleaner.on(.lists) ? unglueLists(grabbed) : grabbed
     let selected = nextMarker.map { lines.replacing("\\n?\(NSRegularExpression.escapedPattern(for: $0))\\z", "") } ?? lines
-    return splitRuns(stripMarkdown(selected, cleaner))
+    guard cleaner.on(.codeBlocks) else { return clean(selected, lists, cleaner) }
+    // a code block is cut whole and keeps its place between the runs around it
+    var runs: [Run] = [], from = selected.text.startIndex
+    for block in selected.text.ranges(of: try! Regex("```[\\s\\S]*?```")) {
+        runs += clean(selected[from..<block.lowerBound], lists, cleaner) + [.codeBlock(selected[block].source)]
+        from = block.upperBound
+    }
+    return runs + clean(selected[from...], lists, cleaner)
+}
+
+private func clean(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) -> [Run] {
+    splitRuns(stripMarkdown(text, cleaner))
         .map { run in
             let isLatin = run.lang == .en
             var said: [String] = []

@@ -231,6 +231,8 @@ final class Panel: SpeechPill {
         show()
     }
 
+    func noticed(_ notice: PillModel.Notice) { model.state.noticed(notice) }
+
     func leave() {
         endWave()
         model.state.leave()

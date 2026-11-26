@@ -59,6 +59,32 @@ enum SpeakerTest {
                   "pill 1 | «read 1: chunk 1/2» | kokoro Hello. in 3000 | «first audio: kokoro N ms» | «kokoro skipped: status(500), off for 60 s» | «read 1: chunk 2/2» | system Bye. | drop ahead | rest | pill -")
         await row("a stream that says «cancelled» on its own ends no read", { $0.voices.script[.kokoro] = [.fails(CancellationError())] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: timeout, off for 60 s» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
+        // a code block's place: its sounds end one by one, by hand, so the transcript shows where the notice falls
+        let block = Chunk(lang: .en, text: "", isCodeBlock: true), one = Chunk(lang: .en, text: "One."), two = Chunk(lang: .en, text: "Two.")
+        let slowly = { (parts: [Chunk]) in { (stage: Stage) async in
+            stage.read(parts)
+            for _ in 0..<3 {
+                await settle()
+                stage.calls.append("sound ends")
+                stage.audio.endsNext()
+            }
+        } }
+        let sounding = { (stage: Stage) in stage.voices.script[.kokoro] = [.sounds, .sounds, .sounds] }
+        await row("a code block is told after the sound before it, before the next is asked", sounding, slowly([one, block, two]),
+                  "pill 1 | «read 1: chunk 1/3» | kokoro One. in 3000 | speed 1.0 | start | play | sound | «first audio: kokoro N ms» | sound ends | «read 1: chunk 2/3: a code block, skipped» | pill: a code block. skipped. | «read 1: chunk 3/3» | kokoro Two. in 3000 | speed 1.0 | «silence: N ms mid-read» | sound | sound ends | drop ahead | rest | pill - | sound ends")
+        await row("a text that is only a code block asks no engine and ends as a read", sounding, { $0.read(spokenChunks(of: "```\nlet a = 1\n```")) },
+                  "pill 1 | «read 1: chunk 1/1: a code block, skipped» | pill: a code block. skipped. | drop ahead | rest | pill -")
+        await row("a leading code block", sounding, slowly([block, one]),
+                  "pill 1 | «read 1: chunk 1/2: a code block, skipped» | pill: a code block. skipped. | «read 1: chunk 2/2» | kokoro One. in 3000 | speed 1.0 | start | play | sound | «first audio: kokoro N ms» | sound ends | drop ahead | rest | pill - | sound ends | sound ends")
+        await row("a trailing code block", sounding, slowly([one, block]),
+                  "pill 1 | «read 1: chunk 1/2» | kokoro One. in 3000 | speed 1.0 | start | play | sound | «first audio: kokoro N ms» | sound ends | «read 1: chunk 2/2: a code block, skipped» | pill: a code block. skipped. | drop ahead | rest | pill - | sound ends | sound ends")
+        await row("two code blocks side by side, each in its place", sounding, slowly([one, block, block, two]),
+                  "pill 1 | «read 1: chunk 1/4» | kokoro One. in 3000 | speed 1.0 | start | play | sound | «first audio: kokoro N ms» | sound ends | «read 1: chunk 2/4: a code block, skipped» | pill: a code block. skipped. | «read 1: chunk 3/4: a code block, skipped» | pill: a code block. skipped. | «read 1: chunk 4/4» | kokoro Two. in 3000 | speed 1.0 | «silence: N ms mid-read» | sound | sound ends | drop ahead | rest | pill - | sound ends")
+        await row("a stop before a code block's turn tells none", sounding, { stage in
+            stage.read([one, block, two])
+            await settle()
+            stage.speaker.silence()
+        }, "pill 1 | «read 1: chunk 1/3» | kokoro One. in 3000 | speed 1.0 | start | play | sound | «first audio: kokoro N ms» | «read 1: stopped» | drop ahead | stop | pill - | rest")
         await row("a read ends with its last sound, not before", { $0.voices.script[.kokoro] = [.sounds] }, { stage in
             stage.read("Hello.")
             await settle()
@@ -928,4 +954,5 @@ final class PlantedPill: SpeechPill {
     init(_ call: @escaping (String) -> Void) { self.call = call }
     func follow(_ playback: Playback) { call("pill \(playback.read.map(String.init) ?? "-")\(playback.isPaused ? " paused" : "")") }
     func leave() { call("leave") }
+    func noticed(_ notice: PillModel.Notice) { call("pill: \(notice.line)") }
 }
