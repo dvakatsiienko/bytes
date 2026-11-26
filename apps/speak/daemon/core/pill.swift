@@ -8,6 +8,8 @@ struct PillState: Equatable {
     var hasSignal = false
     // what stands in the sentence's row, until the read ends
     private(set) var notice: PillModel.Notice?
+    // the sentence being read; its row opens only while there is one
+    private(set) var sentence: PillModel.Sentence?
 
     // a read that begins takes the pill
     mutating func follow(_ playback: Playback) {
@@ -33,7 +35,11 @@ struct PillState: Equatable {
 
     mutating func showSample() { isSample = true }
     mutating func noticed(_ notice: PillModel.Notice) { self.notice = notice }
-    mutating func leave() { (isWaveOn, isSample, hasSignal, notice) = (false, false, false, nil) }
+    mutating func reads(_ sentence: PillModel.Sentence?) { self.sentence = sentence }
+    mutating func leave() { (isWaveOn, isSample, hasSignal, notice, sentence) = (false, false, false, nil, nil) }
+
+    // the body: the control row alone, or with the sentence row under it
+    var hasSentenceRow: Bool { sentence != nil || notice != nil }
 
     // ⏸ while it talks, ▶ while paused, a dim ▶ when nothing plays; the meter runs once a sound was heard
     var look: PillLook {

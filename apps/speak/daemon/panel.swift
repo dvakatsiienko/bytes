@@ -14,6 +14,9 @@ final class PanelModel: ObservableObject {
     let meter: Meter
     // which button the pointer is over; lives here because a plain swiftc build has no SwiftUI @State macro
     @Published var hovered: String?
+    // the reading engine's speed, as the player plays it
+    @Published var speed: Double = 1
+    var speedLabel: String { String(format: "%g×", (speed * 100).rounded() / 100) }
 
     init(tuning: @escaping @MainActor () -> (glide: Double, flow: Double)) { meter = Meter(tuning: tuning) }
 
@@ -32,37 +35,66 @@ final class PanelModel: ObservableObject {
 }
 
 struct PanelView: View {
-    static let size = CGSize(width: 236, height: 36)
+    static let width: CGFloat = 354
+    static let controlRow: CGFloat = 37
+    static let sentenceRow: CGFloat = 27
+    static func size(hasSentenceRow: Bool) -> CGSize {
+        CGSize(width: width, height: controlRow + (hasSentenceRow ? sentenceRow : 0))
+    }
     @ObservedObject var model: PanelModel
 
     var body: some View {
         let look = model.state.look
-        HStack(spacing: 2) {
-            PillButton(model: model, symbol: "xmark", label: "Close the panel, keep speaking", action: model.onClose)
-            LevelMeter(meter: model.meter, isRunning: look.isMeterRunning)
-                .frame(maxWidth: .infinity)
-            PillButton(
-                model: model,
-                symbol: look.symbol,
-                label: look.label,
-                isDisabled: look.isDisabled,
-                action: model.onPause,
-            )
-            PillButton(model: model, symbol: "stop.fill", label: "Stop · F5", hint: "F5", action: model.onStop)
-            PillButton(model: model, symbol: model.isSticky ? "pin.fill" : "pin", label: model.isSticky ? "Unstick" : "Stick: stay after speech ends", isOn: model.isSticky) {
-                model.isSticky.toggle()
-                if !model.isSticky { model.onUnstick() }
+        let hasSentenceRow = model.state.hasSentenceRow
+        let shape = RoundedRectangle(cornerRadius: hasSentenceRow ? 14 : Self.controlRow / 2, style: .continuous)
+        VStack(spacing: 0) {
+            HStack(spacing: 2) {
+                PillButton(model: model, symbol: "xmark", label: "Close the panel, keep speaking", action: model.onClose)
+                LevelMeter(meter: model.meter, isRunning: look.isMeterRunning)
+                    .frame(maxWidth: .infinity)
+                PillButton(model: model, symbol: "speaker.wave.2.fill", label: "Volume", action: {})
+                Text(model.speedLabel)
+                    .font(.system(size: 12, weight: .medium))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.white.opacity(0.85))
+                    .padding(.horizontal, 4)
+                    .accessibilityLabel("Speed \(model.speedLabel)")
+                Divider().frame(height: 16).overlay(Color.white.opacity(0.14))
+                PillButton(
+                    model: model,
+                    symbol: look.symbol,
+                    label: look.label,
+                    isDisabled: look.isDisabled,
+                    action: model.onPause,
+                )
+                PillButton(model: model, symbol: "stop.fill", label: "stop F5", action: model.onStop)
+                Divider().frame(height: 16).overlay(Color.white.opacity(0.14))
+                PillButton(model: model, symbol: "pin.fill", label: model.isSticky ? "Unstick" : "Stick: stay after speech ends", isOn: model.isSticky) {
+                    model.isSticky.toggle()
+                    if !model.isSticky { model.onUnstick() }
+                }
+            }
+            .padding(.horizontal, 6)
+            .frame(height: Self.controlRow)
+            if hasSentenceRow {
+                Rectangle().fill(Color.white.opacity(0.1)).frame(height: 1)
+                Text(model.state.sentence?.text ?? model.state.notice?.line ?? "")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.white.opacity(0.62))
+                    .lineLimit(1)
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .textSelection(.enabled)
             }
         }
-        .padding(.horizontal, 6)
-        .frame(width: Self.size.width, height: Self.size.height)
+        .frame(width: Self.width, height: Self.size(hasSentenceRow: hasSentenceRow).height)
         // the tint sits over the glass: a second .background would land behind it and vanish
         .background(ZStack { VisualEffect(); Color.black.opacity(0.55) })
-        .clipShape(Capsule())
-        .overlay(Capsule().strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
+        .clipShape(shape)
+        .overlay(shape.strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
         // the whole pill drags; a button's own click wins over this gesture. isMovableByWindowBackground never
         // fired under SwiftUI (dima's hand test, take 2)
-        .contentShape(Capsule())
+        .contentShape(shape)
         .gesture(DragGesture(minimumDistance: 2).onChanged { _ in model.onDrag() }.onEnded { _ in model.onDragEnd() })
         .environment(\.colorScheme, .dark)
     }
@@ -101,7 +133,6 @@ struct PillButton: View {
     @ObservedObject var model: PanelModel
     let symbol: String
     let label: String
-    var hint: String?
     var isOn = false
     var isDisabled = false
     let action: () -> Void
@@ -110,21 +141,11 @@ struct PillButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: symbol)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(isOn ? 1 : 0.72))
-                if let hint {
-                    Text(hint)
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.5))
-                        .padding(.horizontal, 3)
-                        .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Color.white.opacity(0.18), lineWidth: 1))
-                }
-            }
-            .padding(.horizontal, hint == nil ? 0 : 6)
-            .frame(minWidth: 26, minHeight: 26)
-            .background(Capsule().fill(Color.white.opacity(isHovered ? 0.12 : 0)))
+            Image(systemName: symbol)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(isOn ? LevelMeter.accent : Color.white.opacity(0.72))
+                .frame(minWidth: 26, minHeight: 26)
+                .background(Capsule().fill(isOn ? LevelMeter.accent.opacity(0.28) : Color.white.opacity(isHovered ? 0.12 : 0)))
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -161,7 +182,7 @@ final class Panel: SpeechPill {
     private let unsaved = Wave()
     private lazy var window: NSPanel = {
         let panel = NSPanel(
-            contentRect: NSRect(origin: .zero, size: PanelView.size),
+            contentRect: NSRect(origin: .zero, size: PanelView.size(hasSentenceRow: false)),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: true,
@@ -209,10 +230,11 @@ final class Panel: SpeechPill {
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(mouse) }) ?? NSScreen.main else { return }
         let area = screen.visibleFrame
         let saved = (UserDefaults.standard.dictionary(forKey: "panelPositions") as? [String: [Double]])?[Self.key(screen)]
-        let offset = saved.map { NSPoint(x: $0[0], y: $0[1]) } ?? NSPoint(x: (area.width - PanelView.size.width) / 2, y: 24)
+        let size = window.frame.size
+        let offset = saved.map { NSPoint(x: $0[0], y: $0[1]) } ?? NSPoint(x: (area.width - size.width) / 2, y: 24)
         window.setFrameOrigin(NSPoint(
-            x: area.minX + min(max(0, offset.x), area.width - PanelView.size.width),
-            y: area.minY + min(max(0, offset.y), area.height - PanelView.size.height),
+            x: area.minX + min(max(0, offset.x), area.width - size.width),
+            y: area.minY + min(max(0, offset.y), area.height - size.height),
         ))
     }
 
@@ -228,15 +250,32 @@ final class Panel: SpeechPill {
         guard isNew else { return }
         model.meter.reset()
         endWave()
+        if let lead = settings().chain[.en]?.first { model.speed = settings()[lead].speed }
         show()
     }
 
-    func noticed(_ notice: PillModel.Notice) { model.state.noticed(notice) }
+    func noticed(_ notice: PillModel.Notice) {
+        model.state.noticed(notice)
+        fitWindow()
+    }
+
+    // the body grows and shrinks from its top edge, so the control row stays put; at the screen's bottom edge the
+    // whole pill moves up by what it gained instead (the FRM-290 spike, 26 Nov)
+    private func fitWindow() {
+        let size = PanelView.size(hasSentenceRow: model.state.hasSentenceRow)
+        var frame = window.frame
+        guard frame.size != size else { return }
+        frame.origin.y = frame.maxY - size.height
+        frame.size = size
+        if let area = window.screen?.visibleFrame, frame.minY < area.minY { frame.origin.y = area.minY }
+        window.setFrame(frame, display: true)
+    }
 
     func leave() {
         endWave()
         model.state.leave()
         model.meter.reset()
+        fitWindow()
         if !model.isSticky { hide() }
     }
 
@@ -297,7 +336,11 @@ final class Panel: SpeechPill {
             showSampleLevels()
             model.state.follow(.reading(1, isPaused: fixture.isPaused))
         }
-        if fixture.hint?.control == .stop { model.hovered = "Stop · F5" }
+        model.state.reads(fixture.sentence)
+        if let notice = fixture.notice { model.state.noticed(notice) }
+        if fixture.openRow?.control == .speed, let speed = fixture.openRow?.value { model.speed = speed }
+        if fixture.hint?.control == .stop { model.hovered = "stop F5" }
+        fitWindow()
         show()
     }
 
