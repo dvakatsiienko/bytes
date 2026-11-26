@@ -207,7 +207,7 @@
 
 ## x-speak — hotkey + pill
 
-> states: reading, the word highlight, paused, idle with stick on, a long line, fell through to the next engine, the code block cue, hover tooltips, the volume popover, the speed popover, on a light and a dark desktop
+> states: reading, the word highlight, paused, idle with stick on, a long line, no word timings, fell through to the next engine, the code block cue, hover tooltips, the volume popover, the speed popover, on a light and a dark desktop
 
 - ✅ F4 reads the selected text aloud, cutting off whatever plays
   - given text selected in any app
@@ -259,6 +259,7 @@
 - ⬜ a code block is skipped, and the pill says so in its place
   - given a sentence, a ``` block and a sentence, when F4 reads them, then the first sentence is heard to its end, the pill is handed its notice «a code block. skipped.» and the log reads «a code block, skipped», then the second is asked for and heard
   - decision: today's pill holds the notice and draws none of it; drawing it is the pill chunk's (FRM-290)
+  - given a code block in the read, then the sentence row says “a code block. skipped.” in the fall-through line's style, led by a small code glyph, with no line count
   - given a text that is only a block, then no engine is asked and the read ends as any read does; leading, trailing and two side-by-side blocks each keep their place; a stop before a block's turn tells nothing
   - given `codeBlocks` off, then the block's text is read as words, as before the rule
 - ⬜ a word is taught in a file, with no rebuild
@@ -280,6 +281,7 @@
   - and list markers («■», «•», «★») are never spoken; a bulleted item glued to the one above on an opening «/“ still gets its pause
 - ⬜ the pill floats while speech plays: its wave, ⏸ / ▶, ■, stick and close
   - then the ⏸ / ▶ button follows the speech, and the pill never takes focus from the app in front
+  - decision: the key label beside stop is gone and its hint says «stop F5»; the pill is 354 wide, 354 × 64 reading and 354 × 37 idle
   - and paused, the wave keeps its last shape in grey and the sentence line takes the same grey, the held word on its pad; only stopped is the wave flat (dima, 2026-10-01, merge v1.14)
 - ⬜ the mac voice plays through the one audio output, like every other voice
   - given the mac voice reads, then its wave runs on the pill, and it starts no gap after the sentence before
@@ -300,7 +302,9 @@
   - given speech playing through kokoro, elevenlabs or the macOS voice
   - then the pill shows the current sentence with the spoken word lit, in step with the audio
   - decision: timings come from the engines — kokoro's word timestamps (mlx-audio drops them today), elevenlabs' stream/with-timestamps, the macOS voice's willSpeakRange; whisper alignment only as a last resort (the highlight research, 2026-09-30)
-  - decision: the line shows the normalized text, so the lit word matches what is heard; an engine without word timings (kokoro today) gets a char-proportional estimate (dima, 2026-10-01)
+  - decision: the line shows the normalized text, so the lit word matches what is heard (dima, 2026-10-01)
+  - given an engine that gives no word timings, then the pill shows the sentence in the heard tone with no word lit; no word is ever lit by estimate
+  - given a sentence that fits the row, then it shows whole; only a line too long for the row fades at both ends and runs edge to edge
 - 🧭 in native apps the spoken word gets a click-through highlight over the source text — an experiment
   - given text read from TextEdit, Notes or Safari
   - then the spoken word gets a click-through overlay over the source text
