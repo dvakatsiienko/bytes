@@ -36,6 +36,29 @@ enum PillTest {
             ("a mark lights its word", "\(PillFixture.reading.model.sentence!.parts)", #"(heard: "The ", lit: "kettle", ahead: " clicks off and the room is quiet.")"#),
             ("no mark lights nothing", "\(PillFixture.noWordTimings.model.sentence!.parts)", #"(heard: "The kettle clicks off and the room is quiet.", lit: "", ahead: "")"#),
             ("a mark off its word lights nothing", "\(PillModel.Sentence(text: "one two", word: .init(text: "two", offset: 0, isHeld: false)).parts.lit)", ""),
+        ]) + check("the sentence comes up with its sound", [
+            ("before its sound, none", shown(at: -1), "-"),
+            ("at its start, the first", shown(at: 0), "One."),
+            ("between, still the first", shown(at: 1.9), "One."),
+            ("past both starts, the last", shown(at: 5), "Two."),
+            ("a notice stands over the sentences queued before it", shown(at: 0, notice: true, then: 5), "a code block. skipped."),
+            ("a sentence queued after a notice takes its place", shown(at: 0, notice: true, queuedAfter: ("Three.", 4), then: 5), "Three."),
+            ("a read's end clears what is queued", shown(at: 0, leave: true), "-"),
         ])
+    }
+
+    private static func shown(at position: Double, notice: Bool = false, queuedAfter: (String, Double)? = nil, then later: Double? = nil, leave: Bool = false) -> String {
+        var state = PillState()
+        state.queue("One.", from: 0)
+        state.queue("Two.", from: 2)
+        state.advance(to: position)
+        if notice { state.noticed(.codeBlock) }
+        if let queuedAfter { state.queue(queuedAfter.0, from: queuedAfter.1) }
+        if let later { state.advance(to: later) }
+        if leave {
+            state.leave()
+            state.advance(to: 10)
+        }
+        return state.notice?.line ?? state.sentence?.text ?? "-"
     }
 }

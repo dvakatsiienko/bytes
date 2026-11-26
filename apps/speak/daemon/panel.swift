@@ -241,6 +241,9 @@ final class Panel: SpeechPill {
         return panel
     }()
     private var dragStart: (mouse: NSPoint, origin: NSPoint)?
+    // how far into the read's sound the listener is, in seconds at 1×: brings up each queued sentence
+    var position: () -> Double = { 0 }
+    private var sentenceTimer: Timer?
 
     init(settings: @escaping @MainActor () -> Config) {
         self.settings = settings
@@ -296,6 +299,19 @@ final class Panel: SpeechPill {
         show()
     }
 
+    func queues(_ text: String, from start: Double) {
+        model.state.queue(text, from: start)
+        guard sentenceTimer == nil else { return }
+        sentenceTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                let before = self.model.state.sentence
+                self.model.state.advance(to: self.position())
+                if self.model.state.sentence != before { self.fitWindow() }
+            }
+        }
+    }
+
     func noticed(_ notice: PillModel.Notice) {
         model.state.noticed(notice)
         fitWindow()
@@ -314,6 +330,8 @@ final class Panel: SpeechPill {
     }
 
     func leave() {
+        sentenceTimer?.invalidate()
+        sentenceTimer = nil
         endWave()
         model.state.leave()
         model.meter.reset()

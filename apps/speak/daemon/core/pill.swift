@@ -10,6 +10,14 @@ struct PillState: Equatable {
     private(set) var notice: PillModel.Notice?
     // the sentence being read; its row opens only while there is one
     private(set) var sentence: PillModel.Sentence?
+    // the sentences queued after it, each from where its sound starts, in seconds of sound at 1×
+    private var ahead: [Queued] = []
+    private struct Queued: Equatable {
+        let start: Double
+        let sentence: PillModel.Sentence
+        // queued after the notice that stands: its sentence takes the notice's place
+        var isAfterNotice = true
+    }
 
     // a read that begins takes the pill
     mutating func follow(_ playback: Playback) {
@@ -34,9 +42,26 @@ struct PillState: Equatable {
     }
 
     mutating func showSample() { isSample = true }
-    mutating func noticed(_ notice: PillModel.Notice) { self.notice = notice }
+    mutating func noticed(_ notice: PillModel.Notice) {
+        self.notice = notice
+        for index in ahead.indices { ahead[index].isAfterNotice = false }
+    }
     mutating func reads(_ sentence: PillModel.Sentence?) { self.sentence = sentence }
-    mutating func leave() { (isWaveOn, isSample, hasSignal, notice, sentence) = (false, false, false, nil, nil) }
+
+    // a chunk handed to the player: its sentence comes up once the sound reaches its start
+    mutating func queue(_ text: String, from start: Double) { ahead.append(Queued(start: start, sentence: .init(text: text))) }
+
+    // the sound heard so far brings up each sentence it reached; a notice stands until a sentence queued after it comes
+    // up, whichever comes up first in time
+    mutating func advance(to position: Double) {
+        while let next = ahead.first, next.start <= position {
+            sentence = next.sentence
+            if next.isAfterNotice { notice = nil }
+            ahead.removeFirst()
+        }
+    }
+
+    mutating func leave() { (isWaveOn, isSample, hasSignal, notice, sentence, ahead) = (false, false, false, nil, nil, []) }
 
     // the body: the control row alone, or with the sentence row under it
     var hasSentenceRow: Bool { sentence != nil || notice != nil }

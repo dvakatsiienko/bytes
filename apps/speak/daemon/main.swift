@@ -62,6 +62,7 @@ final class App {
         kokoro.onWarm = { [weak speaker] in speaker?.serverIsWarm(of: .kokoro) }
         audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
         panel.model.onClose = { [panel] in panel.hide() }
+        panel.position = { [player] in player.played.position }
         panel.model.onPause = { [weak speaker] in speaker?.togglePause() }
         panel.model.onStop = { [weak speaker] in speaker?.silence() }
         panel.model.onUnstick = { [weak speaker, panel] in

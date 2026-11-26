@@ -24,6 +24,8 @@ protocol SpeechPill: AnyObject {
     func leave()
     // a line in its own voice where the sentence stands, until the next one or the read's end
     func noticed(_ notice: PillModel.Notice)
+    // a chunk handed to the player, its sound starting at `start` seconds into the read at 1×
+    func queues(_ text: String, from start: Double)
 }
 
 @MainActor
@@ -193,6 +195,7 @@ final class Speaker: ReadTarget {
                 }
                 write(part)
                 tally?.began(chunk.text, start: player.sound)
+                pill.queues(chunk.text, from: player.sound)
                 let engines = candidates(chain: saved().chain, lang: chunk.lang, only: only, benched: benched(), lead: lead, now: Date())
                 if let server = rendersAhead(engines, lead: proven, isPlaying: player.isPlaying) {
                     voices.openAhead(chunk, with: server, settings: settings(server))
@@ -214,7 +217,14 @@ final class Speaker: ReadTarget {
                     let stopped = { if isHeard { self.write("\(part) → \(engine.rawValue), stopped") } }
                     do {
                         try await voices.speak(chunk, with: engine, settings: { self.settings(engine) }, deadline: deadline) { isCached in
-                            if isFirst { self.write("first audio: \(engine.rawValue) \(elapsed(pressed))\(isCached ? ", kept" : "")") }
+                            if isFirst {
+                                self.write("first audio: \(engine.rawValue) \(elapsed(pressed))\(isCached ? ", kept" : "")")
+                                // the chain's own first voice out of quota: the pill says who reads instead
+                                if let first = self.saved().chain[chunk.lang]?.first, first != engine, only == nil,
+                                   self.outOfQuota[first].map({ $0.until > Date() }) == true {
+                                    self.pill.noticed(.fellThrough(from: first, to: engine))
+                                }
+                            }
                             isFirst = false
                             isHeard = true
                             wasAsked = !isCached

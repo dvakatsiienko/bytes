@@ -222,7 +222,7 @@ enum SpeakerTest {
         await row("a kokoro whose wait ran out hands its chunk on", { $0.voices.script[.kokoro] = [.fails(EngineError.timeout)] }, { $0.read("Hello.") },
                   "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: timeout, off for 60 s» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill -")
         await row("a quota refusal asks the provider", { $0.voices.script[.kokoro] = [.fails(EngineError.quota("14 left"))] }, { $0.read("Hello.") },
-                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: quota(\"14 left\"), off for 3600 s» | system Hello. | «first audio: system N ms» | drop ahead | rest | pill - | balances")
+                  "pill 1 | «read 1: chunk 1/1» | kokoro Hello. in 3000 | «kokoro skipped: quota(\"14 left\"), off for 3600 s» | system Hello. | «first audio: system N ms» | pill: kokoro is out of quota. system reads. | drop ahead | rest | pill - | balances")
         let refused = { (stage: Stage) in
             stage.chain = [.elevenlabs, .system]
             stage.voices.balance = [.elevenlabs: Balance(left: 150)]
@@ -236,7 +236,7 @@ enum SpeakerTest {
         await row("a refusal with credits left holds: the next read is not refused again", refused, { stage in
             stage.read("Hello.")
             await again(stage)
-        }, "pill 2 | «read 2: chunk 1/1» | system Bye. | «first audio: system N ms» | drop ahead | rest | pill -")
+        }, "pill 2 | «read 2: chunk 1/1» | system Bye. | «first audio: system N ms» | pill: elevenlabs is out of quota. system reads. | drop ahead | rest | pill -")
         await row("a balance that grew lifts it", refused, { stage in
             stage.read("Hello.")
             await settle()
@@ -375,8 +375,17 @@ enum SpeakerTest {
             act(stage.speaker)
             return stage.speaker.order
         }
+        let queued = { (parts: [Chunk]) async -> String in
+            let stage = Stage()
+            sounding(stage)
+            await slowly(parts)(stage)
+            return stage.pill.queued.joined(separator: " | ")
+        }
         let hello = Stage.chunks("Hello.")
-        var failed = check("read", rows) + check("order", [
+        var failed = check("read", rows) + check("the pill's sentences", [
+            ("each chunk from where its sound starts", await queued([one, two]), "One. @0.00000 | Two. @0.00008"),
+            ("a code block is no sentence", await queued([one, block, two]), "One. @0.00000 | Two. @0.00008"),
+        ]) + check("order", [
             ("a read takes one", orders { $0.read(hello, from: "com.example.app", pressed: .now) }, 1),
             ("a read over a read takes one more", orders { $0.read(hello, from: "com.example.app", pressed: .now); $0.read(hello, from: "com.example.app", pressed: .now) }, 2),
             ("the socket's read", orders { $0.readGiven(hello) }, 1),
@@ -801,6 +810,7 @@ final class Stage {
     let hand = Hand()
     private(set) var records: [ReadRecord] = []
     let audio: PlantedAudio, voices: PlantedVoices, player: Player
+    let pill: PlantedPill
     private(set) var speaker: Speaker!
     var calls: [String] {
         get { log.made }
@@ -815,8 +825,10 @@ final class Stage {
         let start = SuspendingClock.now
         player = Player(device: audio, settling: .zero, now: { [hand] in hand.passed.map { start + .milliseconds(Int($0 * 1000)) } ?? .now }, log: { call("«\($0)»") })
         voices.player = player
+        let pill = PlantedPill(call)
+        self.pill = pill
         speaker = Speaker(
-            player: player, voices: voices, pill: PlantedPill(call),
+            player: player, voices: voices, pill: pill,
             settings: { [weak self] in Stage.config(self?.chain ?? [], self?.budget ?? 900, volume: self?.volume ?? 100, gain: self?.gain ?? 1) }, toChunks: { spokenChunks(of: $0) },
             onRead: { [weak self] in self?.records.append($0) }, log: { call("«\($0)»") }
         )
@@ -955,4 +967,6 @@ final class PlantedPill: SpeechPill {
     func follow(_ playback: Playback) { call("pill \(playback.read.map(String.init) ?? "-")\(playback.isPaused ? " paused" : "")") }
     func leave() { call("leave") }
     func noticed(_ notice: PillModel.Notice) { call("pill: \(notice.line)") }
+    private(set) var queued: [String] = []
+    func queues(_ text: String, from start: Double) { queued.append("\(text) @\(String(format: "%.5f", start))") }
 }
