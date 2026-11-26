@@ -232,6 +232,11 @@
   - given selected text holding a path, a file link, a pid, a git hash or a long id
   - when the user presses F4
   - then the voice says «exa dot md» for `docs/test-drive/exa.md`, «a markdown file link», «pid», «a commit», «an id» — never a full path or the digits
+- ⬜ each cleaner rule has a switch
+  - given `{"cleaner": {"rules": {"paths": false}}}` in the settings file, when the next press reads `docs/test-drive/exa.md`, then the voice says the whole path, and every other rule reads as before
+  - given no `cleaner` section, then every rule is on; given a rule name it does not know, then the load fails and names it
+  - the rules, in their order: `lists`, `codeBlocks`, `markdown`, `emoji`, `lineEnds`, `fileLinks`, `urls`, `ids`, `dates`, `addresses`, `ticketIds`, `versions`, `units`, `paths`, `codeNames`, `words`, `symbols`
+  - decision: a daemon from before the switches loads a settings file that holds the section and reads with every rule on
 - ⬜ a word is taught in a file, with no rebuild
   - given a word that is not letters a–z alone (a digit, a sign, cyrillic), or a list it does not know, then it is a bad edit: a read would never say it
   - makes: nothing; `~/Library/Application Support/speak/word-lists.json` is dima's own, absent until he writes one
@@ -303,6 +308,7 @@
 - ✅ `pnpm speak:try "<text>"` (`daemon:try`) speaks one text with this tree's daemon, built beside the live one
   - makes: `daemon/build/x-speak-try`, in the tree
   - given the live daemon quiet, when it runs, then the text is heard with this mac's live settings (the tracked seed, when it has none), and the live daemon answers `status` before and after and keeps its keys
+  - given `SPEAK_TRY_SETTINGS=<a copy>`, then it reads with that copy and leaves the live settings untouched
   - given the live daemon reading aloud, then it refuses in one line; given a live read that starts while it speaks, then it goes quiet within about a second
   - given no text, an empty one or one that opens with a dash and is not `--pill`, then it refuses in one line and starts nothing
   - decision: it is handed no cloud keys and never starts the kokoro server; with no kokoro running, the chain goes on to its next engine — a server started by a process that leaves would be nobody's, and the keys are the live daemon's (run on the built binary with kokoro's port denied by a sandbox; the macOS voice's sound after it was not heard)

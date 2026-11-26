@@ -22,9 +22,16 @@ private let months = ["January", "February", "March", "April", "May", "June", "J
 
 private func spell(_ letters: String) -> String { letters.uppercased().map(String.init).joined(separator: " ") }
 
-private func stripMarkdown(_ text: SourcedText) -> SourcedText {
+private func stripMarkdown(_ text: SourcedText, _ cleaner: Cleaner) -> SourcedText {
     var t = text
-    t = t.replacing("```[\\s\\S]*?```", " code block. ")
+    if cleaner.on(.codeBlocks) { t = t.replacing("```[\\s\\S]*?```", " code block. ") }
+    if cleaner.on(.markdown) { t = markdown(t) }
+    if cleaner.on(.emoji) { t = emoji(t) }
+    return cleaner.on(.lineEnds) ? lineEnds(t) : t
+}
+
+private func markdown(_ text: SourcedText) -> SourcedText {
+    var t = text
     t = t.replacing("!\\[[^\\]]*\\]\\([^)]*\\)", "")
     t = t.replacing("\\[([^\\]]+)\\]\\([^)]*\\)", "$1")
     t = t.replacing("^\\s{0,3}#{1,6}\\s+", "", .anchorsMatchLines)
@@ -34,78 +41,97 @@ private func stripMarkdown(_ text: SourcedText) -> SourcedText {
     t = t.replacing("^\\s*>\\s?", "", .anchorsMatchLines)
     t = t.replacing("(\\*\\*|__|~~|`)", "")
     t = t.replacing("(^|\\s)[*_]([^*_\\n]+)[*_](?=\\s|[.,!?]|$)", "$1$2")
+    // bullets and geometric shapes: the Claude app hands nested list markers over as «■», read as «black square»
+    return t.replacing("[\\x{2022}\\x{2023}\\x{2043}\\x{25A0}-\\x{25FF}\\x{2605}\\x{2606}]", "")
+}
+
+private func emoji(_ text: SourcedText) -> SourcedText {
+    var t = text
     // ➡️ is an arrow before it is a pictograph: it pauses like «→» instead of vanishing
     t = t.replacing("\\x{27A1}\\x{FE0F}?", " → ")
     // pictographs, skin tones, flags, keycaps, tag sequences and the joiners that glue them
-    t = t.replacing("[\\p{Extended_Pictographic}\\p{Emoji_Modifier}\\p{Regional_Indicator}\\x{FE0E}\\x{FE0F}\\x{200D}\\x{20E3}\\x{E0020}-\\x{E007F}]", "")
-    // bullets and geometric shapes: the Claude app hands nested list markers over as «■», read as «black square»
-    t = t.replacing("[\\x{2022}\\x{2023}\\x{2043}\\x{25A0}-\\x{25FF}\\x{2605}\\x{2606}]", "")
+    return t.replacing("[\\p{Extended_Pictographic}\\p{Emoji_Modifier}\\p{Regional_Indicator}\\x{FE0E}\\x{FE0F}\\x{200D}\\x{20E3}\\x{E0020}-\\x{E007F}]", "")
+}
+
+private func lineEnds(_ t: SourcedText) -> SourcedText {
     // a line that ends bare ends a sentence: several lines read as one run-on otherwise (dima: «it sounds like a single sentence»)
     // a mark that already pauses, an opener or a joining sign ends none, and a line of signs alone is none
     return t.replacing("(?<!\\s)(?=\\h*\\R)(?<=[\\p{L}\\p{N}][^\\p{L}\\p{N}\\v]{0,40})(?<![.!?…;:,]|[.!?…][»”\"'’)*\\]]{1,2})(?<![({\\[«“‘„<→⇒·|&=\\\\\\-–—]|[-=]>)\\h*\\R", ".\n")
 }
 
-private func rewriteLatin(_ text: SourcedText, _ lists: WordLists) -> SourcedText {
+private func rewriteLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) -> SourcedText {
     var t = text
     // ids carry nothing a listener can use: a file link names its kind, a hash, a uuid, a long token or a pid number is cut
-    t = t.replacing("\\bfile://\\S*?(?:\\.(\\w+))?(?=[.,;:!?)]*(?:\\s|$))", .caseInsensitive) { g in
-        let kind = lists.fileKinds[g[1].lowercased()] ?? g[1].lowercased()
-        guard let first = kind.first else { return "a file link" }
-        // «an html», «a pdf», «a markdown»: a kind read letter by letter takes its article from the letter's name
-        let isSpelled = lists.letters.contains(kind) || !kind.contains(where: "aeiou".contains)
-        return ((isSpelled ? "aefhilmnorsx" : "aeiou").contains(first) ? "an " : "a ") + kind + " file link"
+    if cleaner.on(.fileLinks) {
+        t = t.replacing("\\bfile://\\S*?(?:\\.(\\w+))?(?=[.,;:!?)]*(?:\\s|$))", .caseInsensitive) { g in
+            let kind = lists.fileKinds[g[1].lowercased()] ?? g[1].lowercased()
+            guard let first = kind.first else { return "a file link" }
+            // «an html», «a pdf», «a markdown»: a kind read letter by letter takes its article from the letter's name
+            let isSpelled = lists.letters.contains(kind) || !kind.contains(where: "aeiou".contains)
+            return ((isSpelled ? "aefhilmnorsx" : "aeiou").contains(first) ? "an " : "a ") + kind + " file link"
+        }
     }
-    t = t.replacing("\\bhttps?://(?:www\\.)?([^/\\s),;]+)\\S*?(?=[.,;:!?)]*(?:\\s|$))", "$1", .caseInsensitive)
-    t = t.replacing("\\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\\b", "an id")
-    t = t.replacing("\\b(pid)\\b\\s*[:=]?\\s*\\d+", "pid", .caseInsensitive)
+    if cleaner.on(.urls) { t = t.replacing("\\bhttps?://(?:www\\.)?([^/\\s),;]+)\\S*?(?=[.,;:!?)]*(?:\\s|$))", "$1", .caseInsensitive) }
+    if cleaner.on(.ids) { t = t.replacing("\\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\\b", "an id") }
+    if cleaner.on(.ids) { t = t.replacing("\\b(pid)\\b\\s*[:=]?\\s*\\d+", "pid", .caseInsensitive) }
     // two letters and two digits at least, so «1e10000» and «deadbeef» stay words; a «#» in front is a colour
-    t = t.replacing("(?<![#\\w])(?=(?:[0-9a-f]*\\d){2})(?=(?:[0-9a-f]*[a-f]){2})(?:[0-9a-f]{7,12}|[0-9a-f]{40})\\b", "a commit")
+    if cleaner.on(.ids) { t = t.replacing("(?<![#\\w])(?=(?:[0-9a-f]*\\d){2})(?=(?:[0-9a-f]*[a-f]){2})(?:[0-9a-f]{7,12}|[0-9a-f]{40})\\b", "a commit") }
     // six digits at least, so a type name like «ISO8601DateFormatter» stays a name
-    t = t.replacing("\\b(?=(?:[A-Za-z]*\\d){6})(?=[A-Za-z0-9]*[A-Za-z])[A-Za-z0-9]{16,}\\b", "an id")
-    t = t.replacing("\\b(\\d{4})-(\\d{2})-(\\d{2})\\b") { g in
-        guard let month = Int(g[2]), (1...12).contains(month), let day = Int(g[3]) else { return g[0] }
-        return "\(months[month - 1]) \(day), \(g[1])"
+    if cleaner.on(.ids) { t = t.replacing("\\b(?=(?:[A-Za-z]*\\d){6})(?=[A-Za-z0-9]*[A-Za-z])[A-Za-z0-9]{16,}\\b", "an id") }
+    if cleaner.on(.dates) {
+        t = t.replacing("\\b(\\d{4})-(\\d{2})-(\\d{2})\\b") { g in
+            guard let month = Int(g[2]), (1...12).contains(month), let day = Int(g[3]) else { return g[0] }
+            return "\(months[month - 1]) \(day), \(g[1])"
+        }
     }
-    t = t.replacing("\\b127\\.0\\.0\\.1\\b", "localhost")
-    t = t.replacing("\\b(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\b", "$1 dot $2 dot $3 dot $4")
-    t = t.replacing("\\b([A-Za-z0-9][\\w.-]*):(\\d{2,5})\\b", "$1 port $2")
-    t = t.replacing("\\b([A-Z]{2,6})-(\\d+)\\b") { g in "\(spell(g[1])) \(g[2])" }
-    t = t.replacing("\\bv?(\\d+(?:\\.\\d+){1,3})\\b") { g in
-        let parts = g[1].split(separator: ".")
-        if g[0].hasPrefix("v") { return "version " + parts.joined(separator: " point ") }
-        return parts.count > 2 ? parts.joined(separator: " point ") : g[0]
+    if cleaner.on(.addresses) { t = t.replacing("\\b127\\.0\\.0\\.1\\b", "localhost") }
+    if cleaner.on(.addresses) { t = t.replacing("\\b(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\b", "$1 dot $2 dot $3 dot $4") }
+    if cleaner.on(.addresses) { t = t.replacing("\\b([A-Za-z0-9][\\w.-]*):(\\d{2,5})\\b", "$1 port $2") }
+    if cleaner.on(.ticketIds) { t = t.replacing("\\b([A-Z]{2,6})-(\\d+)\\b") { g in "\(spell(g[1])) \(g[2])" } }
+    if cleaner.on(.versions) {
+        t = t.replacing("\\bv?(\\d+(?:\\.\\d+){1,3})\\b") { g in
+            let parts = g[1].split(separator: ".")
+            if g[0].hasPrefix("v") { return "version " + parts.joined(separator: " point ") }
+            return parts.count > 2 ? parts.joined(separator: " point ") : g[0]
+        }
     }
     let units = lists.units.keys.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern).joined(separator: "|")
-    t = t.replacing("(\\d)\\s?(\(units))(?!\\w)", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" }
+    if cleaner.on(.units) { t = t.replacing("(\\d)\\s?(\(units))(?!\\w)", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" } }
     // a path says only its last part; a bare «audio/video» is two words, not a path
-    t = t.replacing("(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*") { g in
-        // the dot a line end put after a folder is not a part of its path
-        let stop = g[0].last == "." && g[0].dropLast().last == "/" ? "." : "", path = g[0].dropLast(stop.count)
-        let parts = path.split(separator: "/").filter { !["~", ".", ".."].contains($0) }
-        // a file name has a word before its extension («exa.md»), a version has digits («24.x»); a sentence end the
-        // line-break rule put on the leaf is not an extension either
-        let hasExtension = parts.last?.range(of: "[A-Za-z][\\w-]*\\.[A-Za-z]\\w*\\.?$", options: .regularExpression) != nil
-        let isPath = path.first.map { "~./".contains($0) } == true || path.hasSuffix("/") || hasExtension
-        return (isPath ? parts.last.map(String.init) ?? "" : parts.joined(separator: " ")) + stop
+    if cleaner.on(.paths) {
+        // never from inside a word or a url the url rule left
+        t = t.replacing("(?<![:/\\w.-])(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*") { g in
+            // the dot a line end put after a folder is not a part of its path
+            let stop = g[0].last == "." && g[0].dropLast().last == "/" ? "." : "", path = g[0].dropLast(stop.count)
+            let parts = path.split(separator: "/").filter { !["~", ".", ".."].contains($0) }
+            // a file name has a word before its extension («exa.md»), a version has digits («24.x»); a sentence end the
+            // line-break rule put on the leaf is not an extension either
+            let hasExtension = parts.last?.range(of: "[A-Za-z][\\w-]*\\.[A-Za-z]\\w*\\.?$", options: .regularExpression) != nil
+            let isPath = path.first.map { "~./".contains($0) } == true || path.hasSuffix("/") || hasExtension
+            return (isPath ? parts.last.map(String.init) ?? "" : parts.joined(separator: " ")) + stop
+        }
     }
-    t = t.replacing("\\b(\\w+)\\.(ts|tsx|js|md|json|sh|py|swift|go|yaml|toml)\\b", "$1 dot $2")
-    t = t.replacing("\\b(\\w+)\\.([a-z]+[A-Z]\\w*)\\b", "$1 dot $2")
-    t = t.replacing("([A-Za-z]):([A-Za-z])", "$1 $2")
+    if cleaner.on(.codeNames) { t = t.replacing("\\b(\\w+)\\.(ts|tsx|js|md|json|sh|py|swift|go|yaml|toml)\\b", "$1 dot $2") }
+    if cleaner.on(.codeNames) { t = t.replacing("\\b(\\w+)\\.([a-z]+[A-Z]\\w*)\\b", "$1 dot $2") }
+    if cleaner.on(.codeNames) { t = t.replacing("([A-Za-z]):([A-Za-z])", "$1 $2") }
     // «GitHub» taught as a word is one
-    t = t.replacing("(?<![A-Za-z])[A-Za-z]*[a-z][A-Z][A-Za-z]*") { g in
-        let lower = g[0].lowercased()
-        return lists.words[lower] != nil || lists.letters.contains(lower) ? g[0] : g[0].replacingOccurrences(of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression)
+    if cleaner.on(.codeNames) {
+        t = t.replacing("(?<![A-Za-z])[A-Za-z]*[a-z][A-Z][A-Za-z]*") { g in
+            let lower = g[0].lowercased()
+            return lists.words[lower] != nil || lists.letters.contains(lower) ? g[0] : g[0].replacingOccurrences(of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression)
+        }
     }
-    t = t.replacing("\\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\\b") { g in g[0].lowercased() }
-    t = t.replacing("(\\w)_(?=\\w)", "$1 ")
-    t = t.replacing("#(\\d+)", "number $1")
+    if cleaner.on(.codeNames) { t = t.replacing("\\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\\b") { g in g[0].lowercased() } }
+    if cleaner.on(.codeNames) { t = t.replacing("(\\w)_(?=\\w)", "$1 ") }
+    if cleaner.on(.codeNames) { t = t.replacing("#(\\d+)", "number $1") }
+    guard cleaner.on(.words) else { return t }
     return t.replacing("\\b[A-Za-z]+\\b") { g in
         let lower = g[0].lowercased()
         return lists.words[lower] ?? (lists.letters.contains(lower) ? spell(lower) : g[0])
     }
 }
 
-private func rewriteSymbols(_ text: SourcedText) -> SourcedText {
+private func symbols(_ text: SourcedText) -> SourcedText {
     var t = text
     // a key glyph is a word a voice cannot say: «⌘Enter» reads «command Enter»
     t = t.replacing("[⌘⌥⇧⌃]") { g in " " + ["⌘": "command", "⌥": "option", "⇧": "shift", "⌃": "control"][g[0]]! + " " }
@@ -116,8 +142,12 @@ private func rewriteSymbols(_ text: SourcedText) -> SourcedText {
     t = t.replacing("\\s@(\\w)", " at $1")
     t = t.replacing("[«»\"“”]", "")
     t = t.replacing("[()\\[\\]]", ", ")
-    t = t.replacing("[{}<>*_=+^~\\\\]", " ")
-    t = t.replacing("\\s+", " ")
+    return t.replacing("[{}<>*_=+^~\\\\]", " ")
+}
+
+// what a voice is left with: one space between words, no mark doubled or opening the text
+private func tidy(_ text: SourcedText) -> SourcedText {
+    var t = text.replacing("\\s+", " ")
     t = t.replacing("\\s+([.,!?;:])", "$1")
     t = t.replacing(",(\\s*,)+", ",")
     t = t.replacing("([.!?;:]),", "$1")
@@ -151,11 +181,10 @@ private func splitRuns(_ spoken: SourcedText) -> [Run] {
 // line above: «lane1. merge now2. sleep». numbers that run 1, 2, … right after a non-digit get their lines back; a
 // lone glued «3.» (FRM-283.) is never a list, and an id's own digits after «-» or «#» never start one. from 2 on, a
 // line that ends in a digit («pr #522. sleep now3.») is tried too, once no cleaner match exists, and kept only when
-// the next number follows it: «node to 22. done» keeps its 22. U+FFFC stands in for an inline image or icon
+// the next number follows it: «node to 22. done» keeps its 22
 private func unglueLists(_ text: SourcedText) -> SourcedText {
-    var t = text.replacing("[\\x{FFFC}\\x{0}]", "")
     // a bulleted item glued to the one above opens on a quote that touches the last word: «… stays open«a gui …»
-    t = t.replacing("(?<=[\\p{L}\\p{N}])(?=[«“])", "\n")
+    let t = text.replacing("(?<=[\\p{L}\\p{N}])(?=[«“])", "\n")
     let glued = t.text
     var breaks: [(index: String.Index, afterDigit: Bool)] = []
     var from = glued.startIndex
@@ -175,10 +204,15 @@ private func unglueLists(_ text: SourcedText) -> SourcedText {
 
 // accessibility's text runs on past the marker of a list item the selection's end only touches: a triple-click on
 // «commit» ends at the start of item 3, and answers «commit3. ». the lines come back first: that marker proves the list
-func normalize(_ text: String, _ lists: WordLists = .shipped, nextMarker: String? = nil) -> [Run] {
-    let lines = unglueLists(SourcedText(text))
+func normalize(_ text: String, _ lists: WordLists = .shipped, _ cleaner: Cleaner = Cleaner(), nextMarker: String? = nil) -> [Run] {
+    // U+FFFC stands in for an inline image or icon
+    let grabbed = SourcedText(text).replacing("[\\x{FFFC}\\x{0}]", "")
+    let lines = cleaner.on(.lists) ? unglueLists(grabbed) : grabbed
     let selected = nextMarker.map { lines.replacing("\\n?\(NSRegularExpression.escapedPattern(for: $0))\\z", "") } ?? lines
-    return splitRuns(stripMarkdown(selected))
-        .map { Run(lang: $0.lang, spoken: rewriteSymbols($0.lang == .en ? rewriteLatin($0.spoken, lists) : $0.spoken)) }
+    return splitRuns(stripMarkdown(selected, cleaner))
+        .map { run in
+            let latin = run.lang == .en ? rewriteLatin(run.spoken, lists, cleaner) : run.spoken
+            return Run(lang: run.lang, spoken: tidy(cleaner.on(.symbols) ? symbols(latin) : latin))
+        }
         .filter { !$0.text.isEmpty }
 }

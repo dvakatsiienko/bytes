@@ -7,6 +7,7 @@ import { LIMITS, typed } from './src/limits.ts';
 // a name in one and not the other is a type error
 const SETTINGS = {
   chain: true,
+  cleaner: true,
   engines: true,
   firstAudioMs: true,
   meterFlowMs: true,

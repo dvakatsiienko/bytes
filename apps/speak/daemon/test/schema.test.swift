@@ -14,6 +14,11 @@ enum SchemaTest {
             ("an engine's names", engine.keys.sorted().joined(separator: " "), EngineConfig.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("the languages", names(top["chain"]), Lang.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a voice's languages", names(engine["voice"]), "* " + names(top["chain"])),
+            ("the cleaner's names", (top["cleaner"]?["properties"] as? [String: Any] ?? [:]).keys.sorted().joined(separator: " "), Cleaner.CodingKeys.allCases.map(\.rawValue).joined(separator: " ")),
+            ("the cleaner's rules", (((top["cleaner"]?["properties"] as? [String: Any])?["rules"] as? [String: Any])?["properties"] as? [String: Any] ?? [:]).keys.sorted().joined(separator: " "), CleanerRule.allCases.map(\.rawValue).sorted().joined(separator: " ")),
+            ("a rule off is off", cleaner(#"{"rules":{"paths":false,"ids":true}}"#), "paths"),
+            ("no cleaner section: every rule on", cleaner(nil), ""),
+            ("a rule's name is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{},"cleaner":{"rules":{"emojis":false}}}"#), "unknown name «emojis» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"),
         ]
         for key in schema["required"] as? [String] ?? [] {
             rows.append(("\(key) is required", answer(without: key), "missing «\(key)»"))
@@ -48,6 +53,12 @@ enum SchemaTest {
     }
 
     private static func answer(_ json: String) -> String { value("chain", json) }
+
+    // the rules a settings file turns off, by name
+    private static func cleaner(_ section: String?) -> String {
+        let json = #"{"chain":{},"firstAudioMs":900,"engines":{}"# + (section.map { #","cleaner":"# + $0 } ?? "") + "}"
+        do { return try JSONDecoder().decode(Config.self, from: Data(json.utf8)).cleaner.off.map(\.rawValue).sorted().joined(separator: " ") } catch { return configReason(error) }
+    }
 
     private static func value(_ key: String, _ json: String) -> String {
         do {

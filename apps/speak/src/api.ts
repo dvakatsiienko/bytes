@@ -114,6 +114,8 @@ export interface EngineSettings {
 
 export interface Config {
   chain: Partial<Record<Lang, Engine[]>>;
+  // the cleaner's rules turned off by name; the page draws none of it yet
+  cleaner?: { rules?: Record<string, boolean> };
   engines: Partial<Record<Engine, EngineSettings>>;
   firstAudioMs: number;
   meterFlowMs?: number;

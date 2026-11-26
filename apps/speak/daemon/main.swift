@@ -22,10 +22,10 @@ final class App {
     private lazy var player = Player(device: audio, log: log)
     private lazy var voices = Voices(EngineParts(net: net, mac: MacRender()), player: player, keys: keys, servers: [.kokoro: kokoro])
     private(set) lazy var speaker = makeSpeaker()
-    private lazy var toChunks = { [wordLists] in spokenChunks(of: $0, wordLists.current) }
+    private lazy var toChunks = { [wordLists, configStore] in spokenChunks(of: $0, wordLists.current, configStore.current.cleaner) }
     private lazy var presses = PressSequencer(
         grab: Grab(copyOnlyApps: { [wordLists] in wordLists.current.copyOnlyApps }), target: speaker, refreshSettings: { [configStore] in configStore.refresh() },
-        toChunks: { [wordLists] in spokenChunks(of: $0, wordLists.current, nextMarker: $1) }, log: log
+        toChunks: { [wordLists, configStore] in spokenChunks(of: $0, wordLists.current, configStore.current.cleaner, nextMarker: $1) }, log: log
     )
     private lazy var commands = SocketCommands(speaker: speaker, voices: voices, panel: panel, configStore: configStore, toChunks: toChunks, job: job)
     private lazy var hotkeys = Hotkeys(presses: { [unowned self] in presses })

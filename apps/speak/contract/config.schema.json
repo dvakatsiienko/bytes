@@ -30,6 +30,35 @@
       "propertyNames": { "enum": ["en", "uk", "ru"] },
       "type": "object"
     },
+    "cleaner": {
+      "additionalProperties": false,
+      "properties": {
+        "rules": {
+          "additionalProperties": false,
+          "properties": {
+            "addresses": { "default": true, "type": "boolean" },
+            "codeBlocks": { "default": true, "type": "boolean" },
+            "codeNames": { "default": true, "type": "boolean" },
+            "dates": { "default": true, "type": "boolean" },
+            "emoji": { "default": true, "type": "boolean" },
+            "fileLinks": { "default": true, "type": "boolean" },
+            "ids": { "default": true, "type": "boolean" },
+            "lineEnds": { "default": true, "type": "boolean" },
+            "lists": { "default": true, "type": "boolean" },
+            "markdown": { "default": true, "type": "boolean" },
+            "paths": { "default": true, "type": "boolean" },
+            "symbols": { "default": true, "type": "boolean" },
+            "ticketIds": { "default": true, "type": "boolean" },
+            "units": { "default": true, "type": "boolean" },
+            "urls": { "default": true, "type": "boolean" },
+            "versions": { "default": true, "type": "boolean" },
+            "words": { "default": true, "type": "boolean" }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
     "engines": {
       "additionalProperties": { "$ref": "#/$defs/settings" },
       "type": "object"

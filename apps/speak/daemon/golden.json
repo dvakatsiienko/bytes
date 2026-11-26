@@ -496,15 +496,15 @@
     "out": [["en", "cd now"]]
   },
   {
-    "in": "cpu at 40%\u00a0\nnext",
+    "in": "cpu at 40% \nnext",
     "out": [["en", "cpu at 40%. next"]]
   },
   {
-    "in": "one\u00a0\ntwo",
+    "in": "one \ntwo",
     "out": [["en", "one. two"]]
   },
   {
-    "in": "one\u2028two",
+    "in": "one two",
     "out": [["en", "one. two"]]
   },
   {
@@ -524,11 +524,96 @@
     "out": [["en", "it said ok? then go"]]
   },
   {
-    "in": "one\u2028%%%\ntwo",
+    "in": "one %%%\ntwo",
     "out": [["en", "one. %%% two"]]
   },
   {
     "in": "a\u0000 b",
     "out": [["en", "a b"]]
+  },
+  {
+    "in": "lane1. merge now2. sleep well",
+    "off": ["lists"],
+    "out": [["en", "lane1. merge now2. sleep well"]]
+  },
+  {
+    "in": "Look:\n```\nlet a = 1\n```\nDone.",
+    "off": ["codeBlocks"],
+    "out": [["en", "Look: let a 1. Done."]]
+  },
+  {
+    "in": "## **Ship it** now",
+    "off": ["markdown"],
+    "out": [["en", "## Ship it now"]]
+  },
+  {
+    "in": "🎉 done",
+    "off": ["emoji"],
+    "out": [["en", "🎉 done"]]
+  },
+  {
+    "in": "first line\nsecond line",
+    "off": ["lineEnds"],
+    "out": [["en", "first line second line"]]
+  },
+  {
+    "in": "open file:///Users/x/notes.md now",
+    "off": ["fileLinks"],
+    "out": [["en", "open file:///Users/x/notes dot md now"]]
+  },
+  {
+    "in": "see https://github.com/foo/bar today",
+    "off": ["urls"],
+    "out": [["en", "see https://github.com/foo/bar today"]]
+  },
+  {
+    "in": "commit 3f9a2b1c4d landed",
+    "off": ["ids"],
+    "out": [["en", "commit 3f9a2b1c4d landed"]]
+  },
+  {
+    "in": "due 2026-11-27",
+    "off": ["dates"],
+    "out": [["en", "due 2026-11-27"]]
+  },
+  {
+    "in": "open 127.0.0.1:7386",
+    "off": ["addresses"],
+    "out": [["en", "open 127 point 0 point 0 point 1:7386"]]
+  },
+  {
+    "in": "FRM-694 is next",
+    "off": ["ticketIds"],
+    "out": [["en", "FRM-694 is next"]]
+  },
+  {
+    "in": "x v0.11.107",
+    "off": ["versions"],
+    "out": [["en", "x v0.11.107"]]
+  },
+  {
+    "in": "took 5ms",
+    "off": ["units"],
+    "out": [["en", "took 5ms"]]
+  },
+  {
+    "in": "read docs/test-drive/exa.md first",
+    "off": ["paths"],
+    "out": [["en", "read docs/test-drive/exa dot md first"]]
+  },
+  {
+    "in": "call configStore.refresh then MAX_SIZE",
+    "off": ["codeNames"],
+    "out": [["en", "call configStore.refresh then MAX SIZE"]]
+  },
+  {
+    "in": "the API is up",
+    "off": ["words"],
+    "out": [["en", "the API is up"]]
+  },
+  {
+    "in": "a → b & c",
+    "off": ["symbols"],
+    "out": [["en", "a → b & c"]]
   }
 ]

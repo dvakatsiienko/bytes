@@ -2,7 +2,7 @@
 # speaks one text with this tree's daemon, built beside the installed one: it takes neither the hotkeys nor the control
 # socket, has no cloud keys, never starts the kokoro server, and goes quiet when the live daemon starts a read.
 # with --pill it shows one fixed state of the pill for 20 s instead, or prints it as json: nothing is read and nothing sounds.
-# usage: script/daemon-try.sh <text …> | --pill <state> [--print-model]
+# usage: [SPEAK_TRY_SETTINGS=<a settings copy>] script/daemon-try.sh <text …> | --pill <state> [--print-model]
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib/daemon-installed.sh"
@@ -28,6 +28,8 @@ daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 
 trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 [ -f "$settings" ] || settings=$PWD/config.json
+# a copy of the settings to read with instead, never written
+settings=${SPEAK_TRY_SETTINGS:-$settings}
 build/x-speak-try --config "$settings" "$text" &
 child=$!
 while kill -0 "$child" 2>/dev/null; do

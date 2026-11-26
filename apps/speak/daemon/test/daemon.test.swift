@@ -6,6 +6,10 @@ import Foundation
 struct Case: Decodable {
     let `in`: String
     let out: [[String]]
+    // the cleaner's rules this case turns off; such a case reads otherwise with every rule on
+    var off: [String]?
+
+    var cleaner: Cleaner { Cleaner(off: Set((off ?? []).compactMap(CleanerRule.init))) }
 }
 
 @main
@@ -71,21 +75,31 @@ struct DaemonTest {
     static func goldenFailures(_ path: String) throws -> Int {
         let cases = try JSONDecoder().decode([Case].self, from: Data(contentsOf: URL(fileURLWithPath: path)))
         var failed = 0
+        let switched = Set(cases.flatMap { $0.off ?? [] })
+        for rule in CleanerRule.allCases where !switched.contains(rule.rawValue) {
+            failed += 1
+            print("✗ no golden case turns off «\(rule.rawValue)»")
+        }
         for item in cases {
-            let got = normalize(item.in).map { [$0.lang.rawValue, $0.text] }
-            if got != item.out {
+            let read = { (cleaner: Cleaner) in normalize(item.in, .shipped, cleaner).map { [$0.lang.rawValue, $0.text] } }
+            let got = read(item.cleaner)
+            if got != item.out || (item.off ?? []).contains(where: { CleanerRule(rawValue: $0) == nil }) {
                 failed += 1
                 print("✗ \(item.in)\n  want \(item.out)\n  got  \(got)")
             }
+            if item.off != nil, got == read(Cleaner()) {
+                failed += 1
+                print("✗ \(item.in)\n  reads the same with \(item.off ?? []) on")
+            }
             // a chunk comes from inside the text, after the one before it
-            let sources = spokenChunks(of: item.in).map(\.source)
+            let sources = spokenChunks(of: item.in, .shipped, item.cleaner).map(\.source)
             if !zip(sources, sources.dropFirst()).allSatisfy({ $0.upperBound <= $1.lowerBound }) || sources.contains(where: { $0.isEmpty || $0.upperBound > item.in.utf16.count }) {
                 failed += 1
                 print("✗ \(item.in)\n  sources \(sources)")
             }
             // and holds the words it says, those the text has
             let words = { (text: String) in Set(text.lowercased().split { !$0.isLetter }.map(String.init).filter { $0.count > 3 }) }
-            for chunk in spokenChunks(of: item.in) {
+            for chunk in spokenChunks(of: item.in, .shipped, item.cleaner) {
                 let gone = words(chunk.text).intersection(words(item.in)).subtracting(words((item.in as NSString).substring(with: NSRange(chunk.source))))
                 if gone.isEmpty { continue }
                 failed += 1

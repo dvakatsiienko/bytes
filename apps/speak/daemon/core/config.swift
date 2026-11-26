@@ -12,6 +12,7 @@ struct Config: Decodable {
     let meterFlowMs: Double
     // the master volume, in percent, on top of each engine's gain
     let volume: Double
+    let cleaner: Cleaner
     let engines: [Engine: EngineConfig]
 
     subscript(engine: Engine) -> EngineConfig { engines[engine] ?? EngineConfig() }
@@ -36,6 +37,7 @@ struct Config: Decodable {
         meterGlideMs = try container.decodeIfPresent(Double.self, forKey: .meterGlideMs) ?? 30
         meterFlowMs = try container.decodeIfPresent(Double.self, forKey: .meterFlowMs) ?? 40
         volume = try container.decodeIfPresent(Double.self, forKey: .volume) ?? 100
+        cleaner = try container.decodeIfPresent(Cleaner.self, forKey: .cleaner) ?? Cleaner()
         try inRange("firstAudioMs", Double(firstAudioMs), 100...3000)
         try inRange("meterGlideMs", meterGlideMs, 0...200)
         try inRange("meterFlowMs", meterFlowMs, 0...200)
@@ -49,11 +51,12 @@ struct Config: Decodable {
         meterGlideMs = 30
         meterFlowMs = 40
         volume = 100
+        cleaner = Cleaner()
         self.engines = engines
     }
 
     // an unknown engine or language name fails the whole load, so a typo is reported instead of ignored
-    fileprivate static func parse<T>(_ name: String, _ make: (String) -> T?) throws -> T {
+    static func parse<T>(_ name: String, _ make: (String) -> T?) throws -> T {
         guard let value = make(name) else { throw ConfigError.unknownName(name) }
         return value
     }
@@ -69,7 +72,7 @@ struct Config: Decodable {
         engines: [.kokoro: EngineConfig(gain: 1.9)],
     )
 
-    enum CodingKeys: String, CodingKey, CaseIterable { case chain, firstAudioMs, meterGlideMs, meterFlowMs, volume, engines }
+    enum CodingKeys: String, CodingKey, CaseIterable { case chain, firstAudioMs, meterGlideMs, meterFlowMs, volume, cleaner, engines }
 }
 
 // the bounds and defaults here are contract/config.schema.json's; its test drives each one through this decoder
