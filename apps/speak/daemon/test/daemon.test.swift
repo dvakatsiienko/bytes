@@ -16,7 +16,7 @@ struct Case: Decodable {
 struct DaemonTest {
     @MainActor
     static func main() async throws {
-        var failed = try goldenFailures(CommandLine.arguments[1]) + sourceFailures() + argvFailures() + PillTest.failures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
+        var failed = try goldenFailures(CommandLine.arguments[1]) + DictionaryTest.failures(JSONDecoder().decode([Case].self, from: Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1])))) + sourceFailures() + argvFailures() + PillTest.failures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
         failed += try WireTest.failures(CommandLine.arguments[3] + "/wire.schema.json")
         failed += await SeamsTest.failures() + SpeakerTest.failures() + EnginesTest.failures() + StartTest.failures()
         exit(failed == 0 ? 0 : 1)

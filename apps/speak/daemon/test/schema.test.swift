@@ -14,7 +14,7 @@ enum SchemaTest {
             ("an engine's names", engine.keys.sorted().joined(separator: " "), EngineConfig.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("the languages", names(top["chain"]), Lang.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a voice's languages", names(engine["voice"]), "* " + names(top["chain"])),
-            ("the cleaner's names", (top["cleaner"]?["properties"] as? [String: Any] ?? [:]).keys.sorted().joined(separator: " "), Cleaner.CodingKeys.allCases.map(\.rawValue).joined(separator: " ")),
+            ("the cleaner's names", (top["cleaner"]?["properties"] as? [String: Any] ?? [:]).keys.sorted().joined(separator: " "), Cleaner.CodingKeys.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("the cleaner's rules", (((top["cleaner"]?["properties"] as? [String: Any])?["rules"] as? [String: Any])?["properties"] as? [String: Any] ?? [:]).keys.sorted().joined(separator: " "), CleanerRule.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a rule off is off", cleaner(#"{"rules":{"paths":false,"ids":true}}"#), "paths"),
             ("no cleaner section: every rule on", cleaner(nil), ""),

@@ -59,11 +59,25 @@ private func lineEnds(_ t: SourcedText) -> SourcedText {
     return t.replacing("(?<!\\s)(?=\\h*\\R)(?<=[\\p{L}\\p{N}][^\\p{L}\\p{N}\\v]{0,40})(?<![.!?…;:,]|[.!?…][»”\"'’)*\\]]{1,2})(?<![({\\[«“‘„<→⇒·|&=\\\\\\-–—]|[-=]>)\\h*\\R", ".\n")
 }
 
-private func rewriteLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) -> SourcedText {
+// what the cut rules match: a dictionary entry never rewrites inside one, whether its rule is on or off
+private enum Cut {
+    static let fileLink = "\\bfile://\\S*?(?:\\.(\\w+))?(?=[.,;:!?)]*(?:\\s|$))"
+    static let url = "\\bhttps?://(?:www\\.)?([^/\\s),;]+)\\S*?(?=[.,;:!?)]*(?:\\s|$))"
+    static let uuid = "\\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\\b"
+    // two letters and two digits at least, so «1e10000» and «deadbeef» stay words; a «#» in front is a colour
+    static let commit = "(?<![#\\w])(?=(?:[0-9a-f]*\\d){2})(?=(?:[0-9a-f]*[a-f]){2})(?:[0-9a-f]{7,12}|[0-9a-f]{40})\\b"
+    // six digits at least, so a type name like «ISO8601DateFormatter» stays a name
+    static let token = "\\b(?=(?:[A-Za-z]*\\d){6})(?=[A-Za-z0-9]*[A-Za-z])[A-Za-z0-9]{16,}\\b"
+    // never from inside a word or a url the url rule left
+    static let path = "(?<![:/\\w.-])(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*"
+    static let all: [(String, NSRegularExpression.Options)] = [(fileLink, .caseInsensitive), (url, .caseInsensitive), (uuid, []), (commit, []), (token, []), (path, [])]
+}
+
+private func cutLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) -> SourcedText {
     var t = text
     // ids carry nothing a listener can use: a file link names its kind, a hash, a uuid, a long token or a pid number is cut
     if cleaner.on(.fileLinks) {
-        t = t.replacing("\\bfile://\\S*?(?:\\.(\\w+))?(?=[.,;:!?)]*(?:\\s|$))", .caseInsensitive) { g in
+        t = t.replacing(Cut.fileLink, .caseInsensitive) { g in
             let kind = lists.fileKinds[g[1].lowercased()] ?? g[1].lowercased()
             guard let first = kind.first else { return "a file link" }
             // «an html», «a pdf», «a markdown»: a kind read letter by letter takes its article from the letter's name
@@ -71,13 +85,11 @@ private func rewriteLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cl
             return ((isSpelled ? "aefhilmnorsx" : "aeiou").contains(first) ? "an " : "a ") + kind + " file link"
         }
     }
-    if cleaner.on(.urls) { t = t.replacing("\\bhttps?://(?:www\\.)?([^/\\s),;]+)\\S*?(?=[.,;:!?)]*(?:\\s|$))", "$1", .caseInsensitive) }
-    if cleaner.on(.ids) { t = t.replacing("\\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\\b", "an id") }
+    if cleaner.on(.urls) { t = t.replacing(Cut.url, "$1", .caseInsensitive) }
+    if cleaner.on(.ids) { t = t.replacing(Cut.uuid, "an id") }
     if cleaner.on(.ids) { t = t.replacing("\\b(pid)\\b\\s*[:=]?\\s*\\d+", "pid", .caseInsensitive) }
-    // two letters and two digits at least, so «1e10000» and «deadbeef» stay words; a «#» in front is a colour
-    if cleaner.on(.ids) { t = t.replacing("(?<![#\\w])(?=(?:[0-9a-f]*\\d){2})(?=(?:[0-9a-f]*[a-f]){2})(?:[0-9a-f]{7,12}|[0-9a-f]{40})\\b", "a commit") }
-    // six digits at least, so a type name like «ISO8601DateFormatter» stays a name
-    if cleaner.on(.ids) { t = t.replacing("\\b(?=(?:[A-Za-z]*\\d){6})(?=[A-Za-z0-9]*[A-Za-z])[A-Za-z0-9]{16,}\\b", "an id") }
+    if cleaner.on(.ids) { t = t.replacing(Cut.commit, "a commit") }
+    if cleaner.on(.ids) { t = t.replacing(Cut.token, "an id") }
     if cleaner.on(.dates) {
         t = t.replacing("\\b(\\d{4})-(\\d{2})-(\\d{2})\\b") { g in
             guard let month = Int(g[2]), (1...12).contains(month), let day = Int(g[3]) else { return g[0] }
@@ -99,8 +111,7 @@ private func rewriteLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cl
     if cleaner.on(.units) { t = t.replacing("(\\d)\\s?(\(units))(?!\\w)", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" } }
     // a path says only its last part; a bare «audio/video» is two words, not a path
     if cleaner.on(.paths) {
-        // never from inside a word or a url the url rule left
-        t = t.replacing("(?<![:/\\w.-])(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*") { g in
+        t = t.replacing(Cut.path) { g in
             // the dot a line end put after a folder is not a part of its path
             let stop = g[0].last == "." && g[0].dropLast().last == "/" ? "." : "", path = g[0].dropLast(stop.count)
             let parts = path.split(separator: "/").filter { !["~", ".", ".."].contains($0) }
@@ -111,6 +122,11 @@ private func rewriteLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cl
             return (isPath ? parts.last.map(String.init) ?? "" : parts.joined(separator: " ")) + stop
         }
     }
+    return t
+}
+
+private func rewriteLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) -> SourcedText {
+    var t = text
     if cleaner.on(.codeNames) { t = t.replacing("\\b(\\w+)\\.(ts|tsx|js|md|json|sh|py|swift|go|yaml|toml)\\b", "$1 dot $2") }
     if cleaner.on(.codeNames) { t = t.replacing("\\b(\\w+)\\.([a-z]+[A-Z]\\w*)\\b", "$1 dot $2") }
     if cleaner.on(.codeNames) { t = t.replacing("([A-Za-z]):([A-Za-z])", "$1 $2") }
@@ -205,14 +221,32 @@ private func unglueLists(_ text: SourcedText) -> SourcedText {
 // accessibility's text runs on past the marker of a list item the selection's end only touches: a triple-click on
 // «commit» ends at the start of item 3, and answers «commit3. ». the lines come back first: that marker proves the list
 func normalize(_ text: String, _ lists: WordLists = .shipped, _ cleaner: Cleaner = Cleaner(), nextMarker: String? = nil) -> [Run] {
-    // U+FFFC stands in for an inline image or icon
-    let grabbed = SourcedText(text).replacing("[\\x{FFFC}\\x{0}]", "")
+    // U+FFFC stands in for an inline image or icon; the private-use units, apple's icons among them, are the dictionary's
+    let grabbed = SourcedText(text).replacing("[\\x{FFFC}\\x{0}\(standIns)]", "")
     let lines = cleaner.on(.lists) ? unglueLists(grabbed) : grabbed
     let selected = nextMarker.map { lines.replacing("\\n?\(NSRegularExpression.escapedPattern(for: $0))\\z", "") } ?? lines
     return splitRuns(stripMarkdown(selected, cleaner))
         .map { run in
-            let latin = run.lang == .en ? rewriteLatin(run.spoken, lists, cleaner) : run.spoken
-            return Run(lang: run.lang, spoken: tidy(cleaner.on(.symbols) ? symbols(latin) : latin))
+            let isLatin = run.lang == .en
+            var said: [String] = []
+            var t = dictionary(isLatin ? cutLatin(run.spoken, lists, cleaner) : run.spoken, cleaner.dictionary, keeping: Cut.all.flatMap { run.spoken.sources(of: $0.0, $0.1) }, &said)
+            if isLatin { t = rewriteLatin(t, lists, cleaner) }
+            t = tidy(cleaner.on(.symbols) ? symbols(t) : t)
+            return Run(lang: run.lang, spoken: t.replacing("[\(standIns)]") { g in said[Int(g[0].unicodeScalars.first!.value) - 0xE000] })
         }
         .filter { !$0.text.isEmpty }
+}
+
+private let standIns = "\\x{E000}-\\x{F8FF}"
+
+// his words, once the cuts ran: whole words only, never inside what a cut rule matches (on or off), each held as one
+// stand-in unit until the end so no later rule reads it again
+private func dictionary(_ text: SourcedText, _ entries: [Cleaner.Entry], keeping kept: [Range<Int>], _ said: inout [String]) -> SourcedText {
+    entries.reduce(text) { t, entry in
+        t.replacingWhole("(?<![\\p{L}\\p{N}_])\(NSRegularExpression.escapedPattern(for: entry.word))(?![\\p{L}\\p{N}_])", entry.anyCase ? .caseInsensitive : []) { _, source in
+            guard !kept.contains(where: { $0.overlaps(source) }), said.count < 0x18FF else { return nil }
+            said.append(entry.say)
+            return String(Character(Unicode.Scalar(0xE000 + said.count - 1)!))
+        }
+    }
 }

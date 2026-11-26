@@ -33,6 +33,23 @@
     "cleaner": {
       "additionalProperties": false,
       "properties": {
+        "dictionary": {
+          "additionalProperties": {
+            "anyOf": [
+              { "type": "string" },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "anyCase": { "default": false, "type": "boolean" },
+                  "say": { "type": "string" }
+                },
+                "required": ["say"],
+                "type": "object"
+              }
+            ]
+          },
+          "type": "object"
+        },
         "rules": {
           "additionalProperties": false,
           "properties": {

@@ -237,6 +237,11 @@
   - given no `cleaner` section, then every rule is on; given a rule name it does not know, then the load fails and names it
   - the rules, in their order: `lists`, `codeBlocks`, `markdown`, `emoji`, `lineEnds`, `fileLinks`, `urls`, `ids`, `dates`, `addresses`, `ticketIds`, `versions`, `units`, `paths`, `codeNames`, `words`, `symbols`
   - decision: a daemon from before the switches loads a settings file that holds the section and reads with every rule on
+- ⬜ a word in the dictionary is said his way, on every engine
+  - given `{"cleaner": {"dictionary": {"cc": "Claude Code"}}}` in the settings file, when the next press reads «ask cc now», then every engine hears «ask Claude Code now»
+  - given the word inside another («account»), in another case («CC»), inside a file link, a path or an id, then it is left as before; `{"say": "Claude Code", "anyCase": true}` matches any case
+  - given an entry's spoken words, then no later rule reads them again: «api» there is never spelled out
+  - given an entry for a file name, a path or an id, then the save is refused with the line why, since a cut rule takes those first
 - ⬜ a word is taught in a file, with no rebuild
   - given a word that is not letters a–z alone (a digit, a sign, cyrillic), or a list it does not know, then it is a bad edit: a read would never say it
   - makes: nothing; `~/Library/Application Support/speak/word-lists.json` is dima's own, absent until he writes one

@@ -116,11 +116,12 @@ struct EngineConfig: Decodable, Equatable {
 }
 
 enum ConfigError: Error, CustomStringConvertible {
-    case unknownName(String), outOfRange(String, Double, ClosedRange<Double>)
+    case unknownName(String), outOfRange(String, Double, ClosedRange<Double>), refusedWord(String, String)
 
     var description: String {
         switch self {
         case .unknownName(let name): "unknown name «\(name)» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru"
+        case .refusedWord(let word, let why): "the dictionary's «\(word)» is refused: \(why)"
         case .outOfRange(let field, let value, let range): "\(field) \(plain(value)) is out of range (\(plain(range.lowerBound))–\(plain(range.upperBound)))"
         }
     }

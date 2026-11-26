@@ -21,6 +21,7 @@
 - **pill flow** — how long the pill's wave holds before moving one bar outward, in ms (`meterFlowMs`)
 - **word lists** — the words, letters, units, file kinds and ⌘C-only apps a read treats their own way: what ships in `core/word-lists.swift`, and dima's `word-lists.json` beside the settings file over it
 - **cleaner rule** — one named rewrite the daemon makes before a voice sees the text (a path to its last part, an id cut, an emoji gone); each is on unless the settings file's `cleaner` section turns it off
+- **dictionary** — dima's words and how each is said, in the settings file's `cleaner` section; read after the cut rules, on every engine
 - **settings file** — dima's knobs on this mac, `~/Library/Application Support/speak/config.json`; the daemon alone writes it
 - **settings version** — the mark of the settings file's bytes; a save names the one it edits, and is refused when the file moved on
 - **kept binary** — the daemon a build replaced, held beside the installed one as `x-speak.prev` with the config argument and the settings it ran with

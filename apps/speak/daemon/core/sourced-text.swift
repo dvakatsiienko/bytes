@@ -72,6 +72,28 @@ struct SourcedText: Equatable {
         }
     }
 
+    // the parts of the grabbed text a pattern's matches came from
+    func sources(of pattern: String, _ options: NSRegularExpression.Options = []) -> [Range<Int>] {
+        let units = text as NSString
+        return try! NSRegularExpression(pattern: pattern, options: options).matches(in: text, range: NSRange(location: 0, length: units.length)).map { source(of: $0.range) }
+    }
+
+    // a match `make` answers for becomes that string, every unit of it from the whole match; nil leaves the match
+    func replacingWhole(_ pattern: String, _ options: NSRegularExpression.Options = [], _ make: (_ match: String, _ source: Range<Int>) -> String?) -> SourcedText {
+        replacing(pattern, options) { match, units, result in
+            let from = source(of: match.range)
+            guard let string = make(units.substring(with: match.range), from) else { return result.add(match.range, of: self, units) }
+            result.text += string
+            result.places += repeatElement(from, count: string.utf16.count)
+        }
+    }
+
+    private func source(of range: NSRange) -> Range<Int> {
+        let part = places[range.location..<range.upperBound]
+        guard let first = part.first, let last = part.last else { return 0..<0 }
+        return first.lowerBound..<last.upperBound
+    }
+
     private func replacing(_ pattern: String, _ options: NSRegularExpression.Options, _ replacement: (NSTextCheckingResult, NSString, inout SourcedText) -> Void) -> SourcedText {
         let matches = try! NSRegularExpression(pattern: pattern, options: options).matches(in: text, range: NSRange(text.startIndex..., in: text))
         guard !matches.isEmpty else { return self }
