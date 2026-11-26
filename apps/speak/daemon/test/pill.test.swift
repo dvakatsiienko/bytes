@@ -36,6 +36,17 @@ enum PillTest {
             ("a mark lights its word", "\(PillFixture.reading.model.sentence!.parts)", #"(heard: "The ", lit: "kettle", ahead: " clicks off and the room is quiet.")"#),
             ("no mark lights nothing", "\(PillFixture.noWordTimings.model.sentence!.parts)", #"(heard: "The kettle clicks off and the room is quiet.", lit: "", ahead: "")"#),
             ("a mark off its word lights nothing", "\(PillModel.Sentence(text: "one two", word: .init(text: "two", offset: 0, isHeld: false)).parts.lit)", ""),
+        ]) + check("the open row's keys", [
+            ("↑ on volume", "\(PillModel.OpenRow.Control.volume.stepped(72, up: true, shift: false, option: false))", "73.0"),
+            ("⇧↓ on volume", "\(PillModel.OpenRow.Control.volume.stepped(72, up: false, shift: true, option: false))", "68.0"),
+            ("⌥↑ on volume", "\(PillModel.OpenRow.Control.volume.stepped(72, up: true, shift: false, option: true))", "72.1"),
+            ("↑ at the top stays", "\(PillModel.OpenRow.Control.volume.stepped(100, up: true, shift: true, option: false))", "100.0"),
+            ("↑ on speed", "\(PillModel.OpenRow.Control.speed.stepped(1.15, up: true, shift: false, option: false))", "1.16"),
+            ("⇧↓ on speed", "\(PillModel.OpenRow.Control.speed.stepped(1.15, up: false, shift: true, option: false))", "1.11"),
+            ("↓ at the bottom stays", "\(PillModel.OpenRow.Control.speed.stepped(0.5, up: false, shift: false, option: false))", "0.5"),
+            ("a typed speed with its ×", "\(PillModel.OpenRow.Control.speed.typed("1,3×") ?? -1)", "1.3"),
+            ("a typed volume past the top", "\(PillModel.OpenRow.Control.volume.typed("140") ?? -1)", "100.0"),
+            ("a word typed", "\(PillModel.OpenRow.Control.volume.typed("loud") ?? -1)", "-1.0"),
         ]) + check("the sentence comes up with its sound", [
             ("before its sound, none", shown(at: -1), "-"),
             ("at its start, the first", shown(at: 0), "One."),

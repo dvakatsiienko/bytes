@@ -2,6 +2,7 @@
 import Foundation
 
 struct Config: Decodable {
+    static let volumes = 0.0...100
     // per language, tried in order; an engine that fails or runs out of quota is skipped silently
     let chain: [Lang: [Engine]]
     // a cloud engine with no audio by then yields to the next one, while nothing is playing yet
@@ -44,7 +45,7 @@ struct Config: Decodable {
         try inRange("firstAudioMs", Double(firstAudioMs), 100...3000)
         try inRange("meterGlideMs", meterGlideMs, 0...200)
         try inRange("meterFlowMs", meterFlowMs, 0...200)
-        try inRange("volume", volume, 0...100)
+        try inRange("volume", volume, Config.volumes)
         let named = try container.decode([String: EngineConfig].self, forKey: .engines)
         skipped += named.keys.filter { Engine(rawValue: $0) == nil }
         engines = Dictionary(uniqueKeysWithValues: named.compactMap { name, settings in Engine(rawValue: name).map { ($0, settings) } })
@@ -87,6 +88,7 @@ private func inRange(_ field: String, _ value: Double, _ range: ClosedRange<Doub
 }
 
 struct EngineConfig: Decodable, Equatable {
+    static let speeds = 0.5...3.0
     // the voices dima hearted: the page sorts by them, a heart writes them, no read asks them
     var favourites: [String] = []
     var model: String?
@@ -114,7 +116,7 @@ struct EngineConfig: Decodable, Equatable {
         for name in voice.keys where name != "*" { _ = try Config.parse(name, Lang.init) }
         speed = try container.decodeIfPresent(Double.self, forKey: .speed) ?? 1
         gain = try container.decodeIfPresent(Double.self, forKey: .gain) ?? 1
-        try inRange("speed", speed, 0.5...3)
+        try inRange("speed", speed, EngineConfig.speeds)
         try inRange("gain", gain, 0...4)
     }
 

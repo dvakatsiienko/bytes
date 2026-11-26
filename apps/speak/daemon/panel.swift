@@ -21,6 +21,35 @@ final class PanelModel: ObservableObject {
     @Published var volume: Double = 100
     // where each control sits in the pill, by its name: the hint stands over it
     var frames: [String: CGRect] = [:]
+    // the volume or speed row, open under the sentence row; its box's text while it is typed in
+    @Published var openRow: PillModel.OpenRow.Control?
+    @Published var draft = ""
+    var onSet: (PillModel.OpenRow.Control, Double) -> Void = { _, _ in }
+    var onRelease: () -> Void = {}
+
+    func value(of control: PillModel.OpenRow.Control) -> Double { control == .volume ? volume : speed }
+
+    func toggle(_ control: PillModel.OpenRow.Control) {
+        openRow = openRow == control ? nil : control
+        draft = Self.shown(value(of: control), control)
+        if openRow == nil { onRelease() }
+    }
+
+    func set(_ control: PillModel.OpenRow.Control, _ value: Double) {
+        let value = control.clamped(value)
+        if control == .volume { volume = value } else { speed = value }
+        draft = Self.shown(value, control)
+        // a drag saves once it rests, not on every step of it
+        saving?.invalidate()
+        saving = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.onSet(control, value) }
+        }
+    }
+    private var saving: Timer?
+
+    static func shown(_ value: Double, _ control: PillModel.OpenRow.Control) -> String {
+        control == .volume ? String(format: "%g", (value * 10).rounded() / 10) : String(format: "%.2f", value)
+    }
     var speedLabel: String { String(format: "%g×", (speed * 100).rounded() / 100) }
 
     init(tuning: @escaping @MainActor () -> (glide: Double, flow: Double)) { meter = Meter(tuning: tuning) }
@@ -43,22 +72,25 @@ struct PanelView: View {
     static let width: CGFloat = 354
     static let controlRow: CGFloat = 37
     static let sentenceRow: CGFloat = 27
-    static func size(hasSentenceRow: Bool) -> CGSize {
-        CGSize(width: width, height: controlRow + (hasSentenceRow ? sentenceRow : 0))
+    static let openRowHeight: CGFloat = 62
+    static let chrome = Color(red: 0.15, green: 0.15, blue: 0.16)
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    static func size(hasSentenceRow: Bool, hasOpenRow: Bool = false) -> CGSize {
+        CGSize(width: width, height: controlRow + (hasSentenceRow ? sentenceRow : 0) + (hasOpenRow ? openRowHeight : 0))
     }
     @ObservedObject var model: PanelModel
 
     var body: some View {
         let look = model.state.look
         let hasSentenceRow = model.state.hasSentenceRow
-        let shape = RoundedRectangle(cornerRadius: hasSentenceRow ? 14 : Self.controlRow / 2, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: hasSentenceRow || model.openRow != nil ? 14 : Self.controlRow / 2, style: .continuous)
         VStack(spacing: 0) {
             HStack(spacing: 2) {
                 PillButton(model: model, symbol: "xmark", label: "close the pill", action: model.onClose)
                 LevelMeter(meter: model.meter, isRunning: look.isMeterRunning, isPaused: model.state.playback.isPaused)
                     .frame(maxWidth: .infinity)
-                PillButton(model: model, symbol: "speaker.wave.2.fill", label: "volume \(Int(model.volume.rounded()))", action: {})
-                PillButton(model: model, text: model.speedLabel, label: "speed \(model.speedLabel)", action: {})
+                PillButton(model: model, symbol: "speaker.wave.2.fill", label: "volume \(PanelModel.shown(model.volume, .volume))", isOn: model.openRow == .volume) { model.toggle(.volume) }
+                PillButton(model: model, text: model.speedLabel, label: "speed \(model.speedLabel)", isOn: model.openRow == .speed) { model.toggle(.speed) }
                 Divider().frame(height: 16).overlay(Color.white.opacity(0.14))
                 PillButton(
                     model: model,
@@ -82,15 +114,21 @@ struct PanelView: View {
                     .padding(.horizontal, 12)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .transition(.opacity)
+                    .frame(height: Self.sentenceRow)
+            }
+            if let control = model.openRow {
+                Rectangle().fill(Color.white.opacity(0.1)).frame(height: 1)
+                OpenRowView(model: model, control: control).frame(height: Self.openRowHeight - 1)
             }
         }
-        .frame(width: Self.width, height: Self.size(hasSentenceRow: hasSentenceRow).height)
+        .frame(width: Self.width, height: Self.size(hasSentenceRow: hasSentenceRow, hasOpenRow: model.openRow != nil).height)
         .coordinateSpace(name: "pill")
         .onPreferenceChange(ControlFrames.self) { frames in model.frames = frames }
         // the line fades as its row closes: a fade, never a slide, so Reduce Motion keeps it
         .animation(.easeOut(duration: 0.2), value: hasSentenceRow)
         // the tint sits over the glass: a second .background would land behind it and vanish
-        .background(ZStack { VisualEffect(); Color.black.opacity(0.55) })
+        // Reduce Transparency: the solid chrome colour, no glass
+        .background(ZStack { if reduceTransparency { Self.chrome } else { VisualEffect(); Color.black.opacity(0.55) } })
         .clipShape(shape)
         .overlay(shape.strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
         // the whole pill drags; a button's own click wins over this gesture. isMovableByWindowBackground never
@@ -237,6 +275,64 @@ struct PillButton: View {
     }
 }
 
+// an icon, a slider, a number box, then the keys: ↑↓ steps, ⇧ four, ⌥ fine, ⏎ sets the typed value and gives the keyboard
+// back to the app in front
+struct OpenRowView: View {
+    @ObservedObject var model: PanelModel
+    let control: PillModel.OpenRow.Control
+
+    var body: some View {
+        VStack(spacing: 6) {
+            HStack(spacing: 10) {
+                Image(systemName: control == .volume ? "speaker.wave.2.fill" : "gauge.with.dots.needle.33percent")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.72))
+                Slider(value: Binding(get: { model.value(of: control) }, set: { model.set(control, $0) }), in: control.range)
+                    .controlSize(.small)
+                    .tint(LevelMeter.accent)
+                    .accessibilityLabel(control.rawValue)
+                TextField("", text: $model.draft)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 13, weight: .medium))
+                    .monospacedDigit()
+                    .multilineTextAlignment(.trailing)
+                    .padding(.horizontal, 6)
+                    .frame(width: 56, height: 24)
+                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.black.opacity(0.35)))
+                    .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(LevelMeter.accent.opacity(0.8), lineWidth: 1.5))
+                    .accessibilityLabel("\(control.rawValue), type a value and press return")
+                    .onKeyPress(keys: [.upArrow, .downArrow]) { press in
+                        model.set(control, control.stepped(model.value(of: control), up: press.key == .upArrow, shift: press.modifiers.contains(.shift), option: press.modifiers.contains(.option)))
+                        return .handled
+                    }
+                    .onKeyPress(.escape) {
+                        model.toggle(control)
+                        return .handled
+                    }
+                    .onSubmit {
+                        if let value = control.typed(model.draft) { model.set(control, value) } else { model.draft = PanelModel.shown(model.value(of: control), control) }
+                        model.onRelease()
+                    }
+            }
+            HStack(spacing: 12) {
+                ForEach(control.keys, id: \.key) { key in
+                    HStack(spacing: 4) {
+                        Text(key.key)
+                            .font(.system(size: 10, weight: .medium))
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .background(RoundedRectangle(cornerRadius: 3).fill(Color.white.opacity(0.12)))
+                        Text(key.step).font(.system(size: 11))
+                    }
+                }
+            }
+            .foregroundStyle(Color.white.opacity(0.6))
+            .accessibilityHidden(true)
+        }
+        .padding(.horizontal, 12)
+    }
+}
+
 struct ControlFrames: PreferenceKey {
     static let defaultValue: [String: CGRect] = [:]
     static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) { value.merge(nextValue()) { $1 } }
@@ -283,6 +379,12 @@ struct VisualEffect: NSViewRepresentable {
     func updateNSView(_ view: NSVisualEffectView, context: Context) {}
 }
 
+// a borderless panel takes keys only when it says it can: the number box needs them, and never takes the app in front
+// (the FRM-290 spike: a .prohibited app's nonactivating panel keeps the front app and its menu bar)
+final class KeyPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
+}
+
 @MainActor
 final class Panel: SpeechPill {
     let model: PanelModel
@@ -291,7 +393,7 @@ final class Panel: SpeechPill {
     private final class Wave { var tuning: (glide: Double, flow: Double)? }
     private let unsaved = Wave()
     private lazy var window: NSPanel = {
-        let panel = NSPanel(
+        let panel = KeyPanel(
             contentRect: NSRect(origin: .zero, size: PanelView.size(hasSentenceRow: false)),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
@@ -299,6 +401,8 @@ final class Panel: SpeechPill {
         )
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
+        // a click on a button leaves the keyboard where it was; only the row's number box takes it
+        panel.becomesKeyOnlyIfNeeded = true
         panel.hidesOnDeactivate = false
         panel.backgroundColor = .clear
         // dark glass in both system themes, the Whispr feel
@@ -323,6 +427,15 @@ final class Panel: SpeechPill {
         return hint
     }()
     private var hovering: AnyCancellable?
+    private var opening: AnyCancellable?
+
+    // the keyboard goes back to the app in front: ⏎, esc, the row closed, the pill gone
+    private func releaseKeys() {
+        guard window.isKeyWindow else { return }
+        window.makeFirstResponder(nil)
+        window.resignKey()
+        NSApp.deactivate()
+    }
 
     init(settings: @escaping @MainActor () -> Config) {
         self.settings = settings
@@ -332,6 +445,10 @@ final class Panel: SpeechPill {
         hovering = model.$hovered.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] label in
             MainActor.assumeIsolated { self?.showHint(label) }
         }
+        opening = model.$openRow.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] _ in
+            MainActor.assumeIsolated { self?.fitWindow() }
+        }
+        model.onRelease = { [weak self] in self?.releaseKeys() }
     }
 
     // over the control, inside the pill's width, a few points above its top edge
@@ -418,7 +535,7 @@ final class Panel: SpeechPill {
     // the body grows and shrinks from its top edge, so the control row stays put; at the screen's bottom edge the
     // whole pill moves up by what it gained instead (the FRM-290 spike, 26 Nov)
     private func fitWindow() {
-        let size = PanelView.size(hasSentenceRow: model.state.hasSentenceRow)
+        let size = PanelView.size(hasSentenceRow: model.state.hasSentenceRow, hasOpenRow: model.openRow != nil)
         var frame = window.frame
         guard frame.size != size else { return }
         frame.origin.y = frame.maxY - size.height
@@ -444,6 +561,8 @@ final class Panel: SpeechPill {
 
     func hide() {
         showHint(nil)
+        model.openRow = nil
+        releaseKeys()
         window.orderOut(nil)
         model.meter.reset()
         model.state.hasSignal = false
@@ -499,6 +618,7 @@ final class Panel: SpeechPill {
         if let notice = fixture.notice { model.state.noticed(notice) }
         if fixture.openRow?.control == .speed, let speed = fixture.openRow?.value { model.speed = speed }
         if fixture.openRow?.control == .volume, let volume = fixture.openRow?.value { model.volume = volume }
+        if let control = fixture.openRow?.control { model.toggle(control) }
         fitWindow()
         show()
         // the hint finds its control once the pill has laid out

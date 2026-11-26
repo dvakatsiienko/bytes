@@ -47,7 +47,29 @@ struct PillModel: Encodable, Equatable {
         }
     }
     struct OpenRow: Encodable, Equatable {
-        enum Control: String, Encodable { case volume, speed }
+        enum Control: String, Encodable {
+            case volume, speed
+
+            var range: ClosedRange<Double> { self == .volume ? Config.volumes : EngineConfig.speeds }
+
+            // ↑↓ one step, ⇧ four, ⌥ a fine one: volume 1, 4, 0.1; speed 0.01, 0.04, 0.005
+            func stepped(_ value: Double, up: Bool, shift: Bool, option: Bool) -> Double {
+                let unit = self == .volume ? 1.0 : 0.01
+                let step = option ? (self == .volume ? 0.1 : 0.005) : shift ? unit * 4 : unit
+                return clamped(value + (up ? step : -step))
+            }
+
+            // a typed value, read as the box shows it; nil for words
+            func typed(_ text: String) -> Double? {
+                Double(text.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "×", with: "").replacingOccurrences(of: ",", with: ".")).map(clamped)
+            }
+
+            func clamped(_ value: Double) -> Double { ((min(max(value, range.lowerBound), range.upperBound)) * 1000).rounded() / 1000 }
+
+            var keys: [(key: String, step: String)] {
+                self == .volume ? [("↑↓", "1"), ("⇧", "4"), ("⌥", "0.1"), ("⏎", "set")] : [("↑↓", "0.01"), ("⇧", "0.04"), ("⌥", "fine"), ("⏎", "set")]
+            }
+        }
         let control: Control
         let value: Double
     }

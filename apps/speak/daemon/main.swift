@@ -63,6 +63,15 @@ final class App {
         audio.onLevels = { [panel] levels, spacing in panel.model.push(levels, spacing: spacing) }
         panel.model.onClose = { [panel] in panel.hide() }
         panel.position = { [player] in player.played.position }
+        // the pill's volume and speed rows save like the page: the changed key over the version read
+        panel.model.onSet = { [configStore] control, value in
+            let current = configStore.current
+            let patch: Json? = switch control {
+            case .volume: .object(["volume": .number(value)])
+            case .speed: current.chain[.en]?.first.map { .object(["engines": .object([$0.rawValue: .object(["speed": .number(value)])])]) }
+            }
+            do { _ = try configStore.save(patch, over: configStore.saved().version) } catch { log("pill: \(control.rawValue) \(value) not saved — \(error)") }
+        }
         panel.model.onPause = { [weak speaker] in speaker?.togglePause() }
         panel.model.onStop = { [weak speaker] in speaker?.silence() }
         panel.model.onUnstick = { [weak speaker, panel] in
