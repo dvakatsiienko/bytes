@@ -135,6 +135,8 @@ private func cutLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleane
 
 private func rewriteLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) -> SourcedText {
     var t = text
+    // a number after a file name is its line: «reminders.md:43» reads «reminders dot md, line 43»
+    if cleaner.on(.codeNames) { t = t.replacing("\\b(\\w+)\\.(ts|tsx|js|md|json|sh|py|swift|go|yaml|toml):(\\d+)\\b", "$1 dot $2, line $3") }
     if cleaner.on(.codeNames) { t = t.replacing("\\b(\\w+)\\.(ts|tsx|js|md|json|sh|py|swift|go|yaml|toml)\\b", "$1 dot $2") }
     if cleaner.on(.codeNames) { t = t.replacing("\\b(\\w+)\\.([a-z]+[A-Z]\\w*)\\b", "$1 dot $2") }
     if cleaner.on(.codeNames) { t = t.replacing("([A-Za-z]):([A-Za-z])", "$1 $2") }

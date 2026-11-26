@@ -784,6 +784,12 @@
           "to": 35
         }
       ]
+    },
+    {
+      "in": "the reminder at `_clio/memory/_reminders.md:43` still calls it",
+      "out": [
+        ["en", "the reminder at reminders dot md, line 43 still calls it"]
+      ]
     }
   ]
 }

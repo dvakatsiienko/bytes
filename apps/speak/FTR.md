@@ -241,6 +241,7 @@
   - given selected text holding a path, a file link, a pid, a git hash or a long id
   - when the user presses F4
   - then the voice says «exa dot md» for `docs/test-drive/exa.md`, «a markdown file link», «pid», «a commit», «an id» — never a full path or the digits
+  - and a number after a file name is its line: `reminders.md:43` says «reminders dot md, line 43»
 - ⬜ each cleaner rule has a switch
   - given `{"cleaner": {"rules": {"paths": false}}}` in the settings file, when the next press reads `docs/test-drive/exa.md`, then the voice says the whole path, and every other rule reads as before
   - given no `cleaner` section, then every rule is on; given a rule name it does not know, then the load fails and names it
