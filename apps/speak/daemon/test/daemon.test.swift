@@ -92,7 +92,8 @@ struct DaemonTest {
         ])
     }
 
-    // a long grab costs in step with its length: twice the text, at most three times the time (the best of three)
+    // a long grab costs in step with its length: four times the text, at most eight times the time (the best of three).
+    // a linear cost reads 4×, a square one 16×; twice the text at 3× went red twice under a loaded mac (26 Nov)
     static func growthFailures() -> Int {
         let time = { (text: String) in (0..<3).map { _ in
             let began = ContinuousClock.now
@@ -100,8 +101,8 @@ struct DaemonTest {
             return ContinuousClock.now - began
         }.min()! }
         let grows = { (make: (Int) -> String, length: Int) in
-            let whole = time(make(length)), half = time(make(length / 2))
-            return whole <= half * 3 ? "in step" : "\(whole) for the whole, \(half) for half"
+            let whole = time(make(length)), quarter = time(make(length / 4))
+            return whole <= quarter * 8 ? "in step" : "\(whole) for the whole, \(quarter) for a quarter"
         }
         return check("growth", [
             ("a 20,000-letter word", grows({ String(repeating: "a", count: $0) }, 20_000), "in step"),
