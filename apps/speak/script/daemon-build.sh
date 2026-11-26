@@ -42,3 +42,5 @@ names=$(sed -n 's/^    case \([a-z][a-z, ]*\)$/\1/p' "$here/../daemon/core/engin
 sha_of build/x-speak >"$unstarted"
 mv -f build/x-speak "$installed"
 echo "installed $installed — script/daemon-relaunch.sh starts it"
+# a rollback took names out of the settings; this build may know them again, and only a rollback puts them back
+[ ! -f "$fitted" ] || echo "settings: the last rollback kept the whole file as $fitted; speak:rollback forward puts it back, or copy it over by hand"

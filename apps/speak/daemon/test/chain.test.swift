@@ -26,6 +26,11 @@ enum ChainTest {
                 let chunk = spokenChunks(of: text)[0]
                 return chunk.words.map { (text as NSString).substring(with: NSRange($0.source)) }.joined(separator: "|")
             }(), "I|love|it"),
+            ("a decomposed letter is lit whole", { () -> String in
+                let text = "the cafe\u{301} opens"
+                let chunk = spokenChunks(of: text)[0]
+                return chunk.words.map { (text as NSString).substring(with: NSRange($0.source)) }.joined(separator: "|")
+            }(), "the|cafe\u{301}|opens"),
             ("a mark on no word lights none", lit(Mark(range: 900..<901, seconds: 0), in: chunk).map { "\($0)" } ?? "none", "none"),
         ])
     }

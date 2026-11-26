@@ -398,6 +398,8 @@ rollback
 is 'coming forward again puts the whole file back' "$whole" "$(cat "$place")"
 is 'and keeps no copy' no "$([ -f "$place.before-rollback" ] && echo yes || echo no)"
 says 'and says so' 'settings: put back whole'
+setup; with_speechify; build new; started; rollback; build fix
+says 'a build after a fitted rollback says where the whole file is' 'speak:rollback forward puts it back'
 setup; with_speechify; build new; started; rollback; printf '{"chain":{"en":["kokoro"]},"engines":{},"firstAudioMs":700}\n' >"$place"; rollback
 is 'a file changed since the rollback is not put back over' 700 "$(jq .firstAudioMs "$place")"
 setup; with_speechify; build new; started; stub_file "$root/app/script/daemon-relaunch.sh" 'exit 3'; rollback

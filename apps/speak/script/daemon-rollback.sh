@@ -82,8 +82,8 @@ daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 
 ran_with=$(cat "$kept.config" 2>/dev/null || true)
 ran_settings=$(cat "$kept.settings" 2>/dev/null || true)
-carry_settings
 fit_settings
+carry_settings
 swap "$(running_argument)" "$(settings_line)"
 code=0
 "$here/daemon-relaunch.sh" --unwatched || code=$?

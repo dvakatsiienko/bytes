@@ -50,7 +50,12 @@ func wholeWord(_ part: Range<Int>, in text: [UInt16]) -> Range<Int> {
     while to < text.count, !isSpace(text[to]) { to += 1 }
     let whole = from..<to
     while from < to, !isWordy(text[from]) { from += 1 }
-    while to > from, !isWordy(text[to - 1]) { to -= 1 }
+    // a combining mark after a letter is the letter's: a decomposed «café» lights whole
+    let isMark = { (unit: UInt16) -> Bool in
+        guard let scalar = Unicode.Scalar(unit), scalar.value != 0xFE0F else { return false }
+        return [Unicode.GeneralCategory.nonspacingMark, .spacingMark, .enclosingMark].contains(scalar.properties.generalCategory)
+    }
+    while to > from, !isWordy(text[to - 1]), !(isMark(text[to - 1]) && to - 1 > from && (isWordy(text[to - 2]) || isMark(text[to - 2]))) { to -= 1 }
     return from < to ? from..<to : whole
 }
 
