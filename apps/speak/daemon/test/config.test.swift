@@ -20,7 +20,7 @@ enum ConfigTest {
         } }
         let voice = { (voices: String, lang: Lang) in answer(file(engines: #"{"fish":{"voice":\#(voices)}}"#)) { $0[.fish].voice(for: lang) ?? "-" } }
         let range = { (field: String, value: String) in "\(field) \(value) is out of range (\(field == "speed" ? "0.5–3" : "0–4"))" }
-        let unknown = { (name: String) in "unknown name «\(name)» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru" }
+        let unknown = { (name: String) in "unknown name «\(name)» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru" }
         return check("config decode", [
             ("an engine with nothing named", knobs("{}"), "- 1.0 1.0"),
             ("an engine with everything named", knobs(#"{"model":"s2","speed":1.5,"gain":2}"#), "s2 1.5 2.0"),
@@ -37,7 +37,7 @@ enum ConfigTest {
             ("a language's own voice", voice(#"{"en":"Jessica","*":"Sarah"}"#, .en), "Jessica"),
             ("a language with no voice of its own", voice(#"{"en":"Jessica","*":"Sarah"}"#, .uk), "Sarah"),
             ("a language no voice serves", voice(#"{"en":"Jessica"}"#, .uk), "-"),
-            ("a provider with no engine in a chain is skipped", answer(file(chain: #"{"en":["speechify","kokoro","system"]}"#)) { "\($0.chain[.en, default: []].map(\.rawValue)) skipped \($0.skipped)" }, #"["kokoro", "system"] skipped ["speechify"]"#),
+            ("a provider with no engine in a chain is skipped", answer(file(chain: #"{"en":["polly","kokoro","system"]}"#)) { "\($0.chain[.en, default: []].map(\.rawValue)) skipped \($0.skipped)" }, #"["kokoro", "system"] skipped ["polly"]"#),
             ("an unknown language", answer(file(chain: #"{"de":["kokoro"]}"#)) { "\($0.chain)" }, unknown("de")),
             ("a provider with no engine in the engines is skipped", answer(file(engines: #"{"koko":{"gain":2},"fish":{}}"#)) { "\($0.summary) skipped \($0.skipped)" }, #"fish: voice -, speed 1.0, gain 1.0 skipped ["koko"]"#),
             ("a chain keeps its order", answer(file(chain: #"{"uk":["fish","system","gemini"]}"#)) { $0.chain[.uk, default: []].map(\.rawValue).joined(separator: " ") }, "fish system gemini"),
@@ -49,7 +49,7 @@ enum ConfigTest {
     static func engineFailures() -> Int {
         let names = { (holds: (Engine) -> Bool) in Engine.allCases.filter(holds).map(\.rawValue).joined(separator: " ") }
         return check("engine table", [
-            ("cloud", names { $0.isCloud }, "elevenlabs fish gemini"),
+            ("cloud", names { $0.isCloud }, names { $0.facts.keyName != nil }),
             ("streams", names { $0.facts.streams }, "elevenlabs fish"),
             ("speaks english", names { $0.speaks(.en) }, "elevenlabs kokoro system fish gemini"),
             ("speaks ukrainian", names { $0.speaks(.uk) }, "elevenlabs system fish gemini"),

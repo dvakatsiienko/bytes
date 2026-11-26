@@ -62,7 +62,7 @@ enum StoreTest {
             ("a voice taken out", save(#"{"engines":{"elevenlabs":{"voice":{"en":null}}}}"#, at), "-        \"*\": \"EXAVITQu4vr4xnSDxMaL\", -        \"en\": \"cgSgspJ2msm6clMCkdW9\" +        \"*\": \"EXAVITQu4vr4xnSDxMaL\""),
             ("the value it has", save(#"{"firstAudioMs":900}"#, at), ""),
             ("out of range", save(#"{"firstAudioMs":0}"#, at), refused + "firstAudioMs 0 is out of range (100–3000)"),
-            ("an unknown engine", save(#"{"chain":{"en":["koko"]}}"#, at), refused + "unknown name «koko» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"),
+            ("an unknown engine", save(#"{"chain":{"en":["koko"]}}"#, at), refused + "unknown name «koko» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru"),
             ("a wrong type", save(#"{"engines":{"fish":{"gain":"loud"}}}"#, at), refused + "«engines.fish.gain» has the wrong type"),
             ("a required key taken out", save(#"{"chain":null}"#, at), refused + "missing «chain»"),
             ("no patch", save(nil, at), "the save names no change"),
@@ -110,13 +110,13 @@ enum StoreTest {
         store.refresh()
         rows.append(("a backup put back with its old moment is seen", "\(store.current.meterFlowMs)", "70.0"))
         // a provider this build has no engine for, still named in the file
-        let removed = shape.replacingOccurrences(of: "\"ru\": [\"elevenlabs\", \"system\"]", with: "\"ru\": [\"speechify\", \"elevenlabs\", \"system\"]")
+        let removed = shape.replacingOccurrences(of: "\"ru\": [\"elevenlabs\", \"system\"]", with: "\"ru\": [\"polly\", \"elevenlabs\", \"system\"]")
         file.put(removed)
         file.lines = []
         rows.append(("a file naming a removed provider loads", "\(store.refresh() ?? "ok") \(store.current.chain[.ru, default: []].map(\.rawValue))", #"ok ["elevenlabs", "system"]"#))
-        rows.append(("and its log says so", file.lines.last ?? "-", "config: no engine named «speechify» in this build, skipped; the others load as named"))
+        rows.append(("and its log says so", file.lines.last ?? "-", "config: no engine named «polly» in this build, skipped; the others load as named"))
         rows.append(("a save over it still writes", reason { try store.save(json(#"{"meterFlowMs":6}"#), over: store.saved().version) }, ""))
-        rows.append(("and keeps the name", "\(file.text.contains("\"speechify\""))", "true"))
+        rows.append(("and keeps the name", "\(file.text.contains("\"polly\""))", "true"))
         file.link()
         _ = try? store.save(json(#"{"meterFlowMs":3}"#), over: store.saved().version)
         rows.append(("a linked file stays a link, and its target is written", "\(file.isLink) \(file.text.contains("\"meterFlowMs\": 3"))", "true true"))

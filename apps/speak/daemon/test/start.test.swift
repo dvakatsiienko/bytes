@@ -57,12 +57,17 @@ enum StartTest {
 
     static func keysFailures() async -> Int {
         var rows: [(name: String, got: String, want: String)] = []
+        // the keys line of the three engines these rows are about, however many more the catalogue holds
+        let about = { (line: String) in
+            guard line.hasPrefix("keys: "), !line.hasPrefix("keys: not") else { return line }
+            return "keys: " + line.dropFirst(6).components(separatedBy: ", ").filter { ["elevenlabs", "fish", "gemini"].contains($0.split(separator: " ").first.map(String.init)) }.joined(separator: ", ")
+        }
         let row = { (name: String, act: @MainActor (Keys, PlantedRunner, Calls) async -> Void, want: String) in
             let calls = Calls(), runner = PlantedRunner()
             let keys = Keys(run: { try await runner.run($0) }, now: { runner.now }, log: { calls.made.append($0) })
             await act(keys, runner, calls)
             await settle()
-            rows.append((name, (calls.made + ["\(runner.asked) asked"]).joined(separator: " | "), want))
+            rows.append((name, (calls.made.map(about) + ["\(runner.asked) asked"]).joined(separator: " | "), want))
         }
         let press: @MainActor (Keys, PlantedRunner, TimeInterval) async -> Void = { keys, runner, seconds in
             runner.now += seconds
@@ -74,13 +79,13 @@ enum StartTest {
             let keys = Keys(run: { try await runner.run($0) }, keychain: { held[$0] }, now: { runner.now }, log: { calls.made.append($0) })
             await act(keys, runner)
             await settle()
-            rows.append((name, (calls.made + ["\(keys[.elevenlabs] ?? "-") \(keys[.fish] ?? "-") \(keys[.gemini] ?? "-")", "\(runner.asked) asked"]).joined(separator: " | "), want))
+            rows.append((name, (calls.made.map(about) + ["\(keys[.elevenlabs] ?? "-") \(keys[.fish] ?? "-") \(keys[.gemini] ?? "-")", "\(runner.asked) asked"]).joined(separator: " | "), want))
         }
         await keychain("a key in the keychain wins over the runner's", [.fish: "mine"], { keys, _ in await keys.load() },
                        "keys: elevenlabs ok, fish keychain, gemini ok | elevenlabs mine gemini | 1 asked")
         await keychain("one the runner has none of", [.fish: "mine"], { keys, runner in runner.missing = ["fish"]; await keys.load() },
                        "keys: elevenlabs ok, fish keychain, gemini ok | elevenlabs mine gemini | 1 asked")
-        await keychain("every key in the keychain asks no runner", [.elevenlabs: "a", .fish: "b", .gemini: "c"], { keys, _ in await keys.load() },
+        await keychain("every key in the keychain asks no runner", Dictionary(uniqueKeysWithValues: Engine.allCases.filter(\.isCloud).map { ($0, "x") }).merging([.elevenlabs: "a", .fish: "b", .gemini: "c"]) { $1 }, { keys, _ in await keys.load() },
                        "keys: elevenlabs keychain, fish keychain, gemini keychain | a b c | 0 asked")
         await keychain("a runner that fails leaves the keychain's", [.fish: "mine"], { keys, runner in runner.fails = true; await keys.load() },
                        "keys: not loaded — timeout | keys: elevenlabs missing, fish keychain, gemini missing | - mine - | 1 asked")

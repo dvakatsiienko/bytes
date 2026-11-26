@@ -352,7 +352,7 @@ enum EnginesTest {
             for engine in [Engine.elevenlabs, .fish, .gemini] { try? await say(voices, "One.", engine, calls) }
             calls.made = net.asked.map { line in line.split(separator: " ").filter { $0.contains("k-") }.joined() }
         }, "xi-api-key=k-elevenlabs | k-fish | x-goog-api-key=k-gemini")
-        await row("what it says of the keys", { voices, _, calls in calls.made = Engine.allCases.map { "\(voices.hasKey($0))" } }, "true | false | false | true | true")
+        await row("what it says of the keys", { voices, _, calls in calls.made = [Engine.elevenlabs, .kokoro, .system, .fish, .gemini].map { "\(voices.hasKey($0))" } }, "true | false | false | true | true")
         await row("a server that stopped answering is warmed, and only its own", { voices, _, _ in
             voices.restartServer(of: .fish)
             voices.restartServer(of: .kokoro)

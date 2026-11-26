@@ -6,7 +6,23 @@ enum ChainTest {
     static let start = ContinuousClock.now
 
     static func failures() -> Int {
-        candidateFailures() + firstAudioFailures() + kokoroAheadFailures() + benchFailures() + refusalNoteFailures() + quotaBodyFailures() + chunkFailures()
+        candidateFailures() + firstAudioFailures() + kokoroAheadFailures() + benchFailures() + refusalNoteFailures() + quotaBodyFailures() + chunkFailures() + litFailures()
+    }
+
+    // an engine's mark, in the chunk's text, lights the grabbed word through the word map
+    static func litFailures() -> Int {
+        let text = "ask cc to ship cc"
+        let chunk = spokenChunks(of: text, .shipped, Cleaner(dictionary: [Cleaner.Entry(word: "cc", say: "Claude Code")]))[0]
+        let at = { (word: String, from: Int) in
+            let said = (chunk.text as NSString).range(of: word, range: NSRange(location: from, length: chunk.text.utf16.count - from))
+            return lit(Mark(range: said.location..<said.location + said.length, seconds: 0), in: chunk).map { (text as NSString).substring(with: NSRange($0)) + " \($0.lowerBound)" } ?? "none"
+        }
+        return check("lit", [
+            ("a word lights its own", at("ship", 0), "ship 10"),
+            ("each spoken word of an entry lights its word", at("Code", 0), "cc 4"),
+            ("a repeated entry lights its own place", at("Claude", 12), "cc 15"),
+            ("a mark on no word lights none", lit(Mark(range: 900..<901, seconds: 0), in: chunk).map { "\($0)" } ?? "none", "none"),
+        ])
     }
 
     static func candidateFailures() -> Int {

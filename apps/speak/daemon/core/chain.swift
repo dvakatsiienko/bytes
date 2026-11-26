@@ -19,6 +19,11 @@ struct SpokenWord: Equatable {
     var source: Range<Int>
 }
 
+// the grabbed word an engine's mark lights: the first spoken word its range touches; nil for a mark on no word
+func lit(_ mark: Mark, in chunk: Chunk) -> Range<Int>? {
+    chunk.words.first { $0.said.overlaps(mark.range) }?.source
+}
+
 enum EngineError: Error {
     case noKey, noVoice, noSound, status(Int), timeout
     // the provider's own words, e.g. «you have 14 credits remaining, while 203 are required»

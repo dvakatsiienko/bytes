@@ -18,7 +18,7 @@ enum SchemaTest {
             ("the cleaner's rules", (((top["cleaner"]?["properties"] as? [String: Any])?["rules"] as? [String: Any])?["properties"] as? [String: Any] ?? [:]).keys.sorted().joined(separator: " "), CleanerRule.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a rule off is off", cleaner(#"{"rules":{"paths":false,"ids":true}}"#), "paths"),
             ("no cleaner section: every rule on", cleaner(nil), ""),
-            ("a rule's name is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{},"cleaner":{"rules":{"emojis":false}}}"#), "unknown name «emojis» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"),
+            ("a rule's name is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{},"cleaner":{"rules":{"emojis":false}}}"#), "unknown name «emojis» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru"),
         ]
         for key in schema["required"] as? [String] ?? [] {
             rows.append(("\(key) is required", answer(without: key), "missing «\(key)»"))
@@ -36,7 +36,7 @@ enum SchemaTest {
         }
         rows.append(("an integer is not a half", value("firstAudioMs", json(top: "firstAudioMs", 900.5)), "«firstAudioMs» has the wrong type"))
         rows.append(("favourites are words", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"favourites":[1]}}}"#), "«engines.fish.favourites.Index 0» has the wrong type"))
-        rows.append(("a voice's language is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"voice":{"de":"x"}}}}"#), "unknown name «de» — engines: elevenlabs, kokoro, system, fish, gemini; languages: en, uk, ru"))
+        rows.append(("a voice's language is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{"fish":{"voice":{"de":"x"}}}}"#), "unknown name «de» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru"))
         return check("schema", rows)
     }
 
