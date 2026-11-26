@@ -61,7 +61,7 @@ struct Config: Decodable {
         self.engines = engines
     }
 
-    // an unknown engine or language name fails the whole load, so a typo is reported instead of ignored
+    // an unknown language fails the whole load, so a typo is reported instead of ignored; an unknown engine is skipped
     static func parse<T>(_ name: String, _ make: (String) -> T?) throws -> T {
         guard let value = make(name) else { throw ConfigError.unknownName(name) }
         return value
@@ -122,10 +122,11 @@ struct EngineConfig: Decodable, Equatable {
 }
 
 enum ConfigError: Error, CustomStringConvertible {
-    case unknownName(String), outOfRange(String, Double, ClosedRange<Double>), refusedWord(String, String)
+    case unknownName(String), unknownRule(String), outOfRange(String, Double, ClosedRange<Double>), refusedWord(String, String)
 
     var description: String {
         switch self {
+        case .unknownRule(let name): "unknown cleaner rule «\(name)» — rules: \(CleanerRule.allCases.map(\.rawValue).joined(separator: ", "))"
         case .unknownName(let name): "unknown name «\(name)» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru"
         case .refusedWord(let word, let why): "the dictionary's «\(word)» is refused: \(why)"
         case .outOfRange(let field, let value, let range): "\(field) \(plain(value)) is out of range (\(plain(range.lowerBound))–\(plain(range.upperBound)))"

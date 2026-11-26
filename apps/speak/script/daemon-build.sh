@@ -37,6 +37,8 @@ if [ "$runs" = yes ] || { [ -f "$installed" ] && [ ! -f "$kept" ]; }; then
     if [ "$runs" = yes ]; then record_kept "$(running_argument)" "$(settings_line)"; else record_kept '' ''; fi
 fi
 sha_of build/x-speak >>"$readers"
+names=$(sed -n 's/^    case \([a-z][a-z, ]*\)$/\1/p' "$here/../daemon/core/engine.swift" 2>/dev/null | head -1 | tr -d ,)
+[ -z "$names" ] || echo "$(sha_of build/x-speak) $names" >>"$engines"
 sha_of build/x-speak >"$unstarted"
 mv -f build/x-speak "$installed"
 echo "installed $installed — script/daemon-relaunch.sh starts it"

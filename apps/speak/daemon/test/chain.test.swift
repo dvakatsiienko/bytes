@@ -21,6 +21,11 @@ enum ChainTest {
             ("a word lights its own", at("ship", 0), "ship 10"),
             ("each spoken word of an entry lights its word", at("Code", 0), "cc 4"),
             ("a repeated entry lights its own place", at("Claude", 12), "cc 15"),
+            ("a variation selector is not lit", { () -> String in
+                let text = "I \u{2764}\u{FE0F}love it"
+                let chunk = spokenChunks(of: text)[0]
+                return chunk.words.map { (text as NSString).substring(with: NSRange($0.source)) }.joined(separator: "|")
+            }(), "I|love|it"),
             ("a mark on no word lights none", lit(Mark(range: 900..<901, seconds: 0), in: chunk).map { "\($0)" } ?? "none", "none"),
         ])
     }

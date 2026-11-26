@@ -13,6 +13,10 @@ moved_from="$settings.moved-from"
 # the binaries that read the settings at their place, by hash, each written down as a build installs it; a binary from
 # before the settings had a place of their own reads what its launchd argument names
 readers="$install_dir/x-speak.readers"
+# the engines each binary knows, `<hash> <names>`, written down as a build installs it
+engines="$install_dir/x-speak.engines"
+# the whole settings a rollback took names out of, and the hash of what it left
+fitted="$settings.before-rollback"
 
 # 1 the file the settings moved from, 2 its hash then
 moved_line() { sed -n "$1p" "$moved_from" 2>/dev/null || true; }
@@ -24,6 +28,16 @@ old_file_line() {
 }
 
 sha_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
+# a binary from before the list knows the five engines there were then
+engines_of() {
+    names=$(grep "^$(sha_of "$1") " "$engines" 2>/dev/null | tail -1 | cut -d' ' -f2-)
+    printf '%s\n' "${names:-elevenlabs kokoro system fish gemini}"
+}
+# the engine names a settings file holds that $2 does not; nothing for a file that is no json
+unknown_engines() {
+    jq -r --arg known "$2" '($known | split(" ")) as $k | [(.chain // {} | .[] | .[]), (.engines // {} | keys[])] | unique
+        | map(select(. as $n | $k | any(.[]; . == $n) | not)) | join(" ")' "$1" 2>/dev/null || true
+}
 reads_settings() { grep -qx "$(sha_of "$1")" "$readers" 2>/dev/null; }
 
 daemon_status() {

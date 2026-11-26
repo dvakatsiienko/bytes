@@ -803,6 +803,10 @@
     {
       "in": "Upgrade from python2. Install python3.",
       "out": [["en", "Upgrade from python2. Install python3."]]
+    },
+    {
+      "in": "Look:\n~~~\nlet a = 1\n~~~\nDone.",
+      "out": [["en", "Look:"], ["en", ""], ["en", "Done."]]
     }
   ]
 }

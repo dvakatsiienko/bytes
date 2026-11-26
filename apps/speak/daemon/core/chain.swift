@@ -43,7 +43,7 @@ func spokenChunks(of text: String, _ lists: WordLists = .shipped, _ cleaner: Cle
 // «dot» in «exa dot md» lights «exa.md», each word of «a markdown file link» the link
 func wholeWord(_ part: Range<Int>, in text: [UInt16]) -> Range<Int> {
     let isSpace = { (unit: UInt16) in Unicode.Scalar(unit).map(CharacterSet.whitespacesAndNewlines.contains) ?? false }
-    let isWordy = { (unit: UInt16) in Unicode.Scalar(unit).map(CharacterSet.alphanumerics.contains) ?? false }
+    let isWordy = { (unit: UInt16) in Unicode.Scalar(unit).map { $0.properties.isAlphabetic || $0.properties.numericType != nil } ?? false }
     guard !part.isEmpty, part.upperBound <= text.count else { return part }
     var from = part.lowerBound, to = part.upperBound
     while from > 0, !isSpace(text[from - 1]) { from -= 1 }

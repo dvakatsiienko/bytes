@@ -67,7 +67,7 @@ private func lineEnds(_ t: SourcedText) -> SourcedText {
 }
 
 // what the cut rules match: a dictionary entry never rewrites inside one, whether its rule is on or off
-private enum Cut {
+enum Cut {
     static let fileLink = "\\bfile://\\S*?(?:\\.(\\w+))?(?=[.,;:!?)]*(?:\\s|$))"
     static let url = "\\bhttps?://(?:www\\.)?([^/\\s),;]+)\\S*?(?=[.,;:!?)]*(?:\\s|$))"
     static let uuid = "\\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\\b"
@@ -86,10 +86,12 @@ private enum Cut {
     static func unit(_ lists: WordLists) -> String {
         "(\\d)\\s?(\(lists.units.keys.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern).joined(separator: "|")))(?!\\w)"
     }
-    // every span a rule before the dictionary rewrites, and a file name the code names rule reads later
-    static func all(_ lists: WordLists) -> [(String, NSRegularExpression.Options)] {
-        [(fileLink, .caseInsensitive), (url, .caseInsensitive), (uuid, []), (commit, []), (token, []), (path, []), (date, []), (ip, []), (port, []), (ticket, []),
-         (version, []), (unit(lists), .caseInsensitive), (fileName, [])]
+    static let pid = "\\bpid\\s*[:=]?\\s*\\d+"
+    // every span a rule before the dictionary rewrites, and a file name the code names rule reads later, with what it is
+    static func all(_ lists: WordLists) -> [(String, NSRegularExpression.Options, kind: String)] {
+        [(fileLink, .caseInsensitive, "a link"), (url, .caseInsensitive, "a link"), (uuid, [], "an id"), (commit, [], "an id"), (token, [], "an id"),
+         (pid, .caseInsensitive, "an id"), (path, [], "a path"), (date, [], "a date"), (ip, [], "an address"), (port, [], "an address"),
+         (ticket, [], "a ticket id"), (version, [], "a version"), (unit(lists), .caseInsensitive, "a unit"), (fileName, [], "a file name")]
     }
 }
 
@@ -265,7 +267,7 @@ func normalize(_ text: String, _ lists: WordLists = .shipped, _ cleaner: Cleaner
     guard cleaner.on(.codeBlocks) else { return clean(selected, lists, cleaner) }
     // a code block is cut whole and keeps its place between the runs around it
     var runs: [Run] = [], from = selected.text.startIndex
-    for block in selected.text.ranges(of: try! Regex("```[\\s\\S]*?```")) {
+    for block in selected.text.ranges(of: try! Regex("```[\\s\\S]*?```|~~~[\\s\\S]*?~~~")) {
         runs += clean(selected[from..<block.lowerBound], lists, cleaner) + [.codeBlock(selected[block].source)]
         from = block.upperBound
     }
@@ -291,7 +293,7 @@ private let standIns = "\\x{E000}-\\x{F8FF}"
 // stand-in unit until the end so no later rule reads it again
 private func dictionary(_ text: SourcedText, _ entries: [Cleaner.Entry], keeping kept: [Range<Int>], _ said: inout [String]) -> SourcedText {
     entries.reduce(text) { t, entry in
-        t.replacingWhole("(?<![\\p{L}\\p{N}_])\(NSRegularExpression.escapedPattern(for: entry.word))(?![\\p{L}\\p{N}_])", entry.anyCase ? .caseInsensitive : []) { _, source in
+        t.replacingWhole("(?<![\\p{L}\\p{M}\\p{N}_])\(NSRegularExpression.escapedPattern(for: entry.word))(?![\\p{L}\\p{M}\\p{N}_])", entry.anyCase ? .caseInsensitive : []) { _, source in
             guard !kept.contains(where: { $0.overlaps(source) }), said.count < 0x18FF else { return nil }
             said.append(entry.say)
             return String(Character(Unicode.Scalar(0xE000 + said.count - 1)!))

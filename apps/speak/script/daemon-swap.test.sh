@@ -382,4 +382,28 @@ says 'a lock left behind: the line says how to clear it' 'rmdir'
 setup; printf 'good' >"$libexec/x-speak.prev"; stub lsof 'printf "p1\nftxt\ni%s\nn/usr/lib/dyld\nftxt\nn%s\n" "$(cat "$state/inode")" "$libexec/x-speak"'; build new
 is 'an installed path with no inode of its own never borrows the one before it' 'new/good' "$(pair)"
 
+# a build that knows speechify, and settings that name it, over `old`, which does not
+with_speechify() {
+    mkdir -p "$root/app/daemon/core"
+    printf 'enum Engine {\n    case elevenlabs, kokoro, system, fish, gemini, speechify\n' >"$root/app/daemon/core/engine.swift"
+    printf '{"chain":{"en":["kokoro","speechify","system"]},"engines":{"kokoro":{},"speechify":{"gain":1}},"firstAudioMs":900}\n' >"$place"
+    whole=$(cat "$place")
+}
+named() { jq -c '[.chain.en, (.engines | keys)]' "$place" 2>/dev/null; }
+setup; with_speechify; build new; started; rollback
+is 'a rollback onto a binary that lacks an engine takes its name out' '[["kokoro","system"],["kokoro"]]' "$(named)"
+is 'and keeps the whole file beside' "$whole" "$(cat "$place.before-rollback")"
+says 'and says so' 'settings: without speechify, which this daemon does not know'
+rollback
+is 'coming forward again puts the whole file back' "$whole" "$(cat "$place")"
+is 'and keeps no copy' no "$([ -f "$place.before-rollback" ] && echo yes || echo no)"
+says 'and says so' 'settings: put back whole'
+setup; with_speechify; build new; started; rollback; printf '{"chain":{"en":["kokoro"]},"engines":{},"firstAudioMs":700}\n' >"$place"; rollback
+is 'a file changed since the rollback is not put back over' 700 "$(jq .firstAudioMs "$place")"
+setup; with_speechify; build new; started; stub_file "$root/app/script/daemon-relaunch.sh" 'exit 3'; rollback
+is 'a refused relaunch leaves the settings whole' "$whole" "$(cat "$place")"
+is 'and no copy' no "$([ -f "$place.before-rollback" ] && echo yes || echo no)"
+setup; with_speechify; printf '{"chain":{"en":["kokoro"]},"engines":{},"firstAudioMs":900}\n' >"$place"; build new; started; rollback
+is 'a file every daemon knows is not touched' 'no {"chain":{"en":["kokoro"]},"engines":{},"firstAudioMs":900}' "$([ -f "$place.before-rollback" ] && echo yes || echo no) $(cat "$place")"
+
 passed swap

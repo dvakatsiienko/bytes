@@ -36,6 +36,34 @@ place() {
     mv -f "$old_place.new" "$old_place"
     printf '%s\n%s\n' "$old_place" "$(sha_of "$old_place")" >"$moved_from"
 }
+# a binary that lacks an engine the settings name refuses the whole file, so the names it lacks are taken out while
+# it runs, the whole file kept beside; a later rollback onto a binary that knows them all puts it back, if unchanged
+fit=
+fit_settings() {
+    known=$(engines_of "$kept")
+    if [ -f "$fitted" ] && [ "$(sha_of "$settings")" = "$(cat "$fitted.sha" 2>/dev/null)" ] && [ -z "$(unknown_engines "$fitted" "$known")" ]; then
+        cp "$settings" "$settings.fit-undo"
+        cp "$fitted" "$settings.new"
+        mv -f "$settings.new" "$settings"
+        fit="put back whole, as before the last rollback"
+        return 0
+    fi
+    lacks=$(unknown_engines "$settings" "$known")
+    [ -n "$lacks" ] || return 0
+    cp "$settings" "$settings.fit-undo"
+    cp "$settings" "$fitted"
+    jq --arg known "$known" '($known | split(" ")) as $k | def ok: . as $n | $k | any(.[]; . == $n);
+        (if .chain then .chain |= map_values(map(select(ok))) else . end) | (if .engines then .engines |= with_entries(select(.key | ok)) else . end)' \
+        "$settings" >"$settings.new"
+    mv -f "$settings.new" "$settings"
+    sha_of "$settings" >"$fitted.sha"
+    fit="without $lacks, which this daemon does not know; the whole file is $fitted"
+}
+undo_fit() {
+    [ -n "$fit" ] || return 0
+    mv -f "$settings.fit-undo" "$settings"
+    case "$fit" in without*) rm -f "$fitted" "$fitted.sha" ;; esac
+}
 report_change() { # label, now, recorded at the build
     if [ -z "$3" ]; then echo "$1: $2, the build recorded none"
     elif [ "$2" = "$3" ]; then echo "$1: the same"
@@ -55,12 +83,14 @@ daemon_speaks && refuse 'x-speak is reading aloud now — wait for it to end'
 ran_with=$(cat "$kept.config" 2>/dev/null || true)
 ran_settings=$(cat "$kept.settings" 2>/dev/null || true)
 carry_settings
+fit_settings
 swap "$(running_argument)" "$(settings_line)"
 code=0
 "$here/daemon-relaunch.sh" --unwatched || code=$?
 if [ "$code" -eq 3 ]; then
     swap "$ran_with" "$ran_settings"
     [ -z "$old_place" ] || place "$settings.old-place"
+    undo_fit
     refuse 'the relaunch was refused, the binaries are back as they were'
 fi
 # past a refusal the old process is stopped or stopping: the way back is the restored binary, not the bad one
@@ -79,5 +109,8 @@ if [ -n "$old_place" ]; then
     echo "settings: copied to $old_place, which this daemon reads"
     [ "$(sha_of "$settings")" = "$(moved_line 2)" ] || echo "settings: one changed while the daemons changed places, it is in $settings alone"
 fi
+[ -z "$fit" ] || echo "settings: $fit"
+rm -f "$settings.fit-undo"
+case "$fit" in put*) rm -f "$fitted" "$fitted.sha" ;; esac
 echo "rollback: running $(hash_of "$installed")"
 report_change settings "$(settings_line)" "$ran_settings"

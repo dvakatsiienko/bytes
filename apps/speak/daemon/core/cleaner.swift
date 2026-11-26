@@ -23,14 +23,14 @@ struct Cleaner: Decodable, Equatable {
 
     init(off: Set<CleanerRule> = [], dictionary: [Entry] = []) {
         self.off = off
-        self.dictionary = dictionary.sorted { $0.word.count > $1.word.count }
+        self.dictionary = dictionary.sorted { ($0.word.count, $0.word) > ($1.word.count, $1.word) }
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         var off = Set<CleanerRule>()
         for (name, isOn) in try container.decodeIfPresent([String: Bool].self, forKey: .rules) ?? [:] {
-            let rule = try Config.parse(name, CleanerRule.init)
+            guard let rule = CleanerRule(rawValue: name) else { throw ConfigError.unknownRule(name) }
             if !isOn { off.insert(rule) }
         }
         let words = try container.decodeIfPresent([String: Said].self, forKey: .dictionary) ?? [:]
@@ -61,14 +61,10 @@ struct Cleaner: Decodable, Equatable {
     }
 }
 
-// a cut rule takes a file name, an id or a path before the dictionary reads, so an entry for one would never be said
+// a rule before the dictionary rewrites a link, an id, a path, a unit and their kin, and the dictionary never reads
+// inside what one takes, so an entry holding one would never be said: the same patterns refuse it
 private func refusal(_ word: String) -> String? {
     if !word.contains(where: { $0.isLetter || $0.isNumber }) { return "it holds no letter" }
-    if word.contains("/") { return "a path or a link is cut before the dictionary reads" }
-    if word.range(of: "^[\\w-]+\\.[A-Za-z]\\w*$", options: .regularExpression) != nil { return "a file name is cut before the dictionary reads" }
-    let id = "^(?=(?:[A-Za-z]*\\d){6})[A-Za-z0-9]{16,}$|^(?=.*\\d)[0-9a-f]{7,40}$|^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$"
-    if word.range(of: id, options: .regularExpression) != nil {
-        return "an id is cut before the dictionary reads"
-    }
-    return nil
+    let kind = Cut.all(.shipped).first { SourcedText(word).sources(of: $0.0, $0.1).isEmpty == false }?.kind
+    return kind.map { "\($0) is cut before the dictionary reads" }
 }

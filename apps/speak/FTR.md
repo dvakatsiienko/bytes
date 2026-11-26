@@ -331,6 +331,8 @@
   - given a build that was relaunched, when the rollback runs, then the daemon that ran before it answers `status`, named by its hash, with its settings and config argument held against the ones it ran with at the build
   - given a kept daemon from before the settings moved, then the file its argument names gets today's settings, only while it is as the move left it; changed since, the rollback refuses before anything moves
   - given nothing kept, a kept binary with another signature, a daemon reading aloud, or another build or rollback running, then it refuses in one line and the binaries stay as they were
+  - given settings that name an engine the kept daemon lacks (speechify, for a build from before it), then the rollback takes the name out while it runs, keeps the whole file as `config.json.before-rollback` and says so; coming forward again puts the whole file back, unless it changed since
+  - makes: `~/.local/libexec/x-speak/x-speak.engines`, each build's hash and the engines it knows; a binary not in it knows the five from before speechify
 - ✅ `pnpm speak:try "<text>"` (`daemon:try`) speaks one text with this tree's daemon, built beside the live one
   - makes: `daemon/build/x-speak-try`, in the tree
   - given the live daemon quiet, when it runs, then the text is heard with this mac's live settings (the tracked seed, when it has none), and the live daemon answers `status` before and after and keeps its keys

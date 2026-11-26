@@ -30,9 +30,14 @@ enum DictionaryTest {
         rows.append(("never inside a span a rule rewrote", say("open server:8080", [Cleaner.Entry(word: "port", say: "harbour")]), "open server port 8080"))
         rows.append(("never inside a file name", say("see notes.md", [Cleaner.Entry(word: "notes", say: "NOTES")]), "see notes dot md"))
         rows.append(("an entry that says nothing is refused", refusal("x", say: " "), "it says nothing"))
-        for (word, why) in [("notes.md", "a file name"), ("docs/x", "a path or a link"), ("3f9a2b1c4d", "an id"), ("…", "it holds no letter")] {
+        rows.append(("not at a word's end", say("xcc and ccx", cc), "xcc and ccx"))
+        rows.append(("a mark ends no word", say("cafe\u{301} and cafe", [Cleaner.Entry(word: "cafe", say: "coffee")]), "cafe\u{301} and coffee"))
+        rows.append(("words of one length in one order", Cleaner(dictionary: [Cleaner.Entry(word: "ab", say: "1"), Cleaner.Entry(word: "aa", say: "2")]).dictionary.map(\.word).joined(separator: " "), "ab aa"))
+        for (word, why) in [("notes.md", "a file name"), ("docs/x", "a path"), ("3f9a2b1c4d", "an id"), ("…", "it holds no letter"), ("k8s", "a unit"), ("FRM-694", "a ticket id"),
+                            ("5ms", "a unit"), ("v1.2", "a version"), ("https://x.y", "a link"), ("2026-11-26", "a date"), ("pid 42", "an id")] {
             rows.append(("«\(word)» is refused", refusal(word), why))
         }
+        rows.append(("a word no rule takes is said", refusal("socket.io"), "loaded"))
         return check("dictionary", rows)
     }
 
@@ -42,7 +47,7 @@ enum DictionaryTest {
             _ = try JSONDecoder().decode(Config.self, from: Data(json.utf8))
             return "loaded"
         } catch {
-            return configReason(error).range(of: "a file name|a path or a link|an id|it holds no letter|it says nothing", options: .regularExpression).map { String(configReason(error)[$0]) } ?? configReason(error)
+            return configReason(error).range(of: "a file name|a path|a link|an id|a unit|a ticket id|a version|a date|it holds no letter|it says nothing", options: .regularExpression).map { String(configReason(error)[$0]) } ?? configReason(error)
         }
     }
 }

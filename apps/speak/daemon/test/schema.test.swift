@@ -18,7 +18,7 @@ enum SchemaTest {
             ("the cleaner's rules", (((top["cleaner"]?["properties"] as? [String: Any])?["rules"] as? [String: Any])?["properties"] as? [String: Any] ?? [:]).keys.sorted().joined(separator: " "), CleanerRule.allCases.map(\.rawValue).sorted().joined(separator: " ")),
             ("a rule off is off", cleaner(#"{"rules":{"paths":false,"ids":true}}"#), "paths"),
             ("no cleaner section: every rule on", cleaner(nil), ""),
-            ("a rule's name is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{},"cleaner":{"rules":{"emojis":false}}}"#), "unknown name «emojis» — engines: \(Engine.allCases.map(\.rawValue).joined(separator: ", ")); languages: en, uk, ru"),
+            ("a rule's name is one it knows", answer(#"{"chain":{},"firstAudioMs":900,"engines":{},"cleaner":{"rules":{"emojis":false}}}"#), "unknown cleaner rule «emojis» — rules: \(CleanerRule.allCases.map(\.rawValue).joined(separator: ", "))"),
         ]
         for key in schema["required"] as? [String] ?? [] {
             rows.append(("\(key) is required", answer(without: key), "missing «\(key)»"))
