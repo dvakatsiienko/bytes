@@ -9,6 +9,14 @@ struct Chunk {
     var source = 0..<0
     // a code block cut from the text: no engine reads it, the pill tells of it in its place
     var isCodeBlock = false
+    // each word it says, in order, and the grabbed word it came from: a mark on one lights that word
+    var words: [SpokenWord] = []
+}
+
+// a word in a chunk's text, and the word of the grabbed text it says, both in utf-16 units
+struct SpokenWord: Equatable {
+    let said: Range<Int>
+    var source: Range<Int>
 }
 
 enum EngineError: Error {
@@ -18,7 +26,27 @@ enum EngineError: Error {
 }
 
 func spokenChunks(of text: String, _ lists: WordLists = .shipped, _ cleaner: Cleaner = Cleaner(), nextMarker: String? = nil) -> [Chunk] {
-    chunks(normalize(text, lists, cleaner, nextMarker: nextMarker))
+    let grabbed = Array(text.utf16)
+    return chunks(normalize(text, lists, cleaner, nextMarker: nextMarker)).map { chunk in
+        var chunk = chunk
+        for index in chunk.words.indices { chunk.words[index].source = wholeWord(chunk.words[index].source, in: grabbed) }
+        return chunk
+    }
+}
+
+// what a spoken word lights: the whole grabbed word it came from, between spaces, without the marks at its ends;
+// «dot» in «exa dot md» lights «exa.md», each word of «a markdown file link» the link
+func wholeWord(_ part: Range<Int>, in text: [UInt16]) -> Range<Int> {
+    let isSpace = { (unit: UInt16) in Unicode.Scalar(unit).map(CharacterSet.whitespacesAndNewlines.contains) ?? false }
+    let isWordy = { (unit: UInt16) in Unicode.Scalar(unit).map(CharacterSet.alphanumerics.contains) ?? false }
+    guard !part.isEmpty, part.upperBound <= text.count else { return part }
+    var from = part.lowerBound, to = part.upperBound
+    while from > 0, !isSpace(text[from - 1]) { from -= 1 }
+    while to < text.count, !isSpace(text[to]) { to += 1 }
+    let whole = from..<to
+    while from < to, !isWordy(text[from]) { from += 1 }
+    while to > from, !isWordy(text[to - 1]) { to -= 1 }
+    return from < to ? from..<to : whole
 }
 
 // a local server renders a chunk whole before its first sound, and a cloud engine may refuse a long one
@@ -35,7 +63,7 @@ func chunks(_ runs: [Run]) -> [Chunk] {
         // a rewritten end of one and start of the next may come from the same character: it is the first one's
         let add = { (piece: SourcedText) in
             let from = max(piece.source.lowerBound, result.last?.source.upperBound ?? 0)
-            result.append(Chunk(lang: run.lang, text: piece.text, source: from..<max(from, piece.source.upperBound)))
+            result.append(Chunk(lang: run.lang, text: piece.text, source: from..<max(from, piece.source.upperBound), words: piece.words.map { SpokenWord(said: $0.said, source: $0.source) }))
         }
         for sentence in run.spoken.replacing("([.!?…;])\\s+", "$1\0").split(at: "\0") {
             var rest = sentence

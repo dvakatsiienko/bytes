@@ -242,6 +242,10 @@
   - given the word inside another («account»), in another case («CC»), inside a file link, a path or an id, then it is left as before; `{"say": "Claude Code", "anyCase": true}` matches any case
   - given an entry's spoken words, then no later rule reads them again: «api» there is never spelled out
   - given an entry for a file name, a path or an id, then the save is refused with the line why, since a cut rule takes those first
+- ⬜ each spoken word knows the grabbed word it came from
+  - given any read, then every word a chunk says names a part of the grabbed text, in utf-16 units: a dictionary word's spoken words all name its word, a repeated word each its own place, a file link's or a path's spoken words the whole link or path
+  - given «pid 4821», then «pid» names «pid» and no spoken word names the number it dropped
+  - decision: a word lights the whole grabbed word around it, between spaces, so «dot» in «exa dot md» lights `exa.md`; the pill lights words through this map (the pill chunk)
 - ⬜ a code block is skipped, and the pill says so in its place
   - given a sentence, a ``` block and a sentence, when F4 reads them, then the first sentence is heard to its end, the pill's notice reads «a code block. skipped.», then the second is asked for and heard
   - given a text that is only a block, then no engine is asked and the read ends as any read does; leading, trailing and two side-by-side blocks each keep their place; a stop before a block's turn tells nothing

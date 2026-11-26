@@ -94,7 +94,8 @@ private func cutLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleane
     }
     if cleaner.on(.urls) { t = t.replacing(Cut.url, "$1", .caseInsensitive) }
     if cleaner.on(.ids) { t = t.replacing(Cut.uuid, "an id") }
-    if cleaner.on(.ids) { t = t.replacing("\\b(pid)\\b\\s*[:=]?\\s*\\d+", "pid", .caseInsensitive) }
+    // «pid» keeps its own place, so no spoken word comes from the number it drops
+    if cleaner.on(.ids) { t = t.replacing("\\bpid(?=\\s*[:=]?\\s*\\d)", .caseInsensitive) { _ in "pid" }.replacing("(?<=\\bpid)\\s*[:=]?\\s*\\d+", "") }
     if cleaner.on(.ids) { t = t.replacing(Cut.commit, "a commit") }
     if cleaner.on(.ids) { t = t.replacing(Cut.token, "an id") }
     if cleaner.on(.dates) {

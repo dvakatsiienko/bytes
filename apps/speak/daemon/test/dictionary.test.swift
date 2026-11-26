@@ -23,7 +23,7 @@ enum DictionaryTest {
             ("a grabbed private-use unit is dropped", say("a\u{E000}b", cc), "ab"),
         ]
         // with the entry cc, every golden case without the word reads as it did
-        for item in golden where item.off == nil && item.in.range(of: "(?<![\\p{L}\\p{N}_])cc(?![\\p{L}\\p{N}_])", options: .regularExpression) == nil {
+        for item in golden where item.off == nil && item.dictionary == nil && item.in.range(of: "(?<![\\p{L}\\p{N}_])cc(?![\\p{L}\\p{N}_])", options: .regularExpression) == nil {
             let got = normalize(item.in, .shipped, Cleaner(dictionary: cc)).map { [$0.lang.rawValue, $0.text] }
             if got != item.out { rows.append(("golden with cc: \(item.in.prefix(40))", "\(got)", "\(item.out)")) }
         }

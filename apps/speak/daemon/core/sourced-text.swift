@@ -72,6 +72,20 @@ struct SourcedText: Equatable {
         }
     }
 
+    // each run of letters and marks between spaces: where it stands here and the part of the grabbed text it came from
+    var words: [(said: Range<Int>, source: Range<Int>)] {
+        let units = Array(text.utf16)
+        var result: [(said: Range<Int>, source: Range<Int>)] = [], start: Int?
+        for index in 0...units.count {
+            let isSpace = index == units.count || Unicode.Scalar(units[index]).map(CharacterSet.whitespacesAndNewlines.contains) == true
+            if !isSpace, start == nil { start = index }
+            guard isSpace, let from = start else { continue }
+            result.append((from..<index, source(of: NSRange(location: from, length: index - from))))
+            start = nil
+        }
+        return result
+    }
+
     // the parts of the grabbed text a pattern's matches came from
     func sources(of pattern: String, _ options: NSRegularExpression.Options = []) -> [Range<Int>] {
         let units = text as NSString

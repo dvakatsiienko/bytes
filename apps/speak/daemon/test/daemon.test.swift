@@ -3,20 +3,38 @@
 // config cases guard the load line; config, chain and seams.test.swift hold the rest of the core. usage: daemon-test <golden.json> <config.json> <contract folder>
 import Foundation
 
+struct Golden: Decodable {
+    let cases: [Case]
+}
+
 struct Case: Decodable {
     let `in`: String
     let out: [[String]]
     // the cleaner's rules this case turns off; such a case reads otherwise with every rule on
     var off: [String]?
+    var dictionary: [String: String]?
+    // each spoken word, in order, and the part of `in` it lights
+    var words: [Word]?
 
-    var cleaner: Cleaner { Cleaner(off: Set((off ?? []).compactMap(CleanerRule.init))) }
+    struct Word: Decodable, Equatable, CustomStringConvertible {
+        let say: String
+        let from: Int
+        let to: Int
+        var description: String { "\(say)→\(from)..<\(to)" }
+    }
+
+    var cleaner: Cleaner {
+        Cleaner(off: Set((off ?? []).compactMap(CleanerRule.init)), dictionary: (dictionary ?? [:]).map { Cleaner.Entry(word: $0.key, say: $0.value) })
+    }
+
+    static func load(_ path: String) throws -> [Case] { try JSONDecoder().decode(Golden.self, from: Data(contentsOf: URL(fileURLWithPath: path))).cases }
 }
 
 @main
 struct DaemonTest {
     @MainActor
     static func main() async throws {
-        var failed = try goldenFailures(CommandLine.arguments[1]) + DictionaryTest.failures(JSONDecoder().decode([Case].self, from: Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1])))) + sourceFailures() + growthFailures() + argvFailures() + PillTest.failures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
+        var failed = try goldenFailures(CommandLine.arguments[1]) + DictionaryTest.failures(Case.load(CommandLine.arguments[1])) + sourceFailures() + growthFailures() + argvFailures() + PillTest.failures() + configFailures(CommandLine.arguments[2]) + PathsTest.failures() + SchemaTest.failures(CommandLine.arguments[3] + "/config.schema.json") + ConfigTest.failures() + StoreTest.failures() + ChainTest.failures() + WordListsTest.failures()
         failed += try WireTest.failures(CommandLine.arguments[3] + "/wire.schema.json")
         failed += await SeamsTest.failures() + SpeakerTest.failures() + EnginesTest.failures() + StartTest.failures()
         exit(failed == 0 ? 0 : 1)
@@ -92,7 +110,7 @@ struct DaemonTest {
     }
 
     static func goldenFailures(_ path: String) throws -> Int {
-        let cases = try JSONDecoder().decode([Case].self, from: Data(contentsOf: URL(fileURLWithPath: path)))
+        let cases = try Case.load(path)
         var failed = 0
         let switched = Set(cases.flatMap { $0.off ?? [] })
         for rule in CleanerRule.allCases where !switched.contains(rule.rawValue) {
@@ -109,6 +127,13 @@ struct DaemonTest {
             if item.off != nil, got == read(Cleaner()) {
                 failed += 1
                 print("✗ \(item.in)\n  reads the same with \(item.off ?? []) on")
+            }
+            // each spoken word lights a part of the text; the hard cases name which
+            let chunks = spokenChunks(of: item.in, .shipped, item.cleaner)
+            let spoken = chunks.flatMap { chunk in chunk.words.map { Case.Word(say: (chunk.text as NSString).substring(with: NSRange($0.said)), from: $0.source.lowerBound, to: $0.source.upperBound) } }
+            if spoken.contains(where: { $0.from >= $0.to || $0.to > item.in.utf16.count }) || item.words.map({ $0 != spoken }) == true {
+                failed += 1
+                print("✗ \(item.in)\n  want words \(item.words ?? [])\n  got  \(spoken)")
             }
             // a chunk comes from inside the text, after the one before it
             let sources = spokenChunks(of: item.in, .shipped, item.cleaner).map(\.source)
