@@ -553,6 +553,10 @@ enum SpeakerTest {
             if whole.record(.finished, heard: at, position: at, sound: at).wordsHeard != said { short12 += 1 }
         }
         rows.append(("2000 reads to their end, every word", "\(short12) short", "0 short"))
+        var ten = ReadTally(time: Date(), app: nil)
+        ten.began(Array(repeating: "word", count: 10).joined(separator: " "), start: 0)
+        ten.ended(end: 10)
+        rows.append(("a stop at 57 % of a ten-word sentence, rounded down", "\(ten.record(.stopped, heard: 5.7, position: 5.7, sound: 10).wordsHeard)", "5"))
         rows.append(("a second one that goes takes its own alone", "\(tally.record(.stopped, heard: 0, position: player.played.position, sound: player.sound, dropped: player.dropped).wordsHeard) \(player.dropped)", "7 [Range(5.0..<20.0), Range(25.0..<32.0)]"))
         return check("read record", rows) + recordFileFailures()
     }

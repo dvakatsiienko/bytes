@@ -10,6 +10,7 @@ final class SocketCommands: DaemonCommands {
     private let toChunks: (String) -> [Chunk]
     private let job: LaunchdJob
     private var restartAskedAt: Date?
+    private let startedAt = Date()
 
     init(speaker: Speaker, voices: Voices, panel: Panel, configStore: ConfigStore, toChunks: @escaping (String) -> [Chunk], job: LaunchdJob) {
         self.speaker = speaker
@@ -39,7 +40,7 @@ final class SocketCommands: DaemonCommands {
     func stop() { speaker.silence() }
     func restart() -> String? {
         let sinceAsked = restartAskedAt.map { Date().timeIntervalSince($0) }
-        if let refusal = restartRefusal(isSpeaking: speaker.isSpeaking, sinceAsked: sinceAsked, job: job.label, runs: job.build, installed: LaunchdJob.installedBuild()) { return refusal }
+        if let refusal = restartRefusal(isSpeaking: speaker.isSpeaking, sinceAsked: sinceAsked, sinceStart: Date().timeIntervalSince(startedAt), job: job.label, runs: job.build, installed: LaunchdJob.installedBuild()) { return refusal }
         let failure = job.restart()
         if failure == nil { restartAskedAt = Date() }
         return failure

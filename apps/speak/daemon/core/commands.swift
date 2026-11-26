@@ -69,9 +69,11 @@ private func settingsReply(_ ask: () throws -> SavedSettings) -> Reply {
 
 // a restart right after a swap died on its signature and sat out launchd's 30 s, so a build that never ran is the
 // relaunch script's. `runs` and `installed` are the hashes of the binary that runs and of the one launchd would start
-// a second one would kill the daemon the first one starts, and that one's next start waits 30 s
-func restartRefusal(isSpeaking: Bool, sinceAsked: TimeInterval?, job: String?, runs: String?, installed: String?) -> String? {
+// a second one would kill the daemon the first one starts, and that one's next start waits 30 s. the daemon that asked
+// is gone 0.3 s later, so the one it starts counts from its own start
+func restartRefusal(isSpeaking: Bool, sinceAsked: TimeInterval?, sinceStart: TimeInterval, job: String?, runs: String?, installed: String?) -> String? {
     if let sinceAsked, sinceAsked < 30 { return "a restart is on its way" }
+    if sinceStart < 30 { return "x-speak started under 30 s ago" }
     if isSpeaking { return "x-speak is reading aloud" }
     guard let job, job != "0" else { return "launchd does not run this daemon" }
     guard let runs, runs == installed else { return "another build is installed and has not run yet: daemon:relaunch starts it" }
