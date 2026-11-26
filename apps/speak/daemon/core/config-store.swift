@@ -93,6 +93,9 @@ final class ConfigStore {
         let after = before.patched(by: patch)
         let data = Data((after.text() + "\n").utf8)
         let config: Config = try decoded(data)
+        // a save never adds a name no engine answers to: a typo on the page is refused, a removed engine only loads past
+        let was = (try? JSONDecoder().decode(Config.self, from: old))?.skipped ?? []
+        if let typo = config.skipped.first(where: { !was.contains($0) }) { throw SaveError.refused(named(ConfigError.unknownName(typo).description)) }
         guard after != before else { return SavedSettings(config: before, version: mark(old), was: mark(old)) }
         // the rename is the write: until it, the file is the old one whole
         do { try data.write(to: file, options: .atomic) } catch { throw SaveError.notWritten(error.localizedDescription) }
@@ -108,6 +111,7 @@ final class ConfigStore {
         lastError = nil
         hasLoaded = true
         write("config: loaded \(url.path) — \(config.summary)")
+        if !config.skipped.isEmpty { write("config: no engine named \(config.skipped.map { "«\($0)»" }.joined(separator: ", ")) in this build, skipped; the others load as named") }
     }
 
     private func onDisk() throws -> (data: Data, json: Json, config: Config) {

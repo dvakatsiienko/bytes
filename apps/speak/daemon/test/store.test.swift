@@ -109,6 +109,14 @@ enum StoreTest {
         file.putBack(shape)
         store.refresh()
         rows.append(("a backup put back with its old moment is seen", "\(store.current.meterFlowMs)", "70.0"))
+        // a provider this build has no engine for, still named in the file
+        let removed = shape.replacingOccurrences(of: "\"ru\": [\"elevenlabs\", \"system\"]", with: "\"ru\": [\"speechify\", \"elevenlabs\", \"system\"]")
+        file.put(removed)
+        file.lines = []
+        rows.append(("a file naming a removed provider loads", "\(store.refresh() ?? "ok") \(store.current.chain[.ru, default: []].map(\.rawValue))", #"ok ["elevenlabs", "system"]"#))
+        rows.append(("and its log says so", file.lines.last ?? "-", "config: no engine named «speechify» in this build, skipped; the others load as named"))
+        rows.append(("a save over it still writes", reason { try store.save(json(#"{"meterFlowMs":6}"#), over: store.saved().version) }, ""))
+        rows.append(("and keeps the name", "\(file.text.contains("\"speechify\""))", "true"))
         file.link()
         _ = try? store.save(json(#"{"meterFlowMs":3}"#), over: store.saved().version)
         rows.append(("a linked file stays a link, and its target is written", "\(file.isLink) \(file.text.contains("\"meterFlowMs\": 3"))", "true true"))

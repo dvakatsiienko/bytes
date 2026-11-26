@@ -14,6 +14,8 @@ struct Config: Decodable {
     let volume: Double
     let cleaner: Cleaner
     let engines: [Engine: EngineConfig]
+    // providers the file names that this build has no engine for: skipped, so a removed one costs nothing else
+    private(set) var skipped: [String] = []
 
     subscript(engine: Engine) -> EngineConfig { engines[engine] ?? EngineConfig() }
 
@@ -26,8 +28,9 @@ struct Config: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        var skipped: [String] = []
         chain = try Self.keyed(container.decode([String: [String]].self, forKey: .chain), Lang.init) { names in
-            try names.map { try Self.parse($0, Engine.init) }
+            names.compactMap { name in Engine(rawValue: name) ?? { skipped.append(name); return nil }() }
         }
         // asked for as an Int, a half is reported as broken json and names no key
         guard let budget = Int(exactly: try container.decode(Double.self, forKey: .firstAudioMs)) else {
@@ -42,7 +45,10 @@ struct Config: Decodable {
         try inRange("meterGlideMs", meterGlideMs, 0...200)
         try inRange("meterFlowMs", meterFlowMs, 0...200)
         try inRange("volume", volume, 0...100)
-        engines = try Self.keyed(container.decode([String: EngineConfig].self, forKey: .engines), Engine.init) { $0 }
+        let named = try container.decode([String: EngineConfig].self, forKey: .engines)
+        skipped += named.keys.filter { Engine(rawValue: $0) == nil }
+        engines = Dictionary(uniqueKeysWithValues: named.compactMap { name, settings in Engine(rawValue: name).map { ($0, settings) } })
+        self.skipped = Array(Set(skipped)).sorted()
     }
 
     private init(chain: [Lang: [Engine]], firstAudioMs: Int, engines: [Engine: EngineConfig]) {

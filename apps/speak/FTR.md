@@ -184,6 +184,10 @@
   - given a config the daemon cannot read
   - when it is saved
   - then the status line reads «rejected — config.json: unknown name «…» …» and the daemon keeps its last good config
+- ⬜ a provider the settings name but this build has no engine for is skipped
+  - given `speechify` in a chain or under `engines` and no speechify engine, when the daemon loads the file, then the rest loads, the log reads «config: no engine named «speechify» in this build, skipped; the others load as named», and the chain runs on its other engines
+  - given a save over that file, then it writes and keeps the name; a save that adds a new unknown name is refused as above
+  - decision: a removed provider never breaks the load (dima, 25 Nov: easy to add and remove); a typo on the page is still refused
 
 - ✅ only the admin page can write: another web page's request is refused
   - given a POST or PUT to the api without `content-type: application/json`
