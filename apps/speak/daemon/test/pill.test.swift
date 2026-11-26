@@ -32,6 +32,10 @@ enum PillTest {
             ("no sentence", PillFixture.allCases.filter { !printed($0).contains("sentence") }.map(\.rawValue).joined(separator: " "), "fell-through idle-stuck code-block"),
             ("an unknown one names the ten", "\(ArgumentsError.unknownPill("nope"))", "unknown pill «nope» — one of: reading, volume-row, speed-row, paused, fell-through, hover, long-line, idle-stuck, no-word-timings, code-block"),
             ("a word lit stands in its sentence", places.joined(separator: " "), ""),
+        ]) + check("the sentence row", [
+            ("a mark lights its word", "\(PillFixture.reading.model.sentence!.parts)", #"(heard: "The ", lit: "kettle", ahead: " clicks off and the room is quiet.")"#),
+            ("no mark lights nothing", "\(PillFixture.noWordTimings.model.sentence!.parts)", #"(heard: "The kettle clicks off and the room is quiet.", lit: "", ahead: "")"#),
+            ("a mark off its word lights nothing", "\(PillModel.Sentence(text: "one two", word: .init(text: "two", offset: 0, isHeld: false)).parts.lit)", ""),
         ])
     }
 }

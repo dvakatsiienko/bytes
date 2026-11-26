@@ -15,6 +15,15 @@ struct PillModel: Encodable, Equatable {
         let text: String
         // nil where the engine gave no word timings
         var word: Word?
+
+        // what the row draws: the heard part, the lit word, what is still ahead. the word is lit only from a mark, so
+        // with none the whole sentence is heard and nothing is lit
+        var parts: (heard: String, lit: String, ahead: String) {
+            guard let word, word.offset >= 0, text.dropFirst(word.offset).hasPrefix(word.text) else { return (text, "", "") }
+            let start = text.index(text.startIndex, offsetBy: word.offset)
+            let end = text.index(start, offsetBy: word.text.count)
+            return (String(text[..<start]), String(text[start..<end]), String(text[end...]))
+        }
     }
     struct Word: Encodable, Equatable {
         let text: String

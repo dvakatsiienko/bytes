@@ -78,13 +78,9 @@ struct PanelView: View {
             .frame(height: Self.controlRow)
             if hasSentenceRow {
                 Rectangle().fill(Color.white.opacity(0.1)).frame(height: 1)
-                Text(model.state.sentence?.text ?? model.state.notice?.line ?? "")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color.white.opacity(0.62))
-                    .lineLimit(1)
+                SentenceRow(sentence: model.state.sentence, notice: model.state.notice)
                     .padding(.horizontal, 12)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .textSelection(.enabled)
             }
         }
         .frame(width: Self.width, height: Self.size(hasSentenceRow: hasSentenceRow).height)
@@ -97,6 +93,45 @@ struct PanelView: View {
         .contentShape(shape)
         .gesture(DragGesture(minimumDistance: 2).onChanged { _ in model.onDrag() }.onEnded { _ in model.onDragEnd() })
         .environment(\.colorScheme, .dark)
+    }
+}
+
+// the sentence in the heard tone, its spoken word on a pad, what is ahead dimmer; a notice in its place says what the
+// read did instead, led by its glyph
+struct SentenceRow: View {
+    static let heard = Color.white.opacity(0.88)
+    static let ahead = Color.white.opacity(0.5)
+    let sentence: PillModel.Sentence?
+    let notice: PillModel.Notice?
+
+    var body: some View {
+        Group {
+            if let notice {
+                HStack(spacing: 6) {
+                    if notice == .codeBlock {
+                        Image(systemName: "chevron.left.forwardslash.chevron.right").font(.system(size: 9, weight: .semibold))
+                    }
+                    Text(notice.line)
+                }
+                .foregroundStyle(Self.heard)
+            } else if let sentence {
+                let parts = sentence.parts
+                HStack(spacing: 0) {
+                    Text(parts.heard).foregroundStyle(Self.heard)
+                    if !parts.lit.isEmpty {
+                        Text(parts.lit)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 3)
+                            .background(RoundedRectangle(cornerRadius: 4).fill(LevelMeter.accent.opacity(0.42)))
+                    }
+                    Text(parts.ahead).foregroundStyle(Self.ahead)
+                }
+            }
+        }
+        .font(.system(size: 13))
+        .lineLimit(1)
+        .textSelection(.enabled)
     }
 }
 
