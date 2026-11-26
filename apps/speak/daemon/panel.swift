@@ -2,6 +2,7 @@
 // every space, drags anywhere and remembers where. the meter is the one moving part: the mixer's real level, drawn
 // at the display's refresh rate while audio plays and still otherwise — cut `LevelMeter` and `Player.onLevels` to drop it.
 import AppKit
+import Combine
 import SwiftUI
 
 @MainActor
@@ -16,6 +17,10 @@ final class PanelModel: ObservableObject {
     @Published var hovered: String?
     // the reading engine's speed, as the player plays it
     @Published var speed: Double = 1
+    // the master volume, 0–100
+    @Published var volume: Double = 100
+    // where each control sits in the pill, by its name: the hint stands over it
+    var frames: [String: CGRect] = [:]
     var speedLabel: String { String(format: "%g×", (speed * 100).rounded() / 100) }
 
     init(tuning: @escaping @MainActor () -> (glide: Double, flow: Double)) { meter = Meter(tuning: tuning) }
@@ -49,16 +54,11 @@ struct PanelView: View {
         let shape = RoundedRectangle(cornerRadius: hasSentenceRow ? 14 : Self.controlRow / 2, style: .continuous)
         VStack(spacing: 0) {
             HStack(spacing: 2) {
-                PillButton(model: model, symbol: "xmark", label: "Close the panel, keep speaking", action: model.onClose)
+                PillButton(model: model, symbol: "xmark", label: "close the pill", action: model.onClose)
                 LevelMeter(meter: model.meter, isRunning: look.isMeterRunning, isPaused: model.state.playback.isPaused)
                     .frame(maxWidth: .infinity)
-                PillButton(model: model, symbol: "speaker.wave.2.fill", label: "Volume", action: {})
-                Text(model.speedLabel)
-                    .font(.system(size: 12, weight: .medium))
-                    .monospacedDigit()
-                    .foregroundStyle(Color.white.opacity(0.85))
-                    .padding(.horizontal, 4)
-                    .accessibilityLabel("Speed \(model.speedLabel)")
+                PillButton(model: model, symbol: "speaker.wave.2.fill", label: "volume \(Int(model.volume.rounded()))", action: {})
+                PillButton(model: model, text: model.speedLabel, label: "speed \(model.speedLabel)", action: {})
                 Divider().frame(height: 16).overlay(Color.white.opacity(0.14))
                 PillButton(
                     model: model,
@@ -69,7 +69,7 @@ struct PanelView: View {
                 )
                 PillButton(model: model, symbol: "stop.fill", label: "stop F5", action: model.onStop)
                 Divider().frame(height: 16).overlay(Color.white.opacity(0.14))
-                PillButton(model: model, symbol: "pin.fill", label: model.isSticky ? "Unstick" : "Stick: stay after speech ends", isOn: model.isSticky) {
+                PillButton(model: model, symbol: "pin.fill", label: model.isSticky ? "let it go after the read" : "stay up after the read", isOn: model.isSticky) {
                     model.isSticky.toggle()
                     if !model.isSticky { model.onUnstick() }
                 }
@@ -85,6 +85,8 @@ struct PanelView: View {
             }
         }
         .frame(width: Self.width, height: Self.size(hasSentenceRow: hasSentenceRow).height)
+        .coordinateSpace(name: "pill")
+        .onPreferenceChange(ControlFrames.self) { frames in model.frames = frames }
         // the line fades as its row closes: a fade, never a slide, so Reduce Motion keeps it
         .animation(.easeOut(duration: 0.2), value: hasSentenceRow)
         // the tint sits over the glass: a second .background would land behind it and vanish
@@ -120,23 +122,49 @@ struct SentenceRow: View {
                 }
                 .foregroundStyle(Self.heard)
             } else if let sentence {
-                let parts = sentence.parts
-                HStack(spacing: 0) {
-                    Text(parts.heard).foregroundStyle(isPaused ? Self.ahead : Self.heard)
-                    if !parts.lit.isEmpty {
-                        Text(parts.lit)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(isPaused ? Self.heard : .white)
-                            .padding(.horizontal, 3)
-                            .background(RoundedRectangle(cornerRadius: 4).fill(isPaused ? Color.white.opacity(0.14) : LevelMeter.accent.opacity(0.42)))
+                GeometryReader { proxy in
+                    let parts = sentence.parts
+                    let widths = (heard: Self.width(parts.heard), lit: parts.lit.isEmpty ? 0 : Self.width(parts.lit, bold: true) + 6, ahead: Self.width(parts.ahead))
+                    let whole = widths.heard + widths.lit + widths.ahead
+                    let room = proxy.size.width
+                    let fits = whole <= room
+                    // too long: the lit word held in the middle; with no word lit, the line from its start
+                    let x = fits ? (room - whole) / 2 : parts.lit.isEmpty ? 0 : room / 2 - widths.heard - widths.lit / 2
+                    HStack(spacing: 0) {
+                        Text(parts.heard).foregroundStyle(isPaused ? Self.ahead : Self.heard)
+                        if !parts.lit.isEmpty {
+                            Text(parts.lit)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(isPaused ? Self.heard : .white)
+                                .padding(.horizontal, 3)
+                                .background(RoundedRectangle(cornerRadius: 4).fill(isPaused ? Color.white.opacity(0.14) : LevelMeter.accent.opacity(0.42)))
+                        }
+                        Text(parts.ahead).foregroundStyle(Self.ahead)
                     }
-                    Text(parts.ahead).foregroundStyle(Self.ahead)
+                    .fixedSize()
+                    .offset(x: x)
+                    .frame(width: room, height: proxy.size.height, alignment: .leading)
+                    .clipped()
+                    .mask(Self.fade(fits: fits, both: !parts.lit.isEmpty))
                 }
             }
         }
         .font(.system(size: 13))
         .lineLimit(1)
         .textSelection(.enabled)
+    }
+
+    private static func width(_ text: String, bold: Bool = false) -> CGFloat {
+        NSAttributedString(string: text, attributes: [.font: NSFont.systemFont(ofSize: 13, weight: bold ? .semibold : .regular)]).size().width
+    }
+
+    // a line that fits shows whole; a long one fades at both ends, or at its far end alone while no word is lit
+    private static func fade(fits: Bool, both: Bool) -> LinearGradient {
+        let edge = fits ? Color.black : Color.clear
+        return LinearGradient(stops: [
+            .init(color: both ? edge : .black, location: 0), .init(color: .black, location: 0.1),
+            .init(color: .black, location: 0.9), .init(color: edge, location: 1),
+        ], startPoint: .leading, endPoint: .trailing)
     }
 }
 
@@ -173,7 +201,9 @@ struct LevelMeter: View {
 
 struct PillButton: View {
     @ObservedObject var model: PanelModel
-    let symbol: String
+    var symbol = ""
+    // a value drawn in place of an icon, the speed's «1.15×»
+    var text: String?
     let label: String
     var isOn = false
     var isDisabled = false
@@ -183,22 +213,60 @@ struct PillButton: View {
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(isOn ? LevelMeter.accent : Color.white.opacity(0.72))
+            Group {
+                if let text {
+                    Text(text).font(.system(size: 12, weight: .medium)).monospacedDigit().padding(.horizontal, 6)
+                } else {
+                    Image(systemName: symbol).font(.system(size: 10, weight: .semibold))
+                }
+            }
+                .foregroundStyle(isOn ? LevelMeter.accent : Color.white.opacity(text == nil ? 0.72 : 0.88))
                 .frame(minWidth: 26, minHeight: 26)
                 .background(Capsule().fill(isOn ? LevelMeter.accent.opacity(0.28) : Color.white.opacity(isHovered ? 0.12 : 0)))
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .background(GeometryReader { proxy in Color.clear.preference(key: ControlFrames.self, value: [label: proxy.frame(in: .named("pill"))]) })
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.35 : 1)
-        .help(label)
         .accessibilityLabel(label)
         .onHover { isHovered in
             model.hovered = isHovered ? label : nil
             if isHovered { NSCursor.pointingHand.push() } else { NSCursor.pop() }
         }
+    }
+}
+
+struct ControlFrames: PreferenceKey {
+    static let defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) { value.merge(nextValue()) { $1 } }
+}
+
+// a control's name over it, its key in a chip: «pause ⇧F4», «stop F5»; the same words VoiceOver reads
+struct HintView: View {
+    let label: String
+
+    var body: some View {
+        let words = label.split(separator: " ").map(String.init)
+        let key = words.last.flatMap { $0.contains("F") && $0.count <= 3 ? $0 : nil }
+        HStack(spacing: 6) {
+            Text((key == nil ? words : words.dropLast()).joined(separator: " "))
+            if let key {
+                Text(key)
+                    .font(.system(size: 10, weight: .medium))
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Color.white.opacity(0.3), lineWidth: 1))
+            }
+        }
+        .font(.system(size: 12))
+        .foregroundStyle(Color.white.opacity(0.92))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color(white: 0.11)))
+        .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
+        .fixedSize()
+        .environment(\.colorScheme, .dark)
     }
 }
 
@@ -244,12 +312,41 @@ final class Panel: SpeechPill {
     // how far into the read's sound the listener is, in seconds at 1×: brings up each queued sentence
     var position: () -> Double = { 0 }
     private var sentenceTimer: Timer?
+    // the hint over the control under the pointer: its own window above the pill, so it can stand outside the body
+    private lazy var hintWindow: NSPanel = {
+        let hint = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+        hint.level = .floating
+        hint.backgroundColor = .clear
+        hint.isOpaque = false
+        hint.hasShadow = true
+        hint.ignoresMouseEvents = true
+        return hint
+    }()
+    private var hovering: AnyCancellable?
 
     init(settings: @escaping @MainActor () -> Config) {
         self.settings = settings
         model = PanelModel(tuning: { [unsaved] in unsaved.tuning ?? (settings().meterGlideMs, settings().meterFlowMs) })
         model.onDrag = { [weak self] in self?.drag() }
         model.onDragEnd = { [weak self] in self?.dragEnded() }
+        hovering = model.$hovered.removeDuplicates().receive(on: RunLoop.main).sink { [weak self] label in
+            MainActor.assumeIsolated { self?.showHint(label) }
+        }
+    }
+
+    // over the control, inside the pill's width, a few points above its top edge
+    private func showHint(_ label: String?) {
+        guard let label, window.isVisible, let control = model.frames[label] else {
+            if hintWindow.isVisible { window.removeChildWindow(hintWindow); hintWindow.orderOut(nil) }
+            return
+        }
+        let view = NSHostingView(rootView: HintView(label: label))
+        let size = view.fittingSize
+        hintWindow.contentView = view
+        let pill = window.frame
+        let x = min(max(pill.minX, pill.minX + control.midX - size.width / 2), pill.maxX - size.width)
+        hintWindow.setFrame(NSRect(x: x, y: pill.maxY + 6, width: size.width, height: size.height), display: true)
+        if !hintWindow.isVisible { window.addChildWindow(hintWindow, ordered: .above) }
     }
 
     private func drag() {
@@ -296,6 +393,7 @@ final class Panel: SpeechPill {
         model.meter.reset()
         endWave()
         if let lead = settings().chain[.en]?.first { model.speed = settings()[lead].speed }
+        model.volume = settings().volume
         show()
     }
 
@@ -345,6 +443,7 @@ final class Panel: SpeechPill {
     }
 
     func hide() {
+        showHint(nil)
         window.orderOut(nil)
         model.meter.reset()
         model.state.hasSignal = false
@@ -399,9 +498,11 @@ final class Panel: SpeechPill {
         model.state.reads(fixture.sentence)
         if let notice = fixture.notice { model.state.noticed(notice) }
         if fixture.openRow?.control == .speed, let speed = fixture.openRow?.value { model.speed = speed }
-        if fixture.hint?.control == .stop { model.hovered = "stop F5" }
+        if fixture.openRow?.control == .volume, let volume = fixture.openRow?.value { model.volume = volume }
         fitWindow()
         show()
+        // the hint finds its control once the pill has laid out
+        if fixture.hint?.control == .stop { DispatchQueue.main.async { self.model.hovered = "stop F5" } }
     }
 
     private func showSampleLevels() {

@@ -71,7 +71,7 @@ struct PillState: Equatable {
         let isSpeaking = playback != .idle || isSample
         return PillLook(
             symbol: isSpeaking && !playback.isPaused ? "pause.fill" : "play.fill",
-            label: !isSpeaking ? "Nothing playing" : playback.isPaused ? "Resume · F4" : "Pause · F4",
+            label: !isSpeaking ? "nothing playing" : playback.isPaused ? "resume ⇧F4" : "pause ⇧F4",
             isDisabled: !isSpeaking,
             isMeterRunning: (isSpeaking || isWaveOn) && !playback.isPaused && hasSignal
         )

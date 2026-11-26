@@ -340,7 +340,7 @@ enum SeamsTest {
             let look = pill(steps).look
             return "\(look.symbol) \(look.label)\(look.isDisabled ? ", off" : "")\(look.isMeterRunning ? ", meter" : "")"
         }
-        let idle = "play.fill Nothing playing, off", talks = "pause.fill Pause · F4", held = "play.fill Resume · F4"
+        let idle = "play.fill nothing playing, off", talks = "pause.fill pause ⇧F4", held = "play.fill resume ⇧F4"
         return check("pill", [
             ("nothing plays", look { _ in }, idle),
             ("it talks", look { $0.follow(reading); $0.hasSignal = true }, talks + ", meter"),
