@@ -27,6 +27,7 @@ const BRAND_HUE: Record<Engine, string> = {
   fish: '#0e8fd6',
   gemini: '#6f8cf2',
   kokoro: '#e0457b',
+  speechify: '#2f43fa',
   system: '#8b5cf6',
 };
 
@@ -97,6 +98,17 @@ const GLYPHS: Record<Engine, (id: string) => ReactNode> = {
           d='M12 18.6s-6-3.6-6-7.8A3.3 3.3 0 0 1 12 8.9a3.3 3.3 0 0 1 6 1.9c0 4.2-6 7.8-6 7.8z'
           fill='#fff'
         />
+      </>
+    );
+  },
+  // three rising sound bars in white on blue — ours, not the brand's mark, which we do not draw from memory
+  speechify: () => {
+    return (
+      <>
+        <rect fill='#2f43fa' height='24' width='24' />
+        <rect fill='#fff' height='5' rx='1.2' width='2.4' x='6.5' y='9.5' />
+        <rect fill='#fff' height='9' rx='1.2' width='2.4' x='10.8' y='7.5' />
+        <rect fill='#fff' height='13' rx='1.2' width='2.4' x='15.1' y='5.5' />
       </>
     );
   },

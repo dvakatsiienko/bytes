@@ -51,7 +51,7 @@ enum ConfigTest {
         return check("engine table", [
             ("cloud", names { $0.isCloud }, names { $0.facts.keyName != nil }),
             ("streams", names { $0.facts.streams }, "elevenlabs fish"),
-            ("speaks english", names { $0.speaks(.en) }, "elevenlabs kokoro system fish gemini"),
+            ("speaks english", names { $0.speaks(.en) }, "elevenlabs kokoro system fish gemini speechify"),
             ("speaks ukrainian", names { $0.speaks(.uk) }, "elevenlabs system fish gemini"),
             ("speaks russian", names { $0.speaks(.ru) }, "elevenlabs system fish gemini"),
         ])

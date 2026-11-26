@@ -3,7 +3,7 @@ import Foundation
 
 enum Engine: String, CaseIterable {
     // the order the page draws those outside a chain in
-    case elevenlabs, kokoro, system, fish, gemini
+    case elevenlabs, kokoro, system, fish, gemini, speechify
 
     var type: any VoiceEngine.Type {
         switch self {
@@ -12,6 +12,7 @@ enum Engine: String, CaseIterable {
         case .system: MacVoice.self
         case .fish: Fish.self
         case .gemini: Gemini.self
+        case .speechify: Speechify.self
         }
     }
 
@@ -135,9 +136,14 @@ func streamed(_ request: URLRequest, _ net: any Net) -> Pieces {
 
 // one piece, once the whole answer is here
 func rendered(_ request: URLRequest, _ net: any Net, _ pcm: @escaping @Sendable (Data) throws -> Data = { $0 }) -> Pieces {
+    rendered(request, net, answer: { Rendered(pcm: try pcm($0)) })
+}
+
+// one piece and the words in it, once the whole answer is here
+func rendered(_ request: URLRequest, _ net: any Net, answer: @escaping @Sendable (Data) throws -> Rendered) -> Pieces {
     pieces { continuation in
         let (status, body) = try await net.whole(request)
         guard status == 200 else { throw engineError(status: status, body: body) }
-        continuation.yield(Rendered(pcm: try pcm(body)))
+        continuation.yield(try answer(body))
     }
 }

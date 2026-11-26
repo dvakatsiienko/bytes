@@ -1,6 +1,6 @@
 # speak — glossary
 
-- **engine** — a way to turn text into speech: elevenlabs, kokoro, fish, gemini, or the macOS voice
+- **engine** — a way to turn text into speech: elevenlabs, kokoro, fish, gemini, speechify, or the macOS voice
 - **catalogue** — the daemon's list of its engines: each one's label, languages and voices
 - **chain** — one language's engines in the order the daemon tries them; a failing engine hands the line to the next
 - **voice** — the speaker an engine uses, chosen per language

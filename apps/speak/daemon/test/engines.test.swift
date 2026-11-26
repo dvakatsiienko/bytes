@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 enum EnginesTest {
     static func failures() async -> Int {
-        await requestFailures() + renderFailures() + balanceFailures() + holdFailures() + playFailures() + cacheFailures() + voicesFailures()
+        await requestFailures() + renderFailures() + SpeechifyTest.failures() + balanceFailures() + holdFailures() + playFailures() + cacheFailures() + voicesFailures()
     }
 
     static func engine(_ id: Engine, _ net: PlantedNet) -> any VoiceEngine { id.type.init(EngineParts(net: net, mac: PlantedMac())) }
@@ -54,8 +54,8 @@ enum EnginesTest {
         let net = { (body: [Data], status: Int) in PlantedNet(status: status, body: body) }
         let gemini = { (audio: [UInt8]) in Data(#"{"candidates":[{"content":{"parts":[{"inlineData":{"data":"\#(Data(audio).base64EncodedString())"}}]}}]}"#.utf8) }
         var rows: [(name: String, got: String, want: String)] = []
-        // the pieces as they come, the marks with them: none from any engine today
-        for id in Engine.allCases {
+        // the pieces as they come; speechify's answer and marks are its own file's
+        for id in Engine.allCases where id != .speechify {
             let body = id == .gemini ? [gemini([1, 2, 3, 4])] : [Data([1, 2]), Data([3, 4])]
             let want = id == .system ? "7.7" : id.facts.streams ? "1.2 | 3.4" : "1.2.3.4"
             rows.append(("\(id) renders", await render(id, net(body, 200)), want))

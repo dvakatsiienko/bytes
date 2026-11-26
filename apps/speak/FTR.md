@@ -110,6 +110,11 @@
   - given gemini sits before another voice in a chain and has no sound within the first audio budget, then that voice reads the sentence, as for every cloud voice
   - given a voice breaks off in the middle of a sentence, then the read goes on with the next sentence, and no other voice starts that one again
   - given the daemon's main thread stuck for over a minute, then `status` no longer says speaking, so relaunch, rollback and try are open
+- ⬜ speechify reads english after kokoro, its marks lit through the word map
+  - given `SPEECHIFY_API_KEY` (1password `speechify-golden`), when kokoro is benched, then speechify reads the en text in harper; with no key, its card reads «no key» as any engine's
+  - given the `voices` op, then it lists Harper, Beatrice, Imogen, Geffen and Carly, speechify's english staff picks (26 Nov)
+  - given an answer, then each of its word marks lights the grabbed word it speaks; an answer with no marks plays with none
+  - decision: the seed's en chain holds it after kokoro; dima's live chain gains it only by his own save (the admin chunk)
 - ⬜ the first audio budget, in ms, 100 to 3000
   - given the budget reads 900
   - when the user clears its box, or types 0

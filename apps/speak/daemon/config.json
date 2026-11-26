@@ -1,6 +1,6 @@
 {
   "chain": {
-    "en": ["kokoro", "fish", "system", "elevenlabs"],
+    "en": ["kokoro", "speechify", "fish", "system", "elevenlabs"],
     "ru": ["elevenlabs", "system"],
     "uk": ["elevenlabs", "system"]
   },
@@ -48,6 +48,15 @@
       "voice": {
         "*": "af_heart",
         "en": "af_heart"
+      }
+    },
+    "speechify": {
+      "favourites": ["harper_32"],
+      "gain": 1,
+      "model": "simba-3.5",
+      "speed": 1,
+      "voice": {
+        "*": "harper_32"
       }
     },
     "system": {
