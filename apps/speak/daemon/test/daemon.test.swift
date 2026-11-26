@@ -13,6 +13,8 @@ struct Case: Decodable {
     // the cleaner's rules this case turns off; such a case reads otherwise with every rule on
     var off: [String]?
     var dictionary: [String: String]?
+    // the next list item's marker accessibility says the selection only touched
+    var next: String?
     // each spoken word, in order, and the part of `in` it lights
     var words: [Word]?
 
@@ -118,7 +120,7 @@ struct DaemonTest {
             print("✗ no golden case turns off «\(rule.rawValue)»")
         }
         for item in cases {
-            let read = { (cleaner: Cleaner) in normalize(item.in, .shipped, cleaner).map { [$0.lang.rawValue, $0.text] } }
+            let read = { (cleaner: Cleaner) in normalize(item.in, .shipped, cleaner, nextMarker: item.next).map { [$0.lang.rawValue, $0.text] } }
             let got = read(item.cleaner)
             if got != item.out || (item.off ?? []).contains(where: { CleanerRule(rawValue: $0) == nil }) {
                 failed += 1
@@ -129,21 +131,21 @@ struct DaemonTest {
                 print("✗ \(item.in)\n  reads the same with \(item.off ?? []) on")
             }
             // each spoken word lights a part of the text; the hard cases name which
-            let chunks = spokenChunks(of: item.in, .shipped, item.cleaner)
+            let chunks = spokenChunks(of: item.in, .shipped, item.cleaner, nextMarker: item.next)
             let spoken = chunks.flatMap { chunk in chunk.words.map { Case.Word(say: (chunk.text as NSString).substring(with: NSRange($0.said)), from: $0.source.lowerBound, to: $0.source.upperBound) } }
             if spoken.contains(where: { $0.from >= $0.to || $0.to > item.in.utf16.count }) || item.words.map({ $0 != spoken }) == true {
                 failed += 1
                 print("✗ \(item.in)\n  want words \(item.words ?? [])\n  got  \(spoken)")
             }
             // a chunk comes from inside the text, after the one before it
-            let sources = spokenChunks(of: item.in, .shipped, item.cleaner).map(\.source)
+            let sources = spokenChunks(of: item.in, .shipped, item.cleaner, nextMarker: item.next).map(\.source)
             if !zip(sources, sources.dropFirst()).allSatisfy({ $0.upperBound <= $1.lowerBound }) || sources.contains(where: { $0.isEmpty || $0.upperBound > item.in.utf16.count }) {
                 failed += 1
                 print("✗ \(item.in)\n  sources \(sources)")
             }
             // and holds the words it says, those the text has
             let words = { (text: String) in Set(text.lowercased().split { !$0.isLetter }.map(String.init).filter { $0.count > 3 }) }
-            for chunk in spokenChunks(of: item.in, .shipped, item.cleaner) {
+            for chunk in spokenChunks(of: item.in, .shipped, item.cleaner, nextMarker: item.next) {
                 let gone = words(chunk.text).intersection(words(item.in)).subtracting(words((item.in as NSString).substring(with: NSRange(chunk.source))))
                 if gone.isEmpty { continue }
                 failed += 1

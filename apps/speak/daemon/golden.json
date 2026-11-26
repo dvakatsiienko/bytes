@@ -625,7 +625,8 @@
     },
     {
       "in": "merge2. commit3.",
-      "out": [["en", "merge. 2: commit"]]
+      "out": [["en", "merge. 2: commit"]],
+      "next": "3. "
     },
     {
       "in": "ask cc to ship it",
@@ -790,6 +791,18 @@
       "out": [
         ["en", "the reminder at reminders dot md, line 43 still calls it"]
       ]
+    },
+    {
+      "in": "I moved to the M1. Battery life beats the M2.",
+      "out": [["en", "I moved to the M1. Battery life beats the M2."]]
+    },
+    {
+      "in": "Compare the M2. The M3.",
+      "out": [["en", "Compare the M2. The M3."]]
+    },
+    {
+      "in": "Upgrade from python2. Install python3.",
+      "out": [["en", "Upgrade from python2. Install python3."]]
     }
   ]
 }

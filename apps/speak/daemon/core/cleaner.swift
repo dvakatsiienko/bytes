@@ -35,7 +35,7 @@ struct Cleaner: Decodable, Equatable {
         }
         let words = try container.decodeIfPresent([String: Said].self, forKey: .dictionary) ?? [:]
         self.init(off: off, dictionary: try words.map { word, said in
-            if let why = refusal(word) { throw ConfigError.refusedWord(word, why) }
+            if let why = refusal(word) ?? (said.say.allSatisfy(\.isWhitespace) ? "it says nothing" : nil) { throw ConfigError.refusedWord(word, why) }
             return Entry(word: word, say: said.say, anyCase: said.anyCase)
         })
     }

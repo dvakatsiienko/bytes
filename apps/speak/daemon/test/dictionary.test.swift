@@ -24,22 +24,25 @@ enum DictionaryTest {
         ]
         // with the entry cc, every golden case without the word reads as it did
         for item in golden where item.off == nil && item.dictionary == nil && item.in.range(of: "(?<![\\p{L}\\p{N}_])cc(?![\\p{L}\\p{N}_])", options: .regularExpression) == nil {
-            let got = normalize(item.in, .shipped, Cleaner(dictionary: cc)).map { [$0.lang.rawValue, $0.text] }
+            let got = normalize(item.in, .shipped, Cleaner(dictionary: cc), nextMarker: item.next).map { [$0.lang.rawValue, $0.text] }
             if got != item.out { rows.append(("golden with cc: \(item.in.prefix(40))", "\(got)", "\(item.out)")) }
         }
+        rows.append(("never inside a span a rule rewrote", say("open server:8080", [Cleaner.Entry(word: "port", say: "harbour")]), "open server port 8080"))
+        rows.append(("never inside a file name", say("see notes.md", [Cleaner.Entry(word: "notes", say: "NOTES")]), "see notes dot md"))
+        rows.append(("an entry that says nothing is refused", refusal("x", say: " "), "it says nothing"))
         for (word, why) in [("notes.md", "a file name"), ("docs/x", "a path or a link"), ("3f9a2b1c4d", "an id"), ("…", "it holds no letter")] {
             rows.append(("«\(word)» is refused", refusal(word), why))
         }
         return check("dictionary", rows)
     }
 
-    private static func refusal(_ word: String) -> String {
-        let json = #"{"chain":{},"firstAudioMs":900,"engines":{},"cleaner":{"dictionary":{"\#(word)":"x"}}}"#
+    private static func refusal(_ word: String, say: String = "x") -> String {
+        let json = #"{"chain":{},"firstAudioMs":900,"engines":{},"cleaner":{"dictionary":{"\#(word)":"\#(say)"}}}"#
         do {
             _ = try JSONDecoder().decode(Config.self, from: Data(json.utf8))
             return "loaded"
         } catch {
-            return configReason(error).range(of: "a file name|a path or a link|an id|it holds no letter", options: .regularExpression).map { String(configReason(error)[$0]) } ?? configReason(error)
+            return configReason(error).range(of: "a file name|a path or a link|an id|it holds no letter|it says nothing", options: .regularExpression).map { String(configReason(error)[$0]) } ?? configReason(error)
         }
     }
 }

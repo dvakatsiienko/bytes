@@ -257,7 +257,8 @@
   - given «pid 4821», then «pid» names «pid» and no spoken word names the number it dropped
   - decision: a word lights the whole grabbed word around it, between spaces, so «dot» in «exa dot md» lights `exa.md`; the pill lights words through this map (the pill chunk)
 - ⬜ a code block is skipped, and the pill says so in its place
-  - given a sentence, a ``` block and a sentence, when F4 reads them, then the first sentence is heard to its end, the pill's notice reads «a code block. skipped.», then the second is asked for and heard
+  - given a sentence, a ``` block and a sentence, when F4 reads them, then the first sentence is heard to its end, the pill is handed its notice «a code block. skipped.» and the log reads «a code block, skipped», then the second is asked for and heard
+  - decision: today's pill holds the notice and draws none of it; drawing it is the pill chunk's (FRM-290)
   - given a text that is only a block, then no engine is asked and the read ends as any read does; leading, trailing and two side-by-side blocks each keep their place; a stop before a block's turn tells nothing
   - given `codeBlocks` off, then the block's text is read as words, as before the rule
 - ⬜ a word is taught in a file, with no rebuild

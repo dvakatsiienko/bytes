@@ -77,7 +77,20 @@ private enum Cut {
     static let token = "\\b(?=(?:[A-Za-z]*\\d){6})(?=[A-Za-z0-9]*[A-Za-z])[A-Za-z0-9]{16,}\\b"
     // never from inside a word or a url the url rule left
     static let path = "(?<![:/\\w.-])(?:~|\\.{1,2})?/?(?:[\\w.-]+/)+[\\w.-]*"
-    static let all: [(String, NSRegularExpression.Options)] = [(fileLink, .caseInsensitive), (url, .caseInsensitive), (uuid, []), (commit, []), (token, []), (path, [])]
+    static let date = "\\b(\\d{4})-(\\d{2})-(\\d{2})\\b"
+    static let ip = "\\b(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\b"
+    static let port = "(?<![\\w.-])([A-Za-z0-9][\\w.-]*):(\\d{2,5})\\b"
+    static let ticket = "\\b([A-Z]{2,6})-(\\d+)\\b"
+    static let version = "\\bv?(\\d+(?:\\.\\d+){1,3})\\b"
+    static let fileName = "\\b\\w+\\.(?:ts|tsx|js|md|json|sh|py|swift|go|yaml|toml)\\b"
+    static func unit(_ lists: WordLists) -> String {
+        "(\\d)\\s?(\(lists.units.keys.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern).joined(separator: "|")))(?!\\w)"
+    }
+    // every span a rule before the dictionary rewrites, and a file name the code names rule reads later
+    static func all(_ lists: WordLists) -> [(String, NSRegularExpression.Options)] {
+        [(fileLink, .caseInsensitive), (url, .caseInsensitive), (uuid, []), (commit, []), (token, []), (path, []), (date, []), (ip, []), (port, []), (ticket, []),
+         (version, []), (unit(lists), .caseInsensitive), (fileName, [])]
+    }
 }
 
 private func cutLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) -> SourcedText {
@@ -99,24 +112,23 @@ private func cutLatin(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleane
     if cleaner.on(.ids) { t = t.replacing(Cut.commit, "a commit") }
     if cleaner.on(.ids) { t = t.replacing(Cut.token, "an id") }
     if cleaner.on(.dates) {
-        t = t.replacing("\\b(\\d{4})-(\\d{2})-(\\d{2})\\b") { g in
+        t = t.replacing(Cut.date) { g in
             guard let month = Int(g[2]), (1...12).contains(month), let day = Int(g[3]) else { return g[0] }
             return "\(months[month - 1]) \(day), \(g[1])"
         }
     }
     if cleaner.on(.addresses) { t = t.replacing("\\b127\\.0\\.0\\.1\\b", "localhost") }
-    if cleaner.on(.addresses) { t = t.replacing("\\b(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\b", "$1 dot $2 dot $3 dot $4") }
-    if cleaner.on(.addresses) { t = t.replacing("(?<![\\w.-])([A-Za-z0-9][\\w.-]*):(\\d{2,5})\\b", "$1 port $2") }
-    if cleaner.on(.ticketIds) { t = t.replacing("\\b([A-Z]{2,6})-(\\d+)\\b") { g in "\(spell(g[1])) \(g[2])" } }
+    if cleaner.on(.addresses) { t = t.replacing(Cut.ip, "$1 dot $2 dot $3 dot $4") }
+    if cleaner.on(.addresses) { t = t.replacing(Cut.port, "$1 port $2") }
+    if cleaner.on(.ticketIds) { t = t.replacing(Cut.ticket) { g in "\(spell(g[1])) \(g[2])" } }
     if cleaner.on(.versions) {
-        t = t.replacing("\\bv?(\\d+(?:\\.\\d+){1,3})\\b") { g in
+        t = t.replacing(Cut.version) { g in
             let parts = g[1].split(separator: ".")
             if g[0].hasPrefix("v") { return "version " + parts.joined(separator: " point ") }
             return parts.count > 2 ? parts.joined(separator: " point ") : g[0]
         }
     }
-    let units = lists.units.keys.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern).joined(separator: "|")
-    if cleaner.on(.units) { t = t.replacing("(\\d)\\s?(\(units))(?!\\w)", .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" } }
+    if cleaner.on(.units) { t = t.replacing(Cut.unit(lists), .caseInsensitive) { g in "\(g[1]) \(lists.units[g[2].lowercased()] ?? g[2])" } }
     // a path says only its last part; a bare «audio/video» is two words, not a path
     if cleaner.on(.paths) {
         t = t.replacing(Cut.path) { g in
@@ -208,8 +220,9 @@ private func splitRuns(_ spoken: SourcedText) -> [Run] {
 // lone glued «3.» (FRM-283.) is never a list, and an id's own digits after «-» or «#» never start one. from 2 on, a
 // line that ends in a digit («pr #522. sleep now3.») is tried too, once no cleaner match exists, and kept only when
 // the next number follows it: «node to 22. done» keeps its 22. a selection from inside a list starts at its first
-// number past 1, and the marker of the next item that ends the text is the one the selection only touched
-private func unglueLists(_ text: SourcedText) -> SourcedText {
+// number past 1, and the marker of the next item that ends the text is the one the selection only touched; both only
+// when accessibility named that marker (`touched`): «beats the M2.» ends in prose, not a list
+private func unglueLists(_ text: SourcedText, touched: Int?) -> SourcedText {
     // a bulleted item glued to the one above opens on a quote that touches the last word: «… stays open«a gui …»
     let t = text.replacing("(?<=[\\p{L}\\p{N}])(?=[«“])", "\n")
     let glued = t.text
@@ -226,7 +239,7 @@ private func unglueLists(_ text: SourcedText) -> SourcedText {
             from = found.upperBound
             number += 1
         }
-        let end = breaks.isEmpty ? nil : glued.range(of: "(?<=[^\\s\\d#-])\(number)\\.\\s*\\z", options: .regularExpression, range: from..<glued.endIndex)?.lowerBound
+        let end = breaks.isEmpty || touched != number ? nil : glued.range(of: "(?<=[^\\s\\d#-])\(number)\\.\\s*\\z", options: .regularExpression, range: from..<glued.endIndex)?.lowerBound
         // a line that ends in a digit stays a break only when the next number follows it
         if end == nil { while breaks.last?.afterDigit == true { breaks.removeLast() } }
         return (breaks.map(\.index), end)
@@ -234,7 +247,7 @@ private func unglueLists(_ text: SourcedText) -> SourcedText {
     // a list from 1, or the items a selection holds from inside one: «merge2. commit3.» is items 2 and the start of 3
     var (breaks, end) = list(1)
     if breaks.count + (end == nil ? 0 : 1) < 2 {
-        guard let part = (2...9).lazy.map(list).first(where: { $0.end != nil && !$0.breaks.isEmpty }) else { return t }
+        guard touched != nil, let part = (2...9).lazy.map(list).first(where: { $0.end != nil && !$0.breaks.isEmpty }) else { return t }
         (breaks, end) = part
     }
     // the next item's marker the selection only touched is not read; then from the end, so each place still points where it did
@@ -246,7 +259,8 @@ private func unglueLists(_ text: SourcedText) -> SourcedText {
 func normalize(_ text: String, _ lists: WordLists = .shipped, _ cleaner: Cleaner = Cleaner(), nextMarker: String? = nil) -> [Run] {
     // U+FFFC stands in for an inline image or icon; the private-use units, apple's icons among them, are the dictionary's
     let grabbed = SourcedText(text).replacing("[\\x{FFFC}\\x{0}\(standIns)]", "")
-    let lines = cleaner.on(.lists) ? unglueLists(grabbed) : grabbed
+    let touched = nextMarker.flatMap { Int($0.prefix { $0.isNumber }) }
+    let lines = cleaner.on(.lists) ? unglueLists(grabbed, touched: touched) : grabbed
     let selected = nextMarker.map { lines.replacing("\\n?\(NSRegularExpression.escapedPattern(for: $0))\\z", "") } ?? lines
     guard cleaner.on(.codeBlocks) else { return clean(selected, lists, cleaner) }
     // a code block is cut whole and keeps its place between the runs around it
@@ -263,7 +277,7 @@ private func clean(_ text: SourcedText, _ lists: WordLists, _ cleaner: Cleaner) 
         .map { run in
             let isLatin = run.lang == .en
             var said: [String] = []
-            var t = dictionary(isLatin ? cutLatin(run.spoken, lists, cleaner) : run.spoken, cleaner.dictionary, keeping: Cut.all.flatMap { run.spoken.sources(of: $0.0, $0.1) }, &said)
+            var t = dictionary(isLatin ? cutLatin(run.spoken, lists, cleaner) : run.spoken, cleaner.dictionary, keeping: Cut.all(lists).flatMap { run.spoken.sources(of: $0.0, $0.1) }, &said)
             if isLatin { t = rewriteLatin(t, lists, cleaner) }
             t = tidy(cleaner.on(.symbols) ? symbols(t) : t)
             return Run(lang: run.lang, spoken: t.replacing("[\(standIns)]") { g in said[Int(g[0].unicodeScalars.first!.value) - 0xE000] })
