@@ -50,7 +50,7 @@ struct PanelView: View {
         VStack(spacing: 0) {
             HStack(spacing: 2) {
                 PillButton(model: model, symbol: "xmark", label: "Close the panel, keep speaking", action: model.onClose)
-                LevelMeter(meter: model.meter, isRunning: look.isMeterRunning)
+                LevelMeter(meter: model.meter, isRunning: look.isMeterRunning, isPaused: model.state.playback.isPaused)
                     .frame(maxWidth: .infinity)
                 PillButton(model: model, symbol: "speaker.wave.2.fill", label: "Volume", action: {})
                 Text(model.speedLabel)
@@ -78,12 +78,15 @@ struct PanelView: View {
             .frame(height: Self.controlRow)
             if hasSentenceRow {
                 Rectangle().fill(Color.white.opacity(0.1)).frame(height: 1)
-                SentenceRow(sentence: model.state.sentence, notice: model.state.notice)
+                SentenceRow(sentence: model.state.sentence, notice: model.state.notice, isPaused: model.state.playback.isPaused)
                     .padding(.horizontal, 12)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .transition(.opacity)
             }
         }
         .frame(width: Self.width, height: Self.size(hasSentenceRow: hasSentenceRow).height)
+        // the line fades as its row closes: a fade, never a slide, so Reduce Motion keeps it
+        .animation(.easeOut(duration: 0.2), value: hasSentenceRow)
         // the tint sits over the glass: a second .background would land behind it and vanish
         .background(ZStack { VisualEffect(); Color.black.opacity(0.55) })
         .clipShape(shape)
@@ -103,6 +106,8 @@ struct SentenceRow: View {
     static let ahead = Color.white.opacity(0.5)
     let sentence: PillModel.Sentence?
     let notice: PillModel.Notice?
+    // paused, the whole line takes the wave's grey and the word holds on a grey pad
+    let isPaused: Bool
 
     var body: some View {
         Group {
@@ -117,13 +122,13 @@ struct SentenceRow: View {
             } else if let sentence {
                 let parts = sentence.parts
                 HStack(spacing: 0) {
-                    Text(parts.heard).foregroundStyle(Self.heard)
+                    Text(parts.heard).foregroundStyle(isPaused ? Self.ahead : Self.heard)
                     if !parts.lit.isEmpty {
                         Text(parts.lit)
                             .fontWeight(.semibold)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(isPaused ? Self.heard : .white)
                             .padding(.horizontal, 3)
-                            .background(RoundedRectangle(cornerRadius: 4).fill(LevelMeter.accent.opacity(0.42)))
+                            .background(RoundedRectangle(cornerRadius: 4).fill(isPaused ? Color.white.opacity(0.14) : LevelMeter.accent.opacity(0.42)))
                     }
                     Text(parts.ahead).foregroundStyle(Self.ahead)
                 }
@@ -143,6 +148,8 @@ struct LevelMeter: View {
     static let accent = Color(red: 0.56, green: 0.58, blue: 1.0)
     let meter: Meter
     let isRunning: Bool
+    // paused, the wave keeps its last shape in grey
+    let isPaused: Bool
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 60, paused: !isRunning)) { context in
@@ -154,7 +161,7 @@ struct LevelMeter: View {
                 for level in levels {
                     let height = max(width, CGFloat(level) * size.height)
                     let bar = CGRect(x: x, y: (size.height - height) / 2, width: width, height: height)
-                    canvas.fill(Path(roundedRect: bar, cornerRadius: width / 2), with: .color(level > 0.04 ? Self.accent : Color.white.opacity(0.22)))
+                    canvas.fill(Path(roundedRect: bar, cornerRadius: width / 2), with: .color(level <= 0.04 ? Color.white.opacity(0.22) : isPaused ? Color.white.opacity(0.45) : Self.accent))
                     x += width + gap
                 }
             }
@@ -303,7 +310,7 @@ final class Panel: SpeechPill {
         frame.origin.y = frame.maxY - size.height
         frame.size = size
         if let area = window.screen?.visibleFrame, frame.minY < area.minY { frame.origin.y = area.minY }
-        window.setFrame(frame, display: true)
+        window.setFrame(frame, display: true, animate: window.isVisible && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
     }
 
     func leave() {
