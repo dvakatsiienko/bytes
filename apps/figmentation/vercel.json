@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm i --store-dir .pnpm-store -F 'figmentation...'",
+  "git": {
+    "deploymentEnabled": false
+  }
+}
